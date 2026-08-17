@@ -2,6 +2,7 @@
 
 import { gradeTone } from "@/lib/scoutUi";
 import type { PlayerProfile } from "@/lib/types";
+import { MedalBadge } from "./MedalBadge";
 
 const GROUPS = [
   { key: "defensivos", title: "Defensivos", subtitle: "Confrontos e intervenções" },
@@ -29,8 +30,8 @@ export function AspectBoard({ player, compact = false }: Props) {
               {items.map((item) => (
                 <div key={item.label} className={`aspect-card ${compact ? "aspect-card-compact" : ""}`}>
                   <div className="aspect-card-top">
-                    <span>{item.label}</span>
-                    {item.medal && <i className={`medal-pill ${item.medal}`} />}
+                    <span className="aspect-label">{item.label}</span>
+                    {item.medal && <MedalBadge medal={item.medal} />}
                   </div>
                   <strong className={`grade-gradient tone-${gradeTone(item.grade)}`}>{item.grade}</strong>
                 </div>

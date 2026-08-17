@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { PlayerProfile } from "@/lib/types";
 
 export function gradeTone(grade: string): "excellent" | "good" | "average" | "weak" {
@@ -51,6 +52,37 @@ export const TENDENCY_META = [
   { key: "contencao", label: "Contenção", hint: "Leitura e contenção defensiva" },
   { key: "duelo_aereo", label: "Duelo Aéreo", hint: "Domínio em disputas aéreas" },
 ] as const;
+
+export function ratingGradientStyle(value: number, max = 10): CSSProperties {
+  const pct = Math.max(0, Math.min(100, (value / max) * 100));
+  return {
+    background: "linear-gradient(90deg, #ef4444, #fbbf24 50%, #22c55e)",
+    backgroundSize: "200% 100%",
+    backgroundPosition: `${100 - pct}% 0`,
+    WebkitBackgroundClip: "text",
+    backgroundClip: "text",
+    color: "transparent",
+  };
+}
+
+export function percentileGradientStyle(value: number): CSSProperties {
+  const pct = Math.max(0, Math.min(100, value));
+  return {
+    background: "linear-gradient(90deg, #ef4444, #fbbf24 45%, #22c55e)",
+    backgroundSize: "200% 100%",
+    backgroundPosition: `${100 - pct}% 0`,
+    WebkitBackgroundClip: "text",
+    backgroundClip: "text",
+    color: "transparent",
+  };
+}
+
+export function percentileBarGradient(value: number): string {
+  const pct = Math.max(0, Math.min(100, value));
+  if (pct >= 70) return "linear-gradient(90deg, #34d399, #22c55e)";
+  if (pct >= 45) return "linear-gradient(90deg, #fbbf24, #f59e0b)";
+  return "linear-gradient(90deg, #f87171, #ef4444)";
+}
 
 export const PROFILE_META = [
   { key: "combativo", label: "Combativo" },

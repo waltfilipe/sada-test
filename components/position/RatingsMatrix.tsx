@@ -1,6 +1,7 @@
 "use client";
 
 import { formatRating, ratingColor } from "@/lib/positions";
+import { ratingGradientStyle } from "@/lib/scoutUi";
 import type { PlayerProfile } from "@/lib/types";
 
 const PROFILE_RATINGS = [
@@ -15,10 +16,10 @@ type Props = {
 };
 
 export function RatingsMatrix({ player, variant = "full" }: Props) {
-  const items = variant === "compact" ? PROFILE_RATINGS : [
-    { key: "geral", label: "Geral", rankKey: "geral", tone: "geral" },
-    ...PROFILE_RATINGS,
-  ];
+  const items =
+    variant === "compact"
+      ? PROFILE_RATINGS
+      : [{ key: "geral", label: "Geral", rankKey: "geral", tone: "geral" }, ...PROFILE_RATINGS];
 
   if (variant === "compact") {
     return (
@@ -29,7 +30,7 @@ export function RatingsMatrix({ player, variant = "full" }: Props) {
           return (
             <article key={item.key} className={`rating-compact tone-${item.tone}`}>
               <span>{item.label}</span>
-              <strong>{formatRating(value)}</strong>
+              <strong style={ratingGradientStyle(value)}>{formatRating(value)}</strong>
               <em>#{rank}</em>
             </article>
           );
@@ -52,7 +53,7 @@ export function RatingsMatrix({ player, variant = "full" }: Props) {
           return (
             <article key={item.key} className={`rating-tile tone-${item.tone}`}>
               <span>{item.label}</span>
-              <strong style={color ? { color } : undefined}>{formatRating(value)}</strong>
+              <strong style={color ? { color } : ratingGradientStyle(value)}>{formatRating(value)}</strong>
               <div className="rating-tile-foot">
                 <em>Rank #{rank}</em>
                 <div className="rating-meter">

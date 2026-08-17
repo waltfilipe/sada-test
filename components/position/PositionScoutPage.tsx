@@ -2,20 +2,23 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { familyBySlug } from "@/lib/positions";
 import { AspectBoard } from "./AspectBoard";
 import { PlayerCommandRail } from "./PlayerCommandRail";
 import { ProfileDna } from "./ProfileDna";
-import { ScoutHero } from "./ScoutHero";
+import { ScoutHero, ScoutPositionNav } from "./ScoutHero";
 import { SkillIndexPanel } from "./SkillIndexPanel";
-import type { PlayerProfile } from "@/lib/types";
+import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Props = {
+  family: PositionFamily;
   players: PlayerProfile[];
 };
 
-export function ZagueiroScoutPage({ players }: Props) {
+export function PositionScoutPage({ family, players }: Props) {
   const [selectedId, setSelectedId] = useState(players[0]?.player_id ?? "");
   const [profilesFilter, setProfilesFilter] = useState<string[]>([]);
+  const familyMeta = familyBySlug(family);
 
   const selected =
     players.find((player) => player.player_id === selectedId) ?? players[0] ?? null;
@@ -33,15 +36,19 @@ export function ZagueiroScoutPage({ players }: Props) {
   };
 
   if (!selected) {
-    return <div className="scout-page empty">Nenhum zagueiro disponível.</div>;
+    return (
+      <div className="scout-page empty">
+        Nenhum jogador disponível para {familyMeta.label.toLowerCase()}.
+      </div>
+    );
   }
 
   return (
-    <div className="scout-page zagueiros-page">
+    <div className={`scout-page position-page position-${family}`}>
       <header className="scout-topbar">
         <div>
           <p className="scout-kicker">Scout room</p>
-          <h1>Zagueiros</h1>
+          <h1>{familyMeta.label}</h1>
         </div>
         <nav className="scout-topnav">
           <Link href="/filtros">Filtros</Link>
@@ -49,6 +56,8 @@ export function ZagueiroScoutPage({ players }: Props) {
           <Link href="/scatter">Scatter</Link>
         </nav>
       </header>
+
+      <ScoutPositionNav family={family} />
 
       <div className="scout-layout">
         <PlayerCommandRail
@@ -61,14 +70,14 @@ export function ZagueiroScoutPage({ players }: Props) {
         />
 
         <main className="scout-canvas">
-          <ScoutHero player={selected} poolSize={players.length} />
+          <ScoutHero player={selected} poolSize={players.length} family={family} />
 
           <div className="scout-profile-row">
             <ProfileDna player={selected} />
             <AspectBoard player={selected} compact />
           </div>
 
-          <SkillIndexPanel player={selected} />
+          <SkillIndexPanel player={selected} family={family} />
         </main>
       </div>
     </div>

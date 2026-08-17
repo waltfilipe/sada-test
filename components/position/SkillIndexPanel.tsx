@@ -1,15 +1,23 @@
 "use client";
 
-import { TENDENCY_META, percentileLabel } from "@/lib/scoutUi";
-import type { PlayerProfile } from "@/lib/types";
+import { TENDENCY_META, percentileBarGradient, percentileGradientStyle, percentileLabel } from "@/lib/scoutUi";
+import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import { familyBySlug } from "@/lib/positions";
 
-export function SkillIndexPanel({ player }: { player: PlayerProfile }) {
+type Props = {
+  player: PlayerProfile;
+  family: PositionFamily;
+};
+
+export function SkillIndexPanel({ player, family }: Props) {
+  const familyLabel = familyBySlug(family).label.toLowerCase();
+
   return (
     <section className="scout-card skill-index">
       <header>
         <p className="scout-kicker">Índices normalizados</p>
         <h2>Skill index</h2>
-        <p className="scout-sub">Percentis dentro do pool de zagueiros</p>
+        <p className="scout-sub">Percentis dentro do pool de {familyLabel}</p>
       </header>
 
       <div className="skill-list">
@@ -24,11 +32,14 @@ export function SkillIndexPanel({ player }: { player: PlayerProfile }) {
                 </div>
                 <div className="skill-value">
                   <em>{percentileLabel(value)}</em>
-                  <strong>{Math.round(value)}</strong>
+                  <strong style={percentileGradientStyle(value)}>{Math.round(value)}</strong>
                 </div>
               </div>
               <div className="skill-track">
-                <div className="skill-fill" style={{ width: `${value}%` }} />
+                <div
+                  className="skill-fill"
+                  style={{ width: `${value}%`, background: percentileBarGradient(value) }}
+                />
               </div>
             </article>
           );

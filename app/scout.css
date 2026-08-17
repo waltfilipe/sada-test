@@ -73,6 +73,35 @@
   color: #e0e6ef;
 }
 
+.scout-position-nav {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.65rem 1.5rem;
+  border-bottom: 1px solid #243044;
+  overflow-x: auto;
+}
+
+.scout-position-nav a {
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  color: #7b8ba3;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.scout-position-nav a:hover {
+  color: #c5d0df;
+  background: #1a2230;
+}
+
+.scout-position-nav a.active {
+  color: #e8edf4;
+  border-color: #3a4a62;
+  background: #1e2736;
+}
+
 .scout-layout {
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr);
@@ -101,8 +130,73 @@
 .scout-hero-main {
   display: flex;
   gap: 1rem;
-  align-items: center;
+  align-items: flex-start;
   min-width: 0;
+  flex: 1;
+}
+
+.scout-hero-copy {
+  min-width: 0;
+}
+
+.scout-info-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  gap: 0.45rem 1.25rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+}
+
+.scout-info-item {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.scout-info-item dt {
+  margin: 0;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7d94;
+}
+
+.scout-info-item dd {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #c5d0df;
+}
+
+.scout-stats-highlight {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.scout-stat {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  background: #1e2736;
+  border: 1px solid #2d3a4f;
+  text-align: center;
+}
+
+.scout-stat span {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7d94;
+}
+
+.scout-stat strong {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: "Sora", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #f3f6fa;
 }
 
 .scout-avatar {
@@ -240,7 +334,7 @@
   padding: 0.6rem 0.75rem;
   border-radius: 8px;
   background: #1a2230;
-  border: 1px solid #2a3648;
+  border: 2px solid #2a3648;
   min-width: 88px;
   text-align: center;
 }
@@ -258,34 +352,22 @@
   margin: 0.15rem 0;
   font-family: "Sora", sans-serif;
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .rating-compact.tone-combativo {
-  border-color: rgba(251, 113, 133, 0.2);
-  background: rgba(251, 113, 133, 0.06);
-}
-
-.rating-compact.tone-combativo strong {
-  color: #e8a0aa;
+  border-color: rgba(251, 113, 133, 0.55);
+  background: #1a2230;
 }
 
 .rating-compact.tone-construtor {
-  border-color: rgba(52, 211, 153, 0.2);
-  background: rgba(52, 211, 153, 0.06);
-}
-
-.rating-compact.tone-construtor strong {
-  color: #7dd4ae;
+  border-color: rgba(52, 211, 153, 0.55);
+  background: #1a2230;
 }
 
 .rating-compact.tone-posicional {
-  border-color: rgba(96, 165, 250, 0.2);
-  background: rgba(96, 165, 250, 0.06);
-}
-
-.rating-compact.tone-posicional strong {
-  color: #8eb8f0;
+  border-color: rgba(96, 165, 250, 0.55);
+  background: #1a2230;
 }
 
 /* ── Profile + aspects row ── */
@@ -294,7 +376,39 @@
   display: grid;
   grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.4fr);
   gap: 1rem;
-  align-items: start;
+  align-items: stretch;
+}
+
+.scout-profile-row > .profile-dna {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.scout-profile-row > .aspect-board-compact {
+  height: 100%;
+}
+
+.profile-dna .profile-bars {
+  flex: 1;
+}
+
+.aspect-board-compact {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  align-items: stretch;
+}
+
+.aspect-group-compact {
+  padding: 0.75rem !important;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.aspect-group-compact .aspect-cards {
+  flex: 1;
 }
 
 .scout-card {
@@ -348,16 +462,6 @@
 
 /* ── Aspect boards (compact) ── */
 
-.aspect-board-compact {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.6rem;
-}
-
-.aspect-group-compact {
-  padding: 0.75rem !important;
-}
-
 .aspect-group-compact header h2 {
   font-size: 0.82rem;
 }
@@ -385,8 +489,52 @@
 
 .aspect-card-compact .aspect-card-top {
   margin: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
   font-size: 0.72rem;
   color: #7b8ba3;
+}
+
+.aspect-label {
+  line-height: 1.2;
+}
+
+.medal-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  height: 1.15rem;
+  padding: 0 0.3rem;
+  border-radius: 4px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.medal-badge.medal-gold {
+  color: #78350f;
+  background: linear-gradient(135deg, #fde68a, #fbbf24);
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  box-shadow: 0 1px 4px rgba(251, 191, 36, 0.25);
+}
+
+.medal-badge.medal-silver {
+  color: #334155;
+  background: linear-gradient(135deg, #f1f5f9, #94a3b8);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  box-shadow: 0 1px 4px rgba(148, 163, 184, 0.2);
+}
+
+.medal-badge.medal-bronze {
+  color: #fff7ed;
+  background: linear-gradient(135deg, #fdba74, #d97706);
+  border: 1px solid rgba(217, 119, 6, 0.5);
+  box-shadow: 0 1px 4px rgba(217, 119, 6, 0.25);
 }
 
 .aspect-card-compact strong {
@@ -473,12 +621,11 @@
 .skill-value strong {
   font-family: "Sora", sans-serif;
   font-size: 1rem;
-  font-weight: 600;
-  color: #60a5fa;
+  font-weight: 700;
 }
 
 .skill-track {
-  height: 4px;
+  height: 5px;
   border-radius: 3px;
   background: #243044;
   overflow: hidden;
@@ -487,7 +634,6 @@
 .skill-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #3b82f6, #60a5fa);
 }
 
 /* ── Full ratings matrix (legacy) ── */
