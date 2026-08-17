@@ -74,10 +74,15 @@ def main() -> None:
                 "minutes": player["minutes"],
                 "rating": player["rating"],
                 "profile": player["profile"],
+                "transfermarkt": player.get("transfermarkt"),
             }
         )
         profile_path = PROFILES_DIR / f"{player['player_id']}.json"
         profile_path.write_text(json.dumps(player, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    # Players with a missing height are stored as 0, which would pin the
+    # published lower bound at zero and make the height filter useless.
+    valid_heights = df["Altura"][df["Altura"] > 0]
 
     meta = {
         "league": "Série A",
@@ -97,7 +102,7 @@ def main() -> None:
         "clubs": clubs,
         "nationalities": nationalities,
         "filters": {
-            "height": [int(df["Altura"].min()), int(df["Altura"].max())],
+            "height": [int(valid_heights.min()), int(valid_heights.max())],
             "minutes": [0, int(df["Minutos jogados:"].max())],
             "birth_year": [int(df["Nascimento"].min()), int(df["Nascimento"].max())],
             "rating": [round(float(min(p["rating"] for p in all_players)), 1), round(float(max(p["rating"] for p in all_players)), 1)],

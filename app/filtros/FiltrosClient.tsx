@@ -45,10 +45,28 @@ type Props = {
 };
 
 export function FiltrosClient({ meta, players }: Props) {
-  const ageBounds = useMemo<Range>(
-    () => [CURRENT_YEAR - meta.filters.birth_year[1], CURRENT_YEAR - meta.filters.birth_year[0]],
-    [meta.filters.birth_year],
-  );
+  /**
+   * Derived from the rows rather than meta.filters: the published bounds include
+   * players with a missing height, which pins the slider minimum at zero.
+   */
+  const bounds = useMemo(() => {
+    const heights = players.map((p) => p.height).filter((value): value is number => !!value);
+    const years = players.map((p) => p.birth_year).filter((value): value is number => !!value);
+    const ratings = players.map((p) => p.rating);
+    const minutes = players.map((p) => p.minutes);
+
+    return {
+      height: [Math.min(...heights), Math.max(...heights)] as Range,
+      age: [CURRENT_YEAR - Math.max(...years), CURRENT_YEAR - Math.min(...years)] as Range,
+      rating: [
+        Math.floor(Math.min(...ratings) * 10) / 10,
+        Math.ceil(Math.max(...ratings) * 10) / 10,
+      ] as Range,
+      minutes: [0, Math.max(...minutes)] as Range,
+    };
+  }, [players]);
+
+  const ageBounds = bounds.age;
 
   const [family, setFamily] = useState<PositionFamily>("zagueiros");
   const [query, setQuery] = useState("");
@@ -58,10 +76,10 @@ export function FiltrosClient({ meta, players }: Props) {
   const [profiles, setProfiles] = useState<string[]>([]);
   const [sort, setSort] = useState<SortKey>("rating");
 
-  const [rating, setRating] = useState<Range>(meta.filters.rating);
+  const [rating, setRating] = useState<Range>(bounds.rating);
   const [age, setAge] = useState<Range>(ageBounds);
-  const [height, setHeight] = useState<Range>(meta.filters.height);
-  const [minutes, setMinutes] = useState<Range>(meta.filters.minutes);
+  const [height, setHeight] = useState<Range>(bounds.height);
+  const [minutes, setMinutes] = useState<Range>(bounds.minutes);
   const [tendencies, setTendencies] = useState<TendencyRanges>(makeTendencyRanges);
 
   const familyMeta = meta.families.find((item) => item.key === family)!;
@@ -72,10 +90,10 @@ export function FiltrosClient({ meta, players }: Props) {
     setNationality("all");
     setFoot("all");
     setProfiles([]);
-    setRating(meta.filters.rating);
+    setRating(bounds.rating);
     setAge(ageBounds);
-    setHeight(meta.filters.height);
-    setMinutes(meta.filters.minutes);
+    setHeight(bounds.height);
+    setMinutes(bounds.minutes);
     setTendencies(makeTendencyRanges());
   };
 
@@ -150,28 +168,28 @@ export function FiltrosClient({ meta, players }: Props) {
       list.push({ key: `p-${profile}`, label: profile, clear: () => toggleProfile(profile) });
     });
 
-    if (!sameRange(rating, meta.filters.rating)) {
+    if (!sameRange(rating, bounds.rating)) {
       list.push({
         key: "rating",
         label: `Rating ${formatRating(rating[0])}–${formatRating(rating[1])}`,
-        clear: () => setRating(meta.filters.rating),
+        clear: () => setRating(bounds.rating),
       });
     }
     if (!sameRange(age, ageBounds)) {
       list.push({ key: "age", label: `${age[0]}–${age[1]} anos`, clear: () => setAge(ageBounds) });
     }
-    if (!sameRange(height, meta.filters.height)) {
+    if (!sameRange(height, bounds.height)) {
       list.push({
         key: "height",
         label: `${height[0]}–${height[1]} cm`,
-        clear: () => setHeight(meta.filters.height),
+        clear: () => setHeight(bounds.height),
       });
     }
-    if (!sameRange(minutes, meta.filters.minutes)) {
+    if (!sameRange(minutes, bounds.minutes)) {
       list.push({
         key: "minutes",
         label: `${minutes[0]}–${minutes[1]} min`,
-        clear: () => setMinutes(meta.filters.minutes),
+        clear: () => setMinutes(bounds.minutes),
       });
     }
 
@@ -188,7 +206,7 @@ export function FiltrosClient({ meta, players }: Props) {
     });
 
     return list;
-  }, [query, club, nationality, foot, profiles, rating, age, height, minutes, tendencies, meta.filters, ageBounds]);
+  }, [query, club, nationality, foot, profiles, rating, age, height, minutes, tendencies, bounds, ageBounds]);
 
   return (
     <div className="scout-root filters-root">
@@ -309,8 +327,8 @@ export function FiltrosClient({ meta, players }: Props) {
               <h2>Contexto físico</h2>
               <RangeSlider
                 label="Rating"
-                min={meta.filters.rating[0]}
-                max={meta.filters.rating[1]}
+                min={bounds.rating[0]}
+                max={bounds.rating[1]}
                 step={0.1}
                 value={rating}
                 onChange={setRating}
@@ -319,16 +337,16 @@ export function FiltrosClient({ meta, players }: Props) {
               <RangeSlider label="Idade" min={ageBounds[0]} max={ageBounds[1]} value={age} onChange={setAge} suffix="anos" />
               <RangeSlider
                 label="Altura"
-                min={meta.filters.height[0]}
-                max={meta.filters.height[1]}
+                min={bounds.height[0]}
+                max={bounds.height[1]}
                 value={height}
                 onChange={setHeight}
                 suffix="cm"
               />
               <RangeSlider
                 label="Minutagem"
-                min={meta.filters.minutes[0]}
-                max={meta.filters.minutes[1]}
+                min={bounds.minutes[0]}
+                max={bounds.minutes[1]}
                 step={10}
                 value={minutes}
                 onChange={setMinutes}

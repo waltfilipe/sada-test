@@ -680,7 +680,7 @@
 
 .result-index-track b {
   width: 100%;
-  border-radius: 4px;
+  border-radius: 3px;
   background: linear-gradient(180deg, var(--tier-color), color-mix(in srgb, var(--tier-color) 62%, transparent));
 }
 
@@ -696,6 +696,11 @@
 .result-market span:first-child {
   font-weight: 500;
   color: #d9f7ee;
+}
+
+.result-market .result-market-empty {
+  font-weight: 400;
+  color: var(--text-3);
 }
 
 /* Empty state */

@@ -78,7 +78,7 @@ export function PlayerResultCard({ player }: { player: PlayerSearchRow }) {
             >
               <i>{item.short}</i>
               <span className="result-index-track">
-                <b style={{ height: `${Math.max(6, value)}%` }} />
+                <b style={{ height: `${Math.max(4, value)}%` }} />
               </span>
             </span>
           );
@@ -86,8 +86,14 @@ export function PlayerResultCard({ player }: { player: PlayerSearchRow }) {
       </div>
 
       <footer className="result-market">
-        <span>{tm?.market_value ?? "Valor n/d"}</span>
-        <span>{tm?.contract_remaining ?? "Contrato n/d"}</span>
+        {tm?.market_value || tm?.contract_remaining ? (
+          <>
+            <span>{tm.market_value ?? "—"}</span>
+            <span>{tm.contract_remaining ?? "Contrato n/d"}</span>
+          </>
+        ) : (
+          <span className="result-market-empty">Sem dados de mercado</span>
+        )}
       </footer>
     </Link>
   );

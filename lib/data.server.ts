@@ -37,6 +37,8 @@ export function getSearchRows(): PlayerSearchRow[] {
     const profile = getPlayerProfile(player.player_id);
     return {
       ...player,
+      // players.json predates the Transfermarkt enrichment, so take it from the profile.
+      transfermarkt: player.transfermarkt ?? profile?.transfermarkt ?? null,
       goals: profile?.goals ?? 0,
       assists: profile?.assists ?? 0,
       tendencies: profile?.tendencies ?? {
