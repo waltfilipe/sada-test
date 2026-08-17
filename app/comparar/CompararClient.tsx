@@ -194,6 +194,9 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
         </section>
 
         <div className="compare-links">
+          <Link href={`/scatter?posicao=${family}&a=${a.player_id}&b=${b.player_id}`}>
+            Ver scatter
+          </Link>
           <Link href={`/posicao/${family}?atleta=${a.player_id}`}>Ver dossiê de {a.name}</Link>
           <Link href={`/posicao/${family}?atleta=${b.player_id}`}>Ver dossiê de {b.name}</Link>
         </div>
