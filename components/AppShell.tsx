@@ -11,9 +11,11 @@ const NAV = [
   { href: "/scatter", label: "Scatter", icon: "◈" },
 ];
 
+const FULL_BLEED = ["/posicao/", "/filtros"];
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isScoutPage = pathname.startsWith("/posicao/");
+  const isScoutPage = FULL_BLEED.some((prefix) => pathname.startsWith(prefix));
 
   if (isScoutPage) {
     return <div className="app-shell scout-shell">{children}</div>;

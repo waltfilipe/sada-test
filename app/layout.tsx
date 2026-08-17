@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AppShell } from "@/components/AppShell";
 import "./globals.css";
 import "./scout.css";
+import "./filters.css";
 
 export const metadata: Metadata = {
   title: "Série A Scout",

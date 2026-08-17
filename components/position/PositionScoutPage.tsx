@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AspectMatrix } from "./AspectMatrix";
@@ -11,19 +13,18 @@ import { ProfileRatings } from "./ProfileRatings";
 import { RosterRail } from "./RosterRail";
 import { SkillIndexPanel } from "./SkillIndexPanel";
 
-const LINKS = [
-  { href: "/filtros", label: "Filtros" },
-  { href: "/comparar", label: "Comparar" },
-  { href: "/scatter", label: "Scatter" },
-];
-
 type Props = {
   family: PositionFamily;
   players: PlayerProfile[];
 };
 
 export function PositionScoutPage({ family, players }: Props) {
-  const [selectedId, setSelectedId] = useState(players[0]?.player_id ?? "");
+  const searchParams = useSearchParams();
+  const requestedId = searchParams.get("atleta");
+
+  const [selectedId, setSelectedId] = useState(
+    () => (requestedId && players.some((p) => p.player_id === requestedId) ? requestedId : players[0]?.player_id) ?? "",
+  );
   const [profilesFilter, setProfilesFilter] = useState<string[]>([]);
   const familyMeta = familyBySlug(family);
 
@@ -42,6 +43,12 @@ export function PositionScoutPage({ family, players }: Props) {
     }
   }, [players, selectedId]);
 
+  useEffect(() => {
+    if (requestedId && players.some((player) => player.player_id === requestedId)) {
+      setSelectedId(requestedId);
+    }
+  }, [requestedId, players]);
+
   const toggleProfile = (profile: string) => {
     setProfilesFilter((current) =>
       current.includes(profile) ? current.filter((item) => item !== profile) : [...current, profile],
@@ -50,37 +57,24 @@ export function PositionScoutPage({ family, players }: Props) {
 
   return (
     <div className="scout-root">
-      <header className="scout-topbar">
-        <Link href="/" className="scout-brand">
-          <span className="sc-brand-mark">SA</span>
-          <span className="sc-brand-copy">
-            <strong>Série A Scout</strong>
-            <em>Temporada 2025/26</em>
-          </span>
-        </Link>
-
-        <nav className="position-tabs" aria-label="Posições">
-          {POSITION_FAMILIES.map((item) => (
-            <Link
-              key={item.key}
-              href={`/posicao/${item.slug}`}
-              className={item.key === family ? "active" : ""}
-              aria-current={item.key === family ? "page" : undefined}
-            >
-              <span className="tab-full">{item.label}</span>
-              <span className="tab-short">{item.short}</span>
-            </Link>
-          ))}
-        </nav>
-
-        <nav className="topbar-links" aria-label="Ferramentas">
-          {LINKS.map((link) => (
-            <Link key={link.href} href={link.href}>
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-      </header>
+      <ScoutTopbar
+        active="posicoes"
+        center={
+          <nav className="position-tabs" aria-label="Posições">
+            {POSITION_FAMILIES.map((item) => (
+              <Link
+                key={item.key}
+                href={`/posicao/${item.slug}`}
+                className={item.key === family ? "active" : ""}
+                aria-current={item.key === family ? "page" : undefined}
+              >
+                <span className="tab-full">{item.label}</span>
+                <span className="tab-short">{item.short}</span>
+              </Link>
+            ))}
+          </nav>
+        }
+      />
 
       {!selected ? (
         <div className="scout-empty">Nenhum atleta disponível para {familyMeta.label.toLowerCase()}.</div>

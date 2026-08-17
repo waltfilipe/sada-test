@@ -2,7 +2,7 @@ import "server-only";
 
 import fs from "fs";
 import path from "path";
-import type { PlayerProfile, PlayerSummary, PositionFamily, SiteMeta } from "./types";
+import type { PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -22,6 +22,34 @@ export function getMeta(): SiteMeta {
 export function getPlayers(): PlayerSummary[] {
   if (!playersCache) playersCache = readJson("players.json");
   return playersCache!.players;
+}
+
+let searchRowsCache: PlayerSearchRow[] | null = null;
+
+/**
+ * Summaries joined with the per-player tendency indices so the advanced search
+ * can filter the whole pool without shipping the full profile payload.
+ */
+export function getSearchRows(): PlayerSearchRow[] {
+  if (searchRowsCache) return searchRowsCache;
+
+  searchRowsCache = getPlayers().map((player) => {
+    const profile = getPlayerProfile(player.player_id);
+    return {
+      ...player,
+      goals: profile?.goals ?? 0,
+      assists: profile?.assists ?? 0,
+      tendencies: profile?.tendencies ?? {
+        construcao: 0,
+        ofensividade: 0,
+        def1v1: 0,
+        contencao: 0,
+        duelo_aereo: 0,
+      },
+    };
+  });
+
+  return searchRowsCache;
 }
 
 export function getPlayerProfile(playerId: string): PlayerProfile | null {

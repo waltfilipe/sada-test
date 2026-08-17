@@ -40,6 +40,21 @@ export type PlayerSummary = {
   transfermarkt?: TransfermarktInfo;
 };
 
+export type Tendencies = {
+  construcao: number;
+  ofensividade: number;
+  def1v1: number;
+  contencao: number;
+  duelo_aereo: number;
+};
+
+/** Summary enriched with the fields the advanced search needs to filter on. */
+export type PlayerSearchRow = PlayerSummary & {
+  goals: number;
+  assists: number;
+  tendencies: Tendencies;
+};
+
 export type PlayerProfile = PlayerSummary & {
   goals: number;
   assists: number;
@@ -52,13 +67,7 @@ export type PlayerProfile = PlayerSummary & {
     [profileKey: string]: number;
   };
   profile_shares: Record<string, number>;
-  tendencies: {
-    construcao: number;
-    ofensividade: number;
-    def1v1: number;
-    contencao: number;
-    duelo_aereo: number;
-  };
+  tendencies: Tendencies;
   aspects: {
     defensivos: AspectItem[];
     construcao: AspectItem[];

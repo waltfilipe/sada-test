@@ -1,256 +1,436 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { RangeFilter } from "@/components/RangeFilter";
-import { formatRating, ratingColor, POSITION_FAMILIES } from "@/lib/positions";
-import type { PlayerProfile, PlayerSummary, PositionFamily, SiteMeta } from "@/lib/types";
+import { useMemo, useState } from "react";
+import { PlayerResultCard } from "@/components/filters/PlayerResultCard";
+import { RangeSlider } from "@/components/filters/RangeSlider";
+import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { POSITION_FAMILIES } from "@/lib/positions";
+import { TENDENCY_META, formatRating } from "@/lib/scoutTheme";
+import { profileTone } from "@/lib/scoutUi";
+import type { PlayerSearchRow, PositionFamily, SiteMeta, Tendencies } from "@/lib/types";
+
+const CURRENT_YEAR = new Date().getFullYear();
+const FEET = ["all", "Destro", "Canhoto", "Ambidestro"] as const;
+
+const SORTS = [
+  { key: "rating", label: "Melhor rating" },
+  { key: "minutes", label: "Mais minutos" },
+  { key: "age", label: "Mais jovem" },
+  { key: "name", label: "Nome (A–Z)" },
+] as const;
+
+type SortKey = (typeof SORTS)[number]["key"];
+type Range = [number, number];
+type TendencyRanges = Record<keyof Tendencies, Range>;
+
+const FULL_RANGE: Range = [0, 100];
+
+function makeTendencyRanges(): TendencyRanges {
+  return {
+    construcao: [...FULL_RANGE] as Range,
+    ofensividade: [...FULL_RANGE] as Range,
+    def1v1: [...FULL_RANGE] as Range,
+    contencao: [...FULL_RANGE] as Range,
+    duelo_aereo: [...FULL_RANGE] as Range,
+  };
+}
+
+function sameRange(a: Range, b: Range) {
+  return a[0] === b[0] && a[1] === b[1];
+}
 
 type Props = {
   meta: SiteMeta;
-  initialPlayers: PlayerSummary[];
+  players: PlayerSearchRow[];
 };
 
-export function FiltrosClient({ meta, initialPlayers }: Props) {
+export function FiltrosClient({ meta, players }: Props) {
+  const ageBounds = useMemo<Range>(
+    () => [CURRENT_YEAR - meta.filters.birth_year[1], CURRENT_YEAR - meta.filters.birth_year[0]],
+    [meta.filters.birth_year],
+  );
+
   const [family, setFamily] = useState<PositionFamily>("zagueiros");
+  const [query, setQuery] = useState("");
   const [club, setClub] = useState("all");
   const [nationality, setNationality] = useState("all");
-  const [foot, setFoot] = useState("all");
+  const [foot, setFoot] = useState<string>("all");
   const [profiles, setProfiles] = useState<string[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [selectedProfile, setSelectedProfile] = useState<PlayerProfile | null>(null);
-  const [height, setHeight] = useState<[number, number]>(meta.filters.height);
-  const [minutes, setMinutes] = useState<[number, number]>(meta.filters.minutes);
-  const [birthYear, setBirthYear] = useState<[number, number]>(meta.filters.birth_year);
-  const [rating, setRating] = useState<[number, number]>(meta.filters.rating);
-  const [tendencies, setTendencies] = useState({
-    construcao: [0, 100] as [number, number],
-    ofensividade: [0, 100] as [number, number],
-    def1v1: [0, 100] as [number, number],
-    contencao: [0, 100] as [number, number],
-    duelo_aereo: [0, 100] as [number, number],
-  });
+  const [sort, setSort] = useState<SortKey>("rating");
 
-  const familyMeta = meta.families.find((f) => f.key === family)!;
+  const [rating, setRating] = useState<Range>(meta.filters.rating);
+  const [age, setAge] = useState<Range>(ageBounds);
+  const [height, setHeight] = useState<Range>(meta.filters.height);
+  const [minutes, setMinutes] = useState<Range>(meta.filters.minutes);
+  const [tendencies, setTendencies] = useState<TendencyRanges>(makeTendencyRanges);
 
-  const filtered = useMemo(() => {
-    return initialPlayers.filter((player) => {
+  const familyMeta = meta.families.find((item) => item.key === family)!;
+
+  const resetAll = () => {
+    setQuery("");
+    setClub("all");
+    setNationality("all");
+    setFoot("all");
+    setProfiles([]);
+    setRating(meta.filters.rating);
+    setAge(ageBounds);
+    setHeight(meta.filters.height);
+    setMinutes(meta.filters.minutes);
+    setTendencies(makeTendencyRanges());
+  };
+
+  const toggleProfile = (profile: string) => {
+    setProfiles((current) =>
+      current.includes(profile) ? current.filter((item) => item !== profile) : [...current, profile],
+    );
+  };
+
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+
+    const rows = players.filter((player) => {
       if (player.position_family !== family) return false;
       if (club !== "all" && player.club !== club) return false;
       if (nationality !== "all" && player.nationality !== nationality) return false;
       if (foot !== "all" && player.foot !== foot) return false;
-      if (profiles.length && !profiles.includes(player.profile) && player.profile !== "Híbrido") return false;
-      if (player.height != null && (player.height < height[0] || player.height > height[1])) return false;
-      if (player.minutes < minutes[0] || player.minutes > minutes[1]) return false;
-      if (player.birth_year != null && (player.birth_year < birthYear[0] || player.birth_year > birthYear[1])) return false;
+      if (profiles.length && !profiles.includes(player.profile)) return false;
+
+      if (q && !player.name.toLowerCase().includes(q) && !player.club.toLowerCase().includes(q)) {
+        return false;
+      }
+
       if (player.rating < rating[0] || player.rating > rating[1]) return false;
+      if (player.minutes < minutes[0] || player.minutes > minutes[1]) return false;
+
+      if (player.height != null && (player.height < height[0] || player.height > height[1])) return false;
+
+      if (player.birth_year != null) {
+        const playerAge = CURRENT_YEAR - player.birth_year;
+        if (playerAge < age[0] || playerAge > age[1]) return false;
+      }
+
+      for (const item of TENDENCY_META) {
+        const [low, high] = tendencies[item.key];
+        const value = player.tendencies[item.key];
+        if (value < low || value > high) return false;
+      }
+
       return true;
     });
-  }, [initialPlayers, family, club, nationality, foot, profiles, height, minutes, birthYear, rating]);
 
-  useEffect(() => {
-    if (!filtered.length) {
-      setSelectedId(null);
-      setSelectedProfile(null);
-      return;
-    }
-    if (!selectedId || !filtered.some((p) => p.player_id === selectedId)) {
-      setSelectedId(filtered[0].player_id);
-    }
-  }, [filtered, selectedId]);
+    return rows.sort((a, b) => {
+      if (sort === "name") return a.name.localeCompare(b.name, "pt-BR");
+      if (sort === "minutes") return b.minutes - a.minutes;
+      if (sort === "age") return (b.birth_year ?? 0) - (a.birth_year ?? 0);
+      return b.rating - a.rating;
+    });
+  }, [players, family, club, nationality, foot, profiles, query, rating, minutes, height, age, tendencies, sort]);
 
-  useEffect(() => {
-    if (!selectedId) return;
-    fetch(`/api/players/${selectedId}`)
-      .then((res) => res.json())
-      .then((data: PlayerProfile) => {
-        setSelectedProfile(data);
-        if (
-          data.tendencies.construcao < tendencies.construcao[0] ||
-          data.tendencies.construcao > tendencies.construcao[1] ||
-          data.tendencies.ofensividade < tendencies.ofensividade[0] ||
-          data.tendencies.ofensividade > tendencies.ofensividade[1] ||
-          data.tendencies.def1v1 < tendencies.def1v1[0] ||
-          data.tendencies.def1v1 > tendencies.def1v1[1] ||
-          data.tendencies.contencao < tendencies.contencao[0] ||
-          data.tendencies.contencao > tendencies.contencao[1] ||
-          data.tendencies.duelo_aereo < tendencies.duelo_aereo[0] ||
-          data.tendencies.duelo_aereo > tendencies.duelo_aereo[1]
-        ) {
-          // tendency filters are applied client-side after profile fetch
-        }
-      })
-      .catch(() => setSelectedProfile(null));
-  }, [selectedId]);
-
-  const tendencyFiltered = useMemo(() => {
-    if (!selectedProfile) return filtered;
-    const t = selectedProfile.tendencies;
-    const matchesTendencies = (profile: PlayerProfile | null) => {
-      if (!profile) return true;
-      return (
-        profile.tendencies.construcao >= tendencies.construcao[0] &&
-        profile.tendencies.construcao <= tendencies.construcao[1] &&
-        profile.tendencies.ofensividade >= tendencies.ofensividade[0] &&
-        profile.tendencies.ofensividade <= tendencies.ofensividade[1] &&
-        profile.tendencies.def1v1 >= tendencies.def1v1[0] &&
-        profile.tendencies.def1v1 <= tendencies.def1v1[1] &&
-        profile.tendencies.contencao >= tendencies.contencao[0] &&
-        profile.tendencies.contencao <= tendencies.contencao[1] &&
-        profile.tendencies.duelo_aereo >= tendencies.duelo_aereo[0] &&
-        profile.tendencies.duelo_aereo <= tendencies.duelo_aereo[1]
-      );
+  const summary = useMemo(() => {
+    if (!results.length) return null;
+    const ages = results.map((p) => (p.birth_year ? CURRENT_YEAR - p.birth_year : null)).filter(Boolean) as number[];
+    return {
+      rating: results.reduce((sum, p) => sum + p.rating, 0) / results.length,
+      age: ages.length ? ages.reduce((sum, value) => sum + value, 0) / ages.length : null,
+      minutes: results.reduce((sum, p) => sum + p.minutes, 0) / results.length,
     };
-    return filtered.filter((player) => {
-      if (player.player_id === selectedId) return matchesTendencies(selectedProfile);
-      return true;
-    });
-  }, [filtered, selectedProfile, selectedId, tendencies]);
+  }, [results]);
 
-  const toggleProfile = (profile: string) => {
-    setProfiles((current) =>
-      current.includes(profile) ? current.filter((p) => p !== profile) : [...current, profile],
-    );
-  };
+  const chips = useMemo(() => {
+    const list: { key: string; label: string; clear: () => void }[] = [];
+
+    if (query.trim()) list.push({ key: "q", label: `"${query.trim()}"`, clear: () => setQuery("") });
+    if (club !== "all") list.push({ key: "club", label: club, clear: () => setClub("all") });
+    if (nationality !== "all") {
+      list.push({ key: "nat", label: nationality, clear: () => setNationality("all") });
+    }
+    if (foot !== "all") list.push({ key: "foot", label: `Pé ${foot.toLowerCase()}`, clear: () => setFoot("all") });
+
+    profiles.forEach((profile) => {
+      list.push({ key: `p-${profile}`, label: profile, clear: () => toggleProfile(profile) });
+    });
+
+    if (!sameRange(rating, meta.filters.rating)) {
+      list.push({
+        key: "rating",
+        label: `Rating ${formatRating(rating[0])}–${formatRating(rating[1])}`,
+        clear: () => setRating(meta.filters.rating),
+      });
+    }
+    if (!sameRange(age, ageBounds)) {
+      list.push({ key: "age", label: `${age[0]}–${age[1]} anos`, clear: () => setAge(ageBounds) });
+    }
+    if (!sameRange(height, meta.filters.height)) {
+      list.push({
+        key: "height",
+        label: `${height[0]}–${height[1]} cm`,
+        clear: () => setHeight(meta.filters.height),
+      });
+    }
+    if (!sameRange(minutes, meta.filters.minutes)) {
+      list.push({
+        key: "minutes",
+        label: `${minutes[0]}–${minutes[1]} min`,
+        clear: () => setMinutes(meta.filters.minutes),
+      });
+    }
+
+    TENDENCY_META.forEach((item) => {
+      if (!sameRange(tendencies[item.key], FULL_RANGE)) {
+        const [low, high] = tendencies[item.key];
+        list.push({
+          key: `t-${item.key}`,
+          label: `${item.label} ${low}–${high}`,
+          clear: () =>
+            setTendencies((current) => ({ ...current, [item.key]: [...FULL_RANGE] as Range })),
+        });
+      }
+    });
+
+    return list;
+  }, [query, club, nationality, foot, profiles, rating, age, height, minutes, tendencies, meta.filters, ageBounds]);
 
   return (
-    <div className="page filtros-page">
-      <header className="page-header">
-        <div>
-          <p className="eyebrow">Explorar elenco</p>
-          <h1>Filtros de jogadores</h1>
-          <p className="lede">Refine por posição, clube, perfil e métricas normalizadas do modelo.</p>
-        </div>
-        <div className="header-pill">{tendencyFiltered.length} atletas</div>
-      </header>
+    <div className="scout-root filters-root">
+      <ScoutTopbar active="filtros" />
 
-      <div className="filtros-layout">
-        <section className="panel filters-panel">
-          <div className="position-switch">
-            {POSITION_FAMILIES.map((item) => (
-              <button
-                key={item.key}
-                className={family === item.key ? "active" : ""}
-                onClick={() => setFamily(item.key)}
-              >
-                {item.label}
+      <div className="filters-body">
+        <aside className="filters-rail">
+          <div className="filters-rail-inner">
+            <header className="filters-rail-head">
+              <div>
+                <p className="sc-eyebrow">Busca avançada</p>
+                <h1>Filtros</h1>
+              </div>
+              <button type="button" onClick={resetAll} disabled={chips.length === 0}>
+                Limpar
               </button>
-            ))}
-          </div>
+            </header>
 
-          <div className="field-grid">
-            <label>
-              Clubes
-              <select value={club} onChange={(e) => setClub(e.target.value)}>
-                <option value="all">Todos</option>
-                {meta.clubs.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
+            <section className="filter-block">
+              <h2>Posição</h2>
+              <div className="family-grid">
+                {POSITION_FAMILIES.map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    className={family === item.key ? "active" : ""}
+                    onClick={() => {
+                      setFamily(item.key);
+                      setProfiles([]);
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="filter-block">
+              <h2>Busca</h2>
+              <div className="filter-search">
+                <svg viewBox="0 0 16 16" aria-hidden>
+                  <circle cx="7" cy="7" r="4.6" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                  <path d="m10.6 10.6 3.2 3.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Nome ou clube"
+                  aria-label="Buscar por nome ou clube"
+                />
+              </div>
+            </section>
+
+            <section className="filter-block">
+              <h2>Contexto</h2>
+
+              <label className="filter-field">
+                <span>Clube</span>
+                <select value={club} onChange={(event) => setClub(event.target.value)}>
+                  <option value="all">Todos os clubes</option>
+                  {meta.clubs.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="filter-field">
+                <span>Nacionalidade</span>
+                <select value={nationality} onChange={(event) => setNationality(event.target.value)}>
+                  <option value="all">Todas</option>
+                  {meta.nationalities.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="filter-field">
+                <span>Pé dominante</span>
+                <div className="segmented" role="group" aria-label="Pé dominante">
+                  {FEET.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      className={foot === item ? "active" : ""}
+                      onClick={() => setFoot(item)}
+                    >
+                      {item === "all" ? "Todos" : item === "Ambidestro" ? "Ambos" : item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="filter-block">
+              <h2>Perfil tático</h2>
+              <div className="chip-row">
+                {familyMeta.profiles.map((profile) => (
+                  <button
+                    key={profile}
+                    type="button"
+                    className={`filter-chip profile-${profileTone(profile)} ${
+                      profiles.includes(profile) ? "active" : ""
+                    }`}
+                    onClick={() => toggleProfile(profile)}
+                    aria-pressed={profiles.includes(profile)}
+                  >
+                    {profile}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="filter-block">
+              <h2>Contexto físico</h2>
+              <RangeSlider
+                label="Rating"
+                min={meta.filters.rating[0]}
+                max={meta.filters.rating[1]}
+                step={0.1}
+                value={rating}
+                onChange={setRating}
+                format={formatRating}
+              />
+              <RangeSlider label="Idade" min={ageBounds[0]} max={ageBounds[1]} value={age} onChange={setAge} suffix="anos" />
+              <RangeSlider
+                label="Altura"
+                min={meta.filters.height[0]}
+                max={meta.filters.height[1]}
+                value={height}
+                onChange={setHeight}
+                suffix="cm"
+              />
+              <RangeSlider
+                label="Minutagem"
+                min={meta.filters.minutes[0]}
+                max={meta.filters.minutes[1]}
+                step={10}
+                value={minutes}
+                onChange={setMinutes}
+              />
+            </section>
+
+            <section className="filter-block">
+              <h2>Índices normalizados</h2>
+              <p className="filter-block-note">Percentil dentro do pool da posição</p>
+              {TENDENCY_META.map((item) => (
+                <RangeSlider
+                  key={item.key}
+                  label={item.label}
+                  min={0}
+                  max={100}
+                  value={tendencies[item.key]}
+                  onChange={(next) => setTendencies((current) => ({ ...current, [item.key]: next }))}
+                />
+              ))}
+            </section>
+          </div>
+        </aside>
+
+        <main className="filters-results">
+          <div className="results-toolbar">
+            <div className="results-count">
+              <strong>{results.length}</strong>
+              <span>
+                {results.length === 1 ? "atleta encontrado" : "atletas encontrados"} em{" "}
+                {familyMeta.label.toLowerCase()}
+              </span>
+            </div>
+
+            <label className="results-sort">
+              <span>Ordenar</span>
+              <select value={sort} onChange={(event) => setSort(event.target.value as SortKey)}>
+                {SORTS.map((item) => (
+                  <option key={item.key} value={item.key}>
+                    {item.label}
                   </option>
                 ))}
               </select>
             </label>
-            <label>
-              Nacionalidade
-              <select value={nationality} onChange={(e) => setNationality(e.target.value)}>
-                <option value="all">Todos</option>
-                {meta.nationalities.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Pé dominante
-              <select value={foot} onChange={(e) => setFoot(e.target.value)}>
-                <option value="all">Todos</option>
-                <option value="Destro">Destro</option>
-                <option value="Canhoto">Canhoto</option>
-                <option value="Ambidestro">Ambidestro</option>
-              </select>
-            </label>
           </div>
 
-          <div className="profile-checks">
-            <span>Perfil</span>
-            <div className="checks">
-              {familyMeta.profiles.map((profile) => (
-                <label key={profile}>
-                  <input
-                    type="checkbox"
-                    checked={profiles.includes(profile)}
-                    onChange={() => toggleProfile(profile)}
-                  />
-                  {profile}
-                </label>
+          {chips.length > 0 && (
+            <div className="active-chips">
+              {chips.map((chip) => (
+                <button key={chip.key} type="button" onClick={chip.clear}>
+                  {chip.label}
+                  <i aria-hidden>×</i>
+                </button>
+              ))}
+              <button type="button" className="chip-clear-all" onClick={resetAll}>
+                Limpar tudo
+              </button>
+            </div>
+          )}
+
+          {summary && (
+            <div className="results-summary">
+              <div>
+                <span>Rating médio</span>
+                <strong>{formatRating(summary.rating)}</strong>
+              </div>
+              <div>
+                <span>Idade média</span>
+                <strong>
+                  {summary.age ? summary.age.toFixed(1).replace(".", ",") : "—"}
+                  <em>anos</em>
+                </strong>
+              </div>
+              <div>
+                <span>Minutagem média</span>
+                <strong>{Math.round(summary.minutes).toLocaleString("pt-BR")}</strong>
+              </div>
+              <div>
+                <span>Do pool</span>
+                <strong>
+                  {Math.round((results.length / (familyMeta.count || 1)) * 100)}
+                  <em>%</em>
+                </strong>
+              </div>
+            </div>
+          )}
+
+          {results.length > 0 ? (
+            <div className="results-grid">
+              {results.map((player) => (
+                <PlayerResultCard key={player.player_id} player={player} />
               ))}
             </div>
-          </div>
-
-          <div className="range-grid">
-            <RangeFilter label="Altura" min={meta.filters.height[0]} max={meta.filters.height[1]} value={height} onChange={setHeight} />
-            <RangeFilter label="Minutagem" min={meta.filters.minutes[0]} max={meta.filters.minutes[1]} value={minutes} onChange={setMinutes} />
-            <RangeFilter label="Nascimento" min={meta.filters.birth_year[0]} max={meta.filters.birth_year[1]} value={birthYear} onChange={setBirthYear} />
-            <RangeFilter label="Rating" min={meta.filters.rating[0]} max={meta.filters.rating[1]} value={rating} onChange={setRating} format={(v) => v.toFixed(1)} />
-            <RangeFilter label="Construção" min={0} max={100} value={tendencies.construcao} onChange={(v) => setTendencies((t) => ({ ...t, construcao: v }))} />
-            <RangeFilter label="Ofensividade" min={0} max={100} value={tendencies.ofensividade} onChange={(v) => setTendencies((t) => ({ ...t, ofensividade: v }))} />
-            <RangeFilter label="1vs1 - Defensivo" min={0} max={100} value={tendencies.def1v1} onChange={(v) => setTendencies((t) => ({ ...t, def1v1: v }))} />
-            <RangeFilter label="Contenção" min={0} max={100} value={tendencies.contencao} onChange={(v) => setTendencies((t) => ({ ...t, contencao: v }))} />
-            <RangeFilter label="Duelo Aéreo" min={0} max={100} value={tendencies.duelo_aereo} onChange={(v) => setTendencies((t) => ({ ...t, duelo_aereo: v }))} />
-          </div>
-        </section>
-
-        <section className="panel list-panel">
-          <div className="panel-title">
-            <span>Selecionar</span>
-            <strong>Atletas filtrados</strong>
-          </div>
-          <div className="player-list">
-            {tendencyFiltered.map((player) => (
-              <button
-                key={player.player_id}
-                className={`player-list-item ${selectedId === player.player_id ? "active" : ""}`}
-                onClick={() => setSelectedId(player.player_id)}
-              >
-                <div>
-                  <strong>{player.name}</strong>
-                  <span>{player.club}</span>
-                </div>
-                <em style={{ color: ratingColor(player.rating) }}>{formatRating(player.rating)}</em>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="panel preview-panel">
-          {selectedProfile ? (
-            <>
-              <div className="preview-top">
-                <div>
-                  <p className="eyebrow">{selectedProfile.position}</p>
-                  <h2>{selectedProfile.name}</h2>
-                  <p>{selectedProfile.club}</p>
-                </div>
-                <div className="preview-rating" style={{ color: ratingColor(selectedProfile.rating) }}>
-                  {formatRating(selectedProfile.rating)}
-                </div>
-              </div>
-              <div className="preview-grid">
-                <div><span>Ano</span><strong>{selectedProfile.birth_year}</strong></div>
-                <div><span>Nacionalidade</span><strong>{selectedProfile.nationality}</strong></div>
-                <div><span>Altura</span><strong>{selectedProfile.height}</strong></div>
-                <div><span>Pé dominante</span><strong>{selectedProfile.foot}</strong></div>
-              </div>
-              <div className="preview-stats">
-                <div><span>Minutagem</span><strong>{selectedProfile.minutes}</strong></div>
-                <div><span>Gols/Assist.</span><strong>{selectedProfile.goals} / {selectedProfile.assists}</strong></div>
-                <div><span>Perfil</span><strong>{selectedProfile.profile}</strong></div>
-              </div>
-            </>
           ) : (
-            <p className="muted">Selecione um jogador para visualizar o resumo.</p>
+            <div className="results-empty">
+              <strong>Nenhum atleta atende a esses critérios</strong>
+              <p>Afrouxe um intervalo ou remova um filtro para ampliar a busca.</p>
+              <button type="button" onClick={resetAll}>
+                Limpar filtros
+              </button>
+            </div>
           )}
-        </section>
+        </main>
       </div>
     </div>
   );

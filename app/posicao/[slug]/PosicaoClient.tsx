@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { PositionScoutPage } from "@/components/position/PositionScoutPage";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -9,5 +10,9 @@ type Props = {
 };
 
 export function PosicaoClient({ family, players }: Props) {
-  return <PositionScoutPage family={family} players={players} />;
+  return (
+    <Suspense fallback={<div className="scout-root" />}>
+      <PositionScoutPage family={family} players={players} />
+    </Suspense>
+  );
 }
