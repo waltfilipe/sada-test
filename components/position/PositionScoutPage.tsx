@@ -1,14 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { familyBySlug } from "@/lib/positions";
-import { AspectBoard } from "./AspectBoard";
-import { PlayerCommandRail } from "./PlayerCommandRail";
-import { ProfileDna } from "./ProfileDna";
-import { ScoutHero, ScoutPositionNav } from "./ScoutHero";
-import { SkillIndexPanel } from "./SkillIndexPanel";
+import { useEffect, useMemo, useState } from "react";
+import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import { AspectMatrix } from "./AspectMatrix";
+import { DossierHeader } from "./DossierHeader";
+import { ProfileDna } from "./ProfileDna";
+import { ProfileRatings } from "./ProfileRatings";
+import { RosterRail } from "./RosterRail";
+import { SkillIndexPanel } from "./SkillIndexPanel";
+
+const LINKS = [
+  { href: "/filtros", label: "Filtros" },
+  { href: "/comparar", label: "Comparar" },
+  { href: "/scatter", label: "Scatter" },
+];
 
 type Props = {
   family: PositionFamily;
@@ -20,66 +27,93 @@ export function PositionScoutPage({ family, players }: Props) {
   const [profilesFilter, setProfilesFilter] = useState<string[]>([]);
   const familyMeta = familyBySlug(family);
 
-  const selected =
-    players.find((player) => player.player_id === selectedId) ?? players[0] ?? null;
+  const selected = players.find((player) => player.player_id === selectedId) ?? players[0] ?? null;
+
+  const poolMedian = useMemo(() => {
+    if (!players.length) return 0;
+    const sorted = players.map((player) => player.ratings.geral).sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+  }, [players]);
 
   useEffect(() => {
-    if (players.length && !players.some((p) => p.player_id === selectedId)) {
+    if (players.length && !players.some((player) => player.player_id === selectedId)) {
       setSelectedId(players[0].player_id);
     }
   }, [players, selectedId]);
 
   const toggleProfile = (profile: string) => {
     setProfilesFilter((current) =>
-      current.includes(profile) ? current.filter((p) => p !== profile) : [...current, profile],
+      current.includes(profile) ? current.filter((item) => item !== profile) : [...current, profile],
     );
   };
 
-  if (!selected) {
-    return (
-      <div className="scout-page empty">
-        Nenhum jogador disponível para {familyMeta.label.toLowerCase()}.
-      </div>
-    );
-  }
-
   return (
-    <div className={`scout-page position-page position-${family}`}>
+    <div className="scout-root">
       <header className="scout-topbar">
-        <div>
-          <p className="scout-kicker">Scout room</p>
-          <h1>{familyMeta.label}</h1>
-        </div>
-        <nav className="scout-topnav">
-          <Link href="/filtros">Filtros</Link>
-          <Link href="/comparar">Comparar</Link>
-          <Link href="/scatter">Scatter</Link>
+        <Link href="/" className="scout-brand">
+          <span className="sc-brand-mark">SA</span>
+          <span className="sc-brand-copy">
+            <strong>Série A Scout</strong>
+            <em>Temporada 2025/26</em>
+          </span>
+        </Link>
+
+        <nav className="position-tabs" aria-label="Posições">
+          {POSITION_FAMILIES.map((item) => (
+            <Link
+              key={item.key}
+              href={`/posicao/${item.slug}`}
+              className={item.key === family ? "active" : ""}
+              aria-current={item.key === family ? "page" : undefined}
+            >
+              <span className="tab-full">{item.label}</span>
+              <span className="tab-short">{item.short}</span>
+            </Link>
+          ))}
+        </nav>
+
+        <nav className="topbar-links" aria-label="Ferramentas">
+          {LINKS.map((link) => (
+            <Link key={link.href} href={link.href}>
+              {link.label}
+            </Link>
+          ))}
         </nav>
       </header>
 
-      <ScoutPositionNav family={family} />
+      {!selected ? (
+        <div className="scout-empty">Nenhum atleta disponível para {familyMeta.label.toLowerCase()}.</div>
+      ) : (
+        <div className="scout-body">
+          <RosterRail
+            players={players}
+            selectedId={selected.player_id}
+            profilesFilter={profilesFilter}
+            onSelect={setSelectedId}
+            onToggleProfile={toggleProfile}
+            profilesAvailable={selected.profiles_available}
+          />
 
-      <div className="scout-layout">
-        <PlayerCommandRail
-          players={players}
-          selectedId={selected.player_id}
-          profilesFilter={profilesFilter}
-          onSelect={setSelectedId}
-          onToggleProfile={toggleProfile}
-          profilesAvailable={selected.profiles_available}
-        />
+          <main className="dossier">
+            <DossierHeader
+              player={selected}
+              poolSize={players.length}
+              poolMedian={poolMedian}
+              family={family}
+            />
 
-        <main className="scout-canvas">
-          <ScoutHero player={selected} poolSize={players.length} family={family} />
+            <ProfileRatings player={selected} poolSize={players.length} />
 
-          <div className="scout-profile-row">
-            <ProfileDna player={selected} />
-            <AspectBoard player={selected} compact />
-          </div>
+            <div className="dossier-grid">
+              <ProfileDna player={selected} />
+              <SkillIndexPanel player={selected} family={family} />
+            </div>
 
-          <SkillIndexPanel player={selected} family={family} />
-        </main>
-      </div>
+            <AspectMatrix player={selected} />
+          </main>
+        </div>
+      )}
     </div>
   );
 }
