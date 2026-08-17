@@ -15,6 +15,7 @@ from engine.positions import (
     build_player_payload,
     compute_family_metrics,
 )
+from engine.transfermarkt import enrich_players_with_transfermarkt
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
@@ -43,6 +44,12 @@ def main() -> None:
         family_payloads[family_key] = players
         all_players.extend(players)
         print(f"  {family['label']}: {pool_size} jogadores")
+
+    print("Enriquecendo com Transfermarkt (foto, valor e contrato)…")
+    all_players = enrich_players_with_transfermarkt(all_players)
+    family_payloads = {}
+    for family_key in POSITION_FAMILIES:
+        family_payloads[family_key] = [player for player in all_players if player["position_family"] == family_key]
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     PROFILES_DIR.mkdir(parents=True, exist_ok=True)

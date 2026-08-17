@@ -12,6 +12,17 @@ export type AspectItem = {
   medal: "gold" | "silver" | "bronze" | null;
 };
 
+export type TransfermarktInfo = {
+  id: string | null;
+  photo: string | null;
+  market_value: string | null;
+  market_value_eur: number | null;
+  contract_until: string | null;
+  contract_remaining: string | null;
+  club: string | null;
+  profile_url: string | null;
+} | null;
+
 export type PlayerSummary = {
   player_id: string;
   name: string;
@@ -26,6 +37,7 @@ export type PlayerSummary = {
   minutes: number;
   rating: number;
   profile: string;
+  transfermarkt?: TransfermarktInfo;
 };
 
 export type PlayerProfile = PlayerSummary & {

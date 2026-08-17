@@ -212,6 +212,24 @@
   background: #1e2736;
   border: 1px solid #2d3a4f;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.scout-avatar-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.scout-chip.tm-link {
+  color: #93c5fd;
+  border-color: rgba(96, 165, 250, 0.35);
+}
+
+.scout-chip.tm-link:hover {
+  color: #dbeafe;
+  border-color: rgba(96, 165, 250, 0.55);
 }
 
 .scout-hero-copy h1 {
