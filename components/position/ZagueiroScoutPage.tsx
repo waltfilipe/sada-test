@@ -52,6 +52,15 @@ export function ZagueiroScoutPage({ players }: Props) {
       </header>
 
       <div className="scout-layout">
+        <PlayerCommandRail
+          players={players}
+          selectedId={selected.player_id}
+          profilesFilter={profilesFilter}
+          onSelect={setSelectedId}
+          onToggleProfile={toggleProfile}
+          profilesAvailable={selected.profiles_available}
+        />
+
         <main className="scout-canvas">
           <ScoutHero player={selected} poolSize={players.length} />
 
@@ -63,15 +72,6 @@ export function ZagueiroScoutPage({ players }: Props) {
 
           <AspectBoard player={selected} />
         </main>
-
-        <PlayerCommandRail
-          players={players}
-          selectedId={selected.player_id}
-          profilesFilter={profilesFilter}
-          onSelect={setSelectedId}
-          onToggleProfile={toggleProfile}
-          profilesAvailable={selected.profiles_available}
-        />
       </div>
     </div>
   );

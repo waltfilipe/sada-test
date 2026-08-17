@@ -53,7 +53,7 @@ export const TENDENCY_META = [
 ] as const;
 
 export const PROFILE_META = [
-  { key: "combativo", label: "Combativo", color: "#fb7185" },
-  { key: "construtor", label: "Construtor", color: "#34d399" },
-  { key: "posicional", label: "Posicional", color: "#38bdf8" },
+  { key: "combativo", label: "Combativo" },
+  { key: "construtor", label: "Construtor" },
+  { key: "posicional", label: "Posicional" },
 ] as const;

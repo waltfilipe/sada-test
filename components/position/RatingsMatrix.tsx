@@ -1,6 +1,6 @@
 "use client";
 
-import { formatRating, ratingColor } from "@/lib/positions";
+import { formatRating } from "@/lib/positions";
 import type { PlayerProfile } from "@/lib/types";
 
 const RATING_ITEMS = [
@@ -24,7 +24,7 @@ export function RatingsMatrix({ player }: { player: PlayerProfile }) {
           return (
             <article key={item.key} className={`rating-tile tone-${item.key}`}>
               <span>{item.label}</span>
-              <strong style={{ color: ratingColor(value) }}>{formatRating(value)}</strong>
+              <strong>{formatRating(value)}</strong>
               <div className="rating-tile-foot">
                 <em>Rank #{rank}</em>
                 <div className="rating-meter">

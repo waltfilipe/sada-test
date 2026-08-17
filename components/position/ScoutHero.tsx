@@ -1,6 +1,6 @@
 "use client";
 
-import { formatRating, ratingColor } from "@/lib/positions";
+import { formatRating } from "@/lib/positions";
 import { playerInitials, profileTone } from "@/lib/scoutUi";
 import type { PlayerProfile } from "@/lib/types";
 
@@ -41,7 +41,7 @@ export function ScoutHero({ player, poolSize }: Props) {
 
       <div className="scout-hero-score">
         <span>Rating geral</span>
-        <strong style={{ color: ratingColor(player.ratings.geral) }}>{formatRating(player.ratings.geral)}</strong>
+        <strong>{formatRating(player.ratings.geral)}</strong>
         <em>#{player.ranks.geral} no pool</em>
       </div>
     </section>
