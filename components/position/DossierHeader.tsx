@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
 import { profileTone } from "@/lib/scoutUi";
@@ -93,14 +94,30 @@ export function DossierHeader({ player, poolSize, poolMedian, family }: Props) {
           </div>
         </div>
 
-        {tm?.profile_url && (
-          <a className="bar-source" href={tm.profile_url} target="_blank" rel="noreferrer">
-            Transfermarkt
-            <svg viewBox="0 0 12 12" aria-hidden>
-              <path d="M4 2h6v6M10 2 2.5 9.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        <div className="bar-actions">
+          <Link className="bar-compare" href={`/comparar?posicao=${family}&a=${player.player_id}`}>
+            <svg viewBox="0 0 14 14" aria-hidden>
+              <path
+                d="M5.5 3.5 2.5 7l3 3.5M8.5 3.5 11.5 7l-3 3.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
-          </a>
-        )}
+            Comparar
+          </Link>
+
+          {tm?.profile_url && (
+            <a className="bar-source" href={tm.profile_url} target="_blank" rel="noreferrer">
+              Transfermarkt
+              <svg viewBox="0 0 12 12" aria-hidden>
+                <path d="M4 2h6v6M10 2 2.5 9.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              </svg>
+            </a>
+          )}
+        </div>
       </footer>
     </section>
   );

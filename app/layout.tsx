@@ -3,6 +3,7 @@ import { AppShell } from "@/components/AppShell";
 import "./globals.css";
 import "./scout.css";
 import "./filters.css";
+import "./compare.css";
 
 export const metadata: Metadata = {
   title: "Série A Scout",

@@ -1,119 +1,203 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { RadarChart, ScatterPlot } from "@/components/Charts";
-import { AspectPanel, PlayerIdentityCard } from "@/components/PlayerCards";
-import { formatRating, ratingColor } from "@/lib/positions";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { AspectVersus } from "@/components/compare/AspectVersus";
+import { AthleteSlot } from "@/components/compare/AthleteSlot";
+import { VersusBar } from "@/components/compare/VersusBar";
+import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
+import { profileMetaForFamily } from "@/lib/profileMeta";
+import { TENDENCY_META, formatRating } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Props = {
   family: PositionFamily;
   players: PlayerProfile[];
+  initialA?: string;
+  initialB?: string;
 };
 
-export function CompararClient({ family, players }: Props) {
-  const [playerA, setPlayerA] = useState(players[0]?.player_id ?? "");
-  const [playerB, setPlayerB] = useState(players[1]?.player_id ?? players[0]?.player_id ?? "");
+export function CompararClient({ family, players, initialA, initialB }: Props) {
+  const familyMeta = familyBySlug(family);
 
-  const a = players.find((p) => p.player_id === playerA) ?? players[0];
-  const b = players.find((p) => p.player_id === playerB) ?? players[1] ?? players[0];
+  const pick = (requested: string | undefined, fallbackIndex: number) => {
+    if (requested && players.some((player) => player.player_id === requested)) return requested;
+    return players[fallbackIndex]?.player_id ?? players[0]?.player_id ?? "";
+  };
 
-  useEffect(() => {
-    if (!players.length) return;
-    if (!players.some((p) => p.player_id === playerA)) setPlayerA(players[0].player_id);
-    if (!players.some((p) => p.player_id === playerB)) setPlayerB(players[1]?.player_id ?? players[0].player_id);
-  }, [players, playerA, playerB]);
+  const [idA, setIdA] = useState(() => pick(initialA, 0));
+  const [idB, setIdB] = useState(() => {
+    const chosen = pick(initialB, 1);
+    const first = pick(initialA, 0);
+    if (chosen !== first) return chosen;
+    return players.find((player) => player.player_id !== first)?.player_id ?? chosen;
+  });
 
-  const tendencyLabels = ["1vs1 - Defensivo", "Ofensividade", "Construção", "Contenção", "Duelo Aéreo"];
-  const tendencyKeys = ["def1v1", "ofensividade", "construcao", "contencao", "duelo_aereo"] as const;
+  const a = players.find((player) => player.player_id === idA) ?? players[0];
+  const b = players.find((player) => player.player_id === idB) ?? players[1] ?? players[0];
 
-  const radarA = useMemo(
-    () => tendencyKeys.map((key) => a.tendencies[key]),
-    [a],
-  );
-  const radarB = useMemo(
-    () => tendencyKeys.map((key) => b.tendencies[key]),
-    [b],
+  const profileMeta = profileMetaForFamily(family);
+
+  const swap = () => {
+    setIdA(idB);
+    setIdB(idA);
+  };
+
+  const verdict = useMemo(() => {
+    if (!a || !b) return null;
+    const metrics = [
+      a.ratings.geral - b.ratings.geral,
+      ...TENDENCY_META.map((item) => a.tendencies[item.key] - b.tendencies[item.key]),
+    ];
+    const winsA = metrics.filter((value) => value > 0).length;
+    const winsB = metrics.filter((value) => value < 0).length;
+    return { winsA, winsB, total: metrics.length };
+  }, [a, b]);
+
+  const positionTabs = (
+    <nav className="position-tabs" aria-label="Posições">
+      {POSITION_FAMILIES.map((item) => (
+        <Link
+          key={item.key}
+          href={`/comparar?posicao=${item.slug}`}
+          className={item.key === family ? "active" : ""}
+          aria-current={item.key === family ? "page" : undefined}
+        >
+          <span className="tab-full">{item.label}</span>
+          <span className="tab-short">{item.short}</span>
+        </Link>
+      ))}
+    </nav>
   );
 
   if (!a || !b) {
-    return <div className="page"><p className="muted">Selecione jogadores para comparar.</p></div>;
+    return (
+      <div className="scout-root compare-root">
+        <ScoutTopbar active="comparar" center={positionTabs} />
+        <div className="scout-empty">Nenhum atleta disponível para {familyMeta.label.toLowerCase()}.</div>
+      </div>
+    );
   }
 
   return (
-    <div className="page compare-page">
-      <header className="page-header compact">
-        <div>
-          <p className="eyebrow">Comparação direta</p>
-          <h1>Atletas na mesma posição</h1>
+    <div className="scout-root compare-root">
+      <ScoutTopbar active="comparar" center={positionTabs} />
+
+      <main className="compare-canvas">
+        <div className="compare-stage">
+          <AthleteSlot side="a" player={a} players={players} onChange={setIdA} />
+
+          <div className="compare-pivot">
+            <span className="pivot-mark">VS</span>
+            {verdict && (
+              <p className="pivot-score">
+                <b className="side-a">{verdict.winsA}</b>
+                <i aria-hidden>–</i>
+                <b className="side-b">{verdict.winsB}</b>
+              </p>
+            )}
+            <span className="pivot-note">de {verdict?.total ?? 0} indicadores</span>
+            <button type="button" className="pivot-swap" onClick={swap}>
+              Inverter
+            </button>
+          </div>
+
+          <AthleteSlot side="b" player={b} players={players} onChange={setIdB} />
         </div>
-      </header>
 
-      <div className="compare-layout">
-        <section className="panel compare-side">
-          <label>
-            Atleta 1
-            <select value={a.player_id} onChange={(e) => setPlayerA(e.target.value)}>
-              {players.map((player) => (
-                <option key={player.player_id} value={player.player_id}>{player.label}</option>
-              ))}
-            </select>
-          </label>
-          <PlayerIdentityCard player={a} />
-          <div className="compare-rating" style={{ color: ratingColor(a.ratings.geral) }}>
-            <span>Rating Geral</span>
-            <strong>{formatRating(a.ratings.geral)}</strong>
-          </div>
-          <AspectPanel title="Aspectos Defensivos" items={a.aspects.defensivos} />
-          <AspectPanel title="Aspectos de Construção" items={a.aspects.construcao} />
-          <AspectPanel title="Aspectos Ofensivos" items={a.aspects.ofensivos} />
-        </section>
-
-        <section className="panel compare-center">
-          <h3>Gráficos de radar</h3>
-          <div className="compare-radar-block">
-            <p>Tendências</p>
-            <div className="dual-radar">
-              <RadarChart labels={tendencyLabels} values={radarA} color="#34d399" />
-              <RadarChart labels={tendencyLabels} values={radarB} color="#a78bfa" />
+        <section className="sc-panel compare-panel">
+          <header className="sc-panel-head">
+            <div>
+              <p className="sc-eyebrow">Confronto direto</p>
+              <h2>Notas por perfil</h2>
             </div>
-          </div>
-          <div className="compare-radar-block">
-            <p>Perfil</p>
-            <div className="dual-radar">
-              <RadarChart
-                labels={["Combativo", "Posicional", "Construtor"]}
-                values={[a.profile_shares.combativo, a.profile_shares.posicional, a.profile_shares.construtor]}
-                color="#34d399"
+            <p className="sc-note">Escala 0–10</p>
+          </header>
+
+          <div className="versus-rows">
+            <VersusBar
+              label="Rating geral"
+              valueA={a.ratings.geral}
+              valueB={b.ratings.geral}
+              max={10}
+              format={formatRating}
+            />
+            {profileMeta.map((item) => (
+              <VersusBar
+                key={item.key}
+                label={item.label}
+                valueA={a.ratings[item.key] ?? 0}
+                valueB={b.ratings[item.key] ?? 0}
+                max={10}
+                format={formatRating}
               />
-              <RadarChart
-                labels={["Combativo", "Posicional", "Construtor"]}
-                values={[b.profile_shares.combativo, b.profile_shares.posicional, b.profile_shares.construtor]}
-                color="#a78bfa"
-              />
-            </div>
+            ))}
           </div>
         </section>
 
-        <section className="panel compare-side">
-          <label>
-            Atleta 2
-            <select value={b.player_id} onChange={(e) => setPlayerB(e.target.value)}>
-              {players.map((player) => (
-                <option key={player.player_id} value={player.player_id}>{player.label}</option>
+        <div className="compare-grid">
+          <section className="sc-panel compare-panel">
+            <header className="sc-panel-head">
+              <div>
+                <p className="sc-eyebrow">Índices normalizados</p>
+                <h2>Skill index</h2>
+              </div>
+              <p className="sc-note">Percentil no pool</p>
+            </header>
+
+            <div className="versus-rows">
+              {TENDENCY_META.map((item) => (
+                <VersusBar
+                  key={item.key}
+                  label={item.label}
+                  hint={item.hint}
+                  valueA={a.tendencies[item.key]}
+                  valueB={b.tendencies[item.key]}
+                />
               ))}
-            </select>
-          </label>
-          <PlayerIdentityCard player={b} />
-          <div className="compare-rating" style={{ color: ratingColor(b.ratings.geral) }}>
-            <span>Rating Geral</span>
-            <strong>{formatRating(b.ratings.geral)}</strong>
-          </div>
-          <AspectPanel title="Aspectos Defensivos" items={b.aspects.defensivos} />
-          <AspectPanel title="Aspectos de Construção" items={b.aspects.construcao} />
-          <AspectPanel title="Aspectos Ofensivos" items={b.aspects.ofensivos} />
+            </div>
+          </section>
+
+          <section className="sc-panel compare-panel">
+            <header className="sc-panel-head">
+              <div>
+                <p className="sc-eyebrow">Composição tática</p>
+                <h2>DNA de perfil</h2>
+              </div>
+              <p className="sc-note">Participação %</p>
+            </header>
+
+            <div className="versus-rows">
+              {profileMeta.map((item) => (
+                <VersusBar
+                  key={item.key}
+                  label={item.label}
+                  valueA={a.profile_shares[item.key] ?? 0}
+                  valueB={b.profile_shares[item.key] ?? 0}
+                />
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <section className="sc-panel compare-panel">
+          <header className="sc-panel-head">
+            <div>
+              <p className="sc-eyebrow">Avaliação técnica</p>
+              <h2>Aspectos de jogo</h2>
+            </div>
+            <p className="sc-note">Nota e medalha por fundamento</p>
+          </header>
+
+          <AspectVersus a={a} b={b} />
         </section>
-      </div>
+
+        <div className="compare-links">
+          <Link href={`/posicao/${family}?atleta=${a.player_id}`}>Ver dossiê de {a.name}</Link>
+          <Link href={`/posicao/${family}?atleta=${b.player_id}`}>Ver dossiê de {b.name}</Link>
+        </div>
+      </main>
     </div>
   );
 }
