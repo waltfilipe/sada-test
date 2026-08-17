@@ -492,7 +492,7 @@
 
 .result-row {
   display: grid;
-  grid-template-columns: 92px minmax(0, 1fr) minmax(0, 400px) 168px;
+  grid-template-columns: 92px minmax(0, 0.85fr) minmax(0, 1fr) 164px;
   align-items: center;
   gap: 1.5rem;
   padding: 1rem 1.15rem;
@@ -575,15 +575,16 @@
 }
 
 .row-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.4rem;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem 0.75rem;
   margin: 0.85rem 0 0;
 }
 
 .row-facts div {
   display: grid;
   gap: 0.1rem;
+  min-width: 0;
 }
 
 .row-facts dt {
@@ -627,10 +628,10 @@
   min-width: 0;
 }
 
+/* Sentence case keeps the longest label ("Construção") inside the column;
+   uppercase with letter-spacing overflowed at this width. */
 .row-index-label {
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: 0.68rem;
   color: var(--text-3);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -814,7 +815,7 @@
 
 @media (max-width: 1400px) {
   .result-row {
-    grid-template-columns: 84px minmax(0, 1fr) minmax(0, 330px) 150px;
+    grid-template-columns: 84px minmax(0, 0.8fr) minmax(0, 1fr) 150px;
     gap: 1.1rem;
   }
 
@@ -890,5 +891,9 @@
   .row-indices {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.75rem 1rem;
+  }
+
+  .row-facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
