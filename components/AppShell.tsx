@@ -13,6 +13,11 @@ const NAV = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isScoutPage = pathname.startsWith("/posicao/zagueiros");
+
+  if (isScoutPage) {
+    return <div className="app-shell scout-shell">{children}</div>;
+  }
 
   return (
     <div className="app-shell">

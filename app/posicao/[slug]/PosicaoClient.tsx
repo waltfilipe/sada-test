@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { ZagueiroScoutPage } from "@/components/position/ZagueiroScoutPage";
 import { AspectPanel, PlayerIdentityCard, RatingStrip, TendencyBars } from "@/components/PlayerCards";
 import { RadarChart } from "@/components/Charts";
 import { POSITION_FAMILIES } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import { useEffect, useMemo, useState } from "react";
 
 type Props = {
   family: PositionFamily;
@@ -12,6 +13,14 @@ type Props = {
 };
 
 export function PosicaoClient({ family, players }: Props) {
+  if (family === "zagueiros") {
+    return <ZagueiroScoutPage players={players} />;
+  }
+
+  return <LegacyPosicaoClient family={family} players={players} />;
+}
+
+function LegacyPosicaoClient({ family, players }: Props) {
   const [selectedId, setSelectedId] = useState(players[0]?.player_id ?? "");
   const [profiles, setProfiles] = useState<string[]>([]);
   const familyMeta = POSITION_FAMILIES.find((f) => f.key === family)!;
