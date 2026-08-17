@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatRating } from "@/lib/positions";
+import { formatRating, ratingColor } from "@/lib/positions";
 import { profileTone, sortPlayers } from "@/lib/scoutUi";
 import type { PlayerProfile } from "@/lib/types";
 
@@ -96,7 +96,9 @@ export function PlayerCommandRail({
                   {player.club} · {player.profile}
                 </em>
               </span>
-              <span className="rail-rating">{formatRating(player.rating)}</span>
+              <span className="rail-rating" style={{ color: ratingColor(player.rating) }}>
+                {formatRating(player.rating)}
+              </span>
             </button>
           ))}
         </div>

@@ -1,8 +1,9 @@
 "use client";
 
-import { formatRating } from "@/lib/positions";
+import { formatRating, ratingColor } from "@/lib/positions";
 import { playerInitials, profileTone } from "@/lib/scoutUi";
 import type { PlayerProfile } from "@/lib/types";
+import { RatingsMatrix } from "./RatingsMatrix";
 
 type Props = {
   player: PlayerProfile;
@@ -11,6 +12,7 @@ type Props = {
 
 export function ScoutHero({ player, poolSize }: Props) {
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
+  const geralColor = ratingColor(player.ratings.geral);
 
   return (
     <section className="scout-hero">
@@ -39,10 +41,13 @@ export function ScoutHero({ player, poolSize }: Props) {
         </div>
       </div>
 
-      <div className="scout-hero-score">
-        <span>Rating geral</span>
-        <strong>{formatRating(player.ratings.geral)}</strong>
-        <em>#{player.ranks.geral} no pool</em>
+      <div className="scout-hero-ratings">
+        <div className="scout-hero-score">
+          <span>Rating geral</span>
+          <strong style={{ color: geralColor }}>{formatRating(player.ratings.geral)}</strong>
+          <em>#{player.ranks.geral} no pool</em>
+        </div>
+        <RatingsMatrix player={player} variant="compact" />
       </div>
     </section>
   );

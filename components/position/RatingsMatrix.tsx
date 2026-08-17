@@ -1,16 +1,43 @@
 "use client";
 
-import { formatRating } from "@/lib/positions";
+import { formatRating, ratingColor } from "@/lib/positions";
 import type { PlayerProfile } from "@/lib/types";
 
-const RATING_ITEMS = [
-  { key: "geral", label: "Geral", rankKey: "geral" },
-  { key: "combativo", label: "Combativo", rankKey: "combativo" },
-  { key: "construtor", label: "Construtor", rankKey: "construtor" },
-  { key: "posicional", label: "Posicional", rankKey: "posicional" },
+const PROFILE_RATINGS = [
+  { key: "combativo", label: "Combativo", rankKey: "combativo", tone: "combativo" },
+  { key: "construtor", label: "Construtor", rankKey: "construtor", tone: "construtor" },
+  { key: "posicional", label: "Posicional", rankKey: "posicional", tone: "posicional" },
 ] as const;
 
-export function RatingsMatrix({ player }: { player: PlayerProfile }) {
+type Props = {
+  player: PlayerProfile;
+  variant?: "full" | "compact";
+};
+
+export function RatingsMatrix({ player, variant = "full" }: Props) {
+  const items = variant === "compact" ? PROFILE_RATINGS : [
+    { key: "geral", label: "Geral", rankKey: "geral", tone: "geral" },
+    ...PROFILE_RATINGS,
+  ];
+
+  if (variant === "compact") {
+    return (
+      <div className="ratings-compact">
+        {items.map((item) => {
+          const value = player.ratings[item.key as keyof typeof player.ratings];
+          const rank = player.ranks[item.rankKey as keyof typeof player.ranks];
+          return (
+            <article key={item.key} className={`rating-compact tone-${item.tone}`}>
+              <span>{item.label}</span>
+              <strong>{formatRating(value)}</strong>
+              <em>#{rank}</em>
+            </article>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <section className="scout-card ratings-matrix">
       <header>
@@ -18,13 +45,14 @@ export function RatingsMatrix({ player }: { player: PlayerProfile }) {
         <h2>Matriz de ratings</h2>
       </header>
       <div className="ratings-grid">
-        {RATING_ITEMS.map((item) => {
-          const value = player.ratings[item.key];
-          const rank = player.ranks[item.rankKey];
+        {items.map((item) => {
+          const value = player.ratings[item.key as keyof typeof player.ratings];
+          const rank = player.ranks[item.rankKey as keyof typeof player.ranks];
+          const color = item.key === "geral" ? ratingColor(value) : undefined;
           return (
-            <article key={item.key} className={`rating-tile tone-${item.key}`}>
+            <article key={item.key} className={`rating-tile tone-${item.tone}`}>
               <span>{item.label}</span>
-              <strong>{formatRating(value)}</strong>
+              <strong style={color ? { color } : undefined}>{formatRating(value)}</strong>
               <div className="rating-tile-foot">
                 <em>Rank #{rank}</em>
                 <div className="rating-meter">

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { AspectBoard } from "./AspectBoard";
 import { PlayerCommandRail } from "./PlayerCommandRail";
 import { ProfileDna } from "./ProfileDna";
-import { RatingsMatrix } from "./RatingsMatrix";
 import { ScoutHero } from "./ScoutHero";
 import { SkillIndexPanel } from "./SkillIndexPanel";
 import type { PlayerProfile } from "@/lib/types";
@@ -64,13 +63,12 @@ export function ZagueiroScoutPage({ players }: Props) {
         <main className="scout-canvas">
           <ScoutHero player={selected} poolSize={players.length} />
 
-          <div className="scout-bento">
+          <div className="scout-profile-row">
             <ProfileDna player={selected} />
-            <RatingsMatrix player={selected} />
-            <SkillIndexPanel player={selected} />
+            <AspectBoard player={selected} compact />
           </div>
 
-          <AspectBoard player={selected} />
+          <SkillIndexPanel player={selected} />
         </main>
       </div>
     </div>

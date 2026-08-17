@@ -4,30 +4,35 @@ import { gradeTone } from "@/lib/scoutUi";
 import type { PlayerProfile } from "@/lib/types";
 
 const GROUPS = [
-  { key: "defensivos", title: "Aspectos defensivos", subtitle: "Confrontos, aéreo e intervenções" },
-  { key: "construcao", title: "Construção", subtitle: "Passes verticais, PCF e longos" },
-  { key: "ofensivos", title: "Aspectos ofensivos", subtitle: "Segurança e progressão" },
+  { key: "defensivos", title: "Defensivos", subtitle: "Confrontos e intervenções" },
+  { key: "construcao", title: "Construção", subtitle: "Passes e progressão" },
+  { key: "ofensivos", title: "Ofensivos", subtitle: "Segurança ofensiva" },
 ] as const;
 
-export function AspectBoard({ player }: { player: PlayerProfile }) {
+type Props = {
+  player: PlayerProfile;
+  compact?: boolean;
+};
+
+export function AspectBoard({ player, compact = false }: Props) {
   return (
-    <section className="aspect-board">
+    <section className={`aspect-board ${compact ? "aspect-board-compact" : ""}`}>
       {GROUPS.map((group) => {
         const items = player.aspects[group.key];
         return (
-          <article key={group.key} className="scout-card aspect-group">
+          <article key={group.key} className={`scout-card aspect-group ${compact ? "aspect-group-compact" : ""}`}>
             <header>
               <p className="scout-kicker">{group.subtitle}</p>
               <h2>{group.title}</h2>
             </header>
             <div className="aspect-cards">
               {items.map((item) => (
-                <div key={item.label} className={`aspect-card tone-${gradeTone(item.grade)}`}>
+                <div key={item.label} className={`aspect-card ${compact ? "aspect-card-compact" : ""}`}>
                   <div className="aspect-card-top">
                     <span>{item.label}</span>
                     {item.medal && <i className={`medal-pill ${item.medal}`} />}
                   </div>
-                  <strong>{item.grade}</strong>
+                  <strong className={`grade-gradient tone-${gradeTone(item.grade)}`}>{item.grade}</strong>
                 </div>
               ))}
             </div>
