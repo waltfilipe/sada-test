@@ -14,6 +14,7 @@ from .normalize import (
     rank_desc_normalized,
     rank_players,
 )
+from .profiles import FAMILY_PROFILE_CONFIG, profile_ratings_from_row, profile_ranks_from_row, profile_shares_from_row
 
 
 POSITION_FAMILIES: dict[str, dict[str, Any]] = {
@@ -38,14 +39,14 @@ POSITION_FAMILIES: dict[str, dict[str, Any]] = {
     "extremos": {
         "label": "Extremos",
         "positions": ["Extremo Direito", "Extremo Esquerdo"],
-        "profiles": ["Finalizador", "Criador", "Vertical", "Híbrido"],
-        "profile_map": {"finalizador": "Finalizador", "criador": "Criador", "vertical": "Vertical"},
+        "profiles": ["Criador", "Meia Ponta", "Vertical", "Híbrido"],
+        "profile_map": {"criador": "Criador", "meia_ponta": "Meia Ponta", "vertical": "Vertical"},
     },
     "meias-ofensivos": {
         "label": "Meias Ofensivos",
         "positions": ["Meia Ofensivo"],
-        "profiles": ["Armador", "Finalizador", "Móvel", "Híbrido"],
-        "profile_map": {"armador": "Armador", "finalizador": "Finalizador", "movel": "Móvel"},
+        "profiles": ["Armador", "Finalizador", "Híbrido"],
+        "profile_map": {"armador": "Armador", "finalizador": "Finalizador"},
     },
     "atacantes": {
         "label": "Atacantes",
@@ -334,7 +335,7 @@ def compute_family_metrics(df: pd.DataFrame, family_key: str) -> pd.DataFrame:
         return pool
     if family_key == "zagueiros":
         return _compute_zag_indices(pool)
-    return _compute_generic_ratings(pool, family["profiles"][0])
+    return FAMILY_PROFILE_CONFIG[family_key].compute_indices(pool)
 
 
 def medal_for_rank(rank: int, pool_size: int) -> str | None:
@@ -359,28 +360,30 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
         "contencao": round(float(row.get("n_leitura_def", 0)), 0),
         "duelo_aereo": round(float(row.get("n_duelo_ar", 0)), 0),
     }
-    profile_radar = {
-        "combativo": round(float(row.get("pct_combativo", 0)) * 100, 0),
-        "construtor": round(float(row.get("pct_construtor", 0)) * 100, 0),
-        "posicional": round(float(row.get("pct_posicional", 0)) * 100, 0),
-    }
+    profile_shares = profile_shares_from_row(row, family_key)
+    profile_ratings = profile_ratings_from_row(row, family_key)
+    profile_rank_map = profile_ranks_from_row(row, family_key)
+    first_rank = next(iter(profile_rank_map.values()), int(row.get("rank_geral", pool_size)))
 
     aspects = {
         "defensivos": [
-            {"label": "Confrontos", "grade": _grade_from_pct(row.get("n_duelos_def", 0)), "medal": medal_for_rank(int(row.get("rank_combativo", pool_size)), pool_size)},
-            {"label": "Duelos Aéreos", "grade": _grade_from_pct(row.get("n_duelo_ar", 0)), "medal": medal_for_rank(int(row.get("rank_posicional", pool_size)), pool_size)},
+            {"label": "Confrontos", "grade": _grade_from_pct(row.get("n_duelos_def", 0)), "medal": medal_for_rank(first_rank, pool_size)},
+            {"label": "Duelos Aéreos", "grade": _grade_from_pct(row.get("n_duelo_ar", 0)), "medal": medal_for_rank(first_rank, pool_size)},
             {"label": "Intervenções", "grade": _grade_from_pct(row.get("n_leitura_def", 0)), "medal": medal_for_rank(int(row.get("rank_geral", pool_size)), pool_size)},
         ],
         "construcao": [
-            {"label": "Passes Verticais", "grade": _grade_from_pct(row.get("n_construcao", 0)), "medal": medal_for_rank(int(row.get("rank_construtor", pool_size)), pool_size)},
-            {"label": "PCF", "grade": _grade_from_pct(row.get("n_construcao", 0) * 0.9), "medal": medal_for_rank(int(row.get("rank_construtor", pool_size)), pool_size)},
+            {"label": "Passes Verticais", "grade": _grade_from_pct(row.get("n_construcao", 0)), "medal": medal_for_rank(first_rank, pool_size)},
+            {"label": "PCF", "grade": _grade_from_pct(row.get("n_construcao", 0) * 0.9), "medal": medal_for_rank(first_rank, pool_size)},
             {"label": "Passes Longos", "grade": _grade_from_pct(row.get("n_construcao", 0) * 0.8), "medal": None},
         ],
         "ofensivos": [
             {"label": "Ball Security", "grade": _grade_from_pct(row.get("n_conducao", 0) * 0.7), "medal": None},
-            {"label": "Progressão", "grade": _grade_from_pct(row.get("n_conducao", 0)), "medal": medal_for_rank(int(row.get("rank_construtor", pool_size)), pool_size)},
+            {"label": "Progressão", "grade": _grade_from_pct(row.get("n_conducao", 0)), "medal": medal_for_rank(first_rank, pool_size)},
         ],
     }
+
+    ratings = {"geral": round(float(row["rating_geral"]), 1), **profile_ratings}
+    ranks = {"geral": int(row["rank_geral"]), **profile_rank_map}
 
     return {
         "player_id": row["player_id"],
@@ -397,20 +400,10 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
         "goals": int(row.get("Gols", 0) or 0),
         "assists": int(row.get("Assist", 0) or 0),
         "rating": round(float(row["rating_geral"]), 1),
-        "ratings": {
-            "geral": round(float(row["rating_geral"]), 1),
-            "combativo": round(float(row["rating_combativo"]), 1),
-            "construtor": round(float(row["rating_construtor"]), 1),
-            "posicional": round(float(row["rating_posicional"]), 1),
-        },
-        "ranks": {
-            "geral": int(row["rank_geral"]),
-            "combativo": int(row["rank_combativo"]),
-            "construtor": int(row["rank_construtor"]),
-            "posicional": int(row["rank_posicional"]),
-        },
+        "ratings": ratings,
+        "ranks": ranks,
         "profile": row["perfil"],
-        "profile_shares": profile_radar,
+        "profile_shares": profile_shares,
         "tendencies": tendencies,
         "aspects": aspects,
         "profiles_available": family["profiles"],

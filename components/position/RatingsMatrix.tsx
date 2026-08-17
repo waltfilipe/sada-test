@@ -1,14 +1,9 @@
 "use client";
 
-import { formatRating, ratingColor } from "@/lib/positions";
+import { formatRating } from "@/lib/positions";
+import { profileMetaForFamily } from "@/lib/profileMeta";
 import { ratingGradientStyle } from "@/lib/scoutUi";
 import type { PlayerProfile } from "@/lib/types";
-
-const PROFILE_RATINGS = [
-  { key: "combativo", label: "Combativo", rankKey: "combativo", tone: "combativo" },
-  { key: "construtor", label: "Construtor", rankKey: "construtor", tone: "construtor" },
-  { key: "posicional", label: "Posicional", rankKey: "posicional", tone: "posicional" },
-] as const;
 
 type Props = {
   player: PlayerProfile;
@@ -16,17 +11,14 @@ type Props = {
 };
 
 export function RatingsMatrix({ player, variant = "full" }: Props) {
-  const items =
-    variant === "compact"
-      ? PROFILE_RATINGS
-      : [{ key: "geral", label: "Geral", rankKey: "geral", tone: "geral" }, ...PROFILE_RATINGS];
+  const profileMeta = profileMetaForFamily(player.position_family);
 
   if (variant === "compact") {
     return (
       <div className="ratings-compact">
-        {items.map((item) => {
-          const value = player.ratings[item.key as keyof typeof player.ratings];
-          const rank = player.ranks[item.rankKey as keyof typeof player.ranks];
+        {profileMeta.map((item) => {
+          const value = player.ratings[item.key] ?? 0;
+          const rank = player.ranks[item.key] ?? 0;
           return (
             <article key={item.key} className={`rating-compact tone-${item.tone}`}>
               <span>{item.label}</span>
@@ -39,6 +31,8 @@ export function RatingsMatrix({ player, variant = "full" }: Props) {
     );
   }
 
+  const items = [{ key: "geral", label: "Geral", tone: "geral" }, ...profileMeta];
+
   return (
     <section className="scout-card ratings-matrix">
       <header>
@@ -47,13 +41,12 @@ export function RatingsMatrix({ player, variant = "full" }: Props) {
       </header>
       <div className="ratings-grid">
         {items.map((item) => {
-          const value = player.ratings[item.key as keyof typeof player.ratings];
-          const rank = player.ranks[item.rankKey as keyof typeof player.ranks];
-          const color = item.key === "geral" ? ratingColor(value) : undefined;
+          const value = player.ratings[item.key] ?? 0;
+          const rank = player.ranks[item.key] ?? 0;
           return (
             <article key={item.key} className={`rating-tile tone-${item.tone}`}>
               <span>{item.label}</span>
-              <strong style={color ? { color } : ratingGradientStyle(value)}>{formatRating(value)}</strong>
+              <strong style={ratingGradientStyle(value)}>{formatRating(value)}</strong>
               <div className="rating-tile-foot">
                 <em>Rank #{rank}</em>
                 <div className="rating-meter">

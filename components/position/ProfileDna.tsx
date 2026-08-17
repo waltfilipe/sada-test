@@ -1,12 +1,12 @@
 "use client";
 
-import { PROFILE_META } from "@/lib/scoutUi";
+import { profileMetaForFamily } from "@/lib/profileMeta";
 import type { PlayerProfile } from "@/lib/types";
 
 export function ProfileDna({ player }: { player: PlayerProfile }) {
-  const segments = PROFILE_META.map((item) => ({
+  const segments = profileMetaForFamily(player.position_family).map((item) => ({
     ...item,
-    value: player.profile_shares[item.key as keyof PlayerProfile["profile_shares"]],
+    value: player.profile_shares[item.key] ?? 0,
   }));
 
   return (
@@ -27,7 +27,7 @@ export function ProfileDna({ player }: { player: PlayerProfile }) {
               <strong>{Math.round(segment.value)}%</strong>
             </div>
             <div className="profile-bar-track">
-              <div className="profile-bar-fill" style={{ width: `${segment.value}%` }} />
+              <div className={`profile-bar-fill tone-${segment.tone}`} style={{ width: `${segment.value}%` }} />
             </div>
           </div>
         ))}

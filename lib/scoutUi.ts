@@ -17,6 +17,34 @@ export function profileTone(profile: string): string {
       return "construtor";
     case "Posicional":
       return "posicional";
+    case "Defensivo":
+      return "defensivo";
+    case "Vertical":
+      return "vertical";
+    case "Ofensivo":
+      return "ofensivo";
+    case "Contenção":
+      return "contencao";
+    case "Box-to-box":
+    case "Box to Box":
+      return "boxtobox";
+    case "Criador":
+    case "Driblador":
+      return "criador";
+    case "Meia Ponta":
+      return "meia-ponta";
+    case "Ruptura":
+      return "vertical";
+    case "Armador":
+    case "Meia Armador":
+      return "armador";
+    case "Finalizador":
+    case "Meia Atacante":
+      return "finalizador";
+    case "Alvo":
+      return "alvo";
+    case "Móvel":
+      return "movel";
     default:
       return "hibrido";
   }

@@ -460,6 +460,33 @@
   background: linear-gradient(90deg, #4a6080, #6b82a0);
 }
 
+.profile-bar-fill.tone-combativo { background: linear-gradient(90deg, #be5a6d, #fb7185); }
+.profile-bar-fill.tone-construtor { background: linear-gradient(90deg, #2f9d72, #34d399); }
+.profile-bar-fill.tone-posicional { background: linear-gradient(90deg, #3b82c4, #60a5fa); }
+.profile-bar-fill.tone-defensivo { background: linear-gradient(90deg, #64748b, #94a3b8); }
+.profile-bar-fill.tone-vertical { background: linear-gradient(90deg, #7c6ee8, #a78bfa); }
+.profile-bar-fill.tone-ofensivo { background: linear-gradient(90deg, #ea7c2d, #fb923c); }
+.profile-bar-fill.tone-contencao { background: linear-gradient(90deg, #475569, #64748b); }
+.profile-bar-fill.tone-boxtobox { background: linear-gradient(90deg, #0d9488, #2dd4bf); }
+.profile-bar-fill.tone-criador { background: linear-gradient(90deg, #db2777, #f472b6); }
+.profile-bar-fill.tone-meia-ponta { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+.profile-bar-fill.tone-armador { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+.profile-bar-fill.tone-finalizador { background: linear-gradient(90deg, #dc2626, #f87171); }
+.profile-bar-fill.tone-alvo { background: linear-gradient(90deg, #b45309, #f59e0b); }
+.profile-bar-fill.tone-movel { background: linear-gradient(90deg, #0891b2, #22d3ee); }
+
+.rating-compact.tone-defensivo { border-color: rgba(148, 163, 184, 0.55); }
+.rating-compact.tone-vertical { border-color: rgba(167, 139, 250, 0.55); }
+.rating-compact.tone-ofensivo { border-color: rgba(251, 146, 60, 0.55); }
+.rating-compact.tone-contencao { border-color: rgba(100, 116, 139, 0.55); }
+.rating-compact.tone-boxtobox { border-color: rgba(45, 212, 191, 0.55); }
+.rating-compact.tone-criador { border-color: rgba(244, 114, 182, 0.55); }
+.rating-compact.tone-meia-ponta { border-color: rgba(96, 165, 250, 0.55); }
+.rating-compact.tone-armador { border-color: rgba(167, 139, 250, 0.55); }
+.rating-compact.tone-finalizador { border-color: rgba(248, 113, 113, 0.55); }
+.rating-compact.tone-alvo { border-color: rgba(245, 158, 11, 0.55); }
+.rating-compact.tone-movel { border-color: rgba(34, 211, 238, 0.55); }
+
 /* ── Aspect boards (compact) ── */
 
 .aspect-group-compact header h2 {
@@ -505,36 +532,39 @@
 .medal-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 1.35rem;
-  height: 1.15rem;
-  padding: 0 0.3rem;
-  border-radius: 4px;
+  gap: 0.2rem;
+  min-width: 2rem;
+  height: 1.2rem;
+  padding: 0 0.35rem 0 0.2rem;
+  border-radius: 999px;
   font-size: 0.58rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   flex-shrink: 0;
 }
 
+.medal-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+}
+
 .medal-badge.medal-gold {
   color: #78350f;
-  background: linear-gradient(135deg, #fde68a, #fbbf24);
-  border: 1px solid rgba(251, 191, 36, 0.5);
-  box-shadow: 0 1px 4px rgba(251, 191, 36, 0.25);
+  background: rgba(251, 191, 36, 0.14);
+  border: 1px solid rgba(251, 191, 36, 0.45);
 }
 
 .medal-badge.medal-silver {
   color: #334155;
-  background: linear-gradient(135deg, #f1f5f9, #94a3b8);
-  border: 1px solid rgba(148, 163, 184, 0.5);
-  box-shadow: 0 1px 4px rgba(148, 163, 184, 0.2);
+  background: rgba(148, 163, 184, 0.16);
+  border: 1px solid rgba(148, 163, 184, 0.45);
 }
 
 .medal-badge.medal-bronze {
-  color: #fff7ed;
-  background: linear-gradient(135deg, #fdba74, #d97706);
-  border: 1px solid rgba(217, 119, 6, 0.5);
-  box-shadow: 0 1px 4px rgba(217, 119, 6, 0.25);
+  color: #7c2d12;
+  background: rgba(217, 119, 6, 0.14);
+  border: 1px solid rgba(217, 119, 6, 0.45);
 }
 
 .aspect-card-compact strong {

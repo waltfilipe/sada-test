@@ -33,21 +33,13 @@ export type PlayerProfile = PlayerSummary & {
   assists: number;
   ratings: {
     geral: number;
-    combativo: number;
-    construtor: number;
-    posicional: number;
+    [profileKey: string]: number;
   };
   ranks: {
     geral: number;
-    combativo: number;
-    construtor: number;
-    posicional: number;
+    [profileKey: string]: number;
   };
-  profile_shares: {
-    combativo: number;
-    construtor: number;
-    posicional: number;
-  };
+  profile_shares: Record<string, number>;
   tendencies: {
     construcao: number;
     ofensividade: number;
