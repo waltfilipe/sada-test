@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PlayerResultCard } from "@/components/filters/PlayerResultCard";
+import { PlayerResultRow } from "@/components/filters/PlayerResultRow";
 import { RangeSlider } from "@/components/filters/RangeSlider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { POSITION_FAMILIES } from "@/lib/positions";
@@ -144,16 +144,6 @@ export function FiltrosClient({ meta, players }: Props) {
       return b.rating - a.rating;
     });
   }, [players, family, club, nationality, foot, profiles, query, rating, minutes, height, age, tendencies, sort]);
-
-  const summary = useMemo(() => {
-    if (!results.length) return null;
-    const ages = results.map((p) => (p.birth_year ? CURRENT_YEAR - p.birth_year : null)).filter(Boolean) as number[];
-    return {
-      rating: results.reduce((sum, p) => sum + p.rating, 0) / results.length,
-      age: ages.length ? ages.reduce((sum, value) => sum + value, 0) / ages.length : null,
-      minutes: results.reduce((sum, p) => sum + p.minutes, 0) / results.length,
-    };
-  }, [results]);
 
   const chips = useMemo(() => {
     const list: { key: string; label: string; clear: () => void }[] = [];
@@ -373,13 +363,10 @@ export function FiltrosClient({ meta, players }: Props) {
 
         <main className="filters-results">
           <div className="results-toolbar">
-            <div className="results-count">
+            <p className="results-count">
               <strong>{results.length}</strong>
-              <span>
-                {results.length === 1 ? "atleta encontrado" : "atletas encontrados"} em{" "}
-                {familyMeta.label.toLowerCase()}
-              </span>
-            </div>
+              {results.length === 1 ? " atleta" : " atletas"} · {familyMeta.label.toLowerCase()}
+            </p>
 
             <label className="results-sort">
               <span>Ordenar</span>
@@ -407,37 +394,10 @@ export function FiltrosClient({ meta, players }: Props) {
             </div>
           )}
 
-          {summary && (
-            <div className="results-summary">
-              <div>
-                <span>Rating médio</span>
-                <strong>{formatRating(summary.rating)}</strong>
-              </div>
-              <div>
-                <span>Idade média</span>
-                <strong>
-                  {summary.age ? summary.age.toFixed(1).replace(".", ",") : "—"}
-                  <em>anos</em>
-                </strong>
-              </div>
-              <div>
-                <span>Minutagem média</span>
-                <strong>{Math.round(summary.minutes).toLocaleString("pt-BR")}</strong>
-              </div>
-              <div>
-                <span>Do pool</span>
-                <strong>
-                  {Math.round((results.length / (familyMeta.count || 1)) * 100)}
-                  <em>%</em>
-                </strong>
-              </div>
-            </div>
-          )}
-
           {results.length > 0 ? (
-            <div className="results-grid">
+            <div className="results-list">
               {results.map((player) => (
-                <PlayerResultCard key={player.player_id} player={player} />
+                <PlayerResultRow key={player.player_id} player={player} />
               ))}
             </div>
           ) : (

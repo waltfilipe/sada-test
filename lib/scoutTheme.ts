@@ -149,9 +149,39 @@ export function rankPercentile(rank: number, poolSize: number): number {
 }
 
 export const TENDENCY_META = [
-  { key: "contencao", short: "CNT", label: "Contenção", hint: "Leitura e cobertura defensiva" },
-  { key: "def1v1", short: "1V1", label: "1vs1 defensivo", hint: "Eficiência em duelos individuais" },
-  { key: "duelo_aereo", short: "ARE", label: "Duelo aéreo", hint: "Domínio nas disputas pelo alto" },
-  { key: "construcao", short: "CNS", label: "Construção", hint: "Saída e progressão de bola" },
-  { key: "ofensividade", short: "OFE", label: "Ofensividade", hint: "Impacto no terço ofensivo" },
+  {
+    key: "contencao",
+    short: "CNT",
+    compact: "Contenção",
+    label: "Contenção",
+    hint: "Leitura e cobertura defensiva",
+  },
+  {
+    key: "def1v1",
+    short: "1V1",
+    compact: "1v1 Def.",
+    label: "1vs1 defensivo",
+    hint: "Eficiência em duelos individuais",
+  },
+  {
+    key: "duelo_aereo",
+    short: "ARE",
+    compact: "Aéreo",
+    label: "Duelo aéreo",
+    hint: "Domínio nas disputas pelo alto",
+  },
+  {
+    key: "construcao",
+    short: "CNS",
+    compact: "Construção",
+    label: "Construção",
+    hint: "Saída e progressão de bola",
+  },
+  {
+    key: "ofensividade",
+    short: "OFE",
+    compact: "Ofensivo",
+    label: "Ofensividade",
+    hint: "Impacto no terço ofensivo",
+  },
 ] as const;
