@@ -489,7 +489,7 @@
   display: grid;
   grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
   gap: 1rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 /* ── Panels ──────────────────────────────────────────────────────────────── */
@@ -676,12 +676,12 @@
 
 .dial-track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.06);
+  stroke: rgba(255, 255, 255, 0.1);
 }
 
 .dial-reference {
-  stroke: rgba(233, 240, 248, 0.45);
-  stroke-width: 1.5;
+  stroke: rgba(233, 240, 248, 0.62);
+  stroke-width: 1.6;
   stroke-linecap: round;
 }
 
@@ -885,28 +885,45 @@
   background: var(--tier-soft);
 }
 
+.rating-card-body {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.55rem;
+}
+
 .rating-card-value {
-  display: block;
-  margin: 0.4rem 0 0.55rem;
   font-family: "Sora", sans-serif;
-  font-size: 1.85rem;
+  font-size: 2rem;
   font-weight: 600;
   line-height: 1;
   color: var(--tier-color);
   font-variant-numeric: tabular-nums;
 }
 
+.rating-card-detail {
+  display: grid;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 0;
+}
+
 .rating-card-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 0.5rem;
+  gap: 0.5rem;
   font-size: 0.7rem;
 }
 
 .rating-card-foot span {
-  color: var(--text-3);
+  color: var(--text-2);
   font-variant-numeric: tabular-nums;
+}
+
+.rating-card-foot span i {
+  font-style: normal;
+  color: var(--text-3);
 }
 
 .rating-card-foot em {
@@ -937,6 +954,11 @@
 
 /* ── Profile DNA ─────────────────────────────────────────────────────────── */
 
+.profile-dna {
+  display: flex;
+  flex-direction: column;
+}
+
 .dna-stack {
   display: flex;
   gap: 3px;
@@ -953,7 +975,9 @@
 
 .dna-legend {
   display: grid;
-  gap: 0.55rem;
+  flex: 1;
+  align-content: space-evenly;
+  gap: 0.15rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -964,6 +988,12 @@
   grid-template-columns: 8px minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.6rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.dna-legend li:last-child {
+  border-bottom: 0;
 }
 
 .dna-dot {
@@ -991,7 +1021,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 0.75rem;
-  margin: 1.1rem 0 0;
+  margin: auto 0 0;
   padding-top: 0.85rem;
   border-top: 1px solid var(--line);
 }
@@ -1018,7 +1048,7 @@
 
 .skill-row {
   display: grid;
-  grid-template-columns: minmax(0, 200px) minmax(0, 1fr) 74px;
+  grid-template-columns: minmax(0, 216px) minmax(0, 1fr) 78px;
   align-items: center;
   gap: 1rem;
   padding: 0.6rem 0.5rem;
@@ -1051,11 +1081,14 @@
   white-space: nowrap;
 }
 
-.skill-track {
+.skill-meter {
   position: relative;
+}
+
+.skill-track {
   height: 7px;
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.07);
   overflow: hidden;
 }
 
@@ -1070,15 +1103,16 @@
 .skill-mid {
   position: absolute;
   left: 50%;
-  top: -2px;
-  bottom: -2px;
+  top: 50%;
   width: 1px;
+  height: 15px;
+  transform: translate(-50%, -50%);
   background: repeating-linear-gradient(
     to bottom,
-    rgba(233, 240, 248, 0.5) 0 2px,
+    rgba(233, 240, 248, 0.62) 0 2px,
     transparent 2px 4px
   );
-  z-index: 1;
+  pointer-events: none;
 }
 
 .skill-score {

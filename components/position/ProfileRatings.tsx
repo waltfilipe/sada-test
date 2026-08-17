@@ -35,15 +35,20 @@ export function ProfileRatings({ player, poolSize }: { player: PlayerProfile; po
                 {isBest && <span className="rating-card-flag">Dominante</span>}
               </div>
 
-              <strong className="rating-card-value">{formatRating(value)}</strong>
+              <div className="rating-card-body">
+                <strong className="rating-card-value">{formatRating(value)}</strong>
 
-              <div className="meter">
-                <i style={{ width: `${clampPercent(value * 10)}%` }} />
-              </div>
-
-              <div className="rating-card-foot">
-                <span>#{rank}</span>
-                <em>{token.label}</em>
+                <div className="rating-card-detail">
+                  <div className="meter">
+                    <i style={{ width: `${clampPercent(value * 10)}%` }} />
+                  </div>
+                  <div className="rating-card-foot">
+                    <span>
+                      #{rank} <i>no pool</i>
+                    </span>
+                    <em>{token.label}</em>
+                  </div>
+                </div>
               </div>
             </article>
           );

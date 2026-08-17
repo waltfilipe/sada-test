@@ -86,19 +86,18 @@ export function MedalBadge({ medal, withLabel = false, size = 20 }: Props) {
           </linearGradient>
         </defs>
 
-        <path d="M7.4 1 L13 11 L9.6 13.4 L3.4 4.2 Z" fill={`url(#${ribbon})`} opacity="0.92" />
-        <path d="M20.6 1 L15 11 L18.4 13.4 L24.6 4.2 Z" fill={`url(#${ribbon})`} opacity="0.72" />
+        <path d="M6.6 0 L12.8 9.8 L9 12.2 L2.2 2.6 Z" fill={`url(#${ribbon})`} />
+        <path d="M21.4 0 L15.2 9.8 L19 12.2 L25.8 2.6 Z" fill={`url(#${ribbon})`} opacity="0.7" />
 
-        <circle cx="14" cy="21" r="9.4" fill="rgba(0,0,0,0.28)" />
-        <circle cx="14" cy="20.6" r="9" fill={`url(#${face})`} />
-        <circle cx="14" cy="20.6" r="9" fill="none" stroke={p.ring} strokeOpacity="0.5" strokeWidth="0.7" />
-        <circle cx="14" cy="20.6" r="6.6" fill="none" stroke={p.mark} strokeOpacity="0.28" strokeWidth="0.8" />
+        <circle cx="14" cy="20.4" r="10.4" fill="rgba(0,0,0,0.35)" />
+        <circle cx="14" cy="20" r="10" fill={`url(#${face})`} />
+        <circle cx="14" cy="20" r="10" fill="none" stroke={p.ring} strokeOpacity="0.65" strokeWidth="0.9" />
         <path
-          d="M14 15.6 L15.5 18.7 L18.9 19.2 L16.4 21.6 L17 25 L14 23.4 L11 25 L11.6 21.6 L9.1 19.2 L12.5 18.7 Z"
+          d="M14 13.8 L15.85 17.6 L20.05 18.2 L17.02 21.15 L17.74 25.3 L14 23.34 L10.26 25.3 L10.98 21.15 L7.95 18.2 L12.15 17.6 Z"
           fill={p.mark}
-          fillOpacity="0.42"
+          fillOpacity="0.62"
         />
-        <ellipse cx="14" cy="17.4" rx="6.6" ry="4" fill={`url(#${sheen})`} />
+        <ellipse cx="14" cy="16.4" rx="7.2" ry="4.2" fill={`url(#${sheen})`} />
       </svg>
       {withLabel && <span className="sc-medal-caption">{meta.short}</span>}
     </span>

@@ -37,9 +37,9 @@ export function SkillIndexPanel({ player, family }: Props) {
 
               <div className="skill-meter">
                 <div className="skill-track">
-                  <span className="skill-mid" aria-hidden />
                   <i style={{ width: `${value}%` }} />
                 </div>
+                <span className="skill-mid" aria-hidden />
               </div>
 
               <div className="skill-score">

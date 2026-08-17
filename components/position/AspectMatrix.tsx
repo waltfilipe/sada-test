@@ -49,7 +49,7 @@ export function AspectMatrix({ player }: { player: PlayerProfile }) {
                     <div className="aspect-row-top">
                       <span className="aspect-name">{item.label}</span>
                       <div className="aspect-marks">
-                        {item.medal && <MedalBadge medal={item.medal} size={16} />}
+                        {item.medal && <MedalBadge medal={item.medal} size={19} />}
                         <span className="grade-chip">{normalizeGrade(item.grade)}</span>
                       </div>
                     </div>
