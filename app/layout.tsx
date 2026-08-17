@@ -4,6 +4,7 @@ import "./globals.css";
 import "./scout.css";
 import "./filters.css";
 import "./compare.css";
+import "./scatter.css";
 
 export const metadata: Metadata = {
   title: "Série A Scout",

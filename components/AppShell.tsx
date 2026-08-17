@@ -11,7 +11,7 @@ const NAV = [
   { href: "/scatter", label: "Scatter", icon: "◈" },
 ];
 
-const FULL_BLEED = ["/posicao/", "/filtros", "/comparar"];
+const FULL_BLEED = ["/posicao/", "/filtros", "/comparar", "/scatter"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
