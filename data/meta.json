@@ -1,0 +1,346 @@
+{
+  "league": "Série A",
+  "season": "2025/26",
+  "source": "xlsx",
+  "player_count": 347,
+  "families": [
+    {
+      "key": "zagueiros",
+      "label": "Zagueiros",
+      "positions": [
+        "Zagueiro"
+      ],
+      "profiles": [
+        "Combativo",
+        "Construtor",
+        "Posicional",
+        "Híbrido"
+      ],
+      "count": 71
+    },
+    {
+      "key": "laterais",
+      "label": "Laterais",
+      "positions": [
+        "Lateral Direito",
+        "Lateral Esquerdo"
+      ],
+      "profiles": [
+        "Defensivo",
+        "Construtor",
+        "Ofensivo",
+        "Vertical",
+        "Híbrido"
+      ],
+      "count": 68
+    },
+    {
+      "key": "meio-campistas",
+      "label": "Meio-campistas",
+      "positions": [
+        "Meio-campista"
+      ],
+      "profiles": [
+        "Contenção",
+        "Construtor",
+        "Box-to-box",
+        "Ofensivo",
+        "Híbrido"
+      ],
+      "count": 81
+    },
+    {
+      "key": "extremos",
+      "label": "Extremos",
+      "positions": [
+        "Extremo Direito",
+        "Extremo Esquerdo"
+      ],
+      "profiles": [
+        "Finalizador",
+        "Criador",
+        "Vertical",
+        "Híbrido"
+      ],
+      "count": 20
+    },
+    {
+      "key": "meias-ofensivos",
+      "label": "Meias Ofensivos",
+      "positions": [
+        "Meia Ofensivo"
+      ],
+      "profiles": [
+        "Armador",
+        "Finalizador",
+        "Móvel",
+        "Híbrido"
+      ],
+      "count": 64
+    },
+    {
+      "key": "atacantes",
+      "label": "Atacantes",
+      "positions": [
+        "Atacante"
+      ],
+      "profiles": [
+        "Finalizador",
+        "Alvo",
+        "Móvel",
+        "Híbrido"
+      ],
+      "count": 43
+    }
+  ],
+  "clubs": [
+    "Al Feiha",
+    "Al Sharjah",
+    "Athletico Paranaense",
+    "Atlanta United",
+    "Atlante",
+    "Atlético Mineiro",
+    "Bahia",
+    "Batman Petrolspor",
+    "Botafogo",
+    "Ceará",
+    "Chapecoense",
+    "Como",
+    "Corinthians",
+    "Coritiba",
+    "Cruzeiro",
+    "Fiorentina",
+    "Flamengo",
+    "Fluminense",
+    "Fortaleza",
+    "Grêmio",
+    "Grêmio U20",
+    "Internacional",
+    "Juventus",
+    "Júbilo Iwata",
+    "Krasnodar",
+    "Londrina",
+    "Mirassol",
+    "New York City",
+    "Náutico",
+    "Palmeiras",
+    "Qatar SC",
+    "Real Betis",
+    "Red Bull Bragantino",
+    "Red Bull Bragantino U20",
+    "Remo",
+    "River Plate",
+    "Santos",
+    "Santos U20",
+    "Shenzhen Peng City",
+    "Sport Recife",
+    "São Paulo",
+    "São Paulo U20",
+    "Tigres UANL",
+    "Vasco da Gama",
+    "Vila Nova",
+    "Vitória"
+  ],
+  "nationalities": [
+    "Angola",
+    "Argentina",
+    "Belgium",
+    "Bolivia",
+    "Brazil",
+    "Cameroon",
+    "Chile",
+    "Colombia",
+    "Congo DR",
+    "Denmark",
+    "Ecuador",
+    "England",
+    "Germany",
+    "Ghana",
+    "Guinea",
+    "Netherlands",
+    "Panama",
+    "Paraguay",
+    "Peru",
+    "Portugal",
+    "Spain",
+    "Uruguay",
+    "Venezuela"
+  ],
+  "filters": {
+    "height": [
+      0,
+      196
+    ],
+    "minutes": [
+      0,
+      2167
+    ],
+    "birth_year": [
+      1986,
+      2009
+    ],
+    "rating": [
+      5.2,
+      8.8
+    ]
+  },
+  "scatter_metrics": {
+    "zagueiros": [
+      {
+        "key": "intervencoes",
+        "label": "Intervenções",
+        "field": "Interseções"
+      },
+      {
+        "key": "confrontos_of",
+        "label": "Confrontos Ofensivos",
+        "field": "DuelosOf"
+      },
+      {
+        "key": "construcao",
+        "label": "Construção",
+        "field": "n_construcao"
+      },
+      {
+        "key": "duelo_ar",
+        "label": "Duelo Aéreo",
+        "field": "n_duelo_ar"
+      },
+      {
+        "key": "contencao",
+        "label": "Contenção",
+        "field": "n_leitura_def"
+      },
+      {
+        "key": "ofensividade",
+        "label": "Ofensividade",
+        "field": "n_conducao"
+      },
+      {
+        "key": "passes_prog",
+        "label": "Passes Progressivos",
+        "field": "PassesProg"
+      },
+      {
+        "key": "duelos_def",
+        "label": "Duelos Defensivos",
+        "field": "DuelosDef"
+      }
+    ],
+    "laterais": [
+      {
+        "key": "cruzamentos",
+        "label": "Cruzamentos",
+        "field": "Cruz."
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "construcao",
+        "label": "Construção",
+        "field": "n_construcao"
+      },
+      {
+        "key": "duelos_def",
+        "label": "Duelos Defensivos",
+        "field": "DuelosDef"
+      }
+    ],
+    "meio-campistas": [
+      {
+        "key": "passes_prog",
+        "label": "Passes Progressivos",
+        "field": "PassesProg"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "construcao",
+        "label": "Construção",
+        "field": "n_construcao"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      }
+    ],
+    "extremos": [
+      {
+        "key": "dribles",
+        "label": "Dribles",
+        "field": "Dribles"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      },
+      {
+        "key": "finalizacao",
+        "label": "Finalizações",
+        "field": "Finalizações"
+      }
+    ],
+    "meias-ofensivos": [
+      {
+        "key": "passes_chave",
+        "label": "Passes Chave",
+        "field": "PassesChave"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      },
+      {
+        "key": "gols",
+        "label": "Gols",
+        "field": "Gols"
+      }
+    ],
+    "atacantes": [
+      {
+        "key": "gols",
+        "label": "Gols",
+        "field": "Gols"
+      },
+      {
+        "key": "finalizacao",
+        "label": "Finalizações",
+        "field": "Finalizações"
+      },
+      {
+        "key": "toques_area",
+        "label": "Toques na Área",
+        "field": "ToquesArea"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      }
+    ]
+  }
+}
