@@ -426,12 +426,18 @@
   white-space: nowrap;
 }
 
+/* The margin is tinted with the leading side's colour so it reads as "who is
+   ahead, and by how much" rather than as part of the metric label. */
 .versus-label em {
   font-style: normal;
-  font-size: 0.62rem;
+  font-size: 0.63rem;
+  font-weight: 600;
   color: var(--text-3);
   font-variant-numeric: tabular-nums;
 }
+
+.leads-a .versus-label em { color: var(--side-a); }
+.leads-b .versus-label em { color: var(--side-b); }
 
 /* ── Aspect comparison ───────────────────────────────────────────────────── */
 

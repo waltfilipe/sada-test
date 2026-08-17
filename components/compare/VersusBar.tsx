@@ -34,7 +34,7 @@ export function VersusBar({ label, hint, valueA, valueB, max = 100, format }: Pr
 
       <div className="versus-label">
         <span title={hint}>{label}</span>
-        {gap > 0 && <em>{display(gap)}</em>}
+        {gap > 0 && <em>+{display(gap)}</em>}
       </div>
 
       <div className="versus-track side-b">
