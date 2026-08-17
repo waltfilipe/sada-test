@@ -120,7 +120,8 @@ export function FiltrosClient({ meta, players }: Props) {
       if (player.rating < rating[0] || player.rating > rating[1]) return false;
       if (player.minutes < minutes[0] || player.minutes > minutes[1]) return false;
 
-      if (player.height != null && (player.height < height[0] || player.height > height[1])) return false;
+      // Height 0 means "not recorded", so those athletes are never excluded by the range.
+      if (player.height && (player.height < height[0] || player.height > height[1])) return false;
 
       if (player.birth_year != null) {
         const playerAge = CURRENT_YEAR - player.birth_year;
