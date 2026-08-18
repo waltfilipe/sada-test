@@ -12,6 +12,7 @@ from engine.measures import attach_base_measures
 from engine.positions import (
     POSITION_FAMILIES,
     SCATTER_METRICS,
+    attach_aspect_percentiles,
     build_player_payload,
     compute_family_metrics,
 )
@@ -38,7 +39,7 @@ def main() -> None:
     nationalities = sorted({str(n) for n in df["Naturalidade"].dropna().unique()})
 
     for family_key, family in POSITION_FAMILIES.items():
-        computed = compute_family_metrics(df, family_key)
+        computed = attach_aspect_percentiles(compute_family_metrics(df, family_key))
         pool_size = len(computed)
         players = [build_player_payload(row, family_key, pool_size) for _, row in computed.iterrows()]
         family_payloads[family_key] = players

@@ -692,6 +692,136 @@ def medal_for_rank(rank: int, pool_size: int) -> str | None:
     return None
 
 
+def _pool_percentile(pool: pd.DataFrame, *columns: str) -> pd.Series:
+    return percentile_rank(_feat_col(pool, *columns), ascending=True)
+
+
+def _pct_eff(pool: pd.DataFrame, raw_col: str, engine_col: str) -> pd.Series:
+    if raw_col in pool.columns:
+        return _pool_percentile(pool, raw_col)
+    if engine_col in pool.columns:
+        return percentile_rank(pool[engine_col].astype(float) * 100, ascending=True)
+    return pd.Series(0.0, index=pool.index)
+
+
+def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
+    """Pre-compute pool percentiles for each aspect sub-stat."""
+    out = pool.copy()
+    mappings: dict[str, pd.Series] = {
+        "duelos_def_vol": _pool_percentile(out, "Duelos defensivos/90", "DuelosDef"),
+        "duelos_def_eff": _pct_eff(out, "Duelos defensivos ganhos, %", "%DuelosDefW"),
+        "duelos_ar_vol": _pool_percentile(out, "Duelos aérios/90", "DuelosAr"),
+        "duelos_ar_eff": _pct_eff(out, "Duelos aéreos ganhos, %", "%DuelosAr"),
+        "inter_vol": _pool_percentile(out, "Interseções/90", "Interseções"),
+        "rem_int_vol": _pool_percentile(out, "Remates intercetados/90"),
+        "passes_prog_vol": _pool_percentile(out, "Passes progressivos/90", "PassesProg"),
+        "passes_prog_eff": _pct_eff(out, "Passes progressivos certos, %", "%EffPassProg"),
+        "ptf_vol": _pool_percentile(out, "Passes para terço final/90", "PTF"),
+        "ptf_eff": _pct_eff(out, "Passes certos para terço final, %", "%EffPassTF"),
+        "passes_long_vol": _pool_percentile(out, "Passes longos/90", "PassesLongos"),
+        "passes_long_eff": _pct_eff(out, "Passes longos certos, %", "%EffPassesLng"),
+        "duelos_of_vol": _pool_percentile(out, "Duelos ofensivos/90", "DuelosOf"),
+        "duelos_of_eff": _pct_eff(out, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
+        "prog_vol": _pool_percentile(out, "Corridas progressivas/90", "Cond.Prog"),
+    }
+    for key, series in mappings.items():
+        out[f"_asp_{key}"] = series
+    return out
+
+
+def _aspect_stat(label: str, pct: Any) -> dict[str, Any]:
+    return {"label": label, "percentile": round(float(pct or 0), 1)}
+
+
+def _aspect_grade_two(vol: Any, eff: Any, *, w_vol: float = 0.4, w_eff: float = 0.6) -> str:
+    return _grade_from_pct(float(vol or 0) * w_vol + float(eff or 0) * w_eff)
+
+
+def _aspect_grade_mean(a: Any, b: Any) -> str:
+    return _grade_from_pct((float(a or 0) + float(b or 0)) / 2)
+
+
+def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
+    dd_v, dd_e = row.get("_asp_duelos_def_vol", 0), row.get("_asp_duelos_def_eff", 0)
+    da_v, da_e = row.get("_asp_duelos_ar_vol", 0), row.get("_asp_duelos_ar_eff", 0)
+    inter, rem = row.get("_asp_inter_vol", 0), row.get("_asp_rem_int_vol", 0)
+    pp_v, pp_e = row.get("_asp_passes_prog_vol", 0), row.get("_asp_passes_prog_eff", 0)
+    ptf_v, ptf_e = row.get("_asp_ptf_vol", 0), row.get("_asp_ptf_eff", 0)
+    pl_v, pl_e = row.get("_asp_passes_long_vol", 0), row.get("_asp_passes_long_eff", 0)
+    do_v, do_e = row.get("_asp_duelos_of_vol", 0), row.get("_asp_duelos_of_eff", 0)
+    prog = row.get("_asp_prog_vol", 0)
+
+    return {
+        "defensivos": [
+            {
+                "label": "Duelos Defensivos",
+                "grade": _aspect_grade_two(dd_v, dd_e),
+                "stats": [
+                    _aspect_stat("Duelos Defensivos / 90", dd_v),
+                    _aspect_stat("% Duelos Vencidos", dd_e),
+                ],
+            },
+            {
+                "label": "Duelos Aéreos",
+                "grade": _aspect_grade_two(da_v, da_e),
+                "stats": [
+                    _aspect_stat("Duelos Aéreos / 90", da_v),
+                    _aspect_stat("% Duelos Aéreos Vencidos", da_e),
+                ],
+            },
+            {
+                "label": "Intervenções",
+                "grade": _aspect_grade_mean(inter, rem),
+                "stats": [
+                    _aspect_stat("Interseções / 90", inter),
+                    _aspect_stat("Remates Interceptados / 90", rem),
+                ],
+            },
+        ],
+        "construcao": [
+            {
+                "label": "Passes Progressivos",
+                "grade": _aspect_grade_two(pp_v, pp_e),
+                "stats": [
+                    _aspect_stat("Passes Progressivos / 90", pp_v),
+                    _aspect_stat("% Passes Progressivos Certos", pp_e),
+                ],
+            },
+            {
+                "label": "Passes para Terço Final",
+                "grade": _aspect_grade_two(ptf_v, ptf_e),
+                "stats": [
+                    _aspect_stat("Passes Terço Final / 90", ptf_v),
+                    _aspect_stat("% Passes Terço Final Certos", ptf_e),
+                ],
+            },
+            {
+                "label": "Passes Longos",
+                "grade": _aspect_grade_two(pl_v, pl_e),
+                "stats": [
+                    _aspect_stat("Passes Longos / 90", pl_v),
+                    _aspect_stat("% Passes Longos Certos", pl_e),
+                ],
+            },
+        ],
+        "ofensivos": [
+            {
+                "label": "Duelos Ofensivos",
+                "grade": _aspect_grade_two(do_v, do_e),
+                "stats": [
+                    _aspect_stat("Duelos Ofensivos / 90", do_v),
+                    _aspect_stat("% Duelos Ofensivos Vencidos", do_e),
+                ],
+            },
+            {
+                "label": "Progressão",
+                "grade": _grade_from_pct(prog),
+                "stats": [_aspect_stat("Conduções Progressivas / 90", prog)],
+            },
+        ],
+    }
+
+
 def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dict[str, Any]:
     family = POSITION_FAMILIES[family_key]
     tendencies = {
@@ -704,24 +834,7 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
     profile_shares = profile_shares_from_row(row, family_key)
     profile_ratings = profile_ratings_from_row(row, family_key)
     profile_rank_map = profile_ranks_from_row(row, family_key)
-    first_rank = next(iter(profile_rank_map.values()), int(row.get("rank_geral", pool_size)))
-
-    aspects = {
-        "defensivos": [
-            {"label": "Confrontos", "grade": _grade_from_pct(row.get("n_duelos_def", 0)), "medal": medal_for_rank(first_rank, pool_size)},
-            {"label": "Duelos Aéreos", "grade": _grade_from_pct(row.get("n_duelo_ar", 0)), "medal": medal_for_rank(first_rank, pool_size)},
-            {"label": "Intervenções", "grade": _grade_from_pct(row.get("n_contencao", row.get("n_leitura_def", 0))), "medal": medal_for_rank(int(row.get("rank_geral", pool_size)), pool_size)},
-        ],
-        "construcao": [
-            {"label": "Passes Verticais", "grade": _grade_from_pct(row.get("n_construcao", 0)), "medal": medal_for_rank(first_rank, pool_size)},
-            {"label": "PCF", "grade": _grade_from_pct(row.get("n_construcao", 0) * 0.9), "medal": medal_for_rank(first_rank, pool_size)},
-            {"label": "Passes Longos", "grade": _grade_from_pct(row.get("n_construcao", 0) * 0.8), "medal": None},
-        ],
-        "ofensivos": [
-            {"label": "Ball Security", "grade": _grade_from_pct(row.get("n_conducao", 0) * 0.7), "medal": None},
-            {"label": "Progressão", "grade": _grade_from_pct(row.get("n_conducao", 0)), "medal": medal_for_rank(first_rank, pool_size)},
-        ],
-    }
+    aspects = _build_aspects(row)
 
     ratings = {"geral": round(float(row["rating_geral"]), 1), **profile_ratings}
     ranks = {"geral": int(row["rank_geral"]), **profile_rank_map}

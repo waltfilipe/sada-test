@@ -1400,18 +1400,38 @@
 
 .aspect-group ul {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.35rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.aspect-row-top {
+.aspect-row {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.aspect-row-trigger {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
-  margin-bottom: 0.42rem;
+  width: 100%;
+  padding: 0.42rem 0.5rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.aspect-row-trigger:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.aspect-row.is-open .aspect-row-trigger {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .aspect-name {
@@ -1422,11 +1442,77 @@
   white-space: nowrap;
 }
 
-.aspect-marks {
+.aspect-row-end {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.45rem;
   flex-shrink: 0;
+}
+
+.aspect-chevron {
+  color: var(--text-3);
+  transition: transform 0.18s ease;
+}
+
+.aspect-row.is-open .aspect-chevron {
+  transform: rotate(180deg);
+}
+
+.aspect-grade {
+  min-width: 1.6rem;
+  font-family: "Sora", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: right;
+  color: var(--tier-color);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.aspect-stats {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.15rem 0.5rem 0.65rem 0.65rem;
+  border-left: 2px solid var(--line);
+  margin: 0.1rem 0 0.25rem 0.85rem;
+}
+
+.aspect-stat-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.28rem;
+}
+
+.aspect-stat-label {
+  font-size: 0.68rem;
+  color: var(--text-3);
+  line-height: 1.3;
+}
+
+.aspect-stat-pct {
+  font-family: "Sora", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--tier-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.aspect-stat-bar {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.aspect-stat-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--tier-color);
+  opacity: 0.85;
 }
 
 .grade-chip {

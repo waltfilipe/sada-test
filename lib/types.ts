@@ -6,10 +6,15 @@ export type PositionFamily =
   | "meias-ofensivos"
   | "atacantes";
 
+export type AspectStat = {
+  label: string;
+  percentile: number;
+};
+
 export type AspectItem = {
   label: string;
   grade: string;
-  medal: "gold" | "silver" | "bronze" | null;
+  stats: AspectStat[];
 };
 
 export type TransfermarktInfo = {
