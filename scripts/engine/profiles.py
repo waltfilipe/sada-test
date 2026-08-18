@@ -410,10 +410,12 @@ FAMILY_PROFILE_CONFIG: dict[str, FamilyProfileConfig] = {
 
 def profile_shares_from_row(row: pd.Series, family_key: str) -> dict[str, float]:
     if family_key == "zagueiros":
+        con = float(row.get("score_con", 0))
+        def_ = float(row.get("score_def", 0))
+        total = con + def_ or 1.0
         return {
-            "combativo": round(float(row.get("pct_combativo", 0)) * 100, 0),
-            "construtor": round(float(row.get("pct_construtor", 0)) * 100, 0),
-            "posicional": round(float(row.get("pct_posicional", 0)) * 100, 0),
+            "construcao": round(con / total * 100, 0),
+            "defesa": round(def_ / total * 100, 0),
         }
     config = FAMILY_PROFILE_CONFIG[family_key]
     shares: dict[str, float] = {}
@@ -425,9 +427,9 @@ def profile_shares_from_row(row: pd.Series, family_key: str) -> dict[str, float]
 def profile_ratings_from_row(row: pd.Series, family_key: str) -> dict[str, float]:
     if family_key == "zagueiros":
         return {
-            "combativo": round(float(row.get("rating_combativo", 0)), 1),
-            "construtor": round(float(row.get("rating_construtor", 0)), 1),
-            "posicional": round(float(row.get("rating_posicional", 0)), 1),
+            "construcao": round(float(row.get("rating_construcao", 0)), 1),
+            "defesa": round(float(row.get("rating_defesa", 0)), 1),
+            "perfil": round(float(row.get("rating_perfil", 0)), 1),
         }
     config = FAMILY_PROFILE_CONFIG[family_key]
     ratings: dict[str, float] = {}
@@ -439,9 +441,9 @@ def profile_ratings_from_row(row: pd.Series, family_key: str) -> dict[str, float
 def profile_ranks_from_row(row: pd.Series, family_key: str) -> dict[str, int]:
     if family_key == "zagueiros":
         return {
-            "combativo": int(row.get("rank_combativo", 0)),
-            "construtor": int(row.get("rank_construtor", 0)),
-            "posicional": int(row.get("rank_posicional", 0)),
+            "construcao": int(row.get("rank_construcao", 0)),
+            "defesa": int(row.get("rank_defesa", 0)),
+            "perfil": int(row.get("rank_perfil", 0)),
         }
     config = FAMILY_PROFILE_CONFIG[family_key]
     ranks: dict[str, int] = {}

@@ -604,6 +604,9 @@
 }
 
 .profile-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
   padding: 0.18rem 0.5rem;
   border-radius: 5px;
   font-size: 0.68rem;
@@ -611,6 +614,13 @@
   color: var(--tone);
   background: color-mix(in srgb, var(--tone) 13%, transparent);
   border: 1px solid color-mix(in srgb, var(--tone) 32%, transparent);
+}
+
+.profile-lean {
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--tone) 72%, var(--text-2));
+  opacity: 0.92;
 }
 
 .dossier-identity h1 {

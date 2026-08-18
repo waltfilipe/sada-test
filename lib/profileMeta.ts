@@ -8,9 +8,9 @@ export type ProfileMetaItem = {
 
 export const FAMILY_PROFILE_META: Record<PositionFamily, ProfileMetaItem[]> = {
   zagueiros: [
-    { key: "combativo", label: "Combativo", tone: "combativo" },
-    { key: "construtor", label: "Construtor", tone: "construtor" },
-    { key: "posicional", label: "Posicional", tone: "posicional" },
+    { key: "construcao", label: "Construção", tone: "construtor" },
+    { key: "defesa", label: "Defesa", tone: "defensivo" },
+    { key: "perfil", label: "Nota no perfil", tone: "hibrido" },
   ],
   laterais: [
     { key: "defensivo", label: "Defensivo", tone: "defensivo" },
@@ -44,13 +44,20 @@ export function profileMetaForFamily(family: PositionFamily): ProfileMetaItem[] 
   return FAMILY_PROFILE_META[family];
 }
 
-/** Maps a zagueiro classification label to the rating card key to highlight. */
-export function dominantRatingKey(profile: string, family: PositionFamily): string | null {
+/** Highlights the axis card that best matches the player's classified profile. */
+export function dominantRatingKey(
+  profile: string,
+  family: PositionFamily,
+  hybridLean?: string | null,
+): string | null {
   if (family !== "zagueiros") {
     const match = FAMILY_PROFILE_META[family].find((item) => item.label === profile);
     return match?.key ?? null;
   }
-  if (profile === "Construtor" || profile === "Híbrido + Construtor") return "construtor";
-  if (profile === "Defensivo" || profile === "Híbrido + Defensivo") return "posicional";
+  if (profile === "Construtor") return "construcao";
+  if (profile === "Defensivo") return "defesa";
+  if (profile === "Híbrido") {
+    return hybridLean === "+ Construtor" ? "construcao" : "defesa";
+  }
   return null;
 }

@@ -17,19 +17,14 @@ from .normalize import (
 from .profiles import FAMILY_PROFILE_CONFIG, profile_ratings_from_row, profile_ranks_from_row, profile_shares_from_row
 
 
-ZAG_PROFILES = [
-    "Construtor",
-    "Defensivo",
-    "Híbrido + Construtor",
-    "Híbrido + Defensivo",
-]
+ZAG_PROFILES = ["Construtor", "Defensivo", "Híbrido"]
 
 POSITION_FAMILIES: dict[str, dict[str, Any]] = {
     "zagueiros": {
         "label": "Zagueiros",
         "positions": ["Zagueiro"],
         "profiles": ZAG_PROFILES,
-        "profile_map": {"combativo": "Combativo", "construtor": "Construtor", "posicional": "Posicional"},
+        "profile_map": {"construcao": "Construção", "defesa": "Defesa", "perfil": "Perfil"},
     },
     "laterais": {
         "label": "Laterais",
@@ -171,8 +166,13 @@ def _score_axis(frame: pd.DataFrame) -> pd.Series:
     return scaled.mean(axis=1)
 
 
-def _classify_zag_k3(out: pd.DataFrame) -> pd.Series:
-    """K=3 on construction vs defense scores; split hybrids by con/def lean."""
+def _rescale_rating_band(series: pd.Series, lo: float = 5.0, hi: float = 9.5) -> pd.Series:
+    ranked = series.rank(method="average", pct=True)
+    return lo + ranked * (hi - lo)
+
+
+def _apply_zag_k3_classification(out: pd.DataFrame) -> None:
+    """K=3 on construction vs defense; profile is always one of 3, lean is visual metadata."""
     from sklearn.cluster import KMeans
     from sklearn.preprocessing import StandardScaler
 
@@ -211,15 +211,30 @@ def _classify_zag_k3(out: pd.DataFrame) -> pd.Series:
     cluster_to_base = {con_i: "Construtor", def_i: "Defensivo", hybrid_i: "Híbrido"}
 
     profiles: list[str] = []
+    leans: list[str | None] = []
     for idx, cluster in enumerate(km.labels_):
         base = cluster_to_base[int(cluster)]
+        profiles.append(base)
         if base != "Híbrido":
-            profiles.append(base)
+            leans.append(None)
             continue
         gap = float(score_con.iloc[idx] - score_def.iloc[idx])
-        profiles.append("Híbrido + Construtor" if gap >= 0 else "Híbrido + Defensivo")
+        leans.append("+ Construtor" if gap >= 0 else "+ Defensivo")
 
-    return pd.Series(profiles, index=out.index)
+    out["perfil"] = profiles
+    out["hybrid_lean"] = leans
+
+
+def _zag_rating_perfil(row: pd.Series) -> float:
+    con = float(row["rating_construcao"])
+    def_ = float(row["rating_defesa"])
+    if row["perfil"] == "Construtor":
+        return 0.85 * con + 0.15 * def_
+    if row["perfil"] == "Defensivo":
+        return 0.15 * con + 0.85 * def_
+    if row.get("hybrid_lean") == "+ Construtor":
+        return 0.55 * con + 0.45 * def_
+    return 0.45 * con + 0.55 * def_
 
 
 def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
@@ -332,28 +347,34 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
             return indice * (1 - profile_mix) + nota_perfil * profile_mix
         return indice
 
-    out["rating_geral"] = out.apply(
-        lambda r: rating_from_weights(r, 1.75, 1.5, 1.5, 7, 0.83),
+    out["rating_construcao_raw"] = out.apply(
+        lambda r: rating_from_weights(r, 0.5, 0.5, 0.5, 5, 0.88),
         axis=1,
     )
-    out["rating_combativo"] = out.apply(
-        lambda r: rating_from_weights(r, 8.75, 1.5, 1.5, 14, 0.88, "izg_combativo", 0.3),
+    out["rating_defesa_raw"] = out.apply(
+        lambda r: rating_from_weights(r, 2.5, 3.0, 3.0, 10, 0.88),
         axis=1,
     )
-    out["rating_construtor"] = out.apply(
-        lambda r: rating_from_weights(r, 1.75, 1.5, 1.5, 14, 0.88, "izg_construtor", 0.3),
-        axis=1,
-    )
-    out["rating_posicional"] = out.apply(
-        lambda r: rating_from_weights(r, 7.5, 7.5, 7.5, 19, 0.88, "izg_ancora", 0.3),
-        axis=1,
-    )
+    out["rating_construcao"] = _rescale_rating_band(out["rating_construcao_raw"])
+    out["rating_defesa"] = _rescale_rating_band(out["rating_defesa_raw"])
 
-    out["perfil"] = _classify_zag_k3(out)
+    _apply_zag_k3_classification(out)
+
+    out["rating_perfil"] = out.apply(_zag_rating_perfil, axis=1)
+    out["rating_geral"] = out["rating_perfil"]
+
+    # Legacy columns kept for internal diagnostics only
+    out["rating_combativo"] = out["rating_defesa"]
+    out["rating_construtor"] = out["rating_construcao"]
+    out["rating_posicional"] = out["rating_defesa"]
+
     out["rank_geral"] = rank_players(out["rating_geral"])
-    out["rank_combativo"] = rank_players(out["rating_combativo"])
-    out["rank_construtor"] = rank_players(out["rating_construtor"])
-    out["rank_posicional"] = rank_players(out["rating_posicional"])
+    out["rank_construcao"] = rank_players(out["rating_construcao"])
+    out["rank_defesa"] = rank_players(out["rating_defesa"])
+    out["rank_perfil"] = rank_players(out["rating_perfil"])
+    out["rank_combativo"] = out["rank_defesa"]
+    out["rank_construtor"] = out["rank_construcao"]
+    out["rank_posicional"] = out["rank_defesa"]
     return out
 
 
@@ -457,7 +478,7 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
     ratings = {"geral": round(float(row["rating_geral"]), 1), **profile_ratings}
     ranks = {"geral": int(row["rank_geral"]), **profile_rank_map}
 
-    return {
+    payload: dict[str, Any] = {
         "player_id": row["player_id"],
         "name": row["Jogador"],
         "club": row["Equipe"],
@@ -481,6 +502,10 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
         "profiles_available": family["profiles"],
         "scatter": {m["key"]: float(row.get(m["field"], 0) or 0) for m in SCATTER_METRICS[family_key]},
     }
+    if family_key == "zagueiros":
+        lean = row.get("hybrid_lean")
+        payload["hybrid_lean"] = lean if pd.notna(lean) and lean else None
+    return payload
 
 
 def _grade_from_pct(pct: Any) -> str:

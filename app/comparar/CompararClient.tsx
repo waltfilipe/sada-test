@@ -110,7 +110,7 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
           <header className="sc-panel-head">
             <div>
               <p className="sc-eyebrow">Confronto direto</p>
-              <h2>Notas por perfil</h2>
+              <h2>{family === "zagueiros" ? "Construção, defesa e fit no perfil" : "Notas por perfil"}</h2>
             </div>
             <p className="sc-note">Escala 0–10</p>
           </header>

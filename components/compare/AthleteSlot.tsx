@@ -1,7 +1,7 @@
 "use client";
 
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
-import { profileTone } from "@/lib/scoutUi";
+import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import type { PlayerProfile } from "@/lib/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -55,7 +55,7 @@ export function AthleteSlot({ side, player, players, onChange }: Props) {
             <i aria-hidden>·</i>
             <span>{player.position}</span>
           </p>
-          <span className={`profile-tag profile-${profileTone(player.profile)}`}>{player.profile}</span>
+          <ProfileTag {...profileTagProps(player)} />
 
           <div className="slot-rating">
             <strong>{formatRating(player.ratings.geral)}</strong>

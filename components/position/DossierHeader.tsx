@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
-import { profileTone } from "@/lib/scoutUi";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import { ProfileTag, profileTagProps } from "./ProfileTag";
 import { RatingDial } from "./RatingDial";
 
 type Props = {
@@ -44,7 +44,7 @@ export function DossierHeader({ player, poolSize, poolMedian, family }: Props) {
         <p className="dossier-eyebrow">
           <span>{positionLabel}</span>
           <i aria-hidden />
-          <span className={`profile-tag profile-${profileTone(player.profile)}`}>{player.profile}</span>
+          <ProfileTag {...profileTagProps(player)} />
         </p>
 
         <h1>{player.name}</h1>

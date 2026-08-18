@@ -126,6 +126,7 @@ export function RosterRail({
                   <strong>{player.name}</strong>
                   <em>
                     {player.club} · {player.profile}
+                    {player.hybrid_lean ? ` ${player.hybrid_lean}` : ""}
                   </em>
                 </span>
 

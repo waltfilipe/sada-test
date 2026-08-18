@@ -11,6 +11,8 @@ export function profileTone(profile: string): string {
       return "posicional";
     case "Defensivo":
       return "defensivo";
+    case "Híbrido":
+      return "hibrido";
     case "Híbrido + Construtor":
       return "hibrido-construtor";
     case "Híbrido + Defensivo":

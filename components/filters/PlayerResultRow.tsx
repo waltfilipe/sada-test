@@ -10,7 +10,7 @@ import {
   ratingTier,
   tierVars,
 } from "@/lib/scoutTheme";
-import { profileTone } from "@/lib/scoutUi";
+import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import type { PlayerSearchRow } from "@/lib/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -46,7 +46,7 @@ export function PlayerResultRow({ player }: { player: PlayerSearchRow }) {
       <div className="row-identity">
         <div className="row-name">
           <h3>{player.name}</h3>
-          <span className={`profile-tag profile-${profileTone(player.profile)}`}>{player.profile}</span>
+          <ProfileTag {...profileTagProps(player)} />
         </div>
         <p className="row-club">
           {player.club}

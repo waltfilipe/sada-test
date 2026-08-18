@@ -6,14 +6,15 @@ import type { PlayerProfile } from "@/lib/types";
 
 export function ProfileRatings({ player, poolSize }: { player: PlayerProfile; poolSize: number }) {
   const items = profileMetaForFamily(player.position_family);
-  const dominantKey = dominantRatingKey(player.profile, player.position_family);
+  const dominantKey = dominantRatingKey(player.profile, player.position_family, player.hybrid_lean);
+  const isZag = player.position_family === "zagueiros";
 
   return (
     <section className="sc-panel profile-ratings">
       <header className="sc-panel-head">
         <div>
-          <p className="sc-eyebrow">Notas por perfil</p>
-          <h2>Como ele pontua em cada função</h2>
+          <p className="sc-eyebrow">Notas por eixo</p>
+          <h2>{isZag ? "Construção, defesa e fit no perfil" : "Como ele pontua em cada função"}</h2>
         </div>
         <p className="sc-note">Escala 0–10 · ranking dentro do pool</p>
       </header>
@@ -23,7 +24,9 @@ export function ProfileRatings({ player, poolSize }: { player: PlayerProfile; po
           const value = player.ratings[item.key] ?? 0;
           const rank = player.ranks[item.key] ?? poolSize;
           const token = ratingTier(value);
-          const isBest = dominantKey ? item.key === dominantKey : item.label === player.profile;
+          const isPrimary = isZag && item.key === "perfil";
+          const isAxisDominant = dominantKey ? item.key === dominantKey : item.label === player.profile;
+          const isBest = isPrimary || isAxisDominant;
 
           return (
             <article
@@ -33,7 +36,8 @@ export function ProfileRatings({ player, poolSize }: { player: PlayerProfile; po
             >
               <div className="rating-card-head">
                 <span className="rating-card-name">{item.label}</span>
-                {isBest && <span className="rating-card-flag">Dominante</span>}
+                {isPrimary ? <span className="rating-card-flag">Principal</span> : null}
+                {!isPrimary && isAxisDominant ? <span className="rating-card-flag">Eixo</span> : null}
               </div>
 
               <div className="rating-card-body">

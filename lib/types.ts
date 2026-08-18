@@ -37,6 +37,7 @@ export type PlayerSummary = {
   minutes: number;
   rating: number;
   profile: string;
+  hybrid_lean?: string | null;
   transfermarkt?: TransfermarktInfo;
 };
 
