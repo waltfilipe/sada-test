@@ -184,6 +184,13 @@ ZAG_CON_W_LONG_RES = 75 * 10 / 80
 ZAG_CON_W_COND = 15.0
 ZAG_CON_W_DUELO = 10.0
 
+# Defense score: duelos def + reading (inter + residuals) + duelos aéreos
+ZAG_DEF_W_DUEL_DEF = 35.0
+ZAG_DEF_W_INTER = 20.0
+ZAG_DEF_W_CORT_RES = 5.0
+ZAG_DEF_W_REM_RES = 5.0
+ZAG_DEF_W_DUEL_AR = 35.0
+
 
 def _blend_eff_vol_percentiles(
     pool: pd.DataFrame,
@@ -245,6 +252,56 @@ def _zag_median_bonus(row: pd.Series) -> float:
 
 def _zag_rating_from_construction_score(row: pd.Series) -> float:
     score = float(row["score_construcao"])
+    nota = (5 + score / 100 * 4.5) * (1 + row["%Minutos"] * 0.15)
+    return (nota + _zag_median_bonus(row)) * 0.88
+
+
+def _blend_duel_percentiles(
+    pool: pd.DataFrame,
+    raw_eff_col: str,
+    engine_eff_field: str,
+    vol_field: str,
+) -> pd.Series:
+    if raw_eff_col in pool.columns:
+        eff = percentile_rank(pd.to_numeric(pool[raw_eff_col], errors="coerce").fillna(0), ascending=True)
+    else:
+        eff = percentile_rank(pool[engine_eff_field].astype(float), ascending=True)
+    vol = percentile_rank(pool[vol_field].astype(float), ascending=True)
+    return 0.6 * eff + 0.4 * vol
+
+
+def _zag_defense_score(pool: pd.DataFrame) -> pd.Series:
+    blend_duel_def = _blend_duel_percentiles(
+        pool,
+        "Duelos defensivos ganhos, %",
+        "%DuelosDefW",
+        "DuelosDef",
+    )
+    blend_duel_ar = _blend_duel_percentiles(
+        pool,
+        "Duelos aéreos ganhos, %",
+        "%DuelosAr",
+        "DuelosAr",
+    )
+
+    inter = percentile_rank(_feat_col(pool, "Interseções/90", "Interseções").astype(float), ascending=True)
+    cortes = percentile_rank(_feat_col(pool, "Cortes/90", "Carrinhos").astype(float), ascending=True)
+    rem_int = percentile_rank(_feat_col(pool, "Remates intercetados/90").astype(float), ascending=True)
+
+    cort_res = percentile_rank(_residualize_on(pool, cortes, inter), ascending=True)
+    rem_res = percentile_rank(_residualize_on(pool, rem_int, inter), ascending=True)
+
+    return (
+        ZAG_DEF_W_DUEL_DEF / 100 * blend_duel_def
+        + ZAG_DEF_W_INTER / 100 * inter
+        + ZAG_DEF_W_CORT_RES / 100 * cort_res
+        + ZAG_DEF_W_REM_RES / 100 * rem_res
+        + ZAG_DEF_W_DUEL_AR / 100 * blend_duel_ar
+    )
+
+
+def _zag_rating_from_defense_score(row: pd.Series) -> float:
+    score = float(row["score_defesa"])
     nota = (5 + score / 100 * 4.5) * (1 + row["%Minutos"] * 0.15)
     return (nota + _zag_median_bonus(row)) * 0.88
 
@@ -429,13 +486,16 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
     )
     out["score_construcao"] = _zag_construction_score(out)
     out["rating_construcao_raw"] = out.apply(_zag_rating_from_construction_score, axis=1)
-    out["rating_defesa_raw"] = out.apply(
+    out["rating_defesa_legacy_raw"] = out.apply(
         lambda r: rating_from_weights(r, 2.5, 3.0, 3.0, 10, 0.88),
         axis=1,
     )
+    out["score_defesa"] = _zag_defense_score(out)
+    out["rating_defesa_raw"] = out.apply(_zag_rating_from_defense_score, axis=1)
     out["rating_construcao"] = _round_rating_raw(out["rating_construcao_raw"])
     out["rating_construcao_legacy"] = _rescale_rating_band(out["rating_construcao_legacy_raw"])
     out["rating_defesa"] = _round_rating_raw(out["rating_defesa_raw"])
+    out["rating_defesa_legacy"] = _round_rating_raw(out["rating_defesa_legacy_raw"])
 
     _apply_zag_k3_classification(out)
 
