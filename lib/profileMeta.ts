@@ -8,9 +8,9 @@ export type ProfileMetaItem = {
 
 export const FAMILY_PROFILE_META: Record<PositionFamily, ProfileMetaItem[]> = {
   zagueiros: [
+    { key: "perfil", label: "Nota do Perfil", tone: "hibrido" },
     { key: "construcao", label: "Construção", tone: "construtor" },
     { key: "defesa", label: "Defesa", tone: "defensivo" },
-    { key: "perfil", label: "Nota no perfil", tone: "hibrido" },
   ],
   laterais: [
     { key: "defensivo", label: "Defensivo", tone: "defensivo" },

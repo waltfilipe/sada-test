@@ -96,9 +96,10 @@ export function PositionScoutPage({ family, players }: Props) {
               family={family}
             />
 
-            <ProfileRatings player={selected} poolSize={players.length} />
-
-            <SkillIndexPanel player={selected} family={family} />
+            <div className="dossier-grid">
+              <ProfileRatings player={selected} poolSize={players.length} />
+              <SkillIndexPanel player={selected} family={family} />
+            </div>
 
             <AspectMatrix player={selected} />
           </main>
