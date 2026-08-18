@@ -1327,51 +1327,10 @@
 
 /* ── Aspect matrix ───────────────────────────────────────────────────────── */
 
-.aspect-matrix {
-  padding: 1.15rem 1.25rem 1.3rem;
-}
-
-.aspect-panel-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.05rem;
-}
-
-.aspect-panel-head h2 {
-  margin-top: 0.28rem;
-  font-size: 1rem;
-  color: var(--text);
-}
-
 .aspect-groups {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
-  padding-top: 0.15rem;
-  border-top: 1px solid var(--line);
-}
-
-.grade-legend {
-  display: flex;
-  gap: 0.6rem;
-  flex-shrink: 0;
-}
-
-.grade-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.28rem;
-  font-size: 0.7rem;
-  color: var(--text-3);
-}
-
-.grade-legend i {
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  background: var(--tier-color);
 }
 
 .aspect-group {

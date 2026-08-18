@@ -66,42 +66,21 @@ function AspectRow({ item }: { item: PlayerProfile["aspects"]["defensivos"][numb
 
 export function AspectMatrix({ player }: { player: PlayerProfile }) {
   return (
-    <section className="sc-panel aspect-matrix">
-      <header className="aspect-panel-head">
-        <div>
-          <p className="sc-eyebrow">Avaliação técnica</p>
-          <h2>Aspectos de jogo</h2>
-        </div>
+    <div className="aspect-groups">
+      {GROUPS.map((group) => (
+        <article key={group.key} className="aspect-group">
+          <header>
+            <h3>{group.title}</h3>
+            <p>{group.hint}</p>
+          </header>
 
-        <div className="grade-legend">
-          {["A", "B", "C", "D"].map((grade) => {
-            const token = gradeTier(grade);
-            return (
-              <span key={grade} style={tierVars(token)}>
-                <i aria-hidden />
-                {grade}
-              </span>
-            );
-          })}
-        </div>
-      </header>
-
-      <div className="aspect-groups">
-        {GROUPS.map((group) => (
-          <article key={group.key} className="aspect-group">
-            <header>
-              <h3>{group.title}</h3>
-              <p>{group.hint}</p>
-            </header>
-
-            <ul>
-              {player.aspects[group.key].map((item) => (
-                <AspectRow key={item.label} item={item} />
-              ))}
-            </ul>
-          </article>
-        ))}
-      </div>
-    </section>
+          <ul>
+            {player.aspects[group.key].map((item) => (
+              <AspectRow key={item.label} item={item} />
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
   );
 }
