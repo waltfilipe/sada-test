@@ -64,7 +64,7 @@ SCATTER_METRICS = {
         {"key": "confrontos_of", "label": "Confrontos Ofensivos", "field": "DuelosOf"},
         {"key": "construcao", "label": "Construção", "field": "n_construcao"},
         {"key": "duelo_ar", "label": "Duelo Aéreo", "field": "n_duelo_ar"},
-        {"key": "contencao", "label": "Contenção", "field": "n_leitura_def"},
+        {"key": "contencao", "label": "Contenção", "field": "n_contencao"},
         {"key": "ofensividade", "label": "Ofensividade", "field": "n_conducao"},
         {"key": "passes_prog", "label": "Passes Progressivos", "field": "PassesProg"},
         {"key": "duelos_def", "label": "Duelos Defensivos", "field": "DuelosDef"},
@@ -214,6 +214,72 @@ def _residualize_on(pool: pd.DataFrame, y: pd.Series, base: pd.Series) -> pd.Ser
     yv = y.to_numpy(dtype=float)
     coef, _, _, _ = np.linalg.lstsq(np.column_stack([np.ones(len(pool)), x]), yv, rcond=None)
     return pd.Series(yv - (coef[0] + coef[1] * x), index=pool.index)
+
+
+def _zscore_series(series: pd.Series, clip: float = 2.0) -> pd.Series:
+    values = series.astype(float)
+    std = float(values.std(ddof=1))
+    if not std:
+        return pd.Series(0.0, index=series.index)
+    med = float(values.median())
+    return ((values - med) / std).clip(-clip, clip)
+
+
+def _skill_index_from_series(raw: pd.Series) -> pd.Series:
+    """Z-score within pool, then percentile rank (higher = better)."""
+    return percentile_rank(_zscore_series(raw), ascending=True)
+
+
+def _skill_index_composite_z(
+    pool: pd.DataFrame,
+    series_list: list[pd.Series],
+    weights: list[float],
+) -> pd.Series:
+    composite = pd.Series(0.0, index=pool.index)
+    for series, weight in zip(series_list, weights):
+        composite += _zscore_series(series) * weight
+    return percentile_rank(composite, ascending=True)
+
+
+def _raw_pass_blend(pool: pd.DataFrame, comp_col: str, vol_col: str) -> pd.Series:
+    comp = pool[comp_col].astype(float)
+    vol = pool[vol_col].astype(float)
+    return 0.6 * comp + 0.4 * vol
+
+
+def _zag_skill_construcao(pool: pd.DataFrame) -> pd.Series:
+    blend_prog = _raw_pass_blend(pool, "CompPassesProg", "PassesProg")
+    blend_ptf = _raw_pass_blend(pool, "CompPTF", "PTF")
+    blend_long = _raw_pass_blend(pool, "CompBL", "PassesLongos")
+    ptf_res = _residualize_on(pool, blend_ptf, blend_prog)
+    long_res = _residualize_on(pool, blend_long, blend_prog)
+    w_sum = ZAG_CON_W_PROG + ZAG_CON_W_PTF_RES + ZAG_CON_W_LONG_RES
+    composite = (
+        ZAG_CON_W_PROG / w_sum * _zscore_series(blend_prog)
+        + ZAG_CON_W_PTF_RES / w_sum * _zscore_series(ptf_res)
+        + ZAG_CON_W_LONG_RES / w_sum * _zscore_series(long_res)
+    )
+    return percentile_rank(composite, ascending=True)
+
+
+def _zag_skill_ofensividade(pool: pd.DataFrame) -> pd.Series:
+    duelos_of_won = pool["DuelosOf"].astype(float) * pool["%DuelosOfW"].astype(float)
+    return _skill_index_composite_z(pool, [pool["Cond.Prog"].astype(float), duelos_of_won], [0.5, 0.5])
+
+
+def _compute_zag_skill_indices(pool: pd.DataFrame) -> None:
+    """Skill Index: z-score per metric, then percentile rank within the pool."""
+    inter = _feat_col(pool, "Interseções/90", "Interseções").astype(float)
+    duelos_def_won = pool["DuelosDef"].astype(float) * pool["%DuelosDefW"].astype(float)
+    duelos_ar_won = pool["DuelosAr"].astype(float) * pool["%DuelosAr"].astype(float)
+
+    contencao = _skill_index_from_series(inter)
+    pool["n_contencao"] = contencao
+    pool["n_leitura_def"] = contencao
+    pool["n_duelos_def"] = _skill_index_from_series(duelos_def_won)
+    pool["n_duelo_ar"] = _skill_index_from_series(duelos_ar_won)
+    pool["n_construcao"] = _zag_skill_construcao(pool)
+    pool["n_conducao"] = _zag_skill_ofensividade(pool)
 
 
 def _zag_construction_score(pool: pd.DataFrame) -> pd.Series:
@@ -466,11 +532,7 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out["ZG_DuelosAr"] = out.apply(zg_duelos_ar_row, axis=1)
     out["ZG_LeituraDefensiva2"] = out.apply(zg_leitura_row, axis=1)
 
-    out["n_conducao"] = rank_desc_normalized(out["ZG_Condução2"])
-    out["n_construcao"] = rank_desc_normalized(out["ZG_Construção"])
-    out["n_duelo_ar"] = rank_desc_normalized(out["%DuelosAr"] * out["DuelosAr"])
-    out["n_duelos_def"] = rank_desc_normalized(out["ZG_DuelosDefensivo"])
-    out["n_leitura_def"] = rank_desc_normalized(out["ZG_LeituraDefensiva2"])
+    _compute_zag_skill_indices(out)
 
     out["izg_construtor"] = out["ZG_Construção"] * 0.8 + out["ZG_Condução2"] * 0.2 + 2
     out["izg_combativo"] = out["ZG_DuelosDefensivo"] + 2
@@ -630,7 +692,7 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
         "construcao": round(float(row.get("n_construcao", 0)), 0),
         "ofensividade": round(float(row.get("n_conducao", 0)), 0),
         "def1v1": round(float(row.get("n_duelos_def", 0)), 0),
-        "contencao": round(float(row.get("n_leitura_def", 0)), 0),
+        "contencao": round(float(row.get("n_contencao", row.get("n_leitura_def", 0))), 0),
         "duelo_aereo": round(float(row.get("n_duelo_ar", 0)), 0),
     }
     profile_shares = profile_shares_from_row(row, family_key)
@@ -642,7 +704,7 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
         "defensivos": [
             {"label": "Confrontos", "grade": _grade_from_pct(row.get("n_duelos_def", 0)), "medal": medal_for_rank(first_rank, pool_size)},
             {"label": "Duelos Aéreos", "grade": _grade_from_pct(row.get("n_duelo_ar", 0)), "medal": medal_for_rank(first_rank, pool_size)},
-            {"label": "Intervenções", "grade": _grade_from_pct(row.get("n_leitura_def", 0)), "medal": medal_for_rank(int(row.get("rank_geral", pool_size)), pool_size)},
+            {"label": "Intervenções", "grade": _grade_from_pct(row.get("n_contencao", row.get("n_leitura_def", 0))), "medal": medal_for_rank(int(row.get("rank_geral", pool_size)), pool_size)},
         ],
         "construcao": [
             {"label": "Passes Verticais", "grade": _grade_from_pct(row.get("n_construcao", 0)), "medal": medal_for_rank(first_rank, pool_size)},
