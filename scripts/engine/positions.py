@@ -167,8 +167,14 @@ def _score_axis(frame: pd.DataFrame) -> pd.Series:
 
 
 def _rescale_rating_band(series: pd.Series, lo: float = 5.0, hi: float = 9.5) -> pd.Series:
+    """Uniform rank mapping — platykurtic, not bell-shaped. Prefer _round_rating_raw for zagueiros."""
     ranked = series.rank(method="average", pct=True)
     return lo + ranked * (hi - lo)
+
+
+def _round_rating_raw(series: pd.Series) -> pd.Series:
+    """Keep the raw rating scale (≈ normal-ish); avoids inflating tops to 9.5 by rank."""
+    return series.round(1)
 
 
 # Construction score: 75% passes (residualized on prog) + 25% condução (cond + duelo)
@@ -427,13 +433,13 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
         lambda r: rating_from_weights(r, 2.5, 3.0, 3.0, 10, 0.88),
         axis=1,
     )
-    out["rating_construcao"] = _rescale_rating_band(out["rating_construcao_raw"])
+    out["rating_construcao"] = _round_rating_raw(out["rating_construcao_raw"])
     out["rating_construcao_legacy"] = _rescale_rating_band(out["rating_construcao_legacy_raw"])
-    out["rating_defesa"] = _rescale_rating_band(out["rating_defesa_raw"])
+    out["rating_defesa"] = _round_rating_raw(out["rating_defesa_raw"])
 
     _apply_zag_k3_classification(out)
 
-    out["rating_perfil"] = out.apply(_zag_rating_perfil, axis=1)
+    out["rating_perfil"] = out.apply(_zag_rating_perfil, axis=1).round(1)
     out["rating_geral"] = out["rating_perfil"]
 
     # Legacy columns kept for internal diagnostics only
