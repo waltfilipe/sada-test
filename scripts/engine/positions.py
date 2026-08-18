@@ -13,6 +13,7 @@ from .normalize import (
     percentile_rank,
     rank_desc_normalized,
     rank_players,
+    zscore_linear_100,
 )
 from .profiles import FAMILY_PROFILE_CONFIG, profile_ratings_from_row, profile_ranks_from_row, profile_shares_from_row
 
@@ -195,6 +196,9 @@ ZAG_DEF_W_DUEL_AR = 35.0
 ZAG_WEAK_AXIS_GAP = 1.0
 ZAG_SHRINK_MU = 7.25
 ZAG_SHRINK_EXP = 0.65
+
+# Axis rating: z-linear pool normalization before 5 + score/100 × 4.5
+ZAG_AXIS_ZLINEAR_SPREAD = 15.0
 
 
 def _blend_eff_vol_percentiles(
@@ -576,13 +580,15 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
         lambda r: rating_from_weights(r, 0.5, 0.5, 0.5, 5, 0.88),
         axis=1,
     )
-    out["score_construcao"] = _zag_construction_score(out)
+    out["score_construcao_bruto"] = _zag_construction_score(out)
+    out["score_defesa_bruto"] = _zag_defense_score(out)
+    out["score_construcao"] = zscore_linear_100(out["score_construcao_bruto"], spread=ZAG_AXIS_ZLINEAR_SPREAD)
+    out["score_defesa"] = zscore_linear_100(out["score_defesa_bruto"], spread=ZAG_AXIS_ZLINEAR_SPREAD)
     out["rating_construcao_raw"] = out.apply(_zag_rating_from_construction_score, axis=1)
     out["rating_defesa_legacy_raw"] = out.apply(
         lambda r: rating_from_weights(r, 2.5, 3.0, 3.0, 10, 0.88),
         axis=1,
     )
-    out["score_defesa"] = _zag_defense_score(out)
     out["rating_defesa_raw"] = out.apply(_zag_rating_from_defense_score, axis=1)
     out["rating_construcao"] = _round_rating_raw(out["rating_construcao_raw"])
     out["rating_construcao_legacy"] = _rescale_rating_band(out["rating_construcao_legacy_raw"])

@@ -60,3 +60,13 @@ def normalize_rating_component(base: float) -> float:
 
 def rank_players(series: pd.Series) -> pd.Series:
     return series.rank(method="min", ascending=False).astype(int)
+
+
+def zscore_linear_100(series: pd.Series, spread: float = 15.0) -> pd.Series:
+    """Map pool values to 0–100 via z-score (50 = mean), preserving rank order."""
+    values = series.astype(float)
+    std = float(values.std(ddof=1))
+    if not std:
+        return pd.Series(50.0, index=series.index)
+    z = (values - values.mean()) / std
+    return (50 + z * spread).clip(0, 100)
