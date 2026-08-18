@@ -1,11 +1,12 @@
 "use client";
 
-import { profileMetaForFamily } from "@/lib/profileMeta";
+import { dominantRatingKey, profileMetaForFamily } from "@/lib/profileMeta";
 import { clampPercent, formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile } from "@/lib/types";
 
 export function ProfileRatings({ player, poolSize }: { player: PlayerProfile; poolSize: number }) {
   const items = profileMetaForFamily(player.position_family);
+  const dominantKey = dominantRatingKey(player.profile, player.position_family);
 
   return (
     <section className="sc-panel profile-ratings">
@@ -22,7 +23,7 @@ export function ProfileRatings({ player, poolSize }: { player: PlayerProfile; po
           const value = player.ratings[item.key] ?? 0;
           const rank = player.ranks[item.key] ?? poolSize;
           const token = ratingTier(value);
-          const isBest = item.label === player.profile;
+          const isBest = dominantKey ? item.key === dominantKey : item.label === player.profile;
 
           return (
             <article

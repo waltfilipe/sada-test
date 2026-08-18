@@ -8,7 +8,6 @@ import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AspectMatrix } from "./AspectMatrix";
 import { DossierHeader } from "./DossierHeader";
-import { ProfileDna } from "./ProfileDna";
 import { ProfileRatings } from "./ProfileRatings";
 import { RosterRail } from "./RosterRail";
 import { SkillIndexPanel } from "./SkillIndexPanel";
@@ -99,10 +98,7 @@ export function PositionScoutPage({ family, players }: Props) {
 
             <ProfileRatings player={selected} poolSize={players.length} />
 
-            <div className="dossier-grid">
-              <ProfileDna player={selected} />
-              <SkillIndexPanel player={selected} family={family} />
-            </div>
+            <SkillIndexPanel player={selected} family={family} />
 
             <AspectMatrix player={selected} />
           </main>

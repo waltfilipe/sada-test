@@ -17,11 +17,18 @@ from .normalize import (
 from .profiles import FAMILY_PROFILE_CONFIG, profile_ratings_from_row, profile_ranks_from_row, profile_shares_from_row
 
 
+ZAG_PROFILES = [
+    "Construtor",
+    "Defensivo",
+    "Híbrido + Construtor",
+    "Híbrido + Defensivo",
+]
+
 POSITION_FAMILIES: dict[str, dict[str, Any]] = {
     "zagueiros": {
         "label": "Zagueiros",
         "positions": ["Zagueiro"],
-        "profiles": ["Combativo", "Construtor", "Posicional", "Híbrido"],
+        "profiles": ZAG_PROFILES,
         "profile_map": {"combativo": "Combativo", "construtor": "Construtor", "posicional": "Posicional"},
     },
     "laterais": {
@@ -137,6 +144,82 @@ def _eligible_pool(df: pd.DataFrame, positions: list[str], min_pct: float = 0.2)
 
 def _z_percentile(pool: pd.DataFrame, field: str, ascending: bool = True) -> pd.Series:
     return percentile_rank(pool[field], ascending=ascending)
+
+
+def _minmax01(series: pd.Series) -> pd.Series:
+    lo, hi = float(series.min()), float(series.max())
+    if hi <= lo:
+        return pd.Series(0.5, index=series.index)
+    return (series - lo) / (hi - lo)
+
+
+def _feat_col(pool: pd.DataFrame, *candidates: str) -> pd.Series:
+    for name in candidates:
+        if name in pool.columns:
+            return pd.to_numeric(pool[name], errors="coerce").fillna(0)
+    raise KeyError(f"Nenhuma coluna encontrada: {candidates}")
+
+
+def _score_axis(frame: pd.DataFrame) -> pd.Series:
+    from sklearn.preprocessing import MinMaxScaler
+
+    scaled = pd.DataFrame(
+        MinMaxScaler().fit_transform(frame),
+        columns=frame.columns,
+        index=frame.index,
+    )
+    return scaled.mean(axis=1)
+
+
+def _classify_zag_k3(out: pd.DataFrame) -> pd.Series:
+    """K=3 on construction vs defense scores; split hybrids by con/def lean."""
+    from sklearn.cluster import KMeans
+    from sklearn.preprocessing import StandardScaler
+
+    con_frame = pd.DataFrame(
+        {
+            "pprog": _feat_col(out, "Passes progressivos/90", "PassesProg"),
+            "plong": _feat_col(out, "Passes longos/90", "PassesLongos"),
+            "ptf": _feat_col(out, "Passes para terço final/90", "PTF"),
+            "corr": _feat_col(out, "Corridas progressivas/90", "Cond.Prog"),
+        }
+    )
+    def_frame = pd.DataFrame(
+        {
+            "dd": _feat_col(out, "Duelos defensivos/90", "DuelosDef"),
+            "da": _feat_col(out, "Duelos aérios/90", "DuelosAr"),
+            "inter": _feat_col(out, "Interseções/90", "Interseções"),
+        }
+    )
+
+    score_con = _score_axis(con_frame)
+    score_def = _score_axis(def_frame)
+    out["score_con"] = score_con
+    out["score_def"] = score_def
+    out["gap_con_def"] = (score_con - score_def).abs()
+
+    coords = np.column_stack([score_con.to_numpy(), score_def.to_numpy()])
+    scaler = StandardScaler()
+    km = KMeans(n_clusters=3, random_state=42, n_init=30).fit(scaler.fit_transform(coords))
+    centers = scaler.inverse_transform(km.cluster_centers_)
+    center_df = pd.DataFrame(centers, columns=["score_con", "score_def"])
+    gaps = (center_df["score_con"] - center_df["score_def"]).abs()
+    hybrid_i = int(gaps.idxmin())
+    others = [i for i in range(3) if i != hybrid_i]
+    con_i = others[0] if center_df.loc[others[0], "score_con"] > center_df.loc[others[1], "score_con"] else others[1]
+    def_i = [i for i in others if i != con_i][0]
+    cluster_to_base = {con_i: "Construtor", def_i: "Defensivo", hybrid_i: "Híbrido"}
+
+    profiles: list[str] = []
+    for idx, cluster in enumerate(km.labels_):
+        base = cluster_to_base[int(cluster)]
+        if base != "Híbrido":
+            profiles.append(base)
+            continue
+        gap = float(score_con.iloc[idx] - score_def.iloc[idx])
+        profiles.append("Híbrido + Construtor" if gap >= 0 else "Híbrido + Defensivo")
+
+    return pd.Series(profiles, index=out.index)
 
 
 def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
@@ -266,18 +349,7 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
         axis=1,
     )
 
-    def resolve_perfil(row: pd.Series) -> str:
-        profiles = {
-            "Construtor": row["pct_construtor"],
-            "Combativo": row["pct_combativo"],
-            "Posicional": row["pct_posicional"],
-        }
-        ordered = sorted(profiles.items(), key=lambda item: item[1], reverse=True)
-        if ordered[0][1] - ordered[1][1] >= 0.035:
-            return ordered[0][0]
-        return "Híbrido"
-
-    out["perfil"] = out.apply(resolve_perfil, axis=1)
+    out["perfil"] = _classify_zag_k3(out)
     out["rank_geral"] = rank_players(out["rating_geral"])
     out["rank_combativo"] = rank_players(out["rating_combativo"])
     out["rank_construtor"] = rank_players(out["rating_construtor"])

@@ -43,3 +43,14 @@ export const FAMILY_PROFILE_META: Record<PositionFamily, ProfileMetaItem[]> = {
 export function profileMetaForFamily(family: PositionFamily): ProfileMetaItem[] {
   return FAMILY_PROFILE_META[family];
 }
+
+/** Maps a zagueiro classification label to the rating card key to highlight. */
+export function dominantRatingKey(profile: string, family: PositionFamily): string | null {
+  if (family !== "zagueiros") {
+    const match = FAMILY_PROFILE_META[family].find((item) => item.label === profile);
+    return match?.key ?? null;
+  }
+  if (profile === "Construtor" || profile === "Híbrido + Construtor") return "construtor";
+  if (profile === "Defensivo" || profile === "Híbrido + Defensivo") return "posicional";
+  return null;
+}

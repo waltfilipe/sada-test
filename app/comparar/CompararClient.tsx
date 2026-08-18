@@ -136,50 +136,27 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
           </div>
         </section>
 
-        <div className="compare-grid">
-          <section className="sc-panel compare-panel">
-            <header className="sc-panel-head">
-              <div>
-                <p className="sc-eyebrow">Índices normalizados</p>
-                <h2>Skill index</h2>
-              </div>
-              <p className="sc-note">Percentil no pool</p>
-            </header>
-
-            <div className="versus-rows">
-              {TENDENCY_META.map((item) => (
-                <VersusBar
-                  key={item.key}
-                  label={item.label}
-                  hint={item.hint}
-                  valueA={a.tendencies[item.key]}
-                  valueB={b.tendencies[item.key]}
-                />
-              ))}
+        <section className="sc-panel compare-panel">
+          <header className="sc-panel-head">
+            <div>
+              <p className="sc-eyebrow">Índices normalizados</p>
+              <h2>Skill index</h2>
             </div>
-          </section>
+            <p className="sc-note">Percentil no pool</p>
+          </header>
 
-          <section className="sc-panel compare-panel">
-            <header className="sc-panel-head">
-              <div>
-                <p className="sc-eyebrow">Composição tática</p>
-                <h2>DNA de perfil</h2>
-              </div>
-              <p className="sc-note">Participação %</p>
-            </header>
-
-            <div className="versus-rows">
-              {profileMeta.map((item) => (
-                <VersusBar
-                  key={item.key}
-                  label={item.label}
-                  valueA={a.profile_shares[item.key] ?? 0}
-                  valueB={b.profile_shares[item.key] ?? 0}
-                />
-              ))}
-            </div>
-          </section>
-        </div>
+          <div className="versus-rows">
+            {TENDENCY_META.map((item) => (
+              <VersusBar
+                key={item.key}
+                label={item.label}
+                hint={item.hint}
+                valueA={a.tendencies[item.key]}
+                valueB={b.tendencies[item.key]}
+              />
+            ))}
+          </div>
+        </section>
 
         <section className="sc-panel compare-panel">
           <header className="sc-panel-head">

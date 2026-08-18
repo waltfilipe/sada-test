@@ -91,10 +91,7 @@ export function filterPlayers(
     if (filters.club && filters.club !== "all" && player.club !== filters.club) return false;
     if (filters.nationality && filters.nationality !== "all" && player.nationality !== filters.nationality) return false;
     if (filters.foot && filters.foot !== "all" && player.foot !== filters.foot) return false;
-    if (filters.profiles?.length && !filters.profiles.includes(player.profile) && player.profile !== "Híbrido") {
-      const hybridAllowed = filters.profiles.length > 0 && player.profile === "Híbrido";
-      if (!hybridAllowed) return false;
-    }
+    if (filters.profiles?.length && !filters.profiles.includes(player.profile)) return false;
     if (filters.height && player.height != null) {
       if (player.height < filters.height[0] || player.height > filters.height[1]) return false;
     }
