@@ -1,0 +1,171 @@
+{
+  "n_players": 71,
+  "pca_variance": [
+    0.3579718805417742,
+    0.29255179633231165,
+    0.20814119465507627
+  ],
+  "confusion": {
+    "kmeans": {
+      "pred:Combativo": {
+        "atual:Combativo": 0,
+        "atual:Construtor": 0,
+        "atual:Posicional": 0,
+        "atual:Híbrido": 0
+      },
+      "pred:Construtor": {
+        "atual:Combativo": 0,
+        "atual:Construtor": 18,
+        "atual:Posicional": 1,
+        "atual:Híbrido": 6
+      },
+      "pred:Posicional": {
+        "atual:Combativo": 8,
+        "atual:Construtor": 2,
+        "atual:Posicional": 26,
+        "atual:Híbrido": 10
+      },
+      "pred:Híbrido": {
+        "atual:Combativo": 0,
+        "atual:Construtor": 0,
+        "atual:Posicional": 0,
+        "atual:Híbrido": 0
+      }
+    },
+    "hier": {
+      "pred:Combativo": {
+        "atual:Combativo": 0,
+        "atual:Construtor": 0,
+        "atual:Posicional": 0,
+        "atual:Híbrido": 0
+      },
+      "pred:Construtor": {
+        "atual:Combativo": 3,
+        "atual:Construtor": 19,
+        "atual:Posicional": 2,
+        "atual:Híbrido": 10
+      },
+      "pred:Posicional": {
+        "atual:Combativo": 5,
+        "atual:Construtor": 1,
+        "atual:Posicional": 25,
+        "atual:Híbrido": 6
+      },
+      "pred:Híbrido": {
+        "atual:Combativo": 0,
+        "atual:Construtor": 0,
+        "atual:Posicional": 0,
+        "atual:Híbrido": 0
+      }
+    },
+    "gmm": {
+      "pred:Combativo": {
+        "atual:Combativo": 0,
+        "atual:Construtor": 0,
+        "atual:Posicional": 0,
+        "atual:Híbrido": 0
+      },
+      "pred:Construtor": {
+        "atual:Combativo": 2,
+        "atual:Construtor": 18,
+        "atual:Posicional": 2,
+        "atual:Híbrido": 10
+      },
+      "pred:Posicional": {
+        "atual:Combativo": 6,
+        "atual:Construtor": 2,
+        "atual:Posicional": 25,
+        "atual:Híbrido": 6
+      },
+      "pred:Híbrido": {
+        "atual:Combativo": 0,
+        "atual:Construtor": 0,
+        "atual:Posicional": 0,
+        "atual:Híbrido": 0
+      }
+    }
+  },
+  "unstable_players": [
+    {
+      "Jogador": "A. Franco",
+      "Equipe": "Tigres UANL",
+      "atual": "Combativo",
+      "kmeans": "Posicional",
+      "hier": "Construtor",
+      "gmm": "Construtor",
+      "gmm_conf": 0.997
+    },
+    {
+      "Jogador": "I. Román",
+      "Equipe": "Atlético Mineiro",
+      "atual": "Combativo",
+      "kmeans": "Posicional",
+      "hier": "Construtor",
+      "gmm": "Posicional",
+      "gmm_conf": 1.0
+    },
+    {
+      "Jogador": "Victor Caetano",
+      "Equipe": "Chapecoense",
+      "atual": "Combativo",
+      "kmeans": "Posicional",
+      "hier": "Construtor",
+      "gmm": "Construtor",
+      "gmm_conf": 0.882
+    },
+    {
+      "Jogador": "F. Balbuena",
+      "Equipe": "Grêmio",
+      "atual": "Construtor",
+      "kmeans": "Posicional",
+      "hier": "Construtor",
+      "gmm": "Posicional",
+      "gmm_conf": 1.0
+    },
+    {
+      "Jogador": "Gustavo Martins",
+      "Equipe": "Grêmio",
+      "atual": "Híbrido",
+      "kmeans": "Posicional",
+      "hier": "Construtor",
+      "gmm": "Construtor",
+      "gmm_conf": 0.954
+    },
+    {
+      "Jogador": "Kayky Almeida",
+      "Equipe": "Remo",
+      "atual": "Híbrido",
+      "kmeans": "Posicional",
+      "hier": "Construtor",
+      "gmm": "Construtor",
+      "gmm_conf": 0.971
+    },
+    {
+      "Jogador": "Lyanco",
+      "Equipe": "Atlético Mineiro",
+      "atual": "Híbrido",
+      "kmeans": "Posicional",
+      "hier": "Construtor",
+      "gmm": "Construtor",
+      "gmm_conf": 0.999
+    },
+    {
+      "Jogador": "Murilo",
+      "Equipe": "Palmeiras",
+      "atual": "Híbrido",
+      "kmeans": "Posicional",
+      "hier": "Construtor",
+      "gmm": "Construtor",
+      "gmm_conf": 0.995
+    },
+    {
+      "Jogador": "João Paulo",
+      "Equipe": "Chapecoense",
+      "atual": "Posicional",
+      "kmeans": "Posicional",
+      "hier": "Construtor",
+      "gmm": "Construtor",
+      "gmm_conf": 0.993
+    }
+  ]
+}
