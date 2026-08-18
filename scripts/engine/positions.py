@@ -191,6 +191,11 @@ ZAG_DEF_W_CORT_RES = 5.0
 ZAG_DEF_W_REM_RES = 5.0
 ZAG_DEF_W_DUEL_AR = 35.0
 
+# Final profile rating: weak-axis floor + hybrid balance + minutes shrinkage
+ZAG_WEAK_AXIS_GAP = 1.0
+ZAG_SHRINK_MU = 7.25
+ZAG_SHRINK_EXP = 0.65
+
 
 def _blend_eff_vol_percentiles(
     pool: pd.DataFrame,
@@ -360,7 +365,8 @@ def _apply_zag_k3_classification(out: pd.DataFrame) -> None:
     out["hybrid_lean"] = leans
 
 
-def _zag_rating_perfil(row: pd.Series) -> float:
+def _zag_profile_blend_simple(row: pd.Series) -> float:
+    """Legacy profile-weighted mean (no weak-axis forgiveness)."""
     con = float(row["rating_construcao"])
     def_ = float(row["rating_defesa"])
     if row["perfil"] == "Construtor":
@@ -370,6 +376,30 @@ def _zag_rating_perfil(row: pd.Series) -> float:
     if row.get("hybrid_lean") == "+ Construtor":
         return 0.55 * con + 0.45 * def_
     return 0.45 * con + 0.55 * def_
+
+
+def _zag_rating_perfil_base(row: pd.Series, med_con: float, med_def: float) -> float:
+    """Do not penalize specialists on their weak axis; let hybrids benefit from balance."""
+    con = float(row["rating_construcao"])
+    def_ = float(row["rating_defesa"])
+    perfil = row["perfil"]
+    lean = row.get("hybrid_lean")
+
+    if perfil == "Híbrido":
+        profile = 0.55 * con + 0.45 * def_ if lean == "+ Construtor" else 0.45 * con + 0.55 * def_
+        return max(profile, 0.5 * con + 0.5 * def_)
+
+    if perfil == "Construtor":
+        def_eff = max(def_, min(con - ZAG_WEAK_AXIS_GAP, med_def))
+        return 0.85 * con + 0.15 * def_eff
+
+    con_eff = max(con, min(def_ - ZAG_WEAK_AXIS_GAP, med_con))
+    return 0.15 * con_eff + 0.85 * def_
+
+
+def _zag_apply_minutes_shrinkage(base: float, pct_minutes: float) -> float:
+    w = min(1.0, float(pct_minutes) ** ZAG_SHRINK_EXP)
+    return w * base + (1.0 - w) * ZAG_SHRINK_MU
 
 
 def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
@@ -499,7 +529,18 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
 
     _apply_zag_k3_classification(out)
 
-    out["rating_perfil"] = out.apply(_zag_rating_perfil, axis=1).round(1)
+    med_con = float(out["rating_construcao"].median())
+    med_def = float(out["rating_defesa"].median())
+    out["rating_perfil_legacy"] = out.apply(_zag_profile_blend_simple, axis=1).round(1)
+    out["rating_perfil_base"] = out.apply(
+        lambda row: _zag_rating_perfil_base(row, med_con, med_def),
+        axis=1,
+    )
+    out["rating_geral_raw"] = out.apply(
+        lambda row: _zag_apply_minutes_shrinkage(row["rating_perfil_base"], row["%Minutos"]),
+        axis=1,
+    )
+    out["rating_perfil"] = out["rating_geral_raw"].round(1)
     out["rating_geral"] = out["rating_perfil"]
 
     # Legacy columns kept for internal diagnostics only
