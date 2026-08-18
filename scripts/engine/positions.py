@@ -171,6 +171,78 @@ def _rescale_rating_band(series: pd.Series, lo: float = 5.0, hi: float = 9.5) ->
     return lo + ranked * (hi - lo)
 
 
+# Construction score: 75% passes (residualized on prog) + 25% condução (cond + duelo)
+ZAG_CON_W_PROG = 75 * 55 / 80
+ZAG_CON_W_PTF_RES = 75 * 15 / 80
+ZAG_CON_W_LONG_RES = 75 * 10 / 80
+ZAG_CON_W_COND = 15.0
+ZAG_CON_W_DUELO = 10.0
+
+
+def _blend_eff_vol_percentiles(
+    pool: pd.DataFrame,
+    eff_field: str,
+    vol_field: str,
+    *,
+    w_eff: float = 0.6,
+) -> pd.Series:
+    eff = percentile_rank(pool[eff_field].astype(float), ascending=True)
+    vol = percentile_rank(pool[vol_field].astype(float), ascending=True)
+    return w_eff * eff + (1.0 - w_eff) * vol
+
+
+def _residualize_on(pool: pd.DataFrame, y: pd.Series, base: pd.Series) -> pd.Series:
+    x = base.to_numpy(dtype=float)
+    yv = y.to_numpy(dtype=float)
+    coef, _, _, _ = np.linalg.lstsq(np.column_stack([np.ones(len(pool)), x]), yv, rcond=None)
+    return pd.Series(yv - (coef[0] + coef[1] * x), index=pool.index)
+
+
+def _zag_construction_score(pool: pd.DataFrame) -> pd.Series:
+    blend_prog = _blend_eff_vol_percentiles(pool, "%EffPassProg", "PassesProg")
+    blend_ptf = _blend_eff_vol_percentiles(pool, "%EffPassTF", "PTF")
+    blend_long = _blend_eff_vol_percentiles(pool, "%EffPassesLng", "PassesLongos")
+
+    ptf_res = percentile_rank(_residualize_on(pool, blend_ptf, blend_prog), ascending=True)
+    long_res = percentile_rank(_residualize_on(pool, blend_long, blend_prog), ascending=True)
+
+    blend_cond = percentile_rank(pool["Cond.Prog"].astype(float), ascending=True)
+
+    if "Duelos ofensivos ganhos, %" in pool.columns:
+        duelo_eff = percentile_rank(
+            pd.to_numeric(pool["Duelos ofensivos ganhos, %"], errors="coerce").fillna(0),
+            ascending=True,
+        )
+    else:
+        duelo_eff = percentile_rank(pool["%DuelosOfW"].astype(float), ascending=True)
+    duelo_vol = percentile_rank(pool["DuelosOf"].astype(float), ascending=True)
+    blend_duelo = 0.6 * duelo_eff + 0.4 * duelo_vol
+
+    return (
+        ZAG_CON_W_PROG / 100 * blend_prog
+        + ZAG_CON_W_PTF_RES / 100 * ptf_res
+        + ZAG_CON_W_LONG_RES / 100 * long_res
+        + ZAG_CON_W_COND / 100 * blend_cond
+        + ZAG_CON_W_DUELO / 100 * blend_duelo
+    )
+
+
+def _zag_median_bonus(row: pd.Series) -> float:
+    return float(
+        np.median(
+            [row["n_conducao"], row["n_construcao"], row["n_duelo_ar"], row["n_duelos_def"], row["n_leitura_def"]]
+        )
+        / 100
+        * 0.5
+    )
+
+
+def _zag_rating_from_construction_score(row: pd.Series) -> float:
+    score = float(row["score_construcao"])
+    nota = (5 + score / 100 * 4.5) * (1 + row["%Minutos"] * 0.15)
+    return (nota + _zag_median_bonus(row)) * 0.88
+
+
 def _apply_zag_k3_classification(out: pd.DataFrame) -> None:
     """K=3 on construction vs defense; profile is always one of 3, lean is visual metadata."""
     from sklearn.cluster import KMeans
@@ -338,24 +410,25 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
             + m_norm[7] * leitura_weight
         ) / divisor
         nota = conj * (1 + row["%Minutos"] * 0.15)
-        median_bonus = np.median(
-            [row["n_conducao"], row["n_construcao"], row["n_duelo_ar"], row["n_duelos_def"], row["n_leitura_def"]]
-        ) / 100 * 0.5
+        median_bonus = _zag_median_bonus(row)
         indice = (nota + median_bonus) * scale
         if profile_col and profile_mix:
             nota_perfil = (5 + 1.125 * row[profile_col]) * 0.88
             return indice * (1 - profile_mix) + nota_perfil * profile_mix
         return indice
 
-    out["rating_construcao_raw"] = out.apply(
+    out["rating_construcao_legacy_raw"] = out.apply(
         lambda r: rating_from_weights(r, 0.5, 0.5, 0.5, 5, 0.88),
         axis=1,
     )
+    out["score_construcao"] = _zag_construction_score(out)
+    out["rating_construcao_raw"] = out.apply(_zag_rating_from_construction_score, axis=1)
     out["rating_defesa_raw"] = out.apply(
         lambda r: rating_from_weights(r, 2.5, 3.0, 3.0, 10, 0.88),
         axis=1,
     )
     out["rating_construcao"] = _rescale_rating_band(out["rating_construcao_raw"])
+    out["rating_construcao_legacy"] = _rescale_rating_band(out["rating_construcao_legacy_raw"])
     out["rating_defesa"] = _rescale_rating_band(out["rating_defesa_raw"])
 
     _apply_zag_k3_classification(out)
