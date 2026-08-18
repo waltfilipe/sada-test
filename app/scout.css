@@ -461,6 +461,30 @@
   white-space: nowrap;
 }
 
+.roster-meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.18rem;
+}
+
+.roster-minutes {
+  display: grid;
+  justify-items: end;
+  gap: 0.02rem;
+  font-family: "Sora", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.roster-minutes em {
+  font-style: normal;
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+
 .roster-rating {
   padding: 0.16rem 0.42rem;
   border-radius: 6px;
@@ -814,6 +838,99 @@
 
 .bar-market .bar-item strong {
   color: #d9f7ee;
+}
+
+/* Minutes played — shared across dossier, compare and filters */
+
+.minutes-stat {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.minutes-label {
+  font-size: 0.63rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+}
+
+.minutes-value {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  color: #eef6ff;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.minutes-meta {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.1rem;
+}
+
+.minutes-pct {
+  font-size: 0.72rem;
+  color: var(--text-2);
+}
+
+.minutes-pct b {
+  font-family: "Sora", sans-serif;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.minutes-track {
+  width: min(100%, 9.5rem);
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.16);
+  overflow: hidden;
+}
+
+.minutes-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(94, 234, 212, 0.55), var(--accent));
+}
+
+.minutes-stat.is-prominent {
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(94, 234, 212, 0.22);
+  background: rgba(94, 234, 212, 0.06);
+}
+
+.minutes-stat.is-prominent .minutes-value {
+  font-size: 1.45rem;
+}
+
+.minutes-stat.is-compact .minutes-value {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.minutes-stat.is-inline {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.minutes-stat.is-inline strong {
+  font-family: "Sora", sans-serif;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.minutes-stat.is-inline em {
+  font-style: normal;
+  font-size: 0.72rem;
+  color: var(--accent);
+}
+
+.dossier-bar .minutes-stat.is-prominent {
+  flex: 0 1 auto;
 }
 
 .bar-actions {

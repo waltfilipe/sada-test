@@ -10,6 +10,7 @@ import {
   ratingTier,
   tierVars,
 } from "@/lib/scoutTheme";
+import { MinutesStat } from "@/components/position/MinutesStat";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import type { PlayerSearchRow } from "@/lib/types";
 
@@ -24,7 +25,6 @@ export function PlayerResultRow({ player }: { player: PlayerSearchRow }) {
     { label: "Idade", value: age ? `${age}` : "—", unit: age ? "anos" : undefined },
     { label: "Altura", value: player.height ? `${player.height}` : "—", unit: player.height ? "cm" : undefined },
     { label: "Pé", value: player.foot ?? "—" },
-    { label: "Minutos", value: player.minutes.toLocaleString("pt-BR") },
     { label: "G/A", value: `${player.goals}/${player.assists}` },
   ];
 
@@ -84,6 +84,13 @@ export function PlayerResultRow({ player }: { player: PlayerSearchRow }) {
       </div>
 
       <div className="row-aside">
+        <MinutesStat
+          minutes={player.minutes}
+          minutesPct={player.minutes_pct}
+          variant="compact"
+          className="row-minutes"
+        />
+
         <div className="row-rating">
           <strong>{formatRating(player.rating)}</strong>
           <span>Rating</span>

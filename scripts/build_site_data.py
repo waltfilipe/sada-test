@@ -72,6 +72,7 @@ def main() -> None:
                 "height": player["height"],
                 "foot": player["foot"],
                 "minutes": player["minutes"],
+                "minutes_pct": player.get("minutes_pct"),
                 "rating": player["rating"],
                 "profile": player["profile"],
                 "hybrid_lean": player.get("hybrid_lean"),

@@ -1,6 +1,7 @@
 "use client";
 
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
+import { MinutesStat } from "@/components/position/MinutesStat";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import type { PlayerProfile } from "@/lib/types";
 
@@ -22,7 +23,6 @@ export function AthleteSlot({ side, player, players, onChange }: Props) {
     { label: "Idade", value: age ? `${age}` : "—", unit: age ? "anos" : undefined },
     { label: "Altura", value: player.height ? `${player.height}` : "—", unit: player.height ? "cm" : undefined },
     { label: "Pé", value: player.foot ?? "—" },
-    { label: "Minutos", value: player.minutes.toLocaleString("pt-BR") },
   ];
 
   return (
@@ -65,6 +65,13 @@ export function AthleteSlot({ side, player, players, onChange }: Props) {
           </div>
         </div>
       </div>
+
+      <MinutesStat
+        minutes={player.minutes}
+        minutesPct={player.minutes_pct}
+        variant="prominent"
+        className="slot-minutes"
+      />
 
       <dl className="slot-facts">
         {facts.map((fact) => (

@@ -490,6 +490,7 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
         "height": int(row["Altura"]) if pd.notna(row.get("Altura")) else None,
         "foot": row.get("Pé"),
         "minutes": int(row.get("Minutos jogados:", 0) or 0),
+        "minutes_pct": round(float(row.get("%Minutos", 0) or 0) * 100, 1),
         "goals": int(row.get("Gols", 0) or 0),
         "assists": int(row.get("Assist", 0) or 0),
         "rating": round(float(row["rating_geral"]), 1),

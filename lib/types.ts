@@ -35,6 +35,8 @@ export type PlayerSummary = {
   height: number | null;
   foot: string | null;
   minutes: number;
+  /** Share of competition minutes relative to the season leader in the pool (0–100). */
+  minutes_pct?: number | null;
   rating: number;
   profile: string;
   hybrid_lean?: string | null;

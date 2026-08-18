@@ -130,7 +130,15 @@ export function RosterRail({
                   </em>
                 </span>
 
-                <span className="roster-rating">{formatRating(player.rating)}</span>
+                <span className="roster-meta">
+                  <span className="roster-minutes">
+                    {player.minutes.toLocaleString("pt-BR")}
+                    {player.minutes_pct != null ? (
+                      <em>{player.minutes_pct.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}%</em>
+                    ) : null}
+                  </span>
+                  <span className="roster-rating">{formatRating(player.rating)}</span>
+                </span>
               </button>
             );
           })}

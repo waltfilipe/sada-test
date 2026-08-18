@@ -4,6 +4,7 @@ import Link from "next/link";
 import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import { MinutesStat } from "./MinutesStat";
 import { ProfileTag, profileTagProps } from "./ProfileTag";
 import { RatingDial } from "./RatingDial";
 
@@ -79,11 +80,9 @@ export function DossierHeader({ player, poolSize, poolMedian, family }: Props) {
           </div>
         </div>
 
+        <MinutesStat minutes={player.minutes} minutesPct={player.minutes_pct} variant="prominent" />
+
         <div className="bar-group bar-output">
-          <div className="bar-item">
-            <span>Minutos</span>
-            <strong>{player.minutes.toLocaleString("pt-BR")}</strong>
-          </div>
           <div className="bar-item">
             <span>Gols</span>
             <strong>{player.goals}</strong>

@@ -187,9 +187,13 @@
   color: var(--text-3);
 }
 
+.slot-minutes {
+  margin-top: 0.15rem;
+}
+
 .slot-facts {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.5rem 0.75rem;
   margin: 0;
   padding-top: 0.9rem;
