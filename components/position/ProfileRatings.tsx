@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { profileMetaForFamily } from "@/lib/profileMeta";
-import { formatRating } from "@/lib/scoutTheme";
+import { clampPercent, formatRating } from "@/lib/scoutTheme";
 import type { PlayerProfile } from "@/lib/types";
 
 const ZAG_KEY_ORDER = ["perfil", "construcao", "defesa"];
@@ -46,7 +46,7 @@ export function ProfileRatings({ player, poolSize }: { player: PlayerProfile; po
         <p className="sc-note">Escala 0–10</p>
       </header>
 
-      <div className="rating-stack">
+      <div className="rating-cards">
         {ordered.map((item) => {
           const value = player.ratings[item.key] ?? 0;
           const rank = player.ranks[item.key] ?? poolSize;
@@ -54,16 +54,22 @@ export function ProfileRatings({ player, poolSize }: { player: PlayerProfile; po
           return (
             <article
               key={item.key}
-              className={`rating-stack-row ${rank <= 5 ? "is-top5" : ""}`}
+              className={`rating-card rating-card-axis ${rank <= 5 ? "is-top5" : ""}`}
               style={ratingCardStyle(value, rank)}
             >
-              <div className="rating-stack-label">
-                <span>{item.label}</span>
-                <em>
-                  #{rank} no pool
-                </em>
+              <div className="rating-card-head">
+                <span className="rating-card-name">{item.label}</span>
+                <em className="rating-card-rank">#{rank} no pool</em>
               </div>
-              <strong className="rating-stack-value">{formatRating(value)}</strong>
+
+              <div className="rating-card-body">
+                <strong className="rating-card-value rating-card-value-axis">{formatRating(value)}</strong>
+                <div className="rating-card-detail">
+                  <div className="meter">
+                    <i style={{ width: `${clampPercent(value * 10)}%`, background: "var(--rating-accent, var(--accent))" }} />
+                  </div>
+                </div>
+              </div>
             </article>
           );
         })}

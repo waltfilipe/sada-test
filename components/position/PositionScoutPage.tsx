@@ -10,7 +10,6 @@ import { AspectMatrix } from "./AspectMatrix";
 import { DossierHeader } from "./DossierHeader";
 import { ProfileRatings } from "./ProfileRatings";
 import { RosterRail } from "./RosterRail";
-import { SkillIndexPanel } from "./SkillIndexPanel";
 
 type Props = {
   family: PositionFamily;
@@ -96,10 +95,7 @@ export function PositionScoutPage({ family, players }: Props) {
               family={family}
             />
 
-            <div className="dossier-grid">
-              <ProfileRatings player={selected} poolSize={players.length} />
-              <SkillIndexPanel player={selected} family={family} />
-            </div>
+            <ProfileRatings player={selected} poolSize={players.length} />
 
             <AspectMatrix player={selected} />
           </main>

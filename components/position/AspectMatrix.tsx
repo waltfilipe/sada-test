@@ -12,39 +12,25 @@ const GROUPS = [
 
 export function AspectMatrix({ player }: { player: PlayerProfile }) {
   return (
-    <details className="sc-panel aspect-matrix">
-      <summary className="aspect-summary">
-        <div className="aspect-summary-copy">
+    <section className="sc-panel aspect-matrix">
+      <header className="aspect-panel-head">
+        <div>
           <p className="sc-eyebrow">Avaliação técnica</p>
           <h2>Aspectos de jogo</h2>
         </div>
 
-        <div className="aspect-summary-aside">
-          <div className="grade-legend">
-            {["A", "B", "C", "D"].map((grade) => {
-              const token = gradeTier(grade);
-              return (
-                <span key={grade} style={tierVars(token)}>
-                  <i aria-hidden />
-                  {grade}
-                </span>
-              );
-            })}
-          </div>
-          <span className="aspect-chevron" aria-hidden>
-            <svg viewBox="0 0 12 12" width="12" height="12">
-              <path
-                d="M2.5 4.5 6 8l3.5-3.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
+        <div className="grade-legend">
+          {["A", "B", "C", "D"].map((grade) => {
+            const token = gradeTier(grade);
+            return (
+              <span key={grade} style={tierVars(token)}>
+                <i aria-hidden />
+                {grade}
+              </span>
+            );
+          })}
         </div>
-      </summary>
+      </header>
 
       <div className="aspect-groups">
         {GROUPS.map((group) => (
@@ -78,6 +64,6 @@ export function AspectMatrix({ player }: { player: PlayerProfile }) {
           </article>
         ))}
       </div>
-    </details>
+    </section>
   );
 }
