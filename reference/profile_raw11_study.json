@@ -1,0 +1,845 @@
+{
+  "features": [
+    "Duelos defensivos/90",
+    "Duelos aérios/90",
+    "Remates intercetados/90",
+    "Interseções/90",
+    "Cortes/90",
+    "Faltas/90",
+    "Duelos ofensivos/90",
+    "Corridas progressivas/90",
+    "Passes longos/90",
+    "Passes para terço final/90",
+    "Passes progressivos/90"
+  ],
+  "n_players": 71,
+  "descriptive": [
+    {
+      "index": "Duelos defensivos/90",
+      "mean": 4.2,
+      "std": 1.1,
+      "median": 4.11
+    },
+    {
+      "index": "Duelos aérios/90",
+      "mean": 3.32,
+      "std": 0.94,
+      "median": 3.32
+    },
+    {
+      "index": "Remates intercetados/90",
+      "mean": 0.6,
+      "std": 0.27,
+      "median": 0.62
+    },
+    {
+      "index": "Interseções/90",
+      "mean": 4.56,
+      "std": 0.82,
+      "median": 4.39
+    },
+    {
+      "index": "Cortes/90",
+      "mean": 0.2,
+      "std": 0.17,
+      "median": 0.14
+    },
+    {
+      "index": "Faltas/90",
+      "mean": 0.9,
+      "std": 0.39,
+      "median": 0.83
+    },
+    {
+      "index": "Duelos ofensivos/90",
+      "mean": 0.99,
+      "std": 0.71,
+      "median": 0.87
+    },
+    {
+      "index": "Corridas progressivas/90",
+      "mean": 0.73,
+      "std": 0.57,
+      "median": 0.59
+    },
+    {
+      "index": "Passes longos/90",
+      "mean": 4.61,
+      "std": 1.66,
+      "median": 4.26
+    },
+    {
+      "index": "Passes para terço final/90",
+      "mean": 5.05,
+      "std": 1.97,
+      "median": 5.06
+    },
+    {
+      "index": "Passes progressivos/90",
+      "mean": 6.84,
+      "std": 2.17,
+      "median": 6.88
+    }
+  ],
+  "pca_variance": [
+    0.30332062026401063,
+    0.15592326553253325,
+    0.13075941109119077,
+    0.09720549679874232,
+    0.09407922581247412
+  ],
+  "k_selection": [
+    {
+      "K": 2,
+      "silhouette": 0.15608230378068258,
+      "calinski": 16.476964191760054,
+      "davies_bouldin": 1.8907693414820361,
+      "gmm_bic": 2280.082055521653,
+      "ari_vs_atual": 0.3293737339744627
+    },
+    {
+      "K": 3,
+      "silhouette": 0.1531568758777032,
+      "calinski": 13.871799170410183,
+      "davies_bouldin": 1.8562985916089456,
+      "gmm_bic": 2227.7952585389608,
+      "ari_vs_atual": 0.2522169084070666
+    },
+    {
+      "K": 4,
+      "silhouette": 0.152390412188087,
+      "calinski": 12.324823510758634,
+      "davies_bouldin": 1.8565359825901355,
+      "gmm_bic": 2127.4826241514384,
+      "ari_vs_atual": 0.27874018325783095
+    },
+    {
+      "K": 5,
+      "silhouette": 0.13575613944439158,
+      "calinski": 10.622437914060143,
+      "davies_bouldin": 1.836907263846453,
+      "gmm_bic": 2150.035039276307,
+      "ari_vs_atual": 0.24384907410090706
+    },
+    {
+      "K": 6,
+      "silhouette": 0.10144991014926816,
+      "calinski": 10.104193984192843,
+      "davies_bouldin": 1.7778127659302791,
+      "gmm_bic": 1970.5204619519805,
+      "ari_vs_atual": 0.20178994421858407
+    }
+  ],
+  "players": [
+    {
+      "Jogador": "João Victor",
+      "Equipe": "Mirassol",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -2.617,
+      "pc2": -1.501,
+      "changed": false
+    },
+    {
+      "Jogador": "Marllon",
+      "Equipe": "Remo",
+      "perfil": "Combativo",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -2.129,
+      "pc2": 0.339,
+      "changed": true
+    },
+    {
+      "Jogador": "Robert Renan",
+      "Equipe": "Vasco da Gama",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 2.729,
+      "pc2": -0.963,
+      "changed": true
+    },
+    {
+      "Jogador": "S. Ramos Mingo",
+      "Equipe": "Bahia",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.203,
+      "pc2": -1.786,
+      "changed": true
+    },
+    {
+      "Jogador": "Fabricio Bruno",
+      "Equipe": "Cruzeiro",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.75,
+      "pc2": -1.538,
+      "changed": true
+    },
+    {
+      "Jogador": "Bruno Gomes",
+      "Equipe": "Internacional",
+      "perfil": "Construtor",
+      "cluster_k3": 0,
+      "cluster_label": "Construtor",
+      "pc1": 2.92,
+      "pc2": 2.028,
+      "changed": false
+    },
+    {
+      "Jogador": "Arthur Dias",
+      "Equipe": "Athletico Paranaense",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.887,
+      "pc2": -1.001,
+      "changed": true
+    },
+    {
+      "Jogador": "Murilo",
+      "Equipe": "Palmeiras",
+      "perfil": "Híbrido",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.272,
+      "pc2": -0.923,
+      "changed": true
+    },
+    {
+      "Jogador": "G. Gómez",
+      "Equipe": "Palmeiras",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -1.563,
+      "pc2": 0.014,
+      "changed": false
+    },
+    {
+      "Jogador": "Gustavo Henrique",
+      "Equipe": "Corinthians",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -1.571,
+      "pc2": 0.147,
+      "changed": false
+    },
+    {
+      "Jogador": "Eduardo Doma",
+      "Equipe": "Chapecoense",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.288,
+      "pc2": -1.609,
+      "changed": true
+    },
+    {
+      "Jogador": "Ruan Tressoldi",
+      "Equipe": "Atlético Mineiro",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -0.934,
+      "pc2": 0.194,
+      "changed": false
+    },
+    {
+      "Jogador": "J. Freytes",
+      "Equipe": "Fluminense",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 2.336,
+      "pc2": -1.029,
+      "changed": true
+    },
+    {
+      "Jogador": "Gabriel Paulista",
+      "Equipe": "Corinthians",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -0.871,
+      "pc2": -0.351,
+      "changed": false
+    },
+    {
+      "Jogador": "Léo Pereira",
+      "Equipe": "Flamengo",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 1.973,
+      "pc2": -2.112,
+      "changed": true
+    },
+    {
+      "Jogador": "Gustavo Marques",
+      "Equipe": "Red Bull Bragantino",
+      "perfil": "Híbrido",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": -0.745,
+      "pc2": -1.495,
+      "changed": true
+    },
+    {
+      "Jogador": "Alix",
+      "Equipe": "Red Bull Bragantino",
+      "perfil": "Híbrido",
+      "cluster_k3": 0,
+      "cluster_label": "Construtor",
+      "pc1": 1.309,
+      "pc2": 1.285,
+      "changed": true
+    },
+    {
+      "Jogador": "Léo Ortiz",
+      "Equipe": "Flamengo",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 1.993,
+      "pc2": -2.689,
+      "changed": true
+    },
+    {
+      "Jogador": "Jacy",
+      "Equipe": "Coritiba",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -2.357,
+      "pc2": 0.314,
+      "changed": false
+    },
+    {
+      "Jogador": "J. Aguirre",
+      "Equipe": "Athletico Paranaense",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -2.42,
+      "pc2": 1.454,
+      "changed": false
+    },
+    {
+      "Jogador": "Willian Machado",
+      "Equipe": "Mirassol",
+      "perfil": "Híbrido",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.185,
+      "pc2": -1.308,
+      "changed": true
+    },
+    {
+      "Jogador": "Cacá",
+      "Equipe": "Vitória",
+      "perfil": "Híbrido",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -2.459,
+      "pc2": -0.307,
+      "changed": true
+    },
+    {
+      "Jogador": "David Duarte",
+      "Equipe": "Bahia",
+      "perfil": "Posicional",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.233,
+      "pc2": -1.288,
+      "changed": true
+    },
+    {
+      "Jogador": "Bruno Leonardo",
+      "Equipe": "Chapecoense",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -1.816,
+      "pc2": -0.036,
+      "changed": false
+    },
+    {
+      "Jogador": "L. Esquivel",
+      "Equipe": "Athletico Paranaense",
+      "perfil": "Híbrido",
+      "cluster_k3": 0,
+      "cluster_label": "Construtor",
+      "pc1": 4.839,
+      "pc2": 2.102,
+      "changed": true
+    },
+    {
+      "Jogador": "Sabino",
+      "Equipe": "São Paulo",
+      "perfil": "Híbrido",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 1.571,
+      "pc2": -0.069,
+      "changed": true
+    },
+    {
+      "Jogador": "Tiago Cóser",
+      "Equipe": "Coritiba",
+      "perfil": "Híbrido",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -2.464,
+      "pc2": 0.427,
+      "changed": true
+    },
+    {
+      "Jogador": "Alexander Barboza",
+      "Equipe": "Palmeiras",
+      "perfil": "Construtor",
+      "cluster_k3": 0,
+      "cluster_label": "Construtor",
+      "pc1": 4.739,
+      "pc2": 0.283,
+      "changed": false
+    },
+    {
+      "Jogador": "Jemmes",
+      "Equipe": "Fluminense",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -0.722,
+      "pc2": 0.637,
+      "changed": false
+    },
+    {
+      "Jogador": "D. Tchamba",
+      "Equipe": "Remo",
+      "perfil": "Posicional",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": -0.099,
+      "pc2": -1.662,
+      "changed": true
+    },
+    {
+      "Jogador": "N. Ferraresi",
+      "Equipe": "Botafogo",
+      "perfil": "Híbrido",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": -0.057,
+      "pc2": 0.621,
+      "changed": true
+    },
+    {
+      "Jogador": "Luan Peres",
+      "Equipe": "Santos",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -0.463,
+      "pc2": 0.072,
+      "changed": false
+    },
+    {
+      "Jogador": "F. Torres",
+      "Equipe": "Internacional",
+      "perfil": "Posicional",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": -0.161,
+      "pc2": 0.138,
+      "changed": true
+    },
+    {
+      "Jogador": "Victor Gabriel",
+      "Equipe": "Internacional",
+      "perfil": "Híbrido",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 2.098,
+      "pc2": 0.121,
+      "changed": true
+    },
+    {
+      "Jogador": "Lucas Veríssimo",
+      "Equipe": "Santos",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -2.335,
+      "pc2": 0.702,
+      "changed": false
+    },
+    {
+      "Jogador": "Viery",
+      "Equipe": "Fiorentina",
+      "perfil": "Construtor",
+      "cluster_k3": 0,
+      "cluster_label": "Construtor",
+      "pc1": 4.028,
+      "pc2": 0.351,
+      "changed": false
+    },
+    {
+      "Jogador": "Jonathan",
+      "Equipe": "Cruzeiro",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -1.498,
+      "pc2": 0.83,
+      "changed": false
+    },
+    {
+      "Jogador": "Gustavo Martins",
+      "Equipe": "Grêmio",
+      "perfil": "Híbrido",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": -0.065,
+      "pc2": 0.068,
+      "changed": true
+    },
+    {
+      "Jogador": "Gabriel Mercado",
+      "Equipe": "Internacional",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.135,
+      "pc2": 1.142,
+      "changed": true
+    },
+    {
+      "Jogador": "Luan Cândido",
+      "Equipe": "Vitória",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -1.988,
+      "pc2": 0.361,
+      "changed": false
+    },
+    {
+      "Jogador": "A. Franco",
+      "Equipe": "Tigres UANL",
+      "perfil": "Combativo",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.883,
+      "pc2": -0.503,
+      "changed": false
+    },
+    {
+      "Jogador": "Maicon",
+      "Equipe": "Coritiba",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -3.266,
+      "pc2": -0.904,
+      "changed": false
+    },
+    {
+      "Jogador": "Pedro Henrique",
+      "Equipe": "Red Bull Bragantino",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.959,
+      "pc2": -1.494,
+      "changed": true
+    },
+    {
+      "Jogador": "C. Terán",
+      "Equipe": "Athletico Paranaense",
+      "perfil": "Combativo",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.366,
+      "pc2": 0.074,
+      "changed": false
+    },
+    {
+      "Jogador": "A. Saldivia",
+      "Equipe": "Vasco da Gama",
+      "perfil": "Híbrido",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 1.23,
+      "pc2": 0.603,
+      "changed": true
+    },
+    {
+      "Jogador": "C. Cuesta",
+      "Equipe": "Vasco da Gama",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 1.366,
+      "pc2": 0.74,
+      "changed": true
+    },
+    {
+      "Jogador": "Júnior Alonso",
+      "Equipe": "Atlanta United",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -0.9,
+      "pc2": 0.702,
+      "changed": false
+    },
+    {
+      "Jogador": "Ignácio",
+      "Equipe": "Fluminense",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -0.775,
+      "pc2": 1.346,
+      "changed": false
+    },
+    {
+      "Jogador": "L. Villalba",
+      "Equipe": "Cruzeiro",
+      "perfil": "Construtor",
+      "cluster_k3": 0,
+      "cluster_label": "Construtor",
+      "pc1": 4.144,
+      "pc2": -0.286,
+      "changed": false
+    },
+    {
+      "Jogador": "A. Frías",
+      "Equipe": "Santos",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -1.663,
+      "pc2": 1.476,
+      "changed": false
+    },
+    {
+      "Jogador": "Wagner Leonardo",
+      "Equipe": "Grêmio",
+      "perfil": "Combativo",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.245,
+      "pc2": 1.01,
+      "changed": false
+    },
+    {
+      "Jogador": "Gabriel Justino",
+      "Equipe": "Botafogo",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -2.549,
+      "pc2": 0.888,
+      "changed": false
+    },
+    {
+      "Jogador": "Victor Caetano",
+      "Equipe": "Chapecoense",
+      "perfil": "Combativo",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.234,
+      "pc2": 0.965,
+      "changed": false
+    },
+    {
+      "Jogador": "Lyanco",
+      "Equipe": "Atlético Mineiro",
+      "perfil": "Híbrido",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": 0.194,
+      "pc2": 1.337,
+      "changed": true
+    },
+    {
+      "Jogador": "Zé Ivaldo",
+      "Equipe": "Remo",
+      "perfil": "Posicional",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": -0.464,
+      "pc2": -0.363,
+      "changed": true
+    },
+    {
+      "Jogador": "Camutanga",
+      "Equipe": "Vitória",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -2.72,
+      "pc2": -0.254,
+      "changed": false
+    },
+    {
+      "Jogador": "R. Arboleda",
+      "Equipe": "São Paulo",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -0.77,
+      "pc2": 0.894,
+      "changed": false
+    },
+    {
+      "Jogador": "F. Balbuena",
+      "Equipe": "Grêmio",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.595,
+      "pc2": -1.406,
+      "changed": true
+    },
+    {
+      "Jogador": "André Ramalho",
+      "Equipe": "Corinthians",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 1.374,
+      "pc2": -1.755,
+      "changed": true
+    },
+    {
+      "Jogador": "Vitão",
+      "Equipe": "Flamengo",
+      "perfil": "Híbrido",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": -0.507,
+      "pc2": -1.503,
+      "changed": true
+    },
+    {
+      "Jogador": "Vitor Hugo",
+      "Equipe": "Atlético Mineiro",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -2.848,
+      "pc2": -0.318,
+      "changed": false
+    },
+    {
+      "Jogador": "Bruno Fuchs",
+      "Equipe": "Palmeiras",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.749,
+      "pc2": -1.238,
+      "changed": true
+    },
+    {
+      "Jogador": "Bastos",
+      "Equipe": "Botafogo",
+      "perfil": "Combativo",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.18,
+      "pc2": 1.538,
+      "changed": false
+    },
+    {
+      "Jogador": "João Paulo",
+      "Equipe": "Chapecoense",
+      "perfil": "Posicional",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 1.07,
+      "pc2": -0.416,
+      "changed": true
+    },
+    {
+      "Jogador": "Kayky Almeida",
+      "Equipe": "Remo",
+      "perfil": "Híbrido",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.701,
+      "pc2": 0.404,
+      "changed": true
+    },
+    {
+      "Jogador": "Lucas Oliveira",
+      "Equipe": "Mirassol",
+      "perfil": "Híbrido",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -2.23,
+      "pc2": -1.369,
+      "changed": true
+    },
+    {
+      "Jogador": "Rafael Tolói",
+      "Equipe": "São Paulo",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 1.104,
+      "pc2": 0.487,
+      "changed": true
+    },
+    {
+      "Jogador": "Gabriel Xavier",
+      "Equipe": "Shenzhen Peng City",
+      "perfil": "Posicional",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -1.307,
+      "pc2": -0.938,
+      "changed": false
+    },
+    {
+      "Jogador": "I. Román",
+      "Equipe": "Atlético Mineiro",
+      "perfil": "Combativo",
+      "cluster_k3": 0,
+      "cluster_label": "Construtor",
+      "pc1": 1.39,
+      "pc2": 5.727,
+      "changed": true
+    },
+    {
+      "Jogador": "João Marcelo",
+      "Equipe": "Cruzeiro",
+      "perfil": "Construtor",
+      "cluster_k3": 1,
+      "cluster_label": "Combativo",
+      "pc1": 0.608,
+      "pc2": -0.397,
+      "changed": true
+    },
+    {
+      "Jogador": "Newton",
+      "Equipe": "São Paulo",
+      "perfil": "Combativo",
+      "cluster_k3": 2,
+      "cluster_label": "Posicional",
+      "pc1": -1.551,
+      "pc2": 2.989,
+      "changed": true
+    }
+  ]
+}
