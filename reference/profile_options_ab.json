@@ -1,0 +1,785 @@
+{
+  "n_players": 71,
+  "summary": [
+    {
+      "modelo": "Atual (DAX / 5 dim ZG)",
+      "concordancia_%": 100.0,
+      "ARI": 1.0,
+      "NMI": 1.0,
+      "Construtor": 20,
+      "Posicional": 27,
+      "Combativo": 8,
+      "Híbrido": 16
+    },
+    {
+      "modelo": "K-Means 6 comp",
+      "concordancia_%": 29.6,
+      "ARI": 0.44,
+      "NMI": 0.395,
+      "Construtor": 21,
+      "Posicional": 20,
+      "Combativo": 30,
+      "Híbrido": 0
+    },
+    {
+      "modelo": "Option A GMM K=3",
+      "concordancia_%": 54.9,
+      "ARI": 0.306,
+      "NMI": 0.34,
+      "Construtor": 34,
+      "Posicional": 31,
+      "Combativo": 6,
+      "Híbrido": 0
+    },
+    {
+      "modelo": "Option A GMM K=4",
+      "concordancia_%": 18.3,
+      "ARI": 0.223,
+      "NMI": 0.327,
+      "Construtor": 8,
+      "Posicional": 29,
+      "Combativo": 28,
+      "Híbrido": 6
+    },
+    {
+      "modelo": "Option B PCA (±0.25)",
+      "concordancia_%": 25.4,
+      "ARI": 0.266,
+      "NMI": 0.303,
+      "Construtor": 16,
+      "Posicional": 16,
+      "Combativo": 14,
+      "Híbrido": 25
+    }
+  ],
+  "pca_loadings": {
+    "PC1": {
+      "CompPassesProg": 0.5123,
+      "CompBL": 0.3924,
+      "CompPTF": 0.5034,
+      "EffDuelosDef": 0.2599,
+      "LeituraDef.": 0.2739,
+      "Cond.Prog": 0.4331
+    },
+    "PC2": {
+      "CompPassesProg": -0.1629,
+      "CompBL": -0.2038,
+      "CompPTF": -0.17,
+      "EffDuelosDef": 0.6573,
+      "LeituraDef.": 0.647,
+      "Cond.Prog": -0.2287
+    }
+  },
+  "players": [
+    {
+      "Jogador": "João Victor",
+      "Equipe": "Mirassol",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Marllon",
+      "Equipe": "Remo",
+      "perfil": "Combativo",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "Robert Renan",
+      "Equipe": "Vasco da Gama",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "S. Ramos Mingo",
+      "Equipe": "Bahia",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Fabricio Bruno",
+      "Equipe": "Cruzeiro",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Bruno Gomes",
+      "Equipe": "Internacional",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Híbrido",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Arthur Dias",
+      "Equipe": "Athletico Paranaense",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Murilo",
+      "Equipe": "Palmeiras",
+      "perfil": "Híbrido",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "G. Gómez",
+      "Equipe": "Palmeiras",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "Gustavo Henrique",
+      "Equipe": "Corinthians",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Eduardo Doma",
+      "Equipe": "Chapecoense",
+      "perfil": "Construtor",
+      "option_a3": "Duelista",
+      "option_a4": "Leitura",
+      "option_b": "Construtor",
+      "a3_mapped": "Combativo",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Ruan Tressoldi",
+      "Equipe": "Atlético Mineiro",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "J. Freytes",
+      "Equipe": "Fluminense",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Construtor",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Gabriel Paulista",
+      "Equipe": "Corinthians",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Léo Pereira",
+      "Equipe": "Flamengo",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Construtor",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Gustavo Marques",
+      "Equipe": "Red Bull Bragantino",
+      "perfil": "Híbrido",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Alix",
+      "Equipe": "Red Bull Bragantino",
+      "perfil": "Híbrido",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Léo Ortiz",
+      "Equipe": "Flamengo",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Construtor",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Jacy",
+      "Equipe": "Coritiba",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "J. Aguirre",
+      "Equipe": "Athletico Paranaense",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "Willian Machado",
+      "Equipe": "Mirassol",
+      "perfil": "Híbrido",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Cacá",
+      "Equipe": "Vitória",
+      "perfil": "Híbrido",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "David Duarte",
+      "Equipe": "Bahia",
+      "perfil": "Posicional",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Bruno Leonardo",
+      "Equipe": "Chapecoense",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "L. Esquivel",
+      "Equipe": "Athletico Paranaense",
+      "perfil": "Híbrido",
+      "option_a3": "Construtor",
+      "option_a4": "Construtor",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Sabino",
+      "Equipe": "São Paulo",
+      "perfil": "Híbrido",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Tiago Cóser",
+      "Equipe": "Coritiba",
+      "perfil": "Híbrido",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "Alexander Barboza",
+      "Equipe": "Palmeiras",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Construtor",
+      "option_b": "Híbrido",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Jemmes",
+      "Equipe": "Fluminense",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "D. Tchamba",
+      "Equipe": "Remo",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "N. Ferraresi",
+      "Equipe": "Botafogo",
+      "perfil": "Híbrido",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Luan Peres",
+      "Equipe": "Santos",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "F. Torres",
+      "Equipe": "Internacional",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Híbrido",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Victor Gabriel",
+      "Equipe": "Internacional",
+      "perfil": "Híbrido",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Lucas Veríssimo",
+      "Equipe": "Santos",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "Viery",
+      "Equipe": "Fiorentina",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Jonathan",
+      "Equipe": "Cruzeiro",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Gustavo Martins",
+      "Equipe": "Grêmio",
+      "perfil": "Híbrido",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Gabriel Mercado",
+      "Equipe": "Internacional",
+      "perfil": "Construtor",
+      "option_a3": "Duelista",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Combativo",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Luan Cândido",
+      "Equipe": "Vitória",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "A. Franco",
+      "Equipe": "Tigres UANL",
+      "perfil": "Combativo",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Maicon",
+      "Equipe": "Coritiba",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "Pedro Henrique",
+      "Equipe": "Red Bull Bragantino",
+      "perfil": "Construtor",
+      "option_a3": "Duelista",
+      "option_a4": "Construtor",
+      "option_b": "Construtor",
+      "a3_mapped": "Combativo",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "C. Terán",
+      "Equipe": "Athletico Paranaense",
+      "perfil": "Combativo",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "A. Saldivia",
+      "Equipe": "Vasco da Gama",
+      "perfil": "Híbrido",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "C. Cuesta",
+      "Equipe": "Vasco da Gama",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Júnior Alonso",
+      "Equipe": "Atlanta United",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Ignácio",
+      "Equipe": "Fluminense",
+      "perfil": "Posicional",
+      "option_a3": "Duelista",
+      "option_a4": "Híbrido",
+      "option_b": "Híbrido",
+      "a3_mapped": "Combativo",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "L. Villalba",
+      "Equipe": "Cruzeiro",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Construtor",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "A. Frías",
+      "Equipe": "Santos",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Híbrido",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Wagner Leonardo",
+      "Equipe": "Grêmio",
+      "perfil": "Combativo",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Híbrido",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Gabriel Justino",
+      "Equipe": "Botafogo",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Híbrido",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Victor Caetano",
+      "Equipe": "Chapecoense",
+      "perfil": "Combativo",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Lyanco",
+      "Equipe": "Atlético Mineiro",
+      "perfil": "Híbrido",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Zé Ivaldo",
+      "Equipe": "Remo",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Camutanga",
+      "Equipe": "Vitória",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Híbrido",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "R. Arboleda",
+      "Equipe": "São Paulo",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Híbrido",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "F. Balbuena",
+      "Equipe": "Grêmio",
+      "perfil": "Construtor",
+      "option_a3": "Duelista",
+      "option_a4": "Leitura",
+      "option_b": "Híbrido",
+      "a3_mapped": "Combativo",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "André Ramalho",
+      "Equipe": "Corinthians",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Construtor",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Vitão",
+      "Equipe": "Flamengo",
+      "perfil": "Híbrido",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Vitor Hugo",
+      "Equipe": "Atlético Mineiro",
+      "perfil": "Posicional",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "Bruno Fuchs",
+      "Equipe": "Palmeiras",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Construtor",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Construtor"
+    },
+    {
+      "Jogador": "Bastos",
+      "Equipe": "Botafogo",
+      "perfil": "Combativo",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "João Paulo",
+      "Equipe": "Chapecoense",
+      "perfil": "Posicional",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Kayky Almeida",
+      "Equipe": "Remo",
+      "perfil": "Híbrido",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Lucas Oliveira",
+      "Equipe": "Mirassol",
+      "perfil": "Híbrido",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "Rafael Tolói",
+      "Equipe": "São Paulo",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Híbrido",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "Gabriel Xavier",
+      "Equipe": "Shenzhen Peng City",
+      "perfil": "Posicional",
+      "option_a3": "Duelista",
+      "option_a4": "Híbrido",
+      "option_b": "Híbrido",
+      "a3_mapped": "Combativo",
+      "b_mapped": "Híbrido"
+    },
+    {
+      "Jogador": "I. Román",
+      "Equipe": "Atlético Mineiro",
+      "perfil": "Combativo",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    },
+    {
+      "Jogador": "João Marcelo",
+      "Equipe": "Cruzeiro",
+      "perfil": "Construtor",
+      "option_a3": "Construtor",
+      "option_a4": "Leitura",
+      "option_b": "Posicional",
+      "a3_mapped": "Construtor",
+      "b_mapped": "Posicional"
+    },
+    {
+      "Jogador": "Newton",
+      "Equipe": "São Paulo",
+      "perfil": "Combativo",
+      "option_a3": "Leitura",
+      "option_a4": "Duelista",
+      "option_b": "Combativo",
+      "a3_mapped": "Posicional",
+      "b_mapped": "Combativo"
+    }
+  ]
+}
