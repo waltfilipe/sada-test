@@ -767,6 +767,15 @@ def _duelos_won_p90(pool: pd.DataFrame, vol_col: str, pct_col: str) -> pd.Series
     return vol * pct
 
 
+def _acoes_def_bem_sucedidas(pool: pd.DataFrame) -> pd.Series:
+    """Interceptações + rebatidas + duelos def vencidos + bloqueios (p90)."""
+    inter = _ss_inter_col(pool)
+    clear = _ss_clearance_col(pool)
+    block = pd.to_numeric(pool.get("outfielder_block_p90", 0), errors="coerce").fillna(0)
+    dd_won = _duelos_won_p90(pool, "DuelosDef", "%DuelosDefW")
+    return inter + clear + dd_won + block
+
+
 def _custo_def_ajustado(pool: pd.DataFrame) -> pd.Series:
     """Adjusted defensive cost: lower is better (β=0.45 overlap correction)."""
     beta = 0.45
@@ -775,7 +784,10 @@ def _custo_def_ajustado(pool: pd.DataFrame) -> pd.Series:
     faltas = pd.to_numeric(pool.get("Faltas/90", 0), errors="coerce").fillna(0)
     dd_perd = dd * (1 - pct_w)
     num_adj = dd_perd + np.maximum(0, faltas - beta * dd_perd)
-    den = pd.to_numeric(pool.get("Ações defensivas com êxito/90", 0), errors="coerce").fillna(0)
+    if "_acoes_def_comp" in pool.columns:
+        den = pool["_acoes_def_comp"].astype(float)
+    else:
+        den = _acoes_def_bem_sucedidas(pool)
     den = den.replace(0, np.nan)
     return (num_adj / den).fillna(num_adj)
 
@@ -797,6 +809,7 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     prog_certos = out["CompPassesProg"].astype(float)
     long_res = percentile_rank(_residualize_on(out, long_certos, prog_certos), ascending=True)
 
+    out["_acoes_def_comp"] = _acoes_def_bem_sucedidas(out)
     out["_custo_def_raw"] = _custo_def_ajustado(out)
 
     share_long_pct = (share_long.fillna(0) * 100).astype(float)
@@ -834,7 +847,7 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "passes_long_certos90": _pool_percentile(out, "CompBL"),
         "passes_long_res": long_res,
         "rem_int_vol": _pool_percentile(out, "Remates intercetados/90"),
-        "ad_vol": _pool_percentile(out, "Ações defensivas com êxito/90", "AçõesDef"),
+        "ad_vol": percentile_rank(out["_acoes_def_comp"], ascending=True),
         "tend_long": percentile_rank(share_long.fillna(0), ascending=True),
         "tend_prog": percentile_rank(share_prog.fillna(0), ascending=True),
         "tend_lat": percentile_rank(lat_ratio.fillna(0), ascending=True),
@@ -951,7 +964,7 @@ def _sub_metric(label: str, *, percentile: Any, display_value: str | None = None
 def _def_efficiency_group_aspect(row: pd.Series, *, inter: float, cortes: float) -> dict[str, Any]:
     eff_pct = round(float(row.get("_asp_custo_def_eff", 0) or 0), 1)
     ad_pct = round(float(row.get("_asp_ad_vol", 0) or 0), 1)
-    ad = float(row.get("Ações defensivas com êxito/90") or row.get("AçõesDef") or 0)
+    ad = float(row.get("_acoes_def_comp") or 0)
     custo = float(row.get("_custo_def_raw", 0) or 0)
     return {
         "label": "Eficiência Defensiva",
