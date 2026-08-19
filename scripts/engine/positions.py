@@ -212,14 +212,14 @@ ZAG_WEAK_AXIS_GAP = 1.0
 ZAG_SHRINK_MU = 7.25
 ZAG_SHRINK_EXP = 0.65
 
-# Mild confidence pull toward pool mean for low minutes (after shrinkage)
-CONF_MINUTES_FLOOR = 0.90
-CONF_MINUTES_EXP = 0.50
+# Confidence pull toward pool mean for low minutes (after shrinkage)
+CONF_MINUTES_FLOOR = 0.82
+CONF_MINUTES_EXP = 0.40
 
 # Defensive efficiency: shrink percentile toward median when sample is thin
 DEF_SAMPLE_ACTIONS_LO = 6.5
 DEF_SAMPLE_ACTIONS_HI = 10.0
-DEF_SAMPLE_MINUTES_FULL = 0.45
+DEF_SAMPLE_MINUTES_FULL = 0.55
 DEF_EFF_SHRINK_MEDIAN = 50.0
 
 # Core/abs geral rating: badge bonus on efficiency-backed core metrics
@@ -521,7 +521,7 @@ def _def_eff_sample_weight(acoes_p90: pd.Series, pct_minutes: pd.Series) -> pd.S
     pct = pd.to_numeric(pct_minutes, errors="coerce").fillna(0).clip(0, 1)
     span = max(DEF_SAMPLE_ACTIONS_HI - DEF_SAMPLE_ACTIONS_LO, 0.1)
     w_act = ((acoes - DEF_SAMPLE_ACTIONS_LO) / span).clip(0, 1).pow(0.75)
-    w_min = (pct / DEF_SAMPLE_MINUTES_FULL).clip(0, 1).pow(0.65)
+    w_min = (pct / DEF_SAMPLE_MINUTES_FULL).clip(0, 1).pow(0.50)
     return w_act * w_min
 
 
