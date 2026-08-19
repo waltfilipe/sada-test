@@ -1,5 +1,4 @@
 import { archetypeTone, type ZagCluster } from "@/lib/clusterMeta";
-import { ArchetypeTooltip } from "./ArchetypeTooltip";
 
 type Props = {
   cluster: ZagCluster;
@@ -8,16 +7,12 @@ type Props = {
 
 export function ClusterTag({ cluster, className = "" }: Props) {
   return (
-    <ArchetypeTooltip archetype={cluster.archetype}>
-      <span className={`cluster-tag ${className}`.trim()}>
-        <span className={`cluster-tag-macro cluster-${archetypeTone(cluster.archetype)}`}>
-          {cluster.archetype_label}
-        </span>
-        {cluster.is_hybrid ? (
-          <span className="cluster-tag-hybrid">Híbrido</span>
-        ) : null}
+    <span className={`cluster-tag ${className}`.trim()}>
+      <span className={`cluster-tag-macro cluster-${archetypeTone(cluster.archetype)}`}>
+        {cluster.archetype_label}
       </span>
-    </ArchetypeTooltip>
+      {cluster.is_hybrid ? <span className="cluster-tag-hybrid">Híbrido</span> : null}
+    </span>
   );
 }
 

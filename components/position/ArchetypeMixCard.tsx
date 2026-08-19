@@ -3,11 +3,11 @@
 import { formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
 import {
   ZAG_ARCHETYPE_META,
-  archetypeMetaFor,
   archetypeTone,
   type ZagArchetype,
   type ZagCluster,
 } from "@/lib/clusterMeta";
+import { ArchetypeTooltip } from "./ArchetypeTooltip";
 
 type Props = {
   cluster: ZagCluster;
@@ -26,16 +26,11 @@ const RATING_KEYS: Record<ZagArchetype, keyof ZagCluster["ratings"]> = {
 };
 
 export function ArchetypeMixCard({ cluster }: Props) {
-  const primaryMeta = archetypeMetaFor(cluster.archetype);
-
   return (
-    <article className="archetype-mix-card" aria-label="Mix de arquétipo">
+    <article className="archetype-mix-card" aria-label="Perfil do atleta">
       <header className="archetype-mix-head">
-        <span className={`archetype-mix-primary cluster-${archetypeTone(cluster.archetype)}`}>
-          {cluster.archetype_label}
-        </span>
+        <h3>Perfil do Atleta</h3>
         {cluster.is_hybrid ? <span className="cluster-hybrid-badge">Híbrido</span> : null}
-        {primaryMeta ? <p className="archetype-mix-desc">{primaryMeta.description}</p> : null}
       </header>
 
       <ul className="archetype-mix-rows">
@@ -46,15 +41,21 @@ export function ArchetypeMixCard({ cluster }: Props) {
           const token = ratingTier(rating);
 
           return (
-            <li
-              key={item.archetype}
-              className={`archetype-mix-row cluster-${item.tone} ${active ? "active" : ""}`}
-            >
-              <span className="archetype-mix-name">{item.archetype}</span>
-              <span className="archetype-mix-share">{Math.round(share)}%</span>
-              <span className="archetype-mix-rating" style={tierVars(token)}>
-                Rating <strong>{formatRating(rating)}</strong>
-              </span>
+            <li key={item.archetype} className="archetype-mix-item">
+              <ArchetypeTooltip archetype={item.archetype} block>
+                <div
+                  className={`archetype-mix-row cluster-${item.tone} ${active ? "active" : ""}`}
+                  aria-current={active ? "true" : undefined}
+                >
+                  <span className={`archetype-mix-name cluster-${archetypeTone(item.archetype)}`}>
+                    {item.archetype}
+                  </span>
+                  <span className="archetype-mix-share">{Math.round(share)}%</span>
+                  <span className="archetype-mix-rating" style={tierVars(token)}>
+                    Rating <strong>{formatRating(rating)}</strong>
+                  </span>
+                </div>
+              </ArchetypeTooltip>
             </li>
           );
         })}

@@ -6,25 +6,20 @@ import { profileMetaForFamily } from "@/lib/profileMeta";
 import { clampPercent, formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
-function ratingCardStyle(value: number, rank: number): CSSProperties {
+function ratingAccentStyle(value: number, rank: number): CSSProperties {
+  const token = ratingTier(value);
+  const tierColor = tierVars(token)["--tier-color" as keyof ReturnType<typeof tierVars>] as string;
+
   if (rank <= 5) {
     return {
-      background:
-        "linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(96, 165, 250, 0.06) 55%, transparent 100%)",
-      borderColor: "rgba(96, 165, 250, 0.32)",
       ["--rating-accent" as string]: "#93c5fd",
+      ["--rating-glow" as string]: "rgba(96, 165, 250, 0.35)",
     };
   }
 
-  const t = Math.max(0, Math.min(1, (value - 5) / 4));
-  const r = Math.round(239 + (52 - 239) * t);
-  const g = Math.round(68 + (211 - 68) * t);
-  const b = Math.round(68 + (153 - 68) * t);
-
   return {
-    background: `linear-gradient(135deg, rgba(${r}, ${g}, ${b}, 0.16) 0%, rgba(${r}, ${g}, ${b}, 0.04) 60%, transparent 100%)`,
-    borderColor: `rgba(${r}, ${g}, ${b}, 0.24)`,
-    ["--rating-accent" as string]: `rgb(${r}, ${g}, ${b})`,
+    ["--rating-accent" as string]: tierColor ?? "#34d399",
+    ["--rating-glow" as string]: "rgba(52, 211, 153, 0.22)",
   };
 }
 
@@ -48,19 +43,49 @@ export function DossierRatings({ player, poolSize, family }: Props) {
   const geralToken = ratingTier(geral);
   const percentile = poolSize > 0 ? Math.max(1, 100 - Math.round(((poolSize - geralRank) / poolSize) * 100)) : 0;
   const axes = secondaryAxes(family);
+  const minutesPct = player.minutes_pct ?? null;
 
   return (
     <div className={`dossier-ratings ${axes.length === 0 ? "dossier-ratings-solo" : ""}`}>
-      <article className="dossier-rating-hero" style={{ ...tierVars(geralToken), ...ratingCardStyle(geral, geralRank) }}>
-        <span className="dossier-rating-label">Rating geral</span>
-        <strong className="dossier-rating-value">{formatRating(geral)}</strong>
-        <div className="dossier-rating-meta">
-          <span>#{geralRank}</span>
-          <i aria-hidden />
-          <span>Top {percentile}%</span>
+      <article
+        className="dossier-rating-hero dossier-rating-hero-modern"
+        style={{ ...tierVars(geralToken), ...ratingAccentStyle(geral, geralRank) }}
+      >
+        <div className="dossier-rating-ring" aria-hidden>
+          <svg viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" className="dossier-rating-ring-track" />
+            <circle
+              cx="60"
+              cy="60"
+              r="52"
+              className="dossier-rating-ring-fill"
+              style={{
+                strokeDasharray: `${clampPercent(geral * 10) * 3.27} 999`,
+              }}
+            />
+          </svg>
+          <div className="dossier-rating-ring-center">
+            <strong className="dossier-rating-value">{formatRating(geral)}</strong>
+            <span className="dossier-rating-label">Rating</span>
+          </div>
         </div>
-        <div className="dossier-rating-meter meter">
-          <i style={{ width: `${clampPercent(geral * 10)}%`, background: "var(--rating-accent, var(--tier-color))" }} />
+
+        <div className="dossier-rating-side">
+          <div className="dossier-rating-meta">
+            <span className="dossier-rating-rank">#{geralRank}</span>
+            <span>Top {percentile}%</span>
+          </div>
+          {minutesPct != null ? (
+            <div className="dossier-minutes-inline">
+              <div className="dossier-minutes-head">
+                <span>{player.minutes.toLocaleString("pt-BR")} min</span>
+                <strong>{minutesPct.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%</strong>
+              </div>
+              <div className="dossier-minutes-track" aria-hidden>
+                <i style={{ width: `${clampPercent(minutesPct)}%` }} />
+              </div>
+            </div>
+          ) : null}
         </div>
       </article>
 
@@ -75,7 +100,7 @@ export function DossierRatings({ player, poolSize, family }: Props) {
               <article
                 key={axis.key}
                 className={`dossier-rating-axis ${rank <= 5 ? "is-top5" : ""}`}
-                style={{ ...tierVars(token), ...ratingCardStyle(value, rank) }}
+                style={{ ...tierVars(token), ...ratingAccentStyle(value, rank) }}
               >
                 <div className="dossier-rating-axis-head">
                   <span className="dossier-rating-label">{axis.label}</span>

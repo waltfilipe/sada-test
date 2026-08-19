@@ -5,7 +5,6 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
-import { MinutesStat } from "./MinutesStat";
 import { DossierRatings } from "./DossierRatings";
 import { ClusterTag, clusterTagProps } from "./ClusterTag";
 import { ProfileTag, profileTagProps } from "./ProfileTag";
@@ -84,8 +83,6 @@ export function DossierHeader({ player, poolSize, family }: Props) {
             <strong>{contract ?? "—"}</strong>
           </div>
         </div>
-
-        <MinutesStat minutes={player.minutes} minutesPct={player.minutes_pct} variant="prominent" />
 
         <div className="bar-group bar-output">
           <div className="bar-item">

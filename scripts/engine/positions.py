@@ -990,9 +990,12 @@ def _construction_share_aspect(
     pool_avg_pct: float,
     scale_max_pct: float,
     percentile: Any,
+    bar_key: str | None = None,
+    axis_left: str | None = None,
+    axis_right: str | None = None,
 ) -> dict[str, Any]:
     pct = round(float(percentile or 0), 1)
-    return {
+    item: dict[str, Any] = {
         "label": label,
         "kind": "construction_share",
         "grade": _grade_from_pct(pct),
@@ -1003,6 +1006,13 @@ def _construction_share_aspect(
         "scale_max_pct": round(float(scale_max_pct), 1),
         "stats": [],
     }
+    if bar_key:
+        item["bar_key"] = bar_key
+    if axis_left:
+        item["axis_left"] = axis_left
+    if axis_right:
+        item["axis_right"] = axis_right
+    return item
 
 
 def _pass_aspect(
@@ -1060,7 +1070,7 @@ def _def_efficiency_group_aspect(row: pd.Series, *, inter: float, cortes: float)
     }
 
 
-def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
+def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, list[dict[str, Any]]]:
     dd_won = float(row.get("DuelosDef") or 0) * float(row.get("%DuelosDefW") or 0)
     da_won = float(row.get("DuelosAr") or 0) * float(row.get("%DuelosAr") or 0)
     do_won = float(row.get("DuelosOf") or 0) * float(row.get("%DuelosOfW") or 0)
@@ -1114,11 +1124,14 @@ def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
         ],
         "perfil_construcao": [
             _construction_share_aspect(
-                "Passes Longos",
+                "Tendência de Passe" if family_key == "zagueiros" else "Passes Longos",
                 share_pct=float(row.get("_share_long_pct", 0)),
                 pool_avg_pct=float(row.get("_pool_avg_share_long", 0)),
-                scale_max_pct=float(row.get("_scale_share_long", 40)),
+                scale_max_pct=24.0 if family_key == "zagueiros" else float(row.get("_scale_share_long", 40)),
                 percentile=row.get("_asp_tend_long", 0),
+                bar_key="pass_tendency" if family_key == "zagueiros" else None,
+                axis_left="Curto" if family_key == "zagueiros" else None,
+                axis_right="Longo" if family_key == "zagueiros" else None,
             ),
             _construction_share_aspect(
                 "Passes Progressivos",
@@ -1126,6 +1139,9 @@ def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
                 pool_avg_pct=float(row.get("_pool_avg_share_prog", 0)),
                 scale_max_pct=float(row.get("_scale_share_prog", 40)),
                 percentile=row.get("_asp_tend_prog", 0),
+                bar_key="progressive_share" if family_key == "zagueiros" else None,
+                axis_left="Baixo" if family_key == "zagueiros" else None,
+                axis_right="Alto" if family_key == "zagueiros" else None,
             ),
         ],
         "ofensivos": [
@@ -1157,7 +1173,7 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
     profile_shares = profile_shares_from_row(row, family_key)
     profile_ratings = profile_ratings_from_row(row, family_key)
     profile_rank_map = profile_ranks_from_row(row, family_key)
-    aspects = _build_aspects(row)
+    aspects = _build_aspects(row, family_key)
 
     ratings = {"geral": round(float(row["rating_geral"]), 1), **profile_ratings}
     ranks = {"geral": int(row["rank_geral"]), **profile_rank_map}

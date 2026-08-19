@@ -131,15 +131,18 @@
     ],
     "perfil_construcao": [
       {
-        "label": "Passes Longos",
+        "label": "Tendência de Passe",
         "kind": "construction_share",
         "grade": "C",
         "percentile": 41.4,
         "display_value": "10%",
         "share_pct": 10.0,
         "pool_avg_pct": 11.5,
-        "scale_max_pct": 30.0,
-        "stats": []
+        "scale_max_pct": 24.0,
+        "stats": [],
+        "bar_key": "pass_tendency",
+        "axis_left": "Curto",
+        "axis_right": "Longo"
       },
       {
         "label": "Passes Progressivos",
@@ -150,7 +153,10 @@
         "share_pct": 15.6,
         "pool_avg_pct": 16.7,
         "scale_max_pct": 33.3,
-        "stats": []
+        "stats": [],
+        "bar_key": "progressive_share",
+        "axis_left": "Baixo",
+        "axis_right": "Alto"
       }
     ],
     "ofensivos": [

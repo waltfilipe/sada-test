@@ -7,6 +7,7 @@ type Props = {
   archetype: ZagArchetype;
   children: ReactNode;
   className?: string;
+  block?: boolean;
 };
 
 function TraitArrow({ direction }: { direction: "up" | "down" }) {
@@ -25,12 +26,14 @@ function TraitArrow({ direction }: { direction: "up" | "down" }) {
   );
 }
 
-export function ArchetypeTooltip({ archetype, children, className = "" }: Props) {
+export function ArchetypeTooltip({ archetype, children, className = "", block = false }: Props) {
   const meta = archetypeMetaFor(archetype);
   if (!meta) return <>{children}</>;
 
+  const wrapClass = ["archetype-tip-wrap", block ? "is-block" : "", className].filter(Boolean).join(" ");
+
   return (
-    <span className={`archetype-tip-wrap ${className}`.trim()}>
+    <span className={wrapClass}>
       {children}
       <span className={`archetype-tip cluster-${meta.tone}`} role="tooltip">
         <span className="archetype-tip-title">{archetype}</span>

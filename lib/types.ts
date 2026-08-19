@@ -36,6 +36,10 @@ export type AspectItem = {
   pool_avg_pct?: number;
   /** Max % shown on the construction bar scale. */
   scale_max_pct?: number;
+  /** Gradient bar variant for perfil de construção. */
+  bar_key?: "pass_tendency" | "progressive_share";
+  axis_left?: string;
+  axis_right?: string;
   efficiency_pct?: number;
   efficiency_value?: string | null;
   /** @deprecated computed in UI from volume + efficiency percentiles */
