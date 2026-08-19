@@ -1,6 +1,6 @@
 "use client";
 
-import { clusterCounts } from "@/lib/clusterMeta";
+import { archetypeCounts } from "@/lib/clusterMeta";
 import type { PlayerProfile } from "@/lib/types";
 import { ClusterHierarchy } from "./ClusterHierarchy";
 
@@ -12,11 +12,11 @@ type Props = {
 export function DossierProfileCard({ player, poolPlayers = [] }: Props) {
   if (!player.cluster) return null;
 
-  const microCounts = poolPlayers.length ? clusterCounts(poolPlayers).micros : undefined;
+  const poolStats = poolPlayers.length ? archetypeCounts(poolPlayers) : undefined;
 
   return (
     <section className="dossier-profile-card" aria-label="Classificação de perfil">
-      <ClusterHierarchy cluster={player.cluster} poolCounts={microCounts} />
+      <ClusterHierarchy cluster={player.cluster} poolCounts={poolStats} />
     </section>
   );
 }

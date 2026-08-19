@@ -1,85 +1,98 @@
 "use client";
 
 import {
-  ZAG_CLUSTER_TREE,
-  clusterMacroTone,
-  clusterMetaFor,
-  type ClusterMacro,
-  type ClusterMicro,
+  ZAG_ARCHETYPE_META,
+  archetypeCounts,
+  archetypeMetaFor,
+  archetypeTone,
+  type ZagArchetype,
   type ZagCluster,
 } from "@/lib/clusterMeta";
 
 type Props = {
   cluster: ZagCluster;
-  poolCounts?: Partial<Record<ClusterMicro, number>>;
+  poolCounts?: ReturnType<typeof archetypeCounts>;
+};
+
+const SHARE_KEYS: Record<ZagArchetype, keyof ZagCluster["shares"]> = {
+  Rebatedor: "rebatedor",
+  Construtor: "construtor",
+  Agressivo: "agressivo",
 };
 
 export function ClusterHierarchy({ cluster, poolCounts }: Props) {
-  const meta = clusterMetaFor(cluster.macro, cluster.micro);
+  const meta = archetypeMetaFor(cluster.archetype);
 
   return (
-    <section className="cluster-hierarchy" aria-label="Classificação hierárquica">
+    <section className="cluster-hierarchy" aria-label="Classificação de arquétipo">
       <header className="cluster-hierarchy-head">
         <div className="cluster-path">
           <span
-            className={`cluster-path-macro cluster-${clusterMacroTone(cluster.macro)}`}
-            title={meta.branch?.description}
+            className={`cluster-path-macro cluster-${archetypeTone(cluster.archetype)}`}
+            title={meta?.description}
           >
-            {cluster.macro}
+            {cluster.archetype_label}
           </span>
-          <svg viewBox="0 0 16 16" aria-hidden className="cluster-path-chevron">
-            <path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          </svg>
-          <span
-            className={`cluster-path-micro cluster-${clusterMacroTone(cluster.macro)}`}
-            title={meta.leaf?.description}
-          >
-            {cluster.micro_label}
-          </span>
+          {cluster.is_hybrid ? (
+            <span className="cluster-hybrid-badge" title="Perfil equilibrado entre arquétipos — candidato a badge especial">
+              Híbrido
+            </span>
+          ) : null}
         </div>
+        <p className="cluster-share-caption">Mix de arquétipo (pool normalizado)</p>
       </header>
 
-      <div className="cluster-map" role="img" aria-label={`Mapa de perfis: ${meta.path}`}>
-        {ZAG_CLUSTER_TREE.map((branch) => (
-          <div
-            key={branch.macro}
-            className={`cluster-map-branch cluster-${branch.tone}`}
-            title={branch.description}
-          >
-            <p className="cluster-map-macro">{branch.macro}</p>
-            <div className="cluster-map-leaves">
-              {branch.children.map((leaf) => {
-                const active = branch.macro === cluster.macro && leaf.micro === cluster.micro;
-                const count = poolCounts?.[leaf.micro];
-                return (
-                  <div
-                    key={leaf.micro}
-                    className={`cluster-map-leaf ${active ? "active" : ""}`}
-                    aria-current={active ? "true" : undefined}
-                    title={leaf.description}
-                  >
-                    <span className="cluster-map-code">{leaf.micro}</span>
-                    <strong>{leaf.label}</strong>
-                    {typeof count === "number" && <em>{count}</em>}
-                  </div>
-                );
-              })}
+      <div className="cluster-share-bars" aria-label="Participação por arquétipo">
+        {ZAG_ARCHETYPE_META.map((item) => {
+          const share = cluster.shares[SHARE_KEYS[item.archetype]];
+          const active = item.archetype === cluster.archetype;
+          return (
+            <div
+              key={item.archetype}
+              className={`cluster-share-row cluster-${item.tone} ${active ? "active" : ""}`}
+              title={item.description}
+            >
+              <span className="cluster-share-label">{item.archetype}</span>
+              <span className="cluster-share-track">
+                <span className="cluster-share-fill" style={{ width: `${share}%` }} />
+              </span>
+              <span className="cluster-share-value">{share.toFixed(0)}%</span>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
+      {poolCounts && poolCounts.total > 0 ? (
+        <div className="cluster-map cluster-map-archetypes" role="img" aria-label="Distribuição do pool por arquétipo">
+          {ZAG_ARCHETYPE_META.map((item) => {
+            const count = poolCounts.counts[item.archetype];
+            const pct = poolCounts.percents[item.archetype];
+            const active = item.archetype === cluster.archetype;
+            return (
+              <div
+                key={item.archetype}
+                className={`cluster-map-archetype cluster-${item.tone} ${active ? "active" : ""}`}
+                aria-current={active ? "true" : undefined}
+                title={item.description}
+              >
+                <p className="cluster-map-archetype-name">{item.archetype}</p>
+                <strong>{pct}%</strong>
+                <em>{count} atletas</em>
+              </div>
+            );
+          })}
+          {poolCounts.hybrids > 0 ? (
+            <p className="cluster-pool-hybrid-note">
+              {poolCounts.hybrids} atletas marcados como híbridos ({Math.round((poolCounts.hybrids / poolCounts.total) * 100)}%)
+            </p>
+          ) : null}
+        </div>
+      ) : null}
     </section>
   );
 }
 
-export function clusterFilterKey(macro: ClusterMacro | null, micro: ClusterMicro | null): string | null {
-  if (micro) return micro;
-  if (macro) return macro;
-  return null;
-}
-
-const CLUSTER_MICROS = new Set<string>(["D1", "D2", "C1", "C2"]);
-const CLUSTER_MACROS = new Set<string>(["Defensor", "Construtor"]);
+const ARCHETYPES = new Set<string>(["Rebatedor", "Construtor", "Agressivo"]);
 
 export function playerMatchesClusterFilter(
   player: { cluster?: ZagCluster | null },
@@ -88,15 +101,13 @@ export function playerMatchesClusterFilter(
   if (!filters.length) return true;
   if (!player.cluster) return false;
 
-  const microFilters = filters.filter((key) => CLUSTER_MICROS.has(key));
-  const macroFilters = filters.filter((key) => CLUSTER_MACROS.has(key));
+  const archetypeFilters = filters.filter((key) => ARCHETYPES.has(key));
+  const hybridOnly = filters.includes("Híbrido");
 
-  // Micro chips narrow the pool; macro-only applies when no micro is selected.
-  if (microFilters.length) {
-    return microFilters.includes(player.cluster.micro);
+  if (archetypeFilters.length && hybridOnly) {
+    return archetypeFilters.includes(player.cluster.archetype) && player.cluster.is_hybrid;
   }
-  if (macroFilters.length) {
-    return macroFilters.includes(player.cluster.macro);
-  }
+  if (hybridOnly) return player.cluster.is_hybrid;
+  if (archetypeFilters.length) return archetypeFilters.includes(player.cluster.archetype);
   return true;
 }

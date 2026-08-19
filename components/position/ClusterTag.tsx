@@ -1,4 +1,4 @@
-import { clusterMacroTone, clusterMicroTone, type ZagCluster } from "@/lib/clusterMeta";
+import { archetypeTone, type ZagCluster } from "@/lib/clusterMeta";
 
 type Props = {
   cluster: ZagCluster;
@@ -8,8 +8,14 @@ type Props = {
 export function ClusterTag({ cluster, className = "" }: Props) {
   return (
     <span className={`cluster-tag ${className}`.trim()}>
-      <span className={`cluster-tag-macro cluster-${clusterMacroTone(cluster.macro)}`}>{cluster.macro}</span>
-      <span className={`cluster-tag-micro cluster-${clusterMicroTone(cluster.micro)}`}>{cluster.micro}</span>
+      <span className={`cluster-tag-macro cluster-${archetypeTone(cluster.archetype)}`}>
+        {cluster.archetype_label}
+      </span>
+      {cluster.is_hybrid ? (
+        <span className="cluster-tag-hybrid" title="Perfil equilibrado entre arquétipos">
+          Híbrido
+        </span>
+      ) : null}
     </span>
   );
 }

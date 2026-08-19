@@ -57,15 +57,9 @@ export type TransfermarktInfo = {
   profile_url: string | null;
 } | null;
 
-export type ClusterMacro = "Defensor" | "Construtor";
-export type ClusterMicro = "D1" | "D2" | "C1" | "C2";
+import type { ZagArchetype, ZagCluster, ZagClusterShares } from "@/lib/clusterMeta";
 
-export type ZagCluster = {
-  macro: ClusterMacro;
-  micro: ClusterMicro;
-  macro_label: ClusterMacro;
-  micro_label: string;
-};
+export type { ZagArchetype, ZagCluster, ZagClusterShares };
 
 export type PlayerSummary = {
   player_id: string;
