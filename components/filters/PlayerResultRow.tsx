@@ -10,6 +10,7 @@ import {
   ratingTier,
   tierVars,
 } from "@/lib/scoutTheme";
+import { ClubLogo } from "@/components/ClubLogo";
 import { MinutesStat } from "@/components/position/MinutesStat";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import type { PlayerSearchRow } from "@/lib/types";
@@ -49,6 +50,7 @@ export function PlayerResultRow({ player }: { player: PlayerSearchRow }) {
           <ProfileTag {...profileTagProps(player)} />
         </div>
         <p className="row-club">
+          <ClubLogo club={player.club} size={16} />
           {player.club}
           <i aria-hidden>·</i>
           <span>{player.position}</span>
