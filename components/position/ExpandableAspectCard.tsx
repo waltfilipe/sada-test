@@ -94,9 +94,18 @@ function displayValue(item: AspectItem): string {
 export function ExpandableAspectCard({ item, defaultOpen = false }: { item: AspectItem; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   const panelId = useId();
+  const badge = resolveAspectBadge(item);
 
   return (
-    <li className={`aspect-row aspect-row-expand ${open ? "is-open" : ""}`}>
+    <li
+      className={[
+        "aspect-row aspect-row-expand",
+        open ? "is-open" : "",
+        badge ? `has-medal has-medal-${badge}` : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <button
         type="button"
         className="aspect-row-trigger aspect-row-expand-trigger"

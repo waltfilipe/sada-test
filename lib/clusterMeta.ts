@@ -36,7 +36,7 @@ export const ZAG_ARCHETYPE_META: {
   {
     archetype: "Rebatedor",
     tone: "rebatedor",
-    description: "Referência defensiva: clearance, bloqueio, duelos aéreos e defensivos.",
+    description: "Referência defensiva: rebatidas, bloqueio e duelos aéreos e defensivos.",
     traits: [
       { label: "Rebatidas", direction: "up" },
       { label: "Duelos Aéreos", direction: "up" },
@@ -54,7 +54,6 @@ export const ZAG_ARCHETYPE_META: {
       { label: "PTF", direction: "up" },
       { label: "Volume de Passe", direction: "up" },
       { label: "Rebatidas", direction: "down" },
-      { label: "Clearances", direction: "down" },
     ],
   },
   {
@@ -66,7 +65,6 @@ export const ZAG_ARCHETYPE_META: {
       { label: "Condução Prog.", direction: "up" },
       { label: "PTF", direction: "up" },
       { label: "Rebatidas", direction: "down" },
-      { label: "Clearances", direction: "down" },
     ],
   },
 ];
