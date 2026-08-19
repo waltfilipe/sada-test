@@ -17,12 +17,22 @@ export type AspectItem = {
   label: string;
   grade: string;
   stats: AspectStat[];
-  /** Flat metric row: percentile bar with optional efficiency badge. */
-  kind?: "default" | "pass_certos" | "metric";
-  sublabel?: string;
+  /** Flat metric row: percentile bar, raw value, optional efficiency row. */
+  kind?: "default" | "pass_certos" | "metric" | "efficiency_def";
   certos_per90?: number;
   percentile?: number;
+  /** Raw stat shown beside the bar (volume / 90). */
+  display_value?: string;
+  /** Efficiency percentile (bar colour on secondary row). */
+  efficiency_pct?: number;
+  /** Formatted efficiency (e.g. "72%"). */
+  efficiency_value?: string | null;
+  /** Card border tint; also used on efficiency card for AD êxito. */
   accuracy_badge?: AccuracyBadgeKind | null;
+  /** Efficiency card: successful defensive actions below. */
+  secondary_label?: string;
+  secondary_value?: string;
+  secondary_percentile?: number;
 };
 
 export type TransfermarktInfo = {

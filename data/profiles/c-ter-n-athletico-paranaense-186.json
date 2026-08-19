@@ -13,15 +13,15 @@
   "minutes_pct": 49.3,
   "goals": 0,
   "assists": 0,
-  "rating": 6.6,
+  "rating": 6.9,
   "ratings": {
-    "geral": 6.6,
+    "geral": 6.9,
     "construcao": 6.3,
     "defesa": 6.1,
     "perfil": 6.6
   },
   "ranks": {
-    "geral": 69,
+    "geral": 60,
     "construcao": 60,
     "defesa": 65,
     "perfil": 69
@@ -46,7 +46,9 @@
         "grade": "C+",
         "percentile": 45.7,
         "stats": [],
-        "sublabel": "2,6 vencidos / 90",
+        "display_value": "2,6",
+        "efficiency_pct": 67.2,
+        "efficiency_value": "65%",
         "accuracy_badge": "bronze"
       },
       {
@@ -55,7 +57,9 @@
         "grade": "D",
         "percentile": 14.3,
         "stats": [],
-        "sublabel": "1,4 vencidos / 90",
+        "display_value": "1,4",
+        "efficiency_pct": 12.5,
+        "efficiency_value": "49%",
         "accuracy_badge": null
       },
       {
@@ -63,22 +67,28 @@
         "kind": "metric",
         "grade": "D",
         "percentile": 11.3,
-        "stats": []
+        "stats": [],
+        "display_value": "3,7"
       },
       {
         "label": "Rebatidas",
         "kind": "metric",
         "grade": "D",
         "percentile": 11.1,
-        "stats": []
+        "stats": [],
+        "display_value": "0,1"
       },
       {
         "label": "Eficiência",
-        "kind": "metric",
+        "kind": "efficiency_def",
         "grade": "C",
         "percentile": 40.0,
-        "stats": [],
-        "sublabel": "Custo def. ajustado (menor = melhor)"
+        "display_value": "0,26",
+        "secondary_label": "Ações def. c/ êxito",
+        "secondary_value": "6,3",
+        "secondary_percentile": 14.9,
+        "accuracy_badge": null,
+        "stats": []
       }
     ],
     "construcao": [
@@ -87,7 +97,10 @@
         "kind": "pass_certos",
         "grade": "C-",
         "certos_per90": 3.68,
+        "display_value": "3,7",
         "percentile": 30.0,
+        "efficiency_pct": 5.9,
+        "efficiency_value": "53%",
         "accuracy_badge": null,
         "stats": []
       },
@@ -96,7 +109,10 @@
         "kind": "pass_certos",
         "grade": "C-",
         "certos_per90": 2.48,
+        "display_value": "2,5",
         "percentile": 27.1,
+        "efficiency_pct": 5.8,
+        "efficiency_value": "53%",
         "accuracy_badge": null,
         "stats": []
       },
@@ -105,7 +121,10 @@
         "kind": "pass_certos",
         "grade": "C+",
         "certos_per90": 2.24,
+        "display_value": "2,2",
         "percentile": 48.6,
+        "efficiency_pct": 3.0,
+        "efficiency_value": "35%",
         "accuracy_badge": null,
         "stats": []
       }
@@ -116,14 +135,16 @@
         "kind": "metric",
         "grade": "A",
         "percentile": 87.1,
-        "stats": []
+        "stats": [],
+        "display_value": "17%"
       },
       {
         "label": "Tendência de Passes Progressivos",
         "kind": "metric",
         "grade": "B-",
         "percentile": 64.3,
-        "stats": []
+        "stats": [],
+        "display_value": "18%"
       },
       {
         "label": "Tendência de Lateralização",
@@ -131,7 +152,7 @@
         "grade": "C",
         "percentile": 44.3,
         "stats": [],
-        "sublabel": "Laterais / recebidos"
+        "display_value": "0,62"
       }
     ],
     "ofensivos": [
@@ -141,7 +162,9 @@
         "grade": "A",
         "percentile": 92.9,
         "stats": [],
-        "sublabel": "0,6 vencidos / 90",
+        "display_value": "0,6",
+        "efficiency_pct": 52.6,
+        "efficiency_value": "53%",
         "accuracy_badge": "bronze"
       },
       {
@@ -149,7 +172,8 @@
         "kind": "metric",
         "grade": "D",
         "percentile": 16.0,
-        "stats": []
+        "stats": [],
+        "display_value": "0,3"
       }
     ]
   },

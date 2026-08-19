@@ -1717,7 +1717,8 @@
   box-shadow: 0 0 10px color-mix(in srgb, var(--tier-color) 35%, transparent);
 }
 
-.aspect-metric-pct {
+.aspect-metric-pct,
+.aspect-metric-value {
   min-width: 1.55rem;
   font-family: "Sora", sans-serif;
   font-size: 0.78rem;
@@ -1725,6 +1726,37 @@
   color: var(--tier-color);
   font-variant-numeric: tabular-nums;
   text-align: right;
+}
+
+.aspect-metric-eff,
+.aspect-metric-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  padding-top: 0.32rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.aspect-metric-eff-label,
+.aspect-metric-secondary-label {
+  font-size: 0.62rem;
+  color: var(--text-3);
+  letter-spacing: 0.02em;
+}
+
+.aspect-metric-eff-value,
+.aspect-metric-secondary-value {
+  font-family: "Sora", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--tier-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.aspect-row-efficiency .aspect-metric-secondary {
+  margin-top: 0.42rem;
 }
 
 .accuracy-badge {

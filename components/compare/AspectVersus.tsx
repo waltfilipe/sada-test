@@ -1,6 +1,5 @@
 "use client";
 
-import { AccuracyBadge } from "@/components/position/AccuracyBadge";
 import { clampPercent, percentileTier, tierVars } from "@/lib/scoutTheme";
 import type { AspectItem, PlayerProfile } from "@/lib/types";
 
@@ -19,6 +18,12 @@ function aspectScore(item: AspectItem): number {
     return 0;
   }
   return item.stats.reduce((sum, stat) => sum + stat.percentile, 0) / item.stats.length;
+}
+
+function displayValue(item: AspectItem): string {
+  if (item.display_value) return item.display_value;
+  if (item.certos_per90 != null) return item.certos_per90.toFixed(1).replace(".", ",");
+  return "—";
 }
 
 export function AspectVersus({ a, b }: { a: PlayerProfile; b: PlayerProfile }) {
@@ -46,19 +51,17 @@ export function AspectVersus({ a, b }: { a: PlayerProfile; b: PlayerProfile }) {
                 return (
                   <li key={item.label} className={`aspect-versus-row leads-${leads}`}>
                     <span className="aspect-cell side-a">
-                      {item.accuracy_badge && <AccuracyBadge badge={item.accuracy_badge} size={12} showLabel={false} />}
-                      <span className="aspect-metric-pct" style={tierVars(tokenA)}>
-                        {Math.round(scoreA)}
+                      <span className="aspect-metric-value" style={tierVars(tokenA)}>
+                        {displayValue(item)}
                       </span>
                     </span>
 
                     <span className="aspect-versus-label">{item.label}</span>
 
                     <span className="aspect-cell side-b">
-                      <span className="aspect-metric-pct" style={tierVars(tokenB)}>
-                        {Math.round(scoreB)}
+                      <span className="aspect-metric-value" style={tierVars(tokenB)}>
+                        {displayValue(other)}
                       </span>
-                      {other.accuracy_badge && <AccuracyBadge badge={other.accuracy_badge} size={12} showLabel={false} />}
                     </span>
                   </li>
                 );
