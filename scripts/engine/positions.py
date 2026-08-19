@@ -62,7 +62,7 @@ POSITION_FAMILIES: dict[str, dict[str, Any]] = {
 
 SCATTER_METRICS = {
     "zagueiros": [
-        {"key": "intervencoes", "label": "Intervenções", "field": "Interseções"},
+        {"key": "intervencoes", "label": "Intervenções", "field": "interception_won_p90"},
         {"key": "confrontos_of", "label": "Confrontos Ofensivos", "field": "DuelosOf"},
         {"key": "construcao", "label": "Construção", "field": "n_construcao"},
         {"key": "duelo_ar", "label": "Duelo Aéreo", "field": "n_duelo_ar"},
@@ -155,6 +155,20 @@ def _feat_col(pool: pd.DataFrame, *candidates: str) -> pd.Series:
         if name in pool.columns:
             return pd.to_numeric(pool[name], errors="coerce").fillna(0)
     raise KeyError(f"Nenhuma coluna encontrada: {candidates}")
+
+
+def _ss_inter_col(pool: pd.DataFrame) -> pd.Series:
+    """Interceptações: SofaScore interception_won_p90 (fallback Wyscout)."""
+    if "interception_won_p90" in pool.columns:
+        return pd.to_numeric(pool["interception_won_p90"], errors="coerce").fillna(0)
+    return _feat_col(pool, "Interseções", "Interseções/90").astype(float)
+
+
+def _ss_clearance_col(pool: pd.DataFrame) -> pd.Series:
+    """Rebatidas/cortes: SofaScore total_clearance_p90 (fallback Wyscout)."""
+    if "total_clearance_p90" in pool.columns:
+        return pd.to_numeric(pool["total_clearance_p90"], errors="coerce").fillna(0)
+    return _feat_col(pool, "Carrinhos", "Cortes/90").astype(float)
 
 
 def _score_axis(frame: pd.DataFrame) -> pd.Series:
@@ -277,7 +291,7 @@ def _zag_skill_ofensividade(pool: pd.DataFrame) -> pd.Series:
 
 def _compute_zag_skill_indices(pool: pd.DataFrame) -> None:
     """Skill Index: z-score per metric, then percentile rank within the pool."""
-    inter = _feat_col(pool, "Interseções/90", "Interseções").astype(float)
+    inter = _ss_inter_col(pool)
     duelos_def_won = pool["DuelosDef"].astype(float) * pool["%DuelosDefW"].astype(float)
     duelos_ar_won = pool["DuelosAr"].astype(float) * pool["%DuelosAr"].astype(float)
 
@@ -363,8 +377,8 @@ def _zag_defense_score(pool: pd.DataFrame) -> pd.Series:
         "DuelosAr",
     )
 
-    inter = percentile_rank(_feat_col(pool, "Interseções/90", "Interseções").astype(float), ascending=True)
-    cortes = percentile_rank(_feat_col(pool, "Cortes/90", "Carrinhos").astype(float), ascending=True)
+    inter = percentile_rank(_ss_inter_col(pool), ascending=True)
+    cortes = percentile_rank(_ss_clearance_col(pool), ascending=True)
     rem_int = percentile_rank(_feat_col(pool, "Remates intercetados/90").astype(float), ascending=True)
 
     cort_res = percentile_rank(_residualize_on(pool, cortes, inter), ascending=True)
@@ -402,7 +416,7 @@ def _apply_zag_k3_classification(out: pd.DataFrame) -> None:
         {
             "dd": _feat_col(out, "Duelos defensivos/90", "DuelosDef"),
             "da": _feat_col(out, "Duelos aérios/90", "DuelosAr"),
-            "inter": _feat_col(out, "Interseções/90", "Interseções"),
+            "inter": _ss_inter_col(out),
         }
     )
 
@@ -792,8 +806,8 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "duelos_ar_vol": _pool_percentile(out, "Duelos aérios/90", "DuelosAr"),
         "duelos_ar_eff": _pct_eff(out, "Duelos aéreos ganhos, %", "%DuelosAr"),
         "duelos_ar_won_vol": percentile_rank(da_won, ascending=True),
-        "inter_vol": _pool_percentile(out, "Interseções/90", "Interseções"),
-        "cortes_vol": _pool_percentile(out, "Cortes/90", "Carrinhos"),
+        "inter_vol": percentile_rank(_ss_inter_col(out), ascending=True),
+        "cortes_vol": percentile_rank(_ss_clearance_col(out), ascending=True),
         "duelos_of_vol": _pool_percentile(out, "Duelos ofensivos/90", "DuelosOf"),
         "duelos_of_eff": _pct_eff(out, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
         "duelos_of_won_vol": percentile_rank(do_won, ascending=True),
@@ -928,8 +942,8 @@ def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
     dd_won = float(row.get("DuelosDef") or 0) * float(row.get("%DuelosDefW") or 0)
     da_won = float(row.get("DuelosAr") or 0) * float(row.get("%DuelosAr") or 0)
     do_won = float(row.get("DuelosOf") or 0) * float(row.get("%DuelosOfW") or 0)
-    inter = float(row.get("Interseções") or row.get("Interseções/90") or 0)
-    cortes = float(row.get("Carrinhos") or row.get("Cortes/90") or 0)
+    inter = float(row.get("interception_won_p90") or row.get("Interseções") or 0)
+    cortes = float(row.get("total_clearance_p90") or row.get("Carrinhos") or 0)
     prog = float(row.get("Cond.Prog") or row.get("Corridas progressivas/90") or 0)
     pp_e = row.get("_asp_passes_prog_eff", 0)
     ptf_e = row.get("_asp_ptf_eff", 0)

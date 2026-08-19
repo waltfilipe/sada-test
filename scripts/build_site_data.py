@@ -9,6 +9,7 @@ from pathlib import Path
 
 from engine.load_data import load_players_dataframe
 from engine.measures import attach_base_measures
+from engine.sofascore import attach_sofascore_metrics
 from engine.positions import (
     POSITION_FAMILIES,
     SCATTER_METRICS,
@@ -31,6 +32,7 @@ def main() -> None:
     print(f"Source: {source} ({len(raw_df)} players)")
 
     df = attach_base_measures(raw_df)
+    df = attach_sofascore_metrics(df)
     df = df[df["Posição"] != "Goleiro"].copy()
 
     all_players: list[dict] = []
