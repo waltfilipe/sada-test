@@ -212,14 +212,15 @@ ZAG_WEAK_AXIS_GAP = 1.0
 ZAG_SHRINK_MU = 7.25
 ZAG_SHRINK_EXP = 0.65
 
-# Confidence pull toward pool mean for low minutes (after shrinkage)
-CONF_MINUTES_FLOOR = 0.82
-CONF_MINUTES_EXP = 0.40
+# Confidence pull toward pool mean — only below P75 minutes within position pool
+CONF_MINUTES_P75_CUTOFF = 75.0
+CONF_MINUTES_FLOOR = 0.70
+CONF_MINUTES_EXP = 0.25
 
 # Defensive efficiency: shrink percentile toward median when sample is thin
 DEF_SAMPLE_ACTIONS_LO = 6.5
 DEF_SAMPLE_ACTIONS_HI = 10.0
-DEF_SAMPLE_MINUTES_FULL = 0.55
+DEF_MINUTES_BELOW_P75_EXP = 0.38
 DEF_EFF_SHRINK_MEDIAN = 50.0
 
 # Core/abs geral rating: badge bonus on efficiency-backed core metrics
@@ -500,29 +501,50 @@ def _zag_apply_minutes_shrinkage(base: float, pct_minutes: float) -> float:
     return w * base + (1.0 - w) * ZAG_SHRINK_MU
 
 
-def _minutes_confidence(pct_minutes: pd.Series | float) -> pd.Series | float:
-    """1.0 at full minutes; CONF_MINUTES_FLOOR at very low minutes."""
-    if isinstance(pct_minutes, pd.Series):
-        pct = pd.to_numeric(pct_minutes, errors="coerce").fillna(0).clip(0, 1)
-        return CONF_MINUTES_FLOOR + (1.0 - CONF_MINUTES_FLOOR) * pct.pow(CONF_MINUTES_EXP)
-    pct = max(0.0, min(1.0, float(pct_minutes or 0)))
-    return CONF_MINUTES_FLOOR + (1.0 - CONF_MINUTES_FLOOR) * (pct**CONF_MINUTES_EXP)
+def _minutes_pool_pct(pool: pd.DataFrame) -> pd.Series:
+    """Percentile rank of season minutes within the position pool (0–100)."""
+    minutes = pd.to_numeric(pool.get("Minutos jogados:"), errors="coerce").fillna(0)
+    return percentile_rank(minutes, ascending=True)
 
 
-def _apply_confidence_to_rating(rating: float, pct_minutes: float) -> float:
-    """Gently pull rating toward pool mean when minutes are low."""
-    conf = float(_minutes_confidence(pct_minutes))
+def _minutes_confidence(minutes_pool_pct: pd.Series | float) -> pd.Series | float:
+    """1.0 above P75 pool minutes; aggressive pull toward mean below P75."""
+    cutoff = CONF_MINUTES_P75_CUTOFF
+
+    if isinstance(minutes_pool_pct, pd.Series):
+        pct = pd.to_numeric(minutes_pool_pct, errors="coerce").fillna(0).clip(0, 100)
+        t = (pct / cutoff).clip(0, 1)
+        conf = CONF_MINUTES_FLOOR + (1.0 - CONF_MINUTES_FLOOR) * t.pow(CONF_MINUTES_EXP)
+        return conf.where(pct <= cutoff, 1.0)
+
+    pct = max(0.0, min(100.0, float(minutes_pool_pct or 0)))
+    if pct > cutoff:
+        return 1.0
+    t = pct / cutoff
+    return CONF_MINUTES_FLOOR + (1.0 - CONF_MINUTES_FLOOR) * (t**CONF_MINUTES_EXP)
+
+
+def _apply_confidence_to_rating(rating: float, minutes_pool_pct: float) -> float:
+    """Pull rating toward pool mean when minutes are below P75 within position pool."""
+    conf = float(_minutes_confidence(minutes_pool_pct))
     return ZAG_SHRINK_MU + (float(rating) - ZAG_SHRINK_MU) * conf
 
 
-def _def_eff_sample_weight(acoes_p90: pd.Series, pct_minutes: pd.Series) -> pd.Series:
-    """Trust in def-efficiency estimate: needs enough actions/90 and season minutes."""
+def _def_eff_minutes_weight(minutes_pool_pct: pd.Series) -> pd.Series:
+    """1.0 above P75; ramps down aggressively below."""
+    pct = pd.to_numeric(minutes_pool_pct, errors="coerce").fillna(0).clip(0, 100)
+    w = pd.Series(1.0, index=pct.index)
+    below = pct <= CONF_MINUTES_P75_CUTOFF
+    w.loc[below] = (pct.loc[below] / CONF_MINUTES_P75_CUTOFF).pow(DEF_MINUTES_BELOW_P75_EXP)
+    return w
+
+
+def _def_eff_sample_weight(acoes_p90: pd.Series, minutes_pool_pct: pd.Series) -> pd.Series:
+    """Trust in def-efficiency estimate: enough actions/90 and pool minutes ≥ P75."""
     acoes = pd.to_numeric(acoes_p90, errors="coerce").fillna(0)
-    pct = pd.to_numeric(pct_minutes, errors="coerce").fillna(0).clip(0, 1)
     span = max(DEF_SAMPLE_ACTIONS_HI - DEF_SAMPLE_ACTIONS_LO, 0.1)
     w_act = ((acoes - DEF_SAMPLE_ACTIONS_LO) / span).clip(0, 1).pow(0.75)
-    w_min = (pct / DEF_SAMPLE_MINUTES_FULL).clip(0, 1).pow(0.50)
-    return w_act * w_min
+    return w_act * _def_eff_minutes_weight(minutes_pool_pct)
 
 
 def _apply_badge_bonus(pct: float, eff_pct: Any) -> float:
@@ -555,6 +577,7 @@ def _zag_rating_core_abs_pct(row: pd.Series) -> float:
 
 def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out = pool.copy()
+    out["_minutes_pool_pct"] = _minutes_pool_pct(out)
 
     z_fields = {
         "Z_DuelosOf": ("DuelosOf", True),
@@ -689,7 +712,7 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out["rating_perfil_raw"] = out.apply(
         lambda row: _apply_confidence_to_rating(
             _zag_apply_minutes_shrinkage(row["rating_perfil_base"], row["%Minutos"]),
-            row["%Minutos"],
+            row["_minutes_pool_pct"],
         ),
         axis=1,
     )
@@ -703,7 +726,7 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
                 5.0 + row["rating_core_abs_pct"] / 100.0 * 4.5,
                 row["%Minutos"],
             ),
-            row["%Minutos"],
+            row["_minutes_pool_pct"],
         ),
         axis=1,
     )
@@ -726,6 +749,7 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
 
 def _compute_generic_ratings(pool: pd.DataFrame, prefix: str) -> pd.DataFrame:
     out = pool.copy()
+    out["_minutes_pool_pct"] = _minutes_pool_pct(out)
     offensive = out["DuelosOf"] + out["Dribles"] + out["ToquesArea"] + out["Finalizações"]
     construction = out["PassesProg"] * out["%EffPassProg"] + out["PTF"] * out["%EffPassTF"]
     defensive = out["DuelosDef"] * out["%DuelosDefW"] + out["Interseções"]
@@ -749,7 +773,7 @@ def _compute_generic_ratings(pool: pd.DataFrame, prefix: str) -> pd.DataFrame:
         * 0.83
     )
     out["rating_geral"] = out.apply(
-        lambda row: _apply_confidence_to_rating(row["rating_geral"], row["%Minutos"]),
+        lambda row: _apply_confidence_to_rating(row["rating_geral"], row["_minutes_pool_pct"]),
         axis=1,
     )
     out["rating_combativo"] = out["rating_geral"] * 0.98
@@ -856,7 +880,9 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
 
     out["_acoes_def_comp"] = _acoes_def_bem_sucedidas(out)
     out["_custo_def_raw"] = _custo_def_ajustado(out)
-    out["_def_sample_w"] = _def_eff_sample_weight(out["_acoes_def_comp"], out["%Minutos"])
+    if "_minutes_pool_pct" not in out.columns:
+        out["_minutes_pool_pct"] = _minutes_pool_pct(out)
+    out["_def_sample_w"] = _def_eff_sample_weight(out["_acoes_def_comp"], out["_minutes_pool_pct"])
     custo_eff_raw = percentile_rank(-out["_custo_def_raw"], ascending=True)
     custo_eff_adj = out["_def_sample_w"] * custo_eff_raw + (1.0 - out["_def_sample_w"]) * DEF_EFF_SHRINK_MEDIAN
 
