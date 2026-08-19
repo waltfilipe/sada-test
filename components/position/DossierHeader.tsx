@@ -5,17 +5,16 @@ import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { MinutesStat } from "./MinutesStat";
+import { DossierRatings } from "./DossierRatings";
 import { ProfileTag, profileTagProps } from "./ProfileTag";
-import { RatingDial } from "./RatingDial";
 
 type Props = {
   player: PlayerProfile;
   poolSize: number;
-  poolMedian: number;
   family: PositionFamily;
 };
 
-export function DossierHeader({ player, poolSize, poolMedian, family }: Props) {
+export function DossierHeader({ player, poolSize, family }: Props) {
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const positionLabel = player.position || familyBySlug(family).label;
   const tm = player.transfermarkt;
@@ -65,7 +64,7 @@ export function DossierHeader({ player, poolSize, poolMedian, family }: Props) {
       </div>
 
       <div className="dossier-dial">
-        <RatingDial value={player.ratings.geral} rank={player.ranks.geral} poolSize={poolSize} reference={poolMedian} />
+        <DossierRatings player={player} poolSize={poolSize} family={family} />
       </div>
 
       <footer className="dossier-bar">

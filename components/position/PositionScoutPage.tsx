@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AspectMatrix } from "./AspectMatrix";
 import { DossierHeader } from "./DossierHeader";
-import { ProfileRatings } from "./ProfileRatings";
 import { RosterRail } from "./RosterRail";
 
 type Props = {
@@ -27,13 +26,6 @@ export function PositionScoutPage({ family, players }: Props) {
   const familyMeta = familyBySlug(family);
 
   const selected = players.find((player) => player.player_id === selectedId) ?? players[0] ?? null;
-
-  const poolMedian = useMemo(() => {
-    if (!players.length) return 0;
-    const sorted = players.map((player) => player.ratings.geral).sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-  }, [players]);
 
   useEffect(() => {
     if (players.length && !players.some((player) => player.player_id === selectedId)) {
@@ -91,11 +83,8 @@ export function PositionScoutPage({ family, players }: Props) {
             <DossierHeader
               player={selected}
               poolSize={players.length}
-              poolMedian={poolMedian}
               family={family}
             />
-
-            <ProfileRatings player={selected} poolSize={players.length} />
 
             <AspectMatrix player={selected} />
           </main>
