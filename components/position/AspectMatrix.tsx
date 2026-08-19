@@ -12,30 +12,30 @@ const GROUPS = [
   { key: "ofensivos", title: "Ofensivos", hint: "Condução e duelos ofensivos" },
 ] as const;
 
+function passTooltip(item: AspectItem): string {
+  const value = item.certos_per90?.toFixed(1).replace(".", ",") ?? "—";
+  return `${value} passes certos / 90`;
+}
+
 function PassAspectRow({ item }: { item: AspectItem }) {
   const pct = item.percentile ?? 0;
   const token = percentileTier(pct);
-  const gradeToken = gradeTier(item.grade);
 
   return (
     <li className="aspect-row aspect-row-pass">
       <div className="aspect-pass-head">
         <span className="aspect-name">{item.label}</span>
-        <span className="aspect-row-end">
-          {item.accuracy_badge && <AccuracyBadge badge={item.accuracy_badge} />}
-          <span className="aspect-grade" style={tierVars(gradeToken)}>
-            {normalizeGrade(item.grade)}
-          </span>
-        </span>
+        {item.accuracy_badge && <AccuracyBadge badge={item.accuracy_badge} />}
       </div>
-      <div className="aspect-pass-body" style={tierVars(token)}>
-        <div className="aspect-pass-meta">
-          <span className="aspect-pass-value">{item.certos_per90?.toFixed(1)} certos/90</span>
-          <span className="aspect-pass-pct">{Math.round(pct)}</span>
-        </div>
+      <div
+        className="aspect-pass-track"
+        style={tierVars(token)}
+        title={passTooltip(item)}
+      >
         <div className="aspect-stat-bar aspect-pass-bar">
           <i style={{ width: `${clampPercent(pct)}%` }} />
         </div>
+        <span className="aspect-pass-pct">{Math.round(pct)}</span>
       </div>
     </li>
   );

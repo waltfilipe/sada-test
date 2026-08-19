@@ -36,28 +36,40 @@ export function AspectVersus({ a, b }: { a: PlayerProfile; b: PlayerProfile }) {
                 const other = rowsB[index];
                 if (!other) return null;
 
-                const tokenA = gradeTier(item.grade);
-                const tokenB = gradeTier(other.grade);
                 const scoreA = aspectScore(item);
                 const scoreB = aspectScore(other);
                 const leads = scoreA === scoreB ? "tie" : scoreA > scoreB ? "a" : "b";
+                const tokenA = gradeTier(item.grade);
+                const tokenB = gradeTier(other.grade);
 
                 return (
                   <li key={item.label} className={`aspect-versus-row leads-${leads}`}>
                     <span className="aspect-cell side-a">
-                      {item.accuracy_badge && <AccuracyBadge badge={item.accuracy_badge} />}
-                      <span className="aspect-grade" style={tierVars(tokenA)}>
-                        {normalizeGrade(item.grade)}
-                      </span>
+                      {item.kind === "pass_certos" ? (
+                        <>
+                          {item.accuracy_badge && <AccuracyBadge badge={item.accuracy_badge} size={12} />}
+                          <span className="aspect-pass-pct">{Math.round(item.percentile ?? 0)}</span>
+                        </>
+                      ) : (
+                        <span className="aspect-grade" style={tierVars(tokenA)}>
+                          {normalizeGrade(item.grade)}
+                        </span>
+                      )}
                     </span>
 
                     <span className="aspect-versus-label">{item.label}</span>
 
                     <span className="aspect-cell side-b">
-                      <span className="aspect-grade" style={tierVars(tokenB)}>
-                        {normalizeGrade(other.grade)}
-                      </span>
-                      {other.accuracy_badge && <AccuracyBadge badge={other.accuracy_badge} />}
+                      {other.kind === "pass_certos" ? (
+                        <>
+                          <span className="aspect-pass-pct">{Math.round(other.percentile ?? 0)}</span>
+                          {other.accuracy_badge && <AccuracyBadge badge={other.accuracy_badge} size={12} />}
+                        </>
+                      ) : (
+                        <span className="aspect-grade" style={tierVars(tokenB)}>
+                          {normalizeGrade(other.grade)}
+                        </span>
+                      )}
                     </span>
                   </li>
                 );

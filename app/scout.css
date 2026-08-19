@@ -1484,33 +1484,25 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
-  margin-bottom: 0.38rem;
+  margin-bottom: 0.32rem;
 }
 
-.aspect-pass-body {
-  padding-left: 0.05rem;
-}
-
-.aspect-pass-meta {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.28rem;
-}
-
-.aspect-pass-value {
-  font-size: 0.68rem;
-  color: var(--text-3);
-  font-variant-numeric: tabular-nums;
+.aspect-pass-track {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: help;
 }
 
 .aspect-pass-pct {
+  min-width: 1.4rem;
   font-family: "Sora", sans-serif;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--tier-color);
   font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 .aspect-pass-bar {
@@ -1520,32 +1512,26 @@
 .accuracy-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.1rem 0.38rem;
-  border-radius: 999px;
-  font-family: "Sora", sans-serif;
-  font-size: 0.58rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  line-height: 1.2;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 0;
 }
 
-.accuracy-badge-gold {
-  color: #f2c14e;
-  background: rgba(242, 193, 78, 0.1);
-  border: 1px solid rgba(242, 193, 78, 0.32);
+.accuracy-badge-svg {
+  display: block;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
 }
 
-.accuracy-badge-silver {
-  color: #cbd5e1;
-  background: rgba(203, 213, 225, 0.08);
-  border: 1px solid rgba(203, 213, 225, 0.26);
+.accuracy-badge-gold .accuracy-badge-svg {
+  filter: drop-shadow(0 0 4px rgba(242, 193, 78, 0.22));
 }
 
-.accuracy-badge-bronze {
-  color: #d18a51;
-  background: rgba(209, 138, 81, 0.1);
-  border: 1px solid rgba(209, 138, 81, 0.28);
+.accuracy-badge-silver .accuracy-badge-svg {
+  filter: drop-shadow(0 0 3px rgba(203, 213, 225, 0.16));
+}
+
+.accuracy-badge-bronze .accuracy-badge-svg {
+  filter: drop-shadow(0 0 3px rgba(209, 138, 81, 0.18));
 }
 
 .grade-chip {
