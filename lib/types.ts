@@ -26,10 +26,16 @@ export type AspectItem = {
   grade: string;
   stats: AspectStat[];
   /** Expandable metric card. */
-  kind?: "default" | "pass_certos" | "metric" | "def_efficiency_group";
+  kind?: "default" | "pass_certos" | "metric" | "def_efficiency_group" | "construction_share";
   certos_per90?: number;
   percentile?: number;
   display_value?: string;
+  /** Player share % for construction profile bars. */
+  share_pct?: number;
+  /** Position pool average share % (bar center). */
+  pool_avg_pct?: number;
+  /** Max % shown on the construction bar scale. */
+  scale_max_pct?: number;
   efficiency_pct?: number;
   efficiency_value?: string | null;
   /** @deprecated computed in UI from volume + efficiency percentiles */

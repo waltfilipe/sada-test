@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 
-import { dualMetricBadge, pairBadge } from "@/lib/aspectBadges";
+import { resolveAspectBadge } from "@/lib/aspectBadges";
 import { clampPercent, percentileTier, tierVars } from "@/lib/scoutTheme";
 import type { AspectItem } from "@/lib/types";
 import { AccuracyBadge } from "./AccuracyBadge";
@@ -42,14 +42,16 @@ function MetricBar({
 }
 
 function HeaderBadge({ item }: { item: AspectItem }) {
-  let badge = null;
-  if (item.kind === "def_efficiency_group" && item.pair_badge) {
-    badge = pairBadge(item.pair_badge[0], item.pair_badge[1]);
-  } else if (item.efficiency_pct != null && item.percentile != null) {
-    badge = dualMetricBadge(item.percentile, item.efficiency_pct);
-  }
+  const badge = resolveAspectBadge(item);
   if (!badge) return null;
   return <AccuracyBadge badge={badge} size={13} showLabel={false} />;
+}
+
+function volumeLabel(item: AspectItem): string {
+  if (item.kind === "pass_certos") {
+    return item.label;
+  }
+  return item.label;
 }
 
 function ExpandableBody({ item }: { item: AspectItem }) {
@@ -71,7 +73,7 @@ function ExpandableBody({ item }: { item: AspectItem }) {
 
   return (
     <div className="aspect-expand-body">
-      <MetricBar label="Valor absoluto" pct={item.percentile ?? 0} value={displayValue(item)} />
+      <MetricBar label={volumeLabel(item)} pct={item.percentile ?? 0} value={displayValue(item)} />
       {item.efficiency_pct != null ? (
         <MetricBar
           label="Eficiência"

@@ -1,6 +1,6 @@
 "use client";
 
-import { dualMetricBadge } from "@/lib/aspectBadges";
+import { resolveAspectBadge } from "@/lib/aspectBadges";
 import { percentileTier, tierVars } from "@/lib/scoutTheme";
 import type { AspectItem, PlayerProfile } from "@/lib/types";
 import { AccuracyBadge } from "@/components/position/AccuracyBadge";
@@ -29,13 +29,7 @@ function displayValue(item: AspectItem): string {
 }
 
 function rowBadge(item: AspectItem) {
-  if (item.kind === "def_efficiency_group" && item.pair_badge) {
-    return dualMetricBadge(item.pair_badge[0], item.pair_badge[1]);
-  }
-  if (item.efficiency_pct != null && item.percentile != null) {
-    return dualMetricBadge(item.percentile, item.efficiency_pct);
-  }
-  return null;
+  return resolveAspectBadge(item);
 }
 
 export function AspectVersus({ a, b }: { a: PlayerProfile; b: PlayerProfile }) {

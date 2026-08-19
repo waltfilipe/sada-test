@@ -799,6 +799,19 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
 
     out["_custo_def_raw"] = _custo_def_ajustado(out)
 
+    share_long_pct = (share_long.fillna(0) * 100).astype(float)
+    share_prog_pct = (share_prog.fillna(0) * 100).astype(float)
+    avg_long = float(share_long_pct.mean())
+    avg_prog = float(share_prog_pct.mean())
+    scale_long = max(30.0, float(share_long_pct.quantile(0.95)) * 1.15, avg_long * 2)
+    scale_prog = max(30.0, float(share_prog_pct.quantile(0.95)) * 1.15, avg_prog * 2)
+    out["_share_long_pct"] = share_long_pct
+    out["_share_prog_pct"] = share_prog_pct
+    out["_pool_avg_share_long"] = avg_long
+    out["_pool_avg_share_prog"] = avg_prog
+    out["_scale_share_long"] = scale_long
+    out["_scale_share_prog"] = scale_prog
+
     mappings: dict[str, pd.Series] = {
         "duelos_def_vol": _pool_percentile(out, "Duelos defensivos/90", "DuelosDef"),
         "duelos_def_eff": _pct_eff(out, "Duelos defensivos ganhos, %", "%DuelosDefW"),
@@ -881,6 +894,28 @@ def _metric_aspect(
         if eff_display:
             item["efficiency_value"] = eff_display
     return item
+
+
+def _construction_share_aspect(
+    label: str,
+    *,
+    share_pct: float,
+    pool_avg_pct: float,
+    scale_max_pct: float,
+    percentile: Any,
+) -> dict[str, Any]:
+    pct = round(float(percentile or 0), 1)
+    return {
+        "label": label,
+        "kind": "construction_share",
+        "grade": _grade_from_pct(pct),
+        "percentile": pct,
+        "display_value": f"{round(share_pct):.0f}%",
+        "share_pct": round(float(share_pct), 1),
+        "pool_avg_pct": round(float(pool_avg_pct), 1),
+        "scale_max_pct": round(float(scale_max_pct), 1),
+        "stats": [],
+    }
 
 
 def _pass_aspect(
@@ -991,32 +1026,19 @@ def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
             ),
         ],
         "perfil_construcao": [
-            _metric_aspect(
-                "Tendência de Passes Longos",
+            _construction_share_aspect(
+                "Passes Longos",
+                share_pct=float(row.get("_share_long_pct", 0)),
+                pool_avg_pct=float(row.get("_pool_avg_share_long", 0)),
+                scale_max_pct=float(row.get("_scale_share_long", 40)),
                 percentile=row.get("_asp_tend_long", 0),
-                display_value=_fmt_num(
-                    float(row.get("PassesLongos") or 0) / max(float(row.get("Passe") or 1), 1) * 100,
-                    decimals=0,
-                )
-                + "%",
             ),
-            _metric_aspect(
-                "Tendência de Passes Progressivos",
+            _construction_share_aspect(
+                "Passes Progressivos",
+                share_pct=float(row.get("_share_prog_pct", 0)),
+                pool_avg_pct=float(row.get("_pool_avg_share_prog", 0)),
+                scale_max_pct=float(row.get("_scale_share_prog", 40)),
                 percentile=row.get("_asp_tend_prog", 0),
-                display_value=_fmt_num(
-                    float(row.get("PassesProg") or 0) / max(float(row.get("Passe") or 1), 1) * 100,
-                    decimals=0,
-                )
-                + "%",
-            ),
-            _metric_aspect(
-                "Tendência de Lateralização",
-                percentile=row.get("_asp_tend_lat", 0),
-                display_value=_fmt_num(
-                    float(row.get("Passes laterais/90") or 0)
-                    / max(float(row.get("Passes recebidos/90") or row.get("RecPasse") or 1), 1),
-                    decimals=2,
-                ),
             ),
         ],
         "ofensivos": [

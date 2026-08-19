@@ -1,7 +1,7 @@
 "use client";
 
 import { ExpandableAspectCardList } from "./ExpandableAspectCard";
-import { ConstructionProfileGauges } from "./ConstructionProfileGauges";
+import { ConstructionProfileBars } from "./ConstructionProfileBars";
 import type { PlayerProfile } from "@/lib/types";
 
 const BAR_GROUPS = [
@@ -25,7 +25,7 @@ export function AspectMatrix({ player }: { player: PlayerProfile }) {
         </article>
       ))}
 
-      <ConstructionProfileGauges items={player.aspects.perfil_construcao} />
+      <ConstructionProfileBars items={player.aspects.perfil_construcao} />
     </div>
   );
 }
