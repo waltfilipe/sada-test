@@ -13,26 +13,31 @@ export type AspectStat = {
 
 export type AccuracyBadgeKind = "gold" | "silver" | "bronze";
 
+export type AspectSubMetric = {
+  label: string;
+  percentile: number;
+  display_value?: string;
+  efficiency_pct?: number;
+  efficiency_value?: string | null;
+};
+
 export type AspectItem = {
   label: string;
   grade: string;
   stats: AspectStat[];
-  /** Flat metric row: percentile bar, raw value, optional efficiency row. */
-  kind?: "default" | "pass_certos" | "metric" | "efficiency_def";
+  /** Expandable metric card. */
+  kind?: "default" | "pass_certos" | "metric" | "def_efficiency_group";
   certos_per90?: number;
   percentile?: number;
-  /** Raw stat shown beside the bar (volume / 90). */
   display_value?: string;
-  /** Efficiency percentile (bar colour on secondary row). */
   efficiency_pct?: number;
-  /** Formatted efficiency (e.g. "72%"). */
   efficiency_value?: string | null;
-  /** Card border tint; also used on efficiency card for AD êxito. */
+  /** @deprecated computed in UI from volume + efficiency percentiles */
   accuracy_badge?: AccuracyBadgeKind | null;
-  /** Efficiency card: successful defensive actions below. */
-  secondary_label?: string;
-  secondary_value?: string;
-  secondary_percentile?: number;
+  /** Nested rows for Eficiência Defensiva group. */
+  sub_metrics?: AspectSubMetric[];
+  /** Header badge pair: ações c/ êxito × eficiência def. */
+  pair_badge?: [number, number] | null;
 };
 
 export type TransfermarktInfo = {

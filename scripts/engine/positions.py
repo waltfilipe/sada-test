@@ -866,7 +866,6 @@ def _metric_aspect(
         item["efficiency_pct"] = round(float(eff_pct), 1)
         if eff_display:
             item["efficiency_value"] = eff_display
-        item["accuracy_badge"] = _accuracy_badge(eff_pct)
     return item
 
 
@@ -888,26 +887,39 @@ def _pass_aspect(
         "percentile": pct,
         "efficiency_pct": round(float(eff_pct or 0), 1),
         "efficiency_value": eff_display,
-        "accuracy_badge": _accuracy_badge(eff_pct),
         "stats": [],
     }
 
 
-def _efficiency_def_aspect(row: pd.Series) -> dict[str, Any]:
-    pct = round(float(row.get("_asp_custo_def_eff", 0) or 0), 1)
+def _sub_metric(label: str, *, percentile: Any, display_value: str | None = None) -> dict[str, Any]:
+    return {
+        "label": label,
+        "percentile": round(float(percentile or 0), 1),
+        "display_value": display_value,
+    }
+
+
+def _def_efficiency_group_aspect(row: pd.Series, *, inter: float, cortes: float) -> dict[str, Any]:
+    eff_pct = round(float(row.get("_asp_custo_def_eff", 0) or 0), 1)
+    ad_pct = round(float(row.get("_asp_ad_vol", 0) or 0), 1)
     ad = float(row.get("Ações defensivas com êxito/90") or row.get("AçõesDef") or 0)
-    ad_pct = row.get("_asp_ad_vol", 0)
     custo = float(row.get("_custo_def_raw", 0) or 0)
     return {
-        "label": "Eficiência",
-        "kind": "efficiency_def",
-        "grade": _grade_from_pct(pct),
-        "percentile": pct,
-        "display_value": _fmt_num(custo, decimals=2),
-        "secondary_label": "Ações def. c/ êxito",
-        "secondary_value": _fmt_num(ad),
-        "secondary_percentile": round(float(ad_pct or 0), 1),
-        "accuracy_badge": _accuracy_badge(ad_pct),
+        "label": "Eficiência Defensiva",
+        "kind": "def_efficiency_group",
+        "grade": _grade_from_pct(eff_pct),
+        "percentile": eff_pct,
+        "pair_badge": [ad_pct, eff_pct],
+        "sub_metrics": [
+            _sub_metric("Ações bem-sucedidas", percentile=ad_pct, display_value=_fmt_num(ad)),
+            _sub_metric("Interceptações", percentile=row.get("_asp_inter_vol", 0), display_value=_fmt_num(inter)),
+            _sub_metric("Rebatidas", percentile=row.get("_asp_cortes_vol", 0), display_value=_fmt_num(cortes)),
+            _sub_metric(
+                "Eficiência Defensiva",
+                percentile=eff_pct,
+                display_value=_fmt_num(custo, decimals=2),
+            ),
+        ],
         "stats": [],
     }
 
@@ -939,17 +951,7 @@ def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
                 eff_pct=row.get("_asp_duelos_ar_eff", 0),
                 eff_display=_raw_eff_display(row, "Duelos aéreos ganhos, %", "%DuelosAr"),
             ),
-            _metric_aspect(
-                "Interceptações",
-                percentile=row.get("_asp_inter_vol", 0),
-                display_value=_fmt_num(inter),
-            ),
-            _metric_aspect(
-                "Rebatidas",
-                percentile=row.get("_asp_cortes_vol", 0),
-                display_value=_fmt_num(cortes),
-            ),
-            _efficiency_def_aspect(row),
+            _def_efficiency_group_aspect(row, inter=inter, cortes=cortes),
         ],
         "construcao": [
             _pass_aspect(

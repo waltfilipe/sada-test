@@ -48,8 +48,7 @@
         "stats": [],
         "display_value": "1,5",
         "efficiency_pct": 4.9,
-        "efficiency_value": "47%",
-        "accuracy_badge": null
+        "efficiency_value": "47%"
       },
       {
         "label": "Duelos Aéreos",
@@ -59,35 +58,39 @@
         "stats": [],
         "display_value": "2,2",
         "efficiency_pct": 64.1,
-        "efficiency_value": "67%",
-        "accuracy_badge": "bronze"
+        "efficiency_value": "67%"
       },
       {
-        "label": "Interceptações",
-        "kind": "metric",
-        "grade": "C-",
-        "percentile": 27.4,
-        "stats": [],
-        "display_value": "4,1"
-      },
-      {
-        "label": "Rebatidas",
-        "kind": "metric",
-        "grade": "A",
-        "percentile": 94.4,
-        "stats": [],
-        "display_value": "0,6"
-      },
-      {
-        "label": "Eficiência",
-        "kind": "efficiency_def",
+        "label": "Eficiência Defensiva",
+        "kind": "def_efficiency_group",
         "grade": "D",
         "percentile": 17.1,
-        "display_value": "0,33",
-        "secondary_label": "Ações def. c/ êxito",
-        "secondary_value": "6,1",
-        "secondary_percentile": 7.5,
-        "accuracy_badge": null,
+        "pair_badge": [
+          7.5,
+          17.1
+        ],
+        "sub_metrics": [
+          {
+            "label": "Ações bem-sucedidas",
+            "percentile": 7.5,
+            "display_value": "6,1"
+          },
+          {
+            "label": "Interceptações",
+            "percentile": 27.4,
+            "display_value": "4,1"
+          },
+          {
+            "label": "Rebatidas",
+            "percentile": 94.4,
+            "display_value": "0,6"
+          },
+          {
+            "label": "Eficiência Defensiva",
+            "percentile": 17.1,
+            "display_value": "0,33"
+          }
+        ],
         "stats": []
       }
     ],
@@ -101,7 +104,6 @@
         "percentile": 64.3,
         "efficiency_pct": 95.6,
         "efficiency_value": "81%",
-        "accuracy_badge": "gold",
         "stats": []
       },
       {
@@ -113,7 +115,6 @@
         "percentile": 82.9,
         "efficiency_pct": 88.4,
         "efficiency_value": "83%",
-        "accuracy_badge": "silver",
         "stats": []
       },
       {
@@ -125,7 +126,6 @@
         "percentile": 45.7,
         "efficiency_pct": 80.3,
         "efficiency_value": "60%",
-        "accuracy_badge": "silver",
         "stats": []
       }
     ],
@@ -164,8 +164,7 @@
         "stats": [],
         "display_value": "0,4",
         "efficiency_pct": 100.0,
-        "efficiency_value": "100%",
-        "accuracy_badge": "gold"
+        "efficiency_value": "100%"
       },
       {
         "label": "Progressão",
