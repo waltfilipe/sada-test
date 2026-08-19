@@ -44,7 +44,7 @@ function MetricBar({
 function HeaderBadge({ item }: { item: AspectItem }) {
   const badge = resolveAspectBadge(item);
   if (!badge) return null;
-  return <AccuracyBadge badge={badge} size={13} showLabel={false} />;
+  return <AccuracyBadge badge={badge} size={15} showLabel={false} />;
 }
 
 function volumeLabel(item: AspectItem): string {

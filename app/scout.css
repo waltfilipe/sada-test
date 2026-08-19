@@ -2122,7 +2122,7 @@
 }
 
 .aspect-row-expand-trigger {
-  padding: 0.52rem 0.62rem;
+  padding: 0.58rem 0.68rem;
   border-radius: 10px;
 }
 
@@ -2154,14 +2154,14 @@
 }
 
 .aspect-bar-label {
-  font-size: 0.62rem;
+  font-size: 0.74rem;
   color: var(--text-2);
   letter-spacing: 0.02em;
 }
 
 .aspect-bar-value {
   font-family: "Sora", sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.84rem;
   font-weight: 700;
   color: var(--tier-color);
   font-variant-numeric: tabular-nums;
@@ -2196,7 +2196,7 @@
 }
 
 .aspect-sublabel {
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   color: var(--text-3);
   line-height: 1.25;
 }
@@ -2223,7 +2223,7 @@
 .aspect-metric-value {
   min-width: 1.55rem;
   font-family: "Sora", sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: var(--tier-color);
   font-variant-numeric: tabular-nums;
@@ -2243,7 +2243,7 @@
 
 .aspect-metric-eff-label,
 .aspect-metric-secondary-label {
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   color: var(--text-3);
   letter-spacing: 0.02em;
 }
@@ -2251,7 +2251,7 @@
 .aspect-metric-eff-value,
 .aspect-metric-secondary-value {
   font-family: "Sora", sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--tier-color);
   font-variant-numeric: tabular-nums;
@@ -2290,14 +2290,14 @@
 }
 
 .constr-share-label {
-  font-size: 0.68rem;
+  font-size: 0.76rem;
   color: var(--text-2);
   letter-spacing: 0.01em;
 }
 
 .constr-share-value {
   font-family: "Sora", sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: var(--tier-color);
   font-variant-numeric: tabular-nums;
@@ -2396,14 +2396,7 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-}
-
-.constr-gradient-bar.is-pass-tendency .constr-gradient-fill {
-  background: linear-gradient(90deg, #38bdf8 0%, #6366f1 42%, #f97316 72%, #ef4444 100%);
-}
-
-.constr-gradient-bar.is-progressive .constr-gradient-fill {
-  background: linear-gradient(90deg, #38bdf8 0%, #22d3ee 45%, #34d399 100%);
+  background: linear-gradient(90deg, #a8d8f0 0%, #b8c8f2 38%, #e8c4c8 72%, #f0b8b8 100%);
 }
 
 .constr-gradient-marker {
@@ -2423,7 +2416,7 @@
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-3);
@@ -2566,7 +2559,7 @@
 }
 
 .aspect-name {
-  font-size: 0.82rem;
+  font-size: 0.94rem;
   color: var(--text-2);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2618,14 +2611,14 @@
 }
 
 .aspect-stat-label {
-  font-size: 0.68rem;
+  font-size: 0.76rem;
   color: var(--text-3);
   line-height: 1.3;
 }
 
 .aspect-stat-pct {
   font-family: "Sora", sans-serif;
-  font-size: 0.68rem;
+  font-size: 0.76rem;
   font-weight: 600;
   color: var(--tier-color);
   font-variant-numeric: tabular-nums;
@@ -2670,7 +2663,7 @@
 .aspect-pass-pct {
   min-width: 1.4rem;
   font-family: "Sora", sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--tier-color);
   font-variant-numeric: tabular-nums;
@@ -2679,31 +2672,6 @@
 
 .aspect-pass-bar {
   height: 5px;
-}
-
-.accuracy-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  line-height: 0;
-}
-
-.accuracy-badge-svg {
-  display: block;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
-}
-
-.accuracy-badge-gold .accuracy-badge-svg {
-  filter: drop-shadow(0 0 5px rgba(242, 193, 78, 0.35));
-}
-
-.accuracy-badge-silver .accuracy-badge-svg {
-  filter: drop-shadow(0 0 4px rgba(203, 213, 225, 0.24));
-}
-
-.accuracy-badge-bronze .accuracy-badge-svg {
-  filter: drop-shadow(0 0 4px rgba(209, 138, 81, 0.28));
 }
 
 .grade-chip {
