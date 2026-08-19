@@ -1,85 +1,73 @@
-export type ClusterMacro = "Defensor" | "Construtor";
-export type ClusterMicro = "D1" | "D2" | "C1" | "C2";
+export type ZagArchetype = "Rebatedor" | "Construtor" | "Agressivo";
 
-export type ZagCluster = {
-  macro: ClusterMacro;
-  micro: ClusterMicro;
-  macro_label: ClusterMacro;
-  micro_label: string;
+export type ZagClusterShares = {
+  rebatedor: number;
+  construtor: number;
+  agressivo: number;
 };
 
-export const ZAG_CLUSTER_MACROS: ClusterMacro[] = ["Defensor", "Construtor"];
+export type ZagCluster = {
+  archetype: ZagArchetype;
+  archetype_label: string;
+  is_hybrid: boolean;
+  shares: ZagClusterShares;
+};
 
-export const ZAG_CLUSTER_MICROS: ClusterMicro[] = ["D1", "D2", "C1", "C2"];
+export const ZAG_ARCHETYPES: ZagArchetype[] = ["Rebatedor", "Construtor", "Agressivo"];
 
-export const ZAG_CLUSTER_TREE: {
-  macro: ClusterMacro;
+export const ZAG_ARCHETYPE_META: {
+  archetype: ZagArchetype;
   tone: string;
   description: string;
-  children: { micro: ClusterMicro; label: string; description: string }[];
 }[] = [
   {
-    macro: "Defensor",
-    tone: "defensor",
-    description: "Predominância defensiva — clearance, bloqueio e duelos de área.",
-    children: [
-      {
-        micro: "D1",
-        label: "Rebatedor / âncora",
-        description: "Referência na área: aéreo, corte e bloqueio. Passe contido.",
-      },
-      {
-        micro: "D2",
-        label: "Distribuidor longo",
-        description: "Defende com solidez e procura o longo com frequência relativa.",
-      },
-    ],
+    archetype: "Rebatedor",
+    tone: "rebatedor",
+    description: "Referência defensiva: clearance, bloqueio, duelos aéreos e defensivos.",
   },
   {
-    macro: "Construtor",
+    archetype: "Construtor",
     tone: "construtor",
-    description: "Predominância na construção — volume, PTF e condução progressiva.",
-    children: [
-      {
-        micro: "C1",
-        label: "Construtor agressivo",
-        description: "Constrói com alta progessividade e envolvimento em duelos.",
-      },
-      {
-        micro: "C2",
-        label: "Construtor puro",
-        description: "Iniciador de jogo: muito passe, PTF e acerto elevado.",
-      },
-    ],
+    description: "Iniciador de jogo: volume de passe, PTF e progressividade.",
+  },
+  {
+    archetype: "Agressivo",
+    tone: "agressivo",
+    description: "Constrói com envolvimento alto em duelos ofensivos e conduções.",
   },
 ];
 
-export function clusterMacroTone(macro: ClusterMacro): string {
-  return macro === "Construtor" ? "construtor" : "defensor";
+export function archetypeTone(archetype: ZagArchetype): string {
+  return ZAG_ARCHETYPE_META.find((item) => item.archetype === archetype)?.tone ?? "construtor";
 }
 
-export function clusterMicroTone(micro: ClusterMicro): string {
-  if (micro.startsWith("D")) return "defensor";
-  return "construtor";
+export function archetypeMetaFor(archetype: ZagArchetype) {
+  return ZAG_ARCHETYPE_META.find((item) => item.archetype === archetype);
 }
 
-export function clusterMetaFor(macro: ClusterMacro, micro: ClusterMicro) {
-  const branch = ZAG_CLUSTER_TREE.find((item) => item.macro === macro);
-  const leaf = branch?.children.find((item) => item.micro === micro);
-  return {
-    branch,
-    leaf,
-    path: branch && leaf ? `${branch.macro} · ${leaf.label}` : macro,
+export function archetypeCounts(players: { cluster?: ZagCluster | null }[]) {
+  const counts: Record<ZagArchetype, number> = {
+    Rebatedor: 0,
+    Construtor: 0,
+    Agressivo: 0,
   };
-}
-
-export function clusterCounts(players: { cluster?: ZagCluster | null }[]) {
-  const macros: Record<string, number> = { Defensor: 0, Construtor: 0 };
-  const micros: Record<string, number> = { D1: 0, D2: 0, C1: 0, C2: 0 };
+  let hybrids = 0;
   for (const player of players) {
     if (!player.cluster) continue;
-    macros[player.cluster.macro] = (macros[player.cluster.macro] ?? 0) + 1;
-    micros[player.cluster.micro] = (micros[player.cluster.micro] ?? 0) + 1;
+    counts[player.cluster.archetype] = (counts[player.cluster.archetype] ?? 0) + 1;
+    if (player.cluster.is_hybrid) hybrids += 1;
   }
-  return { macros, micros };
+  const total = Object.values(counts).reduce((sum, value) => sum + value, 0);
+  const percents: Record<ZagArchetype, number> = {
+    Rebatedor: total ? Math.round((counts.Rebatedor / total) * 100) : 0,
+    Construtor: total ? Math.round((counts.Construtor / total) * 100) : 0,
+    Agressivo: total ? Math.round((counts.Agressivo / total) * 100) : 0,
+  };
+  return { counts, percents, hybrids, total };
+}
+
+/** @deprecated use archetypeCounts */
+export function clusterCounts(players: { cluster?: ZagCluster | null }[]) {
+  const { counts } = archetypeCounts(players);
+  return { macros: counts, micros: counts };
 }

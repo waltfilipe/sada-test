@@ -1190,14 +1190,17 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
     if family_key == "zagueiros":
         lean = row.get("hybrid_lean")
         payload["hybrid_lean"] = lean if pd.notna(lean) and lean else None
-        macro = row.get("cluster_macro")
-        micro = row.get("cluster_micro")
-        if pd.notna(macro) and pd.notna(micro) and macro and micro:
+        archetype = row.get("cluster_archetype")
+        if pd.notna(archetype) and archetype:
             payload["cluster"] = {
-                "macro": str(macro),
-                "micro": str(micro),
-                "macro_label": str(row.get("cluster_macro_label") or macro),
-                "micro_label": str(row.get("cluster_micro_label") or micro),
+                "archetype": str(archetype),
+                "archetype_label": str(archetype),
+                "is_hybrid": bool(row.get("cluster_is_hybrid")),
+                "shares": {
+                    "rebatedor": float(row.get("cluster_share_rebatedor") or 0),
+                    "construtor": float(row.get("cluster_share_construtor") or 0),
+                    "agressivo": float(row.get("cluster_share_agressivo") or 0),
+                },
             }
     return payload
 

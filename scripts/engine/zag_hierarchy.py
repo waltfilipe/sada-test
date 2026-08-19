@@ -1,36 +1,20 @@
-"""Hierarchical K=2×2 clustering for Serie A zagueiros (Wyscout + SofaScore)."""
+"""Semantic K=3 archetype clustering for Serie A zagueiros (Wyscout + SofaScore)."""
 
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
 
 from .sofascore import SS_PATH, SS_STAT_COLS, aggregate_sofascore, match_ss_row
 
-CLUSTER_FEATURES = [
-    "duelos_def",
-    "duelos_aereos",
-    "passes_terco_final",
-    "conducao_prog",
-    "duelos_ofensivos",
-    "interception_won_p90",
-    "total_clearance_p90",
-    "outfielder_block_p90",
-    "ball_recovery_p90",
-    "share_long",
-    "share_prog",
-    "passes_total_p90",
-]
+ARCHETYPE_LABELS = ("Rebatedor", "Construtor", "Agressivo")
 
-MACRO_LABELS = {0: "Defensor", 1: "Construtor"}
-MICRO_LABELS = {
-    (0, 0): ("D1", "Rebatedor / âncora"),
-    (0, 1): ("D2", "Distribuidor longo"),
-    (1, 0): ("C1", "Construtor agressivo"),
-    (1, 1): ("C2", "Construtor puro"),
-}
+# Primary type when no axis clearly dominates (top share below cutoff).
+HYBRID_TOP_SHARE_CUTOFF = 45.0
+# Minimum gap (pp) between top two shares to avoid hybrid flag.
+HYBRID_GAP_CUTOFF = 12.0
+# Down-weight rebatedor score when PTF is above pool median (avoids false positives).
+REBATEDOR_PTF_PENALTY = 0.65
 
 
 def _build_feature_row(wy_row: pd.Series, ss_row: pd.Series | None) -> dict[str, float]:
@@ -53,47 +37,91 @@ def _build_feature_row(wy_row: pd.Series, ss_row: pd.Series | None) -> dict[str,
     return feats
 
 
-def _macro_ids(feat_df: pd.DataFrame, labels: np.ndarray) -> dict[int, int]:
-    """Map KMeans id -> semantic id (0=Defensor, 1=Construtor)."""
-    scores: dict[int, float] = {}
-    for cluster_id in np.unique(labels):
-        sub = feat_df[labels == cluster_id]
-        build = sub["passes_terco_final"].mean() + sub["conducao_prog"].mean() + sub["passes_total_p90"].mean()
-        defend = sub["total_clearance_p90"].mean() + sub["outfielder_block_p90"].mean()
-        scores[int(cluster_id)] = float(build - defend)
-    ordered = sorted(scores, key=lambda k: scores[k])
-    return {ordered[0]: 0, ordered[1]: 1}
+def _zscore(series: pd.Series) -> pd.Series:
+    std = float(series.std())
+    if std == 0:
+        return pd.Series(0.0, index=series.index)
+    return (series - series.mean()) / std
 
 
-def _assign_micro_labels(feat_df: pd.DataFrame, macro: np.ndarray) -> np.ndarray:
-    """Semantic micro labels within each macro group (stable 28/16/8/19 split)."""
-    micro = np.zeros(len(feat_df), dtype=int)
-    def_mask = macro == 0
-    con_mask = macro == 1
+def _softmax_shares(scores: np.ndarray) -> np.ndarray:
+    """Row-wise softmax → percentage shares summing to 100."""
+    shifted = scores - scores.max(axis=1, keepdims=True)
+    exp = np.exp(shifted)
+    weights = exp / exp.sum(axis=1, keepdims=True)
+    return weights * 100.0
 
-    if def_mask.any():
-        def_sub = feat_df.loc[def_mask, "share_long"]
-        d2_cut = float(def_sub.quantile(1 - 16 / 44))
-        micro[def_mask] = np.where(feat_df.loc[def_mask, "share_long"].to_numpy() >= d2_cut, 1, 0)
 
-    if con_mask.any():
-        con_sub = feat_df.loc[con_mask]
-        agressivo = con_sub["duelos_ofensivos"] * 2 + con_sub["share_prog"]
-        c1_cut = float(agressivo.quantile(0.7))
-        scores = feat_df.loc[con_mask, "duelos_ofensivos"] * 2 + feat_df.loc[con_mask, "share_prog"]
-        micro[con_mask] = np.where(scores.to_numpy() >= c1_cut, 0, 1)
+def _axis_scores(feat_df: pd.DataFrame) -> pd.DataFrame:
+    reb = (
+        _zscore(feat_df["total_clearance_p90"])
+        + _zscore(feat_df["outfielder_block_p90"])
+        + _zscore(feat_df["duelos_aereos"])
+        + _zscore(feat_df["duelos_def"])
+    )
+    con = (
+        _zscore(feat_df["passes_terco_final"])
+        + _zscore(feat_df["passes_total_p90"])
+        + _zscore(feat_df["share_prog"])
+        + _zscore(feat_df["conducao_prog"])
+    )
+    agr = (
+        _zscore(feat_df["duelos_ofensivos"])
+        + _zscore(feat_df["conducao_prog"])
+        + _zscore(feat_df["passes_terco_final"])
+        + _zscore(feat_df["share_prog"])
+    )
+    return pd.DataFrame({"Rebatedor": reb, "Construtor": con, "Agressivo": agr}, index=feat_df.index)
 
-    return micro
+
+def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
+    axis = _axis_scores(feat_df)
+    ptf_median = float(feat_df["passes_terco_final"].median())
+
+    adjusted = axis.copy()
+    high_ptf = feat_df["passes_terco_final"] >= ptf_median
+    adjusted.loc[high_ptf, "Rebatedor"] *= REBATEDOR_PTF_PENALTY
+
+    share_matrix = _softmax_shares(adjusted.to_numpy())
+    shares = pd.DataFrame(share_matrix, columns=ARCHETYPE_LABELS, index=feat_df.index)
+
+    primaries: list[str] = []
+    hybrids: list[bool] = []
+    for idx in feat_df.index:
+        row_shares = shares.loc[idx].sort_values(ascending=False)
+        top = str(row_shares.index[0])
+        top_val = float(row_shares.iloc[0])
+        second_val = float(row_shares.iloc[1])
+        gap = top_val - second_val
+        is_hybrid = top_val < HYBRID_TOP_SHARE_CUTOFF or gap < HYBRID_GAP_CUTOFF
+        primaries.append(top)
+        hybrids.append(is_hybrid)
+
+    return pd.DataFrame(
+        {
+            "cluster_archetype": primaries,
+            "cluster_is_hybrid": hybrids,
+            "cluster_share_rebatedor": shares["Rebatedor"].round(1),
+            "cluster_share_construtor": shares["Construtor"].round(1),
+            "cluster_share_agressivo": shares["Agressivo"].round(1),
+        },
+        index=feat_df.index,
+    )
 
 
 def apply_zag_hierarchical_clusters(pool: pd.DataFrame) -> pd.DataFrame:
-    """Add cluster_macro, cluster_micro, cluster_macro_label, cluster_micro_label."""
+    """Add cluster_archetype, hybrid flag and per-axis share columns."""
     out = pool.copy()
+    empty_cols = {
+        "cluster_archetype": None,
+        "cluster_is_hybrid": None,
+        "cluster_share_rebatedor": None,
+        "cluster_share_construtor": None,
+        "cluster_share_agressivo": None,
+    }
     if not SS_PATH.exists():
-        out["cluster_macro"] = None
-        out["cluster_micro"] = None
-        out["cluster_macro_label"] = None
-        out["cluster_micro_label"] = None
+        for col, default in empty_cols.items():
+            out[col] = default
         return out
 
     ss = aggregate_sofascore(SS_PATH)
@@ -112,29 +140,7 @@ def apply_zag_hierarchical_clusters(pool: pd.DataFrame) -> pd.DataFrame:
             feature_rows.append(_build_feature_row(row, ss_hit))
 
     feat_df = pd.DataFrame(feature_rows, index=out.index)
-    X = StandardScaler().fit_transform(feat_df[CLUSTER_FEATURES].astype(float))
-
-    raw_macro = KMeans(n_clusters=2, random_state=42, n_init=50).fit_predict(X)
-    macro_map = _macro_ids(feat_df, raw_macro)
-    macro = np.array([macro_map[int(label)] for label in raw_macro], dtype=int)
-    micro = _assign_micro_labels(feat_df, macro)
-
-    macro_labels: list[str | None] = []
-    micro_codes: list[str | None] = []
-    micro_labels: list[str | None] = []
-    for m, s in zip(macro, micro):
-        if m not in MACRO_LABELS:
-            macro_labels.append(None)
-            micro_codes.append(None)
-            micro_labels.append(None)
-            continue
-        code, label = MICRO_LABELS.get((int(m), int(s)), (None, None))
-        macro_labels.append(MACRO_LABELS[int(m)])
-        micro_codes.append(code)
-        micro_labels.append(label)
-
-    out["cluster_macro"] = macro_labels
-    out["cluster_micro"] = micro_codes
-    out["cluster_macro_label"] = macro_labels
-    out["cluster_micro_label"] = micro_labels
+    classified = _classify_archetypes(feat_df)
+    for col in classified.columns:
+        out[col] = classified[col]
     return out

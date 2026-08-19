@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ZAG_CLUSTER_TREE } from "@/lib/clusterMeta";
+import { ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
 import { ClubLogo } from "@/components/ClubLogo";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { profileTone, sortPlayers } from "@/lib/scoutUi";
@@ -93,34 +93,28 @@ export function RosterRail({
         <div className="roster-filters">
           {clusterMode && onToggleClusterFilter ? (
             <div className="cluster-filter-groups">
-              <div className="cluster-filter-row" role="group" aria-label="Filtrar por perfil macro">
-                {ZAG_CLUSTER_TREE.map((branch) => (
+              <div className="cluster-filter-row" role="group" aria-label="Filtrar por arquétipo">
+                {ZAG_ARCHETYPE_META.map((item) => (
                   <button
-                    key={branch.macro}
+                    key={item.archetype}
                     type="button"
-                    className={`filter-chip cluster-${branch.tone} ${clusterFilters.includes(branch.macro) ? "active" : ""}`}
-                    onClick={() => onToggleClusterFilter(branch.macro)}
-                    aria-pressed={clusterFilters.includes(branch.macro)}
+                    className={`filter-chip cluster-${item.tone} ${clusterFilters.includes(item.archetype) ? "active" : ""}`}
+                    onClick={() => onToggleClusterFilter(item.archetype)}
+                    aria-pressed={clusterFilters.includes(item.archetype)}
+                    title={item.description}
                   >
-                    {branch.macro}
+                    {item.archetype}
                   </button>
                 ))}
-              </div>
-              <div className="cluster-filter-row cluster-filter-row-micro" role="group" aria-label="Filtrar por subperfil">
-                {ZAG_CLUSTER_TREE.flatMap((branch) =>
-                  branch.children.map((leaf) => (
-                    <button
-                      key={leaf.micro}
-                      type="button"
-                      className={`filter-chip cluster-${branch.tone} ${clusterFilters.includes(leaf.micro) ? "active" : ""}`}
-                      onClick={() => onToggleClusterFilter(leaf.micro)}
-                      aria-pressed={clusterFilters.includes(leaf.micro)}
-                      title={leaf.label}
-                    >
-                      {leaf.micro}
-                    </button>
-                  )),
-                )}
+                <button
+                  type="button"
+                  className={`filter-chip cluster-hibrido ${clusterFilters.includes("Híbrido") ? "active" : ""}`}
+                  onClick={() => onToggleClusterFilter("Híbrido")}
+                  aria-pressed={clusterFilters.includes("Híbrido")}
+                  title="Atletas com mix equilibrado entre arquétipos"
+                >
+                  Híbrido
+                </button>
               </div>
             </div>
           ) : (
