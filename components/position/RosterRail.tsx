@@ -5,7 +5,7 @@ import { ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
 import { ClubLogo } from "@/components/ClubLogo";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { profileTone, sortPlayers } from "@/lib/scoutUi";
-import { playerMatchesClusterFilter } from "./ClusterHierarchy";
+import { playerMatchesClusterFilter } from "./ArchetypeMixCard";
 import type { PlayerProfile } from "@/lib/types";
 
 type Sort = "rating" | "minutes" | "name";

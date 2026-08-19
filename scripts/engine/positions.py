@@ -1192,6 +1192,8 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
         payload["hybrid_lean"] = lean if pd.notna(lean) and lean else None
         archetype = row.get("cluster_archetype")
         if pd.notna(archetype) and archetype:
+            con = float(row["rating_construcao"])
+            def_ = float(row["rating_defesa"])
             payload["cluster"] = {
                 "archetype": str(archetype),
                 "archetype_label": str(archetype),
@@ -1200,6 +1202,11 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
                     "rebatedor": float(row.get("cluster_share_rebatedor") or 0),
                     "construtor": float(row.get("cluster_share_construtor") or 0),
                     "agressivo": float(row.get("cluster_share_agressivo") or 0),
+                },
+                "ratings": {
+                    "rebatedor": round(def_, 1),
+                    "construtor": round(con, 1),
+                    "agressivo": round(0.55 * con + 0.45 * def_, 1),
                 },
             }
     return payload

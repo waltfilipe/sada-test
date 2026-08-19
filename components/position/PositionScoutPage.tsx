@@ -95,7 +95,7 @@ export function PositionScoutPage({ family, players }: Props) {
             <DossierHeader player={selected} poolSize={players.length} family={family} />
 
             {clusterMode && selected.cluster ? (
-              <DossierProfileCard player={selected} poolPlayers={players} />
+              <DossierProfileCard player={selected} />
             ) : null}
 
             <AspectMatrix player={selected} />

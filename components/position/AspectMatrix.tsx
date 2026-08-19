@@ -1,7 +1,6 @@
 "use client";
 
 import { ExpandableAspectCardList } from "./ExpandableAspectCard";
-import { ConstructionProfileBars } from "./ConstructionProfileBars";
 import type { PlayerProfile } from "@/lib/types";
 
 const BAR_GROUPS = [
@@ -12,7 +11,7 @@ const BAR_GROUPS = [
 
 export function AspectMatrix({ player }: { player: PlayerProfile }) {
   return (
-    <div className="aspect-groups aspect-groups-quad">
+    <div className="aspect-groups">
       {BAR_GROUPS.map((group) => (
         <article key={group.key} className="aspect-group">
           <header>
@@ -24,8 +23,6 @@ export function AspectMatrix({ player }: { player: PlayerProfile }) {
           </ul>
         </article>
       ))}
-
-      <ConstructionProfileBars items={player.aspects.perfil_construcao} />
     </div>
   );
 }

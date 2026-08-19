@@ -1,0 +1,48 @@
+"use client";
+
+import type { ReactNode } from "react";
+import { archetypeMetaFor, type ZagArchetype } from "@/lib/clusterMeta";
+
+type Props = {
+  archetype: ZagArchetype;
+  children: ReactNode;
+  className?: string;
+};
+
+function TraitArrow({ direction }: { direction: "up" | "down" }) {
+  if (direction === "up") {
+    return (
+      <svg viewBox="0 0 12 12" aria-hidden className="archetype-tip-arrow archetype-tip-arrow-up">
+        <path d="M6 2.5v7M6 2.5 3.5 5.5M6 2.5l2.5 3" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 12 12" aria-hidden className="archetype-tip-arrow archetype-tip-arrow-down">
+      <path d="M6 9.5v-7M6 9.5 3.5 6.5M6 9.5l2.5-3" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function ArchetypeTooltip({ archetype, children, className = "" }: Props) {
+  const meta = archetypeMetaFor(archetype);
+  if (!meta) return <>{children}</>;
+
+  return (
+    <span className={`archetype-tip-wrap ${className}`.trim()}>
+      {children}
+      <span className={`archetype-tip cluster-${meta.tone}`} role="tooltip">
+        <span className="archetype-tip-title">{archetype}</span>
+        <ul className="archetype-tip-traits">
+          {meta.traits.map((trait) => (
+            <li key={trait.label} className={`archetype-tip-trait is-${trait.direction}`}>
+              <TraitArrow direction={trait.direction} />
+              <span>{trait.label}</span>
+            </li>
+          ))}
+        </ul>
+      </span>
+    </span>
+  );
+}

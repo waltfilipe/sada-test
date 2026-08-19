@@ -29,12 +29,7 @@ function ratingCardStyle(value: number, rank: number): CSSProperties {
 }
 
 function secondaryAxes(family: PositionFamily) {
-  if (family === "zagueiros") {
-    return [
-      { key: "construcao", label: "Construção" },
-      { key: "defesa", label: "Defesa" },
-    ];
-  }
+  if (family === "zagueiros") return [];
 
   return profileMetaForFamily(family)
     .filter((item) => item.key !== "perfil" && item.key !== "geral")
@@ -55,7 +50,7 @@ export function DossierRatings({ player, poolSize, family }: Props) {
   const axes = secondaryAxes(family);
 
   return (
-    <div className="dossier-ratings">
+    <div className={`dossier-ratings ${axes.length === 0 ? "dossier-ratings-solo" : ""}`}>
       <article className="dossier-rating-hero" style={{ ...tierVars(geralToken), ...ratingCardStyle(geral, geralRank) }}>
         <span className="dossier-rating-label">Rating geral</span>
         <strong className="dossier-rating-value">{formatRating(geral)}</strong>
@@ -69,30 +64,32 @@ export function DossierRatings({ player, poolSize, family }: Props) {
         </div>
       </article>
 
-      <div className="dossier-rating-cluster">
-        {axes.map((axis) => {
-          const value = player.ratings[axis.key] ?? 0;
-          const rank = player.ranks[axis.key] ?? poolSize;
-          const token = ratingTier(value);
+      {axes.length > 0 ? (
+        <div className="dossier-rating-cluster">
+          {axes.map((axis) => {
+            const value = player.ratings[axis.key] ?? 0;
+            const rank = player.ranks[axis.key] ?? poolSize;
+            const token = ratingTier(value);
 
-          return (
-            <article
-              key={axis.key}
-              className={`dossier-rating-axis ${rank <= 5 ? "is-top5" : ""}`}
-              style={{ ...tierVars(token), ...ratingCardStyle(value, rank) }}
-            >
-              <div className="dossier-rating-axis-head">
-                <span className="dossier-rating-label">{axis.label}</span>
-                <em>#{rank}</em>
-              </div>
-              <strong className="dossier-rating-axis-value">{formatRating(value)}</strong>
-              <div className="dossier-rating-meter meter meter-sm">
-                <i style={{ width: `${clampPercent(value * 10)}%`, background: "var(--rating-accent, var(--tier-color))" }} />
-              </div>
-            </article>
-          );
-        })}
-      </div>
+            return (
+              <article
+                key={axis.key}
+                className={`dossier-rating-axis ${rank <= 5 ? "is-top5" : ""}`}
+                style={{ ...tierVars(token), ...ratingCardStyle(value, rank) }}
+              >
+                <div className="dossier-rating-axis-head">
+                  <span className="dossier-rating-label">{axis.label}</span>
+                  <em>#{rank}</em>
+                </div>
+                <strong className="dossier-rating-axis-value">{formatRating(value)}</strong>
+                <div className="dossier-rating-meter meter meter-sm">
+                  <i style={{ width: `${clampPercent(value * 10)}%`, background: "var(--rating-accent, var(--tier-color))" }} />
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }

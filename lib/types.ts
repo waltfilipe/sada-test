@@ -57,9 +57,9 @@ export type TransfermarktInfo = {
   profile_url: string | null;
 } | null;
 
-import type { ZagArchetype, ZagCluster, ZagClusterShares } from "@/lib/clusterMeta";
+import type { ZagArchetype, ZagCluster, ZagClusterShares, ZagArchetypeRatings } from "@/lib/clusterMeta";
 
-export type { ZagArchetype, ZagCluster, ZagClusterShares };
+export type { ZagArchetype, ZagCluster, ZagClusterShares, ZagArchetypeRatings };
 
 export type PlayerSummary = {
   player_id: string;

@@ -6,11 +6,23 @@ export type ZagClusterShares = {
   agressivo: number;
 };
 
+export type ZagArchetypeRatings = {
+  rebatedor: number;
+  construtor: number;
+  agressivo: number;
+};
+
 export type ZagCluster = {
   archetype: ZagArchetype;
   archetype_label: string;
   is_hybrid: boolean;
   shares: ZagClusterShares;
+  ratings: ZagArchetypeRatings;
+};
+
+export type ArchetypeTrait = {
+  label: string;
+  direction: "up" | "down";
 };
 
 export const ZAG_ARCHETYPES: ZagArchetype[] = ["Rebatedor", "Construtor", "Agressivo"];
@@ -19,21 +31,43 @@ export const ZAG_ARCHETYPE_META: {
   archetype: ZagArchetype;
   tone: string;
   description: string;
+  traits: ArchetypeTrait[];
 }[] = [
   {
     archetype: "Rebatedor",
     tone: "rebatedor",
     description: "Referência defensiva: clearance, bloqueio, duelos aéreos e defensivos.",
+    traits: [
+      { label: "Rebatidas", direction: "up" },
+      { label: "Duelos Aéreos", direction: "up" },
+      { label: "Bloqueios", direction: "up" },
+      { label: "Passes Progressivos", direction: "down" },
+      { label: "PTF", direction: "down" },
+    ],
   },
   {
     archetype: "Construtor",
     tone: "construtor",
     description: "Iniciador de jogo: volume de passe, PTF e progressividade.",
+    traits: [
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "PTF", direction: "up" },
+      { label: "Volume de Passe", direction: "up" },
+      { label: "Rebatidas", direction: "down" },
+      { label: "Clearances", direction: "down" },
+    ],
   },
   {
     archetype: "Agressivo",
     tone: "agressivo",
     description: "Constrói com envolvimento alto em duelos ofensivos e conduções.",
+    traits: [
+      { label: "Duelos Ofensivos", direction: "up" },
+      { label: "Condução Prog.", direction: "up" },
+      { label: "PTF", direction: "up" },
+      { label: "Rebatidas", direction: "down" },
+      { label: "Clearances", direction: "down" },
+    ],
   },
 ];
 
