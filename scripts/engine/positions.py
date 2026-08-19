@@ -212,6 +212,16 @@ ZAG_WEAK_AXIS_GAP = 1.0
 ZAG_SHRINK_MU = 7.25
 ZAG_SHRINK_EXP = 0.65
 
+# Mild confidence pull toward pool mean for low minutes (after shrinkage)
+CONF_MINUTES_FLOOR = 0.90
+CONF_MINUTES_EXP = 0.50
+
+# Defensive efficiency: shrink percentile toward median when sample is thin
+DEF_SAMPLE_ACTIONS_LO = 6.5
+DEF_SAMPLE_ACTIONS_HI = 10.0
+DEF_SAMPLE_MINUTES_FULL = 0.45
+DEF_EFF_SHRINK_MEDIAN = 50.0
+
 # Core/abs geral rating: badge bonus on efficiency-backed core metrics
 ZAG_RATING_BADGE_BONUS = {"gold": 0.20, "silver": 0.15, "bronze": 0.10}
 
@@ -490,6 +500,31 @@ def _zag_apply_minutes_shrinkage(base: float, pct_minutes: float) -> float:
     return w * base + (1.0 - w) * ZAG_SHRINK_MU
 
 
+def _minutes_confidence(pct_minutes: pd.Series | float) -> pd.Series | float:
+    """1.0 at full minutes; CONF_MINUTES_FLOOR at very low minutes."""
+    if isinstance(pct_minutes, pd.Series):
+        pct = pd.to_numeric(pct_minutes, errors="coerce").fillna(0).clip(0, 1)
+        return CONF_MINUTES_FLOOR + (1.0 - CONF_MINUTES_FLOOR) * pct.pow(CONF_MINUTES_EXP)
+    pct = max(0.0, min(1.0, float(pct_minutes or 0)))
+    return CONF_MINUTES_FLOOR + (1.0 - CONF_MINUTES_FLOOR) * (pct**CONF_MINUTES_EXP)
+
+
+def _apply_confidence_to_rating(rating: float, pct_minutes: float) -> float:
+    """Gently pull rating toward pool mean when minutes are low."""
+    conf = float(_minutes_confidence(pct_minutes))
+    return ZAG_SHRINK_MU + (float(rating) - ZAG_SHRINK_MU) * conf
+
+
+def _def_eff_sample_weight(acoes_p90: pd.Series, pct_minutes: pd.Series) -> pd.Series:
+    """Trust in def-efficiency estimate: needs enough actions/90 and season minutes."""
+    acoes = pd.to_numeric(acoes_p90, errors="coerce").fillna(0)
+    pct = pd.to_numeric(pct_minutes, errors="coerce").fillna(0).clip(0, 1)
+    span = max(DEF_SAMPLE_ACTIONS_HI - DEF_SAMPLE_ACTIONS_LO, 0.1)
+    w_act = ((acoes - DEF_SAMPLE_ACTIONS_LO) / span).clip(0, 1).pow(0.75)
+    w_min = (pct / DEF_SAMPLE_MINUTES_FULL).clip(0, 1).pow(0.65)
+    return w_act * w_min
+
+
 def _apply_badge_bonus(pct: float, eff_pct: Any) -> float:
     badge = _accuracy_badge(eff_pct)
     if not badge:
@@ -652,7 +687,10 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
         axis=1,
     )
     out["rating_perfil_raw"] = out.apply(
-        lambda row: _zag_apply_minutes_shrinkage(row["rating_perfil_base"], row["%Minutos"]),
+        lambda row: _apply_confidence_to_rating(
+            _zag_apply_minutes_shrinkage(row["rating_perfil_base"], row["%Minutos"]),
+            row["%Minutos"],
+        ),
         axis=1,
     )
     out["rating_perfil"] = out["rating_perfil_raw"].round(1)
@@ -660,8 +698,11 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out = attach_aspect_percentiles(out)
     out["rating_core_abs_pct"] = out.apply(_zag_rating_core_abs_pct, axis=1)
     out["rating_geral_raw"] = out.apply(
-        lambda row: _zag_apply_minutes_shrinkage(
-            5.0 + row["rating_core_abs_pct"] / 100.0 * 4.5,
+        lambda row: _apply_confidence_to_rating(
+            _zag_apply_minutes_shrinkage(
+                5.0 + row["rating_core_abs_pct"] / 100.0 * 4.5,
+                row["%Minutos"],
+            ),
             row["%Minutos"],
         ),
         axis=1,
@@ -706,6 +747,10 @@ def _compute_generic_ratings(pool: pd.DataFrame, prefix: str) -> pd.DataFrame:
         * 0.045
         * (1 + out["%Minutos"] * 0.15)
         * 0.83
+    )
+    out["rating_geral"] = out.apply(
+        lambda row: _apply_confidence_to_rating(row["rating_geral"], row["%Minutos"]),
+        axis=1,
     )
     out["rating_combativo"] = out["rating_geral"] * 0.98
     out["rating_construtor"] = out["rating_geral"] * 1.02
@@ -811,6 +856,9 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
 
     out["_acoes_def_comp"] = _acoes_def_bem_sucedidas(out)
     out["_custo_def_raw"] = _custo_def_ajustado(out)
+    out["_def_sample_w"] = _def_eff_sample_weight(out["_acoes_def_comp"], out["%Minutos"])
+    custo_eff_raw = percentile_rank(-out["_custo_def_raw"], ascending=True)
+    custo_eff_adj = out["_def_sample_w"] * custo_eff_raw + (1.0 - out["_def_sample_w"]) * DEF_EFF_SHRINK_MEDIAN
 
     share_long_pct = (share_long.fillna(0) * 100).astype(float)
     share_prog_pct = (share_prog.fillna(0) * 100).astype(float)
@@ -838,7 +886,7 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "duelos_of_eff": _pct_eff(out, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
         "duelos_of_won_vol": percentile_rank(do_won, ascending=True),
         "prog_vol": _pool_percentile(out, "Corridas progressivas/90", "Cond.Prog"),
-        "custo_def_eff": percentile_rank(-_custo_def_ajustado(out), ascending=True),
+        "custo_def_eff": custo_eff_adj,
         "passes_prog_eff": _pct_eff(out, "Passes progressivos certos, %", "%EffPassProg"),
         "passes_prog_certos90": _pool_percentile(out, "CompPassesProg"),
         "ptf_eff": _pct_eff(out, "Passes certos para terço final, %", "%EffPassTF"),
