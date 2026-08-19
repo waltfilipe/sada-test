@@ -2181,7 +2181,7 @@
 }
 
 .aspect-bar-label {
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   color: var(--text-2);
   letter-spacing: 0.02em;
 }
@@ -2236,14 +2236,39 @@
 }
 
 .aspect-metric-bar {
-  height: 6px;
+  position: relative;
+  height: 7px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+  background: linear-gradient(90deg, #efb8b8 0%, #d8e8c0 48%, #7aab82 100%);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+.aspect-metric-bar::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(-50%);
+  z-index: 1;
+  pointer-events: none;
 }
 
 .aspect-metric-bar i {
-  box-shadow: 0 0 10px color-mix(in srgb, var(--tier-color) 35%, transparent);
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 0.58rem;
+  height: 0.58rem;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid rgba(15, 23, 42, 0.82);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3), 0 0 8px rgba(255, 255, 255, 0.18);
+  z-index: 2;
 }
 
 .aspect-metric-pct,
@@ -2322,6 +2347,10 @@
   letter-spacing: 0.01em;
 }
 
+.constr-gradient-bar .constr-share-label {
+  font-size: 0.76rem;
+}
+
 .constr-share-value {
   font-family: "Sora", sans-serif;
   font-size: 0.86rem;
@@ -2346,6 +2375,17 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.constr-share-rail::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateX(-50%);
 }
 
 .constr-share-center {
@@ -2424,6 +2464,19 @@
   inset: 0;
   border-radius: inherit;
   background: linear-gradient(90deg, #7ec8e8 0%, #94a8e8 38%, #de9898 72%, #d87878 100%);
+}
+
+.constr-gradient-track::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(-50%);
+  z-index: 1;
+  pointer-events: none;
 }
 
 .constr-gradient-marker {
@@ -2652,18 +2705,38 @@
 }
 
 .aspect-stat-bar {
-  height: 4px;
+  position: relative;
+  height: 7px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
   overflow: hidden;
+  background: linear-gradient(90deg, #efb8b8 0%, #d8e8c0 48%, #7aab82 100%);
+}
+
+.aspect-stat-bar::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(-50%);
+  z-index: 1;
+  pointer-events: none;
 }
 
 .aspect-stat-bar i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--tier-color);
-  opacity: 0.85;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 0.58rem;
+  height: 0.58rem;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid rgba(15, 23, 42, 0.82);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3);
+  z-index: 2;
 }
 
 /* Pass aspects — certos/90 bar + accuracy badge */

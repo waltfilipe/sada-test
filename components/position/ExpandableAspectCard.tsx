@@ -34,8 +34,8 @@ function MetricBar({
         <span className="aspect-bar-label">{label}</span>
         <span className="aspect-bar-value">{value ?? "—"}</span>
       </div>
-      <div className="aspect-stat-bar aspect-metric-bar">
-        <i style={{ width: `${clampPercent(pct)}%` }} />
+      <div className="aspect-stat-bar aspect-metric-bar" aria-hidden>
+        <i style={{ left: `${clampPercent(pct)}%` }} />
       </div>
     </div>
   );
