@@ -716,10 +716,13 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "rem_int_vol": _pool_percentile(out, "Remates intercetados/90"),
         "passes_prog_vol": _pool_percentile(out, "Passes progressivos/90", "PassesProg"),
         "passes_prog_eff": _pct_eff(out, "Passes progressivos certos, %", "%EffPassProg"),
+        "passes_prog_certos90": _pool_percentile(out, "CompPassesProg"),
         "ptf_vol": _pool_percentile(out, "Passes para terço final/90", "PTF"),
         "ptf_eff": _pct_eff(out, "Passes certos para terço final, %", "%EffPassTF"),
+        "ptf_certos90": _pool_percentile(out, "CompPTF"),
         "passes_long_vol": _pool_percentile(out, "Passes longos/90", "PassesLongos"),
         "passes_long_eff": _pct_eff(out, "Passes longos certos, %", "%EffPassesLng"),
+        "passes_long_certos90": _pool_percentile(out, "CompBL"),
         "duelos_of_vol": _pool_percentile(out, "Duelos ofensivos/90", "DuelosOf"),
         "duelos_of_eff": _pct_eff(out, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
         "prog_vol": _pool_percentile(out, "Corridas progressivas/90", "Cond.Prog"),
@@ -741,13 +744,43 @@ def _aspect_grade_mean(a: Any, b: Any) -> str:
     return _grade_from_pct((float(a or 0) + float(b or 0)) / 2)
 
 
+def _accuracy_badge(eff_pct: Any) -> str | None:
+    value = float(eff_pct or 0)
+    if value > 90:
+        return "gold"
+    if value > 75:
+        return "silver"
+    if value > 50:
+        return "bronze"
+    return None
+
+
+def _pass_aspect(
+    label: str,
+    *,
+    certos_per90: Any,
+    certos_pct: Any,
+    eff_pct: Any,
+) -> dict[str, Any]:
+    pct = round(float(certos_pct or 0), 1)
+    return {
+        "label": label,
+        "kind": "pass_certos",
+        "grade": _grade_from_pct(pct),
+        "certos_per90": round(float(certos_per90 or 0), 2),
+        "percentile": pct,
+        "accuracy_badge": _accuracy_badge(eff_pct),
+        "stats": [],
+    }
+
+
 def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
     dd_v, dd_e = row.get("_asp_duelos_def_vol", 0), row.get("_asp_duelos_def_eff", 0)
     da_v, da_e = row.get("_asp_duelos_ar_vol", 0), row.get("_asp_duelos_ar_eff", 0)
     inter, rem = row.get("_asp_inter_vol", 0), row.get("_asp_rem_int_vol", 0)
-    pp_v, pp_e = row.get("_asp_passes_prog_vol", 0), row.get("_asp_passes_prog_eff", 0)
-    ptf_v, ptf_e = row.get("_asp_ptf_vol", 0), row.get("_asp_ptf_eff", 0)
-    pl_v, pl_e = row.get("_asp_passes_long_vol", 0), row.get("_asp_passes_long_eff", 0)
+    pp_e = row.get("_asp_passes_prog_eff", 0)
+    ptf_e = row.get("_asp_ptf_eff", 0)
+    pl_e = row.get("_asp_passes_long_eff", 0)
     do_v, do_e = row.get("_asp_duelos_of_vol", 0), row.get("_asp_duelos_of_eff", 0)
     prog = row.get("_asp_prog_vol", 0)
 
@@ -779,30 +812,24 @@ def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
             },
         ],
         "construcao": [
-            {
-                "label": "Passes Progressivos",
-                "grade": _aspect_grade_two(pp_v, pp_e),
-                "stats": [
-                    _aspect_stat("Passes Progressivos / 90", pp_v),
-                    _aspect_stat("% Passes Progressivos Certos", pp_e),
-                ],
-            },
-            {
-                "label": "Passes para Terço Final",
-                "grade": _aspect_grade_two(ptf_v, ptf_e),
-                "stats": [
-                    _aspect_stat("Passes Terço Final / 90", ptf_v),
-                    _aspect_stat("% Passes Terço Final Certos", ptf_e),
-                ],
-            },
-            {
-                "label": "Passes Longos",
-                "grade": _aspect_grade_two(pl_v, pl_e),
-                "stats": [
-                    _aspect_stat("Passes Longos / 90", pl_v),
-                    _aspect_stat("% Passes Longos Certos", pl_e),
-                ],
-            },
+            _pass_aspect(
+                "Passes Progressivos",
+                certos_per90=row.get("CompPassesProg", 0),
+                certos_pct=row.get("_asp_passes_prog_certos90", 0),
+                eff_pct=pp_e,
+            ),
+            _pass_aspect(
+                "Passes para Terço Final",
+                certos_per90=row.get("CompPTF", 0),
+                certos_pct=row.get("_asp_ptf_certos90", 0),
+                eff_pct=ptf_e,
+            ),
+            _pass_aspect(
+                "Passes Longos",
+                certos_per90=row.get("CompBL", 0),
+                certos_pct=row.get("_asp_passes_long_certos90", 0),
+                eff_pct=pl_e,
+            ),
         ],
         "ofensivos": [
             {

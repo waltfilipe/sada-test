@@ -11,10 +11,17 @@ export type AspectStat = {
   percentile: number;
 };
 
+export type AccuracyBadgeKind = "gold" | "silver" | "bronze";
+
 export type AspectItem = {
   label: string;
   grade: string;
   stats: AspectStat[];
+  /** Pass aspects: certos/90 volume ranking with accuracy badge. */
+  kind?: "default" | "pass_certos";
+  certos_per90?: number;
+  percentile?: number;
+  accuracy_badge?: AccuracyBadgeKind | null;
 };
 
 export type TransfermarktInfo = {

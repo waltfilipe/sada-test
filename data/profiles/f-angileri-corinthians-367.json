@@ -90,45 +90,30 @@
     "construcao": [
       {
         "label": "Passes Progressivos",
+        "kind": "pass_certos",
         "grade": "A",
-        "stats": [
-          {
-            "label": "Passes Progressivos / 90",
-            "percentile": 98.4
-          },
-          {
-            "label": "% Passes Progressivos Certos",
-            "percentile": 82.8
-          }
-        ]
+        "certos_per90": 7.76,
+        "percentile": 100.0,
+        "accuracy_badge": "silver",
+        "stats": []
       },
       {
         "label": "Passes para Terço Final",
+        "kind": "pass_certos",
         "grade": "A",
-        "stats": [
-          {
-            "label": "Passes Terço Final / 90",
-            "percentile": 93.4
-          },
-          {
-            "label": "% Passes Terço Final Certos",
-            "percentile": 91.4
-          }
-        ]
+        "certos_per90": 5.73,
+        "percentile": 97.0,
+        "accuracy_badge": "gold",
+        "stats": []
       },
       {
         "label": "Passes Longos",
-        "grade": "B",
-        "stats": [
-          {
-            "label": "Passes Longos / 90",
-            "percentile": 83.1
-          },
-          {
-            "label": "% Passes Longos Certos",
-            "percentile": 55.0
-          }
-        ]
+        "kind": "pass_certos",
+        "grade": "B+",
+        "certos_per90": 2.22,
+        "percentile": 82.1,
+        "accuracy_badge": "bronze",
+        "stats": []
       }
     ],
     "ofensivos": [

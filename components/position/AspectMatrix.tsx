@@ -3,15 +3,49 @@
 import { useState } from "react";
 
 import { clampPercent, gradeTier, normalizeGrade, percentileTier, tierVars } from "@/lib/scoutTheme";
-import type { PlayerProfile } from "@/lib/types";
+import type { AspectItem, PlayerProfile } from "@/lib/types";
+import { AccuracyBadge } from "./AccuracyBadge";
 
 const GROUPS = [
   { key: "defensivos", title: "Defensivos", hint: "Duelos e intervenções" },
-  { key: "construcao", title: "Construção", hint: "Passes e progressão" },
+  { key: "construcao", title: "Construção", hint: "Passes certos por 90" },
   { key: "ofensivos", title: "Ofensivos", hint: "Condução e duelos ofensivos" },
 ] as const;
 
-function AspectRow({ item }: { item: PlayerProfile["aspects"]["defensivos"][number] }) {
+function PassAspectRow({ item }: { item: AspectItem }) {
+  const pct = item.percentile ?? 0;
+  const token = percentileTier(pct);
+  const gradeToken = gradeTier(item.grade);
+
+  return (
+    <li className="aspect-row aspect-row-pass">
+      <div className="aspect-pass-head">
+        <span className="aspect-name">{item.label}</span>
+        <span className="aspect-row-end">
+          {item.accuracy_badge && <AccuracyBadge badge={item.accuracy_badge} />}
+          <span className="aspect-grade" style={tierVars(gradeToken)}>
+            {normalizeGrade(item.grade)}
+          </span>
+        </span>
+      </div>
+      <div className="aspect-pass-body" style={tierVars(token)}>
+        <div className="aspect-pass-meta">
+          <span className="aspect-pass-value">{item.certos_per90?.toFixed(1)} certos/90</span>
+          <span className="aspect-pass-pct">{Math.round(pct)}</span>
+        </div>
+        <div className="aspect-stat-bar aspect-pass-bar">
+          <i style={{ width: `${clampPercent(pct)}%` }} />
+        </div>
+      </div>
+    </li>
+  );
+}
+
+function AspectRow({ item }: { item: AspectItem }) {
+  if (item.kind === "pass_certos") {
+    return <PassAspectRow item={item} />;
+  }
+
   const [open, setOpen] = useState(false);
   const token = gradeTier(item.grade);
   const expandable = item.stats.length > 0;
