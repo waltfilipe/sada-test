@@ -1,5 +1,6 @@
 "use client";
 
+import { ClubLogo } from "@/components/ClubLogo";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { MinutesStat } from "@/components/position/MinutesStat";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
@@ -51,6 +52,7 @@ export function AthleteSlot({ side, player, players, onChange }: Props) {
         <div className="slot-identity">
           <h2>{player.name}</h2>
           <p className="slot-club">
+            <ClubLogo club={player.club} size={18} />
             {player.club}
             <i aria-hidden>·</i>
             <span>{player.position}</span>

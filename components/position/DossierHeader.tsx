@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ClubLogo } from "@/components/ClubLogo";
 import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -50,7 +51,10 @@ export function DossierHeader({ player, poolSize, family }: Props) {
         </p>
 
         <h1>{player.name}</h1>
-        <p className="dossier-club">{player.club}</p>
+        <p className="dossier-club">
+          <ClubLogo club={player.club} size={20} />
+          {player.club}
+        </p>
 
         <dl className="dossier-facts">
           {facts.map((fact) => (

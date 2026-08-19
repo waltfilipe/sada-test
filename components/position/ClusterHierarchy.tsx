@@ -64,17 +64,25 @@ export function clusterFilterKey(macro: ClusterMacro | null, micro: ClusterMicro
   return null;
 }
 
+const CLUSTER_MICROS = new Set<string>(["D1", "D2", "C1", "C2"]);
+const CLUSTER_MACROS = new Set<string>(["Defensor", "Construtor"]);
+
 export function playerMatchesClusterFilter(
   player: { cluster?: ZagCluster | null },
   filters: string[],
 ): boolean {
   if (!filters.length) return true;
   if (!player.cluster) return false;
-  return filters.some(
-    (filter) =>
-      filter === player.cluster?.macro ||
-      filter === player.cluster?.micro ||
-      filter === player.cluster?.macro_label ||
-      filter === player.cluster?.micro_label,
-  );
+
+  const microFilters = filters.filter((key) => CLUSTER_MICROS.has(key));
+  const macroFilters = filters.filter((key) => CLUSTER_MACROS.has(key));
+
+  // Micro chips narrow the pool; macro-only applies when no micro is selected.
+  if (microFilters.length) {
+    return microFilters.includes(player.cluster.micro);
+  }
+  if (macroFilters.length) {
+    return macroFilters.includes(player.cluster.macro);
+  }
+  return true;
 }

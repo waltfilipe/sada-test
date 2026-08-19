@@ -6,8 +6,8 @@ import type { AspectItem, PlayerProfile } from "@/lib/types";
 const GROUPS = [
   { key: "defensivos", title: "Defensivos" },
   { key: "construcao", title: "Construção" },
-  { key: "perfil_construcao", title: "Perfil de construção" },
   { key: "ofensivos", title: "Ofensivos" },
+  { key: "perfil_construcao", title: "Perfil de construção" },
 ] as const;
 
 function aspectScore(item: AspectItem): number {

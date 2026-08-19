@@ -4,11 +4,11 @@ import type { CSSProperties } from "react";
 
 import { clampPercent, percentileTier, tierVars } from "@/lib/scoutTheme";
 import type { AccuracyBadgeKind, AspectItem, PlayerProfile } from "@/lib/types";
+import { ConstructionProfileGauges } from "./ConstructionProfileGauges";
 
-const GROUPS = [
+const BAR_GROUPS = [
   { key: "defensivos", title: "Defensivos" },
   { key: "construcao", title: "Construção" },
-  { key: "perfil_construcao", title: "Perfil de construção" },
   { key: "ofensivos", title: "Ofensivos" },
 ] as const;
 
@@ -132,7 +132,7 @@ function AspectRow({ item }: { item: AspectItem }) {
 export function AspectMatrix({ player }: { player: PlayerProfile }) {
   return (
     <div className="aspect-groups aspect-groups-quad">
-      {GROUPS.map((group) => (
+      {BAR_GROUPS.map((group) => (
         <article key={group.key} className="aspect-group">
           <header>
             <h3>{group.title}</h3>
@@ -145,6 +145,8 @@ export function AspectMatrix({ player }: { player: PlayerProfile }) {
           </ul>
         </article>
       ))}
+
+      <ConstructionProfileGauges items={player.aspects.perfil_construcao} />
     </div>
   );
 }

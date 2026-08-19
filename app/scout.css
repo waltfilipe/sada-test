@@ -462,6 +462,13 @@
   white-space: nowrap;
 }
 
+.roster-club {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
 .roster-rating {
   padding: 0.18rem 0.46rem;
   border-radius: 6px;
@@ -796,6 +803,9 @@
 }
 
 .dossier-club {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   margin: 0.3rem 0 0;
   font-size: 0.95rem;
   color: var(--text-2);
@@ -1757,6 +1767,107 @@
 
 .aspect-row-efficiency .aspect-metric-secondary {
   margin-top: 0.42rem;
+}
+
+/* ── Construction profile gauges ─────────────────────────────────────────── */
+
+.aspect-group-gauges > header {
+  padding-bottom: 0.55rem;
+  margin-bottom: 0.45rem;
+}
+
+.constr-gauge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.constr-gauge {
+  display: grid;
+  justify-items: center;
+  padding: 0.35rem 0.2rem 0.15rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.constr-gauge-svg {
+  width: 100%;
+  max-width: 108px;
+  height: auto;
+  display: block;
+}
+
+.constr-gauge-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.constr-gauge-fill {
+  fill: none;
+  stroke-width: 5;
+  stroke-linecap: round;
+  opacity: 0.35;
+}
+
+.constr-gauge-hub {
+  fill: rgba(255, 255, 255, 0.85);
+}
+
+.constr-gauge-needle {
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.constr-gauge-value {
+  margin: -0.15rem 0 0;
+  font-family: "Sora", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--tier-color);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.constr-gauge-label {
+  margin: 0.08rem 0 0;
+  font-size: 0.58rem;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ── Club logos ──────────────────────────────────────────────────────────── */
+
+.club-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.club-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.club-logo-fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--club-logo-size, 18px) * 0.42);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-2);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .accuracy-badge {
