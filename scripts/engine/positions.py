@@ -753,6 +753,12 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "duelos_of_won_vol": percentile_rank(do_won, ascending=True),
         "prog_vol": _pool_percentile(out, "Corridas progressivas/90", "Cond.Prog"),
         "custo_def_eff": percentile_rank(-_custo_def_ajustado(out), ascending=True),
+        "passes_prog_eff": _pct_eff(out, "Passes progressivos certos, %", "%EffPassProg"),
+        "passes_prog_certos90": _pool_percentile(out, "CompPassesProg"),
+        "ptf_eff": _pct_eff(out, "Passes certos para terço final, %", "%EffPassTF"),
+        "ptf_certos90": _pool_percentile(out, "CompPTF"),
+        "passes_long_eff": _pct_eff(out, "Passes longos certos, %", "%EffPassesLng"),
+        "passes_long_certos90": _pool_percentile(out, "CompBL"),
         "tend_long": percentile_rank(share_long.fillna(0), ascending=True),
         "tend_prog": percentile_rank(share_prog.fillna(0), ascending=True),
         "tend_lat": percentile_rank(lat_ratio.fillna(0), ascending=True),
@@ -799,10 +805,32 @@ def _metric_aspect(
     return item
 
 
+def _pass_aspect(
+    label: str,
+    *,
+    certos_per90: Any,
+    certos_pct: Any,
+    eff_pct: Any,
+) -> dict[str, Any]:
+    pct = round(float(certos_pct or 0), 1)
+    return {
+        "label": label,
+        "kind": "pass_certos",
+        "grade": _grade_from_pct(pct),
+        "certos_per90": round(float(certos_per90 or 0), 2),
+        "percentile": pct,
+        "accuracy_badge": _accuracy_badge(eff_pct),
+        "stats": [],
+    }
+
+
 def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
     dd_won = float(row.get("DuelosDef") or 0) * float(row.get("%DuelosDefW") or 0)
     da_won = float(row.get("DuelosAr") or 0) * float(row.get("%DuelosAr") or 0)
     do_won = float(row.get("DuelosOf") or 0) * float(row.get("%DuelosOfW") or 0)
+    pp_e = row.get("_asp_passes_prog_eff", 0)
+    ptf_e = row.get("_asp_ptf_eff", 0)
+    pl_e = row.get("_asp_passes_long_eff", 0)
 
     return {
         "defensivos": [
@@ -833,6 +861,26 @@ def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
             ),
         ],
         "construcao": [
+            _pass_aspect(
+                "Passes Progressivos",
+                certos_per90=row.get("CompPassesProg", 0),
+                certos_pct=row.get("_asp_passes_prog_certos90", 0),
+                eff_pct=pp_e,
+            ),
+            _pass_aspect(
+                "Passes para Terço Final",
+                certos_per90=row.get("CompPTF", 0),
+                certos_pct=row.get("_asp_ptf_certos90", 0),
+                eff_pct=ptf_e,
+            ),
+            _pass_aspect(
+                "Passes Longos",
+                certos_per90=row.get("CompBL", 0),
+                certos_pct=row.get("_asp_passes_long_certos90", 0),
+                eff_pct=pl_e,
+            ),
+        ],
+        "perfil_construcao": [
             _metric_aspect(
                 "Tendência de Passes Longos",
                 percentile=row.get("_asp_tend_long", 0),

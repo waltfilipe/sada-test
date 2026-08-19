@@ -8,6 +8,7 @@ import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AspectMatrix } from "./AspectMatrix";
 import { DossierHeader } from "./DossierHeader";
+import { DossierProfileCard } from "./DossierProfileCard";
 import { RosterRail } from "./RosterRail";
 
 type Props = {
@@ -91,12 +92,11 @@ export function PositionScoutPage({ family, players }: Props) {
           />
 
           <main className="dossier">
-            <DossierHeader
-              player={selected}
-              poolSize={players.length}
-              family={family}
-              poolPlayers={players}
-            />
+            <DossierHeader player={selected} poolSize={players.length} family={family} />
+
+            {clusterMode && selected.cluster ? (
+              <DossierProfileCard player={selected} poolPlayers={players} />
+            ) : null}
 
             <AspectMatrix player={selected} />
           </main>
