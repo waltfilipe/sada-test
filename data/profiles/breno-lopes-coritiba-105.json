@@ -40,100 +40,85 @@
     "defensivos": [
       {
         "label": "Duelos Defensivos",
+        "kind": "metric",
         "grade": "D",
-        "stats": [
-          {
-            "label": "Duelos Defensivos / 90",
-            "percentile": 3.5
-          },
-          {
-            "label": "% Duelos Vencidos",
-            "percentile": 3.8
-          }
-        ]
+        "percentile": 3.2,
+        "stats": [],
+        "sublabel": "1,0 vencidos / 90",
+        "accuracy_badge": null
       },
       {
         "label": "Duelos Aéreos",
+        "kind": "metric",
         "grade": "C",
-        "stats": [
-          {
-            "label": "Duelos Aéreos / 90",
-            "percentile": 24.6
-          },
-          {
-            "label": "% Duelos Aéreos Vencidos",
-            "percentile": 48.8
-          }
-        ]
+        "percentile": 35.5,
+        "stats": [],
+        "sublabel": "0,4 vencidos / 90",
+        "accuracy_badge": null
       },
       {
-        "label": "Intervenções",
+        "label": "Interceptações",
+        "kind": "metric",
         "grade": "D",
-        "stats": [
-          {
-            "label": "Interseções / 90",
-            "percentile": 10.7
-          },
-          {
-            "label": "Remates Interceptados / 90",
-            "percentile": 33.3
-          }
-        ]
+        "percentile": 10.7,
+        "stats": []
+      },
+      {
+        "label": "Rebatidas",
+        "kind": "metric",
+        "grade": "D",
+        "percentile": 0.0,
+        "stats": []
+      },
+      {
+        "label": "Eficiência",
+        "kind": "metric",
+        "grade": "D",
+        "percentile": 17.5,
+        "stats": [],
+        "sublabel": "Custo def. ajustado (menor = melhor)"
       }
     ],
     "construcao": [
       {
-        "label": "Passes Progressivos",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 2.08,
-        "percentile": 22.2,
-        "accuracy_badge": null,
+        "label": "Tendência de Passes Longos",
+        "kind": "metric",
+        "grade": "C",
+        "percentile": 44.4,
         "stats": []
       },
       {
-        "label": "Passes para Terço Final",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 0.76,
-        "percentile": 0.0,
-        "accuracy_badge": null,
+        "label": "Tendência de Passes Progressivos",
+        "kind": "metric",
+        "grade": "C+",
+        "percentile": 50.8,
         "stats": []
       },
       {
-        "label": "Passes Longos",
-        "kind": "pass_certos",
-        "grade": "C-",
-        "certos_per90": 0.63,
-        "percentile": 31.7,
-        "accuracy_badge": "bronze",
-        "stats": []
+        "label": "Tendência de Lateralização",
+        "kind": "metric",
+        "grade": "C",
+        "percentile": 42.9,
+        "stats": [],
+        "sublabel": "Laterais / recebidos"
       }
     ],
     "ofensivos": [
       {
         "label": "Duelos Ofensivos",
-        "grade": "B",
-        "stats": [
-          {
-            "label": "Duelos Ofensivos / 90",
-            "percentile": 48.4
-          },
-          {
-            "label": "% Duelos Ofensivos Vencidos",
-            "percentile": 86.4
-          }
-        ]
+        "kind": "metric",
+        "grade": "C",
+        "percentile": 44.4,
+        "stats": [],
+        "sublabel": "0,3 vencidos / 90",
+        "accuracy_badge": "silver"
       },
       {
         "label": "Progressão",
+        "kind": "metric",
         "grade": "B+",
-        "stats": [
-          {
-            "label": "Conduções Progressivas / 90",
-            "percentile": 84.7
-          }
-        ]
+        "percentile": 84.7,
+        "stats": []
       }
     ]
   },

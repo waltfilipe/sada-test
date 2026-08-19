@@ -706,44 +706,60 @@ def _pct_eff(pool: pd.DataFrame, raw_col: str, engine_col: str) -> pd.Series:
     return pd.Series(0.0, index=pool.index)
 
 
+def _duelos_won_p90(pool: pd.DataFrame, vol_col: str, pct_col: str) -> pd.Series:
+    vol = pool[vol_col].astype(float)
+    pct = pool[pct_col].astype(float)
+    return vol * pct
+
+
+def _custo_def_ajustado(pool: pd.DataFrame) -> pd.Series:
+    """Adjusted defensive cost: lower is better (β=0.45 overlap correction)."""
+    beta = 0.45
+    dd = pool["DuelosDef"].astype(float)
+    pct_w = pool["%DuelosDefW"].astype(float)
+    faltas = pd.to_numeric(pool.get("Faltas/90", 0), errors="coerce").fillna(0)
+    dd_perd = dd * (1 - pct_w)
+    num_adj = dd_perd + np.maximum(0, faltas - beta * dd_perd)
+    den = pd.to_numeric(pool.get("Ações defensivas com êxito/90", 0), errors="coerce").fillna(0)
+    den = den.replace(0, np.nan)
+    return (num_adj / den).fillna(num_adj)
+
+
 def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     """Pre-compute pool percentiles for each aspect sub-stat."""
     out = pool.copy()
+    dd_won = _duelos_won_p90(out, "DuelosDef", "%DuelosDefW")
+    da_won = _duelos_won_p90(out, "DuelosAr", "%DuelosAr")
+    do_won = _duelos_won_p90(out, "DuelosOf", "%DuelosOfW")
+
+    passes = _feat_col(out, "Passes/90", "Passe").astype(float)
+    share_long = _feat_col(out, "Passes longos/90", "PassesLongos").astype(float) / passes.replace(0, np.nan)
+    share_prog = _feat_col(out, "Passes progressivos/90", "PassesProg").astype(float) / passes.replace(0, np.nan)
+    lat = _feat_col(out, "Passes laterais/90").astype(float)
+    rec = _feat_col(out, "Passes recebidos/90").astype(float)
+    lat_ratio = lat / rec.replace(0, np.nan)
+
     mappings: dict[str, pd.Series] = {
         "duelos_def_vol": _pool_percentile(out, "Duelos defensivos/90", "DuelosDef"),
         "duelos_def_eff": _pct_eff(out, "Duelos defensivos ganhos, %", "%DuelosDefW"),
+        "duelos_def_won_vol": percentile_rank(dd_won, ascending=True),
         "duelos_ar_vol": _pool_percentile(out, "Duelos aérios/90", "DuelosAr"),
         "duelos_ar_eff": _pct_eff(out, "Duelos aéreos ganhos, %", "%DuelosAr"),
+        "duelos_ar_won_vol": percentile_rank(da_won, ascending=True),
         "inter_vol": _pool_percentile(out, "Interseções/90", "Interseções"),
-        "rem_int_vol": _pool_percentile(out, "Remates intercetados/90"),
-        "passes_prog_vol": _pool_percentile(out, "Passes progressivos/90", "PassesProg"),
-        "passes_prog_eff": _pct_eff(out, "Passes progressivos certos, %", "%EffPassProg"),
-        "passes_prog_certos90": _pool_percentile(out, "CompPassesProg"),
-        "ptf_vol": _pool_percentile(out, "Passes para terço final/90", "PTF"),
-        "ptf_eff": _pct_eff(out, "Passes certos para terço final, %", "%EffPassTF"),
-        "ptf_certos90": _pool_percentile(out, "CompPTF"),
-        "passes_long_vol": _pool_percentile(out, "Passes longos/90", "PassesLongos"),
-        "passes_long_eff": _pct_eff(out, "Passes longos certos, %", "%EffPassesLng"),
-        "passes_long_certos90": _pool_percentile(out, "CompBL"),
+        "cortes_vol": _pool_percentile(out, "Cortes/90", "Carrinhos"),
         "duelos_of_vol": _pool_percentile(out, "Duelos ofensivos/90", "DuelosOf"),
         "duelos_of_eff": _pct_eff(out, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
+        "duelos_of_won_vol": percentile_rank(do_won, ascending=True),
         "prog_vol": _pool_percentile(out, "Corridas progressivas/90", "Cond.Prog"),
+        "custo_def_eff": percentile_rank(-_custo_def_ajustado(out), ascending=True),
+        "tend_long": percentile_rank(share_long.fillna(0), ascending=True),
+        "tend_prog": percentile_rank(share_prog.fillna(0), ascending=True),
+        "tend_lat": percentile_rank(lat_ratio.fillna(0), ascending=True),
     }
     for key, series in mappings.items():
         out[f"_asp_{key}"] = series
     return out
-
-
-def _aspect_stat(label: str, pct: Any) -> dict[str, Any]:
-    return {"label": label, "percentile": round(float(pct or 0), 1)}
-
-
-def _aspect_grade_two(vol: Any, eff: Any, *, w_vol: float = 0.4, w_eff: float = 0.6) -> str:
-    return _grade_from_pct(float(vol or 0) * w_vol + float(eff or 0) * w_eff)
-
-
-def _aspect_grade_mean(a: Any, b: Any) -> str:
-    return _grade_from_pct((float(a or 0) + float(b or 0)) / 2)
 
 
 def _accuracy_badge(eff_pct: Any) -> str | None:
@@ -757,96 +773,91 @@ def _accuracy_badge(eff_pct: Any) -> str | None:
     return None
 
 
-def _pass_aspect(
+def _fmt_per90(value: float, *, suffix: str = "/ 90") -> str:
+    return f"{value:.1f}".replace(".", ",") + f" {suffix}"
+
+
+def _metric_aspect(
     label: str,
     *,
-    certos_per90: Any,
-    certos_pct: Any,
-    eff_pct: Any,
+    percentile: Any,
+    sublabel: str | None = None,
+    eff_pct: Any = None,
 ) -> dict[str, Any]:
-    pct = round(float(certos_pct or 0), 1)
-    return {
+    pct = round(float(percentile or 0), 1)
+    item: dict[str, Any] = {
         "label": label,
-        "kind": "pass_certos",
+        "kind": "metric",
         "grade": _grade_from_pct(pct),
-        "certos_per90": round(float(certos_per90 or 0), 2),
         "percentile": pct,
-        "accuracy_badge": _accuracy_badge(eff_pct),
         "stats": [],
     }
+    if sublabel:
+        item["sublabel"] = sublabel
+    if eff_pct is not None:
+        item["accuracy_badge"] = _accuracy_badge(eff_pct)
+    return item
 
 
 def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
-    dd_v, dd_e = row.get("_asp_duelos_def_vol", 0), row.get("_asp_duelos_def_eff", 0)
-    da_v, da_e = row.get("_asp_duelos_ar_vol", 0), row.get("_asp_duelos_ar_eff", 0)
-    inter, rem = row.get("_asp_inter_vol", 0), row.get("_asp_rem_int_vol", 0)
-    pp_e = row.get("_asp_passes_prog_eff", 0)
-    ptf_e = row.get("_asp_ptf_eff", 0)
-    pl_e = row.get("_asp_passes_long_eff", 0)
-    do_v, do_e = row.get("_asp_duelos_of_vol", 0), row.get("_asp_duelos_of_eff", 0)
-    prog = row.get("_asp_prog_vol", 0)
+    dd_won = float(row.get("DuelosDef") or 0) * float(row.get("%DuelosDefW") or 0)
+    da_won = float(row.get("DuelosAr") or 0) * float(row.get("%DuelosAr") or 0)
+    do_won = float(row.get("DuelosOf") or 0) * float(row.get("%DuelosOfW") or 0)
 
     return {
         "defensivos": [
-            {
-                "label": "Duelos Defensivos",
-                "grade": _aspect_grade_two(dd_v, dd_e),
-                "stats": [
-                    _aspect_stat("Duelos Defensivos / 90", dd_v),
-                    _aspect_stat("% Duelos Vencidos", dd_e),
-                ],
-            },
-            {
-                "label": "Duelos Aéreos",
-                "grade": _aspect_grade_two(da_v, da_e),
-                "stats": [
-                    _aspect_stat("Duelos Aéreos / 90", da_v),
-                    _aspect_stat("% Duelos Aéreos Vencidos", da_e),
-                ],
-            },
-            {
-                "label": "Intervenções",
-                "grade": _aspect_grade_mean(inter, rem),
-                "stats": [
-                    _aspect_stat("Interseções / 90", inter),
-                    _aspect_stat("Remates Interceptados / 90", rem),
-                ],
-            },
+            _metric_aspect(
+                "Duelos Defensivos",
+                percentile=row.get("_asp_duelos_def_won_vol", 0),
+                sublabel=f"{_fmt_per90(dd_won, suffix='vencidos / 90')}",
+                eff_pct=row.get("_asp_duelos_def_eff", 0),
+            ),
+            _metric_aspect(
+                "Duelos Aéreos",
+                percentile=row.get("_asp_duelos_ar_won_vol", 0),
+                sublabel=f"{_fmt_per90(da_won, suffix='vencidos / 90')}",
+                eff_pct=row.get("_asp_duelos_ar_eff", 0),
+            ),
+            _metric_aspect(
+                "Interceptações",
+                percentile=row.get("_asp_inter_vol", 0),
+            ),
+            _metric_aspect(
+                "Rebatidas",
+                percentile=row.get("_asp_cortes_vol", 0),
+            ),
+            _metric_aspect(
+                "Eficiência",
+                percentile=row.get("_asp_custo_def_eff", 0),
+                sublabel="Custo def. ajustado (menor = melhor)",
+            ),
         ],
         "construcao": [
-            _pass_aspect(
-                "Passes Progressivos",
-                certos_per90=row.get("CompPassesProg", 0),
-                certos_pct=row.get("_asp_passes_prog_certos90", 0),
-                eff_pct=pp_e,
+            _metric_aspect(
+                "Tendência de Passes Longos",
+                percentile=row.get("_asp_tend_long", 0),
             ),
-            _pass_aspect(
-                "Passes para Terço Final",
-                certos_per90=row.get("CompPTF", 0),
-                certos_pct=row.get("_asp_ptf_certos90", 0),
-                eff_pct=ptf_e,
+            _metric_aspect(
+                "Tendência de Passes Progressivos",
+                percentile=row.get("_asp_tend_prog", 0),
             ),
-            _pass_aspect(
-                "Passes Longos",
-                certos_per90=row.get("CompBL", 0),
-                certos_pct=row.get("_asp_passes_long_certos90", 0),
-                eff_pct=pl_e,
+            _metric_aspect(
+                "Tendência de Lateralização",
+                percentile=row.get("_asp_tend_lat", 0),
+                sublabel="Laterais / recebidos",
             ),
         ],
         "ofensivos": [
-            {
-                "label": "Duelos Ofensivos",
-                "grade": _aspect_grade_two(do_v, do_e),
-                "stats": [
-                    _aspect_stat("Duelos Ofensivos / 90", do_v),
-                    _aspect_stat("% Duelos Ofensivos Vencidos", do_e),
-                ],
-            },
-            {
-                "label": "Progressão",
-                "grade": _grade_from_pct(prog),
-                "stats": [_aspect_stat("Conduções Progressivas / 90", prog)],
-            },
+            _metric_aspect(
+                "Duelos Ofensivos",
+                percentile=row.get("_asp_duelos_of_won_vol", 0),
+                sublabel=f"{_fmt_per90(do_won, suffix='vencidos / 90')}",
+                eff_pct=row.get("_asp_duelos_of_eff", 0),
+            ),
+            _metric_aspect(
+                "Progressão",
+                percentile=row.get("_asp_prog_vol", 0),
+            ),
         ],
     }
 
