@@ -6,7 +6,8 @@ import type { AspectItem, PlayerProfile } from "@/lib/types";
 
 const GROUPS = [
   { key: "defensivos", title: "Defensivos" },
-  { key: "construcao", title: "Perfil de construção" },
+  { key: "construcao", title: "Construção" },
+  { key: "perfil_construcao", title: "Perfil de construção" },
   { key: "ofensivos", title: "Ofensivos" },
 ] as const;
 

@@ -6,9 +6,15 @@ import { AccuracyBadge } from "./AccuracyBadge";
 
 const GROUPS = [
   { key: "defensivos", title: "Defensivos" },
-  { key: "construcao", title: "Perfil de construção" },
+  { key: "construcao", title: "Construção" },
+  { key: "perfil_construcao", title: "Perfil de construção" },
   { key: "ofensivos", title: "Ofensivos" },
 ] as const;
+
+function passTooltip(item: AspectItem): string {
+  const value = item.certos_per90?.toFixed(1).replace(".", ",") ?? "—";
+  return `${value} passes certos / 90`;
+}
 
 function MetricAspectRow({ item }: { item: AspectItem }) {
   const pct = item.percentile ?? 0;
@@ -23,7 +29,11 @@ function MetricAspectRow({ item }: { item: AspectItem }) {
         </div>
         {item.accuracy_badge ? <AccuracyBadge badge={item.accuracy_badge} /> : null}
       </div>
-      <div className="aspect-metric-track" style={tierVars(token)}>
+      <div
+        className="aspect-metric-track"
+        style={tierVars(token)}
+        title={item.kind === "pass_certos" ? passTooltip(item) : undefined}
+      >
         <div className="aspect-stat-bar aspect-metric-bar">
           <i style={{ width: `${clampPercent(pct)}%` }} />
         </div>
@@ -47,7 +57,7 @@ function AspectRow({ item }: { item: AspectItem }) {
 
 export function AspectMatrix({ player }: { player: PlayerProfile }) {
   return (
-    <div className="aspect-groups">
+    <div className="aspect-groups aspect-groups-quad">
       {GROUPS.map((group) => (
         <article key={group.key} className="aspect-group">
           <header>
