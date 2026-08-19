@@ -76,25 +76,30 @@ export function DossierHeader({ player, poolSize, family, poolPlayers = [] }: Pr
         <DossierRatings player={player} poolSize={poolSize} family={family} />
       </div>
 
-      {family === "zagueiros" && player.cluster && (
-        <div className="dossier-cluster-panel">
-          <ClusterHierarchy cluster={player.cluster} poolCounts={microCounts} />
-        </div>
-      )}
-
       <footer className="dossier-bar">
-        <div className="bar-group bar-market">
-          <div className="bar-item">
-            <span>Valor de mercado</span>
-            <strong>{tm?.market_value ?? "—"}</strong>
-          </div>
-          <div className="bar-item">
-            <span>Contrato</span>
-            <strong>{contract ?? "—"}</strong>
-          </div>
-        </div>
+        <div className="dossier-bar-stack">
+          <div className="dossier-bar-meta">
+            <div className="bar-group bar-market">
+              <div className="bar-item">
+                <span>Valor de mercado</span>
+                <strong>{tm?.market_value ?? "—"}</strong>
+              </div>
+              <div className="bar-item">
+                <span>Contrato</span>
+                <strong>{contract ?? "—"}</strong>
+              </div>
+            </div>
 
-        <MinutesStat minutes={player.minutes} minutesPct={player.minutes_pct} variant="prominent" />
+            <MinutesStat minutes={player.minutes} minutesPct={player.minutes_pct} variant="prominent" />
+          </div>
+
+          {family === "zagueiros" && player.cluster && (
+            <div className="dossier-cluster-panel dossier-cluster-inline">
+              <p className="dossier-cluster-eyebrow">Perfil</p>
+              <ClusterHierarchy cluster={player.cluster} poolCounts={microCounts} />
+            </div>
+          )}
+        </div>
 
         <div className="bar-group bar-output">
           <div className="bar-item">

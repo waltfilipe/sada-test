@@ -1,18 +1,18 @@
 "use client";
 
 import { AccuracyBadge } from "@/components/position/AccuracyBadge";
-import { gradeTier, normalizeGrade, tierVars } from "@/lib/scoutTheme";
+import { clampPercent, percentileTier, tierVars } from "@/lib/scoutTheme";
 import type { AspectItem, PlayerProfile } from "@/lib/types";
 
 const GROUPS = [
   { key: "defensivos", title: "Defensivos" },
-  { key: "construcao", title: "Construção" },
+  { key: "construcao", title: "Perfil de construção" },
   { key: "ofensivos", title: "Ofensivos" },
 ] as const;
 
 function aspectScore(item: AspectItem): number {
-  if (item.kind === "pass_certos") {
-    return item.percentile ?? 0;
+  if (item.percentile != null) {
+    return item.percentile;
   }
   if (!item.stats.length) {
     return 0;
@@ -39,37 +39,25 @@ export function AspectVersus({ a, b }: { a: PlayerProfile; b: PlayerProfile }) {
                 const scoreA = aspectScore(item);
                 const scoreB = aspectScore(other);
                 const leads = scoreA === scoreB ? "tie" : scoreA > scoreB ? "a" : "b";
-                const tokenA = gradeTier(item.grade);
-                const tokenB = gradeTier(other.grade);
+                const tokenA = percentileTier(scoreA);
+                const tokenB = percentileTier(scoreB);
 
                 return (
                   <li key={item.label} className={`aspect-versus-row leads-${leads}`}>
                     <span className="aspect-cell side-a">
-                      {item.kind === "pass_certos" ? (
-                        <>
-                          {item.accuracy_badge && <AccuracyBadge badge={item.accuracy_badge} size={12} />}
-                          <span className="aspect-pass-pct">{Math.round(item.percentile ?? 0)}</span>
-                        </>
-                      ) : (
-                        <span className="aspect-grade" style={tierVars(tokenA)}>
-                          {normalizeGrade(item.grade)}
-                        </span>
-                      )}
+                      {item.accuracy_badge && <AccuracyBadge badge={item.accuracy_badge} size={12} showLabel={false} />}
+                      <span className="aspect-metric-pct" style={tierVars(tokenA)}>
+                        {Math.round(scoreA)}
+                      </span>
                     </span>
 
                     <span className="aspect-versus-label">{item.label}</span>
 
                     <span className="aspect-cell side-b">
-                      {other.kind === "pass_certos" ? (
-                        <>
-                          <span className="aspect-pass-pct">{Math.round(other.percentile ?? 0)}</span>
-                          {other.accuracy_badge && <AccuracyBadge badge={other.accuracy_badge} size={12} />}
-                        </>
-                      ) : (
-                        <span className="aspect-grade" style={tierVars(tokenB)}>
-                          {normalizeGrade(other.grade)}
-                        </span>
-                      )}
+                      <span className="aspect-metric-pct" style={tierVars(tokenB)}>
+                        {Math.round(scoreB)}
+                      </span>
+                      {other.accuracy_badge && <AccuracyBadge badge={other.accuracy_badge} size={12} showLabel={false} />}
                     </span>
                   </li>
                 );
