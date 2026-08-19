@@ -23,7 +23,9 @@ export function PositionScoutPage({ family, players }: Props) {
     () => (requestedId && players.some((p) => p.player_id === requestedId) ? requestedId : players[0]?.player_id) ?? "",
   );
   const [profilesFilter, setProfilesFilter] = useState<string[]>([]);
+  const [clusterFilters, setClusterFilters] = useState<string[]>([]);
   const familyMeta = familyBySlug(family);
+  const clusterMode = family === "zagueiros";
 
   const selected = players.find((player) => player.player_id === selectedId) ?? players[0] ?? null;
 
@@ -42,6 +44,12 @@ export function PositionScoutPage({ family, players }: Props) {
   const toggleProfile = (profile: string) => {
     setProfilesFilter((current) =>
       current.includes(profile) ? current.filter((item) => item !== profile) : [...current, profile],
+    );
+  };
+
+  const toggleClusterFilter = (key: string) => {
+    setClusterFilters((current) =>
+      current.includes(key) ? current.filter((item) => item !== key) : [...current, key],
     );
   };
 
@@ -77,6 +85,9 @@ export function PositionScoutPage({ family, players }: Props) {
             onSelect={setSelectedId}
             onToggleProfile={toggleProfile}
             profilesAvailable={selected.profiles_available}
+            clusterMode={clusterMode}
+            clusterFilters={clusterFilters}
+            onToggleClusterFilter={toggleClusterFilter}
           />
 
           <main className="dossier">
@@ -84,6 +95,7 @@ export function PositionScoutPage({ family, players }: Props) {
               player={selected}
               poolSize={players.length}
               family={family}
+              poolPlayers={players}
             />
 
             <AspectMatrix player={selected} />

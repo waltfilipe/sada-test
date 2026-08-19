@@ -2,22 +2,31 @@
 
 import Link from "next/link";
 import { familyBySlug } from "@/lib/positions";
+import { clusterCounts } from "@/lib/clusterMeta";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { MinutesStat } from "./MinutesStat";
 import { DossierRatings } from "./DossierRatings";
+import { ClusterTag, clusterTagProps } from "./ClusterTag";
+import { ClusterHierarchy } from "./ClusterHierarchy";
 import { ProfileTag, profileTagProps } from "./ProfileTag";
 
 type Props = {
   player: PlayerProfile;
   poolSize: number;
   family: PositionFamily;
+  poolPlayers?: PlayerProfile[];
 };
 
-export function DossierHeader({ player, poolSize, family }: Props) {
+export function DossierHeader({ player, poolSize, family, poolPlayers = [] }: Props) {
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const positionLabel = player.position || familyBySlug(family).label;
   const tm = player.transfermarkt;
+  const clusterProps = clusterTagProps(player);
+  const microCounts =
+    family === "zagueiros" && poolPlayers.length
+      ? clusterCounts(poolPlayers).micros
+      : undefined;
 
   const contract =
     tm?.contract_remaining ?? (tm?.contract_until ? `até ${formatDate(tm.contract_until)}` : null);
@@ -44,7 +53,7 @@ export function DossierHeader({ player, poolSize, family }: Props) {
         <p className="dossier-eyebrow">
           <span>{positionLabel}</span>
           <i aria-hidden />
-          <ProfileTag {...profileTagProps(player)} />
+          {clusterProps ? <ClusterTag {...clusterProps} /> : <ProfileTag {...profileTagProps(player)} />}
         </p>
 
         <h1>{player.name}</h1>
@@ -66,6 +75,12 @@ export function DossierHeader({ player, poolSize, family }: Props) {
       <div className="dossier-dial">
         <DossierRatings player={player} poolSize={poolSize} family={family} />
       </div>
+
+      {family === "zagueiros" && player.cluster && (
+        <div className="dossier-cluster-panel">
+          <ClusterHierarchy cluster={player.cluster} poolCounts={microCounts} />
+        </div>
+      )}
 
       <footer className="dossier-bar">
         <div className="bar-group bar-market">
