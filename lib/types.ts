@@ -35,6 +35,16 @@ export type TransfermarktInfo = {
   profile_url: string | null;
 } | null;
 
+export type ClusterMacro = "Defensor" | "Construtor";
+export type ClusterMicro = "D1" | "D2" | "C1" | "C2";
+
+export type ZagCluster = {
+  macro: ClusterMacro;
+  micro: ClusterMicro;
+  macro_label: ClusterMacro;
+  micro_label: string;
+};
+
 export type PlayerSummary = {
   player_id: string;
   name: string;
@@ -52,6 +62,7 @@ export type PlayerSummary = {
   rating: number;
   profile: string;
   hybrid_lean?: string | null;
+  cluster?: ZagCluster | null;
   transfermarkt?: TransfermarktInfo;
 };
 

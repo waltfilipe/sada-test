@@ -16,6 +16,7 @@ from .normalize import (
     zscore_linear_100,
 )
 from .profiles import FAMILY_PROFILE_CONFIG, profile_ratings_from_row, profile_ranks_from_row, profile_shares_from_row
+from .zag_hierarchy import apply_zag_hierarchical_clusters
 
 
 ZAG_PROFILES = ["Construtor", "Defensivo", "Híbrido"]
@@ -596,6 +597,7 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out["rating_defesa_legacy"] = _round_rating_raw(out["rating_defesa_legacy_raw"])
 
     _apply_zag_k3_classification(out)
+    out = apply_zag_hierarchical_clusters(out)
 
     med_con = float(out["rating_construcao"].median())
     med_def = float(out["rating_defesa"].median())
@@ -894,6 +896,15 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
     if family_key == "zagueiros":
         lean = row.get("hybrid_lean")
         payload["hybrid_lean"] = lean if pd.notna(lean) and lean else None
+        macro = row.get("cluster_macro")
+        micro = row.get("cluster_micro")
+        if pd.notna(macro) and pd.notna(micro) and macro and micro:
+            payload["cluster"] = {
+                "macro": str(macro),
+                "micro": str(micro),
+                "macro_label": str(row.get("cluster_macro_label") or macro),
+                "micro_label": str(row.get("cluster_micro_label") or micro),
+            }
     return payload
 
 

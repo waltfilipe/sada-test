@@ -77,6 +77,7 @@ def main() -> None:
                 "rating": player["rating"],
                 "profile": player["profile"],
                 "hybrid_lean": player.get("hybrid_lean"),
+                "cluster": player.get("cluster"),
                 "transfermarkt": player.get("transfermarkt"),
             }
         )

@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ZAG_CLUSTER_TREE } from "@/lib/clusterMeta";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { profileTone, sortPlayers } from "@/lib/scoutUi";
+import { playerMatchesClusterFilter } from "./ClusterHierarchy";
 import type { PlayerProfile } from "@/lib/types";
 
 type Sort = "rating" | "minutes" | "name";
@@ -20,6 +22,9 @@ type Props = {
   onSelect: (id: string) => void;
   onToggleProfile: (profile: string) => void;
   profilesAvailable: string[];
+  clusterMode?: boolean;
+  clusterFilters?: string[];
+  onToggleClusterFilter?: (key: string) => void;
 };
 
 export function RosterRail({
@@ -29,6 +34,9 @@ export function RosterRail({
   onSelect,
   onToggleProfile,
   profilesAvailable,
+  clusterMode = false,
+  clusterFilters = [],
+  onToggleClusterFilter,
 }: Props) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<Sort>("rating");
@@ -36,12 +44,16 @@ export function RosterRail({
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     const filtered = players.filter((player) => {
-      if (profilesFilter.length && !profilesFilter.includes(player.profile)) return false;
+      if (clusterMode) {
+        if (!playerMatchesClusterFilter(player, clusterFilters)) return false;
+      } else if (profilesFilter.length && !profilesFilter.includes(player.profile)) {
+        return false;
+      }
       if (!q) return true;
       return player.name.toLowerCase().includes(q) || player.club.toLowerCase().includes(q);
     });
     return sortPlayers(filtered, sort);
-  }, [players, profilesFilter, query, sort]);
+  }, [players, profilesFilter, clusterMode, clusterFilters, query, sort]);
 
   return (
     <aside className="roster">
@@ -78,19 +90,53 @@ export function RosterRail({
         </div>
 
         <div className="roster-filters">
-          {profilesAvailable.map((profile) => (
-            <button
-              key={profile}
-              type="button"
-              className={`filter-chip profile-${profileTone(profile)} ${
-                profilesFilter.includes(profile) ? "active" : ""
-              }`}
-              onClick={() => onToggleProfile(profile)}
-              aria-pressed={profilesFilter.includes(profile)}
-            >
-              {profile}
-            </button>
-          ))}
+          {clusterMode && onToggleClusterFilter ? (
+            <div className="cluster-filter-groups">
+              <div className="cluster-filter-row" role="group" aria-label="Filtrar por perfil macro">
+                {ZAG_CLUSTER_TREE.map((branch) => (
+                  <button
+                    key={branch.macro}
+                    type="button"
+                    className={`filter-chip cluster-${branch.tone} ${clusterFilters.includes(branch.macro) ? "active" : ""}`}
+                    onClick={() => onToggleClusterFilter(branch.macro)}
+                    aria-pressed={clusterFilters.includes(branch.macro)}
+                  >
+                    {branch.macro}
+                  </button>
+                ))}
+              </div>
+              <div className="cluster-filter-row cluster-filter-row-micro" role="group" aria-label="Filtrar por subperfil">
+                {ZAG_CLUSTER_TREE.flatMap((branch) =>
+                  branch.children.map((leaf) => (
+                    <button
+                      key={leaf.micro}
+                      type="button"
+                      className={`filter-chip cluster-${branch.tone} ${clusterFilters.includes(leaf.micro) ? "active" : ""}`}
+                      onClick={() => onToggleClusterFilter(leaf.micro)}
+                      aria-pressed={clusterFilters.includes(leaf.micro)}
+                      title={leaf.label}
+                    >
+                      {leaf.micro}
+                    </button>
+                  )),
+                )}
+              </div>
+            </div>
+          ) : (
+            profilesAvailable.map((profile) => (
+              <button
+                key={profile}
+                type="button"
+                className={`filter-chip profile-${profileTone(profile)} ${
+                  profilesFilter.includes(profile) ? "active" : ""
+                }`}
+                onClick={() => onToggleProfile(profile)}
+                aria-pressed={profilesFilter.includes(profile)}
+              >
+                {profile}
+              </button>
+            ))
+          )}
         </div>
 
         <p className="roster-count">
@@ -125,8 +171,10 @@ export function RosterRail({
                 <span className="roster-info">
                   <strong>{player.name}</strong>
                   <em>
-                    {player.club} · {player.profile}
-                    {player.hybrid_lean ? ` ${player.hybrid_lean}` : ""}
+                    {player.club}
+                    {player.cluster
+                      ? ` · ${player.cluster.macro} · ${player.cluster.micro}`
+                      : ` · ${player.profile}${player.hybrid_lean ? ` ${player.hybrid_lean}` : ""}`}
                   </em>
                 </span>
 
