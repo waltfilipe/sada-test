@@ -1,7 +1,9 @@
 "use client";
 
-import { clampPercent, percentileTier, tierVars } from "@/lib/scoutTheme";
+import { dualMetricBadge } from "@/lib/aspectBadges";
+import { percentileTier, tierVars } from "@/lib/scoutTheme";
 import type { AspectItem, PlayerProfile } from "@/lib/types";
+import { AccuracyBadge } from "@/components/position/AccuracyBadge";
 
 const GROUPS = [
   { key: "defensivos", title: "Defensivos" },
@@ -26,6 +28,16 @@ function displayValue(item: AspectItem): string {
   return "—";
 }
 
+function rowBadge(item: AspectItem) {
+  if (item.kind === "def_efficiency_group" && item.pair_badge) {
+    return dualMetricBadge(item.pair_badge[0], item.pair_badge[1]);
+  }
+  if (item.efficiency_pct != null && item.percentile != null) {
+    return dualMetricBadge(item.percentile, item.efficiency_pct);
+  }
+  return null;
+}
+
 export function AspectVersus({ a, b }: { a: PlayerProfile; b: PlayerProfile }) {
   return (
     <div className="aspect-versus">
@@ -47,10 +59,13 @@ export function AspectVersus({ a, b }: { a: PlayerProfile; b: PlayerProfile }) {
                 const leads = scoreA === scoreB ? "tie" : scoreA > scoreB ? "a" : "b";
                 const tokenA = percentileTier(scoreA);
                 const tokenB = percentileTier(scoreB);
+                const badgeA = rowBadge(item);
+                const badgeB = rowBadge(other);
 
                 return (
                   <li key={item.label} className={`aspect-versus-row leads-${leads}`}>
                     <span className="aspect-cell side-a">
+                      {badgeA ? <AccuracyBadge badge={badgeA} size={11} showLabel={false} /> : null}
                       <span className="aspect-metric-value" style={tierVars(tokenA)}>
                         {displayValue(item)}
                       </span>
@@ -62,6 +77,7 @@ export function AspectVersus({ a, b }: { a: PlayerProfile; b: PlayerProfile }) {
                       <span className="aspect-metric-value" style={tierVars(tokenB)}>
                         {displayValue(other)}
                       </span>
+                      {badgeB ? <AccuracyBadge badge={badgeB} size={11} showLabel={false} /> : null}
                     </span>
                   </li>
                 );

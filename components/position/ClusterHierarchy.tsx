@@ -21,18 +21,31 @@ export function ClusterHierarchy({ cluster, poolCounts }: Props) {
     <section className="cluster-hierarchy" aria-label="Classificação hierárquica">
       <header className="cluster-hierarchy-head">
         <div className="cluster-path">
-          <span className={`cluster-path-macro cluster-${clusterMacroTone(cluster.macro)}`}>{cluster.macro}</span>
+          <span
+            className={`cluster-path-macro cluster-${clusterMacroTone(cluster.macro)}`}
+            title={meta.branch?.description}
+          >
+            {cluster.macro}
+          </span>
           <svg viewBox="0 0 16 16" aria-hidden className="cluster-path-chevron">
             <path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
           </svg>
-          <span className={`cluster-path-micro cluster-${clusterMacroTone(cluster.macro)}`}>{cluster.micro_label}</span>
+          <span
+            className={`cluster-path-micro cluster-${clusterMacroTone(cluster.macro)}`}
+            title={meta.leaf?.description}
+          >
+            {cluster.micro_label}
+          </span>
         </div>
-        <p className="cluster-path-desc">{meta.leaf?.description ?? meta.branch?.description}</p>
       </header>
 
       <div className="cluster-map" role="img" aria-label={`Mapa de perfis: ${meta.path}`}>
         {ZAG_CLUSTER_TREE.map((branch) => (
-          <div key={branch.macro} className={`cluster-map-branch cluster-${branch.tone}`}>
+          <div
+            key={branch.macro}
+            className={`cluster-map-branch cluster-${branch.tone}`}
+            title={branch.description}
+          >
             <p className="cluster-map-macro">{branch.macro}</p>
             <div className="cluster-map-leaves">
               {branch.children.map((leaf) => {
@@ -43,6 +56,7 @@ export function ClusterHierarchy({ cluster, poolCounts }: Props) {
                     key={leaf.micro}
                     className={`cluster-map-leaf ${active ? "active" : ""}`}
                     aria-current={active ? "true" : undefined}
+                    title={leaf.description}
                   >
                     <span className="cluster-map-code">{leaf.micro}</span>
                     <strong>{leaf.label}</strong>

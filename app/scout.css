@@ -697,11 +697,7 @@
 }
 
 .cluster-path-desc {
-  margin: 0;
-  font-size: 0.82rem;
-  line-height: 1.45;
-  color: var(--text-2);
-  max-width: 62ch;
+  display: none;
 }
 
 .cluster-map {
@@ -1675,6 +1671,68 @@
   list-style: none;
 }
 
+.aspect-row-expand {
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, rgba(255, 255, 255, 0.008) 100%);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.aspect-row-expand:hover {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.aspect-row-expand.is-open {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.aspect-row-expand-trigger {
+  padding: 0.52rem 0.62rem;
+  border-radius: 10px;
+}
+
+.aspect-expand-panel {
+  padding: 0 0.62rem 0.62rem;
+}
+
+.aspect-expand-body {
+  display: grid;
+  gap: 0.55rem;
+  padding-top: 0.15rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.aspect-bar-row {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.aspect-bar-row-muted .aspect-bar-label {
+  color: var(--text-3);
+}
+
+.aspect-bar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.45rem;
+}
+
+.aspect-bar-label {
+  font-size: 0.62rem;
+  color: var(--text-2);
+  letter-spacing: 0.02em;
+}
+
+.aspect-bar-value {
+  font-family: "Sora", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--tier-color);
+  font-variant-numeric: tabular-nums;
+}
+
 .aspect-row-metric {
   padding: 0.55rem 0.62rem 0.62rem;
   border-radius: 10px;
@@ -1771,60 +1829,71 @@
 
 /* ── Construction profile gauges ─────────────────────────────────────────── */
 
+.aspect-group-gauges {
+  align-self: start;
+}
+
 .aspect-group-gauges > header {
-  padding-bottom: 0.55rem;
-  margin-bottom: 0.45rem;
+  padding-bottom: 0.45rem;
+  margin-bottom: 0.35rem;
 }
 
 .constr-gauge-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.35rem;
+  gap: 0.25rem;
 }
 
 .constr-gauge {
   display: grid;
   justify-items: center;
-  padding: 0.35rem 0.2rem 0.15rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.02);
+  padding: 0.2rem 0.12rem 0.1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.015);
   border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .constr-gauge-svg {
   width: 100%;
-  max-width: 108px;
+  max-width: 84px;
   height: auto;
   display: block;
 }
 
 .constr-gauge-track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.08);
-  stroke-width: 5;
+  stroke: rgba(255, 255, 255, 0.07);
+  stroke-width: 4.5;
   stroke-linecap: round;
 }
 
 .constr-gauge-fill {
   fill: none;
-  stroke-width: 5;
+  stroke-width: 4.5;
   stroke-linecap: round;
-  opacity: 0.35;
+}
+
+.constr-gauge-tick {
+  stroke: rgba(255, 255, 255, 0.35);
+  stroke-width: 0.8;
+  stroke-linecap: round;
 }
 
 .constr-gauge-hub {
-  fill: rgba(255, 255, 255, 0.85);
+  fill: rgba(255, 255, 255, 0.9);
+  stroke: rgba(0, 0, 0, 0.15);
+  stroke-width: 0.4;
 }
 
 .constr-gauge-needle {
-  stroke-width: 1.8;
+  stroke-width: 1.4;
   stroke-linecap: round;
 }
 
 .constr-gauge-value {
-  margin: -0.15rem 0 0;
+  margin: -0.05rem 0 0;
   font-family: "Sora", sans-serif;
-  font-size: 0.82rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: var(--tier-color);
   font-variant-numeric: tabular-nums;
@@ -1832,11 +1901,12 @@
 }
 
 .constr-gauge-label {
-  margin: 0.08rem 0 0;
-  font-size: 0.58rem;
+  margin: 0;
+  font-size: 0.54rem;
   color: var(--text-3);
   text-align: center;
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
 }
 
 /* ── Club logos ──────────────────────────────────────────────────────────── */
