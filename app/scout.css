@@ -2503,13 +2503,18 @@
 .accuracy-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.28rem;
+  gap: 0.32rem;
   flex-shrink: 0;
   line-height: 0;
-  padding: 0.14rem 0.38rem 0.14rem 0.28rem;
-  border-radius: 999px;
-  border: 1px solid var(--badge-ring, rgba(255, 255, 255, 0.12));
-  background: var(--badge-bg, rgba(255, 255, 255, 0.04));
+}
+
+.accuracy-badge .sc-medal {
+  line-height: 0;
+}
+
+.accuracy-badge .sc-medal-svg {
+  display: block;
+  filter: none;
 }
 
 .accuracy-badge-label {
@@ -2726,7 +2731,7 @@
 
 .sc-medal-svg {
   display: block;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+  filter: none;
 }
 
 .sc-medal-caption {
@@ -2735,9 +2740,9 @@
   letter-spacing: 0.02em;
 }
 
-.sc-medal-gold .sc-medal-caption { color: #f2c14e; }
-.sc-medal-silver .sc-medal-caption { color: #cbd5e1; }
-.sc-medal-bronze .sc-medal-caption { color: #d18a51; }
+.sc-medal-gold .sc-medal-caption { color: #ebc55b; }
+.sc-medal-silver .sc-medal-caption { color: #c5cad3; }
+.sc-medal-bronze .sc-medal-caption { color: #d68f6c; }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 
