@@ -198,6 +198,9 @@ ZAG_WEAK_AXIS_GAP = 1.0
 ZAG_SHRINK_MU = 7.25
 ZAG_SHRINK_EXP = 0.65
 
+# Core/abs geral rating: badge bonus on efficiency-backed core metrics
+ZAG_RATING_BADGE_BONUS = {"gold": 0.20, "silver": 0.15, "bronze": 0.10}
+
 # Axis rating: z-linear pool normalization before 5 + score/100 × 4.5
 ZAG_AXIS_ZLINEAR_SPREAD = 15.0
 
@@ -473,6 +476,34 @@ def _zag_apply_minutes_shrinkage(base: float, pct_minutes: float) -> float:
     return w * base + (1.0 - w) * ZAG_SHRINK_MU
 
 
+def _apply_badge_bonus(pct: float, eff_pct: Any) -> float:
+    badge = _accuracy_badge(eff_pct)
+    if not badge:
+        return pct
+    return min(100.0, pct * (1.0 + ZAG_RATING_BADGE_BONUS[badge]))
+
+
+def _zag_rating_core_abs_pct(row: pd.Series) -> float:
+    """Blend core (×1) and absolute (×0.5) percentiles; core metrics get efficiency badge bonus."""
+    core_parts = [
+        _apply_badge_bonus(float(row.get("_asp_duelos_def_won_vol", 0)), row.get("_asp_duelos_def_eff", 0)),
+        _apply_badge_bonus(float(row.get("_asp_duelos_ar_won_vol", 0)), row.get("_asp_duelos_ar_eff", 0)),
+        float(row.get("_asp_custo_def_eff", 0)),
+        _apply_badge_bonus(float(row.get("_asp_passes_prog_certos90", 0)), row.get("_asp_passes_prog_eff", 0)),
+        _apply_badge_bonus(float(row.get("_asp_passes_long_res", 0)), row.get("_asp_passes_long_eff", 0)),
+    ]
+    abs_parts = [
+        float(row.get("_asp_inter_vol", 0)),
+        float(row.get("_asp_cortes_vol", 0)),
+        float(row.get("_asp_rem_int_vol", 0)),
+        float(row.get("_asp_prog_vol", 0)),
+        float(row.get("_asp_duelos_of_won_vol", 0)),
+    ]
+    core_avg = sum(core_parts) / len(core_parts)
+    abs_avg = sum(abs_parts) / len(abs_parts)
+    return (core_avg + 0.5 * abs_avg) / 1.5
+
+
 def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out = pool.copy()
 
@@ -606,12 +637,22 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
         lambda row: _zag_rating_perfil_base(row, med_con, med_def),
         axis=1,
     )
-    out["rating_geral_raw"] = out.apply(
+    out["rating_perfil_raw"] = out.apply(
         lambda row: _zag_apply_minutes_shrinkage(row["rating_perfil_base"], row["%Minutos"]),
         axis=1,
     )
-    out["rating_perfil"] = out["rating_geral_raw"].round(1)
-    out["rating_geral"] = out["rating_perfil"]
+    out["rating_perfil"] = out["rating_perfil_raw"].round(1)
+
+    out = attach_aspect_percentiles(out)
+    out["rating_core_abs_pct"] = out.apply(_zag_rating_core_abs_pct, axis=1)
+    out["rating_geral_raw"] = out.apply(
+        lambda row: _zag_apply_minutes_shrinkage(
+            5.0 + row["rating_core_abs_pct"] / 100.0 * 4.5,
+            row["%Minutos"],
+        ),
+        axis=1,
+    )
+    out["rating_geral"] = out["rating_geral_raw"].round(1)
 
     # Legacy columns kept for internal diagnostics only
     out["rating_combativo"] = out["rating_defesa"]
@@ -738,6 +779,11 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     lat = _feat_col(out, "Passes laterais/90").astype(float)
     rec = _feat_col(out, "Passes recebidos/90").astype(float)
     lat_ratio = lat / rec.replace(0, np.nan)
+    long_certos = out["CompBL"].astype(float)
+    prog_certos = out["CompPassesProg"].astype(float)
+    long_res = percentile_rank(_residualize_on(out, long_certos, prog_certos), ascending=True)
+
+    out["_custo_def_raw"] = _custo_def_ajustado(out)
 
     mappings: dict[str, pd.Series] = {
         "duelos_def_vol": _pool_percentile(out, "Duelos defensivos/90", "DuelosDef"),
@@ -759,6 +805,9 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "ptf_certos90": _pool_percentile(out, "CompPTF"),
         "passes_long_eff": _pct_eff(out, "Passes longos certos, %", "%EffPassesLng"),
         "passes_long_certos90": _pool_percentile(out, "CompBL"),
+        "passes_long_res": long_res,
+        "rem_int_vol": _pool_percentile(out, "Remates intercetados/90"),
+        "ad_vol": _pool_percentile(out, "Ações defensivas com êxito/90", "AçõesDef"),
         "tend_long": percentile_rank(share_long.fillna(0), ascending=True),
         "tend_prog": percentile_rank(share_prog.fillna(0), ascending=True),
         "tend_lat": percentile_rank(lat_ratio.fillna(0), ascending=True),
@@ -783,12 +832,25 @@ def _fmt_per90(value: float, *, suffix: str = "/ 90") -> str:
     return f"{value:.1f}".replace(".", ",") + f" {suffix}"
 
 
+def _fmt_num(value: float, *, decimals: int = 1) -> str:
+    return f"{value:.{decimals}f}".replace(".", ",")
+
+
+def _raw_eff_display(row: pd.Series, raw_col: str, engine_col: str) -> str:
+    if raw_col in row.index and pd.notna(row.get(raw_col)):
+        pct = float(row[raw_col])
+    else:
+        pct = float(row.get(engine_col, 0) or 0) * 100
+    return f"{pct:.0f}%"
+
+
 def _metric_aspect(
     label: str,
     *,
     percentile: Any,
-    sublabel: str | None = None,
+    display_value: str | None = None,
     eff_pct: Any = None,
+    eff_display: str | None = None,
 ) -> dict[str, Any]:
     pct = round(float(percentile or 0), 1)
     item: dict[str, Any] = {
@@ -798,9 +860,12 @@ def _metric_aspect(
         "percentile": pct,
         "stats": [],
     }
-    if sublabel:
-        item["sublabel"] = sublabel
+    if display_value:
+        item["display_value"] = display_value
     if eff_pct is not None:
+        item["efficiency_pct"] = round(float(eff_pct), 1)
+        if eff_display:
+            item["efficiency_value"] = eff_display
         item["accuracy_badge"] = _accuracy_badge(eff_pct)
     return item
 
@@ -811,6 +876,7 @@ def _pass_aspect(
     certos_per90: Any,
     certos_pct: Any,
     eff_pct: Any,
+    eff_display: str | None = None,
 ) -> dict[str, Any]:
     pct = round(float(certos_pct or 0), 1)
     return {
@@ -818,8 +884,30 @@ def _pass_aspect(
         "kind": "pass_certos",
         "grade": _grade_from_pct(pct),
         "certos_per90": round(float(certos_per90 or 0), 2),
+        "display_value": _fmt_num(float(certos_per90 or 0)),
         "percentile": pct,
+        "efficiency_pct": round(float(eff_pct or 0), 1),
+        "efficiency_value": eff_display,
         "accuracy_badge": _accuracy_badge(eff_pct),
+        "stats": [],
+    }
+
+
+def _efficiency_def_aspect(row: pd.Series) -> dict[str, Any]:
+    pct = round(float(row.get("_asp_custo_def_eff", 0) or 0), 1)
+    ad = float(row.get("Ações defensivas com êxito/90") or row.get("AçõesDef") or 0)
+    ad_pct = row.get("_asp_ad_vol", 0)
+    custo = float(row.get("_custo_def_raw", 0) or 0)
+    return {
+        "label": "Eficiência",
+        "kind": "efficiency_def",
+        "grade": _grade_from_pct(pct),
+        "percentile": pct,
+        "display_value": _fmt_num(custo, decimals=2),
+        "secondary_label": "Ações def. c/ êxito",
+        "secondary_value": _fmt_num(ad),
+        "secondary_percentile": round(float(ad_pct or 0), 1),
+        "accuracy_badge": _accuracy_badge(ad_pct),
         "stats": [],
     }
 
@@ -828,6 +916,9 @@ def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
     dd_won = float(row.get("DuelosDef") or 0) * float(row.get("%DuelosDefW") or 0)
     da_won = float(row.get("DuelosAr") or 0) * float(row.get("%DuelosAr") or 0)
     do_won = float(row.get("DuelosOf") or 0) * float(row.get("%DuelosOfW") or 0)
+    inter = float(row.get("Interseções") or row.get("Interseções/90") or 0)
+    cortes = float(row.get("Carrinhos") or row.get("Cortes/90") or 0)
+    prog = float(row.get("Cond.Prog") or row.get("Corridas progressivas/90") or 0)
     pp_e = row.get("_asp_passes_prog_eff", 0)
     ptf_e = row.get("_asp_ptf_eff", 0)
     pl_e = row.get("_asp_passes_long_eff", 0)
@@ -837,28 +928,28 @@ def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
             _metric_aspect(
                 "Duelos Defensivos",
                 percentile=row.get("_asp_duelos_def_won_vol", 0),
-                sublabel=f"{_fmt_per90(dd_won, suffix='vencidos / 90')}",
+                display_value=_fmt_num(dd_won),
                 eff_pct=row.get("_asp_duelos_def_eff", 0),
+                eff_display=_raw_eff_display(row, "Duelos defensivos ganhos, %", "%DuelosDefW"),
             ),
             _metric_aspect(
                 "Duelos Aéreos",
                 percentile=row.get("_asp_duelos_ar_won_vol", 0),
-                sublabel=f"{_fmt_per90(da_won, suffix='vencidos / 90')}",
+                display_value=_fmt_num(da_won),
                 eff_pct=row.get("_asp_duelos_ar_eff", 0),
+                eff_display=_raw_eff_display(row, "Duelos aéreos ganhos, %", "%DuelosAr"),
             ),
             _metric_aspect(
                 "Interceptações",
                 percentile=row.get("_asp_inter_vol", 0),
+                display_value=_fmt_num(inter),
             ),
             _metric_aspect(
                 "Rebatidas",
                 percentile=row.get("_asp_cortes_vol", 0),
+                display_value=_fmt_num(cortes),
             ),
-            _metric_aspect(
-                "Eficiência",
-                percentile=row.get("_asp_custo_def_eff", 0),
-                sublabel="Custo def. ajustado (menor = melhor)",
-            ),
+            _efficiency_def_aspect(row),
         ],
         "construcao": [
             _pass_aspect(
@@ -866,45 +957,64 @@ def _build_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
                 certos_per90=row.get("CompPassesProg", 0),
                 certos_pct=row.get("_asp_passes_prog_certos90", 0),
                 eff_pct=pp_e,
+                eff_display=_raw_eff_display(row, "Passes progressivos certos, %", "%EffPassProg"),
             ),
             _pass_aspect(
                 "Passes para Terço Final",
                 certos_per90=row.get("CompPTF", 0),
                 certos_pct=row.get("_asp_ptf_certos90", 0),
                 eff_pct=ptf_e,
+                eff_display=_raw_eff_display(row, "Passes certos para terço final, %", "%EffPassTF"),
             ),
             _pass_aspect(
                 "Passes Longos",
                 certos_per90=row.get("CompBL", 0),
                 certos_pct=row.get("_asp_passes_long_certos90", 0),
                 eff_pct=pl_e,
+                eff_display=_raw_eff_display(row, "Passes longos certos, %", "%EffPassesLng"),
             ),
         ],
         "perfil_construcao": [
             _metric_aspect(
                 "Tendência de Passes Longos",
                 percentile=row.get("_asp_tend_long", 0),
+                display_value=_fmt_num(
+                    float(row.get("PassesLongos") or 0) / max(float(row.get("Passe") or 1), 1) * 100,
+                    decimals=0,
+                )
+                + "%",
             ),
             _metric_aspect(
                 "Tendência de Passes Progressivos",
                 percentile=row.get("_asp_tend_prog", 0),
+                display_value=_fmt_num(
+                    float(row.get("PassesProg") or 0) / max(float(row.get("Passe") or 1), 1) * 100,
+                    decimals=0,
+                )
+                + "%",
             ),
             _metric_aspect(
                 "Tendência de Lateralização",
                 percentile=row.get("_asp_tend_lat", 0),
-                sublabel="Laterais / recebidos",
+                display_value=_fmt_num(
+                    float(row.get("Passes laterais/90") or 0)
+                    / max(float(row.get("Passes recebidos/90") or row.get("RecPasse") or 1), 1),
+                    decimals=2,
+                ),
             ),
         ],
         "ofensivos": [
             _metric_aspect(
                 "Duelos Ofensivos",
                 percentile=row.get("_asp_duelos_of_won_vol", 0),
-                sublabel=f"{_fmt_per90(do_won, suffix='vencidos / 90')}",
+                display_value=_fmt_num(do_won),
                 eff_pct=row.get("_asp_duelos_of_eff", 0),
+                eff_display=_raw_eff_display(row, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
             ),
             _metric_aspect(
                 "Progressão",
                 percentile=row.get("_asp_prog_vol", 0),
+                display_value=_fmt_num(prog),
             ),
         ],
     }
