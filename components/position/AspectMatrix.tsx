@@ -17,8 +17,10 @@ export function AspectMatrix({ player, family }: { player: PlayerProfile; family
       ? [...BAR_GROUPS, LAT_EXTRA_GROUP]
       : BAR_GROUPS;
 
+  const groupsClass = family === "laterais" ? "aspect-groups aspect-groups-quad" : "aspect-groups";
+
   return (
-    <div className="aspect-groups">
+    <div className={groupsClass}>
       {groups.map((group) => {
         const items = player.aspects[group.key as keyof typeof player.aspects];
         if (!items?.length) return null;

@@ -1029,8 +1029,8 @@ def _accuracy_badge(eff_pct: Any) -> str | None:
     return None
 
 
-def _fmt_per90(value: float, *, suffix: str = "/ 90") -> str:
-    return f"{value:.1f}".replace(".", ",") + f" {suffix}"
+def _fmt_per90(value: float) -> str:
+    return f"{value:.1f}".replace(".", ",")
 
 
 def _fmt_num(value: float, *, decimals: int = 1) -> str:
@@ -1233,12 +1233,12 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 percentile=row.get("_asp_passes_total_vol", 0),
                 sub_metrics=[
                     _sub_metric(
-                        "Passes/90",
+                        "Passes",
                         percentile=row.get("_asp_passes_total_vol", 0),
                         display_value=_fmt_per90(_row_vol(row, "Passe", "Passes/90")),
                     ),
                     _sub_metric(
-                        "Passes Recebidos/90",
+                        "Passes Recebidos",
                         percentile=row.get("_asp_rec_passes_vol", 0),
                         display_value=_fmt_per90(_row_vol(row, "RecPasse", "Passes recebidos/90")),
                     ),
@@ -1263,12 +1263,12 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                     percentile=max(float(row.get("_asp_cond_prog_vol", 0) or 0), float(row.get("_asp_acel_vol", 0) or 0)),
                     sub_metrics=[
                         _sub_metric(
-                            "Conduções Progressivas/90",
+                            "Conduções Progressivas",
                             percentile=row.get("_asp_cond_prog_vol", 0),
                             display_value=_fmt_num(prog),
                         ),
                         _sub_metric(
-                            "Acelerações/90",
+                            "Acelerações",
                             percentile=row.get("_asp_acel_vol", 0),
                             display_value=_fmt_per90(accel),
                         ),
@@ -1373,7 +1373,7 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 eff_pct=row.get("_asp_cruz_eff", 0),
                 eff_display=_raw_eff_display(row, "Cruzamentos certos, %", "%EffCruz."),
                 sub_metrics=[
-                    _sub_metric("Cruzamentos/90", percentile=row.get("_asp_cruz_vol", 0), display_value=_fmt_per90(cruz_vol)),
+                    _sub_metric("Cruzamentos", percentile=row.get("_asp_cruz_vol", 0), display_value=_fmt_per90(cruz_vol)),
                     _sub_metric(
                         "Eficiência",
                         percentile=row.get("_asp_cruz_eff", 0),
@@ -1386,12 +1386,12 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 percentile=max(float(row.get("_asp_passes_chave_vol", 0) or 0), float(row.get("_asp_passe_area_certos90", 0) or 0)),
                 sub_metrics=[
                     _sub_metric(
-                        "Passes Chave/90",
+                        "Passes Chave",
                         percentile=row.get("_asp_passes_chave_vol", 0),
                         display_value=_fmt_per90(_row_vol(row, "PassesChave", "Passes chave/90")),
                     ),
                     _sub_metric(
-                        "Passes para Área/90",
+                        "Passes para Área",
                         percentile=row.get("_asp_passe_area_certos90", 0),
                         display_value=_fmt_per90(passe_area),
                     ),
@@ -1402,12 +1402,12 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 percentile=max(float(row.get("_asp_acoes_at_vol", 0) or 0), float(row.get("_asp_toques_area_vol", 0) or 0)),
                 sub_metrics=[
                     _sub_metric(
-                        "Ações Ofensivas/90",
+                        "Ações Ofensivas",
                         percentile=row.get("_asp_acoes_at_vol", 0),
                         display_value=_fmt_per90(_row_vol(row, "AcoesAtW", "Acções atacantes com sucesso/90")),
                     ),
                     _sub_metric(
-                        "Toques na Área/90",
+                        "Toques na Área",
                         percentile=row.get("_asp_toques_area_vol", 0),
                         display_value=_fmt_per90(_row_vol(row, "ToquesArea", "Toques na área/90")),
                     ),

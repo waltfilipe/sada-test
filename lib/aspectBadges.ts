@@ -30,15 +30,41 @@ export function volumeBadge(volumePct: number): AccuracyBadgeKind | null {
   return null;
 }
 
+function metricGroupBadge(item: {
+  sub_metrics?: { label: string; percentile: number }[];
+  pair_badge?: [number, number] | null;
+}): AccuracyBadgeKind | null {
+  if (item.pair_badge) {
+    return pairBadge(item.pair_badge[0], item.pair_badge[1]);
+  }
+  const subs = item.sub_metrics;
+  if (!subs?.length) return null;
+
+  const effSub = subs.find((s) => s.label === "Eficiência" || s.label === "Eficiência Defensiva");
+  if (effSub) {
+    const volSub = subs.find((s) => s !== effSub);
+    if (volSub) return dualMetricBadge(volSub.percentile, effSub.percentile);
+  }
+  if (subs.length === 2) {
+    return pairBadge(subs[0].percentile, subs[1].percentile);
+  }
+  return null;
+}
+
 export function resolveAspectBadge(item: {
   label: string;
   kind?: string;
   percentile?: number;
   efficiency_pct?: number;
   pair_badge?: [number, number] | null;
+  sub_metrics?: { label: string; percentile: number }[];
 }): AccuracyBadgeKind | null {
   if (item.kind === "def_efficiency_group" && item.pair_badge) {
     return pairBadge(item.pair_badge[0], item.pair_badge[1]);
+  }
+  if (item.kind === "metric_group") {
+    const groupBadge = metricGroupBadge(item);
+    if (groupBadge) return groupBadge;
   }
   if (item.efficiency_pct != null && item.percentile != null) {
     return dualMetricBadge(item.percentile, item.efficiency_pct);
