@@ -43,7 +43,7 @@ export function resolveAspectBadge(item: {
   if (item.efficiency_pct != null && item.percentile != null) {
     return dualMetricBadge(item.percentile, item.efficiency_pct);
   }
-  if (item.label === "Progressão" && item.percentile != null) {
+  if (item.label === "Conduções Progressivas" && item.percentile != null) {
     return volumeBadge(item.percentile);
   }
   return null;
