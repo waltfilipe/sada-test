@@ -65,6 +65,7 @@ export function ArchetypeMixCard({ cluster }: Props) {
 }
 
 const ARCHETYPES = new Set<string>(["Rebatedor", "Construtor", "Agressivo"]);
+const CONSTRUTOR_SUBTYPES = new Set<string>(["Construtor Defensivo", "Construtor Lançador"]);
 
 export function playerMatchesClusterFilter(
   player: { cluster?: ZagCluster | null },
@@ -74,12 +75,17 @@ export function playerMatchesClusterFilter(
   if (!player.cluster) return false;
 
   const archetypeFilters = filters.filter((key) => ARCHETYPES.has(key));
+  const subtypeFilters = filters.filter((key) => CONSTRUTOR_SUBTYPES.has(key));
   const hybridOnly = filters.includes("Híbrido");
 
   if (archetypeFilters.length && hybridOnly) {
     return archetypeFilters.includes(player.cluster.archetype) && player.cluster.is_hybrid;
   }
+  if (subtypeFilters.length && hybridOnly) {
+    return subtypeFilters.includes(player.cluster.construtor_subtype ?? "") && player.cluster.is_hybrid;
+  }
   if (hybridOnly) return player.cluster.is_hybrid;
+  if (subtypeFilters.length) return subtypeFilters.includes(player.cluster.construtor_subtype ?? "");
   if (archetypeFilters.length) return archetypeFilters.includes(player.cluster.archetype);
   return true;
 }

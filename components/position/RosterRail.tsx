@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
+import { ZAG_ARCHETYPE_META, CONSTRUTOR_SUBTYPE_META } from "@/lib/clusterMeta";
 import { ClubLogo } from "@/components/ClubLogo";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { profileTone, sortPlayers } from "@/lib/scoutUi";
@@ -111,10 +111,24 @@ export function RosterRail({
                   className={`filter-chip cluster-hibrido ${clusterFilters.includes("Híbrido") ? "active" : ""}`}
                   onClick={() => onToggleClusterFilter("Híbrido")}
                   aria-pressed={clusterFilters.includes("Híbrido")}
-                  title="Atletas com mix equilibrado entre arquétipos"
+                  title="Construtor com M4 alto — perfil limítrofe com Agressivo"
                 >
                   Híbrido
                 </button>
+              </div>
+              <div className="cluster-filter-row" role="group" aria-label="Filtrar por subtipo de construtor">
+                {CONSTRUTOR_SUBTYPE_META.map((item) => (
+                  <button
+                    key={item.subtype}
+                    type="button"
+                    className={`filter-chip cluster-construtor ${clusterFilters.includes(item.subtype) ? "active" : ""}`}
+                    onClick={() => onToggleClusterFilter(item.subtype)}
+                    aria-pressed={clusterFilters.includes(item.subtype)}
+                    title={item.description}
+                  >
+                    {item.short_label}
+                  </button>
+                ))}
               </div>
             </div>
           ) : (

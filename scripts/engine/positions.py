@@ -1210,9 +1210,12 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
         if pd.notna(archetype) and archetype:
             con = float(row["rating_construcao"])
             def_ = float(row["rating_defesa"])
+            label = row.get("cluster_archetype_label")
+            subtype = row.get("cluster_construtor_subtype")
             payload["cluster"] = {
                 "archetype": str(archetype),
-                "archetype_label": str(archetype),
+                "archetype_label": str(label if pd.notna(label) and label else archetype),
+                "construtor_subtype": str(subtype) if pd.notna(subtype) and subtype else None,
                 "is_hybrid": bool(row.get("cluster_is_hybrid")),
                 "shares": {
                     "rebatedor": float(row.get("cluster_share_rebatedor") or 0),

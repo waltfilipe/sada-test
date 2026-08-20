@@ -1,4 +1,4 @@
-"""Semantic K=3 archetype clustering for Serie A zagueiros (Wyscout + SofaScore)."""
+"""Semantic archetype tree for Serie A zagueiros (Wyscout + SofaScore)."""
 
 from __future__ import annotations
 
@@ -8,13 +8,14 @@ import pandas as pd
 from .sofascore import SS_PATH, SS_STAT_COLS, aggregate_sofascore, match_ss_row
 
 ARCHETYPE_LABELS = ("Rebatedor", "Construtor", "Agressivo")
+CONSTRUTOR_SUBTYPE_LABELS = ("Construtor Defensivo", "Construtor Lançador")
 
-# Primary type when no axis clearly dominates (top share below cutoff).
-HYBRID_TOP_SHARE_CUTOFF = 45.0
-# Minimum gap (pp) between top two shares to avoid hybrid flag.
-HYBRID_GAP_CUTOFF = 12.0
-# Down-weight rebatedor score when PTF is above pool median (avoids false positives).
-REBATEDOR_PTF_PENALTY = 0.65
+# Mean construction z-score above pool → Construtor branch.
+CONSTRUCTION_Z_THRESHOLD = 0.25
+# M4 = (DD + INT) / (Rebatidas + DA) — contact/reading vs line/aerial.
+M4_AGRESSIVO_THRESHOLD = 0.60
+# Construtor with high M4 → hybrid (borderline with Agressivo).
+M4_CONSTRUTOR_HYBRID_THRESHOLD = 0.75
 
 
 def _build_feature_row(wy_row: pd.Series, ss_row: pd.Series | None) -> dict[str, float]:
@@ -52,6 +53,26 @@ def _softmax_shares(scores: np.ndarray) -> np.ndarray:
     return weights * 100.0
 
 
+def _construction_z(feat_df: pd.DataFrame) -> pd.Series:
+    components = pd.DataFrame(
+        {
+            "ptf": _zscore(feat_df["passes_terco_final"]),
+            "passes": _zscore(feat_df["passes_total_p90"]),
+            "share_prog": _zscore(feat_df["share_prog"]),
+            "conducao": _zscore(feat_df["conducao_prog"]),
+        },
+        index=feat_df.index,
+    )
+    return components.mean(axis=1)
+
+
+def _m4_ratio(feat_df: pd.DataFrame) -> pd.Series:
+    contact = feat_df["duelos_def"] + feat_df["interception_won_p90"]
+    line = feat_df["total_clearance_p90"] + feat_df["duelos_aereos"]
+    denom = line.replace(0, np.nan)
+    return (contact / denom).fillna(0.0)
+
+
 def _axis_scores(feat_df: pd.DataFrame) -> pd.DataFrame:
     reb = (
         _zscore(feat_df["total_clearance_p90"])
@@ -74,32 +95,63 @@ def _axis_scores(feat_df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame({"Rebatedor": reb, "Construtor": con, "Agressivo": agr}, index=feat_df.index)
 
 
+def _construtor_subtype_score(feat_df: pd.DataFrame) -> pd.Series:
+    """z(rebatidas) + z(duelos aéreos) + z(tendência longo)."""
+    return (
+        _zscore(feat_df["total_clearance_p90"])
+        + _zscore(feat_df["duelos_aereos"])
+        + _zscore(feat_df["share_long"])
+    )
+
+
 def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
+    con_z = _construction_z(feat_df)
+    m4 = _m4_ratio(feat_df)
+    subtype_score = _construtor_subtype_score(feat_df)
+
     axis = _axis_scores(feat_df)
-    ptf_median = float(feat_df["passes_terco_final"].median())
-
-    adjusted = axis.copy()
-    high_ptf = feat_df["passes_terco_final"] >= ptf_median
-    adjusted.loc[high_ptf, "Rebatedor"] *= REBATEDOR_PTF_PENALTY
-
-    share_matrix = _softmax_shares(adjusted.to_numpy())
+    share_matrix = _softmax_shares(axis.to_numpy())
     shares = pd.DataFrame(share_matrix, columns=ARCHETYPE_LABELS, index=feat_df.index)
 
     primaries: list[str] = []
+    labels: list[str] = []
+    subtypes: list[str | None] = []
     hybrids: list[bool] = []
+
     for idx in feat_df.index:
-        row_shares = shares.loc[idx].sort_values(ascending=False)
-        top = str(row_shares.index[0])
-        top_val = float(row_shares.iloc[0])
-        second_val = float(row_shares.iloc[1])
-        gap = top_val - second_val
-        is_hybrid = top_val < HYBRID_TOP_SHARE_CUTOFF or gap < HYBRID_GAP_CUTOFF
-        primaries.append(top)
+        cz = float(con_z.loc[idx])
+        m4_val = float(m4.loc[idx])
+
+        if cz >= CONSTRUCTION_Z_THRESHOLD:
+            primary = "Construtor"
+            is_hybrid = m4_val >= M4_CONSTRUTOR_HYBRID_THRESHOLD
+            sub_score = float(subtype_score.loc[idx])
+            if sub_score >= 0:
+                subtype = CONSTRUTOR_SUBTYPE_LABELS[0]
+            else:
+                subtype = CONSTRUTOR_SUBTYPE_LABELS[1]
+            label = subtype
+        elif m4_val >= M4_AGRESSIVO_THRESHOLD:
+            primary = "Agressivo"
+            is_hybrid = False
+            subtype = None
+            label = primary
+        else:
+            primary = "Rebatedor"
+            is_hybrid = False
+            subtype = None
+            label = primary
+
+        primaries.append(primary)
+        labels.append(label)
+        subtypes.append(subtype)
         hybrids.append(is_hybrid)
 
     return pd.DataFrame(
         {
             "cluster_archetype": primaries,
+            "cluster_archetype_label": labels,
+            "cluster_construtor_subtype": subtypes,
             "cluster_is_hybrid": hybrids,
             "cluster_share_rebatedor": shares["Rebatedor"].round(1),
             "cluster_share_construtor": shares["Construtor"].round(1),
@@ -110,10 +162,12 @@ def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def apply_zag_hierarchical_clusters(pool: pd.DataFrame) -> pd.DataFrame:
-    """Add cluster_archetype, hybrid flag and per-axis share columns."""
+    """Add cluster_archetype, hybrid flag, constructor subtype and per-axis share columns."""
     out = pool.copy()
     empty_cols = {
         "cluster_archetype": None,
+        "cluster_archetype_label": None,
+        "cluster_construtor_subtype": None,
         "cluster_is_hybrid": None,
         "cluster_share_rebatedor": None,
         "cluster_share_construtor": None,
