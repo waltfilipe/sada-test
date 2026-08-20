@@ -14,15 +14,15 @@ type Props = {
 };
 
 const SHARE_KEYS: Record<ZagArchetype, keyof ZagCluster["shares"]> = {
-  Rebatedor: "rebatedor",
+  "Defensor de Área": "defensor_area",
   Construtor: "construtor",
-  Agressivo: "agressivo",
+  Combativo: "combativo",
 };
 
 const RATING_KEYS: Record<ZagArchetype, keyof ZagCluster["ratings"]> = {
-  Rebatedor: "rebatedor",
+  "Defensor de Área": "defensor_area",
   Construtor: "construtor",
-  Agressivo: "agressivo",
+  Combativo: "combativo",
 };
 
 export function ArchetypeMixCard({ cluster }: Props) {
@@ -30,7 +30,11 @@ export function ArchetypeMixCard({ cluster }: Props) {
     <article className="archetype-mix-card" aria-label="Perfil do atleta">
       <header className="archetype-mix-head">
         <h3>Perfil do Atleta</h3>
-        {cluster.is_hybrid ? <span className="cluster-hybrid-badge">Híbrido</span> : null}
+        {cluster.construtor_badge_short ? (
+          <span className="cluster-badge-hierarchical" title={cluster.construtor_badge ?? undefined}>
+            {cluster.construtor_badge_short}
+          </span>
+        ) : null}
       </header>
 
       <ul className="archetype-mix-rows">
@@ -64,7 +68,8 @@ export function ArchetypeMixCard({ cluster }: Props) {
   );
 }
 
-const ARCHETYPES = new Set<string>(["Rebatedor", "Construtor", "Agressivo"]);
+const ARCHETYPES = new Set<string>(["Defensor de Área", "Construtor", "Combativo"]);
+const CONSTRUTOR_BADGES = new Set<string>(["Construtor Âncora", "Construtor Puro"]);
 
 export function playerMatchesClusterFilter(
   player: { cluster?: ZagCluster | null },
@@ -74,12 +79,9 @@ export function playerMatchesClusterFilter(
   if (!player.cluster) return false;
 
   const archetypeFilters = filters.filter((key) => ARCHETYPES.has(key));
-  const hybridOnly = filters.includes("Híbrido");
+  const badgeFilters = filters.filter((key) => CONSTRUTOR_BADGES.has(key));
 
-  if (archetypeFilters.length && hybridOnly) {
-    return archetypeFilters.includes(player.cluster.archetype) && player.cluster.is_hybrid;
-  }
-  if (hybridOnly) return player.cluster.is_hybrid;
+  if (badgeFilters.length) return badgeFilters.includes(player.cluster.construtor_badge ?? "");
   if (archetypeFilters.length) return archetypeFilters.includes(player.cluster.archetype);
   return true;
 }

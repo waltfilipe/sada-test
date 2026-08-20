@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
+import { ZAG_ARCHETYPE_META, CONSTRUTOR_BADGE_META } from "@/lib/clusterMeta";
 import { ClubLogo } from "@/components/ClubLogo";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { profileTone, sortPlayers } from "@/lib/scoutUi";
@@ -106,15 +106,20 @@ export function RosterRail({
                     {item.archetype}
                   </button>
                 ))}
-                <button
-                  type="button"
-                  className={`filter-chip cluster-hibrido ${clusterFilters.includes("Híbrido") ? "active" : ""}`}
-                  onClick={() => onToggleClusterFilter("Híbrido")}
-                  aria-pressed={clusterFilters.includes("Híbrido")}
-                  title="Atletas com mix equilibrado entre arquétipos"
-                >
-                  Híbrido
-                </button>
+              </div>
+              <div className="cluster-filter-row" role="group" aria-label="Filtrar badge de construtor">
+                {CONSTRUTOR_BADGE_META.map((item) => (
+                  <button
+                    key={item.badge}
+                    type="button"
+                    className={`filter-chip cluster-construtor ${clusterFilters.includes(item.badge) ? "active" : ""}`}
+                    onClick={() => onToggleClusterFilter(item.badge)}
+                    aria-pressed={clusterFilters.includes(item.badge)}
+                    title={item.description}
+                  >
+                    {item.short_label}
+                  </button>
+                ))}
               </div>
             </div>
           ) : (

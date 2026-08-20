@@ -1,21 +1,25 @@
-export type ZagArchetype = "Rebatedor" | "Construtor" | "Agressivo";
+export type ZagArchetype = "Defensor de Área" | "Construtor" | "Combativo";
+
+export type ConstrutorBadge = "Construtor Âncora" | "Construtor Puro";
 
 export type ZagClusterShares = {
-  rebatedor: number;
+  defensor_area: number;
   construtor: number;
-  agressivo: number;
+  combativo: number;
 };
 
 export type ZagArchetypeRatings = {
-  rebatedor: number;
+  defensor_area: number;
   construtor: number;
-  agressivo: number;
+  combativo: number;
 };
 
 export type ZagCluster = {
   archetype: ZagArchetype;
   archetype_label: string;
-  is_hybrid: boolean;
+  /** Hierarchical badge when archetype is Construtor. */
+  construtor_badge?: ConstrutorBadge | null;
+  construtor_badge_short?: string | null;
   shares: ZagClusterShares;
   ratings: ZagArchetypeRatings;
 };
@@ -25,7 +29,39 @@ export type ArchetypeTrait = {
   direction: "up" | "down";
 };
 
-export const ZAG_ARCHETYPES: ZagArchetype[] = ["Rebatedor", "Construtor", "Agressivo"];
+export const ZAG_ARCHETYPES: ZagArchetype[] = ["Defensor de Área", "Construtor", "Combativo"];
+
+export const CONSTRUTOR_BADGES: ConstrutorBadge[] = ["Construtor Âncora", "Construtor Puro"];
+
+export const CONSTRUTOR_BADGE_META: {
+  badge: ConstrutorBadge;
+  short_label: string;
+  description: string;
+  traits: ArchetypeTrait[];
+}[] = [
+  {
+    badge: "Construtor Âncora",
+    short_label: "Âncora",
+    description: "Constrói com tendência ao passe longo — distribui a partir da defesa.",
+    traits: [
+      { label: "Tendência Longo", direction: "up" },
+      { label: "Passes Longos", direction: "up" },
+      { label: "PTF", direction: "up" },
+      { label: "Passes Progressivos", direction: "down" },
+    ],
+  },
+  {
+    badge: "Construtor Puro",
+    short_label: "Puro",
+    description: "Iniciador de jogo curto e progressivo, sem perfil de distribuidor longo.",
+    traits: [
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "PTF", direction: "up" },
+      { label: "Volume de Passe", direction: "up" },
+      { label: "Tendência Longo", direction: "down" },
+    ],
+  },
+];
 
 export const ZAG_ARCHETYPE_META: {
   archetype: ZagArchetype;
@@ -34,8 +70,8 @@ export const ZAG_ARCHETYPE_META: {
   traits: ArchetypeTrait[];
 }[] = [
   {
-    archetype: "Rebatedor",
-    tone: "rebatedor",
+    archetype: "Defensor de Área",
+    tone: "defensor-area",
     description: "Referência defensiva: rebatidas, bloqueio e duelos aéreos e defensivos.",
     traits: [
       { label: "Rebatidas", direction: "up" },
@@ -57,13 +93,13 @@ export const ZAG_ARCHETYPE_META: {
     ],
   },
   {
-    archetype: "Agressivo",
-    tone: "agressivo",
-    description: "Constrói com envolvimento alto em duelos ofensivos e conduções.",
+    archetype: "Combativo",
+    tone: "combativo",
+    description: "Leitura e contato: duelos defensivos, interceptações e envolvimento alto.",
     traits: [
+      { label: "Duelos Defensivos", direction: "up" },
+      { label: "Interceptações", direction: "up" },
       { label: "Duelos Ofensivos", direction: "up" },
-      { label: "Condução Prog.", direction: "up" },
-      { label: "PTF", direction: "up" },
       { label: "Rebatidas", direction: "down" },
     ],
   },
@@ -77,25 +113,35 @@ export function archetypeMetaFor(archetype: ZagArchetype) {
   return ZAG_ARCHETYPE_META.find((item) => item.archetype === archetype);
 }
 
+export function construtorBadgeMetaFor(badge: ConstrutorBadge) {
+  return CONSTRUTOR_BADGE_META.find((item) => item.badge === badge);
+}
+
 export function archetypeCounts(players: { cluster?: ZagCluster | null }[]) {
   const counts: Record<ZagArchetype, number> = {
-    Rebatedor: 0,
+    "Defensor de Área": 0,
     Construtor: 0,
-    Agressivo: 0,
+    Combativo: 0,
   };
-  let hybrids = 0;
+  const construtorBadges: Record<ConstrutorBadge, number> = {
+    "Construtor Âncora": 0,
+    "Construtor Puro": 0,
+  };
   for (const player of players) {
     if (!player.cluster) continue;
     counts[player.cluster.archetype] = (counts[player.cluster.archetype] ?? 0) + 1;
-    if (player.cluster.is_hybrid) hybrids += 1;
+    if (player.cluster.construtor_badge) {
+      construtorBadges[player.cluster.construtor_badge] =
+        (construtorBadges[player.cluster.construtor_badge] ?? 0) + 1;
+    }
   }
   const total = Object.values(counts).reduce((sum, value) => sum + value, 0);
   const percents: Record<ZagArchetype, number> = {
-    Rebatedor: total ? Math.round((counts.Rebatedor / total) * 100) : 0,
+    "Defensor de Área": total ? Math.round((counts["Defensor de Área"] / total) * 100) : 0,
     Construtor: total ? Math.round((counts.Construtor / total) * 100) : 0,
-    Agressivo: total ? Math.round((counts.Agressivo / total) * 100) : 0,
+    Combativo: total ? Math.round((counts.Combativo / total) * 100) : 0,
   };
-  return { counts, percents, hybrids, total };
+  return { counts, percents, construtorBadges, total };
 }
 
 /** @deprecated use archetypeCounts */

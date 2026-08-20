@@ -630,8 +630,10 @@
 }
 
 .cluster-defensor { --tone: #38bdf8; }
-.cluster-rebatedor { --tone: #38bdf8; }
+.cluster-defensor-area { --tone: #38bdf8; }
 .cluster-construtor { --tone: #34d399; }
+.cluster-combativo { --tone: #fbbf24; }
+.cluster-rebatedor { --tone: #38bdf8; }
 .cluster-agressivo { --tone: #fbbf24; }
 .cluster-hibrido { --tone: #c084fc; }
 
@@ -647,11 +649,18 @@
 }
 
 .cluster-tag-macro,
+.cluster-tag-badge,
 .cluster-tag-micro,
 .cluster-tag-hybrid {
   padding: 0.2rem 0.45rem;
   color: var(--tone);
   background: color-mix(in srgb, var(--tone) 12%, transparent);
+}
+
+.cluster-tag-badge {
+  border-left: 1px solid color-mix(in srgb, var(--tone) 28%, transparent);
+  font-family: "Sora", sans-serif;
+  font-weight: 600;
 }
 
 .cluster-tag-hybrid {
@@ -709,6 +718,18 @@
 
 .cluster-path-desc {
   display: none;
+}
+
+.cluster-badge-hierarchical {
+  font-family: "Sora", sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  color: #6ee7b7;
+  background: color-mix(in srgb, #34d399 18%, transparent);
+  border: 1px solid color-mix(in srgb, #34d399 35%, transparent);
 }
 
 .cluster-hybrid-badge {

@@ -1,4 +1,4 @@
-"""Semantic K=3 archetype clustering for Serie A zagueiros (Wyscout + SofaScore)."""
+"""Semantic archetype tree for Serie A zagueiros (Wyscout + SofaScore)."""
 
 from __future__ import annotations
 
@@ -7,14 +7,13 @@ import pandas as pd
 
 from .sofascore import SS_PATH, SS_STAT_COLS, aggregate_sofascore, match_ss_row
 
-ARCHETYPE_LABELS = ("Rebatedor", "Construtor", "Agressivo")
+ARCHETYPE_LABELS = ("Defensor de Área", "Construtor", "Combativo")
+CONSTRUTOR_BADGE_LABELS = ("Construtor Âncora", "Construtor Puro")
 
-# Primary type when no axis clearly dominates (top share below cutoff).
-HYBRID_TOP_SHARE_CUTOFF = 45.0
-# Minimum gap (pp) between top two shares to avoid hybrid flag.
-HYBRID_GAP_CUTOFF = 12.0
-# Down-weight rebatedor score when PTF is above pool median (avoids false positives).
-REBATEDOR_PTF_PENALTY = 0.65
+# Mean construction z-score above pool → Construtor branch.
+CONSTRUCTION_Z_THRESHOLD = 0.25
+# M4 = (DD + INT) / (Rebatidas + DA) — contact/reading vs line/aerial.
+M4_COMBATIVO_THRESHOLD = 0.60
 
 
 def _build_feature_row(wy_row: pd.Series, ss_row: pd.Series | None) -> dict[str, float]:
@@ -52,8 +51,28 @@ def _softmax_shares(scores: np.ndarray) -> np.ndarray:
     return weights * 100.0
 
 
+def _construction_z(feat_df: pd.DataFrame) -> pd.Series:
+    components = pd.DataFrame(
+        {
+            "ptf": _zscore(feat_df["passes_terco_final"]),
+            "passes": _zscore(feat_df["passes_total_p90"]),
+            "share_prog": _zscore(feat_df["share_prog"]),
+            "conducao": _zscore(feat_df["conducao_prog"]),
+        },
+        index=feat_df.index,
+    )
+    return components.mean(axis=1)
+
+
+def _m4_ratio(feat_df: pd.DataFrame) -> pd.Series:
+    contact = feat_df["duelos_def"] + feat_df["interception_won_p90"]
+    line = feat_df["total_clearance_p90"] + feat_df["duelos_aereos"]
+    denom = line.replace(0, np.nan)
+    return (contact / denom).fillna(0.0)
+
+
 def _axis_scores(feat_df: pd.DataFrame) -> pd.DataFrame:
-    reb = (
+    defensor = (
         _zscore(feat_df["total_clearance_p90"])
         + _zscore(feat_df["outfielder_block_p90"])
         + _zscore(feat_df["duelos_aereos"])
@@ -65,59 +84,86 @@ def _axis_scores(feat_df: pd.DataFrame) -> pd.DataFrame:
         + _zscore(feat_df["share_prog"])
         + _zscore(feat_df["conducao_prog"])
     )
-    agr = (
+    combativo = (
         _zscore(feat_df["duelos_ofensivos"])
         + _zscore(feat_df["conducao_prog"])
         + _zscore(feat_df["passes_terco_final"])
         + _zscore(feat_df["share_prog"])
     )
-    return pd.DataFrame({"Rebatedor": reb, "Construtor": con, "Agressivo": agr}, index=feat_df.index)
+    return pd.DataFrame(
+        {"Defensor de Área": defensor, "Construtor": con, "Combativo": combativo},
+        index=feat_df.index,
+    )
 
 
 def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
+    con_z = _construction_z(feat_df)
+    m4 = _m4_ratio(feat_df)
+    mean_share_long = float(feat_df["share_long"].mean())
+
     axis = _axis_scores(feat_df)
-    ptf_median = float(feat_df["passes_terco_final"].median())
-
-    adjusted = axis.copy()
-    high_ptf = feat_df["passes_terco_final"] >= ptf_median
-    adjusted.loc[high_ptf, "Rebatedor"] *= REBATEDOR_PTF_PENALTY
-
-    share_matrix = _softmax_shares(adjusted.to_numpy())
+    share_matrix = _softmax_shares(axis.to_numpy())
     shares = pd.DataFrame(share_matrix, columns=ARCHETYPE_LABELS, index=feat_df.index)
 
     primaries: list[str] = []
-    hybrids: list[bool] = []
+    labels: list[str] = []
+    badges: list[str | None] = []
+    badge_short: list[str | None] = []
+
     for idx in feat_df.index:
-        row_shares = shares.loc[idx].sort_values(ascending=False)
-        top = str(row_shares.index[0])
-        top_val = float(row_shares.iloc[0])
-        second_val = float(row_shares.iloc[1])
-        gap = top_val - second_val
-        is_hybrid = top_val < HYBRID_TOP_SHARE_CUTOFF or gap < HYBRID_GAP_CUTOFF
-        primaries.append(top)
-        hybrids.append(is_hybrid)
+        cz = float(con_z.loc[idx])
+        m4_val = float(m4.loc[idx])
+        share_long = float(feat_df.loc[idx, "share_long"])
+
+        if cz >= CONSTRUCTION_Z_THRESHOLD:
+            primary = "Construtor"
+            label = primary
+            if share_long > mean_share_long:
+                badge = CONSTRUTOR_BADGE_LABELS[0]
+                badge_short.append("Âncora")
+            else:
+                badge = CONSTRUTOR_BADGE_LABELS[1]
+                badge_short.append("Puro")
+        elif m4_val >= M4_COMBATIVO_THRESHOLD:
+            primary = "Combativo"
+            label = primary
+            badge = None
+            badge_short.append(None)
+        else:
+            primary = "Defensor de Área"
+            label = primary
+            badge = None
+            badge_short.append(None)
+
+        primaries.append(primary)
+        labels.append(label)
+        badges.append(badge)
 
     return pd.DataFrame(
         {
             "cluster_archetype": primaries,
-            "cluster_is_hybrid": hybrids,
-            "cluster_share_rebatedor": shares["Rebatedor"].round(1),
+            "cluster_archetype_label": labels,
+            "cluster_construtor_badge": badges,
+            "cluster_construtor_badge_short": badge_short,
+            "cluster_share_defensor_area": shares["Defensor de Área"].round(1),
             "cluster_share_construtor": shares["Construtor"].round(1),
-            "cluster_share_agressivo": shares["Agressivo"].round(1),
+            "cluster_share_combativo": shares["Combativo"].round(1),
         },
         index=feat_df.index,
     )
 
 
 def apply_zag_hierarchical_clusters(pool: pd.DataFrame) -> pd.DataFrame:
-    """Add cluster_archetype, hybrid flag and per-axis share columns."""
+    """Add cluster_archetype, constructor badge and per-axis share columns."""
     out = pool.copy()
     empty_cols = {
         "cluster_archetype": None,
-        "cluster_is_hybrid": None,
-        "cluster_share_rebatedor": None,
+        "cluster_archetype_label": None,
+        "cluster_construtor_badge": None,
+        "cluster_construtor_badge_short": None,
+        "cluster_share_defensor_area": None,
         "cluster_share_construtor": None,
-        "cluster_share_agressivo": None,
+        "cluster_share_combativo": None,
     }
     if not SS_PATH.exists():
         for col, default in empty_cols.items():
