@@ -476,8 +476,9 @@
   font-size: 0.8rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: var(--tier-color);
-  background: var(--tier-soft);
+  color: var(--rating-accent, var(--tier-color));
+  background: color-mix(in srgb, var(--rating-accent, var(--tier-color)) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rating-accent, var(--tier-color)) 32%, transparent);
   align-self: center;
 }
 
@@ -1280,9 +1281,39 @@
   color: #eef4fb;
 }
 
-.dossier-minutes-inline {
-  display: grid;
-  gap: 0.28rem;
+.dossier-rating-gradient .dossier-rating-ring-fill {
+  stroke: var(--rating-accent, var(--tier-color));
+}
+
+.dossier-rating-gradient .dossier-rating-value {
+  color: var(--rating-accent, var(--tier-color));
+}
+
+.bar-item-minutes {
+  min-width: 8.5rem;
+}
+
+.dossier-bar-minutes-track {
+  height: 4px;
+  margin-top: 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.dossier-bar-minutes-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(94, 234, 212, 0.45), var(--accent));
+}
+
+.bar-minutes-pct {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.62rem;
+  font-style: normal;
+  color: var(--text-3);
 }
 
 .dossier-minutes-head {
@@ -1317,9 +1348,104 @@
 
 .dossier-profile-row {
   display: grid;
-  grid-template-columns: minmax(240px, 0.85fr) minmax(0, 1.15fr);
+  grid-template-columns: minmax(240px, 0.82fr) minmax(0, 1.18fr);
   gap: 0.85rem;
   align-items: stretch;
+}
+
+.dossier-profile-col {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+}
+
+.dossier-profile-col-bars {
+  gap: 0.65rem;
+}
+
+.archetype-radar {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.75rem 0.85rem 0.8rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(360px 180px at 50% 0%, rgba(56, 189, 248, 0.05), transparent 72%),
+    linear-gradient(180deg, #10161f 0%, #0b1017 100%);
+}
+
+.archetype-radar-svg {
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
+  display: block;
+}
+
+.archetype-radar-grid {
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 1;
+}
+
+.archetype-radar-spoke {
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 1;
+}
+
+.archetype-radar-fill {
+  fill: rgba(94, 234, 212, 0.16);
+  stroke: rgba(94, 234, 212, 0.72);
+  stroke-width: 1.6;
+  filter: drop-shadow(0 0 10px rgba(94, 234, 212, 0.18));
+}
+
+.archetype-radar-dot {
+  fill: var(--tone);
+  stroke: rgba(255, 255, 255, 0.92);
+  stroke-width: 1.2;
+}
+
+.archetype-radar-label {
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  fill: var(--tone);
+  font-family: "Sora", sans-serif;
+}
+
+.archetype-radar-legend {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.archetype-radar-legend li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+  padding: 0.35rem 0.45rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 0.62rem;
+  color: var(--text-3);
+}
+
+.archetype-radar-legend li.active {
+  border-color: rgba(94, 234, 212, 0.28);
+  background: rgba(94, 234, 212, 0.06);
+}
+
+.archetype-radar-legend strong {
+  font-family: "Sora", sans-serif;
+  font-size: 0.82rem;
+  color: #eef4fb;
+}
+
+.aspect-group-def {
+  margin-top: 0;
 }
 
 .archetype-mix-card {
@@ -2453,13 +2579,11 @@
   height: 0.55rem;
   border-radius: 999px;
   overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .constr-gradient-fill {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #f5d6d6 0%, #e8edd8 48%, #b8d4bc 100%);
+  display: none;
 }
 
 .constr-gradient-track::after {
@@ -2701,18 +2825,36 @@
 }
 
 .aspect-stat-bar {
-  height: 4px;
+  height: 6px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
 }
 
 .aspect-stat-bar i {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--tier-color);
-  opacity: 0.85;
+  background: linear-gradient(90deg, #f5a8a8 0%, #efe5b0 50%, #8ecf9a 100%);
+  opacity: 0.95;
+}
+
+.aspect-stat-bar-gradient {
+  position: relative;
+}
+
+.aspect-stat-bar-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #f5a8a8 0%, #efe5b0 50%, #8ecf9a 100%);
+  opacity: 0.18;
+}
+
+.aspect-metric-bar i {
+  box-shadow: 0 0 8px color-mix(in srgb, #8ecf9a 28%, transparent);
 }
 
 /* Pass aspects — certos/90 bar + accuracy badge */

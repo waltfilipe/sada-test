@@ -111,6 +111,44 @@ export function clampPercent(value: number): number {
   return Math.max(0, Math.min(100, value));
 }
 
+/** Pastel red → green gradient for percentile stat bars. */
+export const STAT_BAR_GRADIENT =
+  "linear-gradient(90deg, #f5a8a8 0%, #efe5b0 50%, #8ecf9a 100%)";
+
+/** Blue → red spectrum for construction / defensive profile bars. */
+export const SPECTRUM_BAR_GRADIENT =
+  "linear-gradient(90deg, #4a8fd8 0%, #9e6bb8 50%, #d95555 100%)";
+
+function lerpChannel(a: number, b: number, t: number): number {
+  return Math.round(a + (b - a) * t);
+}
+
+/** Rating colour on a red → dark-green scale (5–10). */
+export function ratingGradientColor(rating: number, max = 10): string {
+  const t = clampPercent(((rating - 5) / (max - 5)) * 100) / 100;
+  const r = lerpChannel(239, 22, t);
+  const g = lerpChannel(107, 101, t);
+  const b = lerpChannel(107, 52, t);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+export function ratingGradientStyle(rating: number, max = 10): CSSProperties {
+  const color = ratingGradientColor(rating, max);
+  return {
+    color,
+    ["--rating-accent" as string]: color,
+    ["--tier-color" as string]: color,
+    ["--rating-glow" as string]: `color-mix(in srgb, ${color} 35%, transparent)`,
+  };
+}
+
+export function percentileBarFillStyle(pct: number): CSSProperties {
+  return {
+    width: `${clampPercent(pct)}%`,
+    background: STAT_BAR_GRADIENT,
+  };
+}
+
 /** Inline CSS custom properties so a component can theme itself from a tier. */
 export function tierVars(token: TierToken): CSSProperties {
   return {

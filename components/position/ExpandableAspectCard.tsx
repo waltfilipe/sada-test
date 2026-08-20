@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 
 import { resolveAspectBadge } from "@/lib/aspectBadges";
-import { clampPercent, percentileTier, tierVars } from "@/lib/scoutTheme";
+import { clampPercent, percentileBarFillStyle } from "@/lib/scoutTheme";
 import type { AspectItem } from "@/lib/types";
 import { AccuracyBadge } from "./AccuracyBadge";
 
@@ -26,16 +26,14 @@ function MetricBar({
   value?: string;
   muted?: boolean;
 }) {
-  const token = percentileTier(pct);
-
   return (
-    <div className={`aspect-bar-row ${muted ? "aspect-bar-row-muted" : ""}`} style={tierVars(token)}>
+    <div className={`aspect-bar-row ${muted ? "aspect-bar-row-muted" : ""}`}>
       <div className="aspect-bar-head">
         <span className="aspect-bar-label">{label}</span>
         <span className="aspect-bar-value">{value ?? "—"}</span>
       </div>
-      <div className="aspect-stat-bar aspect-metric-bar" aria-hidden>
-        <i style={{ width: `${clampPercent(pct)}%` }} />
+      <div className="aspect-stat-bar aspect-metric-bar aspect-stat-bar-gradient" aria-hidden>
+        <i style={percentileBarFillStyle(pct)} />
       </div>
     </div>
   );

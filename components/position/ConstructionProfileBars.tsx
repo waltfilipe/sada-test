@@ -1,6 +1,6 @@
 "use client";
 
-import { clampPercent } from "@/lib/scoutTheme";
+import { clampPercent, SPECTRUM_BAR_GRADIENT } from "@/lib/scoutTheme";
 import type { AspectItem } from "@/lib/types";
 
 function formatPct(value: number, decimals = 0): string {
@@ -41,22 +41,32 @@ function ShareBarClassic({ item }: { item: AspectItem }) {
 
 function GradientShareBar({ item }: { item: AspectItem }) {
   const share = item.share_pct ?? 0;
-  const scale = Math.max(item.scale_max_pct ?? 24, 1);
+  const scale = Math.max(item.scale_max_pct ?? 100, 1);
   const playerPos = clampPercent((share / scale) * 100);
   const isPassTendency = item.bar_key === "pass_tendency";
+  const isDefensive = item.bar_key === "def_contact_style" || item.bar_key === "def_foul_style";
   const tooltipText = isPassTendency
     ? `${formatPct(share, 1)} de passes longos`
-    : `${formatPct(share, 1)} de passes progressivos`;
+    : isDefensive
+      ? `${formatPct(share, 1)} no espectro`
+      : `${formatPct(share, 1)} de passes progressivos`;
 
   return (
-    <div className={`constr-gradient-bar ${isPassTendency ? "is-pass-tendency" : "is-progressive"}`}>
+    <div
+      className={[
+        "constr-gradient-bar",
+        isPassTendency ? "is-pass-tendency" : "",
+        isDefensive ? "is-defensive" : "is-progressive",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <div className="constr-share-head">
         <span className="constr-share-label">{item.label}</span>
       </div>
 
       <div className="constr-gradient-tip-wrap">
-        <div className="constr-gradient-track" aria-hidden>
-          <span className="constr-gradient-fill" />
+        <div className="constr-gradient-track" aria-hidden style={{ background: SPECTRUM_BAR_GRADIENT }}>
           <span className="constr-gradient-marker" style={{ left: `${playerPos}%` }} />
         </div>
         <span className="constr-gradient-tip" role="tooltip">
@@ -73,21 +83,32 @@ function GradientShareBar({ item }: { item: AspectItem }) {
   );
 }
 
-export function ConstructionProfileBars({ items }: { items: AspectItem[] }) {
+type Props = {
+  items: AspectItem[];
+  embedded?: boolean;
+};
+
+export function ConstructionProfileBars({ items, embedded = false }: Props) {
+  const stack = (
+    <div className="constr-share-stack">
+      {items.map((item) =>
+        item.bar_key ? (
+          <GradientShareBar key={item.label} item={item} />
+        ) : (
+          <ShareBarClassic key={item.label} item={item} />
+        ),
+      )}
+    </div>
+  );
+
+  if (embedded) return stack;
+
   return (
     <article className="aspect-group aspect-group-constr">
       <header>
         <h3>Perfil de construção</h3>
       </header>
-      <div className="constr-share-stack">
-        {items.map((item) =>
-          item.bar_key ? (
-            <GradientShareBar key={item.label} item={item} />
-          ) : (
-            <ShareBarClassic key={item.label} item={item} />
-          ),
-        )}
-      </div>
+      {stack}
     </article>
   );
 }

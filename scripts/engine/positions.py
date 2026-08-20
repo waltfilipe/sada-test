@@ -899,6 +899,18 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     out["_scale_share_long"] = scale_long
     out["_scale_share_prog"] = scale_prog
 
+    line_def = da_won + _ss_clearance_col(out)
+    contact_def = dd_won + _ss_inter_col(out)
+    style_total = line_def + contact_def
+    contact_share = (contact_def / style_total.replace(0, np.nan)).fillna(0.5) * 100.0
+    faltas = pd.to_numeric(out.get("Faltas/90", 0), errors="coerce").fillna(0)
+    foul_denom = faltas + out["_acoes_def_comp"].astype(float)
+    foul_share = (faltas / foul_denom.replace(0, np.nan)).fillna(0.0) * 100.0
+    out["_def_contact_pct"] = contact_share.astype(float)
+    out["_def_foul_pct"] = foul_share.astype(float)
+    out["_pool_avg_def_contact"] = float(contact_share.mean())
+    out["_pool_avg_def_foul"] = float(foul_share.mean())
+
     mappings: dict[str, pd.Series] = {
         "duelos_def_vol": _pool_percentile(out, "Duelos defensivos/90", "DuelosDef"),
         "duelos_def_eff": _pct_eff(out, "Duelos defensivos ganhos, %", "%DuelosDefW"),
@@ -1144,6 +1156,32 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 axis_right="Alto" if family_key == "zagueiros" else None,
             ),
         ],
+        "perfil_defensivo": (
+            [
+                _construction_share_aspect(
+                    "Estilo de defesa",
+                    share_pct=float(row.get("_def_contact_pct", 0)),
+                    pool_avg_pct=float(row.get("_pool_avg_def_contact", 0)),
+                    scale_max_pct=100.0,
+                    percentile=row.get("_asp_ad_vol", 0),
+                    bar_key="def_contact_style",
+                    axis_left="Cobertura",
+                    axis_right="Agressivo",
+                ),
+                _construction_share_aspect(
+                    "Disciplina defensiva",
+                    share_pct=float(row.get("_def_foul_pct", 0)),
+                    pool_avg_pct=float(row.get("_pool_avg_def_foul", 0)),
+                    scale_max_pct=100.0,
+                    percentile=row.get("_asp_custo_def_eff", 0),
+                    bar_key="def_foul_style",
+                    axis_left="Eficiente",
+                    axis_right="Faltoso",
+                ),
+            ]
+            if family_key == "zagueiros"
+            else []
+        ),
         "ofensivos": [
             _metric_aspect(
                 "Duelos Ofensivos",

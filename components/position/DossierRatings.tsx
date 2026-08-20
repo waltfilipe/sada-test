@@ -1,27 +1,14 @@
 "use client";
 
-import type { CSSProperties } from "react";
-
 import { profileMetaForFamily } from "@/lib/profileMeta";
-import { clampPercent, formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
+import {
+  clampPercent,
+  formatRating,
+  ratingGradientStyle,
+  ratingTier,
+  tierVars,
+} from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
-
-function ratingAccentStyle(value: number, rank: number): CSSProperties {
-  const token = ratingTier(value);
-  const tierColor = tierVars(token)["--tier-color" as keyof ReturnType<typeof tierVars>] as string;
-
-  if (rank <= 5) {
-    return {
-      ["--rating-accent" as string]: "#93c5fd",
-      ["--rating-glow" as string]: "rgba(96, 165, 250, 0.35)",
-    };
-  }
-
-  return {
-    ["--rating-accent" as string]: tierColor ?? "#34d399",
-    ["--rating-glow" as string]: "rgba(52, 211, 153, 0.22)",
-  };
-}
 
 function secondaryAxes(family: PositionFamily) {
   if (family === "zagueiros") return [];
@@ -43,13 +30,13 @@ export function DossierRatings({ player, poolSize, family }: Props) {
   const geralToken = ratingTier(geral);
   const percentile = poolSize > 0 ? Math.max(1, 100 - Math.round(((poolSize - geralRank) / poolSize) * 100)) : 0;
   const axes = secondaryAxes(family);
-  const minutesPct = player.minutes_pct ?? null;
+  const ratingStyle = ratingGradientStyle(geral);
 
   return (
     <div className={`dossier-ratings ${axes.length === 0 ? "dossier-ratings-solo" : ""}`}>
       <article
-        className="dossier-rating-hero dossier-rating-hero-modern"
-        style={{ ...tierVars(geralToken), ...ratingAccentStyle(geral, geralRank) }}
+        className="dossier-rating-hero dossier-rating-hero-modern dossier-rating-gradient"
+        style={{ ...tierVars(geralToken), ...ratingStyle }}
       >
         <div className="dossier-rating-ring" aria-hidden>
           <svg viewBox="0 0 120 120">
@@ -75,17 +62,6 @@ export function DossierRatings({ player, poolSize, family }: Props) {
             <span className="dossier-rating-rank">#{geralRank}</span>
             <span>Top {percentile}%</span>
           </div>
-          {minutesPct != null ? (
-            <div className="dossier-minutes-inline">
-              <div className="dossier-minutes-head">
-                <span>{player.minutes.toLocaleString("pt-BR")} min</span>
-                <strong>{minutesPct.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%</strong>
-              </div>
-              <div className="dossier-minutes-track" aria-hidden>
-                <i style={{ width: `${clampPercent(minutesPct)}%` }} />
-              </div>
-            </div>
-          ) : null}
         </div>
       </article>
 
@@ -95,12 +71,13 @@ export function DossierRatings({ player, poolSize, family }: Props) {
             const value = player.ratings[axis.key] ?? 0;
             const rank = player.ranks[axis.key] ?? poolSize;
             const token = ratingTier(value);
+            const axisStyle = ratingGradientStyle(value);
 
             return (
               <article
                 key={axis.key}
-                className={`dossier-rating-axis ${rank <= 5 ? "is-top5" : ""}`}
-                style={{ ...tierVars(token), ...ratingAccentStyle(value, rank) }}
+                className={`dossier-rating-axis dossier-rating-gradient ${rank <= 5 ? "is-top5" : ""}`}
+                style={{ ...tierVars(token), ...axisStyle }}
               >
                 <div className="dossier-rating-axis-head">
                   <span className="dossier-rating-label">{axis.label}</span>
@@ -108,7 +85,7 @@ export function DossierRatings({ player, poolSize, family }: Props) {
                 </div>
                 <strong className="dossier-rating-axis-value">{formatRating(value)}</strong>
                 <div className="dossier-rating-meter meter meter-sm">
-                  <i style={{ width: `${clampPercent(value * 10)}%`, background: "var(--rating-accent, var(--tier-color))" }} />
+                  <i style={{ width: `${clampPercent(value * 10)}%`, background: axisStyle.color }} />
                 </div>
               </article>
             );

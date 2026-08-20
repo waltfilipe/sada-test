@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ZAG_ARCHETYPE_META, CONSTRUTOR_BADGE_META } from "@/lib/clusterMeta";
+import { ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
 import { ClubLogo } from "@/components/ClubLogo";
-import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
+import { formatRating, playerInitials, ratingGradientStyle } from "@/lib/scoutTheme";
 import { profileTone, sortPlayers } from "@/lib/scoutUi";
 import { playerMatchesClusterFilter } from "./ArchetypeMixCard";
 import type { PlayerProfile } from "@/lib/types";
@@ -107,20 +107,6 @@ export function RosterRail({
                   </button>
                 ))}
               </div>
-              <div className="cluster-filter-row" role="group" aria-label="Filtrar badge de construtor">
-                {CONSTRUTOR_BADGE_META.map((item) => (
-                  <button
-                    key={item.badge}
-                    type="button"
-                    className={`filter-chip cluster-construtor ${clusterFilters.includes(item.badge) ? "active" : ""}`}
-                    onClick={() => onToggleClusterFilter(item.badge)}
-                    aria-pressed={clusterFilters.includes(item.badge)}
-                    title={item.description}
-                  >
-                    {item.short_label}
-                  </button>
-                ))}
-              </div>
             </div>
           ) : (
             profilesAvailable.map((profile) => (
@@ -145,7 +131,7 @@ export function RosterRail({
 
         <div className="roster-list">
           {visible.map((player, index) => {
-            const token = ratingTier(player.rating);
+            const ratingStyle = ratingGradientStyle(player.rating);
             const active = player.player_id === selectedId;
 
             return (
@@ -153,7 +139,7 @@ export function RosterRail({
                 key={player.player_id}
                 type="button"
                 className={`roster-item ${active ? "active" : ""}`}
-                style={tierVars(token)}
+                style={ratingStyle}
                 onClick={() => onSelect(player.player_id)}
                 aria-current={active}
               >

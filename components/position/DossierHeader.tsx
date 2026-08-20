@@ -93,6 +93,24 @@ export function DossierHeader({ player, poolSize, family }: Props) {
             <span>Assistências</span>
             <strong>{player.assists}</strong>
           </div>
+          <div className="bar-item bar-item-minutes">
+            <span>Minutos</span>
+            <strong>{player.minutes.toLocaleString("pt-BR")}</strong>
+            {player.minutes_pct != null ? (
+              <div className="dossier-bar-minutes-track" aria-hidden>
+                <i style={{ width: `${Math.max(0, Math.min(100, player.minutes_pct))}%` }} />
+              </div>
+            ) : null}
+            {player.minutes_pct != null ? (
+              <em className="bar-minutes-pct">
+                {player.minutes_pct.toLocaleString("pt-BR", {
+                  minimumFractionDigits: 1,
+                  maximumFractionDigits: 1,
+                })}
+                % da temporada
+              </em>
+            ) : null}
+          </div>
         </div>
 
         <div className="bar-actions">

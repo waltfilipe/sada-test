@@ -37,7 +37,7 @@ export type AspectItem = {
   /** Max % shown on the construction bar scale. */
   scale_max_pct?: number;
   /** Gradient bar variant for perfil de construção. */
-  bar_key?: "pass_tendency" | "progressive_share";
+  bar_key?: "pass_tendency" | "progressive_share" | "def_contact_style" | "def_foul_style";
   axis_left?: string;
   axis_right?: string;
   efficiency_pct?: number;
@@ -118,6 +118,7 @@ export type PlayerProfile = PlayerSummary & {
     defensivos: AspectItem[];
     construcao: AspectItem[];
     perfil_construcao: AspectItem[];
+    perfil_defensivo?: AspectItem[];
     ofensivos: AspectItem[];
   };
   profiles_available: string[];
