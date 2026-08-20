@@ -16,6 +16,7 @@ from .normalize import (
     zscore_linear_100,
 )
 from .profiles import FAMILY_PROFILE_CONFIG, profile_ratings_from_row, profile_ranks_from_row, profile_shares_from_row
+from .lat_hierarchy import apply_lat_hierarchical_clusters
 from .zag_hierarchy import apply_zag_hierarchical_clusters
 
 
@@ -31,8 +32,8 @@ POSITION_FAMILIES: dict[str, dict[str, Any]] = {
     "laterais": {
         "label": "Laterais",
         "positions": ["Lateral Direito", "Lateral Esquerdo"],
-        "profiles": ["Defensivo", "Construtor", "Ofensivo", "Vertical", "Híbrido"],
-        "profile_map": {"defensivo": "Defensivo", "construtor": "Construtor", "ofensivo": "Ofensivo", "vertical": "Vertical"},
+        "profiles": ["Defensivo", "Construtor", "Ofensivo", "Híbrido"],
+        "profile_map": {"defensivo": "Defensivo", "construtor": "Construtor", "ofensivo": "Ofensivo"},
     },
     "meio-campistas": {
         "label": "Meio-campistas",
@@ -747,6 +748,61 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def _compute_lat_indices(pool: pd.DataFrame) -> pd.DataFrame:
+    out = pool.copy()
+    out["CorridasProg"] = pd.to_numeric(out.get("Corridas progressivas/90"), errors="coerce").fillna(0)
+    out["DuelosOfRaw"] = pd.to_numeric(out.get("Duelos ofensivos/90"), errors="coerce").fillna(0)
+    out["AcoesAtW"] = pd.to_numeric(out.get("Acções atacantes com sucesso/90"), errors="coerce").fillna(0)
+    out = apply_lat_hierarchical_clusters(out)
+
+    out["_minutes_pool_pct"] = _minutes_pool_pct(out)
+    out["pct_defensivo"] = percentile_rank(out["lat_z_def"], ascending=True) / 100.0
+    out["pct_construtor"] = percentile_rank(out["lat_z_con"], ascending=True) / 100.0
+    out["pct_ofensivo"] = percentile_rank(out["lat_z_off"], ascending=True) / 100.0
+
+    def _lat_axis_rating(z_col: str) -> pd.Series:
+        pct = percentile_rank(out[z_col], ascending=True)
+        raw = 5 + pct * 0.045 * 0.88 * (1 + out["%Minutos"] * 0.15)
+        return out.apply(
+            lambda row: _apply_confidence_to_rating(float(raw.loc[row.name]), float(row["_minutes_pool_pct"])),
+            axis=1,
+        )
+
+    out["rating_defensivo_raw"] = _lat_axis_rating("lat_z_def")
+    out["rating_construtor_raw"] = _lat_axis_rating("lat_z_con")
+    out["rating_ofensivo_raw"] = _lat_axis_rating("lat_z_off")
+    out["rating_defensivo"] = _round_rating_raw(out["rating_defensivo_raw"])
+    out["rating_construtor"] = _round_rating_raw(out["rating_construtor_raw"])
+    out["rating_ofensivo"] = _round_rating_raw(out["rating_ofensivo_raw"])
+
+    core_pct = (
+        out["pct_defensivo"] * 0.30 + out["pct_construtor"] * 0.35 + out["pct_ofensivo"] * 0.35
+    ) * 100.0
+    out["rating_geral_raw"] = out.apply(
+        lambda row: _apply_confidence_to_rating(
+            _zag_apply_minutes_shrinkage(5.0 + float(core_pct.loc[row.name]) / 100.0 * 4.5, row["%Minutos"]),
+            row["_minutes_pool_pct"],
+        ),
+        axis=1,
+    )
+    out["rating_geral"] = out["rating_geral_raw"].round(1)
+    out["perfil"] = out["cluster_archetype"]
+
+    out["n_construcao"] = percentile_rank(out["lat_z_con"], ascending=True)
+    out["n_conducao"] = percentile_rank(out["lat_z_off"], ascending=True)
+    out["n_duelos_def"] = percentile_rank(out["lat_z_def"], ascending=True)
+    out["n_leitura_def"] = percentile_rank(out["LeituraDef."], ascending=True)
+    out["n_duelo_ar"] = percentile_rank(out["DuelosAr"] * out["%DuelosAr"], ascending=True)
+
+    out = attach_aspect_percentiles(out)
+
+    out["rank_geral"] = rank_players(out["rating_geral"])
+    out["rank_defensivo"] = rank_players(out["rating_defensivo"])
+    out["rank_construtor"] = rank_players(out["rating_construtor"])
+    out["rank_ofensivo"] = rank_players(out["rating_ofensivo"])
+    return out
+
+
 def _compute_generic_ratings(pool: pd.DataFrame, prefix: str) -> pd.DataFrame:
     out = pool.copy()
     out["_minutes_pool_pct"] = _minutes_pool_pct(out)
@@ -802,6 +858,8 @@ def compute_family_metrics(df: pd.DataFrame, family_key: str) -> pd.DataFrame:
         return pool
     if family_key == "zagueiros":
         return _compute_zag_indices(pool)
+    if family_key == "laterais":
+        return _compute_lat_indices(pool)
     return FAMILY_PROFILE_CONFIG[family_key].compute_indices(pool)
 
 
@@ -942,6 +1000,18 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "tend_long": percentile_rank(share_long.fillna(0), ascending=True),
         "tend_prog": percentile_rank(share_prog.fillna(0), ascending=True),
         "tend_lat": percentile_rank(lat_ratio.fillna(0), ascending=True),
+        "passes_total_vol": _pool_percentile(out, "Passes/90", "Passe"),
+        "rec_passes_vol": _pool_percentile(out, "Passes recebidos/90", "RecPasse"),
+        "acel_vol": _pool_percentile(out, "Acelerações/90", "Acelerações"),
+        "dribles_vol": _pool_percentile(out, "Dribles/90", "Dribles"),
+        "dribles_eff": _pct_eff(out, "Dribles com sucesso, %", "%EffDribles"),
+        "cruz_vol": _pool_percentile(out, "Cruzamentos/90", "Cruz."),
+        "cruz_eff": _pct_eff(out, "Cruzamentos certos, %", "%EffCruz."),
+        "passes_chave_vol": _pool_percentile(out, "Passes chave/90", "PassesChave"),
+        "passe_area_certos90": _pool_percentile(out, "PasseAreaW"),
+        "acoes_at_vol": _pool_percentile(out, "Acções atacantes com sucesso/90", "AcoesAtW", "AçõesAtW"),
+        "toques_area_vol": _pool_percentile(out, "Toques na área/90", "ToquesArea"),
+        "cond_prog_vol": _pool_percentile(out, "Cond.Prog"),
     }
     for key, series in mappings.items():
         out[f"_asp_{key}"] = series
@@ -980,6 +1050,38 @@ def _row_vol(row: pd.Series, *keys: str) -> float:
         if key in row.index and pd.notna(row.get(key)):
             return float(row[key])
     return 0.0
+
+
+def _sub_metric(label: str, *, percentile: Any, display_value: str | None = None) -> dict[str, Any]:
+    return {
+        "label": label,
+        "percentile": round(float(percentile or 0), 1),
+        "display_value": display_value,
+    }
+
+
+def _metric_group_aspect(
+    label: str,
+    *,
+    percentile: Any,
+    sub_metrics: list[dict[str, Any]],
+    eff_pct: Any = None,
+    eff_display: str | None = None,
+) -> dict[str, Any]:
+    pct = round(float(percentile or 0), 1)
+    item: dict[str, Any] = {
+        "label": label,
+        "kind": "metric_group",
+        "grade": _grade_from_pct(pct),
+        "percentile": pct,
+        "sub_metrics": sub_metrics,
+        "stats": [],
+    }
+    if eff_pct is not None:
+        item["efficiency_pct"] = round(float(eff_pct), 1)
+        if eff_display:
+            item["efficiency_value"] = eff_display
+    return item
 
 
 def _metric_aspect(
@@ -1063,14 +1165,6 @@ def _pass_aspect(
     }
 
 
-def _sub_metric(label: str, *, percentile: Any, display_value: str | None = None) -> dict[str, Any]:
-    return {
-        "label": label,
-        "percentile": round(float(percentile or 0), 1),
-        "display_value": display_value,
-    }
-
-
 def _def_efficiency_group_aspect(row: pd.Series, *, inter: float, cortes: float) -> dict[str, Any]:
     eff_pct = round(float(row.get("_asp_custo_def_eff", 0) or 0), 1)
     ad_pct = round(float(row.get("_asp_ad_vol", 0) or 0), 1)
@@ -1102,30 +1196,14 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
     do_vol = _row_vol(row, "DuelosOf", "Duelos ofensivos/90")
     inter = float(row.get("interception_won_p90") or row.get("Interseções") or 0)
     cortes = float(row.get("total_clearance_p90") or row.get("Carrinhos") or 0)
-    prog = float(row.get("Cond.Prog") or row.get("Corridas progressivas/90") or 0)
+    prog = float(row.get("Cond.Prog") or 0)
+    accel = _row_vol(row, "Acelerações", "Acelerações/90")
     pp_e = row.get("_asp_passes_prog_eff", 0)
     ptf_e = row.get("_asp_ptf_eff", 0)
     pl_e = row.get("_asp_passes_long_eff", 0)
+    spectrum_family = family_key in ("zagueiros", "laterais")
 
-    return {
-        "defensivos": [
-            _metric_aspect(
-                "Duelos Defensivos",
-                percentile=row.get("_asp_duelos_def_vol", 0),
-                display_value=_fmt_per90(dd_vol),
-                eff_pct=row.get("_asp_duelos_def_eff", 0),
-                eff_display=_raw_eff_display(row, "Duelos defensivos ganhos, %", "%DuelosDefW"),
-            ),
-            _metric_aspect(
-                "Duelos Aéreos",
-                percentile=row.get("_asp_duelos_ar_vol", 0),
-                display_value=_fmt_per90(da_vol),
-                eff_pct=row.get("_asp_duelos_ar_eff", 0),
-                eff_display=_raw_eff_display(row, "Duelos aéreos ganhos, %", "%DuelosAr"),
-            ),
-            _def_efficiency_group_aspect(row, inter=inter, cortes=cortes),
-        ],
-        "construcao": [
+    construcao = [
             _pass_aspect(
                 "Passes Progressivos",
                 vol_per90=_row_vol(row, "PassesProg", "Passes progressivos/90"),
@@ -1147,17 +1225,102 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 eff_pct=pl_e,
                 eff_display=_raw_eff_display(row, "Passes longos certos, %", "%EffPassesLng"),
             ),
+        ]
+    if family_key == "laterais":
+        construcao.append(
+            _metric_group_aspect(
+                "Distribuição",
+                percentile=row.get("_asp_passes_total_vol", 0),
+                sub_metrics=[
+                    _sub_metric(
+                        "Passes/90",
+                        percentile=row.get("_asp_passes_total_vol", 0),
+                        display_value=_fmt_per90(_row_vol(row, "Passe", "Passes/90")),
+                    ),
+                    _sub_metric(
+                        "Passes Recebidos/90",
+                        percentile=row.get("_asp_rec_passes_vol", 0),
+                        display_value=_fmt_per90(_row_vol(row, "RecPasse", "Passes recebidos/90")),
+                    ),
+                ],
+            )
+        )
+
+    ofensivos = [
+        _metric_aspect(
+            "Duelos Ofensivos",
+            percentile=row.get("_asp_duelos_of_vol", 0),
+            display_value=_fmt_per90(do_vol),
+            eff_pct=row.get("_asp_duelos_of_eff", 0),
+            eff_display=_raw_eff_display(row, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
+        ),
+    ]
+    if family_key == "laterais":
+        ofensivos.extend(
+            [
+                _metric_group_aspect(
+                    "Progressão",
+                    percentile=max(float(row.get("_asp_cond_prog_vol", 0) or 0), float(row.get("_asp_acel_vol", 0) or 0)),
+                    sub_metrics=[
+                        _sub_metric(
+                            "Conduções Progressivas/90",
+                            percentile=row.get("_asp_cond_prog_vol", 0),
+                            display_value=_fmt_num(prog),
+                        ),
+                        _sub_metric(
+                            "Acelerações/90",
+                            percentile=row.get("_asp_acel_vol", 0),
+                            display_value=_fmt_per90(accel),
+                        ),
+                    ],
+                ),
+                _metric_aspect(
+                    "Dribles",
+                    percentile=row.get("_asp_dribles_vol", 0),
+                    display_value=_fmt_per90(_row_vol(row, "Dribles", "Dribles/90")),
+                    eff_pct=row.get("_asp_dribles_eff", 0),
+                    eff_display=_raw_eff_display(row, "Dribles com sucesso, %", "%EffDribles"),
+                ),
+            ]
+        )
+    else:
+        ofensivos.append(
+            _metric_aspect(
+                "Conduções Progressivas",
+                percentile=row.get("_asp_prog_vol", 0),
+                display_value=_fmt_num(prog),
+            )
+        )
+
+    aspects: dict[str, list[dict[str, Any]]] = {
+        "defensivos": [
+            _metric_aspect(
+                "Duelos Defensivos",
+                percentile=row.get("_asp_duelos_def_vol", 0),
+                display_value=_fmt_per90(dd_vol),
+                eff_pct=row.get("_asp_duelos_def_eff", 0),
+                eff_display=_raw_eff_display(row, "Duelos defensivos ganhos, %", "%DuelosDefW"),
+            ),
+            _metric_aspect(
+                "Duelos Aéreos",
+                percentile=row.get("_asp_duelos_ar_vol", 0),
+                display_value=_fmt_per90(da_vol),
+                eff_pct=row.get("_asp_duelos_ar_eff", 0),
+                eff_display=_raw_eff_display(row, "Duelos aéreos ganhos, %", "%DuelosAr"),
+            ),
+            _def_efficiency_group_aspect(row, inter=inter, cortes=cortes),
         ],
+        "construcao": construcao,
         "perfil_construcao": [
             _construction_share_aspect(
-                "Tendência de Passe" if family_key == "zagueiros" else "Passes Longos",
+                "Tendência de Passe" if spectrum_family else "Passes Longos",
                 share_pct=float(row.get("_share_long_pct", 0)),
                 pool_avg_pct=float(row.get("_pool_avg_share_long", 0)),
                 scale_max_pct=24.0 if family_key == "zagueiros" else float(row.get("_scale_share_long", 40)),
                 percentile=row.get("_asp_tend_long", 0),
-                bar_key="pass_tendency" if family_key == "zagueiros" else None,
-                axis_left="Curto" if family_key == "zagueiros" else None,
-                axis_right="Longo" if family_key == "zagueiros" else None,
+                bar_key="pass_tendency" if spectrum_family else None,
+                axis_left="Curto" if spectrum_family else None,
+                axis_right="Longo" if spectrum_family else None,
             ),
             _construction_share_aspect(
                 "Passes Progressivos",
@@ -1165,9 +1328,9 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 pool_avg_pct=float(row.get("_pool_avg_share_prog", 0)),
                 scale_max_pct=float(row.get("_scale_share_prog", 40)),
                 percentile=row.get("_asp_tend_prog", 0),
-                bar_key="progressive_share" if family_key == "zagueiros" else None,
-                axis_left="Baixo" if family_key == "zagueiros" else None,
-                axis_right="Alto" if family_key == "zagueiros" else None,
+                bar_key="progressive_share" if spectrum_family else None,
+                axis_left="Baixo" if spectrum_family else None,
+                axis_right="Alto" if spectrum_family else None,
             ),
         ],
         "perfil_defensivo": (
@@ -1194,24 +1357,65 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                     axis_right="Faltoso",
                 ),
             ]
-            if family_key == "zagueiros"
+            if spectrum_family
             else []
         ),
-        "ofensivos": [
-            _metric_aspect(
-                "Duelos Ofensivos",
-                percentile=row.get("_asp_duelos_of_vol", 0),
-                display_value=_fmt_per90(do_vol),
-                eff_pct=row.get("_asp_duelos_of_eff", 0),
-                eff_display=_raw_eff_display(row, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
-            ),
-            _metric_aspect(
-                "Conduções Progressivas",
-                percentile=row.get("_asp_prog_vol", 0),
-                display_value=_fmt_num(prog),
-            ),
-        ],
+        "ofensivos": ofensivos,
     }
+
+    if family_key == "laterais":
+        cruz_vol = _row_vol(row, "Cruz.", "Cruzamentos/90")
+        passe_area = float(row.get("PasseAreaW") or 0)
+        aspects["terco_final"] = [
+            _metric_group_aspect(
+                "Cruzamentos",
+                percentile=row.get("_asp_cruz_vol", 0),
+                eff_pct=row.get("_asp_cruz_eff", 0),
+                eff_display=_raw_eff_display(row, "Cruzamentos certos, %", "%EffCruz."),
+                sub_metrics=[
+                    _sub_metric("Cruzamentos/90", percentile=row.get("_asp_cruz_vol", 0), display_value=_fmt_per90(cruz_vol)),
+                    _sub_metric(
+                        "Eficiência",
+                        percentile=row.get("_asp_cruz_eff", 0),
+                        display_value=_raw_eff_display(row, "Cruzamentos certos, %", "%EffCruz."),
+                    ),
+                ],
+            ),
+            _metric_group_aspect(
+                "Passes Finas",
+                percentile=max(float(row.get("_asp_passes_chave_vol", 0) or 0), float(row.get("_asp_passe_area_certos90", 0) or 0)),
+                sub_metrics=[
+                    _sub_metric(
+                        "Passes Chave/90",
+                        percentile=row.get("_asp_passes_chave_vol", 0),
+                        display_value=_fmt_per90(_row_vol(row, "PassesChave", "Passes chave/90")),
+                    ),
+                    _sub_metric(
+                        "Passes para Área/90",
+                        percentile=row.get("_asp_passe_area_certos90", 0),
+                        display_value=_fmt_per90(passe_area),
+                    ),
+                ],
+            ),
+            _metric_group_aspect(
+                "Ofensividade",
+                percentile=max(float(row.get("_asp_acoes_at_vol", 0) or 0), float(row.get("_asp_toques_area_vol", 0) or 0)),
+                sub_metrics=[
+                    _sub_metric(
+                        "Ações Ofensivas/90",
+                        percentile=row.get("_asp_acoes_at_vol", 0),
+                        display_value=_fmt_per90(_row_vol(row, "AcoesAtW", "Acções atacantes com sucesso/90")),
+                    ),
+                    _sub_metric(
+                        "Toques na Área/90",
+                        percentile=row.get("_asp_toques_area_vol", 0),
+                        display_value=_fmt_per90(_row_vol(row, "ToquesArea", "Toques na área/90")),
+                    ),
+                ],
+            ),
+        ]
+
+    return aspects
 
 
 def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dict[str, Any]:
@@ -1267,6 +1471,7 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
             badge = row.get("cluster_construtor_badge")
             badge_short = row.get("cluster_construtor_badge_short")
             payload["cluster"] = {
+                "family": "zagueiros",
                 "archetype": str(archetype),
                 "archetype_label": str(label if pd.notna(label) and label else archetype),
                 "construtor_badge": str(badge) if pd.notna(badge) and badge else None,
@@ -1280,6 +1485,29 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
                     "defensor_area": round(def_, 1),
                     "construtor": round(con, 1),
                     "combativo": round(0.55 * con + 0.45 * def_, 1),
+                },
+            }
+    if family_key == "laterais":
+        archetype = row.get("cluster_archetype")
+        if pd.notna(archetype) and archetype:
+            badge = row.get("cluster_hybrid_badge")
+            badge_short = row.get("cluster_hybrid_badge_short")
+            label = row.get("cluster_archetype_label")
+            payload["cluster"] = {
+                "family": "laterais",
+                "archetype": str(archetype),
+                "archetype_label": str(label if pd.notna(label) and label else archetype),
+                "hybrid_badge": str(badge) if pd.notna(badge) and badge else None,
+                "hybrid_badge_short": str(badge_short) if pd.notna(badge_short) and badge_short else None,
+                "shares": {
+                    "defensivo": float(row.get("cluster_share_defensivo") or 0),
+                    "construtor": float(row.get("cluster_share_construtor") or 0),
+                    "ofensivo": float(row.get("cluster_share_ofensivo") or 0),
+                },
+                "ratings": {
+                    "defensivo": round(float(row.get("rating_defensivo") or 0), 1),
+                    "construtor": round(float(row.get("rating_construtor") or 0), 1),
+                    "ofensivo": round(float(row.get("rating_ofensivo") or 0), 1),
                 },
             }
     return payload

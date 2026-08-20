@@ -26,7 +26,7 @@ export function PositionScoutPage({ family, players }: Props) {
   const [profilesFilter, setProfilesFilter] = useState<string[]>([]);
   const [clusterFilters, setClusterFilters] = useState<string[]>([]);
   const familyMeta = familyBySlug(family);
-  const clusterMode = family === "zagueiros";
+  const clusterMode = family === "zagueiros" || family === "laterais";
 
   const selected = players.find((player) => player.player_id === selectedId) ?? players[0] ?? null;
 
@@ -89,6 +89,7 @@ export function PositionScoutPage({ family, players }: Props) {
             clusterMode={clusterMode}
             clusterFilters={clusterFilters}
             onToggleClusterFilter={toggleClusterFilter}
+            family={family}
           />
 
           <main className="dossier">
@@ -98,7 +99,7 @@ export function PositionScoutPage({ family, players }: Props) {
               <DossierProfileCard player={selected} />
             ) : null}
 
-            <AspectMatrix player={selected} />
+            <AspectMatrix player={selected} family={family} />
           </main>
         </div>
       )}

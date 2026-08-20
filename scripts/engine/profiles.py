@@ -417,6 +417,12 @@ def profile_shares_from_row(row: pd.Series, family_key: str) -> dict[str, float]
             "construcao": round(con / total * 100, 0),
             "defesa": round(def_ / total * 100, 0),
         }
+    if family_key == "laterais":
+        return {
+            "defensivo": round(float(row.get("cluster_share_defensivo") or 0), 0),
+            "construtor": round(float(row.get("cluster_share_construtor") or 0), 0),
+            "ofensivo": round(float(row.get("cluster_share_ofensivo") or 0), 0),
+        }
     config = FAMILY_PROFILE_CONFIG[family_key]
     shares: dict[str, float] = {}
     for spec in config.profiles:
@@ -431,6 +437,12 @@ def profile_ratings_from_row(row: pd.Series, family_key: str) -> dict[str, float
             "defesa": round(float(row.get("rating_defesa", 0)), 1),
             "perfil": round(float(row.get("rating_perfil", 0)), 1),
         }
+    if family_key == "laterais":
+        return {
+            "defensivo": round(float(row.get("rating_defensivo", 0)), 1),
+            "construtor": round(float(row.get("rating_construtor", 0)), 1),
+            "ofensivo": round(float(row.get("rating_ofensivo", 0)), 1),
+        }
     config = FAMILY_PROFILE_CONFIG[family_key]
     ratings: dict[str, float] = {}
     for spec in config.profiles:
@@ -444,6 +456,12 @@ def profile_ranks_from_row(row: pd.Series, family_key: str) -> dict[str, int]:
             "construcao": int(row.get("rank_construcao", 0)),
             "defesa": int(row.get("rank_defesa", 0)),
             "perfil": int(row.get("rank_perfil", 0)),
+        }
+    if family_key == "laterais":
+        return {
+            "defensivo": int(row.get("rank_defensivo", 0)),
+            "construtor": int(row.get("rank_construtor", 0)),
+            "ofensivo": int(row.get("rank_ofensivo", 0)),
         }
     config = FAMILY_PROFILE_CONFIG[family_key]
     ranks: dict[str, int] = {}

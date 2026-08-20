@@ -15,6 +15,7 @@ export type ZagArchetypeRatings = {
 };
 
 export type ZagCluster = {
+  family?: "zagueiros";
   archetype: ZagArchetype;
   archetype_label: string;
   /** Hierarchical badge when archetype is Construtor. */
@@ -23,6 +24,42 @@ export type ZagCluster = {
   shares: ZagClusterShares;
   ratings: ZagArchetypeRatings;
 };
+
+export type LatArchetype = "Defensivo" | "Construtor" | "Ofensivo" | "Híbrido";
+
+export type LatHybridBadge = "Lateral Base" | "Lateral Moderno" | "Lateral Projetivo" | "Lateral Completo";
+
+export type LatClusterShares = {
+  defensivo: number;
+  construtor: number;
+  ofensivo: number;
+};
+
+export type LatArchetypeRatings = {
+  defensivo: number;
+  construtor: number;
+  ofensivo: number;
+};
+
+export type LatCluster = {
+  family: "laterais";
+  archetype: LatArchetype;
+  archetype_label: string;
+  hybrid_badge?: LatHybridBadge | string | null;
+  hybrid_badge_short?: string | null;
+  shares: LatClusterShares;
+  ratings: LatArchetypeRatings;
+};
+
+export type PositionCluster = ZagCluster | LatCluster;
+
+export function isLatCluster(cluster: PositionCluster): cluster is LatCluster {
+  return cluster.family === "laterais" || "defensivo" in cluster.shares;
+}
+
+export function isZagCluster(cluster: PositionCluster): cluster is ZagCluster {
+  return !isLatCluster(cluster);
+}
 
 export type ArchetypeTrait = {
   label: string;
@@ -142,6 +179,124 @@ export function archetypeCounts(players: { cluster?: ZagCluster | null }[]) {
     Combativo: total ? Math.round((counts.Combativo / total) * 100) : 0,
   };
   return { counts, percents, construtorBadges, total };
+}
+
+export const LAT_ARCHETYPES: LatArchetype[] = ["Defensivo", "Construtor", "Ofensivo", "Híbrido"];
+
+export const LAT_HYBRID_BADGE_META: {
+  badge: LatHybridBadge;
+  short_label: string;
+  description: string;
+  traits: ArchetypeTrait[];
+}[] = [
+  {
+    badge: "Lateral Base",
+    short_label: "Base",
+    description: "Combina solidez defensiva com construção — lateral de referência na fase defensiva e de saída.",
+    traits: [
+      { label: "Duelos Defensivos", direction: "up" },
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "Interceptações", direction: "up" },
+      { label: "Toques na Área", direction: "down" },
+    ],
+  },
+  {
+    badge: "Lateral Moderno",
+    short_label: "Moderno",
+    description: "Defende com volume e projeta-se ofensivamente — perfil de ala completa no jogo moderno.",
+    traits: [
+      { label: "Duelos Defensivos", direction: "up" },
+      { label: "Toques na Área", direction: "up" },
+      { label: "Corridas Progressivas", direction: "up" },
+      { label: "Passes Longos", direction: "down" },
+    ],
+  },
+  {
+    badge: "Lateral Projetivo",
+    short_label: "Projetivo",
+    description: "Constrói e ataca — combina progressividade com presença no terço final.",
+    traits: [
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "Toques na Área", direction: "up" },
+      { label: "Acelerações", direction: "up" },
+      { label: "Rebatidas", direction: "down" },
+    ],
+  },
+  {
+    badge: "Lateral Completo",
+    short_label: "Completo",
+    description: "Elite nas três frentes — defende, constrói e ataca em volume acima da média.",
+    traits: [
+      { label: "Duelos Defensivos", direction: "up" },
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "Toques na Área", direction: "up" },
+      { label: "Cruzamentos", direction: "up" },
+    ],
+  },
+];
+
+export const LAT_ARCHETYPE_META: {
+  archetype: LatArchetype;
+  tone: string;
+  description: string;
+  traits: ArchetypeTrait[];
+}[] = [
+  {
+    archetype: "Defensivo",
+    tone: "defensivo",
+    description: "Prioridade na fase defensiva: duelos, interceptações e rebatidas.",
+    traits: [
+      { label: "Duelos Defensivos", direction: "up" },
+      { label: "Rebatidas", direction: "up" },
+      { label: "Interceptações", direction: "up" },
+      { label: "Toques na Área", direction: "down" },
+    ],
+  },
+  {
+    archetype: "Construtor",
+    tone: "construtor",
+    description: "Iniciador de jogo: passes progressivos, PTF e envolvimento na construção.",
+    traits: [
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "PTF", direction: "up" },
+      { label: "Passes Recebidos", direction: "up" },
+      { label: "Cruzamentos", direction: "down" },
+    ],
+  },
+  {
+    archetype: "Ofensivo",
+    tone: "ofensivo",
+    description: "Projeção ofensiva: conduções, acelerações e presença no terço final.",
+    traits: [
+      { label: "Toques na Área", direction: "up" },
+      { label: "Corridas Progressivas", direction: "up" },
+      { label: "Acelerações", direction: "up" },
+      { label: "Rebatidas", direction: "down" },
+    ],
+  },
+  {
+    archetype: "Híbrido",
+    tone: "hibrido",
+    description: "Dois eixos fortes — perfil dual com identidade em mais de uma frente.",
+    traits: [
+      { label: "Versatilidade", direction: "up" },
+      { label: "Volume Defensivo", direction: "up" },
+      { label: "Projeção Ofensiva", direction: "up" },
+      { label: "Especialização", direction: "down" },
+    ],
+  },
+];
+
+export function latArchetypeTone(archetype: LatArchetype): string {
+  return LAT_ARCHETYPE_META.find((item) => item.archetype === archetype)?.tone ?? "construtor";
+}
+
+export function latArchetypeMetaFor(archetype: LatArchetype) {
+  return LAT_ARCHETYPE_META.find((item) => item.archetype === archetype);
+}
+
+export function latHybridBadgeMetaFor(badge: string) {
+  return LAT_HYBRID_BADGE_META.find((item) => item.badge === badge);
 }
 
 /** @deprecated use archetypeCounts */

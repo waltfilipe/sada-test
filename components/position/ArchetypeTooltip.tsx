@@ -1,10 +1,18 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { archetypeMetaFor, type ZagArchetype } from "@/lib/clusterMeta";
+import {
+  archetypeMetaFor,
+  isLatCluster,
+  latArchetypeMetaFor,
+  type LatArchetype,
+  type PositionCluster,
+  type ZagArchetype,
+} from "@/lib/clusterMeta";
 
 type Props = {
-  archetype: ZagArchetype;
+  archetype: ZagArchetype | LatArchetype;
+  cluster?: PositionCluster;
   children: ReactNode;
   className?: string;
   block?: boolean;
@@ -26,8 +34,11 @@ function TraitArrow({ direction }: { direction: "up" | "down" }) {
   );
 }
 
-export function ArchetypeTooltip({ archetype, children, className = "", block = false }: Props) {
-  const meta = archetypeMetaFor(archetype);
+export function ArchetypeTooltip({ archetype, cluster, children, className = "", block = false }: Props) {
+  const meta =
+    cluster && isLatCluster(cluster)
+      ? latArchetypeMetaFor(archetype as LatArchetype)
+      : archetypeMetaFor(archetype as ZagArchetype);
   if (!meta) return <>{children}</>;
 
   const wrapClass = ["archetype-tip-wrap", block ? "is-block" : "", className].filter(Boolean).join(" ");

@@ -55,7 +55,7 @@ function volumeLabel(item: AspectItem): string {
 }
 
 function ExpandableBody({ item }: { item: AspectItem }) {
-  if (item.kind === "def_efficiency_group" && item.sub_metrics?.length) {
+  if ((item.kind === "def_efficiency_group" || item.kind === "metric_group") && item.sub_metrics?.length) {
     return (
       <div className="aspect-expand-body">
         {item.sub_metrics.map((sub) => (

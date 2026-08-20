@@ -1,12 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
+import { LAT_ARCHETYPE_META, LAT_HYBRID_BADGE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
 import { ClubLogo } from "@/components/ClubLogo";
 import { formatRating, playerInitials, ratingGradientStyle } from "@/lib/scoutTheme";
 import { profileTone, sortPlayers } from "@/lib/scoutUi";
 import { playerMatchesClusterFilter } from "./ArchetypeMixCard";
-import type { PlayerProfile } from "@/lib/types";
+import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Sort = "rating" | "minutes" | "name";
 
@@ -26,6 +26,7 @@ type Props = {
   clusterMode?: boolean;
   clusterFilters?: string[];
   onToggleClusterFilter?: (key: string) => void;
+  family?: PositionFamily;
 };
 
 export function RosterRail({
@@ -38,6 +39,7 @@ export function RosterRail({
   clusterMode = false,
   clusterFilters = [],
   onToggleClusterFilter,
+  family = "zagueiros",
 }: Props) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<Sort>("rating");
@@ -94,7 +96,7 @@ export function RosterRail({
           {clusterMode && onToggleClusterFilter ? (
             <div className="cluster-filter-groups">
               <div className="cluster-filter-row" role="group" aria-label="Filtrar por arquétipo">
-                {ZAG_ARCHETYPE_META.map((item) => (
+                {(family === "laterais" ? LAT_ARCHETYPE_META : ZAG_ARCHETYPE_META).map((item) => (
                   <button
                     key={item.archetype}
                     type="button"
@@ -107,6 +109,22 @@ export function RosterRail({
                   </button>
                 ))}
               </div>
+              {family === "laterais" ? (
+                <div className="cluster-filter-row" role="group" aria-label="Filtrar por badge híbrido">
+                  {LAT_HYBRID_BADGE_META.map((item) => (
+                    <button
+                      key={item.badge}
+                      type="button"
+                      className={`filter-chip cluster-hibrido ${clusterFilters.includes(item.badge) ? "active" : ""}`}
+                      onClick={() => onToggleClusterFilter(item.badge)}
+                      aria-pressed={clusterFilters.includes(item.badge)}
+                      title={item.description}
+                    >
+                      {item.short_label}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
           ) : (
             profilesAvailable.map((profile) => (

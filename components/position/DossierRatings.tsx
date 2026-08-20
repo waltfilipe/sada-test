@@ -11,7 +11,7 @@ import {
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 function secondaryAxes(family: PositionFamily) {
-  if (family === "zagueiros") return [];
+  if (family === "zagueiros" || family === "laterais") return [];
 
   return profileMetaForFamily(family)
     .filter((item) => item.key !== "perfil" && item.key !== "geral")

@@ -26,7 +26,7 @@ export type AspectItem = {
   grade: string;
   stats: AspectStat[];
   /** Expandable metric card. */
-  kind?: "default" | "pass_certos" | "metric" | "def_efficiency_group" | "construction_share";
+  kind?: "default" | "pass_certos" | "metric" | "metric_group" | "def_efficiency_group" | "construction_share";
   certos_per90?: number;
   percentile?: number;
   display_value?: string;
@@ -61,9 +61,9 @@ export type TransfermarktInfo = {
   profile_url: string | null;
 } | null;
 
-import type { ZagArchetype, ZagCluster, ZagClusterShares, ZagArchetypeRatings } from "@/lib/clusterMeta";
+import type { PositionCluster, ZagArchetype, ZagCluster, ZagClusterShares, ZagArchetypeRatings } from "@/lib/clusterMeta";
 
-export type { ZagArchetype, ZagCluster, ZagClusterShares, ZagArchetypeRatings };
+export type { PositionCluster, ZagArchetype, ZagCluster, ZagClusterShares, ZagArchetypeRatings };
 
 export type PlayerSummary = {
   player_id: string;
@@ -82,7 +82,7 @@ export type PlayerSummary = {
   rating: number;
   profile: string;
   hybrid_lean?: string | null;
-  cluster?: ZagCluster | null;
+  cluster?: PositionCluster | null;
   transfermarkt?: TransfermarktInfo;
 };
 
@@ -120,6 +120,7 @@ export type PlayerProfile = PlayerSummary & {
     perfil_construcao: AspectItem[];
     perfil_defensivo?: AspectItem[];
     ofensivos: AspectItem[];
+    terco_final?: AspectItem[];
   };
   profiles_available: string[];
   scatter: Record<string, number>;
