@@ -69,7 +69,7 @@ export function ArchetypeMixCard({ cluster }: Props) {
 }
 
 const ARCHETYPES = new Set<string>(["Defensor de Área", "Construtor", "Combativo"]);
-const CONSTRUTOR_BADGES = new Set<string>(["Construtor Âncora", "Construtor Puro"]);
+const CONSTRUTOR_BADGES = new Set<string>(["Construtor Âncora", "Construtor Nato"]);
 
 export function playerMatchesClusterFilter(
   player: { cluster?: ZagCluster | null },

@@ -1348,7 +1348,7 @@
 
 .dossier-profile-row {
   display: grid;
-  grid-template-columns: minmax(240px, 0.82fr) minmax(0, 1.18fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.85rem;
   align-items: stretch;
 }
@@ -1457,6 +1457,41 @@
   background:
     radial-gradient(420px 160px at 0% 0%, rgba(56, 189, 248, 0.06), transparent 70%),
     linear-gradient(180deg, #121821 0%, #0d1118 100%);
+  height: 100%;
+  min-height: 0;
+}
+
+.dossier-profile-card-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 0.85rem 0.95rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(420px 160px at 100% 0%, rgba(56, 189, 248, 0.04), transparent 70%),
+    linear-gradient(180deg, #121821 0%, #0d1118 100%);
+}
+
+.dossier-profile-card-panel > header {
+  padding-bottom: 0.45rem;
+  margin-bottom: 0.35rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.dossier-profile-card-panel > header h3 {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.dossier-profile-card-panel .constr-share-stack {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.85rem;
 }
 
 .archetype-mix-head {
@@ -2624,8 +2659,7 @@
 
 .constr-gradient-tip {
   position: absolute;
-  left: 50%;
-  bottom: calc(100% + 0.45rem);
+  bottom: calc(100% + 0.55rem);
   transform: translateX(-50%) translateY(4px);
   z-index: 20;
   display: grid;
@@ -2640,6 +2674,17 @@
   visibility: hidden;
   pointer-events: none;
   transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+}
+
+.constr-gradient-tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(10, 14, 20, 0.98);
+  filter: drop-shadow(0 1px 0 rgba(148, 163, 184, 0.12));
 }
 
 .constr-gradient-tip strong {
@@ -2660,6 +2705,23 @@
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
+}
+
+.constr-metric-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.35rem 0 0.15rem;
+}
+
+.constr-metric-value {
+  font-family: "Sora", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #eef4fb;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 /* ── Club logos ──────────────────────────────────────────────────────────── */
@@ -2836,21 +2898,11 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #f5a8a8 0%, #efe5b0 50%, #8ecf9a 100%);
   opacity: 0.95;
 }
 
-.aspect-stat-bar-gradient {
-  position: relative;
-}
-
 .aspect-stat-bar-gradient::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #f5a8a8 0%, #efe5b0 50%, #8ecf9a 100%);
-  opacity: 0.18;
+  display: none;
 }
 
 .aspect-metric-bar i {

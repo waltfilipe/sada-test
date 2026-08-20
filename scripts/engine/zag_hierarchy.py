@@ -8,7 +8,7 @@ import pandas as pd
 from .sofascore import SS_PATH, SS_STAT_COLS, aggregate_sofascore, match_ss_row
 
 ARCHETYPE_LABELS = ("Defensor de Área", "Construtor", "Combativo")
-CONSTRUTOR_BADGE_LABELS = ("Construtor Âncora", "Construtor Puro")
+CONSTRUTOR_BADGE_LABELS = ("Construtor Âncora", "Construtor Nato")
 
 # Mean construction z-score above pool → Construtor branch.
 CONSTRUCTION_Z_THRESHOLD = 0.25
@@ -129,7 +129,7 @@ def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
                 badge_short.append("Âncora")
             else:
                 badge = CONSTRUTOR_BADGE_LABELS[1]
-                badge_short.append("Puro")
+                badge_short.append("Nato")
         else:
             badge = None
             badge_short.append(None)

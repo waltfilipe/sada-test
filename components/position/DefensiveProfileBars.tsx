@@ -7,7 +7,7 @@ export function DefensiveProfileBars({ items }: { items: AspectItem[] }) {
   if (!items.length) return null;
 
   return (
-    <article className="aspect-group aspect-group-def">
+    <article className="dossier-profile-card-panel aspect-group-def">
       <header>
         <h3>Perfil defensivo</h3>
       </header>

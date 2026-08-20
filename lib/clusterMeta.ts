@@ -1,6 +1,6 @@
 export type ZagArchetype = "Defensor de Área" | "Construtor" | "Combativo";
 
-export type ConstrutorBadge = "Construtor Âncora" | "Construtor Puro";
+export type ConstrutorBadge = "Construtor Âncora" | "Construtor Nato";
 
 export type ZagClusterShares = {
   defensor_area: number;
@@ -31,7 +31,7 @@ export type ArchetypeTrait = {
 
 export const ZAG_ARCHETYPES: ZagArchetype[] = ["Defensor de Área", "Construtor", "Combativo"];
 
-export const CONSTRUTOR_BADGES: ConstrutorBadge[] = ["Construtor Âncora", "Construtor Puro"];
+export const CONSTRUTOR_BADGES: ConstrutorBadge[] = ["Construtor Âncora", "Construtor Nato"];
 
 export const CONSTRUTOR_BADGE_META: {
   badge: ConstrutorBadge;
@@ -51,8 +51,8 @@ export const CONSTRUTOR_BADGE_META: {
     ],
   },
   {
-    badge: "Construtor Puro",
-    short_label: "Puro",
+    badge: "Construtor Nato",
+    short_label: "Nato",
     description: "Iniciador de jogo curto e progressivo, sem perfil de distribuidor longo.",
     traits: [
       { label: "Passes Progressivos", direction: "up" },
@@ -125,7 +125,7 @@ export function archetypeCounts(players: { cluster?: ZagCluster | null }[]) {
   };
   const construtorBadges: Record<ConstrutorBadge, number> = {
     "Construtor Âncora": 0,
-    "Construtor Puro": 0,
+    "Construtor Nato": 0,
   };
   for (const player of players) {
     if (!player.cluster) continue;

@@ -899,17 +899,17 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     out["_scale_share_long"] = scale_long
     out["_scale_share_prog"] = scale_prog
 
-    line_def = da_won + _ss_clearance_col(out)
-    contact_def = dd_won + _ss_inter_col(out)
-    style_total = line_def + contact_def
-    contact_share = (contact_def / style_total.replace(0, np.nan)).fillna(0.5) * 100.0
+    dd_vol = _feat_col(out, "Duelos defensivos/90", "DuelosDef").astype(float)
+    da_vol = _feat_col(out, "Duelos aérios/90", "DuelosAr").astype(float)
+    inter_vol = _ss_inter_col(out)
+    clear_vol = _ss_clearance_col(out)
+    line_def = clear_vol + da_vol
+    contact_def = dd_vol + inter_vol
+    m4_ratio = (contact_def / line_def.replace(0, np.nan)).fillna(0.0)
     faltas = pd.to_numeric(out.get("Faltas/90", 0), errors="coerce").fillna(0)
-    foul_denom = faltas + out["_acoes_def_comp"].astype(float)
-    foul_share = (faltas / foul_denom.replace(0, np.nan)).fillna(0.0) * 100.0
-    out["_def_contact_pct"] = contact_share.astype(float)
-    out["_def_foul_pct"] = foul_share.astype(float)
-    out["_pool_avg_def_contact"] = float(contact_share.mean())
-    out["_pool_avg_def_foul"] = float(foul_share.mean())
+    out["_def_m4_ratio"] = m4_ratio.astype(float)
+    out["_pool_avg_def_m4"] = float(m4_ratio.mean())
+    out["_asp_def_style"] = percentile_rank(m4_ratio, ascending=True)
 
     mappings: dict[str, pd.Series] = {
         "duelos_def_vol": _pool_percentile(out, "Duelos defensivos/90", "DuelosDef"),
@@ -1005,6 +1005,7 @@ def _construction_share_aspect(
     bar_key: str | None = None,
     axis_left: str | None = None,
     axis_right: str | None = None,
+    display_value: str | None = None,
 ) -> dict[str, Any]:
     pct = round(float(percentile or 0), 1)
     item: dict[str, Any] = {
@@ -1012,7 +1013,7 @@ def _construction_share_aspect(
         "kind": "construction_share",
         "grade": _grade_from_pct(pct),
         "percentile": pct,
-        "display_value": f"{round(share_pct):.0f}%",
+        "display_value": display_value or f"{round(share_pct):.0f}%",
         "share_pct": round(float(share_pct), 1),
         "pool_avg_pct": round(float(pool_avg_pct), 1),
         "scale_max_pct": round(float(scale_max_pct), 1),
@@ -1160,23 +1161,19 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
             [
                 _construction_share_aspect(
                     "Estilo de defesa",
-                    share_pct=100.0 - float(row.get("_def_contact_pct", 0)),
-                    pool_avg_pct=100.0 - float(row.get("_pool_avg_def_contact", 0)),
+                    share_pct=float(row.get("_asp_def_style", 0)),
+                    pool_avg_pct=float(row.get("_pool_avg_def_m4", 0)),
                     scale_max_pct=100.0,
-                    percentile=row.get("_asp_ad_vol", 0),
+                    percentile=row.get("_asp_def_style", 0),
                     bar_key="def_contact_style",
-                    axis_left="Agressivo",
-                    axis_right="Cobertura",
+                    axis_left="Cobertura",
+                    axis_right="Agressivo",
+                    display_value=_fmt_num(float(row.get("_def_m4_ratio", 0)), decimals=2),
                 ),
-                _construction_share_aspect(
+                _metric_aspect(
                     "Disciplina defensiva",
-                    share_pct=float(row.get("_def_foul_pct", 0)),
-                    pool_avg_pct=float(row.get("_pool_avg_def_foul", 0)),
-                    scale_max_pct=100.0,
                     percentile=row.get("_asp_custo_def_eff", 0),
-                    bar_key="def_foul_style",
-                    axis_left="Eficiente",
-                    axis_right="Faltoso",
+                    display_value=_fmt_per90(float(row.get("Faltas/90", 0) or 0)),
                 ),
             ]
             if family_key == "zagueiros"

@@ -111,9 +111,12 @@ export function clampPercent(value: number): number {
   return Math.max(0, Math.min(100, value));
 }
 
-/** Pastel red → green gradient for percentile stat bars. */
-export const STAT_BAR_GRADIENT =
-  "linear-gradient(90deg, #f5a8a8 0%, #efe5b0 50%, #8ecf9a 100%)";
+/** Pastel red → dark-green stops for stat bars (sampled at percentile). */
+const STAT_BAR_STOPS: { p: number; r: number; g: number; b: number }[] = [
+  { p: 0, r: 245, g: 168, b: 168 },
+  { p: 50, r: 239, g: 229, b: 176 },
+  { p: 100, r: 22, g: 101, b: 52 },
+];
 
 /** Blue → red spectrum for construction / defensive profile bars. */
 export const SPECTRUM_BAR_GRADIENT =
@@ -123,13 +126,48 @@ function lerpChannel(a: number, b: number, t: number): number {
   return Math.round(a + (b - a) * t);
 }
 
-/** Rating colour on a red → dark-green scale (5–10). */
+function sampleStatBarRgb(pct: number): [number, number, number] {
+  const value = clampPercent(pct);
+  for (let i = 0; i < STAT_BAR_STOPS.length - 1; i += 1) {
+    const left = STAT_BAR_STOPS[i];
+    const right = STAT_BAR_STOPS[i + 1];
+    if (value <= right.p) {
+      const span = right.p - left.p || 1;
+      const t = (value - left.p) / span;
+      return [
+        lerpChannel(left.r, right.r, t),
+        lerpChannel(left.g, right.g, t),
+        lerpChannel(left.b, right.b, t),
+      ];
+    }
+  }
+  const last = STAT_BAR_STOPS[STAT_BAR_STOPS.length - 1];
+  return [last.r, last.g, last.b];
+}
+
+/** Pastel tint of the gradient colour at a given percentile. */
+export function statBarPastelColor(pct: number, mix = 0.42): string {
+  const [r, g, b] = sampleStatBarRgb(pct);
+  const pr = Math.round(r + (255 - r) * mix);
+  const pg = Math.round(g + (255 - g) * mix);
+  const pb = Math.round(b + (255 - b) * mix);
+  return `rgb(${pr}, ${pg}, ${pb})`;
+}
+
+/** Rating colour on a red → green scale (5–10), green reads clearly from ~7.5. */
 export function ratingGradientColor(rating: number, max = 10): string {
   const t = clampPercent(((rating - 5) / (max - 5)) * 100) / 100;
-  const r = lerpChannel(239, 22, t);
-  const g = lerpChannel(107, 101, t);
-  const b = lerpChannel(107, 52, t);
-  return `rgb(${r}, ${g}, ${b})`;
+  let hue: number;
+  if (t >= 0.5) {
+    hue = lerpChannel(115, 145, (t - 0.5) / 0.5);
+  } else if (t >= 0.2) {
+    hue = lerpChannel(15, 115, (t - 0.2) / 0.3);
+  } else {
+    hue = lerpChannel(4, 15, t / 0.2);
+  }
+  const saturation = t >= 0.5 ? lerpChannel(48, 56, (t - 0.5) / 0.5) : lerpChannel(72, 48, t / 0.5);
+  const lightness = t >= 0.5 ? lerpChannel(46, 42, (t - 0.5) / 0.5) : lerpChannel(58, 46, t / 0.5);
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
 export function ratingGradientStyle(rating: number, max = 10): CSSProperties {
@@ -143,10 +181,17 @@ export function ratingGradientStyle(rating: number, max = 10): CSSProperties {
 }
 
 export function percentileBarFillStyle(pct: number): CSSProperties {
+  const color = statBarPastelColor(pct);
   return {
     width: `${clampPercent(pct)}%`,
-    background: STAT_BAR_GRADIENT,
+    background: color,
+    ["--stat-bar-accent" as string]: color,
   };
+}
+
+export function statValueStyle(pct: number): CSSProperties {
+  const color = statBarPastelColor(pct, 0.28);
+  return { color, ["--stat-bar-accent" as string]: color };
 }
 
 /** Inline CSS custom properties so a component can theme itself from a tier. */
