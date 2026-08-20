@@ -1160,13 +1160,13 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
             [
                 _construction_share_aspect(
                     "Estilo de defesa",
-                    share_pct=float(row.get("_def_contact_pct", 0)),
-                    pool_avg_pct=float(row.get("_pool_avg_def_contact", 0)),
+                    share_pct=100.0 - float(row.get("_def_contact_pct", 0)),
+                    pool_avg_pct=100.0 - float(row.get("_pool_avg_def_contact", 0)),
                     scale_max_pct=100.0,
                     percentile=row.get("_asp_ad_vol", 0),
                     bar_key="def_contact_style",
-                    axis_left="Cobertura",
-                    axis_right="Agressivo",
+                    axis_left="Agressivo",
+                    axis_right="Cobertura",
                 ),
                 _construction_share_aspect(
                     "Disciplina defensiva",
