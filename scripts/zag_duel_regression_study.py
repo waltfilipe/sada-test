@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 """Offline study: defensive duels regression score for zagueiros.
 
-Pool histórico (2022–2025): regressões
-  A) eff% ~ vol/90 (+ vol²)
-  B) vol/90 ~ minutes_pct (dentro da temporada)
+Pool histórico (Série A + B, 2022–25):
+  eff% ~ vol/90 (+ vol²)
 
-Aplicação 2026 (71 zagueiros do site):
-  score_A = percentil do resíduo de eficiência (encolhido por confiança)
-  score_B = percentil do resíduo de volume vs minutos
-  score = 0.75 × score_A_final + 0.25 × score_B
+Score 2026 (71 zagueiros):
+  70% — resíduo de eficiência vs esperado (cap ±5 pp) + shrinkage por confiança
+  30% — impacto bruto (duelos vencidos/90, percentil no pool 2026)
 """
 
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -27,24 +27,35 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from engine.load_data import _dedupe_columns, _map_wyscout_position
 from engine.measures import attach_base_measures
 
-# ── Config ────────────────────────────────────────────────────────────────────
-MIN_PCT_MINUTES = 0.20  # mesmo filtro do engine (_eligible_pool)
+MIN_PCT_MINUTES = 0.20
 MIN_MINUTES_ABS = 400
-CONF_REF_DUELS = 80  # tentativas totais para confiança plena em score_A
-WEIGHT_EFF = 0.75
-WEIGHT_VOL = 0.25
+CONF_REF_DUELS = 80
+WEIGHT_EFF = 0.70
+WEIGHT_WON = 0.30
+RESID_CAP_PP = 5.0
 
-HISTORICAL_FILES = [
-    (ROOT / "base_dados" / "Série A 2022.xlsx", 2022),
-    (ROOT / "base_dados" / "Série A 23.xlsx", 2023),
-    (ROOT / "base_dados" / "Serie A 24.xlsx", 2024),
-    (ROOT / "base_dados" / "Série A 25 Final.xlsx", 2025),
-]
-TARGET_FILE = (ROOT / "Serie A 26.xlsx", 2026)
 OUT_CSV = ROOT / "reference" / "zag_duel_regression_rankings_2026.csv"
+OUT_PLOT = ROOT / "reference" / "zag_duel_score_distribution_2026.png"
 
 
-def load_zagueiros(path: Path, season: int) -> pd.DataFrame:
+def _season_from_path(path: Path) -> int:
+    m = re.search(r"(\d{2,4})", path.stem)
+    if not m:
+        return 0
+    year = int(m.group(1))
+    return year if year > 100 else 2000 + year
+
+
+HISTORICAL_FILES = sorted(
+    (ROOT / "base_dados").glob("*.xlsx"),
+    key=_season_from_path,
+)
+
+
+def load_zagueiros(path: Path) -> pd.DataFrame:
+    season = _season_from_path(path)
+    league = "B" if re.search(r"S[ée]rie B", path.name, re.I) else "A"
+
     xl = pd.ExcelFile(path)
     sheet = "Tb_SerieC25" if "Tb_SerieC25" in xl.sheet_names else "Search results (500)"
     df = pd.read_excel(path, sheet_name=sheet)
@@ -54,11 +65,11 @@ def load_zagueiros(path: Path, season: int) -> pd.DataFrame:
     df["Posição"] = [_map_wyscout_position(v) for v in df.get("Posição", [])]
     df = df[df["Posição"] == "Zagueiro"].copy()
     df["season"] = season
+    df["league"] = league
     return df
 
 
 def prepare_df(df: pd.DataFrame) -> pd.DataFrame:
-    """Attach measures and duel columns."""
     out = attach_base_measures(df.copy())
     out["vol"] = pd.to_numeric(out["Duelos defensivos/90"], errors="coerce")
     out["eff"] = pd.to_numeric(out["Duelos defensivos ganhos, %"], errors="coerce")
@@ -71,150 +82,156 @@ def prepare_df(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def fit_eff_regression(pool: pd.DataFrame) -> dict:
-    """eff ~ vol + vol²"""
+def fit_eff_regression(pool: pd.DataFrame) -> dict[str, float]:
     vol = pool["vol"].to_numpy()
     eff = pool["eff"].to_numpy()
     X = np.column_stack([np.ones(len(vol)), vol, vol**2])
     beta, _, _, _ = np.linalg.lstsq(X, eff, rcond=None)
-    return {"b0": beta[0], "b1": beta[1], "b2": beta[2]}
+    return {"b0": float(beta[0]), "b1": float(beta[1]), "b2": float(beta[2])}
 
 
-def fit_vol_regression(pool: pd.DataFrame) -> dict:
-    """vol ~ minutes_pct (%Minutos × 100)"""
-    pct = (pool["%Minutos"] * 100).to_numpy()
-    vol = pool["vol"].to_numpy()
-    X = np.column_stack([np.ones(len(pct)), pct])
-    beta, _, _, _ = np.linalg.lstsq(X, vol, rcond=None)
-    return {"g0": beta[0], "g1": beta[1]}
-
-
-def predict_eff(vol: float, coef: dict) -> float:
+def predict_eff(vol: float, coef: dict[str, float]) -> float:
     return coef["b0"] + coef["b1"] * vol + coef["b2"] * vol**2
-
-
-def predict_vol(minutes_pct100: float, coef: dict) -> float:
-    return coef["g0"] + coef["g1"] * minutes_pct100
 
 
 def pct_rank(value: float, series: pd.Series) -> float:
     return float(stats.percentileofscore(series, value, kind="mean"))
 
 
-def confidence(n_duels: float, ref: float = CONF_REF_DUELS) -> float:
-    return min(1.0, max(0.0, n_duels / ref))
+def confidence(n_duels: float) -> float:
+    return min(1.0, max(0.0, n_duels / CONF_REF_DUELS))
 
 
-def score_players(df: pd.DataFrame, eff_coef: dict, vol_coef: dict) -> pd.DataFrame:
+def cap_residual(resid: float, cap: float = RESID_CAP_PP) -> float:
+    return float(np.clip(resid, -cap, cap))
+
+
+def score_players(df: pd.DataFrame, eff_coef: dict[str, float]) -> pd.DataFrame:
     out = df.copy()
     out["eff_expected"] = out["vol"].apply(lambda v: predict_eff(v, eff_coef))
-    out["vol_expected"] = (out["%Minutos"] * 100).apply(lambda p: predict_vol(p, vol_coef))
-    out["resid_eff"] = out["eff"] - out["eff_expected"]
-    out["resid_vol"] = out["vol"] - out["vol_expected"]
+    out["resid_eff_raw"] = out["eff"] - out["eff_expected"]
+    out["resid_eff"] = out["resid_eff_raw"].apply(cap_residual)
     out["conf"] = out["n_duels"].apply(confidence)
 
     out["score_A_pct"] = out["resid_eff"].apply(lambda r: pct_rank(r, out["resid_eff"]))
-    # Encolhe score_A em direção a 50 (neutro) quando poucas tentativas
     out["score_A"] = 50.0 + out["conf"] * (out["score_A_pct"] - 50.0)
 
-    out["score_B"] = out["resid_vol"].apply(lambda r: pct_rank(r, out["resid_vol"]))
-    out["score_final"] = WEIGHT_EFF * out["score_A"] + WEIGHT_VOL * out["score_B"]
+    out["score_B"] = out["won_p90"].apply(lambda w: pct_rank(w, out["won_p90"]))
+    out["score_final"] = WEIGHT_EFF * out["score_A"] + WEIGHT_WON * out["score_B"]
     return out
 
 
-def main() -> None:
-    # ── Pool histórico ──
-    hist_frames = [prepare_df(load_zagueiros(p, s)) for p, s in HISTORICAL_FILES]
-    hist = pd.concat(hist_frames, ignore_index=True)
-    print(f"Pool histórico (2022–25): {len(hist)} observações de zagueiros")
-    print(f"  vol/90 med={hist['vol'].median():.2f}  eff% med={hist['eff'].median():.1f}")
-
-    eff_coef = fit_eff_regression(hist)
-    vol_coef = fit_vol_regression(hist)
-
-    print("\n── Regressão A: eff% ~ vol + vol² ──")
-    print(f"  eff_esperada = {eff_coef['b0']:.2f} + {eff_coef['b1']:.3f}·vol + {eff_coef['b2']:.4f}·vol²")
-    print(f"  R² = {1 - np.var(hist['eff'] - hist['vol'].apply(lambda v: predict_eff(v, eff_coef)))/np.var(hist['eff']):.3f}")
-
-    print("\n── Regressão B: vol/90 ~ %minutos_competição ──")
-    print(f"  vol_esperado = {vol_coef['g0']:.3f} + {vol_coef['g1']:.4f}·pct_min")
-    pct100 = hist["%Minutos"] * 100
-    pred_v = pct100.apply(lambda p: predict_vol(p, vol_coef))
-    print(f"  R² = {1 - np.var(hist['vol'] - pred_v)/np.var(hist['vol']):.3f}")
-
-    # ── 2026 ──
-    target_raw = load_zagueiros(TARGET_FILE[0], TARGET_FILE[1])
-    target = prepare_df(target_raw)
-
-    # Alinhar com os 71 do site (por player_id slug)
-    site_ids = {p["player_id"] for p in json.loads((ROOT / "data" / "family-zagueiros.json").read_text())["players"]}
-
-    def slug(row: pd.Series) -> str:
-        import re
-
-        name = str(row["Jogador"])
-        club = str(row.get("Equipe", row.get("Equipa", "")))
-        base = re.sub(r"[^a-z0-9]+", "-", f"{name}-{club}".lower()).strip("-")
-        return base  # partial match below
-
-    target["slug_base"] = target.apply(slug, axis=1)
-
-    # Match site players by name+club from json
+def match_site_players(target: pd.DataFrame) -> pd.DataFrame:
     site_players = json.loads((ROOT / "data" / "family-zagueiros.json").read_text())["players"]
-    site_keys = {p["player_id"]: (p["name"], p["club"]) for p in site_players}
-
     matched_rows = []
-    for pid, (name, club) in site_keys.items():
-        mask = (target["Jogador"] == name) & (target["Equipe"].astype(str).str.contains(club.split()[0], case=False, na=False))
+    for p in site_players:
+        name, club = p["name"], p["club"]
+        mask = (target["Jogador"] == name) & (
+            target["Equipe"].astype(str).str.contains(club.split()[0], case=False, na=False)
+        )
         if not mask.any():
-            # fallback: name only
             mask = target["Jogador"] == name
         if mask.any():
             row = target[mask].iloc[0].copy()
-            row["player_id"] = pid
+            row["player_id"] = p["player_id"]
             matched_rows.append(row)
         else:
-            print(f"  AVISO: não encontrado no xlsx: {name} ({club})")
+            print(f"  AVISO: não encontrado: {name} ({club})")
+    return pd.DataFrame(matched_rows)
 
-    scored = pd.DataFrame(matched_rows)
-    if len(scored) < len(site_players):
-        print(f"\nMatched {len(scored)}/{len(site_players)} jogadores do site")
 
-    scored = score_players(scored, eff_coef, vol_coef)
+def plot_distribution(scored: pd.DataFrame, eff_coef: dict[str, float], n_hist: int) -> None:
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), facecolor="#0d1118")
+
+    scores = scored["score_final"].to_numpy()
+    ax = axes[0]
+    ax.set_facecolor("#121821")
+    bins = np.linspace(scores.min() - 1, scores.max() + 1, 18)
+    ax.hist(scores, bins=bins, color="#38bdf8", edgecolor="#1e293b", alpha=0.85)
+    ax.axvline(scores.mean(), color="#fbbf24", ls="--", lw=1.5, label=f"Média {scores.mean():.1f}")
+    ax.axvline(np.median(scores), color="#34d399", ls=":", lw=1.5, label=f"Mediana {np.median(scores):.1f}")
+    ax.set_xlabel("Score final (0–100)", color="#e2e8f0")
+    ax.set_ylabel("Zagueiros", color="#e2e8f0")
+    ax.set_title("Distribuição — Duelos Defensivos (2026)", color="#f1f5f9", fontsize=11)
+    ax.tick_params(colors="#94a3b8")
+    ax.legend(facecolor="#1e293b", edgecolor="#334155", labelcolor="#e2e8f0", fontsize=8)
+    for spine in ax.spines.values():
+        spine.set_color("#334155")
+
+    ax2 = axes[1]
+    ax2.set_facecolor("#121821")
+    vol_grid = np.linspace(1.5, 9.0, 100)
+    eff_curve = predict_eff(vol_grid, eff_coef)
+    ax2.plot(vol_grid, eff_curve, color="#34d399", lw=2, label="Eff esperada (pool hist.)")
+    ax2.scatter(scored["vol"], scored["eff"], c=scored["score_final"], cmap="viridis", s=28, alpha=0.85, edgecolors="#1e293b")
+    sm = plt.cm.ScalarMappable(cmap="viridis", norm=plt.Normalize(scores.min(), scores.max()))
+    sm.set_array([])
+    cbar = fig.colorbar(sm, ax=ax2, fraction=0.046, pad=0.04)
+    cbar.set_label("Score final", color="#e2e8f0")
+    cbar.ax.yaxis.set_tick_params(color="#94a3b8")
+    plt.setp(cbar.ax.yaxis.get_ticklabels(), color="#94a3b8")
+    ax2.set_xlabel("Duelos defensivos /90", color="#e2e8f0")
+    ax2.set_ylabel("Eficiência (%)", color="#e2e8f0")
+    ax2.set_title(f"Eff vs volume — pool n={n_hist}", color="#f1f5f9", fontsize=11)
+    ax2.tick_params(colors="#94a3b8")
+    for spine in ax2.spines.values():
+        spine.set_color("#334155")
+
+    fig.suptitle(
+        f"Score = 70% eff residual (cap ±{RESID_CAP_PP:.0f}pp, conf) + 30% ganhos/90",
+        color="#94a3b8",
+        fontsize=9,
+        y=1.02,
+    )
+    fig.tight_layout()
+    OUT_PLOT.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(OUT_PLOT, dpi=144, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.close(fig)
+
+
+def main() -> None:
+    hist_paths = list(HISTORICAL_FILES)
+    hist_frames = [prepare_df(load_zagueiros(p)) for p in hist_paths]
+    hist = pd.concat(hist_frames, ignore_index=True)
+    n_a = (hist["league"] == "A").sum()
+    n_b = (hist["league"] == "B").sum()
+    print(f"Pool histórico: {len(hist)} obs ({n_a} Série A + {n_b} Série B)")
+    print(f"  vol/90 med={hist['vol'].median():.2f}  eff% med={hist['eff'].median():.1f}  ganhos/90 med={hist['won_p90'].median():.2f}")
+
+    eff_coef = fit_eff_regression(hist)
+    pred = hist["vol"].apply(lambda v: predict_eff(v, eff_coef))
+    r2 = 1 - np.var(hist["eff"] - pred) / np.var(hist["eff"])
+    print(f"\nRegressão eff ~ vol + vol²  (R²={r2:.3f})")
+    print(f"  eff_esperada = {eff_coef['b0']:.2f} + {eff_coef['b1']:.3f}·vol + {eff_coef['b2']:.4f}·vol²")
+
+    target = prepare_df(load_zagueiros(ROOT / "Serie A 26.xlsx"))
+    scored = match_site_players(target)
+    scored = score_players(scored, eff_coef)
     scored = scored.sort_values("score_final", ascending=False).reset_index(drop=True)
     scored["rank"] = np.arange(1, len(scored) + 1)
 
-    OUT_CSV.parent.mkdir(parents=True, exist_ok=True)
     cols_out = [
-        "rank",
-        "player_id",
-        "Jogador",
-        "Equipe",
-        "minutes",
-        "vol",
-        "eff",
-        "n_duels",
-        "eff_expected",
-        "resid_eff",
-        "conf",
-        "score_A",
-        "vol_expected",
-        "resid_vol",
-        "score_B",
-        "score_final",
+        "rank", "player_id", "Jogador", "Equipe", "minutes", "vol", "eff", "won_p90",
+        "n_duels", "eff_expected", "resid_eff_raw", "resid_eff", "conf",
+        "score_A", "score_B", "score_final",
     ]
     scored[cols_out].to_csv(OUT_CSV, index=False, float_format="%.2f")
+    plot_distribution(scored, eff_coef, len(hist))
     print(f"\nSalvo: {OUT_CSV}")
+    print(f"Gráfico: {OUT_PLOT}")
 
-    print("\n══ TOP 20 — Score duelos defensivos (75% eff | 25% vol) ══")
-    print(f"{'#':>3}  {'Jogador':<28} {'Clube':<18} {'Vol':>4} {'Eff':>4} {'ResEff':>7} {'Conf':>5} {'ScA':>5} {'ScB':>5} {'FINAL':>6}")
-    print("-" * 105)
+    print(f"\n══ TOP 20 — 70% eff (cap ±{RESID_CAP_PP:.0f}pp + conf) | 30% ganhos/90 ══")
+    print(f"{'#':>3}  {'Jogador':<26} {'Clube':<16} {'Vol':>4} {'Eff':>4} {'G/90':>4} {'Res':>6} {'Conf':>5} {'ScA':>5} {'ScB':>5} {'FIN':>6}")
+    print("-" * 102)
     for _, r in scored.head(20).iterrows():
         print(
-            f"{int(r['rank']):>3}  {str(r['Jogador'])[:28]:<28} {str(r['Equipe'])[:18]:<18} "
-            f"{r['vol']:>4.1f} {r['eff']:>3.0f}% {r['resid_eff']:>+6.1f}pp {r['conf']:>5.2f} "
+            f"{int(r['rank']):>3}  {str(r['Jogador'])[:26]:<26} {str(r['Equipe'])[:16]:<16} "
+            f"{r['vol']:>4.1f} {r['eff']:>3.0f}% {r['won_p90']:>4.2f} {r['resid_eff']:>+5.1f}pp {r['conf']:>5.2f} "
             f"{r['score_A']:>5.1f} {r['score_B']:>5.1f} {r['score_final']:>6.1f}"
         )
+
+    print(f"\nDistribuição: min={scored['score_final'].min():.1f}  Q1={scored['score_final'].quantile(0.25):.1f}  "
+          f"med={scored['score_final'].median():.1f}  Q3={scored['score_final'].quantile(0.75):.1f}  max={scored['score_final'].max():.1f}")
 
 
 if __name__ == "__main__":
