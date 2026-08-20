@@ -11,7 +11,14 @@ export function ClusterTag({ cluster, className = "" }: Props) {
       <span className={`cluster-tag-macro cluster-${archetypeTone(cluster.archetype)}`}>
         {cluster.archetype_label}
       </span>
-      {cluster.is_hybrid ? <span className="cluster-tag-hybrid">Híbrido</span> : null}
+      {cluster.construtor_badge_short ? (
+        <span
+          className={`cluster-tag-badge cluster-${archetypeTone(cluster.archetype)}`}
+          title={cluster.construtor_badge ?? undefined}
+        >
+          {cluster.construtor_badge_short}
+        </span>
+      ) : null}
     </span>
   );
 }

@@ -1211,21 +1211,22 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
             con = float(row["rating_construcao"])
             def_ = float(row["rating_defesa"])
             label = row.get("cluster_archetype_label")
-            subtype = row.get("cluster_construtor_subtype")
+            badge = row.get("cluster_construtor_badge")
+            badge_short = row.get("cluster_construtor_badge_short")
             payload["cluster"] = {
                 "archetype": str(archetype),
                 "archetype_label": str(label if pd.notna(label) and label else archetype),
-                "construtor_subtype": str(subtype) if pd.notna(subtype) and subtype else None,
-                "is_hybrid": bool(row.get("cluster_is_hybrid")),
+                "construtor_badge": str(badge) if pd.notna(badge) and badge else None,
+                "construtor_badge_short": str(badge_short) if pd.notna(badge_short) and badge_short else None,
                 "shares": {
-                    "rebatedor": float(row.get("cluster_share_rebatedor") or 0),
+                    "defensor_area": float(row.get("cluster_share_defensor_area") or 0),
                     "construtor": float(row.get("cluster_share_construtor") or 0),
-                    "agressivo": float(row.get("cluster_share_agressivo") or 0),
+                    "combativo": float(row.get("cluster_share_combativo") or 0),
                 },
                 "ratings": {
-                    "rebatedor": round(def_, 1),
+                    "defensor_area": round(def_, 1),
                     "construtor": round(con, 1),
-                    "agressivo": round(0.55 * con + 0.45 * def_, 1),
+                    "combativo": round(0.55 * con + 0.45 * def_, 1),
                 },
             }
     return payload

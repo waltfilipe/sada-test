@@ -7,15 +7,13 @@ import pandas as pd
 
 from .sofascore import SS_PATH, SS_STAT_COLS, aggregate_sofascore, match_ss_row
 
-ARCHETYPE_LABELS = ("Rebatedor", "Construtor", "Agressivo")
-CONSTRUTOR_SUBTYPE_LABELS = ("Construtor Defensivo", "Construtor Lançador")
+ARCHETYPE_LABELS = ("Defensor de Área", "Construtor", "Combativo")
+CONSTRUTOR_BADGE_LABELS = ("Construtor Âncora", "Construtor Puro")
 
 # Mean construction z-score above pool → Construtor branch.
 CONSTRUCTION_Z_THRESHOLD = 0.25
 # M4 = (DD + INT) / (Rebatidas + DA) — contact/reading vs line/aerial.
-M4_AGRESSIVO_THRESHOLD = 0.60
-# Construtor with high M4 → hybrid (borderline with Agressivo).
-M4_CONSTRUTOR_HYBRID_THRESHOLD = 0.75
+M4_COMBATIVO_THRESHOLD = 0.60
 
 
 def _build_feature_row(wy_row: pd.Series, ss_row: pd.Series | None) -> dict[str, float]:
@@ -74,7 +72,7 @@ def _m4_ratio(feat_df: pd.DataFrame) -> pd.Series:
 
 
 def _axis_scores(feat_df: pd.DataFrame) -> pd.DataFrame:
-    reb = (
+    defensor = (
         _zscore(feat_df["total_clearance_p90"])
         + _zscore(feat_df["outfielder_block_p90"])
         + _zscore(feat_df["duelos_aereos"])
@@ -86,28 +84,22 @@ def _axis_scores(feat_df: pd.DataFrame) -> pd.DataFrame:
         + _zscore(feat_df["share_prog"])
         + _zscore(feat_df["conducao_prog"])
     )
-    agr = (
+    combativo = (
         _zscore(feat_df["duelos_ofensivos"])
         + _zscore(feat_df["conducao_prog"])
         + _zscore(feat_df["passes_terco_final"])
         + _zscore(feat_df["share_prog"])
     )
-    return pd.DataFrame({"Rebatedor": reb, "Construtor": con, "Agressivo": agr}, index=feat_df.index)
-
-
-def _construtor_subtype_score(feat_df: pd.DataFrame) -> pd.Series:
-    """z(rebatidas) + z(duelos aéreos) + z(tendência longo)."""
-    return (
-        _zscore(feat_df["total_clearance_p90"])
-        + _zscore(feat_df["duelos_aereos"])
-        + _zscore(feat_df["share_long"])
+    return pd.DataFrame(
+        {"Defensor de Área": defensor, "Construtor": con, "Combativo": combativo},
+        index=feat_df.index,
     )
 
 
 def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
     con_z = _construction_z(feat_df)
     m4 = _m4_ratio(feat_df)
-    subtype_score = _construtor_subtype_score(feat_df)
+    mean_share_long = float(feat_df["share_long"].mean())
 
     axis = _axis_scores(feat_df)
     share_matrix = _softmax_shares(axis.to_numpy())
@@ -115,63 +107,63 @@ def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
 
     primaries: list[str] = []
     labels: list[str] = []
-    subtypes: list[str | None] = []
-    hybrids: list[bool] = []
+    badges: list[str | None] = []
+    badge_short: list[str | None] = []
 
     for idx in feat_df.index:
         cz = float(con_z.loc[idx])
         m4_val = float(m4.loc[idx])
+        share_long = float(feat_df.loc[idx, "share_long"])
 
         if cz >= CONSTRUCTION_Z_THRESHOLD:
             primary = "Construtor"
-            is_hybrid = m4_val >= M4_CONSTRUTOR_HYBRID_THRESHOLD
-            sub_score = float(subtype_score.loc[idx])
-            if sub_score >= 0:
-                subtype = CONSTRUTOR_SUBTYPE_LABELS[0]
+            label = primary
+            if share_long > mean_share_long:
+                badge = CONSTRUTOR_BADGE_LABELS[0]
+                badge_short.append("Âncora")
             else:
-                subtype = CONSTRUTOR_SUBTYPE_LABELS[1]
-            label = subtype
-        elif m4_val >= M4_AGRESSIVO_THRESHOLD:
-            primary = "Agressivo"
-            is_hybrid = False
-            subtype = None
+                badge = CONSTRUTOR_BADGE_LABELS[1]
+                badge_short.append("Puro")
+        elif m4_val >= M4_COMBATIVO_THRESHOLD:
+            primary = "Combativo"
             label = primary
+            badge = None
+            badge_short.append(None)
         else:
-            primary = "Rebatedor"
-            is_hybrid = False
-            subtype = None
+            primary = "Defensor de Área"
             label = primary
+            badge = None
+            badge_short.append(None)
 
         primaries.append(primary)
         labels.append(label)
-        subtypes.append(subtype)
-        hybrids.append(is_hybrid)
+        badges.append(badge)
 
     return pd.DataFrame(
         {
             "cluster_archetype": primaries,
             "cluster_archetype_label": labels,
-            "cluster_construtor_subtype": subtypes,
-            "cluster_is_hybrid": hybrids,
-            "cluster_share_rebatedor": shares["Rebatedor"].round(1),
+            "cluster_construtor_badge": badges,
+            "cluster_construtor_badge_short": badge_short,
+            "cluster_share_defensor_area": shares["Defensor de Área"].round(1),
             "cluster_share_construtor": shares["Construtor"].round(1),
-            "cluster_share_agressivo": shares["Agressivo"].round(1),
+            "cluster_share_combativo": shares["Combativo"].round(1),
         },
         index=feat_df.index,
     )
 
 
 def apply_zag_hierarchical_clusters(pool: pd.DataFrame) -> pd.DataFrame:
-    """Add cluster_archetype, hybrid flag, constructor subtype and per-axis share columns."""
+    """Add cluster_archetype, constructor badge and per-axis share columns."""
     out = pool.copy()
     empty_cols = {
         "cluster_archetype": None,
         "cluster_archetype_label": None,
-        "cluster_construtor_subtype": None,
-        "cluster_is_hybrid": None,
-        "cluster_share_rebatedor": None,
+        "cluster_construtor_badge": None,
+        "cluster_construtor_badge_short": None,
+        "cluster_share_defensor_area": None,
         "cluster_share_construtor": None,
-        "cluster_share_agressivo": None,
+        "cluster_share_combativo": None,
     }
     if not SS_PATH.exists():
         for col, default in empty_cols.items():
