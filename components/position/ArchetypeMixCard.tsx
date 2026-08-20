@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
 import {
   ZAG_ARCHETYPE_META,
@@ -26,19 +28,26 @@ const RATING_KEYS: Record<ZagArchetype, keyof ZagCluster["ratings"]> = {
 };
 
 export function ArchetypeMixCard({ cluster }: Props) {
+  const orderedArchetypes = useMemo(
+    () =>
+      [...ZAG_ARCHETYPE_META].sort((a, b) => {
+        if (a.archetype === cluster.archetype) return -1;
+        if (b.archetype === cluster.archetype) return 1;
+        return (
+          cluster.shares[SHARE_KEYS[b.archetype]] - cluster.shares[SHARE_KEYS[a.archetype]]
+        );
+      }),
+    [cluster],
+  );
+
   return (
     <article className="archetype-mix-card" aria-label="Perfil do atleta">
       <header className="archetype-mix-head">
         <h3>Perfil do Atleta</h3>
-        {cluster.construtor_badge_short ? (
-          <span className="cluster-badge-hierarchical" title={cluster.construtor_badge ?? undefined}>
-            {cluster.construtor_badge_short}
-          </span>
-        ) : null}
       </header>
 
       <ul className="archetype-mix-rows">
-        {ZAG_ARCHETYPE_META.map((item) => {
+        {orderedArchetypes.map((item) => {
           const share = cluster.shares[SHARE_KEYS[item.archetype]];
           const rating = cluster.ratings[RATING_KEYS[item.archetype]];
           const active = item.archetype === cluster.archetype;

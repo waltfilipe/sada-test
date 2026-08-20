@@ -910,6 +910,8 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     out["_def_m4_ratio"] = m4_ratio.astype(float)
     out["_pool_avg_def_m4"] = float(m4_ratio.mean())
     out["_asp_def_style"] = percentile_rank(m4_ratio, ascending=True)
+    out["_asp_faltas_vol"] = percentile_rank(faltas, ascending=True)
+    out["_pool_avg_faltas"] = float(faltas.mean())
 
     mappings: dict[str, pd.Series] = {
         "duelos_def_vol": _pool_percentile(out, "Duelos defensivos/90", "DuelosDef"),
@@ -1170,10 +1172,15 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                     axis_right="Agressivo",
                     display_value=_fmt_num(float(row.get("_def_m4_ratio", 0)), decimals=2),
                 ),
-                _metric_aspect(
+                _construction_share_aspect(
                     "Disciplina defensiva",
+                    share_pct=float(row.get("_asp_faltas_vol", 0)),
+                    pool_avg_pct=float(row.get("_pool_avg_faltas", 0)),
+                    scale_max_pct=100.0,
                     percentile=row.get("_asp_custo_def_eff", 0),
-                    display_value=_fmt_per90(float(row.get("Faltas/90", 0) or 0)),
+                    bar_key="def_foul_style",
+                    axis_left="Disciplinado",
+                    axis_right="Faltoso",
                 ),
             ]
             if family_key == "zagueiros"
@@ -1188,7 +1195,7 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 eff_display=_raw_eff_display(row, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
             ),
             _metric_aspect(
-                "Progressão",
+                "Conduções Progressivas",
                 percentile=row.get("_asp_prog_vol", 0),
                 display_value=_fmt_num(prog),
             ),
