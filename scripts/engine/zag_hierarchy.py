@@ -14,6 +14,8 @@ CONSTRUTOR_BADGE_LABELS = ("Construtor Âncora", "Construtor Puro")
 CONSTRUCTION_Z_THRESHOLD = 0.25
 # M4 = (DD + INT) / (Rebatidas + DA) — contact/reading vs line/aerial.
 M4_COMBATIVO_THRESHOLD = 0.60
+# Nudge the tree winner so mix-card shares match the primary archetype label.
+PRIMARY_SHARE_BOOST = 1.0
 
 
 def _build_feature_row(wy_row: pd.Series, ss_row: pd.Series | None) -> dict[str, float]:
@@ -71,39 +73,43 @@ def _m4_ratio(feat_df: pd.DataFrame) -> pd.Series:
     return (contact / denom).fillna(0.0)
 
 
-def _axis_scores(feat_df: pd.DataFrame) -> pd.DataFrame:
-    defensor = (
-        _zscore(feat_df["total_clearance_p90"])
-        + _zscore(feat_df["outfielder_block_p90"])
-        + _zscore(feat_df["duelos_aereos"])
-        + _zscore(feat_df["duelos_def"])
-    )
-    con = (
-        _zscore(feat_df["passes_terco_final"])
-        + _zscore(feat_df["passes_total_p90"])
-        + _zscore(feat_df["share_prog"])
-        + _zscore(feat_df["conducao_prog"])
-    )
-    combativo = (
-        _zscore(feat_df["duelos_ofensivos"])
-        + _zscore(feat_df["conducao_prog"])
-        + _zscore(feat_df["passes_terco_final"])
-        + _zscore(feat_df["share_prog"])
-    )
+def _branch_scores(feat_df: pd.DataFrame) -> pd.DataFrame:
+    """Tree-aligned branch strengths for mix-card shares."""
     return pd.DataFrame(
-        {"Defensor de Área": defensor, "Construtor": con, "Combativo": combativo},
+        {
+            "Defensor de Área": (
+                _zscore(feat_df["total_clearance_p90"])
+                + _zscore(feat_df["duelos_aereos"])
+                + _zscore(feat_df["outfielder_block_p90"])
+            )
+            / 3.0,
+            "Construtor": _construction_z(feat_df),
+            "Combativo": _zscore(_m4_ratio(feat_df)),
+        },
         index=feat_df.index,
-    )
+    )[list(ARCHETYPE_LABELS)]
+
+
+def _primary_archetype(con_z: float, m4_val: float) -> str:
+    if con_z >= CONSTRUCTION_Z_THRESHOLD:
+        return "Construtor"
+    if m4_val >= M4_COMBATIVO_THRESHOLD:
+        return "Combativo"
+    return "Defensor de Área"
+
+
+def _mix_shares(feat_df: pd.DataFrame, primaries: list[str]) -> pd.DataFrame:
+    branches = _branch_scores(feat_df).copy()
+    for idx, primary in zip(feat_df.index, primaries):
+        branches.loc[idx, primary] += PRIMARY_SHARE_BOOST
+    share_matrix = _softmax_shares(branches.to_numpy())
+    return pd.DataFrame(share_matrix, columns=ARCHETYPE_LABELS, index=feat_df.index)
 
 
 def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
     con_z = _construction_z(feat_df)
     m4 = _m4_ratio(feat_df)
     mean_share_long = float(feat_df["share_long"].mean())
-
-    axis = _axis_scores(feat_df)
-    share_matrix = _softmax_shares(axis.to_numpy())
-    shares = pd.DataFrame(share_matrix, columns=ARCHETYPE_LABELS, index=feat_df.index)
 
     primaries: list[str] = []
     labels: list[str] = []
@@ -115,29 +121,24 @@ def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
         m4_val = float(m4.loc[idx])
         share_long = float(feat_df.loc[idx, "share_long"])
 
-        if cz >= CONSTRUCTION_Z_THRESHOLD:
-            primary = "Construtor"
-            label = primary
+        primary = _primary_archetype(cz, m4_val)
+        label = primary
+        if primary == "Construtor":
             if share_long > mean_share_long:
                 badge = CONSTRUTOR_BADGE_LABELS[0]
                 badge_short.append("Âncora")
             else:
                 badge = CONSTRUTOR_BADGE_LABELS[1]
                 badge_short.append("Puro")
-        elif m4_val >= M4_COMBATIVO_THRESHOLD:
-            primary = "Combativo"
-            label = primary
-            badge = None
-            badge_short.append(None)
         else:
-            primary = "Defensor de Área"
-            label = primary
             badge = None
             badge_short.append(None)
 
         primaries.append(primary)
         labels.append(label)
         badges.append(badge)
+
+    shares = _mix_shares(feat_df, primaries)
 
     return pd.DataFrame(
         {
