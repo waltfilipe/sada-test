@@ -7,6 +7,8 @@ type Props = {
   hint?: string;
   valueA: number;
   valueB: number;
+  rankA?: number;
+  rankB?: number;
   max?: number;
   format?: (value: number) => string;
 };
@@ -16,7 +18,16 @@ type Props = {
  * the reader compares lengths against a shared baseline instead of eyeballing
  * two separate charts.
  */
-export function VersusBar({ label, hint, valueA, valueB, max = 100, format }: Props) {
+export function VersusBar({
+  label,
+  hint,
+  valueA,
+  valueB,
+  rankA,
+  rankB,
+  max = 100,
+  format,
+}: Props) {
   const display = (value: number) => (format ? format(value) : String(Math.round(value)));
   const widthA = clampPercent((valueA / max) * 100);
   const widthB = clampPercent((valueB / max) * 100);
@@ -26,7 +37,10 @@ export function VersusBar({ label, hint, valueA, valueB, max = 100, format }: Pr
 
   return (
     <div className={`versus-row leads-${leads}`}>
-      <span className="versus-value side-a">{display(valueA)}</span>
+      <span className="versus-value side-a">
+        {display(valueA)}
+        {rankA != null ? <em>#{rankA}</em> : null}
+      </span>
 
       <div className="versus-track side-a">
         <i style={{ width: `${widthA}%` }} />
@@ -41,7 +55,10 @@ export function VersusBar({ label, hint, valueA, valueB, max = 100, format }: Pr
         <i style={{ width: `${widthB}%` }} />
       </div>
 
-      <span className="versus-value side-b">{display(valueB)}</span>
+      <span className="versus-value side-b">
+        {display(valueB)}
+        {rankB != null ? <em>#{rankB}</em> : null}
+      </span>
     </div>
   );
 }

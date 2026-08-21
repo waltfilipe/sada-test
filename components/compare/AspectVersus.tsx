@@ -1,16 +1,10 @@
 "use client";
 
 import { resolveAspectBadge } from "@/lib/aspectBadges";
-import { percentileTier, tierVars } from "@/lib/scoutTheme";
+import { aspectGroupsForPlayers } from "@/lib/aspectGroups";
+import { gradeTier, percentileTier, tierVars } from "@/lib/scoutTheme";
 import type { AspectItem, PlayerProfile } from "@/lib/types";
 import { AccuracyBadge } from "@/components/position/AccuracyBadge";
-
-const GROUPS = [
-  { key: "defensivos", title: "Defensivos" },
-  { key: "construcao", title: "Construção" },
-  { key: "ofensivos", title: "Ofensivos" },
-  { key: "perfil_construcao", title: "Perfil de construção" },
-] as const;
 
 function aspectScore(item: AspectItem): number {
   if (item.percentile != null) {
@@ -32,46 +26,76 @@ function rowBadge(item: AspectItem) {
   return resolveAspectBadge(item);
 }
 
+function matchByLabel(itemsA: AspectItem[] | undefined, itemsB: AspectItem[] | undefined) {
+  const mapB = new Map((itemsB ?? []).map((item) => [item.label, item]));
+  const labels = new Set([...(itemsA ?? []).map((item) => item.label), ...(itemsB ?? []).map((item) => item.label)]);
+
+  return [...labels].map((label) => ({
+    label,
+    itemA: (itemsA ?? []).find((item) => item.label === label),
+    itemB: mapB.get(label),
+  }));
+}
+
+function GradeChip({ grade }: { grade: string }) {
+  return (
+    <span className="grade-chip" style={tierVars(gradeTier(grade))}>
+      {grade}
+    </span>
+  );
+}
+
+function AspectCell({ item }: { item?: AspectItem }) {
+  if (!item) {
+    return <span className="aspect-cell-empty">—</span>;
+  }
+
+  const score = aspectScore(item);
+  const token = percentileTier(score);
+  const badge = rowBadge(item);
+
+  return (
+    <>
+      {badge ? <AccuracyBadge badge={badge} size={11} showLabel={false} /> : null}
+      {item.grade ? <GradeChip grade={item.grade} /> : null}
+      <span className="aspect-metric-value" style={tierVars(token)}>
+        {displayValue(item)}
+      </span>
+    </>
+  );
+}
+
 export function AspectVersus({ a, b }: { a: PlayerProfile; b: PlayerProfile }) {
+  const groups = aspectGroupsForPlayers(a, b);
+
   return (
     <div className="aspect-versus">
-      {GROUPS.map((group) => {
+      {groups.map((group) => {
         const rowsA = a.aspects[group.key];
         const rowsB = b.aspects[group.key];
+        const rows = matchByLabel(rowsA, rowsB);
 
         return (
           <article key={group.key} className="aspect-versus-group">
             <h3>{group.title}</h3>
 
             <ul>
-              {rowsA.map((item, index) => {
-                const other = rowsB[index];
-                if (!other) return null;
-
-                const scoreA = aspectScore(item);
-                const scoreB = aspectScore(other);
-                const leads = scoreA === scoreB ? "tie" : scoreA > scoreB ? "a" : "b";
-                const tokenA = percentileTier(scoreA);
-                const tokenB = percentileTier(scoreB);
-                const badgeA = rowBadge(item);
-                const badgeB = rowBadge(other);
+              {rows.map(({ label, itemA, itemB }) => {
+                const scoreA = itemA ? aspectScore(itemA) : -1;
+                const scoreB = itemB ? aspectScore(itemB) : -1;
+                const leads =
+                  scoreA === scoreB ? "tie" : scoreA > scoreB ? "a" : scoreB > scoreA ? "b" : "tie";
 
                 return (
-                  <li key={item.label} className={`aspect-versus-row leads-${leads}`}>
+                  <li key={label} className={`aspect-versus-row leads-${leads}`}>
                     <span className="aspect-cell side-a">
-                      {badgeA ? <AccuracyBadge badge={badgeA} size={11} showLabel={false} /> : null}
-                      <span className="aspect-metric-value" style={tierVars(tokenA)}>
-                        {displayValue(item)}
-                      </span>
+                      <AspectCell item={itemA} />
                     </span>
 
-                    <span className="aspect-versus-label">{item.label}</span>
+                    <span className="aspect-versus-label">{label}</span>
 
                     <span className="aspect-cell side-b">
-                      <span className="aspect-metric-value" style={tierVars(tokenB)}>
-                        {displayValue(other)}
-                      </span>
-                      {badgeB ? <AccuracyBadge badge={badgeB} size={11} showLabel={false} /> : null}
+                      <AspectCell item={itemB} />
                     </span>
                   </li>
                 );

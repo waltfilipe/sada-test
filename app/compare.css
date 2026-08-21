@@ -200,6 +200,11 @@
   border-top: 1px solid var(--line);
 }
 
+.slot-facts div:nth-child(4),
+.slot-facts div:nth-child(5) {
+  grid-column: span 1;
+}
+
 .slot-facts div {
   display: grid;
   gap: 0.1rem;
@@ -362,12 +367,28 @@
 }
 
 .versus-value {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.05rem;
   font-family: "Sora", sans-serif;
   font-size: 0.92rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--text-3);
   transition: color 0.16s ease;
+}
+
+.versus-value em {
+  font-style: normal;
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: var(--text-3);
+  opacity: 0.85;
+}
+
+.versus-value.side-b {
+  align-items: flex-start;
 }
 
 .versus-value.side-a {
@@ -517,6 +538,213 @@
   white-space: nowrap;
 }
 
+.aspect-cell-empty {
+  font-size: 0.78rem;
+  color: var(--text-3);
+  opacity: 0.5;
+}
+
+.aspect-versus-row .grade-chip {
+  min-width: 28px;
+  padding: 0.08rem 0.3rem;
+  font-size: 0.68rem;
+}
+
+/* ── Archetype versus ────────────────────────────────────────────────────── */
+
+.archetype-versus-rows {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.archetype-versus-item {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.archetype-versus-head {
+  margin-bottom: 0.55rem;
+}
+
+.archetype-versus-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.archetype-versus-metric {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 72px;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.archetype-versus-metric + .archetype-versus-metric {
+  border-top: 1px solid var(--line);
+  margin-top: 0.15rem;
+  padding-top: 0.45rem;
+}
+
+.archetype-versus-side {
+  font-family: "Sora", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+.archetype-versus-side.side-a {
+  text-align: right;
+}
+
+.archetype-versus-side.side-b {
+  text-align: left;
+}
+
+.archetype-versus-metric.leads-a .archetype-versus-side.side-a {
+  color: var(--side-a);
+}
+
+.archetype-versus-metric.leads-b .archetype-versus-side.side-b {
+  color: var(--side-b);
+}
+
+.archetype-versus-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  text-align: center;
+}
+
+/* ── Profile bars versus ─────────────────────────────────────────────────── */
+
+.profile-bars-versus-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.profile-bars-versus-group {
+  padding: 0.9rem 1rem 1rem;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.profile-bars-versus-group h3 {
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.profile-bars-versus-stack {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.profile-bar-versus-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(100px, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.profile-bar-versus-side {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.profile-bar-versus-side.side-a {
+  text-align: right;
+}
+
+.profile-bar-versus-value {
+  font-family: "Sora", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.profile-bar-versus-label {
+  font-size: 0.72rem;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.profile-bar-versus-track {
+  position: relative;
+  height: 10px;
+}
+
+.profile-bar-versus-rail {
+  position: absolute;
+  inset: 3px 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.profile-bar-versus-center {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  margin-left: -1px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.profile-bar-versus-dot {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  border: 2px solid #0e131b;
+}
+
+.profile-bar-versus-row.leads-a .profile-bar-versus-side.side-a .profile-bar-versus-dot {
+  background: var(--side-a);
+}
+
+.profile-bar-versus-row.leads-b .profile-bar-versus-side.side-b .profile-bar-versus-dot {
+  background: var(--side-b);
+}
+
+.profile-bar-versus-row.leads-tie .profile-bar-versus-dot {
+  background: var(--text-3);
+}
+
+.profile-bar-versus-row .spectrum-fill-wrap {
+  margin: 0;
+}
+
+.profile-bar-versus-row .spectrum-fill-foot {
+  font-size: 0.62rem;
+}
+
+.profile-bar-versus-row .spectrum-fill-progress.side-a-fill {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--side-a) 35%, transparent), var(--side-a));
+}
+
+.profile-bar-versus-row .spectrum-fill-progress.side-b-fill {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--side-b) 35%, transparent), var(--side-b));
+}
+
+.profile-bar-versus-row.leads-a .profile-bar-versus-side.side-b,
+.profile-bar-versus-row.leads-b .profile-bar-versus-side.side-a {
+  opacity: 0.55;
+}
+
 /* ── Footer links ────────────────────────────────────────────────────────── */
 
 .compare-links {
@@ -548,7 +776,8 @@
   }
 
   .compare-grid,
-  .aspect-versus {
+  .aspect-versus,
+  .profile-bars-versus-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 

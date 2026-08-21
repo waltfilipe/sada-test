@@ -1,9 +1,10 @@
 "use client";
 
 import { ClubLogo } from "@/components/ClubLogo";
-import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
-import { MinutesStat } from "@/components/position/MinutesStat";
+import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
+import { MinutesStat } from "@/components/position/MinutesStat";
+import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile } from "@/lib/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -19,11 +20,17 @@ export function AthleteSlot({ side, player, players, onChange }: Props) {
   const token = ratingTier(player.ratings.geral);
   const age = player.birth_year ? CURRENT_YEAR - player.birth_year : null;
   const tm = player.transfermarkt;
+  const clusterProps = clusterTagProps(player);
 
   const facts = [
     { label: "Idade", value: age ? `${age}` : "—", unit: age ? "anos" : undefined },
     { label: "Altura", value: player.height ? `${player.height}` : "—", unit: player.height ? "cm" : undefined },
     { label: "Pé", value: player.foot ?? "—" },
+    {
+      label: "G / A",
+      value: `${player.goals} / ${player.assists}`,
+    },
+    { label: "Nacionalidade", value: player.nationality ?? "—" },
   ];
 
   return (
@@ -57,7 +64,7 @@ export function AthleteSlot({ side, player, players, onChange }: Props) {
             <i aria-hidden>·</i>
             <span>{player.position}</span>
           </p>
-          <ProfileTag {...profileTagProps(player)} />
+          {clusterProps ? <ClusterTag {...clusterProps} /> : <ProfileTag {...profileTagProps(player)} />}
 
           <div className="slot-rating">
             <strong>{formatRating(player.ratings.geral)}</strong>

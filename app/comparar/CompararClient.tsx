@@ -1,24 +1,73 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { ArchetypeVersus } from "@/components/compare/ArchetypeVersus";
 import { AspectVersus } from "@/components/compare/AspectVersus";
 import { AthleteSlot } from "@/components/compare/AthleteSlot";
+import { ProfileBarsVersus } from "@/components/compare/ProfileBarsVersus";
+import { ProfileShareVersus } from "@/components/compare/ProfileShareVersus";
 import { VersusBar } from "@/components/compare/VersusBar";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { aspectGroupsForPlayers } from "@/lib/aspectGroups";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
 import { profileMetaForFamily } from "@/lib/profileMeta";
 import { TENDENCY_META, formatRating } from "@/lib/scoutTheme";
-import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
+
+type Metric = { key: string; label: string };
 
 type Props = {
   family: PositionFamily;
   players: PlayerProfile[];
+  scatterMetrics: Metric[];
   initialA?: string;
   initialB?: string;
 };
 
-export function CompararClient({ family, players, initialA, initialB }: Props) {
+function aspectScore(item: AspectItem): number {
+  if (item.percentile != null) return item.percentile;
+  if (!item.stats.length) return 0;
+  return item.stats.reduce((sum, stat) => sum + stat.percentile, 0) / item.stats.length;
+}
+
+function countVersusMetrics(a: PlayerProfile, b: PlayerProfile, family: PositionFamily) {
+  const metrics: number[] = [a.ratings.geral - b.ratings.geral];
+
+  for (const item of profileMetaForFamily(family)) {
+    metrics.push((a.ratings[item.key] ?? 0) - (b.ratings[item.key] ?? 0));
+  }
+
+  for (const item of TENDENCY_META) {
+    metrics.push(a.tendencies[item.key] - b.tendencies[item.key]);
+  }
+
+  for (const group of aspectGroupsForPlayers(a, b)) {
+    const labels = new Set([
+      ...(a.aspects[group.key] ?? []).map((row) => row.label),
+      ...(b.aspects[group.key] ?? []).map((row) => row.label),
+    ]);
+    for (const label of labels) {
+      const itemA = (a.aspects[group.key] ?? []).find((row) => row.label === label);
+      const itemB = (b.aspects[group.key] ?? []).find((row) => row.label === label);
+      const scoreA = itemA ? aspectScore(itemA) : -1;
+      const scoreB = itemB ? aspectScore(itemB) : -1;
+      if (scoreA >= 0 && scoreB >= 0) metrics.push(scoreA - scoreB);
+    }
+  }
+
+  return metrics;
+}
+
+function formatScatterMetric(value: number): string {
+  if (Math.abs(value) >= 100) return value.toFixed(1).replace(".", ",");
+  if (Math.abs(value) >= 10) return value.toFixed(2).replace(".", ",");
+  return value.toFixed(2).replace(".", ",");
+}
+
+export function CompararClient({ family, players, scatterMetrics, initialA, initialB }: Props) {
+  const router = useRouter();
   const familyMeta = familyBySlug(family);
 
   const pick = (requested: string | undefined, fallbackIndex: number) => {
@@ -38,22 +87,33 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
   const b = players.find((player) => player.player_id === idB) ?? players[1] ?? players[0];
 
   const profileMeta = profileMetaForFamily(family);
+  const hasCluster = Boolean(a?.cluster && b?.cluster);
+  const hasProfileBars =
+    (a?.aspects.perfil_construcao?.length ?? 0) > 0 ||
+    (b?.aspects.perfil_construcao?.length ?? 0) > 0 ||
+    (a?.aspects.perfil_defensivo?.length ?? 0) > 0 ||
+    (b?.aspects.perfil_defensivo?.length ?? 0) > 0;
 
   const swap = () => {
     setIdA(idB);
     setIdB(idA);
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams();
+    params.set("posicao", family);
+    if (idA) params.set("a", idA);
+    if (idB) params.set("b", idB);
+    router.replace(`/comparar?${params.toString()}`, { scroll: false });
+  }, [family, idA, idB, router]);
+
   const verdict = useMemo(() => {
     if (!a || !b) return null;
-    const metrics = [
-      a.ratings.geral - b.ratings.geral,
-      ...TENDENCY_META.map((item) => a.tendencies[item.key] - b.tendencies[item.key]),
-    ];
+    const metrics = countVersusMetrics(a, b, family);
     const winsA = metrics.filter((value) => value > 0).length;
     const winsB = metrics.filter((value) => value < 0).length;
     return { winsA, winsB, total: metrics.length };
-  }, [a, b]);
+  }, [a, b, family]);
 
   const positionTabs = (
     <nav className="position-tabs" aria-label="Posições">
@@ -120,6 +180,8 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
               label="Rating geral"
               valueA={a.ratings.geral}
               valueB={b.ratings.geral}
+              rankA={a.ranks.geral}
+              rankB={b.ranks.geral}
               max={10}
               format={formatRating}
             />
@@ -129,12 +191,54 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
                 label={item.label}
                 valueA={a.ratings[item.key] ?? 0}
                 valueB={b.ratings[item.key] ?? 0}
+                rankA={a.ranks[item.key]}
+                rankB={b.ranks[item.key]}
                 max={10}
                 format={formatRating}
               />
             ))}
           </div>
         </section>
+
+        {hasCluster ? (
+          <section className="sc-panel compare-panel">
+            <header className="sc-panel-head">
+              <div>
+                <p className="sc-eyebrow">Arquétipos</p>
+                <h2>Mix de perfil e rating por arquétipo</h2>
+              </div>
+              <p className="sc-note">Afinidade % · rating 0–10</p>
+            </header>
+            <ArchetypeVersus a={a} b={b} />
+          </section>
+        ) : null}
+
+        <section className="sc-panel compare-panel">
+          <header className="sc-panel-head">
+            <div>
+              <p className="sc-eyebrow">Fit no pool</p>
+              <h2>Distribuição de perfil</h2>
+            </div>
+            <p className="sc-note">Share relativo no pool da posição</p>
+          </header>
+          <ProfileShareVersus family={family} a={a} b={b} />
+        </section>
+
+        {hasProfileBars ? (
+          <section className="sc-panel compare-panel">
+            <header className="sc-panel-head">
+              <div>
+                <p className="sc-eyebrow">Estilo de jogo</p>
+                <h2>Barras de perfil técnico</h2>
+              </div>
+              <p className="sc-note">Ponto vs média do pool</p>
+            </header>
+            <div className="profile-bars-versus-grid">
+              <ProfileBarsVersus title="Perfil de construção" a={a} b={b} aspectKey="perfil_construcao" />
+              <ProfileBarsVersus title="Perfil defensivo" a={a} b={b} aspectKey="perfil_defensivo" />
+            </div>
+          </section>
+        ) : null}
 
         <section className="sc-panel compare-panel">
           <header className="sc-panel-head">
@@ -158,13 +262,43 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
           </div>
         </section>
 
+        {scatterMetrics.length ? (
+          <section className="sc-panel compare-panel">
+            <header className="sc-panel-head">
+              <div>
+                <p className="sc-eyebrow">Volume bruto</p>
+                <h2>Stats por 90</h2>
+              </div>
+              <p className="sc-note">Métricas do scatter</p>
+            </header>
+
+            <div className="versus-rows">
+              {scatterMetrics.map((metric) => {
+                const valueA = a.scatter[metric.key] ?? 0;
+                const valueB = b.scatter[metric.key] ?? 0;
+                const max = Math.max(valueA, valueB, 1) * 1.15;
+                return (
+                  <VersusBar
+                    key={metric.key}
+                    label={metric.label}
+                    valueA={valueA}
+                    valueB={valueB}
+                    max={max}
+                    format={formatScatterMetric}
+                  />
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
+
         <section className="sc-panel compare-panel">
           <header className="sc-panel-head">
             <div>
               <p className="sc-eyebrow">Avaliação técnica</p>
               <h2>Aspectos de jogo</h2>
             </div>
-            <p className="sc-note">Nota e medalha por fundamento</p>
+            <p className="sc-note">Nota, medalha e volume por fundamento</p>
           </header>
 
           <AspectVersus a={a} b={b} />
