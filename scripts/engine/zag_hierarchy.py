@@ -14,8 +14,6 @@ CONSTRUTOR_BADGE_LABELS = ("Construtor Âncora", "Construtor Nato")
 CONSTRUCTION_Z_THRESHOLD = 0.25
 # M4 = (DD + INT) / (Rebatidas + DA) — contact/reading vs line/aerial.
 M4_COMBATIVO_THRESHOLD = 0.60
-# Elite duelos def z-score → Combativo even when construction volume is high.
-DD_COMBATIVO_Z_THRESHOLD = 1.5
 # Nudge the tree winner so mix-card shares match the primary archetype label.
 PRIMARY_SHARE_BOOST = 1.0
 
@@ -92,9 +90,7 @@ def _branch_scores(feat_df: pd.DataFrame) -> pd.DataFrame:
     )[list(ARCHETYPE_LABELS)]
 
 
-def _primary_archetype(con_z: float, m4_val: float, duelos_def_z: float) -> str:
-    if m4_val >= M4_COMBATIVO_THRESHOLD and duelos_def_z >= DD_COMBATIVO_Z_THRESHOLD:
-        return "Combativo"
+def _primary_archetype(con_z: float, m4_val: float) -> str:
     if con_z >= CONSTRUCTION_Z_THRESHOLD:
         return "Construtor"
     if m4_val >= M4_COMBATIVO_THRESHOLD:
@@ -113,7 +109,6 @@ def _mix_shares(feat_df: pd.DataFrame, primaries: list[str]) -> pd.DataFrame:
 def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
     con_z = _construction_z(feat_df)
     m4 = _m4_ratio(feat_df)
-    duelos_def_z = _zscore(feat_df["duelos_def"])
     mean_share_long = float(feat_df["share_long"].mean())
 
     primaries: list[str] = []
@@ -124,10 +119,9 @@ def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
     for idx in feat_df.index:
         cz = float(con_z.loc[idx])
         m4_val = float(m4.loc[idx])
-        dd_z = float(duelos_def_z.loc[idx])
         share_long = float(feat_df.loc[idx, "share_long"])
 
-        primary = _primary_archetype(cz, m4_val, dd_z)
+        primary = _primary_archetype(cz, m4_val)
         label = primary
         if primary == "Construtor":
             if share_long > mean_share_long:
