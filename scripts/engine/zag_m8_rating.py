@@ -56,23 +56,32 @@ NOTA_MU = 6.5
 NOTA_SCALE = 1.85
 NOTA_TAU = 2.5
 
+# Hero rating: blend M8 weak-axis with z-symmetry (con/def percentiles).
+M8_BLEND_WEIGHT = 0.50
+SYMMETRY_K = 15.0
+
 
 def _map_perfil_cluster(perfil: str) -> str:
     if perfil == "Construtor":
         return "Construtor"
-    if perfil in ("Posicional", "Combativo", "Defensivo"):
+    if perfil in ("Posicional", "Combativo", "Defensivo", "Defensor de Área"):
         return "Defensivo"
     return "Híbrido"
 
 
-def _load_hierarchical_perfil() -> pd.DataFrame:
-    path = ROOT / "reference" / "hierarchical_classification.csv"
-    if not path.exists():
-        return pd.DataFrame(columns=["Jogador", "perfil_cluster"])
-    return pd.read_csv(path)[["Jogador", "perfil"]].rename(columns={"perfil": "perfil_cluster"})
+def _zscore_series(series: pd.Series) -> pd.Series:
+    mu = float(series.mean())
+    sig = float(series.std())
+    if sig == 0:
+        return pd.Series(0.0, index=series.index)
+    return (series - mu) / sig
 
 
-def _load_reference_axis_scores() -> pd.DataFrame | None:
+def _symmetry_raw(con: float, def_: float, z_con: pd.Series, z_def: pd.Series, idx) -> float:
+    z_meta = (float(z_con.loc[idx]) + float(z_def.loc[idx])) / 2.0
+    return 50.0 + SYMMETRY_K * z_meta
+
+
     path = ROOT / "reference" / "zag_composite_rating_2026.csv"
     if not path.exists():
         return None
@@ -139,16 +148,22 @@ def apply_zag_m8_ratings(out: pd.DataFrame) -> pd.DataFrame:
     merged["def"] = (merged["duelos_def"] + merged["duelos_ar"] + merged["eficiencia_def"]) / 3
     med_con = float(merged["con"].median())
     med_def = float(merged["def"].median())
-    hier = _load_hierarchical_perfil()
-    if not hier.empty:
-        merged = merged.merge(hier, on="Jogador", how="left")
-    if "perfil_cluster" in merged.columns:
-        merged["perfil_m"] = merged["perfil_cluster"].fillna(merged["perfil"]).apply(_map_perfil_cluster)
+    z_con = _zscore_series(merged["con"])
+    z_def = _zscore_series(merged["def"])
+
+    if "cluster_archetype" in merged.columns:
+        merged["perfil_m"] = merged["cluster_archetype"].fillna(merged.get("perfil")).apply(_map_perfil_cluster)
+    elif "perfil_cluster" in merged.columns:
+        merged["perfil_m"] = merged["perfil_cluster"].fillna(merged.get("perfil")).apply(_map_perfil_cluster)
     else:
-        merged["perfil_m"] = merged["perfil"].apply(_map_perfil_cluster)
-    merged["m8_pre_shrink"] = merged.apply(lambda row: _model2_raw(row, med_con, med_def), axis=1)
+        merged["perfil_m"] = merged.get("perfil", "Híbrido").apply(_map_perfil_cluster)
+
+    m8_core = merged.apply(lambda row: _model2_raw(row, med_con, med_def), axis=1)
     merged["m8_bonus"] = merged.apply(_balance_bonus, axis=1)
-    merged["m8_raw"] = merged["m8_pre_shrink"] + merged["m8_bonus"]
+    m8_full = m8_core + merged["m8_bonus"]
+    sym_raw = merged.apply(lambda row: _symmetry_raw(row["con"], row["def"], z_con, z_def, row.name), axis=1)
+    merged["m8_pre_shrink"] = M8_BLEND_WEIGHT * m8_full + (1.0 - M8_BLEND_WEIGHT) * sym_raw
+    merged["m8_raw"] = merged["m8_pre_shrink"]
     merged["m8_final"] = merged.apply(lambda row: _shrink(row["m8_raw"], row["%Minutos"]), axis=1)
     merged["nota_global"] = _tanh_nota(merged["m8_final"]).round(2)
 

@@ -703,6 +703,7 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
 
     _apply_zag_k3_classification(out)
     out = apply_zag_hierarchical_clusters(out)
+    out["perfil"] = out["cluster_archetype"]
     out = apply_zag_m8_ratings(out)
 
     out = attach_aspect_percentiles(out)

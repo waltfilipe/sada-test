@@ -1,4 +1,8 @@
-"""Semantic archetype tree for Serie A zagueiros (Wyscout + SofaScore)."""
+"""Semantic archetype classification for Serie A zagueiros (Wyscout + SofaScore).
+
+Hybrid model (lat-style): argmax on z-scored area / construction / combat axes,
+Construtor guard, 2+ strong axes → argmax among strong, dual Con+Cb tie-break on duelos def.
+"""
 
 from __future__ import annotations
 
@@ -10,12 +14,14 @@ from .sofascore import SS_PATH, SS_STAT_COLS, aggregate_sofascore, match_ss_row
 ARCHETYPE_LABELS = ("Defensor de Área", "Construtor", "Combativo")
 CONSTRUTOR_BADGE_LABELS = ("Construtor Âncora", "Construtor Nato")
 
-# Mean construction z-score above pool → Construtor branch.
 CONSTRUCTION_Z_THRESHOLD = 0.25
-# M4 = (DD + INT) / (Rebatidas + DA) — contact/reading vs line/aerial.
-M4_COMBATIVO_THRESHOLD = 0.60
-# Nudge the tree winner so mix-card shares match the primary archetype label.
+STRONG_Z_THRESHOLD = 0.30
+DUAL_COMB_DD_THRESHOLD = 1.5
 PRIMARY_SHARE_BOOST = 1.0
+
+AREA_COLS = ["total_clearance_p90", "duelos_aereos", "outfielder_block_p90"]
+CON_COLS = ["passes_terco_final", "share_prog", "conducao_prog"]
+COM_COLS = ["duelos_def", "interception_won_p90", "m4_ratio"]
 
 
 def _build_feature_row(wy_row: pd.Series, ss_row: pd.Series | None) -> dict[str, float]:
@@ -45,25 +51,15 @@ def _zscore(series: pd.Series) -> pd.Series:
     return (series - series.mean()) / std
 
 
+def _axis_z(feat_df: pd.DataFrame, cols: list[str]) -> pd.Series:
+    return pd.DataFrame({col: _zscore(feat_df[col]) for col in cols}).mean(axis=1)
+
+
 def _softmax_shares(scores: np.ndarray) -> np.ndarray:
-    """Row-wise softmax → percentage shares summing to 100."""
     shifted = scores - scores.max(axis=1, keepdims=True)
     exp = np.exp(shifted)
     weights = exp / exp.sum(axis=1, keepdims=True)
     return weights * 100.0
-
-
-def _construction_z(feat_df: pd.DataFrame) -> pd.Series:
-    components = pd.DataFrame(
-        {
-            "ptf": _zscore(feat_df["passes_terco_final"]),
-            "passes": _zscore(feat_df["passes_total_p90"]),
-            "share_prog": _zscore(feat_df["share_prog"]),
-            "conducao": _zscore(feat_df["conducao_prog"]),
-        },
-        index=feat_df.index,
-    )
-    return components.mean(axis=1)
 
 
 def _m4_ratio(feat_df: pd.DataFrame) -> pd.Series:
@@ -73,29 +69,42 @@ def _m4_ratio(feat_df: pd.DataFrame) -> pd.Series:
     return (contact / denom).fillna(0.0)
 
 
+def _strong_axes(z_area: float, z_con: float, z_com: float, thr: float = STRONG_Z_THRESHOLD) -> list[str]:
+    axes = [("Defensor de Área", z_area), ("Construtor", z_con), ("Combativo", z_com)]
+    return [name for name, value in axes if value >= thr]
+
+
+def _primary_lat_style(z_area: float, z_con: float, z_com: float) -> str:
+    zmap = {"Defensor de Área": z_area, "Construtor": z_con, "Combativo": z_com}
+    if max(zmap.values()) < 0:
+        return "Defensor de Área"
+    primary = max(zmap, key=zmap.get)
+    if primary == "Construtor" and (z_con < CONSTRUCTION_Z_THRESHOLD or z_com >= z_con):
+        return "Combativo" if z_com >= z_area else "Defensor de Área"
+    return primary
+
+
+def _primary_hybrid(z_area: float, z_con: float, z_com: float, z_dd: float) -> str:
+    strong = _strong_axes(z_area, z_con, z_com)
+    zmap = {"Defensor de Área": z_area, "Construtor": z_con, "Combativo": z_com}
+    if len(strong) >= 2:
+        if "Combativo" in strong and "Construtor" in strong and z_dd >= DUAL_COMB_DD_THRESHOLD:
+            return "Combativo"
+        return max(strong, key=lambda k: zmap[k])
+    return _primary_lat_style(z_area, z_con, z_com)
+
+
 def _branch_scores(feat_df: pd.DataFrame) -> pd.DataFrame:
-    """Tree-aligned branch strengths for mix-card shares."""
+    feat = feat_df.copy()
+    feat["m4_ratio"] = _m4_ratio(feat)
     return pd.DataFrame(
         {
-            "Defensor de Área": (
-                _zscore(feat_df["total_clearance_p90"])
-                + _zscore(feat_df["duelos_aereos"])
-                + _zscore(feat_df["outfielder_block_p90"])
-            )
-            / 3.0,
-            "Construtor": _construction_z(feat_df),
-            "Combativo": _zscore(_m4_ratio(feat_df)),
+            "Defensor de Área": _axis_z(feat, AREA_COLS),
+            "Construtor": _axis_z(feat, CON_COLS),
+            "Combativo": _axis_z(feat, COM_COLS),
         },
         index=feat_df.index,
     )[list(ARCHETYPE_LABELS)]
-
-
-def _primary_archetype(con_z: float, m4_val: float) -> str:
-    if con_z >= CONSTRUCTION_Z_THRESHOLD:
-        return "Construtor"
-    if m4_val >= M4_COMBATIVO_THRESHOLD:
-        return "Combativo"
-    return "Defensor de Área"
 
 
 def _mix_shares(feat_df: pd.DataFrame, primaries: list[str]) -> pd.DataFrame:
@@ -107,21 +116,29 @@ def _mix_shares(feat_df: pd.DataFrame, primaries: list[str]) -> pd.DataFrame:
 
 
 def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
-    con_z = _construction_z(feat_df)
-    m4 = _m4_ratio(feat_df)
-    mean_share_long = float(feat_df["share_long"].mean())
+    feat = feat_df.copy()
+    feat["m4_ratio"] = _m4_ratio(feat)
+
+    z_area = _axis_z(feat, AREA_COLS)
+    z_con = _axis_z(feat, CON_COLS)
+    z_com = _axis_z(feat, COM_COLS)
+    z_dd = _zscore(feat["duelos_def"])
+
+    mean_share_long = float(feat["share_long"].mean())
 
     primaries: list[str] = []
     labels: list[str] = []
     badges: list[str | None] = []
     badge_short: list[str | None] = []
 
-    for idx in feat_df.index:
-        cz = float(con_z.loc[idx])
-        m4_val = float(m4.loc[idx])
-        share_long = float(feat_df.loc[idx, "share_long"])
+    for idx in feat.index:
+        za = float(z_area.loc[idx])
+        zc = float(z_con.loc[idx])
+        zcb = float(z_com.loc[idx])
+        zdd = float(z_dd.loc[idx])
+        share_long = float(feat.loc[idx, "share_long"])
 
-        primary = _primary_archetype(cz, m4_val)
+        primary = _primary_hybrid(za, zc, zcb, zdd)
         label = primary
         if primary == "Construtor":
             if share_long > mean_share_long:
@@ -138,7 +155,7 @@ def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
         labels.append(label)
         badges.append(badge)
 
-    shares = _mix_shares(feat_df, primaries)
+    shares = _mix_shares(feat, primaries)
 
     return pd.DataFrame(
         {
@@ -150,7 +167,7 @@ def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
             "cluster_share_construtor": shares["Construtor"].round(1),
             "cluster_share_combativo": shares["Combativo"].round(1),
         },
-        index=feat_df.index,
+        index=feat.index,
     )
 
 
@@ -171,7 +188,6 @@ def apply_zag_hierarchical_clusters(pool: pd.DataFrame) -> pd.DataFrame:
             out[col] = default
         return out
 
-    ss = aggregate_sofascore(SS_PATH)
     feature_rows: list[dict[str, float]] = []
     for _, row in out.iterrows():
         if float(row.get("interception_won_p90") or 0) > 0 or float(row.get("total_clearance_p90") or 0) > 0:
@@ -183,6 +199,7 @@ def apply_zag_hierarchical_clusters(pool: pd.DataFrame) -> pd.DataFrame:
             }
             feature_rows.append(_build_feature_row(row, pd.Series(ss_hit)))
         else:
+            ss = aggregate_sofascore(SS_PATH)
             ss_hit = match_ss_row(row, ss)
             feature_rows.append(_build_feature_row(row, ss_hit))
 
