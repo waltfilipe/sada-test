@@ -18,6 +18,7 @@ from .normalize import (
 from .profiles import FAMILY_PROFILE_CONFIG, profile_ratings_from_row, profile_ranks_from_row, profile_shares_from_row
 from .lat_hierarchy import apply_lat_hierarchical_clusters
 from .zag_hierarchy import apply_zag_hierarchical_clusters
+from .zag_m8_rating import apply_zag_m8_ratings
 
 
 ZAG_PROFILES = ["Construtor", "Defensivo", "Híbrido"]
@@ -702,49 +703,11 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
 
     _apply_zag_k3_classification(out)
     out = apply_zag_hierarchical_clusters(out)
-
-    med_con = float(out["rating_construcao"].median())
-    med_def = float(out["rating_defesa"].median())
-    out["rating_perfil_legacy"] = out.apply(_zag_profile_blend_simple, axis=1).round(1)
-    out["rating_perfil_base"] = out.apply(
-        lambda row: _zag_rating_perfil_base(row, med_con, med_def),
-        axis=1,
-    )
-    out["rating_perfil_raw"] = out.apply(
-        lambda row: _apply_confidence_to_rating(
-            _zag_apply_minutes_shrinkage(row["rating_perfil_base"], row["%Minutos"]),
-            row["_minutes_pool_pct"],
-        ),
-        axis=1,
-    )
-    out["rating_perfil"] = out["rating_perfil_raw"].round(1)
+    out = apply_zag_m8_ratings(out)
 
     out = attach_aspect_percentiles(out)
-    out["rating_core_abs_pct"] = out.apply(_zag_rating_core_abs_pct, axis=1)
-    out["rating_geral_raw"] = out.apply(
-        lambda row: _apply_confidence_to_rating(
-            _zag_apply_minutes_shrinkage(
-                5.0 + row["rating_core_abs_pct"] / 100.0 * 4.5,
-                row["%Minutos"],
-            ),
-            row["_minutes_pool_pct"],
-        ),
-        axis=1,
-    )
-    out["rating_geral"] = out["rating_geral_raw"].round(1)
-
-    # Legacy columns kept for internal diagnostics only
-    out["rating_combativo"] = out["rating_defesa"]
-    out["rating_construtor"] = out["rating_construcao"]
-    out["rating_posicional"] = out["rating_defesa"]
-
-    out["rank_geral"] = rank_players(out["rating_geral"])
     out["rank_construcao"] = rank_players(out["rating_construcao"])
     out["rank_defesa"] = rank_players(out["rating_defesa"])
-    out["rank_perfil"] = rank_players(out["rating_perfil"])
-    out["rank_combativo"] = out["rank_defesa"]
-    out["rank_construtor"] = out["rank_construcao"]
-    out["rank_posicional"] = out["rank_defesa"]
     return out
 
 
@@ -1465,8 +1428,6 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
         payload["hybrid_lean"] = lean if pd.notna(lean) and lean else None
         archetype = row.get("cluster_archetype")
         if pd.notna(archetype) and archetype:
-            con = float(row["rating_construcao"])
-            def_ = float(row["rating_defesa"])
             label = row.get("cluster_archetype_label")
             badge = row.get("cluster_construtor_badge")
             badge_short = row.get("cluster_construtor_badge_short")
@@ -1482,9 +1443,9 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
                     "combativo": float(row.get("cluster_share_combativo") or 0),
                 },
                 "ratings": {
-                    "defensor_area": round(def_, 1),
-                    "construtor": round(con, 1),
-                    "combativo": round(0.55 * con + 0.45 * def_, 1),
+                    "defensor_area": round(float(row.get("nota_defensor_area") or row["rating_geral"]), 1),
+                    "construtor": round(float(row.get("nota_construtor") or row["rating_geral"]), 1),
+                    "combativo": round(float(row.get("nota_combativo") or row["rating_geral"]), 1),
                 },
             }
     if family_key == "laterais":
