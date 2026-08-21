@@ -27,6 +27,8 @@ from engine.zag_m8_rating import (  # noqa: E402
 
 STRONG_W, WEAK_W = 0.85, 0.15
 META_K = 15.0  # escala 0-100: meta = 50 + k * (z_con + z_def) / 2
+Z_GAP = 0.5  # piso no eixo fraco em σ: z_def_eff = max(z_def, z_con - Z_GAP)
+BLEND_M8 = 0.60  # peso M8 no blend suave
 
 
 def _model2_raw(con: float, def_: float, perfil: str, med_con: float, med_def: float) -> float:
@@ -80,15 +82,32 @@ def _score(pool: pd.DataFrame, *, mode: str) -> pd.DataFrame:
     out["z_def"] = _z(out["def"])
     out["z_meta"] = (out["z_con"] + out["z_def"]) / 2
 
+    out["z_def_eff"] = np.maximum(out["z_def"], out["z_con"] - Z_GAP)
+    out["z_meta_suave"] = (out["z_con"] + out["z_def_eff"]) / 2
+    out["meta_z"] = 50.0 + META_K * out["z_meta"]
+    out["meta_z_suave"] = 50.0 + META_K * out["z_meta_suave"]
+
     if mode == "atual":
         out["m8_pre_shrink"] = out.apply(
             lambda row: _model2_raw(float(row["con"]), float(row["def"]), row["perfil_m"], med_con, med_def),
             axis=1,
         )
         out["m8_bonus"] = out.apply(_balance_bonus, axis=1)
-    else:
-        out["m8_pre_shrink"] = 50.0 + META_K * out["z_meta"]
+    elif mode == "simetria":
+        out["m8_pre_shrink"] = out["meta_z"]
         out["m8_bonus"] = 0.0
+    elif mode == "simetria_suave":
+        out["m8_pre_shrink"] = out["meta_z_suave"]
+        out["m8_bonus"] = 0.0
+    elif mode == "blend_suave":
+        m8 = out.apply(
+            lambda row: _model2_raw(float(row["con"]), float(row["def"]), row["perfil_m"], med_con, med_def),
+            axis=1,
+        ) + out.apply(_balance_bonus, axis=1)
+        out["m8_pre_shrink"] = BLEND_M8 * m8 + (1.0 - BLEND_M8) * out["meta_z_suave"]
+        out["m8_bonus"] = 0.0
+    else:
+        raise ValueError(mode)
 
     out["m8_raw"] = out["m8_pre_shrink"] + out["m8_bonus"]
     out["m8_final"] = out.apply(lambda row: _shrink(row["m8_raw"], row["%Minutos"]), axis=1)
@@ -109,6 +128,7 @@ def main() -> None:
     pool = _attach_profiles(_load_pool())
     atual = _score(pool, mode="atual")
     simetria = _score(pool, mode="simetria")
+    suave = _score(pool, mode="simetria_suave")
 
     out_dir = ROOT / "reference"
     compare = atual[
@@ -121,20 +141,37 @@ def main() -> None:
         on="player_id",
         how="left",
     )
+    compare = compare.merge(
+        suave[["player_id", "nota", "rank", "z_def_eff", "z_meta_suave"]].rename(
+            columns={"nota": "nota_suave", "rank": "rank_suave"}
+        ),
+        on="player_id",
+        how="left",
+    )
     compare["delta_rank"] = compare["rank_atual"] - compare["rank_sim"]
+    compare["delta_rank_suave"] = compare["rank_atual"] - compare["rank_suave"]
     compare = compare.sort_values("rank_atual")
     compare.to_csv(out_dir / "zag_symmetry_compare_2026.csv", index=False, float_format="%.2f")
 
-    top = pd.concat([_top20(atual, "atual"), _top20(simetria, "simetria_z")], ignore_index=True)
+    top = pd.concat(
+        [_top20(atual, "atual"), _top20(simetria, "simetria_z"), _top20(suave, "simetria_suave")],
+        ignore_index=True,
+    )
     top.to_csv(out_dir / "zag_symmetry_top20_2026.csv", index=False, float_format="%.2f")
 
     print("=" * 92)
     print("SIMETRIA ESTATÍSTICA — z_con + z_def vs M8 ATUAL")
     print("=" * 92)
     print(f"\nPool: con μ={pool['con'].mean():.1f} σ={pool['con'].std():.1f}  |  def μ={pool['def'].mean():.1f} σ={pool['def'].std():.1f}")
-    print(f"Simetria: meta = 50 + {META_K:.0f} × (z_con + z_def)/2  →  shrink  →  tanh (mesmo do M8)\n")
+    print(f"Simetria pura:  meta = 50 + {META_K:.0f} × (z_con + z_def)/2")
+    print(f"Simetria suave: meta = 50 + {META_K:.0f} × (z_con + z_def_eff)/2")
+    print(f"                  z_def_eff = max(z_def, z_con − {Z_GAP})  →  shrink  →  tanh\n")
 
-    for label, df in [("ATUAL (M8 weak-axis 85/15)", atual), ("SIMETRIA (z_con + z_def)", simetria)]:
+    for label, df in [
+        ("ATUAL (M8 weak-axis 85/15)", atual),
+        ("SIMETRIA PURA (z_con + z_def)", simetria),
+        ("SIMETRIA SUAVE (piso z, gap=0.5)", suave),
+    ]:
         print("-" * 92)
         print(label)
         print("-" * 92)
