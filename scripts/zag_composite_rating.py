@@ -7,12 +7,11 @@ Aspectos com regressão de impacto (pool A+B 2022–25):
 Eficiência defensiva (sem regressão):
   60% eficiência (−custo ajustado, menor = melhor) + 40% ações bem-sucedidas/90
 
-Rating geral = média simples dos 5 aspectos.
+Rating geral = média simples dos 5 aspectos, com shrinkage final por %Minutos.
 """
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
@@ -29,7 +28,6 @@ from zag_aspect_regression_study import (  # noqa: E402
     enrich_base,
     load_zagueiros,
     match_site_players,
-    metric_columns,
     prepare_metric_df,
 )
 
@@ -37,6 +35,9 @@ WEIGHT_RESID = 0.50
 WEIGHT_IMPACT = 0.50
 WEIGHT_EFF_DEF = 0.60
 WEIGHT_ACOES = 0.40
+
+SHRINK_MU = 50.0
+SHRINK_EXP = 0.65
 
 IMPACT_METRICS = ("duelos_def", "duelos_ar", "passes_prog", "passes_long")
 
@@ -55,6 +56,12 @@ def fit_impact_regression(pool: pd.DataFrame) -> dict[str, float]:
 
 def predict_impact(vol: float, coef: dict[str, float]) -> float:
     return coef["b0"] + coef["b1"] * vol + coef["b2"] * vol ** 2
+
+
+def apply_minutes_shrinkage(rating_mean: float, pct_minutes: float) -> tuple[float, float]:
+    """Pull rating toward SHRINK_MU when %Minutos is low. Returns (rating_final, weight)."""
+    w = min(1.0, float(pct_minutes) ** SHRINK_EXP)
+    return SHRINK_MU + w * (float(rating_mean) - SHRINK_MU), w
 
 
 def score_impact_5050(target: pd.DataFrame, spec) -> pd.DataFrame:
@@ -109,7 +116,14 @@ def build_composite() -> pd.DataFrame:
 
     score_cols = list(IMPACT_METRICS) + ["eficiencia_def"]
     out["rating_mean"] = out[score_cols].mean(axis=1)
-    out = out.sort_values("rating_mean", ascending=False).reset_index(drop=True)
+
+    minutes = match_site_players(target)[["player_id", "%Minutos", "minutes"]]
+    out = out.merge(minutes, on="player_id", how="left")
+    shrunk = out.apply(lambda r: apply_minutes_shrinkage(r["rating_mean"], r["%Minutos"]), axis=1)
+    out["minutes_weight"] = [s[1] for s in shrunk]
+    out["rating_final"] = [s[0] for s in shrunk]
+
+    out = out.sort_values("rating_final", ascending=False).reset_index(drop=True)
     out["rank"] = np.arange(1, len(out) + 1)
     return out
 
@@ -121,21 +135,24 @@ def main() -> None:
 
     print(f"Rating composto — {len(composite)} zagueiros (Serie A 2026)\n")
     print(
-        "Modelo: 50/50 impact-residual (duelos def, aéreos, prog, long) + "
-        "60/40 efic/custo vs ações (sem regressão)\n"
+        "Modelo: 50/50 impact-residual + 60/40 efic def → média → "
+        f"shrinkage rating = 50 + %Minutos^{SHRINK_EXP} × (média − 50)\n"
     )
     header = (
-        f"{'#':>3}  {'Jogador':<22} {'Equipe':<20} "
-        f"{'DD':>5} {'Ar':>5} {'Prog':>5} {'Long':>5} {'Efic':>5} {'MÉDIA':>6}"
+        f"{'#':>3}  {'Jogador':<22} {'Equipe':<18} {'%Min':>5} "
+        f"{'DD':>5} {'Ar':>5} {'Prog':>5} {'Long':>5} {'Efic':>5} "
+        f"{'Raw':>5} {'FIN':>5}"
     )
     print(header)
     print("-" * len(header))
 
     for _, r in composite.head(20).iterrows():
         print(
-            f"{int(r['rank']):>3}  {str(r['Jogador'])[:22]:<22} {str(r['Equipe'])[:20]:<20} "
+            f"{int(r['rank']):>3}  {str(r['Jogador'])[:22]:<22} {str(r['Equipe'])[:18]:<18} "
+            f"{r['%Minutos'] * 100:>4.0f}% "
             f"{r['duelos_def']:>5.1f} {r['duelos_ar']:>5.1f} {r['passes_prog']:>5.1f} "
-            f"{r['passes_long']:>5.1f} {r['eficiencia_def']:>5.1f} {r['rating_mean']:>6.1f}"
+            f"{r['passes_long']:>5.1f} {r['eficiencia_def']:>5.1f} "
+            f"{r['rating_mean']:>5.1f} {r['rating_final']:>5.1f}"
         )
 
     print(f"\n→ {out_csv}")
