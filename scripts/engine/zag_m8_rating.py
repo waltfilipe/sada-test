@@ -57,8 +57,12 @@ NOTA_SCALE = 1.85
 NOTA_TAU = 2.5
 
 # Hero rating: blend M8 weak-axis with z-symmetry (con/def percentiles).
+STRONG_W = 0.70
+WEAK_W = 0.30
 M8_BLEND_WEIGHT = 0.50
-SYMMETRY_K = 15.0
+SYM_DOM_W = 0.10
+SYM_WEAK_W = 0.90
+SYM_K = 15.0
 
 
 def _map_perfil_cluster(perfil: str) -> str:
@@ -78,10 +82,13 @@ def _zscore_series(series: pd.Series) -> pd.Series:
 
 
 def _symmetry_raw(con: float, def_: float, z_con: pd.Series, z_def: pd.Series, idx) -> float:
-    z_meta = (float(z_con.loc[idx]) + float(z_def.loc[idx])) / 2.0
-    return 50.0 + SYMMETRY_K * z_meta
+    zc = float(z_con.loc[idx])
+    zd = float(z_def.loc[idx])
+    z_meta = SYM_DOM_W * max(zc, zd) + SYM_WEAK_W * min(zc, zd)
+    return 50.0 + SYM_K * z_meta
 
 
+def _load_reference_axis_scores() -> pd.DataFrame | None:
     path = ROOT / "reference" / "zag_composite_rating_2026.csv"
     if not path.exists():
         return None
@@ -98,9 +105,9 @@ def _model2_raw(row: pd.Series, med_con: float, med_def: float) -> float:
         return max(base, 0.5 * con + 0.5 * def_)
     if perfil == "Construtor":
         def_eff = max(def_, min(con - GAP, med_def))
-        return 0.85 * con + 0.15 * def_eff
+        return STRONG_W * con + WEAK_W * def_eff
     con_eff = max(con, min(def_ - GAP, med_con))
-    return 0.15 * con_eff + 0.85 * def_
+    return WEAK_W * con_eff + STRONG_W * def_
 
 
 def _balance_bonus(row: pd.Series) -> float:
