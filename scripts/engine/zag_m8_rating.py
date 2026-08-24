@@ -17,34 +17,16 @@ if str(SCRIPTS) not in sys.path:
 
 SCORE_COLS = ["duelos_def", "duelos_ar", "passes_prog", "passes_long", "eficiencia_def"]
 
-ARCHETYPE_WEIGHTS: dict[str, dict[str, float]] = {
-    "Construtor": {
-        "passes_prog": 0.35,
-        "passes_long": 0.35,
-        "duelos_def": 0.10,
-        "duelos_ar": 0.10,
-        "eficiencia_def": 0.10,
-    },
-    "Combativo": {
-        "passes_prog": 0.10,
-        "passes_long": 0.10,
-        "duelos_def": 0.50,
-        "duelos_ar": 0.10,
-        "eficiencia_def": 0.20,
-    },
-    "Defensor de Área": {
-        "passes_prog": 0.10,
-        "passes_long": 0.10,
-        "duelos_def": 0.20,
-        "duelos_ar": 0.30,
-        "eficiencia_def": 0.30,
-    },
-}
+FORCED_PROFILES: tuple[tuple[str, str], ...] = (
+    ("Construtor", "construtor"),
+    ("Defensivo", "defensor_area"),
+    ("Combativo", "combativo"),
+)
 
-ARCHETYPE_SLUGS = {
-    "Construtor": "construtor",
-    "Combativo": "combativo",
-    "Defensor de Área": "defensor_area",
+ACTIVE_NOTA_COL = {
+    "Construtor": "nota_construtor",
+    "Defensor de Área": "nota_defensor_area",
+    "Combativo": "nota_combativo",
 }
 
 GAP = 10.0
@@ -95,6 +77,22 @@ def _load_reference_axis_scores() -> pd.DataFrame | None:
     return pd.read_csv(path)[["player_id", *SCORE_COLS]]
 
 
+def _def_branch_score(row: pd.Series, branch: str) -> float:
+    if branch == "Combativo":
+        return (
+            0.625 * float(row["duelos_def"])
+            + 0.125 * float(row["duelos_ar"])
+            + 0.25 * float(row["eficiencia_def"])
+        )
+    if branch == "Defensivo":
+        return (
+            0.25 * float(row["duelos_def"])
+            + 0.375 * float(row["duelos_ar"])
+            + 0.375 * float(row["eficiencia_def"])
+        )
+    return float(row["def"])
+
+
 def _model2_raw(row: pd.Series, med_con: float, med_def: float) -> float:
     con = float(row["con"])
     def_ = float(row["def"])
@@ -110,6 +108,18 @@ def _model2_raw(row: pd.Series, med_con: float, med_def: float) -> float:
     return WEAK_W * con_eff + STRONG_W * def_
 
 
+def _model2_raw_forced(row: pd.Series, perfil_m: str, med_con: float, med_def: float) -> float:
+    """Counterfactual M8 weak-axis for a forced profile (no symmetry blend)."""
+    if perfil_m == "Construtor":
+        forced = row.copy()
+        forced["perfil_m"] = "Construtor"
+        return _model2_raw(forced, med_con, med_def)
+    con = float(row["con"])
+    def_ = _def_branch_score(row, perfil_m)
+    con_eff = max(con, min(def_ - GAP, med_con))
+    return WEAK_W * con_eff + STRONG_W * def_
+
+
 def _balance_bonus(row: pd.Series) -> float:
     std = float(np.std([row[c] for c in SCORE_COLS]))
     if std < BALANCE_STD_REF:
@@ -120,10 +130,6 @@ def _balance_bonus(row: pd.Series) -> float:
 def _shrink(raw: float, pct_minutes: float) -> float:
     w = min(1.0, float(pct_minutes) ** SHRINK_EXP)
     return SHRINK_MU + w * (float(raw) - SHRINK_MU)
-
-
-def _weighted_raw(row: pd.Series, weights: dict[str, float]) -> float:
-    return float(sum(float(row[col]) * weights[col] for col in SCORE_COLS))
 
 
 def _tanh_nota(series: pd.Series) -> pd.Series:
@@ -174,17 +180,26 @@ def apply_zag_m8_ratings(out: pd.DataFrame) -> pd.DataFrame:
     merged["m8_final"] = merged.apply(lambda row: _shrink(row["m8_raw"], row["%Minutos"]), axis=1)
     merged["nota_global"] = _tanh_nota(merged["m8_final"]).round(2)
 
-    for arch, weights in ARCHETYPE_WEIGHTS.items():
-        slug = ARCHETYPE_SLUGS[arch]
+    for perfil_m, slug in FORCED_PROFILES:
         raw_col = f"m8_raw_{slug}"
         final_col = f"m8_final_{slug}"
         nota_col = f"nota_{slug}"
-        merged[raw_col] = merged.apply(lambda row, w=weights: _weighted_raw(row, w), axis=1)
+        merged[raw_col] = merged.apply(
+            lambda row, pm=perfil_m: _model2_raw_forced(row, pm, med_con, med_def) + row["m8_bonus"],
+            axis=1,
+        )
         merged[final_col] = merged.apply(lambda row, c=raw_col: _shrink(row[c], row["%Minutos"]), axis=1)
         merged[nota_col] = _tanh_nota(merged[final_col]).round(2)
 
+    def _active_nota(row: pd.Series) -> float:
+        arch = row.get("cluster_archetype") or row.get("perfil")
+        col = ACTIVE_NOTA_COL.get(str(arch) if pd.notna(arch) else "")
+        if col:
+            return float(row[col])
+        return float(row["nota_global"])
+
     merged["rating_geral"] = merged["nota_global"].round(1)
-    merged["rating_perfil"] = merged["nota_global"].round(1)
+    merged["rating_perfil"] = merged.apply(_active_nota, axis=1).round(1)
     merged["rank_geral"] = rank_players(merged["rating_geral"])
     merged["rank_perfil"] = rank_players(merged["rating_perfil"])
 
