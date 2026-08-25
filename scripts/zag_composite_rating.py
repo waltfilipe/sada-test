@@ -185,6 +185,83 @@ def build_axis_scores_for_pool(pool: pd.DataFrame) -> pd.DataFrame:
     return out[["player_id", *IMPACT_METRICS, "eficiencia_def"]]
 
 
+def _residualize_series(y: pd.Series, x: pd.Series) -> pd.Series:
+    xv = x.to_numpy(dtype=float)
+    yv = y.to_numpy(dtype=float)
+    coef, _, _, _ = np.linalg.lstsq(np.column_stack([np.ones(len(xv)), xv]), yv, rcond=None)
+    return pd.Series(yv - (coef[0] + coef[1] * xv), index=y.index)
+
+
+def score_eficiencia_def_v2_pool(enriched: pd.DataFrame) -> pd.Series:
+    """Defensive efficiency without interceptions/clearances (for DA composite)."""
+    dd = enriched["duelos_def_vol"]
+    pct_w = enriched["duelos_def_eff"] / 100.0
+    block = _pool_col(enriched, "outfielder_block_p90")
+    acoes = dd * pct_w + block
+    beta = 0.45
+    faltas = _pool_col(enriched, "Faltas/90", "Faltas")
+    dd_perd = dd * (1 - pct_w)
+    num = dd_perd + np.maximum(0, faltas - beta * dd_perd)
+    custo = (num / acoes.replace(0, np.nan)).fillna(num)
+    eff_pct = custo.apply(lambda c: pct_rank(c, custo))
+    eff_pct = 100.0 - eff_pct
+    acoes_pct = acoes.apply(lambda a: pct_rank(a, acoes))
+    return WEIGHT_EFF_DEF * eff_pct + WEIGHT_ACOES * acoes_pct
+
+
+def score_vol_impact_5050(vol: pd.Series, impact: pd.Series, conf_ref: float) -> pd.Series:
+    conf = (vol / conf_ref).clip(0, 1)
+    resid = _residualize_series(impact, vol)
+    resid_pct = resid.apply(lambda r: pct_rank(r, resid))
+    score_resid = 50.0 + conf * (resid_pct - 50.0)
+    score_impact = impact.apply(lambda x: pct_rank(x, impact))
+    return WEIGHT_RESID * score_resid + WEIGHT_IMPACT * score_impact
+
+
+def build_tri_composite_metric_scores(pool: pd.DataFrame) -> pd.DataFrame:
+    """Eight metric scores (0–100) for tri-composite zagueiro ratings."""
+    enriched = enrich_pool(pool)
+    enriched["block_p90"] = _pool_col(pool, "outfielder_block_p90")
+    enriched["faltas_p90"] = _pool_col(pool, "Faltas/90", "Faltas")
+
+    frames = []
+    for key in IMPACT_METRICS:
+        spec = next(m for m in METRICS if m.key == key)
+        frames.append(score_impact_5050_pool(enriched, spec)[["player_id", key]])
+
+    out = frames[0]
+    for df in frames[1:]:
+        out = out.merge(df, on="player_id", how="outer")
+
+    out["eficiencia_def_v2"] = score_eficiencia_def_v2_pool(enriched)
+
+    clear = _pool_col(pool, "total_clearance_p90", "Cortes/90", "Cortes", "Carrinhos")
+    out["rebatidas"] = score_vol_impact_5050(clear, clear, conf_ref=8.0)
+
+    inter = _pool_col(pool, "interception_won_p90", "Interseções/90", "Interseções")
+    out["interceptions"] = score_vol_impact_5050(inter, inter, conf_ref=6.0)
+
+    cond = _pool_col(pool, "Cond.Prog", "Corridas progressivas/90")
+    out["conducao_prog"] = score_vol_impact_5050(cond, cond, conf_ref=4.0)
+
+    comp_ptf = _pool_col(pool, "CompPTF")
+    comp_pp = _pool_col(pool, "CompPassesProg")
+    ptf_res = _residualize_series(comp_ptf, comp_pp)
+    out["ptf_mitigated"] = ptf_res.apply(lambda r: pct_rank(r, ptf_res))
+
+    return out[
+        [
+            "player_id",
+            *IMPACT_METRICS,
+            "eficiencia_def_v2",
+            "rebatidas",
+            "interceptions",
+            "conducao_prog",
+            "ptf_mitigated",
+        ]
+    ]
+
+
 def build_composite() -> pd.DataFrame:
     target = enrich_base(load_zagueiros(ROOT / "Serie A 26.xlsx"))
 
