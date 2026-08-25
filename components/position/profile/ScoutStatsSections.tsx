@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { GradeBadge } from "@/components/ui/GradeBadge";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
+import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 
 function flattenAspects(player: PlayerProfile): AspectItem[] {
   const groups = player.aspects;
@@ -24,15 +24,90 @@ function findAspect(items: AspectItem[], label: string): AspectItem | undefined 
   return items.find((item) => candidates.some((c) => item.label === c || item.label.startsWith(c)));
 }
 
-function metricValue(item: AspectItem): string {
-  if (item.display_value) return item.display_value;
-  if (item.certos_per90 != null) return item.certos_per90.toFixed(1).replace(".", ",");
-  return "—";
+function metricValue(value?: string | null): string {
+  return value ?? "—";
 }
 
 function sectionLetter(items: AspectItem[]): string | undefined {
   if (!items.length) return undefined;
   return items[0]?.grade;
+}
+
+const ROW_LABEL_ALIASES: Record<string, string> = {
+  "Ações bem-sucedidas": "Ações Defensivas/90",
+};
+
+function rowLabel(label: string): string {
+  if (ROW_LABEL_ALIASES[label]) return ROW_LABEL_ALIASES[label];
+  if (label === "Eficiência" || label === "Eficiência Defensiva") return label;
+  if (label.includes("/90") || label.includes("/ 90")) return label;
+  return `${label}/90`;
+}
+
+function volumeRowLabel(item: AspectItem): string {
+  return rowLabel(item.label);
+}
+
+type MetricRowProps = {
+  label: string;
+  value?: string | null;
+  percentile?: number | null;
+  grade?: string;
+};
+
+function StatMetricRow({ label, value, percentile, grade }: MetricRowProps) {
+  return (
+    <div className="stat-metric-row">
+      <div className="stat-metric-head">
+        <span className="stat-metric-label">{label}</span>
+        <span className="stat-metric-value tabular">{metricValue(value)}</span>
+      </div>
+      <MetricGradientBar score={percentile ?? null} letter={grade} scale="percent" />
+    </div>
+  );
+}
+
+function StatAspectBlock({ item }: { item: AspectItem }) {
+  const hasSubMetrics =
+    (item.kind === "def_efficiency_group" || item.kind === "metric_group") &&
+    Boolean(item.sub_metrics?.length);
+
+  return (
+    <div className="stat-aspect-group">
+      <div className="stat-aspect-group-head">
+        <span className="stat-aspect-group-title">{item.label}</span>
+        <GradeBadge letter={item.grade} size="sm" />
+      </div>
+      <div className="stat-aspect-group-body">
+        {hasSubMetrics ? (
+          item.sub_metrics!.map((sub: AspectSubMetric) => (
+            <StatMetricRow
+              key={sub.label}
+              label={rowLabel(sub.label)}
+              value={sub.display_value}
+              percentile={sub.percentile}
+            />
+          ))
+        ) : (
+          <>
+            <StatMetricRow
+              label={volumeRowLabel(item)}
+              value={item.display_value ?? (item.certos_per90 != null ? item.certos_per90.toFixed(1).replace(".", ",") : undefined)}
+              percentile={item.percentile}
+              grade={item.grade}
+            />
+            {item.efficiency_pct != null ? (
+              <StatMetricRow
+                label="Eficiência"
+                value={item.efficiency_value}
+                percentile={item.efficiency_pct}
+              />
+            ) : null}
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export function ScoutStatsSections({
@@ -71,18 +146,7 @@ export function ScoutStatsSections({
               <div className="report-pass-accordion-panel">
                 <div className="pass-score-metrics">
                   {metrics.map((item) => (
-                    <div key={item.label} className="pass-metric-block">
-                      <div className="pass-metric-head">
-                        <span className="pass-metric-label">{item.label}</span>
-                        <span className="pass-metric-value tabular">{metricValue(item)}</span>
-                        <GradeBadge letter={item.grade} size="sm" />
-                      </div>
-                      <MetricGradientBar
-                        score={item.percentile ?? null}
-                        letter={item.grade}
-                        scale="percent"
-                      />
-                    </div>
+                    <StatAspectBlock key={item.label} item={item} />
                   ))}
                 </div>
               </div>

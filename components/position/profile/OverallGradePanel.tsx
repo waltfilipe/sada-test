@@ -11,9 +11,9 @@ type Props = {
 export function OverallGradePanel({ score, title = "Rating Geral" }: Props) {
   if (score == null) {
     return (
-      <div className="overall-grade-panel">
-        <span className="pass-grade-title">{title}</span>
-        <p className="muted">Indisponível</p>
+      <div className="overall-grade-panel overall-grade-panel-compact">
+        <span className="overall-grade-title-vertical">{title}</span>
+        <p className="muted overall-grade-unavailable">Indisponível</p>
       </div>
     );
   }
@@ -22,8 +22,8 @@ export function OverallGradePanel({ score, title = "Rating Geral" }: Props) {
 
   return (
     <Tooltip content="Nota geral do atleta no pool da posição." block>
-      <div className="overall-grade-panel">
-        <span className="pass-grade-title">{title}</span>
+      <div className="overall-grade-panel overall-grade-panel-compact">
+        <span className="overall-grade-title-vertical">{title}</span>
         <div className="overall-grade-display">
           <span className="overall-grade-score tabular" style={{ color }}>
             {score.toFixed(1)}
