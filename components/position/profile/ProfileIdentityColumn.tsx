@@ -87,7 +87,7 @@ export function ProfileIdentityColumn({ player, family }: Props) {
         </div>
       </div>
 
-      <div className="player-card identity-card">
+      <div className="identity-card identity-card-bare">
         <div className="identity-facts identity-facts-side">
           <div className="identity-fact">
             <FactIcon icon="fa-cake-candles" />
