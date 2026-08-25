@@ -1,4 +1,5 @@
-"""Zagueiro tri-composite rating — profile metrics, share blend, shrinkage and tanh nota."""
+"""Zagueiro tri-composite rating — profile tanh notas and α-blended overall."""
+
 
 from __future__ import annotations
 
@@ -31,6 +32,8 @@ SHRINK_EXP = 0.65
 NOTA_MU = 6.5
 NOTA_SCALE = 1.85
 NOTA_TAU = 2.5
+# Overall = α·equal thirds + (1−α)·share-weighted blend of profile notas.
+GERAL_ALPHA = 0.25
 
 
 def _shrink(raw: float, pct_minutes: float) -> float:
@@ -45,6 +48,20 @@ def _tanh_nota(series: pd.Series) -> pd.Series:
         return pd.Series(NOTA_MU, index=series.index)
     z = (series - mu) / (sig * NOTA_TAU)
     return NOTA_MU + NOTA_SCALE * np.tanh(z)
+
+
+def _geral_from_profile_notas(merged: pd.DataFrame) -> pd.Series:
+    """Blend profile notas: fixed equal thirds + cluster shares (contrapeso)."""
+    alpha = GERAL_ALPHA
+    w_equal = alpha / 3.0
+    w_c = w_equal + (1.0 - alpha) * merged["cluster_share_construtor"].fillna(0) / 100.0
+    w_da = w_equal + (1.0 - alpha) * merged["cluster_share_defensor_area"].fillna(0) / 100.0
+    w_cb = w_equal + (1.0 - alpha) * merged["cluster_share_combativo"].fillna(0) / 100.0
+    return (
+        w_c * merged["nota_construtor"]
+        + w_da * merged["nota_defensor_area"]
+        + w_cb * merged["nota_combativo"]
+    )
 
 
 def apply_zag_m8_ratings(out: pd.DataFrame) -> pd.DataFrame:
@@ -73,7 +90,7 @@ def apply_zag_m8_ratings(out: pd.DataFrame) -> pd.DataFrame:
     )
     merged["m8_raw"] = merged["m8_pre_shrink"]
     merged["m8_final"] = merged.apply(lambda row: _shrink(row["m8_raw"], row["%Minutos"]), axis=1)
-    merged["nota_global"] = _tanh_nota(merged["m8_final"]).round(2)
+    merged["nota_global"] = _geral_from_profile_notas(merged).round(2)
 
     # Separate tanh pools per profile can leave nota_global above the active profile
     # (e.g. high-share Construtor with elite raw but stiff construtor pool). The
