@@ -23,11 +23,7 @@ from zag_composite_rating import (  # noqa: E402
     score_vol_impact_5050,
 )
 
-LAT_CON_IMPACT = ("passes_prog", "passes_long")
-
-
-def _eff_impact(vol: pd.Series, eff_pct: pd.Series) -> pd.Series:
-    return vol * eff_pct / 100.0
+LAT_HIST_IMPACT = ("duelos_def", "passes_prog", "passes_long", "dribles", "cruzamentos")
 
 
 def score_distribuicao_pool(pool: pd.DataFrame) -> pd.Series:
@@ -39,18 +35,8 @@ def score_distribuicao_pool(pool: pd.DataFrame) -> pd.Series:
     return 0.70 * comp_pct + 0.30 * rec_pct
 
 
-def score_dribles_pool(pool: pd.DataFrame) -> pd.Series:
-    vol = _pool_col(pool, "Dribles", "Dribles/90")
-    eff = _pool_col(pool, "%EffDribles", "Dribles com sucesso, %")
-    impact = _eff_impact(vol, eff)
-    return score_vol_impact_5050(vol, impact, conf_ref=5.0)
-
-
-def score_cruzamentos_pool(pool: pd.DataFrame) -> pd.Series:
-    vol = _pool_col(pool, "Cruz.", "Cruzamentos/90")
-    eff = _pool_col(pool, "%EffCruz.", "Cruzamentos certos, %")
-    impact = _eff_impact(vol, eff)
-    return score_vol_impact_5050(vol, impact, conf_ref=4.0)
+def _eff_impact(vol: pd.Series, eff_pct: pd.Series) -> pd.Series:
+    return vol * eff_pct / 100.0
 
 
 def score_passes_finais_pool(pool: pd.DataFrame) -> pd.Series:
@@ -85,7 +71,7 @@ def build_lat_tri_composite_metric_scores(pool: pd.DataFrame) -> pd.DataFrame:
     spec_dd = next(m for m in METRICS if m.key == "duelos_def")
     out = score_impact_5050_pool(enriched, spec_dd)[["player_id", "duelos_def"]]
 
-    for key in LAT_CON_IMPACT:
+    for key in LAT_HIST_IMPACT[1:]:
         spec = next(m for m in METRICS if m.key == key)
         frame = score_impact_5050_pool(enriched, spec)[["player_id", key]]
         out = out.merge(frame, on="player_id", how="outer")
@@ -103,8 +89,6 @@ def build_lat_tri_composite_metric_scores(pool: pd.DataFrame) -> pd.DataFrame:
         eficiencia_def_v2=score_eficiencia_def_v2_pool(enriched),
         ptf_mitigated=ptf_res.apply(lambda r: pct_rank(r, ptf_res)),
         distribuicao=score_distribuicao_pool(pool),
-        dribles=score_dribles_pool(pool),
-        cruzamentos=score_cruzamentos_pool(pool),
         passes_finais=score_passes_finais_pool(pool),
         ofensividade=score_ofensividade_pool(pool),
     )

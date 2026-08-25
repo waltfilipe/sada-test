@@ -24,8 +24,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from zag_aspect_regression_study import (  # noqa: E402
     HISTORICAL_FILES,
+    LAT_HISTORICAL_METRICS,
     METRICS,
     enrich_base,
+    load_laterais,
     load_zagueiros,
     match_site_players,
     prepare_metric_df,
@@ -77,7 +79,8 @@ def _score_impact_5050_frame(scored: pd.DataFrame, spec, coef: dict[str, float])
 
 
 def _impact_coef(spec) -> dict[str, float]:
-    hist = pd.concat([enrich_base(load_zagueiros(p)) for p in HISTORICAL_FILES], ignore_index=True)
+    loader = load_laterais if spec.key in LAT_HISTORICAL_METRICS else load_zagueiros
+    hist = pd.concat([enrich_base(loader(p)) for p in HISTORICAL_FILES], ignore_index=True)
     return fit_impact_regression(prepare_metric_df(hist, spec))
 
 
@@ -165,6 +168,13 @@ def enrich_pool(pool: pd.DataFrame) -> pd.DataFrame:
     out["passes_long_impact"] = _pool_col(out, "CompBL")
     if (out["passes_long_impact"] == 0).all():
         out["passes_long_impact"] = out["passes_long_vol"] * out["passes_long_eff"] / 100.0
+
+    out["dribles_vol"] = _pool_col(out, "Dribles", "Dribles/90")
+    out["dribles_eff"] = _pool_col(out, "%EffDribles", "Dribles com sucesso, %")
+    out["dribles_impact"] = out["dribles_vol"] * out["dribles_eff"] / 100.0
+    out["cruzamentos_vol"] = _pool_col(out, "Cruz.", "Cruzamentos/90")
+    out["cruzamentos_eff"] = _pool_col(out, "%EffCruz.", "Cruzamentos certos, %")
+    out["cruzamentos_impact"] = out["cruzamentos_vol"] * out["cruzamentos_eff"] / 100.0
     return out
 
 

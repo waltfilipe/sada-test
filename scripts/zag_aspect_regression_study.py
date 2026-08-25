@@ -133,6 +133,13 @@ def enrich_base(df: pd.DataFrame) -> pd.DataFrame:
     if (out["passes_long_impact"] == 0).all():
         out["passes_long_impact"] = out["passes_long_vol"] * out["passes_long_eff"] / 100.0
 
+    out["dribles_vol"] = _num(out, "Dribles/90", "Dribles")
+    out["dribles_eff"] = _num(out, "Dribles com sucesso, %")
+    out["dribles_impact"] = out["dribles_vol"] * out["dribles_eff"] / 100.0
+    out["cruzamentos_vol"] = _num(out, "Cruzamentos/90", "Cruz.")
+    out["cruzamentos_eff"] = _num(out, "Cruzamentos certos, %")
+    out["cruzamentos_impact"] = out["cruzamentos_vol"] * out["cruzamentos_eff"] / 100.0
+
     return out
 
 
@@ -184,7 +191,27 @@ METRICS: list[MetricSpec] = [
         higher_eff_better=True,
         eff_is_pct=False,
     ),
+    MetricSpec(
+        key="dribles",
+        title="Dribles",
+        vol_label="Dribles/90",
+        eff_label="Eff %",
+        impact_label="Certos/90",
+        conf_ref=60,
+        resid_cap=RESID_CAP_PP,
+    ),
+    MetricSpec(
+        key="cruzamentos",
+        title="Cruzamentos",
+        vol_label="Cruz./90",
+        eff_label="Eff %",
+        impact_label="Certos/90",
+        conf_ref=50,
+        resid_cap=RESID_CAP_PP,
+    ),
 ]
+
+LAT_HISTORICAL_METRICS = frozenset({"dribles", "cruzamentos"})
 
 
 def metric_columns(spec: MetricSpec) -> tuple[str, str, str, str]:
@@ -196,6 +223,10 @@ def metric_columns(spec: MetricSpec) -> tuple[str, str, str, str]:
         return "passes_prog_vol", "passes_prog_eff", "passes_prog_impact", "passes_prog_vol"
     if spec.key == "passes_long":
         return "passes_long_vol", "passes_long_eff", "passes_long_impact", "passes_long_vol"
+    if spec.key == "dribles":
+        return "dribles_vol", "dribles_eff", "dribles_impact", "dribles_vol"
+    if spec.key == "cruzamentos":
+        return "cruzamentos_vol", "cruzamentos_eff", "cruzamentos_impact", "cruzamentos_vol"
     return "acoes_def", "custo_def", "inter_clear_p90", "acoes_def"
 
 
@@ -213,7 +244,7 @@ def prepare_metric_df(df: pd.DataFrame, spec: MetricSpec) -> pd.DataFrame:
     return out
 
 
-def load_zagueiros(path: Path) -> pd.DataFrame:
+def _load_position_pool(path: Path, positions: frozenset[str]) -> pd.DataFrame:
     league = "B" if re.search(r"S[ée]rie B", path.name, re.I) else "A"
     xl = pd.ExcelFile(path)
     sheet = "Tb_SerieC25" if "Tb_SerieC25" in xl.sheet_names else "Search results (500)"
@@ -222,9 +253,17 @@ def load_zagueiros(path: Path) -> pd.DataFrame:
     if "Equipa" in df.columns and "Equipe" not in df.columns:
         df = df.rename(columns={"Equipa": "Equipe"})
     df["Posição"] = [_map_wyscout_position(v) for v in df.get("Posição", [])]
-    df = df[df["Posição"] == "Zagueiro"].copy()
+    df = df[df["Posição"].isin(positions)].copy()
     df["league"] = league
     return df
+
+
+def load_zagueiros(path: Path) -> pd.DataFrame:
+    return _load_position_pool(path, frozenset({"Zagueiro"}))
+
+
+def load_laterais(path: Path) -> pd.DataFrame:
+    return _load_position_pool(path, frozenset({"Lateral Direito", "Lateral Esquerdo"}))
 
 
 def fit_eff_regression(pool: pd.DataFrame) -> dict[str, float]:
