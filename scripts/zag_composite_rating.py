@@ -218,6 +218,13 @@ def score_vol_impact_5050(vol: pd.Series, impact: pd.Series, conf_ref: float) ->
     return WEIGHT_RESID * score_resid + WEIGHT_IMPACT * score_impact
 
 
+def _scores_by_player_id(pool: pd.DataFrame, **columns: pd.Series) -> pd.DataFrame:
+    """Attach pool-indexed score columns keyed by player_id (safe after out-of-order merges)."""
+    data: dict[str, pd.Series] = {"player_id": pool["player_id"]}
+    data.update(columns)
+    return pd.DataFrame(data)
+
+
 def build_tri_composite_metric_scores(pool: pd.DataFrame) -> pd.DataFrame:
     """Eight metric scores (0–100) for tri-composite zagueiro ratings."""
     enriched = enrich_pool(pool)
@@ -233,21 +240,22 @@ def build_tri_composite_metric_scores(pool: pd.DataFrame) -> pd.DataFrame:
     for df in frames[1:]:
         out = out.merge(df, on="player_id", how="outer")
 
-    out["eficiencia_def_v2"] = score_eficiencia_def_v2_pool(enriched)
-
     clear = _pool_col(pool, "total_clearance_p90", "Cortes/90", "Cortes", "Carrinhos")
-    out["rebatidas"] = score_vol_impact_5050(clear, clear, conf_ref=8.0)
-
     inter = _pool_col(pool, "interception_won_p90", "Interseções/90", "Interseções")
-    out["interceptions"] = score_vol_impact_5050(inter, inter, conf_ref=6.0)
-
     cond = _pool_col(pool, "Cond.Prog", "Corridas progressivas/90")
-    out["conducao_prog"] = score_vol_impact_5050(cond, cond, conf_ref=4.0)
-
     comp_ptf = _pool_col(pool, "CompPTF")
     comp_pp = _pool_col(pool, "CompPassesProg")
     ptf_res = _residualize_series(comp_ptf, comp_pp)
-    out["ptf_mitigated"] = ptf_res.apply(lambda r: pct_rank(r, ptf_res))
+
+    extra = _scores_by_player_id(
+        pool,
+        eficiencia_def_v2=score_eficiencia_def_v2_pool(enriched),
+        rebatidas=score_vol_impact_5050(clear, clear, conf_ref=8.0),
+        interceptions=score_vol_impact_5050(inter, inter, conf_ref=6.0),
+        conducao_prog=score_vol_impact_5050(cond, cond, conf_ref=4.0),
+        ptf_mitigated=ptf_res.apply(lambda r: pct_rank(r, ptf_res)),
+    )
+    out = out.merge(extra, on="player_id", how="left")
 
     return out[
         [
