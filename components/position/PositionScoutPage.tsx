@@ -24,6 +24,8 @@ export function PositionScoutPage({ family, players }: Props) {
   );
   const [profilesFilter, setProfilesFilter] = useState<string[]>([]);
   const [clusterFilters, setClusterFilters] = useState<string[]>([]);
+  const [statSectionFilter, setStatSectionFilter] = useState<string | null>(null);
+  const [statLetterFilter, setStatLetterFilter] = useState<string | null>(null);
   const familyMeta = familyBySlug(family);
   const clusterMode = family === "zagueiros" || family === "laterais";
 
@@ -90,22 +92,28 @@ export function PositionScoutPage({ family, players }: Props) {
           <>
             <PositionFilterBar
               family={family}
-              players={players}
               clusterMode={clusterMode}
               clusterFilters={clusterFilters}
               profilesFilter={profilesFilter}
               onToggleClusterFilter={toggleClusterFilter}
               onToggleProfile={toggleProfile}
               profilesAvailable={profilesAvailable}
+              statSectionFilter={statSectionFilter}
+              statLetterFilter={statLetterFilter}
+              onStatSectionChange={setStatSectionFilter}
+              onStatLetterChange={setStatLetterFilter}
             />
 
             <PositionPlayerPicker
               players={players}
+              family={family}
               selectedId={selected.player_id}
               onSelect={setSelectedId}
               clusterMode={clusterMode}
               clusterFilters={clusterFilters}
               profilesFilter={profilesFilter}
+              statSectionFilter={statSectionFilter}
+              statLetterFilter={statLetterFilter}
             />
 
             <PositionProfileView player={selected} family={family} />

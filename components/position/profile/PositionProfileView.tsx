@@ -3,7 +3,7 @@
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { OverallGradePanel } from "./OverallGradePanel";
 import { ProfileIdentityColumn } from "./ProfileIdentityColumn";
-import { ProfilePillarBars, ProfileSharePanel } from "./ProfileSharePanel";
+import { ProfilePillarBars } from "./ProfileSharePanel";
 import { ScoutStatsSections } from "./ScoutStatsSections";
 
 type Props = {
@@ -24,7 +24,6 @@ export function PositionProfileView({ player, family }: Props) {
             <div className="player-card profile-grade-card">
               <OverallGradePanel score={overall} />
             </div>
-            <ProfileSharePanel player={player} />
             <ProfilePillarBars player={player} />
           </div>
         </div>

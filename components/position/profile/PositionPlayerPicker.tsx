@@ -1,32 +1,41 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
-import { formatRating, playerInitials } from "@/lib/scoutTheme";
+import { playerMatchesStatLetterFilter } from "@/lib/playerStatFilters";
+import { playerInitials } from "@/lib/scoutTheme";
 import { sortPlayers } from "@/lib/scoutUi";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
-import type { PlayerProfile } from "@/lib/types";
+import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Props = {
   players: PlayerProfile[];
+  family: PositionFamily;
   selectedId: string;
   onSelect: (id: string) => void;
   clusterMode?: boolean;
   clusterFilters?: string[];
   profilesFilter?: string[];
+  statSectionFilter?: string | null;
+  statLetterFilter?: string | null;
 };
 
 export function PositionPlayerPicker({
   players,
+  family,
   selectedId,
   onSelect,
   clusterMode = false,
   clusterFilters = [],
   profilesFilter = [],
+  statSectionFilter = null,
+  statLetterFilter = null,
 }: Props) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -36,13 +45,26 @@ export function PositionPlayerPicker({
       } else if (profilesFilter.length && !profilesFilter.includes(player.profile)) {
         return false;
       }
+      if (!playerMatchesStatLetterFilter(player, family, statSectionFilter, statLetterFilter)) {
+        return false;
+      }
       if (!q) return true;
       return player.name.toLowerCase().includes(q) || player.club.toLowerCase().includes(q);
     });
-    return sortPlayers(filtered, "rating");
-  }, [players, clusterMode, clusterFilters, profilesFilter, query]);
+    return sortPlayers(filtered, "name");
+  }, [
+    players,
+    family,
+    clusterMode,
+    clusterFilters,
+    profilesFilter,
+    statSectionFilter,
+    statLetterFilter,
+    query,
+  ]);
 
   const selected = players.find((p) => p.player_id === selectedId) ?? visible[0] ?? null;
+  const showSuggestions = open && query.trim().length > 0;
 
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
@@ -52,36 +74,90 @@ export function PositionPlayerPicker({
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
-  function onSearchSubmit(e: FormEvent) {
-    e.preventDefault();
-    if (visible[0]) onSelect(visible[0].player_id);
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [query, visible.length]);
+
+  function pick(player: PlayerProfile) {
+    onSelect(player.player_id);
+    setQuery("");
+    setOpen(false);
+  }
+
+  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!showSuggestions || !visible.length) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((i) => Math.min(i + 1, visible.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter" && visible[activeIndex]) {
+      e.preventDefault();
+      pick(visible[activeIndex]);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
   }
 
   return (
     <div className="player-search-row position-player-picker" ref={rootRef}>
-      <form className="player-search-form" onSubmit={onSearchSubmit}>
+      <div className="position-player-search-wrap">
         <label className="filter-label" htmlFor="player-search">
           Buscar atleta
         </label>
         <div className="player-search-input-wrap">
           <input
+            ref={inputRef}
             id="player-search"
             type="search"
             className="player-search-input"
-            placeholder="Nome ou clube…"
+            placeholder="Digite o nome do atleta…"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            autoComplete="off"
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setOpen(true);
+            }}
+            onFocus={() => setOpen(true)}
+            onKeyDown={onKeyDown}
           />
         </div>
-      </form>
+
+        {showSuggestions ? (
+          <ul className="position-player-suggestions" role="listbox">
+            {visible.length ? (
+              visible.slice(0, 12).map((player, index) => (
+                <li key={player.player_id}>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={index === activeIndex}
+                    className={index === activeIndex ? "active" : ""}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    onClick={() => pick(player)}
+                  >
+                    <PlayerOptionRow player={player} />
+                  </button>
+                </li>
+              ))
+            ) : (
+              <li className="position-player-suggestion-empty">Nenhum atleta encontrado.</li>
+            )}
+          </ul>
+        ) : null}
+      </div>
 
       <div className="player-select-field position-player-select-wrap">
         <label className="filter-label">Atleta</label>
         <button
           type="button"
           className="position-player-trigger"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open && !query.trim()}
+          onClick={() => {
+            setOpen((v) => !v);
+            inputRef.current?.focus();
+          }}
         >
           {selected ? <PlayerOptionRow player={selected} selected /> : "Selecionar…"}
           <span className="position-player-chevron" aria-hidden>
@@ -89,7 +165,7 @@ export function PositionPlayerPicker({
           </span>
         </button>
 
-        {open ? (
+        {open && !query.trim() ? (
           <ul className="position-player-menu" role="listbox">
             {visible.map((player) => (
               <li key={player.player_id}>
@@ -98,10 +174,7 @@ export function PositionPlayerPicker({
                   role="option"
                   aria-selected={player.player_id === selectedId}
                   className={player.player_id === selectedId ? "active" : ""}
-                  onClick={() => {
-                    onSelect(player.player_id);
-                    setOpen(false);
-                  }}
+                  onClick={() => pick(player)}
                 >
                   <PlayerOptionRow player={player} />
                 </button>
@@ -117,7 +190,7 @@ export function PositionPlayerPicker({
 function PlayerOptionRow({ player, selected = false }: { player: PlayerProfile; selected?: boolean }) {
   const photo = player.transfermarkt?.photo;
   return (
-    <span className={`position-player-option${selected ? " is-selected" : ""}`}>
+    <span className={`position-player-option position-player-option-inline${selected ? " is-selected" : ""}`}>
       <span className="position-player-photo">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -126,15 +199,9 @@ function PlayerOptionRow({ player, selected = false }: { player: PlayerProfile; 
           <span>{playerInitials(player.name)}</span>
         )}
       </span>
-      <span className="position-player-copy">
-        <span className="position-player-name">{player.name}</span>
-        <span className="position-player-meta">
-          <strong className="tabular">({formatRating(player.ratings.geral ?? player.rating)})</strong>
-          <span> — </span>
-          <ClubLogo club={player.club} size={14} />
-          {player.club}
-        </span>
-      </span>
+      <span className="position-player-name">{player.name}</span>
+      <ClubLogo club={player.club} size={16} />
+      <span className="position-player-club">{player.club}</span>
     </span>
   );
 }

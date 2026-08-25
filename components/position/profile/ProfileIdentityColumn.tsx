@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
-import { playerInitials } from "@/lib/scoutTheme";
+import { sortedProfileShareRows } from "@/lib/profileShares";
+import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
-import { profileDescription } from "./PositionFilterBar";
 
 type Props = {
   player: PlayerProfile;
@@ -28,9 +29,11 @@ function formatDate(iso: string): string {
 export function ProfileIdentityColumn({ player, family }: Props) {
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const tm = player.transfermarkt;
-  const profile = profileDescription(player);
   const contract =
     tm?.contract_remaining ?? (tm?.contract_until ? formatDate(tm.contract_until) : null);
+
+  const shareRows = useMemo(() => sortedProfileShareRows(player), [player]);
+  const activeKey = player.cluster?.archetype === "Híbrido" ? null : player.cluster?.archetype;
 
   return (
     <div className="pa-col pa-col-identity">
@@ -65,24 +68,31 @@ export function ProfileIdentityColumn({ player, family }: Props) {
               {player.club} · {player.position}
             </p>
 
-            <div
-              className="profile-cluster-card profile-cluster-inline"
-              style={{
-                borderColor: `${profile.accent}44`,
-                boxShadow: `inset 0 1px 0 ${profile.accent}18`,
-              }}
-            >
-              <div className="profile-cluster-body">
-                <span className="profile-cluster-icon" style={{ color: profile.accent }} aria-hidden="true">
-                  <i className="fa-solid fa-fingerprint" />
-                </span>
-                <div className="profile-cluster-copy">
-                  <span className="profile-cluster-eyebrow">Perfil</span>
-                  <p className="profile-cluster-title">{profile.title}</p>
-                  <p className="profile-cluster-summary">{profile.summary}</p>
-                </div>
-              </div>
-            </div>
+            {shareRows.length ? (
+              <ul className="profile-share-inline-list">
+                {shareRows.map((row) => {
+                  const token = ratingTier(row.rating);
+                  const active = row.key === activeKey;
+                  return (
+                    <li
+                      key={row.key}
+                      className={`profile-share-inline-row cluster-${row.tone}${active ? " active" : ""}`}
+                    >
+                      <span className="profile-share-inline-label">{row.label}</span>
+                      <span className="profile-share-inline-meta tabular">
+                        <span>{Math.round(row.share)}%</span>
+                        <span className="profile-share-inline-sep">·</span>
+                        <span className="profile-share-inline-rating" style={tierVars(token)}>
+                          {formatRating(row.rating)}
+                        </span>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="profile-share-inline-fallback">{player.profile}</p>
+            )}
           </div>
         </div>
       </div>

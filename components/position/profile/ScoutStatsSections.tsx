@@ -76,7 +76,6 @@ function StatAspectBlock({ item }: { item: AspectItem }) {
     <div className="stat-aspect-group">
       <div className="stat-aspect-group-head">
         <span className="stat-aspect-group-title">{item.label}</span>
-        <GradeBadge letter={item.grade} size="sm" />
       </div>
       <div className="stat-aspect-group-body">
         {hasSubMetrics ? (
