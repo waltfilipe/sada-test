@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AppShell } from "@/components/AppShell";
 import "./globals.css";
 import "./scout.css";
+import "./profile-layout.css";
 import "./filters.css";
 import "./compare.css";
 import "./scatter.css";

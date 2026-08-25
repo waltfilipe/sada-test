@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
-import { AspectMatrix } from "./AspectMatrix";
-import { DossierHeader } from "./DossierHeader";
-import { DossierProfileCard } from "./DossierProfileCard";
-import { RosterRail } from "./RosterRail";
+import { PositionFilterBar } from "./profile/PositionFilterBar";
+import { PositionPlayerPicker } from "./profile/PositionPlayerPicker";
+import { PositionProfileView } from "./profile/PositionProfileView";
 
 type Props = {
   family: PositionFamily;
@@ -27,6 +26,15 @@ export function PositionScoutPage({ family, players }: Props) {
   const [clusterFilters, setClusterFilters] = useState<string[]>([]);
   const familyMeta = familyBySlug(family);
   const clusterMode = family === "zagueiros" || family === "laterais";
+
+  const profilesAvailable = useMemo(() => {
+    const set = new Set<string>();
+    for (const player of players) {
+      if (player.profile) set.add(player.profile);
+      for (const profile of player.profiles_available ?? []) set.add(profile);
+    }
+    return [...set];
+  }, [players]);
 
   const selected = players.find((player) => player.player_id === selectedId) ?? players[0] ?? null;
 
@@ -55,7 +63,7 @@ export function PositionScoutPage({ family, players }: Props) {
   };
 
   return (
-    <div className="scout-root">
+    <div className="scout-root profile-page">
       <ScoutTopbar
         active="posicoes"
         center={
@@ -75,34 +83,35 @@ export function PositionScoutPage({ family, players }: Props) {
         }
       />
 
-      {!selected ? (
-        <div className="scout-empty">Nenhum atleta disponível para {familyMeta.label.toLowerCase()}.</div>
-      ) : (
-        <div className="scout-body">
-          <RosterRail
-            players={players}
-            selectedId={selected.player_id}
-            profilesFilter={profilesFilter}
-            onSelect={setSelectedId}
-            onToggleProfile={toggleProfile}
-            profilesAvailable={selected.profiles_available}
-            clusterMode={clusterMode}
-            clusterFilters={clusterFilters}
-            onToggleClusterFilter={toggleClusterFilter}
-            family={family}
-          />
+      <div className="profile-page-body">
+        {!selected ? (
+          <div className="scout-empty">Nenhum atleta disponível para {familyMeta.label.toLowerCase()}.</div>
+        ) : (
+          <>
+            <PositionFilterBar
+              family={family}
+              players={players}
+              clusterMode={clusterMode}
+              clusterFilters={clusterFilters}
+              profilesFilter={profilesFilter}
+              onToggleClusterFilter={toggleClusterFilter}
+              onToggleProfile={toggleProfile}
+              profilesAvailable={profilesAvailable}
+            />
 
-          <main className="dossier">
-            <DossierHeader player={selected} poolSize={players.length} family={family} />
+            <PositionPlayerPicker
+              players={players}
+              selectedId={selected.player_id}
+              onSelect={setSelectedId}
+              clusterMode={clusterMode}
+              clusterFilters={clusterFilters}
+              profilesFilter={profilesFilter}
+            />
 
-            {clusterMode && selected.cluster ? (
-              <DossierProfileCard player={selected} />
-            ) : null}
-
-            <AspectMatrix player={selected} family={family} />
-          </main>
-        </div>
-      )}
+            <PositionProfileView player={selected} family={family} poolSize={players.length} />
+          </>
+        )}
+      </div>
     </div>
   );
 }
