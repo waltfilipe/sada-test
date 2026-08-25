@@ -9,21 +9,20 @@ import { ScoutStatsSections } from "./ScoutStatsSections";
 type Props = {
   player: PlayerProfile;
   family: PositionFamily;
-  poolSize: number;
 };
 
-export function PositionProfileView({ player, family, poolSize }: Props) {
+export function PositionProfileView({ player, family }: Props) {
   const overall = player.ratings.geral ?? player.rating;
 
   return (
     <div className="profile-view-shell">
       <div className="pa-layout">
-        <ProfileIdentityColumn player={player} family={family} poolSize={poolSize} />
+        <ProfileIdentityColumn player={player} family={family} />
 
         <div className="pa-col pa-col-score">
           <div className="score-stack">
             <div className="player-card profile-grade-card">
-              <OverallGradePanel score={overall} embedded />
+              <OverallGradePanel score={overall} />
             </div>
             <ProfileSharePanel player={player} />
             <ProfilePillarBars player={player} />

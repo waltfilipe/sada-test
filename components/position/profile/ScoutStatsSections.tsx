@@ -56,7 +56,7 @@ export function ScoutStatsSections({
           if (!metrics.length) return null;
 
           return (
-            <details key={section.title} className="report-pass-accordion-item" open>
+            <details key={section.title} className="report-pass-accordion-item">
               <summary className="report-pass-accordion-trigger">
                 <span className="report-pass-accordion-left">
                   <span className="report-pass-accordion-chevron" aria-hidden="true">

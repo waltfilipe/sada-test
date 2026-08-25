@@ -108,7 +108,7 @@ export function PositionScoutPage({ family, players }: Props) {
               profilesFilter={profilesFilter}
             />
 
-            <PositionProfileView player={selected} family={family} poolSize={players.length} />
+            <PositionProfileView player={selected} family={family} />
           </>
         )}
       </div>
