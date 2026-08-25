@@ -101,9 +101,17 @@ def _active_nota_col(row: pd.Series, config: TriCompositeFamilyConfig) -> str | 
     archetype = row.get(config.archetype_col) or row.get(config.perfil_col)
     if pd.isna(archetype) or not archetype:
         return None
+    label = str(archetype)
     for spec in config.profiles:
-        if str(archetype) == spec.archetype_label:
+        if label == spec.archetype_label:
             return spec.nota_col
+    # Laterais Híbrido: use highest cluster share among profile axes.
+    if label == "Híbrido":
+        best = max(
+            config.profiles,
+            key=lambda spec: float(row.get(spec.share_col) or 0),
+        )
+        return best.nota_col
     return None
 
 

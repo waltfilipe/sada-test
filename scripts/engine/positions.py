@@ -17,6 +17,7 @@ from .normalize import (
 )
 from .profiles import FAMILY_PROFILE_CONFIG, profile_ratings_from_row, profile_ranks_from_row, profile_shares_from_row
 from .lat_hierarchy import apply_lat_hierarchical_clusters
+from .lat_tri_composite_config import apply_lat_tri_composite_ratings
 from .zag_hierarchy import apply_zag_hierarchical_clusters
 from .zag_m8_rating import apply_zag_m8_ratings
 
@@ -718,39 +719,8 @@ def _compute_lat_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out["DuelosOfRaw"] = pd.to_numeric(out.get("Duelos ofensivos/90"), errors="coerce").fillna(0)
     out["AcoesAtW"] = pd.to_numeric(out.get("Acções atacantes com sucesso/90"), errors="coerce").fillna(0)
     out = apply_lat_hierarchical_clusters(out)
-
-    out["_minutes_pool_pct"] = _minutes_pool_pct(out)
-    out["pct_defensivo"] = percentile_rank(out["lat_z_def"], ascending=True) / 100.0
-    out["pct_construtor"] = percentile_rank(out["lat_z_con"], ascending=True) / 100.0
-    out["pct_ofensivo"] = percentile_rank(out["lat_z_off"], ascending=True) / 100.0
-
-    def _lat_axis_rating(z_col: str) -> pd.Series:
-        pct = percentile_rank(out[z_col], ascending=True)
-        raw = 5 + pct * 0.045 * 0.88 * (1 + out["%Minutos"] * 0.15)
-        return out.apply(
-            lambda row: _apply_confidence_to_rating(float(raw.loc[row.name]), float(row["_minutes_pool_pct"])),
-            axis=1,
-        )
-
-    out["rating_defensivo_raw"] = _lat_axis_rating("lat_z_def")
-    out["rating_construtor_raw"] = _lat_axis_rating("lat_z_con")
-    out["rating_ofensivo_raw"] = _lat_axis_rating("lat_z_off")
-    out["rating_defensivo"] = _round_rating_raw(out["rating_defensivo_raw"])
-    out["rating_construtor"] = _round_rating_raw(out["rating_construtor_raw"])
-    out["rating_ofensivo"] = _round_rating_raw(out["rating_ofensivo_raw"])
-
-    core_pct = (
-        out["pct_defensivo"] * 0.30 + out["pct_construtor"] * 0.35 + out["pct_ofensivo"] * 0.35
-    ) * 100.0
-    out["rating_geral_raw"] = out.apply(
-        lambda row: _apply_confidence_to_rating(
-            _zag_apply_minutes_shrinkage(5.0 + float(core_pct.loc[row.name]) / 100.0 * 4.5, row["%Minutos"]),
-            row["_minutes_pool_pct"],
-        ),
-        axis=1,
-    )
-    out["rating_geral"] = out["rating_geral_raw"].round(1)
     out["perfil"] = out["cluster_archetype"]
+    out = apply_lat_tri_composite_ratings(out)
 
     out["n_construcao"] = percentile_rank(out["lat_z_con"], ascending=True)
     out["n_conducao"] = percentile_rank(out["lat_z_off"], ascending=True)
@@ -759,11 +729,6 @@ def _compute_lat_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out["n_duelo_ar"] = percentile_rank(out["DuelosAr"] * out["%DuelosAr"], ascending=True)
 
     out = attach_aspect_percentiles(out)
-
-    out["rank_geral"] = rank_players(out["rating_geral"])
-    out["rank_defensivo"] = rank_players(out["rating_defensivo"])
-    out["rank_construtor"] = rank_players(out["rating_construtor"])
-    out["rank_ofensivo"] = rank_players(out["rating_ofensivo"])
     return out
 
 
@@ -1467,9 +1432,9 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
                     "ofensivo": float(row.get("cluster_share_ofensivo") or 0),
                 },
                 "ratings": {
-                    "defensivo": round(float(row.get("rating_defensivo") or 0), 1),
-                    "construtor": round(float(row.get("rating_construtor") or 0), 1),
-                    "ofensivo": round(float(row.get("rating_ofensivo") or 0), 1),
+                    "defensivo": round(float(row.get("nota_defensivo") or row.get("rating_defensivo") or row["rating_geral"]), 1),
+                    "construtor": round(float(row.get("nota_construtor") or row.get("rating_construtor") or row["rating_geral"]), 1),
+                    "ofensivo": round(float(row.get("nota_ofensivo") or row.get("rating_ofensivo") or row["rating_geral"]), 1),
                 },
             }
     return payload
