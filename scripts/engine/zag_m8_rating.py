@@ -75,6 +75,18 @@ def apply_zag_m8_ratings(out: pd.DataFrame) -> pd.DataFrame:
     merged["m8_final"] = merged.apply(lambda row: _shrink(row["m8_raw"], row["%Minutos"]), axis=1)
     merged["nota_global"] = _tanh_nota(merged["m8_final"]).round(2)
 
+    # Separate tanh pools per profile can leave nota_global above the active profile
+    # (e.g. high-share Construtor with elite raw but stiff construtor pool). The
+    # classified specialty should never rate below the share-weighted overall.
+    for arch, col in ACTIVE_NOTA_COL.items():
+        mask = merged["cluster_archetype"] == arch
+        if not mask.any():
+            continue
+        merged.loc[mask, col] = np.maximum(
+            merged.loc[mask, col].astype(float),
+            merged.loc[mask, "nota_global"].astype(float),
+        ).round(2)
+
     def _active_nota(row: pd.Series) -> float:
         arch = row.get("cluster_archetype") or row.get("perfil")
         col = ACTIVE_NOTA_COL.get(str(arch) if pd.notna(arch) else "")
