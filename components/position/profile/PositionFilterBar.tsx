@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { GradeBadge } from "@/components/ui/GradeBadge";
 import {
   LAT_ARCHETYPE_META,
   LAT_HYBRID_BADGE_META,
@@ -12,8 +11,7 @@ import {
 import { profileAccent } from "@/lib/profileShares";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { STAT_LETTER_OPTIONS, type StatLetterFilters } from "@/lib/playerStatFilters";
-import { playerSectionGrade } from "@/lib/sectionGrades";
-import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import type { PositionFamily } from "@/lib/types";
 
 type Props = {
   family: PositionFamily;
@@ -23,7 +21,6 @@ type Props = {
   onToggleClusterFilter: (key: string) => void;
   onToggleProfile: (profile: string) => void;
   profilesAvailable: string[];
-  selectedPlayer: PlayerProfile | null;
   statLetterFilters: StatLetterFilters;
   onStatLetterFilterChange: (sectionTitle: string, letter: string | null) => void;
 };
@@ -36,7 +33,6 @@ export function PositionFilterBar({
   onToggleClusterFilter,
   onToggleProfile,
   profilesAvailable,
-  selectedPlayer,
   statLetterFilters,
   onStatLetterFilterChange,
 }: Props) {
@@ -132,11 +128,6 @@ export function PositionFilterBar({
             <StatSectionFilterCard
               key={section.title}
               title={section.title}
-              letter={
-                selectedPlayer
-                  ? playerSectionGrade(selectedPlayer, family, section.title)
-                  : undefined
-              }
               selectedFilter={statLetterFilters[section.title] ?? null}
               onFilterChange={(letter) => onStatLetterFilterChange(section.title, letter)}
             />
@@ -149,12 +140,10 @@ export function PositionFilterBar({
 
 function StatSectionFilterCard({
   title,
-  letter,
   selectedFilter,
   onFilterChange,
 }: {
   title: string;
-  letter?: string;
   selectedFilter: string | null;
   onFilterChange: (letter: string | null) => void;
 }) {
@@ -165,13 +154,13 @@ function StatSectionFilterCard({
       <div className="profile-stat-filter-card-head">
         <span className="profile-stat-filter-card-title">{title}</span>
         <div className="profile-stat-filter-card-actions">
-          {letter ? <GradeBadge letter={letter} size="sm" /> : null}
           <div className="profile-stat-letter-filter">
             <button
               type="button"
               className={`profile-stat-letter-trigger${selectedFilter ? " active" : ""}`}
               aria-expanded={open}
               aria-haspopup="listbox"
+              aria-label={`Filtrar ${title} por nota mínima`}
               onClick={() => setOpen((value) => !value)}
             >
               {selectedFilter ?? "—"}

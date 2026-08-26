@@ -4,7 +4,8 @@ import { useMemo } from "react";
 import { GradeBadge } from "@/components/ui/GradeBadge";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import { playerSectionGrade } from "@/lib/sectionGrades";
+import type { SectionGradeLookup } from "@/lib/sectionGrades";
+import { getPlayerSectionGrade } from "@/lib/sectionGrades";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 
 function flattenAspects(player: PlayerProfile): AspectItem[] {
@@ -30,11 +31,11 @@ function metricValue(value?: string | null): string {
 }
 
 function sectionLetter(
-  player: PlayerProfile,
-  family: PositionFamily,
+  lookup: SectionGradeLookup,
+  playerId: string,
   sectionTitle: string,
 ): string | undefined {
-  return playerSectionGrade(player, family, sectionTitle);
+  return getPlayerSectionGrade(lookup, playerId, sectionTitle);
 }
 
 const ROW_LABEL_ALIASES: Record<string, string> = {
@@ -116,9 +117,11 @@ function StatAspectBlock({ item, groupTitle }: { item: AspectItem; groupTitle?: 
 export function ScoutStatsSections({
   player,
   family,
+  sectionGradeLookup,
 }: {
   player: PlayerProfile;
   family: PositionFamily;
+  sectionGradeLookup: SectionGradeLookup;
 }) {
   const all = useMemo(() => flattenAspects(player), [player]);
   const sections = statSectionsForFamily(family);
@@ -153,7 +156,7 @@ export function ScoutStatsSections({
                   <span className="report-pass-accordion-title">{section.title}</span>
                 </span>
                 <span className="report-pass-accordion-right">
-                  <GradeBadge letter={sectionLetter(player, family, section.title)} size="sm" />
+                  <GradeBadge letter={sectionLetter(sectionGradeLookup, player.player_id, section.title)} size="sm" />
                 </span>
               </summary>
               <div className="report-pass-accordion-panel">

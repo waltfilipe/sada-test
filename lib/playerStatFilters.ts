@@ -1,25 +1,30 @@
-import { playerSectionGrade as sectionGradeFromProfile } from "@/lib/sectionGrades";
+import {
+  getPlayerSectionGrade,
+  type SectionGradeLookup,
+} from "@/lib/sectionGrades";
 import { gradeScore } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
+export type { SectionGradeLookup } from "@/lib/sectionGrades";
+
 export function playerSectionGrade(
-  player: PlayerProfile,
-  family: PositionFamily,
+  lookup: SectionGradeLookup,
+  playerId: string,
   sectionTitle: string,
 ): string | undefined {
-  return sectionGradeFromProfile(player, family, sectionTitle);
+  return getPlayerSectionGrade(lookup, playerId, sectionTitle);
 }
 
 export type StatLetterFilters = Record<string, string | null>;
 
 export function playerMatchesStatLetterFilters(
   player: PlayerProfile,
-  family: PositionFamily,
   filters: StatLetterFilters,
+  lookup: SectionGradeLookup,
 ): boolean {
   for (const [sectionTitle, minLetter] of Object.entries(filters)) {
     if (!minLetter) continue;
-    const grade = playerSectionGrade(player, family, sectionTitle);
+    const grade = getPlayerSectionGrade(lookup, player.player_id, sectionTitle);
     if (!grade) return false;
     if (gradeScore(grade) < gradeScore(minLetter)) return false;
   }
@@ -32,9 +37,10 @@ export function playerMatchesStatLetterFilter(
   family: PositionFamily,
   sectionTitle: string | null,
   minLetter: string | null,
+  lookup: SectionGradeLookup,
 ): boolean {
   if (!sectionTitle || !minLetter) return true;
-  return playerMatchesStatLetterFilters(player, family, { [sectionTitle]: minLetter });
+  return playerMatchesStatLetterFilters(player, { [sectionTitle]: minLetter }, lookup);
 }
 
 export const STAT_LETTER_OPTIONS = [

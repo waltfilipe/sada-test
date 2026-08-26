@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
+import { buildSectionGradeLookup } from "@/lib/sectionGrades";
 import type { StatLetterFilters } from "@/lib/playerStatFilters";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { PositionFilterBar } from "./profile/PositionFilterBar";
@@ -37,6 +38,11 @@ export function PositionScoutPage({ family, players }: Props) {
     }
     return [...set];
   }, [players]);
+
+  const sectionGradeLookup = useMemo(
+    () => buildSectionGradeLookup(players, family),
+    [players, family],
+  );
 
   const selected = players.find((player) => player.player_id === selectedId) ?? players[0] ?? null;
 
@@ -108,7 +114,6 @@ export function PositionScoutPage({ family, players }: Props) {
                 onToggleClusterFilter={toggleClusterFilter}
                 onToggleProfile={toggleProfile}
                 profilesAvailable={profilesAvailable}
-                selectedPlayer={selected}
                 statLetterFilters={statLetterFilters}
                 onStatLetterFilterChange={setStatLetterFilter}
               />
@@ -122,10 +127,15 @@ export function PositionScoutPage({ family, players }: Props) {
                 clusterFilters={clusterFilters}
                 profilesFilter={profilesFilter}
                 statLetterFilters={statLetterFilters}
+                sectionGradeLookup={sectionGradeLookup}
               />
             </div>
 
-            <PositionProfileView player={selected} family={family} />
+            <PositionProfileView
+              player={selected}
+              family={family}
+              sectionGradeLookup={sectionGradeLookup}
+            />
           </>
         )}
       </div>

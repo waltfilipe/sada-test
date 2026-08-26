@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
-import type { StatLetterFilters } from "@/lib/playerStatFilters";
+import type { StatLetterFilters, SectionGradeLookup } from "@/lib/playerStatFilters";
 import { playerMatchesStatLetterFilters } from "@/lib/playerStatFilters";
 import { sortPlayers } from "@/lib/scoutUi";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
@@ -17,6 +17,7 @@ type Props = {
   clusterFilters?: string[];
   profilesFilter?: string[];
   statLetterFilters?: StatLetterFilters;
+  sectionGradeLookup: SectionGradeLookup;
 };
 
 export function PositionPlayerPicker({
@@ -28,6 +29,7 @@ export function PositionPlayerPicker({
   clusterFilters = [],
   profilesFilter = [],
   statLetterFilters = {},
+  sectionGradeLookup,
 }: Props) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -43,7 +45,7 @@ export function PositionPlayerPicker({
       } else if (profilesFilter.length && !profilesFilter.includes(player.profile)) {
         return false;
       }
-      if (!playerMatchesStatLetterFilters(player, family, statLetterFilters)) {
+      if (!playerMatchesStatLetterFilters(player, statLetterFilters, sectionGradeLookup)) {
         return false;
       }
       if (!q) return true;
@@ -57,6 +59,7 @@ export function PositionPlayerPicker({
     clusterFilters,
     profilesFilter,
     statLetterFilters,
+    sectionGradeLookup,
     query,
   ]);
 

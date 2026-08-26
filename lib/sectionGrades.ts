@@ -92,6 +92,8 @@ const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string
   },
 };
 
+export type SectionGradeLookup = Map<string, Record<string, string>>;
+
 export function playerSectionScore(
   player: PlayerProfile,
   family: PositionFamily,
@@ -109,7 +111,34 @@ export function playerSectionScore(
   return blockScores.reduce((sum, score) => sum + score, 0) / blockScores.length;
 }
 
-/** Same thresholds as pipeline `_grade_from_pct`. */
+/** Percentile rank within a pool (100 = best, 0 = worst). Ties use average rank. */
+export function poolPercentileRank(scores: number[], value: number): number {
+  if (!scores.length) return 0;
+  if (scores.length === 1) return 100;
+  const less = scores.filter((score) => score < value).length;
+  const equal = scores.filter((score) => score === value).length;
+  const avgRank = less + (equal + 1) / 2;
+  return ((avgRank - 1) / (scores.length - 1)) * 100;
+}
+
+/** Letter from pool percentile — full scale aligned with `gradeScore` thresholds. */
+export function letterFromPoolPercentile(pct: number): string {
+  if (pct >= 97) return "A+";
+  if (pct >= 92) return "A";
+  if (pct >= 87) return "A-";
+  if (pct >= 80) return "B+";
+  if (pct >= 70) return "B";
+  if (pct >= 60) return "B-";
+  if (pct >= 50) return "C+";
+  if (pct >= 40) return "C";
+  if (pct >= 30) return "C-";
+  if (pct >= 22) return "D+";
+  if (pct >= 15) return "D";
+  if (pct >= 10) return "D-";
+  return "D-";
+}
+
+/** @deprecated pipeline-style thresholds without A+ */
 export function letterFromPercentile(pct: number): string {
   if (pct >= 85) return "A";
   if (pct >= 75) return "B+";
@@ -122,25 +151,63 @@ export function letterFromPercentile(pct: number): string {
 }
 
 export function letterFromRating(rating: number, max = 10): string {
-  return letterFromPercentile((rating / max) * 100);
+  return letterFromPoolPercentile((rating / max) * 100);
+}
+
+export function buildSectionGradeLookup(
+  players: PlayerProfile[],
+  family: PositionFamily,
+): SectionGradeLookup {
+  const lookup: SectionGradeLookup = new Map();
+  const sections = statSectionsForFamily(family);
+
+  for (const section of sections) {
+    const scored = players
+      .map((player) => ({
+        id: player.player_id,
+        score: playerSectionScore(player, family, section.title),
+      }))
+      .filter((entry): entry is { id: string; score: number } => entry.score != null);
+
+    const allScores = scored.map((entry) => entry.score);
+
+    for (const { id, score } of scored) {
+      const pct = poolPercentileRank(allScores, score);
+      const letter = letterFromPoolPercentile(pct);
+      const existing = lookup.get(id) ?? {};
+      existing[section.title] = letter;
+      lookup.set(id, existing);
+    }
+  }
+
+  return lookup;
+}
+
+export function getPlayerSectionGrade(
+  lookup: SectionGradeLookup,
+  playerId: string,
+  sectionTitle: string,
+): string | undefined {
+  return lookup.get(playerId)?.[sectionTitle];
 }
 
 export function playerSectionGrade(
   player: PlayerProfile,
   family: PositionFamily,
   sectionTitle: string,
+  pool: PlayerProfile[],
 ): string | undefined {
-  const score = playerSectionScore(player, family, sectionTitle);
-  if (score == null) return undefined;
-  return letterFromPercentile(score);
+  const lookup = buildSectionGradeLookup(pool, family);
+  return getPlayerSectionGrade(lookup, player.player_id, sectionTitle);
 }
 
 export function allSectionGrades(
-  player: PlayerProfile,
+  lookup: SectionGradeLookup,
+  playerId: string,
   family: PositionFamily,
 ): Record<string, string | undefined> {
   const sections = statSectionsForFamily(family);
   return Object.fromEntries(
-    sections.map((section) => [section.title, playerSectionGrade(player, family, section.title)]),
+    sections.map((section) => [section.title, getPlayerSectionGrade(lookup, playerId, section.title)]),
   );
 }
