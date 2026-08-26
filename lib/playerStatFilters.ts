@@ -10,6 +10,23 @@ export function playerSectionGrade(
   return sectionGradeFromProfile(player, family, sectionTitle);
 }
 
+export type StatLetterFilters = Record<string, string | null>;
+
+export function playerMatchesStatLetterFilters(
+  player: PlayerProfile,
+  family: PositionFamily,
+  filters: StatLetterFilters,
+): boolean {
+  for (const [sectionTitle, minLetter] of Object.entries(filters)) {
+    if (!minLetter) continue;
+    const grade = playerSectionGrade(player, family, sectionTitle);
+    if (!grade) return false;
+    if (gradeScore(grade) < gradeScore(minLetter)) return false;
+  }
+  return true;
+}
+
+/** @deprecated use playerMatchesStatLetterFilters */
 export function playerMatchesStatLetterFilter(
   player: PlayerProfile,
   family: PositionFamily,
@@ -17,9 +34,7 @@ export function playerMatchesStatLetterFilter(
   minLetter: string | null,
 ): boolean {
   if (!sectionTitle || !minLetter) return true;
-  const grade = playerSectionGrade(player, family, sectionTitle);
-  if (!grade) return false;
-  return gradeScore(grade) >= gradeScore(minLetter);
+  return playerMatchesStatLetterFilters(player, family, { [sectionTitle]: minLetter });
 }
 
 export const STAT_LETTER_OPTIONS = [

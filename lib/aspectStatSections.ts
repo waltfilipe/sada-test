@@ -20,7 +20,7 @@ export const ZAG_STAT_SECTIONS: StatSectionSpec[] = [
   },
   {
     title: "Ofensivo",
-    labels: ["Duelos Ofensivos", "Progressão"],
+    labels: ["Duelos Ofensivos", "Conduções Progressivas"],
   },
 ];
 

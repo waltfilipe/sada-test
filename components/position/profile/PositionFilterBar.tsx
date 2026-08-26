@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { GradeBadge } from "@/components/ui/GradeBadge";
 import {
   LAT_ARCHETYPE_META,
@@ -11,8 +11,9 @@ import {
 } from "@/lib/clusterMeta";
 import { profileAccent } from "@/lib/profileShares";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import { STAT_LETTER_OPTIONS } from "@/lib/playerStatFilters";
-import type { PositionFamily } from "@/lib/types";
+import { STAT_LETTER_OPTIONS, type StatLetterFilters } from "@/lib/playerStatFilters";
+import { playerSectionGrade } from "@/lib/sectionGrades";
+import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Props = {
   family: PositionFamily;
@@ -22,18 +23,9 @@ type Props = {
   onToggleClusterFilter: (key: string) => void;
   onToggleProfile: (profile: string) => void;
   profilesAvailable: string[];
-  statSectionFilter: string | null;
-  statLetterFilter: string | null;
-  onStatSectionChange: (section: string | null) => void;
-  onStatLetterChange: (letter: string | null) => void;
-};
-
-const STAT_SECTION_ACCENT: Record<string, string> = {
-  Defensivo: "#38bdf8",
-  Aéreo: "#a78bfa",
-  Construção: "#34d399",
-  Ofensivo: "#fbbf24",
-  "Terço Final": "#f472b6",
+  selectedPlayer: PlayerProfile | null;
+  statLetterFilters: StatLetterFilters;
+  onStatLetterFilterChange: (sectionTitle: string, letter: string | null) => void;
 };
 
 export function PositionFilterBar({
@@ -44,10 +36,9 @@ export function PositionFilterBar({
   onToggleClusterFilter,
   onToggleProfile,
   profilesAvailable,
-  statSectionFilter,
-  statLetterFilter,
-  onStatSectionChange,
-  onStatLetterChange,
+  selectedPlayer,
+  statLetterFilters,
+  onStatLetterFilterChange,
 }: Props) {
   const statSections = useMemo(() => statSectionsForFamily(family), [family]);
 
@@ -55,16 +46,6 @@ export function PositionFilterBar({
     family === "laterais" ? LAT_ARCHETYPE_META : family === "zagueiros" ? ZAG_ARCHETYPE_META : null;
 
   const hybridFilters = family === "laterais" ? LAT_HYBRID_BADGE_META : null;
-
-  const handleStatCardClick = (title: string) => {
-    if (statSectionFilter === title) {
-      onStatSectionChange(null);
-      onStatLetterChange(null);
-      return;
-    }
-    onStatSectionChange(title);
-    onStatLetterChange(null);
-  };
 
   return (
     <div className="profile-top-filters">
@@ -75,7 +56,7 @@ export function PositionFilterBar({
         </div>
 
         {clusterMode && archetypeFilters ? (
-          <div className="profile-filter-chip-grid">
+          <div className="profile-filter-card-grid">
             {archetypeFilters
               .filter((item) => item.archetype !== "Híbrido")
               .map((item) => {
@@ -89,12 +70,13 @@ export function PositionFilterBar({
                   <button
                     key={item.archetype}
                     type="button"
-                    className={`profile-filter-chip profile-filter-chip-profile cluster-${tone}${active ? " active" : ""}`}
+                    className={`profile-archetype-card player-card cluster-${tone}${active ? " active" : ""}`}
                     style={{ "--chip-accent": accent } as React.CSSProperties}
                     onClick={() => onToggleClusterFilter(item.archetype)}
                     aria-pressed={active}
                   >
-                    {item.archetype}
+                    <span className="profile-archetype-card-title">{item.archetype}</span>
+                    <span className="profile-archetype-card-copy">{item.description}</span>
                   </button>
                 );
               })}
@@ -104,18 +86,19 @@ export function PositionFilterBar({
                 <button
                   key={item.badge}
                   type="button"
-                  className={`profile-filter-chip profile-filter-chip-profile cluster-hibrido${active ? " active" : ""}`}
+                  className={`profile-archetype-card player-card cluster-hibrido${active ? " active" : ""}`}
                   style={{ "--chip-accent": "#fbbf24" } as React.CSSProperties}
                   onClick={() => onToggleClusterFilter(item.badge)}
                   aria-pressed={active}
                 >
-                  {item.short_label}
+                  <span className="profile-archetype-card-title">{item.short_label}</span>
+                  <span className="profile-archetype-card-copy">{item.description}</span>
                 </button>
               );
             })}
           </div>
         ) : profilesAvailable.length ? (
-          <div className="profile-filter-chip-grid">
+          <div className="profile-filter-card-grid">
             {profilesAvailable.map((profile) => {
               const active = profilesFilter.includes(profile);
               const accent = profileAccent(profile);
@@ -123,12 +106,12 @@ export function PositionFilterBar({
                 <button
                   key={profile}
                   type="button"
-                  className={`profile-filter-chip profile-filter-chip-profile${active ? " active" : ""}`}
+                  className={`profile-archetype-card player-card${active ? " active" : ""}`}
                   style={{ "--chip-accent": accent } as React.CSSProperties}
                   onClick={() => onToggleProfile(profile)}
                   aria-pressed={active}
                 >
-                  {profile}
+                  <span className="profile-archetype-card-title">{profile}</span>
                 </button>
               );
             })}
@@ -141,53 +124,94 @@ export function PositionFilterBar({
       <div className="profile-filter-panel profile-filter-panel-stats">
         <div className="profile-filter-panel-head">
           <h3 className="profile-filter-panel-title">Stats</h3>
-          <span className="profile-filter-panel-hint">Nota mínima na família</span>
+          <span className="profile-filter-panel-hint">Filtre por nota mínima em cada família</span>
         </div>
 
-        <div className="profile-filter-chip-grid profile-filter-chip-grid-stats">
-          {statSections.map((section) => {
-            const active = statSectionFilter === section.title;
-            const accent = STAT_SECTION_ACCENT[section.title] ?? "#67e8f9";
-            return (
-              <button
-                key={section.title}
-                type="button"
-                className={`profile-filter-chip profile-filter-chip-stat${active ? " active" : ""}`}
-                style={{ "--chip-accent": accent } as React.CSSProperties}
-                onClick={() => handleStatCardClick(section.title)}
-                aria-pressed={active}
-              >
-                {section.title}
-                {active && statLetterFilter ? (
-                  <GradeBadge letter={statLetterFilter} size="sm" />
-                ) : null}
-              </button>
-            );
-          })}
+        <div className="profile-stat-filter-grid">
+          {statSections.map((section) => (
+            <StatSectionFilterCard
+              key={section.title}
+              title={section.title}
+              letter={
+                selectedPlayer
+                  ? playerSectionGrade(selectedPlayer, family, section.title)
+                  : undefined
+              }
+              selectedFilter={statLetterFilters[section.title] ?? null}
+              onFilterChange={(letter) => onStatLetterFilterChange(section.title, letter)}
+            />
+          ))}
         </div>
+      </div>
+    </div>
+  );
+}
 
-        {statSectionFilter ? (
-          <div className="stat-letter-slicer">
-            <span className="stat-letter-slicer-label">{statSectionFilter}</span>
-            <div className="stat-letter-chips stat-letter-chips-compact">
-              {STAT_LETTER_OPTIONS.map((letter) => (
-                <button
-                  key={letter}
-                  type="button"
-                  className={`stat-letter-chip${statLetterFilter === letter ? " active" : ""}`}
-                  onClick={() => onStatLetterChange(statLetterFilter === letter ? null : letter)}
-                  aria-pressed={statLetterFilter === letter}
-                >
-                  {letter}
-                </button>
-              ))}
-            </div>
+function StatSectionFilterCard({
+  title,
+  letter,
+  selectedFilter,
+  onFilterChange,
+}: {
+  title: string;
+  letter?: string;
+  selectedFilter: string | null;
+  onFilterChange: (letter: string | null) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="profile-stat-filter-card player-card">
+      <div className="profile-stat-filter-card-head">
+        <span className="profile-stat-filter-card-title">{title}</span>
+        <div className="profile-stat-filter-card-actions">
+          {letter ? <GradeBadge letter={letter} size="sm" /> : null}
+          <div className="profile-stat-letter-filter">
+            <button
+              type="button"
+              className={`profile-stat-letter-trigger${selectedFilter ? " active" : ""}`}
+              aria-expanded={open}
+              aria-haspopup="listbox"
+              onClick={() => setOpen((value) => !value)}
+            >
+              {selectedFilter ?? "—"}
+            </button>
+            {open ? (
+              <ul className="profile-stat-letter-menu" role="listbox">
+                <li>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={!selectedFilter}
+                    className={!selectedFilter ? "active" : ""}
+                    onClick={() => {
+                      onFilterChange(null);
+                      setOpen(false);
+                    }}
+                  >
+                    —
+                  </button>
+                </li>
+                {STAT_LETTER_OPTIONS.map((option) => (
+                  <li key={option}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={selectedFilter === option}
+                      className={selectedFilter === option ? "active" : ""}
+                      onClick={() => {
+                        onFilterChange(selectedFilter === option ? null : option);
+                        setOpen(false);
+                      }}
+                    >
+                      {option}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
-        ) : (
-          <p className="profile-filter-panel-empty profile-filter-panel-empty-stats">
-            Selecione uma família de stats para filtrar por letra.
-          </p>
-        )}
+        </div>
       </div>
     </div>
   );

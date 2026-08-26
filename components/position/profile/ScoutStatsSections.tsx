@@ -71,7 +71,7 @@ function StatMetricRow({ label, value, percentile, grade }: MetricRowProps) {
   );
 }
 
-function StatAspectBlock({ item }: { item: AspectItem }) {
+function StatAspectBlock({ item, groupTitle }: { item: AspectItem; groupTitle?: string }) {
   const hasSubMetrics =
     (item.kind === "def_efficiency_group" || item.kind === "metric_group") &&
     Boolean(item.sub_metrics?.length);
@@ -79,7 +79,7 @@ function StatAspectBlock({ item }: { item: AspectItem }) {
   return (
     <div className="stat-aspect-group">
       <div className="stat-aspect-group-head">
-        <span className="stat-aspect-group-title">{item.label}</span>
+        <span className="stat-aspect-group-title">{groupTitle ?? item.label}</span>
       </div>
       <div className="stat-aspect-group-body">
         {hasSubMetrics ? (
@@ -127,9 +127,19 @@ export function ScoutStatsSections({
     <div className="pass-scores-panel">
       <div className="report-pass-accordion">
         {sections.map((section) => {
-          const metrics = section.labels
-            .map((label) => findAspect(all, label))
-            .filter((item): item is AspectItem => Boolean(item));
+          type MetricEntry = { item: AspectItem; groupTitle?: string };
+          const metrics: MetricEntry[] = [];
+          for (const label of section.labels) {
+            const item = findAspect(all, label);
+            if (!item) continue;
+            const groupTitle =
+              family === "zagueiros" &&
+              section.title === "Ofensivo" &&
+              label === "Conduções Progressivas"
+                ? "Progressão"
+                : undefined;
+            metrics.push({ item, groupTitle });
+          }
 
           if (!metrics.length) return null;
 
@@ -148,8 +158,8 @@ export function ScoutStatsSections({
               </summary>
               <div className="report-pass-accordion-panel">
                 <div className="pass-score-metrics">
-                  {metrics.map((item) => (
-                    <StatAspectBlock key={item.label} item={item} />
+                  {metrics.map(({ item, groupTitle }) => (
+                    <StatAspectBlock key={item.label} item={item} groupTitle={groupTitle} />
                   ))}
                 </div>
               </div>

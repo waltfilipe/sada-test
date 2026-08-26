@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
+import type { StatLetterFilters } from "@/lib/playerStatFilters";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { PositionFilterBar } from "./profile/PositionFilterBar";
 import { PositionPlayerPicker } from "./profile/PositionPlayerPicker";
@@ -24,8 +25,7 @@ export function PositionScoutPage({ family, players }: Props) {
   );
   const [profilesFilter, setProfilesFilter] = useState<string[]>([]);
   const [clusterFilters, setClusterFilters] = useState<string[]>([]);
-  const [statSectionFilter, setStatSectionFilter] = useState<string | null>(null);
-  const [statLetterFilter, setStatLetterFilter] = useState<string | null>(null);
+  const [statLetterFilters, setStatLetterFilters] = useState<StatLetterFilters>({});
   const familyMeta = familyBySlug(family);
   const clusterMode = family === "zagueiros" || family === "laterais";
 
@@ -64,6 +64,15 @@ export function PositionScoutPage({ family, players }: Props) {
     );
   };
 
+  const setStatLetterFilter = (sectionTitle: string, letter: string | null) => {
+    setStatLetterFilters((current) => {
+      const next = { ...current };
+      if (!letter) delete next[sectionTitle];
+      else next[sectionTitle] = letter;
+      return next;
+    });
+  };
+
   return (
     <div className="scout-root profile-page">
       <ScoutTopbar
@@ -99,10 +108,9 @@ export function PositionScoutPage({ family, players }: Props) {
                 onToggleClusterFilter={toggleClusterFilter}
                 onToggleProfile={toggleProfile}
                 profilesAvailable={profilesAvailable}
-                statSectionFilter={statSectionFilter}
-                statLetterFilter={statLetterFilter}
-                onStatSectionChange={setStatSectionFilter}
-                onStatLetterChange={setStatLetterFilter}
+                selectedPlayer={selected}
+                statLetterFilters={statLetterFilters}
+                onStatLetterFilterChange={setStatLetterFilter}
               />
 
               <PositionPlayerPicker
@@ -113,8 +121,7 @@ export function PositionScoutPage({ family, players }: Props) {
                 clusterMode={clusterMode}
                 clusterFilters={clusterFilters}
                 profilesFilter={profilesFilter}
-                statSectionFilter={statSectionFilter}
-                statLetterFilter={statLetterFilter}
+                statLetterFilters={statLetterFilters}
               />
             </div>
 

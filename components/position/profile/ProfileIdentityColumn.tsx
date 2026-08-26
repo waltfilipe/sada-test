@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
+import { Tooltip } from "@/components/ui/Tooltip";
 import {
-  profileAccent,
-  profileEmoji,
-  sortedProfileShareRows,
-} from "@/lib/profileShares";
+  latArchetypeMetaFor,
+  archetypeMetaFor,
+  type ArchetypeTrait,
+} from "@/lib/clusterMeta";
+import { profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -30,6 +32,67 @@ function formatDate(iso: string): string {
   return `${day}/${month}/${year}`;
 }
 
+function profileMetaForLabel(label: string, family: PositionFamily) {
+  if (family === "laterais") {
+    return latArchetypeMetaFor(label as "Defensivo" | "Construtor" | "Ofensivo" | "Híbrido");
+  }
+  if (family === "zagueiros") {
+    return archetypeMetaFor(label as "Defensor de Área" | "Construtor" | "Combativo");
+  }
+  return undefined;
+}
+
+function ProfileTooltipContent({
+  label,
+  rating,
+  family,
+}: {
+  label: string;
+  rating: number;
+  family: PositionFamily;
+}) {
+  const meta = profileMetaForLabel(label, family);
+  const accent = profileAccent(label);
+  const ups = meta?.traits.filter((item) => item.direction === "up") ?? [];
+  const downs = meta?.traits.filter((item) => item.direction === "down") ?? [];
+
+  return (
+    <div className="profile-archetype-tip">
+      <div className="profile-archetype-tip-head">
+        <span className="profile-archetype-tip-label">{label}</span>
+        <span className="profile-archetype-tip-rating tabular" style={{ color: accent }}>
+          Rating {formatRating(rating)}
+        </span>
+      </div>
+      {meta?.description ? <p className="profile-archetype-tip-copy">{meta.description}</p> : null}
+      <TraitList title="Valoriza" traits={ups} direction="up" />
+      <TraitList title="Desvaloriza" traits={downs} direction="down" />
+    </div>
+  );
+}
+
+function TraitList({
+  title,
+  traits,
+  direction,
+}: {
+  title: string;
+  traits: ArchetypeTrait[];
+  direction: "up" | "down";
+}) {
+  if (!traits.length) return null;
+  return (
+    <div className="profile-archetype-tip-traits">
+      <span className="profile-archetype-tip-traits-title">{title}</span>
+      <ul className={`profile-archetype-tip-list profile-archetype-tip-list-${direction}`}>
+        {traits.map((trait) => (
+          <li key={trait.label}>{trait.label}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function ProfileIdentityColumn({ player, family }: Props) {
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const tm = player.transfermarkt;
@@ -37,9 +100,7 @@ export function ProfileIdentityColumn({ player, family }: Props) {
     tm?.contract_remaining ?? (tm?.contract_until ? formatDate(tm.contract_until) : null);
 
   const shareRows = useMemo(() => sortedProfileShareRows(player), [player]);
-  const dominant = shareRows[0];
   const activeKey = player.cluster?.archetype === "Híbrido" ? null : player.cluster?.archetype;
-  const dominantAccent = dominant ? profileAccent(dominant.label) : profileAccent(player.profile);
 
   return (
     <div className="pa-col pa-col-identity">
@@ -74,60 +135,45 @@ export function ProfileIdentityColumn({ player, family }: Props) {
               <ClubLogo club={player.club} size={15} /> {player.club} · {player.position}
             </p>
 
-            {dominant ? (
-              <div
-                className="profile-identity-profile-card"
-                style={{
-                  borderColor: `${dominantAccent}55`,
-                  boxShadow: `inset 0 1px 0 ${dominantAccent}22`,
-                }}
-              >
-                <div
-                  className="profile-identity-primary"
-                  style={{ background: `${dominantAccent}12` }}
-                >
-                  <span className="profile-identity-emoji" aria-hidden="true">
-                    {profileEmoji(dominant.label)}
+            {shareRows.length ? (
+              <div className="profile-perfil-card">
+                <div className="profile-perfil-card-head">
+                  <span className="profile-perfil-card-title">Perfil</span>
+                  <span className="profile-perfil-card-digital" aria-hidden="true">
+                    {Math.round(shareRows[0]?.share ?? 0)}%
                   </span>
-                  <div className="profile-identity-primary-copy">
-                    <span className="profile-cluster-eyebrow">Perfil principal</span>
-                    <p className="profile-cluster-title">{dominant.label}</p>
-                    <p className="profile-identity-primary-meta tabular">
-                      {Math.round(dominant.share)}%
-                      <span className="profile-share-inline-sep">·</span>
-                      <span style={tierVars(ratingTier(dominant.rating))}>
-                        {formatRating(dominant.rating)}
-                      </span>
-                    </p>
-                  </div>
                 </div>
-
-                {shareRows.length > 1 ? (
-                  <ul className="profile-share-stack">
-                    {shareRows.slice(1).map((row) => {
-                      const token = ratingTier(row.rating);
-                      const active = row.key === activeKey;
-                      return (
-                        <li
-                          key={row.key}
-                          className={`profile-share-stack-row cluster-${row.tone}${active ? " active" : ""}`}
+                <ul className="profile-perfil-list">
+                  {shareRows.map((row) => {
+                    const token = ratingTier(row.rating);
+                    const active = row.key === activeKey;
+                    const accent = profileAccent(row.label);
+                    return (
+                      <li key={row.key}>
+                        <Tooltip
+                          content={
+                            <ProfileTooltipContent label={row.label} rating={row.rating} family={family} />
+                          }
+                          block
                         >
-                          <span className="profile-share-stack-label">
-                            <span className="profile-share-stack-emoji" aria-hidden="true">
-                              {profileEmoji(row.label)}
+                          <div
+                            className={`profile-perfil-row cluster-${row.tone}${active ? " active" : ""}`}
+                            style={{ "--profile-accent": accent } as React.CSSProperties}
+                          >
+                            <span className="profile-perfil-row-label">{row.label}</span>
+                            <span className="profile-perfil-row-meta tabular">
+                              <span className="profile-perfil-row-share">{Math.round(row.share)}%</span>
+                              <span className="profile-perfil-row-sep">·</span>
+                              <span className="profile-perfil-row-rating" style={tierVars(token)}>
+                                Rating {formatRating(row.rating)}
+                              </span>
                             </span>
-                            {row.label}
-                          </span>
-                          <span className="profile-share-stack-meta tabular">
-                            {Math.round(row.share)}%
-                            <span className="profile-share-inline-sep">·</span>
-                            <span style={tierVars(token)}>{formatRating(row.rating)}</span>
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : null}
+                          </div>
+                        </Tooltip>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
             ) : (
               <p className="profile-share-inline-fallback">{player.profile}</p>

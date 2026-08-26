@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
-import { playerMatchesStatLetterFilter } from "@/lib/playerStatFilters";
+import type { StatLetterFilters } from "@/lib/playerStatFilters";
+import { playerMatchesStatLetterFilters } from "@/lib/playerStatFilters";
 import { playerInitials } from "@/lib/scoutTheme";
 import { sortPlayers } from "@/lib/scoutUi";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
@@ -16,8 +17,7 @@ type Props = {
   clusterMode?: boolean;
   clusterFilters?: string[];
   profilesFilter?: string[];
-  statSectionFilter?: string | null;
-  statLetterFilter?: string | null;
+  statLetterFilters?: StatLetterFilters;
 };
 
 export function PositionPlayerPicker({
@@ -28,8 +28,7 @@ export function PositionPlayerPicker({
   clusterMode = false,
   clusterFilters = [],
   profilesFilter = [],
-  statSectionFilter = null,
-  statLetterFilter = null,
+  statLetterFilters = {},
 }: Props) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -45,7 +44,7 @@ export function PositionPlayerPicker({
       } else if (profilesFilter.length && !profilesFilter.includes(player.profile)) {
         return false;
       }
-      if (!playerMatchesStatLetterFilter(player, family, statSectionFilter, statLetterFilter)) {
+      if (!playerMatchesStatLetterFilters(player, family, statLetterFilters)) {
         return false;
       }
       if (!q) return true;
@@ -58,8 +57,7 @@ export function PositionPlayerPicker({
     clusterMode,
     clusterFilters,
     profilesFilter,
-    statSectionFilter,
-    statLetterFilter,
+    statLetterFilters,
     query,
   ]);
 
