@@ -101,33 +101,31 @@ export function PositionPlayerPicker({
   }
 
   return (
-    <div className="player-search-row position-player-picker" ref={rootRef}>
-      <div className="position-player-search-wrap">
-        <label className="filter-label" htmlFor="player-search">
-          Buscar atleta
+    <div className="profile-top-picker" ref={rootRef}>
+      <div className="profile-top-picker-search">
+        <label className="filter-label filter-label-compact" htmlFor="player-search">
+          Buscar
         </label>
-        <div className="player-search-input-wrap">
-          <input
-            ref={inputRef}
-            id="player-search"
-            type="search"
-            className="player-search-input"
-            placeholder="Digite o nome do atleta…"
-            value={query}
-            autoComplete="off"
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setOpen(true);
-            }}
-            onFocus={() => setOpen(true)}
-            onKeyDown={onKeyDown}
-          />
-        </div>
+        <input
+          ref={inputRef}
+          id="player-search"
+          type="search"
+          className="player-search-input player-search-input-compact"
+          placeholder="Nome do atleta…"
+          value={query}
+          autoComplete="off"
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={onKeyDown}
+        />
 
         {showSuggestions ? (
-          <ul className="position-player-suggestions" role="listbox">
+          <ul className="position-player-suggestions position-player-suggestions-compact" role="listbox">
             {visible.length ? (
-              visible.slice(0, 12).map((player, index) => (
+              visible.slice(0, 10).map((player, index) => (
                 <li key={player.player_id}>
                   <button
                     type="button"
@@ -148,11 +146,11 @@ export function PositionPlayerPicker({
         ) : null}
       </div>
 
-      <div className="player-select-field position-player-select-wrap">
-        <label className="filter-label">Atleta</label>
+      <div className="profile-top-picker-current">
+        <label className="filter-label filter-label-compact">Atleta</label>
         <button
           type="button"
-          className="position-player-trigger"
+          className="position-player-trigger position-player-trigger-compact"
           aria-expanded={open && !query.trim()}
           onClick={() => {
             setOpen((v) => !v);
@@ -166,7 +164,7 @@ export function PositionPlayerPicker({
         </button>
 
         {open && !query.trim() ? (
-          <ul className="position-player-menu" role="listbox">
+          <ul className="position-player-menu position-player-menu-compact" role="listbox">
             {visible.map((player) => (
               <li key={player.player_id}>
                 <button
@@ -190,8 +188,8 @@ export function PositionPlayerPicker({
 function PlayerOptionRow({ player, selected = false }: { player: PlayerProfile; selected?: boolean }) {
   const photo = player.transfermarkt?.photo;
   return (
-    <span className={`position-player-option position-player-option-inline${selected ? " is-selected" : ""}`}>
-      <span className="position-player-photo">
+    <span className={`position-player-option position-player-option-inline position-player-option-compact${selected ? " is-selected" : ""}`}>
+      <span className="position-player-photo position-player-photo-compact">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={photo} alt="" />
@@ -200,7 +198,7 @@ function PlayerOptionRow({ player, selected = false }: { player: PlayerProfile; 
         )}
       </span>
       <span className="position-player-name">{player.name}</span>
-      <ClubLogo club={player.club} size={16} />
+      <ClubLogo club={player.club} size={14} />
       <span className="position-player-club">{player.club}</span>
     </span>
   );

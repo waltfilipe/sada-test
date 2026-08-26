@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { GradeBadge } from "@/components/ui/GradeBadge";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
+import { playerSectionGrade } from "@/lib/sectionGrades";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 
 function flattenAspects(player: PlayerProfile): AspectItem[] {
@@ -28,9 +29,12 @@ function metricValue(value?: string | null): string {
   return value ?? "—";
 }
 
-function sectionLetter(items: AspectItem[]): string | undefined {
-  if (!items.length) return undefined;
-  return items[0]?.grade;
+function sectionLetter(
+  player: PlayerProfile,
+  family: PositionFamily,
+  sectionTitle: string,
+): string | undefined {
+  return playerSectionGrade(player, family, sectionTitle);
 }
 
 const ROW_LABEL_ALIASES: Record<string, string> = {
@@ -139,7 +143,7 @@ export function ScoutStatsSections({
                   <span className="report-pass-accordion-title">{section.title}</span>
                 </span>
                 <span className="report-pass-accordion-right">
-                  <GradeBadge letter={sectionLetter(metrics)} size="sm" />
+                  <GradeBadge letter={sectionLetter(player, family, section.title)} size="sm" />
                 </span>
               </summary>
               <div className="report-pass-accordion-panel">

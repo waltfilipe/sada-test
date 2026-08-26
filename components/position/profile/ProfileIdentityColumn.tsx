@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
-import { sortedProfileShareRows } from "@/lib/profileShares";
+import {
+  profileAccent,
+  profileEmoji,
+  sortedProfileShareRows,
+} from "@/lib/profileShares";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -33,7 +37,9 @@ export function ProfileIdentityColumn({ player, family }: Props) {
     tm?.contract_remaining ?? (tm?.contract_until ? formatDate(tm.contract_until) : null);
 
   const shareRows = useMemo(() => sortedProfileShareRows(player), [player]);
+  const dominant = shareRows[0];
   const activeKey = player.cluster?.archetype === "Híbrido" ? null : player.cluster?.archetype;
+  const dominantAccent = dominant ? profileAccent(dominant.label) : profileAccent(player.profile);
 
   return (
     <div className="pa-col pa-col-identity">
@@ -65,31 +71,64 @@ export function ProfileIdentityColumn({ player, family }: Props) {
           <div className="profile-identity-head-copy">
             <h2 className="identity-title">{player.name}</h2>
             <p className="identity-subline">
-              {player.club} · {player.position}
+              <ClubLogo club={player.club} size={15} /> {player.club} · {player.position}
             </p>
 
-            {shareRows.length ? (
-              <ul className="profile-share-inline-list">
-                {shareRows.map((row) => {
-                  const token = ratingTier(row.rating);
-                  const active = row.key === activeKey;
-                  return (
-                    <li
-                      key={row.key}
-                      className={`profile-share-inline-row cluster-${row.tone}${active ? " active" : ""}`}
-                    >
-                      <span className="profile-share-inline-label">{row.label}</span>
-                      <span className="profile-share-inline-meta tabular">
-                        <span>{Math.round(row.share)}%</span>
-                        <span className="profile-share-inline-sep">·</span>
-                        <span className="profile-share-inline-rating" style={tierVars(token)}>
-                          {formatRating(row.rating)}
-                        </span>
+            {dominant ? (
+              <div
+                className="profile-identity-profile-card"
+                style={{
+                  borderColor: `${dominantAccent}55`,
+                  boxShadow: `inset 0 1px 0 ${dominantAccent}22`,
+                }}
+              >
+                <div
+                  className="profile-identity-primary"
+                  style={{ background: `${dominantAccent}12` }}
+                >
+                  <span className="profile-identity-emoji" aria-hidden="true">
+                    {profileEmoji(dominant.label)}
+                  </span>
+                  <div className="profile-identity-primary-copy">
+                    <span className="profile-cluster-eyebrow">Perfil principal</span>
+                    <p className="profile-cluster-title">{dominant.label}</p>
+                    <p className="profile-identity-primary-meta tabular">
+                      {Math.round(dominant.share)}%
+                      <span className="profile-share-inline-sep">·</span>
+                      <span style={tierVars(ratingTier(dominant.rating))}>
+                        {formatRating(dominant.rating)}
                       </span>
-                    </li>
-                  );
-                })}
-              </ul>
+                    </p>
+                  </div>
+                </div>
+
+                {shareRows.length > 1 ? (
+                  <ul className="profile-share-stack">
+                    {shareRows.slice(1).map((row) => {
+                      const token = ratingTier(row.rating);
+                      const active = row.key === activeKey;
+                      return (
+                        <li
+                          key={row.key}
+                          className={`profile-share-stack-row cluster-${row.tone}${active ? " active" : ""}`}
+                        >
+                          <span className="profile-share-stack-label">
+                            <span className="profile-share-stack-emoji" aria-hidden="true">
+                              {profileEmoji(row.label)}
+                            </span>
+                            {row.label}
+                          </span>
+                          <span className="profile-share-stack-meta tabular">
+                            {Math.round(row.share)}%
+                            <span className="profile-share-inline-sep">·</span>
+                            <span style={tierVars(token)}>{formatRating(row.rating)}</span>
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : null}
+              </div>
             ) : (
               <p className="profile-share-inline-fallback">{player.profile}</p>
             )}

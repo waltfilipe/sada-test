@@ -9,9 +9,10 @@ import {
   latArchetypeTone,
   archetypeTone,
 } from "@/lib/clusterMeta";
+import { profileAccent } from "@/lib/profileShares";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { STAT_LETTER_OPTIONS } from "@/lib/playerStatFilters";
-import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import type { PositionFamily } from "@/lib/types";
 
 type Props = {
   family: PositionFamily;
@@ -27,18 +28,13 @@ type Props = {
   onStatLetterChange: (letter: string | null) => void;
 };
 
-function profileCardAccent(family: PositionFamily, key: string): string {
-  if (family === "laterais") {
-    if (key === "Defensivo") return "#38bdf8";
-    if (key === "Construtor") return "#a78bfa";
-    if (key === "Ofensivo") return "#34d399";
-    return "#67e8f9";
-  }
-  if (key === "Defensor de Área") return "#38bdf8";
-  if (key === "Construtor") return "#a78bfa";
-  if (key === "Combativo") return "#f97316";
-  return "#67e8f9";
-}
+const STAT_SECTION_ACCENT: Record<string, string> = {
+  Defensivo: "#38bdf8",
+  Aéreo: "#a78bfa",
+  Construção: "#34d399",
+  Ofensivo: "#fbbf24",
+  "Terço Final": "#f472b6",
+};
 
 export function PositionFilterBar({
   family,
@@ -71,11 +67,15 @@ export function PositionFilterBar({
   };
 
   return (
-    <div className="profile-group-panel profile-filters-compact">
-      {clusterMode && archetypeFilters ? (
-        <div className="profile-filter-block">
-          <span className="profile-league-filter-eyebrow">Perfil</span>
-          <div className="profile-filter-card-grid">
+    <div className="profile-top-filters">
+      <div className="profile-filter-panel profile-filter-panel-perfil">
+        <div className="profile-filter-panel-head">
+          <h3 className="profile-filter-panel-title">Perfil</h3>
+          <span className="profile-filter-panel-hint">Filtre por arquétipo</span>
+        </div>
+
+        {clusterMode && archetypeFilters ? (
+          <div className="profile-filter-chip-grid">
             {archetypeFilters
               .filter((item) => item.archetype !== "Híbrido")
               .map((item) => {
@@ -84,18 +84,17 @@ export function PositionFilterBar({
                     ? latArchetypeTone(item.archetype as "Defensivo" | "Construtor" | "Ofensivo")
                     : archetypeTone(item.archetype as "Defensor de Área" | "Construtor" | "Combativo");
                 const active = clusterFilters.includes(item.archetype);
-                const accent = profileCardAccent(family, item.archetype);
+                const accent = profileAccent(item.archetype);
                 return (
                   <button
                     key={item.archetype}
                     type="button"
-                    className={`reports-category-card profile-archetype-card cluster-${tone}${active ? " active" : ""}`}
-                    style={{ "--category-accent": accent } as React.CSSProperties}
+                    className={`profile-filter-chip profile-filter-chip-profile cluster-${tone}${active ? " active" : ""}`}
+                    style={{ "--chip-accent": accent } as React.CSSProperties}
                     onClick={() => onToggleClusterFilter(item.archetype)}
                     aria-pressed={active}
                   >
-                    <span className="reports-category-card-eyebrow">Perfil</span>
-                    <span className="reports-category-card-title">{item.archetype}</span>
+                    {item.archetype}
                   </button>
                 );
               })}
@@ -105,59 +104,62 @@ export function PositionFilterBar({
                 <button
                   key={item.badge}
                   type="button"
-                  className={`reports-category-card profile-archetype-card cluster-hibrido${active ? " active" : ""}`}
-                  style={{ "--category-accent": "#fbbf24" } as React.CSSProperties}
+                  className={`profile-filter-chip profile-filter-chip-profile cluster-hibrido${active ? " active" : ""}`}
+                  style={{ "--chip-accent": "#fbbf24" } as React.CSSProperties}
                   onClick={() => onToggleClusterFilter(item.badge)}
                   aria-pressed={active}
                 >
-                  <span className="reports-category-card-eyebrow">Híbrido</span>
-                  <span className="reports-category-card-title">{item.short_label}</span>
+                  {item.short_label}
                 </button>
               );
             })}
           </div>
-        </div>
-      ) : profilesAvailable.length ? (
-        <div className="profile-filter-block">
-          <span className="profile-league-filter-eyebrow">Perfil</span>
-          <div className="profile-filter-card-grid">
-            {profilesAvailable.map((profile) => (
-              <button
-                key={profile}
-                type="button"
-                className={`reports-category-card profile-archetype-card${profilesFilter.includes(profile) ? " active" : ""}`}
-                style={{ "--category-accent": "#67e8f9" } as React.CSSProperties}
-                onClick={() => onToggleProfile(profile)}
-                aria-pressed={profilesFilter.includes(profile)}
-              >
-                <span className="reports-category-card-eyebrow">Perfil</span>
-                <span className="reports-category-card-title">{profile}</span>
-              </button>
-            ))}
+        ) : profilesAvailable.length ? (
+          <div className="profile-filter-chip-grid">
+            {profilesAvailable.map((profile) => {
+              const active = profilesFilter.includes(profile);
+              const accent = profileAccent(profile);
+              return (
+                <button
+                  key={profile}
+                  type="button"
+                  className={`profile-filter-chip profile-filter-chip-profile${active ? " active" : ""}`}
+                  style={{ "--chip-accent": accent } as React.CSSProperties}
+                  onClick={() => onToggleProfile(profile)}
+                  aria-pressed={active}
+                >
+                  {profile}
+                </button>
+              );
+            })}
           </div>
-        </div>
-      ) : null}
+        ) : (
+          <p className="profile-filter-panel-empty">Sem perfis disponíveis.</p>
+        )}
+      </div>
 
-      <div className="profile-filter-block">
-        <span className="profile-league-filter-eyebrow">Stats</span>
-        <div className="profile-filter-card-grid profile-stat-filter-grid">
+      <div className="profile-filter-panel profile-filter-panel-stats">
+        <div className="profile-filter-panel-head">
+          <h3 className="profile-filter-panel-title">Stats</h3>
+          <span className="profile-filter-panel-hint">Nota mínima na família</span>
+        </div>
+
+        <div className="profile-filter-chip-grid profile-filter-chip-grid-stats">
           {statSections.map((section) => {
             const active = statSectionFilter === section.title;
+            const accent = STAT_SECTION_ACCENT[section.title] ?? "#67e8f9";
             return (
               <button
                 key={section.title}
                 type="button"
-                className={`reports-category-card profile-stat-filter-card${active ? " active" : ""}`}
-                style={{ "--category-accent": "#67e8f9" } as React.CSSProperties}
+                className={`profile-filter-chip profile-filter-chip-stat${active ? " active" : ""}`}
+                style={{ "--chip-accent": accent } as React.CSSProperties}
                 onClick={() => handleStatCardClick(section.title)}
                 aria-pressed={active}
               >
-                <span className="reports-category-card-eyebrow">Stats</span>
-                <span className="reports-category-card-title">{section.title}</span>
+                {section.title}
                 {active && statLetterFilter ? (
-                  <span className="profile-stat-filter-grade">
-                    <GradeBadge letter={statLetterFilter} size="sm" />
-                  </span>
+                  <GradeBadge letter={statLetterFilter} size="sm" />
                 ) : null}
               </button>
             );
@@ -165,9 +167,9 @@ export function PositionFilterBar({
         </div>
 
         {statSectionFilter ? (
-          <div className="stat-letter-filter-row">
-            <span className="stat-letter-filter-label">Nota mínima em {statSectionFilter}</span>
-            <div className="stat-letter-chips">
+          <div className="stat-letter-slicer">
+            <span className="stat-letter-slicer-label">{statSectionFilter}</span>
+            <div className="stat-letter-chips stat-letter-chips-compact">
               {STAT_LETTER_OPTIONS.map((letter) => (
                 <button
                   key={letter}
@@ -181,30 +183,12 @@ export function PositionFilterBar({
               ))}
             </div>
           </div>
-        ) : null}
+        ) : (
+          <p className="profile-filter-panel-empty profile-filter-panel-empty-stats">
+            Selecione uma família de stats para filtrar por letra.
+          </p>
+        )}
       </div>
     </div>
   );
-}
-
-export function profileDescription(player: PlayerProfile): { title: string; summary: string; accent: string } {
-  if (player.cluster) {
-    if (player.cluster.family === "laterais" || "defensivo" in player.cluster.shares) {
-      return {
-        title: player.cluster.archetype_label,
-        summary: "",
-        accent: "#34d399",
-      };
-    }
-    return {
-      title: player.cluster.archetype_label,
-      summary: "",
-      accent: "#a78bfa",
-    };
-  }
-  return {
-    title: player.profile,
-    summary: "",
-    accent: "#67e8f9",
-  };
 }

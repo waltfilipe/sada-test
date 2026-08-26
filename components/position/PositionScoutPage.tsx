@@ -90,31 +90,33 @@ export function PositionScoutPage({ family, players }: Props) {
           <div className="scout-empty">Nenhum atleta disponível para {familyMeta.label.toLowerCase()}.</div>
         ) : (
           <>
-            <PositionFilterBar
-              family={family}
-              clusterMode={clusterMode}
-              clusterFilters={clusterFilters}
-              profilesFilter={profilesFilter}
-              onToggleClusterFilter={toggleClusterFilter}
-              onToggleProfile={toggleProfile}
-              profilesAvailable={profilesAvailable}
-              statSectionFilter={statSectionFilter}
-              statLetterFilter={statLetterFilter}
-              onStatSectionChange={setStatSectionFilter}
-              onStatLetterChange={setStatLetterFilter}
-            />
+            <div className="profile-top-shell">
+              <PositionFilterBar
+                family={family}
+                clusterMode={clusterMode}
+                clusterFilters={clusterFilters}
+                profilesFilter={profilesFilter}
+                onToggleClusterFilter={toggleClusterFilter}
+                onToggleProfile={toggleProfile}
+                profilesAvailable={profilesAvailable}
+                statSectionFilter={statSectionFilter}
+                statLetterFilter={statLetterFilter}
+                onStatSectionChange={setStatSectionFilter}
+                onStatLetterChange={setStatLetterFilter}
+              />
 
-            <PositionPlayerPicker
-              players={players}
-              family={family}
-              selectedId={selected.player_id}
-              onSelect={setSelectedId}
-              clusterMode={clusterMode}
-              clusterFilters={clusterFilters}
-              profilesFilter={profilesFilter}
-              statSectionFilter={statSectionFilter}
-              statLetterFilter={statLetterFilter}
-            />
+              <PositionPlayerPicker
+                players={players}
+                family={family}
+                selectedId={selected.player_id}
+                onSelect={setSelectedId}
+                clusterMode={clusterMode}
+                clusterFilters={clusterFilters}
+                profilesFilter={profilesFilter}
+                statSectionFilter={statSectionFilter}
+                statLetterFilter={statLetterFilter}
+              />
+            </div>
 
             <PositionProfileView player={selected} family={family} />
           </>

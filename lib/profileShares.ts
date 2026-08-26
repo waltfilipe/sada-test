@@ -60,3 +60,27 @@ export function buildProfileShareRows(player: PlayerProfile): ProfileShareRow[] 
 export function sortedProfileShareRows(player: PlayerProfile): ProfileShareRow[] {
   return [...buildProfileShareRows(player)].sort((a, b) => b.share - a.share);
 }
+
+export function profileEmoji(label: string): string {
+  const map: Record<string, string> = {
+    "Defensor de Área": "🛡️",
+    Construtor: "🎯",
+    Combativo: "⚔️",
+    Defensivo: "🛡️",
+    Ofensivo: "⚡",
+    Híbrido: "🔀",
+  };
+  return map[label] ?? "📊";
+}
+
+export function profileAccent(label: string): string {
+  const map: Record<string, string> = {
+    "Defensor de Área": "#38bdf8",
+    Construtor: "#a78bfa",
+    Combativo: "#f97316",
+    Defensivo: "#38bdf8",
+    Ofensivo: "#34d399",
+    Híbrido: "#fbbf24",
+  };
+  return map[label] ?? "#67e8f9";
+}
