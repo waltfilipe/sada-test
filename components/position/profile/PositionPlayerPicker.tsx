@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
 import type { StatLetterFilters } from "@/lib/playerStatFilters";
 import { playerMatchesStatLetterFilters } from "@/lib/playerStatFilters";
-import { playerInitials } from "@/lib/scoutTheme";
 import { sortPlayers } from "@/lib/scoutUi";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -50,7 +49,7 @@ export function PositionPlayerPicker({
       if (!q) return true;
       return player.name.toLowerCase().includes(q) || player.club.toLowerCase().includes(q);
     });
-    return sortPlayers(filtered, "name");
+    return sortPlayers(filtered, "rating");
   }, [
     players,
     family,
@@ -184,17 +183,8 @@ export function PositionPlayerPicker({
 }
 
 function PlayerOptionRow({ player, selected = false }: { player: PlayerProfile; selected?: boolean }) {
-  const photo = player.transfermarkt?.photo;
   return (
     <span className={`position-player-option position-player-option-inline position-player-option-compact${selected ? " is-selected" : ""}`}>
-      <span className="position-player-photo position-player-photo-compact">
-        {photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} alt="" />
-        ) : (
-          <span>{playerInitials(player.name)}</span>
-        )}
-      </span>
       <span className="position-player-name">{player.name}</span>
       <ClubLogo club={player.club} size={14} />
       <span className="position-player-club">{player.club}</span>
