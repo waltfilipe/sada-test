@@ -1,16 +1,16 @@
-/** Grade colors and bar helpers (test-site profile layout). */
+/** Grade colors and bar helpers — brand scale: D vermelho → C amarelo → B verde claro → A+ verde escuro. */
 
 export const LETTER_GRADE_PILL_COLORS: Record<string, string> = {
-  "A+": "#15803d",
-  A: "#16a34a",
-  "A-": "#22c55e",
-  "B+": "#4d7c0f",
-  B: "#65a30d",
-  "B-": "#84cc16",
-  "C+": "#ca8a04",
-  C: "#eab308",
-  "C-": "#facc15",
-  D: "#dc2626",
+  "A+": "#0b7a3e",
+  A: "#159c4e",
+  "A-": "#21c468",
+  "B+": "#31e981",
+  B: "#6fef9f",
+  "B-": "#aaee8c",
+  "C+": "#dce976",
+  C: "#fed766",
+  "C-": "#fe9b52",
+  D: "#fe4a49",
 };
 
 const LETTER_GRADE_COLOR_SCORES: Record<string, number> = {
@@ -27,11 +27,12 @@ const LETTER_GRADE_COLOR_SCORES: Record<string, number> = {
 };
 
 const PASS_GRADE_STOPS: [number, [number, number, number]][] = [
-  [0, [0x7f, 0x1d, 0x1d]],
-  [24, [0xb4, 0x53, 0x09]],
-  [42, [0xca, 0x8a, 0x04]],
-  [68, [0x65, 0xa3, 0x0d]],
-  [100, [0x16, 0xa3, 0x4a]],
+  [0, [0xfe, 0x4a, 0x49]],
+  [28, [0xfe, 0x9b, 0x52]],
+  [46, [0xfe, 0xd7, 0x66]],
+  [64, [0xaa, 0xee, 0x8c]],
+  [82, [0x31, 0xe9, 0x81]],
+  [100, [0x0b, 0x7a, 0x3e]],
 ];
 
 const PASS_GRADE_DISPLAY_FLOOR = 4.875;
@@ -58,7 +59,7 @@ export function passGradeGradientColor(pct: number): string {
       return `#${rgb.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
     }
   }
-  return "#16a34a";
+  return "#0b7a3e";
 }
 
 export function barPosition(score: number | null | undefined): number {
@@ -92,7 +93,7 @@ export function badgeTextColor(hexColor: string): string {
   const g = parseInt(hexColor.slice(3, 5), 16);
   const b = parseInt(hexColor.slice(5, 7), 16);
   const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-  return lum > 168 ? "#1e293b" : "#f8fafc";
+  return lum > 168 ? "#0d1b2a" : "#f8fafc";
 }
 
 export function gradeTier(score: number): string {

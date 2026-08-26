@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
 import {
   LAT_ARCHETYPE_META,
   LAT_HYBRID_BADGE_META,
@@ -9,8 +8,6 @@ import {
   archetypeTone,
 } from "@/lib/clusterMeta";
 import { profileAccent } from "@/lib/profileShares";
-import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import { STAT_LETTER_OPTIONS, type StatLetterFilters } from "@/lib/playerStatFilters";
 import type { PositionFamily } from "@/lib/types";
 
 type Props = {
@@ -21,10 +18,7 @@ type Props = {
   onToggleClusterFilter: (key: string) => void;
   onToggleProfile: (profile: string) => void;
   profilesAvailable: string[];
-  statLetterFilters: StatLetterFilters;
-  onStatLetterFilterChange: (sectionTitle: string, letter: string | null) => void;
   onClearProfileFilters: () => void;
-  onClearStatFilters: () => void;
 };
 
 export function PositionFilterBar({
@@ -35,14 +29,9 @@ export function PositionFilterBar({
   onToggleClusterFilter,
   onToggleProfile,
   profilesAvailable,
-  statLetterFilters,
-  onStatLetterFilterChange,
   onClearProfileFilters,
-  onClearStatFilters,
 }: Props) {
-  const statSections = useMemo(() => statSectionsForFamily(family), [family]);
   const hasProfileFilters = clusterFilters.length > 0 || profilesFilter.length > 0;
-  const hasStatFilters = Object.values(statLetterFilters).some(Boolean);
 
   const archetypeFilters =
     family === "laterais" ? LAT_ARCHETYPE_META : family === "zagueiros" ? ZAG_ARCHETYPE_META : null;
@@ -50,193 +39,80 @@ export function PositionFilterBar({
   const hybridFilters = family === "laterais" ? LAT_HYBRID_BADGE_META : null;
 
   return (
-    <div className="profile-top-filters">
-      <div className="profile-filter-panel profile-filter-panel-perfil">
-        <div className="profile-filter-panel-head">
-          <h3 className="profile-filter-panel-title">Perfil</h3>
-          {hasProfileFilters ? (
-            <button type="button" className="profile-filter-clear" onClick={onClearProfileFilters}>
-              <i className="fa-solid fa-xmark" aria-hidden="true" /> Limpar
-            </button>
-          ) : (
-            <span className="profile-filter-panel-hint">Filtre por arquétipo</span>
-          )}
-        </div>
-
-        {clusterMode && archetypeFilters ? (
-          <div className="profile-filter-card-grid">
-            {archetypeFilters
-              .filter((item) => item.archetype !== "Híbrido")
-              .map((item) => {
-                const tone =
-                  family === "laterais"
-                    ? latArchetypeTone(item.archetype as "Defensivo" | "Construtor" | "Ofensivo")
-                    : archetypeTone(item.archetype as "Defensor de Área" | "Construtor" | "Combativo");
-                const active = clusterFilters.includes(item.archetype);
-                const accent = profileAccent(item.archetype);
-                return (
-                  <button
-                    key={item.archetype}
-                    type="button"
-                    className={`profile-archetype-card player-card cluster-${tone}${active ? " active" : ""}`}
-                    style={{ "--chip-accent": accent } as React.CSSProperties}
-                    onClick={() => onToggleClusterFilter(item.archetype)}
-                    aria-pressed={active}
-                  >
-                    <span className="profile-archetype-card-title">{item.archetype}</span>
-                    <span className="profile-archetype-card-copy">{item.description}</span>
-                  </button>
-                );
-              })}
-            {hybridFilters?.map((item) => {
-              const active = clusterFilters.includes(item.badge);
-              return (
-                <button
-                  key={item.badge}
-                  type="button"
-                  className={`profile-archetype-card player-card cluster-hibrido${active ? " active" : ""}`}
-                  style={{ "--chip-accent": "#fbbf24" } as React.CSSProperties}
-                  onClick={() => onToggleClusterFilter(item.badge)}
-                  aria-pressed={active}
-                >
-                  <span className="profile-archetype-card-title">{item.short_label}</span>
-                  <span className="profile-archetype-card-copy">{item.description}</span>
-                </button>
-              );
-            })}
-          </div>
-        ) : profilesAvailable.length ? (
-          <div className="profile-filter-card-grid">
-            {profilesAvailable.map((profile) => {
-              const active = profilesFilter.includes(profile);
-              const accent = profileAccent(profile);
-              return (
-                <button
-                  key={profile}
-                  type="button"
-                  className={`profile-archetype-card player-card${active ? " active" : ""}`}
-                  style={{ "--chip-accent": accent } as React.CSSProperties}
-                  onClick={() => onToggleProfile(profile)}
-                  aria-pressed={active}
-                >
-                  <span className="profile-archetype-card-title">{profile}</span>
-                </button>
-              );
-            })}
-          </div>
+    <div className="profile-filter-panel profile-filter-panel-perfil">
+      <div className="profile-filter-panel-head">
+        <h3 className="profile-filter-panel-title">Perfil</h3>
+        {hasProfileFilters ? (
+          <button type="button" className="profile-filter-clear" onClick={onClearProfileFilters}>
+            <i className="fa-solid fa-xmark" aria-hidden="true" /> Limpar
+          </button>
         ) : (
-          <p className="profile-filter-panel-empty">Sem perfis disponíveis.</p>
+          <span className="profile-filter-panel-hint">Filtre por arquétipo</span>
         )}
       </div>
 
-      <div className="profile-filter-panel profile-filter-panel-stats">
-        <div className="profile-filter-panel-head">
-          <h3 className="profile-filter-panel-title">Stats</h3>
-          {hasStatFilters ? (
-            <button type="button" className="profile-filter-clear" onClick={onClearStatFilters}>
-              <i className="fa-solid fa-xmark" aria-hidden="true" /> Limpar
-            </button>
-          ) : (
-            <span className="profile-filter-panel-hint">Filtre por nota mínima em cada família</span>
-          )}
+      {clusterMode && archetypeFilters ? (
+        <div className="profile-filter-chip-grid">
+          {archetypeFilters
+            .filter((item) => item.archetype !== "Híbrido")
+            .map((item) => {
+              const tone =
+                family === "laterais"
+                  ? latArchetypeTone(item.archetype as "Defensivo" | "Construtor" | "Ofensivo")
+                  : archetypeTone(item.archetype as "Defensor de Área" | "Construtor" | "Combativo");
+              const active = clusterFilters.includes(item.archetype);
+              const accent = profileAccent(item.archetype);
+              return (
+                <button
+                  key={item.archetype}
+                  type="button"
+                  className={`profile-filter-chip profile-filter-chip-profile cluster-${tone}${active ? " active" : ""}`}
+                  style={{ "--chip-accent": accent } as React.CSSProperties}
+                  onClick={() => onToggleClusterFilter(item.archetype)}
+                  aria-pressed={active}
+                >
+                  {item.archetype}
+                </button>
+              );
+            })}
+          {hybridFilters?.map((item) => {
+            const active = clusterFilters.includes(item.badge);
+            return (
+              <button
+                key={item.badge}
+                type="button"
+                className={`profile-filter-chip profile-filter-chip-profile cluster-hibrido${active ? " active" : ""}`}
+                style={{ "--chip-accent": "#fed766" } as React.CSSProperties}
+                onClick={() => onToggleClusterFilter(item.badge)}
+                aria-pressed={active}
+              >
+                {item.short_label}
+              </button>
+            );
+          })}
         </div>
-
-        <div className="profile-stat-filter-grid">
-          {statSections.map((section) => (
-            <StatSectionFilterCard
-              key={section.title}
-              title={section.title}
-              selectedFilter={statLetterFilters[section.title] ?? null}
-              onFilterChange={(letter) => onStatLetterFilterChange(section.title, letter)}
-            />
-          ))}
+      ) : profilesAvailable.length ? (
+        <div className="profile-filter-chip-grid">
+          {profilesAvailable.map((profile) => {
+            const active = profilesFilter.includes(profile);
+            const accent = profileAccent(profile);
+            return (
+              <button
+                key={profile}
+                type="button"
+                className={`profile-filter-chip profile-filter-chip-profile${active ? " active" : ""}`}
+                style={{ "--chip-accent": accent } as React.CSSProperties}
+                onClick={() => onToggleProfile(profile)}
+                aria-pressed={active}
+              >
+                {profile}
+              </button>
+            );
+          })}
         </div>
-      </div>
-    </div>
-  );
-}
-
-function StatSectionFilterCard({
-  title,
-  selectedFilter,
-  onFilterChange,
-}: {
-  title: string;
-  selectedFilter: string | null;
-  onFilterChange: (letter: string | null) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    function onDocClick(event: MouseEvent) {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    }
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
-    }
-    document.addEventListener("mousedown", onDocClick);
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", onDocClick);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open]);
-
-  return (
-    <div className="profile-stat-filter-card player-card" ref={rootRef}>
-      <div className="profile-stat-filter-card-head">
-        <span className="profile-stat-filter-card-title">{title}</span>
-        <div className="profile-stat-filter-card-actions">
-          <div className="profile-stat-letter-filter">
-            <button
-              type="button"
-              className={`profile-stat-letter-trigger${selectedFilter ? " active" : ""}`}
-              aria-expanded={open}
-              aria-haspopup="listbox"
-              aria-label={`Filtrar ${title} por nota mínima`}
-              onClick={() => setOpen((value) => !value)}
-            >
-              {selectedFilter ?? "—"}
-            </button>
-            {open ? (
-              <ul className="profile-stat-letter-menu" role="listbox">
-                <li>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={!selectedFilter}
-                    className={!selectedFilter ? "active" : ""}
-                    onClick={() => {
-                      onFilterChange(null);
-                      setOpen(false);
-                    }}
-                  >
-                    —
-                  </button>
-                </li>
-                {STAT_LETTER_OPTIONS.map((option) => (
-                  <li key={option}>
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={selectedFilter === option}
-                      className={selectedFilter === option ? "active" : ""}
-                      onClick={() => {
-                        onFilterChange(selectedFilter === option ? null : option);
-                        setOpen(false);
-                      }}
-                    >
-                      {option}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-        </div>
-      </div>
+      ) : (
+        <p className="profile-filter-panel-empty">Sem perfis disponíveis.</p>
+      )}
     </div>
   );
 }

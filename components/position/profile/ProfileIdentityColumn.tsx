@@ -139,9 +139,6 @@ export function ProfileIdentityColumn({ player, family }: Props) {
               <div className="profile-perfil-card">
                 <div className="profile-perfil-card-head">
                   <span className="profile-perfil-card-title">Perfil</span>
-                  <span className="profile-perfil-card-digital" aria-hidden="true">
-                    {Math.round(shareRows[0]?.share ?? 0)}%
-                  </span>
                 </div>
                 <ul className="profile-perfil-list">
                   {shareRows.map((row) => {

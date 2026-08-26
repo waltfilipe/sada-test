@@ -1,15 +1,20 @@
 :root {
-  --bg: #07111f;
-  --bg-elevated: #0d1a2d;
-  --panel: rgba(12, 24, 43, 0.88);
+  /* Brand — blue-black base + ciano elétrico, secundárias digitais */
+  --bg: #0d1b2a;
+  --bg-elevated: #12233a;
+  --panel: rgba(13, 27, 42, 0.88);
   --panel-border: rgba(148, 163, 184, 0.14);
   --text: #e5eefb;
   --muted: #8fa1bb;
-  --gold: #f4c15d;
-  --accent: #67e8f9;
-  --rating-high: #4ade80;
-  --rating-mid: #f59e0b;
-  --rating-low: #f87171;
+  --gold: #fed766;
+  --accent: #1be7ff;
+  --brand-red: #fe4a49;
+  --brand-green: #31e981;
+  --brand-yellow: #fed766;
+  --brand-purple: #8980f5;
+  --rating-high: #31e981;
+  --rating-mid: #fed766;
+  --rating-low: #fe4a49;
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
 }
 
@@ -22,11 +27,11 @@ body {
   margin: 0;
   min-height: 100%;
   background:
-    radial-gradient(circle at top left, rgba(56, 189, 248, 0.08), transparent 28%),
-    radial-gradient(circle at 80% 10%, rgba(244, 193, 93, 0.08), transparent 24%),
-    linear-gradient(180deg, #040a14 0%, var(--bg) 100%);
+    radial-gradient(circle at top left, rgba(27, 231, 255, 0.06), transparent 28%),
+    radial-gradient(circle at 80% 10%, rgba(137, 128, 245, 0.06), transparent 24%),
+    linear-gradient(180deg, #081220 0%, var(--bg) 100%);
   color: var(--text);
-  font-family: "Manrope", system-ui, sans-serif;
+  font-family: "TASA Orbiter Variable", "DM Sans", system-ui, sans-serif;
 }
 
 a {

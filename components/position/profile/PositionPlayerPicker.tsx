@@ -2,12 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
-import type { StatLetterFilters, SectionGradeLookup } from "@/lib/playerStatFilters";
-import { playerMatchesStatLetterFilters } from "@/lib/playerStatFilters";
-import { formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
-import { sortPlayers } from "@/lib/scoutUi";
+import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
+
+type SortKey = "rating" | "minutes";
 
 type Props = {
   players: PlayerProfile[];
@@ -17,26 +16,27 @@ type Props = {
   clusterMode?: boolean;
   clusterFilters?: string[];
   profilesFilter?: string[];
-  statLetterFilters?: StatLetterFilters;
-  sectionGradeLookup: SectionGradeLookup;
 };
 
 export function PositionPlayerPicker({
   players,
-  family,
   selectedId,
   onSelect,
   clusterMode = false,
   clusterFilters = [],
   profilesFilter = [],
-  statLetterFilters = {},
-  sectionGradeLookup,
 }: Props) {
   const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [sortKey, setSortKey] = useState<SortKey>("rating");
+  const [clubFilter, setClubFilter] = useState<string[]>([]);
+  const [clubMenuOpen, setClubMenuOpen] = useState(false);
+  const clubMenuRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const clubs = useMemo(
+    () => [...new Set(players.map((p) => p.club))].sort((a, b) => a.localeCompare(b, "pt-BR")),
+    [players],
+  );
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -46,192 +46,218 @@ export function PositionPlayerPicker({
       } else if (profilesFilter.length && !profilesFilter.includes(player.profile)) {
         return false;
       }
-      if (!playerMatchesStatLetterFilters(player, statLetterFilters, sectionGradeLookup)) {
-        return false;
-      }
+      if (clubFilter.length && !clubFilter.includes(player.club)) return false;
       if (!q) return true;
       return player.name.toLowerCase().includes(q) || player.club.toLowerCase().includes(q);
     });
-    return sortPlayers(filtered, "rating");
-  }, [
-    players,
-    family,
-    clusterMode,
-    clusterFilters,
-    profilesFilter,
-    statLetterFilters,
-    sectionGradeLookup,
-    query,
-  ]);
-
-  const selected = players.find((p) => p.player_id === selectedId) ?? visible[0] ?? null;
-  const showSuggestions = open && query.trim().length > 0;
+    return [...filtered].sort((a, b) =>
+      sortKey === "minutes" ? b.minutes - a.minutes : b.rating - a.rating,
+    );
+  }, [players, clusterMode, clusterFilters, profilesFilter, clubFilter, sortKey, query]);
 
   useEffect(() => {
-    function onDocClick(e: MouseEvent) {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    if (!clubMenuOpen) return;
+    function onDocClick(event: MouseEvent) {
+      if (!clubMenuRef.current?.contains(event.target as Node)) setClubMenuOpen(false);
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setClubMenuOpen(false);
     }
     document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, []);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [clubMenuOpen]);
 
+  // Keep the selected card in view when the selection changes.
   useEffect(() => {
-    setActiveIndex(0);
-  }, [query, visible.length]);
+    const track = trackRef.current;
+    if (!track) return;
+    const card = track.querySelector<HTMLElement>(`[data-player-id="${selectedId}"]`);
+    card?.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
+  }, [selectedId]);
 
-  function pick(player: PlayerProfile) {
-    onSelect(player.player_id);
-    setQuery("");
-    setOpen(false);
+  function scrollTrack(direction: -1 | 1) {
+    const track = trackRef.current;
+    if (!track) return;
+    track.scrollBy({ left: direction * track.clientWidth * 0.85, behavior: "smooth" });
   }
 
-  const selectedVisibleIndex = visible.findIndex((p) => p.player_id === selectedId);
-
-  function canStep(delta: number): boolean {
-    if (!visible.length) return false;
-    if (selectedVisibleIndex === -1) return true;
-    const next = selectedVisibleIndex + delta;
-    return next >= 0 && next < visible.length;
-  }
-
-  function step(delta: number) {
-    if (!visible.length) return;
-    const next = selectedVisibleIndex === -1 ? 0 : selectedVisibleIndex + delta;
-    const target = visible[Math.max(0, Math.min(visible.length - 1, next))];
-    if (target) onSelect(target.player_id);
-  }
-
-  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!showSuggestions || !visible.length) return;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setActiveIndex((i) => Math.min(i + 1, visible.length - 1));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setActiveIndex((i) => Math.max(i - 1, 0));
-    } else if (e.key === "Enter" && visible[activeIndex]) {
-      e.preventDefault();
-      pick(visible[activeIndex]);
-    } else if (e.key === "Escape") {
-      setOpen(false);
-    }
+  function toggleClub(club: string) {
+    setClubFilter((current) =>
+      current.includes(club) ? current.filter((item) => item !== club) : [...current, club],
+    );
   }
 
   return (
-    <div className="profile-top-picker" ref={rootRef}>
-      <div className="profile-top-picker-search">
-        <label className="filter-label filter-label-compact" htmlFor="player-search">
-          Buscar
-        </label>
-        <input
-          ref={inputRef}
-          id="player-search"
-          type="search"
-          className="player-search-input player-search-input-compact"
-          placeholder="Nome do atleta…"
-          value={query}
-          autoComplete="off"
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setOpen(true);
-          }}
-          onFocus={() => setOpen(true)}
-          onKeyDown={onKeyDown}
-        />
-
-        {showSuggestions ? (
-          <ul className="position-player-suggestions position-player-suggestions-compact" role="listbox">
-            {visible.length ? (
-              visible.slice(0, 10).map((player, index) => (
-                <li key={player.player_id}>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={index === activeIndex}
-                    className={index === activeIndex ? "active" : ""}
-                    onMouseEnter={() => setActiveIndex(index)}
-                    onClick={() => pick(player)}
-                  >
-                    <PlayerOptionRow player={player} />
-                  </button>
-                </li>
-              ))
-            ) : (
-              <li className="position-player-suggestion-empty">Nenhum atleta encontrado.</li>
-            )}
-          </ul>
-        ) : null}
-      </div>
-
-      <div className="profile-top-picker-current">
-        <label className="filter-label filter-label-compact">Atleta</label>
-        <div className="position-player-trigger-row">
-          <button
-            type="button"
-            className="position-player-step"
-            aria-label="Atleta anterior"
-            disabled={!canStep(-1)}
-            onClick={() => step(-1)}
-          >
-            ‹
-          </button>
-          <button
-            type="button"
-            className="position-player-trigger position-player-trigger-compact"
-            aria-expanded={open && !query.trim()}
-            onClick={() => {
-              setOpen((v) => !v);
-              inputRef.current?.focus();
-            }}
-          >
-            {selected ? <PlayerOptionRow player={selected} selected /> : "Selecionar…"}
-            <span className="position-player-chevron" aria-hidden>
-              ▾
-            </span>
-          </button>
-          <button
-            type="button"
-            className="position-player-step"
-            aria-label="Próximo atleta"
-            disabled={!canStep(1)}
-            onClick={() => step(1)}
-          >
-            ›
-          </button>
+    <div className="player-strip player-card">
+      <div className="player-strip-head">
+        <div className="player-strip-title-wrap">
+          <h3 className="profile-filter-panel-title">Atletas</h3>
+          <span className="player-strip-count tabular">{visible.length}</span>
         </div>
 
-        {open && !query.trim() ? (
-          <ul className="position-player-menu position-player-menu-compact" role="listbox">
-            {visible.map((player) => (
-              <li key={player.player_id}>
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={player.player_id === selectedId}
-                  className={player.player_id === selectedId ? "active" : ""}
-                  onClick={() => pick(player)}
-                >
-                  <PlayerOptionRow player={player} />
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <div className="player-strip-controls">
+          <div className="player-strip-sort" role="group" aria-label="Ordenar atletas">
+            <span className="player-strip-sort-label">Ordenar</span>
+            <button
+              type="button"
+              className={`player-strip-sort-chip${sortKey === "rating" ? " active" : ""}`}
+              onClick={() => setSortKey("rating")}
+              aria-pressed={sortKey === "rating"}
+            >
+              Rating
+            </button>
+            <button
+              type="button"
+              className={`player-strip-sort-chip${sortKey === "minutes" ? " active" : ""}`}
+              onClick={() => setSortKey("minutes")}
+              aria-pressed={sortKey === "minutes"}
+            >
+              Minutos
+            </button>
+          </div>
+
+          <div className="player-strip-club" ref={clubMenuRef}>
+            <button
+              type="button"
+              className={`player-strip-sort-chip player-strip-club-trigger${clubFilter.length ? " active" : ""}`}
+              onClick={() => setClubMenuOpen((value) => !value)}
+              aria-expanded={clubMenuOpen}
+              aria-haspopup="listbox"
+            >
+              Clube{clubFilter.length ? ` · ${clubFilter.length}` : ""}
+              <i className="fa-solid fa-chevron-down" aria-hidden="true" />
+            </button>
+            {clubMenuOpen ? (
+              <div className="player-strip-club-menu" role="listbox" aria-multiselectable="true">
+                {clubFilter.length ? (
+                  <button
+                    type="button"
+                    className="player-strip-club-clear"
+                    onClick={() => setClubFilter([])}
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true" /> Limpar seleção
+                  </button>
+                ) : null}
+                <ul>
+                  {clubs.map((club) => {
+                    const active = clubFilter.includes(club);
+                    return (
+                      <li key={club}>
+                        <button
+                          type="button"
+                          role="option"
+                          aria-selected={active}
+                          className={active ? "active" : ""}
+                          onClick={() => toggleClub(club)}
+                        >
+                          <span className="player-strip-club-check" aria-hidden="true">
+                            {active ? <i className="fa-solid fa-check" /> : null}
+                          </span>
+                          <ClubLogo club={club} size={14} />
+                          {club}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+
+          <input
+            type="search"
+            className="player-strip-search"
+            placeholder="Buscar atleta…"
+            value={query}
+            autoComplete="off"
+            onChange={(event) => setQuery(event.target.value)}
+            aria-label="Buscar atleta"
+          />
+        </div>
+      </div>
+
+      <div className="player-strip-body">
+        <button
+          type="button"
+          className="player-strip-arrow player-strip-arrow-left"
+          aria-label="Atletas anteriores"
+          onClick={() => scrollTrack(-1)}
+        >
+          ‹
+        </button>
+
+        <div className="player-strip-track" ref={trackRef}>
+          {visible.length ? (
+            visible.map((player) => (
+              <PlayerStripCard
+                key={player.player_id}
+                player={player}
+                selected={player.player_id === selectedId}
+                onSelect={() => onSelect(player.player_id)}
+              />
+            ))
+          ) : (
+            <p className="player-strip-empty">Nenhum atleta encontrado com os filtros atuais.</p>
+          )}
+        </div>
+
+        <button
+          type="button"
+          className="player-strip-arrow player-strip-arrow-right"
+          aria-label="Próximos atletas"
+          onClick={() => scrollTrack(1)}
+        >
+          ›
+        </button>
       </div>
     </div>
   );
 }
 
-function PlayerOptionRow({ player, selected = false }: { player: PlayerProfile; selected?: boolean }) {
+function PlayerStripCard({
+  player,
+  selected,
+  onSelect,
+}: {
+  player: PlayerProfile;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const photo = player.transfermarkt?.photo;
   const tier = ratingTier(player.rating);
+
   return (
-    <span className={`position-player-option position-player-option-inline position-player-option-compact${selected ? " is-selected" : ""}`}>
-      <span className="position-player-rating tabular" style={tierVars(tier)}>
-        {formatRating(player.rating)}
+    <button
+      type="button"
+      data-player-id={player.player_id}
+      className={`player-strip-card${selected ? " selected" : ""}`}
+      onClick={onSelect}
+      aria-pressed={selected}
+    >
+      <span className="player-strip-card-media">
+        <span className="player-strip-card-photo">
+          {photo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={photo} alt="" loading="lazy" />
+          ) : (
+            <span>{playerInitials(player.name)}</span>
+          )}
+        </span>
+        <span className="player-strip-card-rating tabular" style={tierVars(tier)}>
+          {formatRating(player.rating)}
+        </span>
       </span>
-      <span className="position-player-name">{player.name}</span>
-      <ClubLogo club={player.club} size={14} />
-      <span className="position-player-club">{player.club}</span>
-    </span>
+      <span className="player-strip-card-copy">
+        <span className="player-strip-card-name">{player.name}</span>
+        <span className="player-strip-card-club">
+          <ClubLogo club={player.club} size={13} />
+          <span>{player.club}</span>
+        </span>
+      </span>
+    </button>
   );
 }

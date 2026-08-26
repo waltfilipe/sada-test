@@ -75,12 +75,12 @@ export function profileEmoji(label: string): string {
 
 export function profileAccent(label: string): string {
   const map: Record<string, string> = {
-    "Defensor de Área": "#38bdf8",
-    Construtor: "#a78bfa",
-    Combativo: "#f97316",
-    Defensivo: "#38bdf8",
-    Ofensivo: "#34d399",
-    Híbrido: "#fbbf24",
+    "Defensor de Área": "#1be7ff",
+    Construtor: "#8980f5",
+    Combativo: "#fe4a49",
+    Defensivo: "#1be7ff",
+    Ofensivo: "#31e981",
+    Híbrido: "#fed766",
   };
-  return map[label] ?? "#67e8f9";
+  return map[label] ?? "#1be7ff";
 }

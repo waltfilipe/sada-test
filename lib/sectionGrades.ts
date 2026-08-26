@@ -121,7 +121,7 @@ export function poolPercentileRank(scores: number[], value: number): number {
   return ((avgRank - 1) / (scores.length - 1)) * 100;
 }
 
-/** Letter from pool percentile — full scale aligned with `gradeScore` thresholds. */
+/** Letter from pool percentile — 10-step scale: D vermelho → A+ verde escuro. */
 export function letterFromPoolPercentile(pct: number): string {
   if (pct >= 97) return "A+";
   if (pct >= 92) return "A";
@@ -132,10 +132,7 @@ export function letterFromPoolPercentile(pct: number): string {
   if (pct >= 50) return "C+";
   if (pct >= 40) return "C";
   if (pct >= 30) return "C-";
-  if (pct >= 22) return "D+";
-  if (pct >= 15) return "D";
-  if (pct >= 10) return "D-";
-  return "D-";
+  return "D";
 }
 
 /** @deprecated pipeline-style thresholds without A+ */
