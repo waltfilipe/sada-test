@@ -79,6 +79,13 @@ export function PositionScoutPage({ family, players }: Props) {
     });
   };
 
+  const clearProfileFilters = () => {
+    setProfilesFilter([]);
+    setClusterFilters([]);
+  };
+
+  const clearStatFilters = () => setStatLetterFilters({});
+
   return (
     <div className="scout-root profile-page">
       <ScoutTopbar
@@ -105,6 +112,13 @@ export function PositionScoutPage({ family, players }: Props) {
           <div className="scout-empty">Nenhum atleta disponível para {familyMeta.label.toLowerCase()}.</div>
         ) : (
           <>
+            <div className="profile-context-header">
+              <h1 className="profile-context-title">{familyMeta.label}</h1>
+              <span className="profile-context-meta">
+                {players.length} atletas · Série A 2025/26
+              </span>
+            </div>
+
             <div className="profile-top-shell">
               <PositionFilterBar
                 family={family}
@@ -116,6 +130,8 @@ export function PositionScoutPage({ family, players }: Props) {
                 profilesAvailable={profilesAvailable}
                 statLetterFilters={statLetterFilters}
                 onStatLetterFilterChange={setStatLetterFilter}
+                onClearProfileFilters={clearProfileFilters}
+                onClearStatFilters={clearStatFilters}
               />
 
               <PositionPlayerPicker
@@ -135,6 +151,7 @@ export function PositionScoutPage({ family, players }: Props) {
               player={selected}
               family={family}
               sectionGradeLookup={sectionGradeLookup}
+              poolSize={players.length}
             />
           </>
         )}

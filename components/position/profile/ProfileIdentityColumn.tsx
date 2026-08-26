@@ -160,7 +160,10 @@ export function ProfileIdentityColumn({ player, family }: Props) {
                             className={`profile-perfil-row cluster-${row.tone}${active ? " active" : ""}`}
                             style={{ "--profile-accent": accent } as React.CSSProperties}
                           >
-                            <span className="profile-perfil-row-label">{row.label}</span>
+                            <span className="profile-perfil-row-label">
+                              {row.label}
+                              <i className="fa-solid fa-circle-info profile-perfil-row-info" aria-hidden="true" />
+                            </span>
                             <span className="profile-perfil-row-meta tabular">
                               <span className="profile-perfil-row-share">{Math.round(row.share)}%</span>
                               <span className="profile-perfil-row-sep">·</span>

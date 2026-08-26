@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   LAT_ARCHETYPE_META,
   LAT_HYBRID_BADGE_META,
@@ -23,6 +23,8 @@ type Props = {
   profilesAvailable: string[];
   statLetterFilters: StatLetterFilters;
   onStatLetterFilterChange: (sectionTitle: string, letter: string | null) => void;
+  onClearProfileFilters: () => void;
+  onClearStatFilters: () => void;
 };
 
 export function PositionFilterBar({
@@ -35,8 +37,12 @@ export function PositionFilterBar({
   profilesAvailable,
   statLetterFilters,
   onStatLetterFilterChange,
+  onClearProfileFilters,
+  onClearStatFilters,
 }: Props) {
   const statSections = useMemo(() => statSectionsForFamily(family), [family]);
+  const hasProfileFilters = clusterFilters.length > 0 || profilesFilter.length > 0;
+  const hasStatFilters = Object.values(statLetterFilters).some(Boolean);
 
   const archetypeFilters =
     family === "laterais" ? LAT_ARCHETYPE_META : family === "zagueiros" ? ZAG_ARCHETYPE_META : null;
@@ -48,7 +54,13 @@ export function PositionFilterBar({
       <div className="profile-filter-panel profile-filter-panel-perfil">
         <div className="profile-filter-panel-head">
           <h3 className="profile-filter-panel-title">Perfil</h3>
-          <span className="profile-filter-panel-hint">Filtre por arquétipo</span>
+          {hasProfileFilters ? (
+            <button type="button" className="profile-filter-clear" onClick={onClearProfileFilters}>
+              <i className="fa-solid fa-xmark" aria-hidden="true" /> Limpar
+            </button>
+          ) : (
+            <span className="profile-filter-panel-hint">Filtre por arquétipo</span>
+          )}
         </div>
 
         {clusterMode && archetypeFilters ? (
@@ -120,7 +132,13 @@ export function PositionFilterBar({
       <div className="profile-filter-panel profile-filter-panel-stats">
         <div className="profile-filter-panel-head">
           <h3 className="profile-filter-panel-title">Stats</h3>
-          <span className="profile-filter-panel-hint">Filtre por nota mínima em cada família</span>
+          {hasStatFilters ? (
+            <button type="button" className="profile-filter-clear" onClick={onClearStatFilters}>
+              <i className="fa-solid fa-xmark" aria-hidden="true" /> Limpar
+            </button>
+          ) : (
+            <span className="profile-filter-panel-hint">Filtre por nota mínima em cada família</span>
+          )}
         </div>
 
         <div className="profile-stat-filter-grid">
@@ -148,9 +166,26 @@ function StatSectionFilterCard({
   onFilterChange: (letter: string | null) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDocClick(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
 
   return (
-    <div className="profile-stat-filter-card player-card">
+    <div className="profile-stat-filter-card player-card" ref={rootRef}>
       <div className="profile-stat-filter-card-head">
         <span className="profile-stat-filter-card-title">{title}</span>
         <div className="profile-stat-filter-card-actions">

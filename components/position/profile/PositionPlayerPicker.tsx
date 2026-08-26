@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
 import type { StatLetterFilters, SectionGradeLookup } from "@/lib/playerStatFilters";
 import { playerMatchesStatLetterFilters } from "@/lib/playerStatFilters";
+import { formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { sortPlayers } from "@/lib/scoutUi";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -84,6 +85,22 @@ export function PositionPlayerPicker({
     setOpen(false);
   }
 
+  const selectedVisibleIndex = visible.findIndex((p) => p.player_id === selectedId);
+
+  function canStep(delta: number): boolean {
+    if (!visible.length) return false;
+    if (selectedVisibleIndex === -1) return true;
+    const next = selectedVisibleIndex + delta;
+    return next >= 0 && next < visible.length;
+  }
+
+  function step(delta: number) {
+    if (!visible.length) return;
+    const next = selectedVisibleIndex === -1 ? 0 : selectedVisibleIndex + delta;
+    const target = visible[Math.max(0, Math.min(visible.length - 1, next))];
+    if (target) onSelect(target.player_id);
+  }
+
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (!showSuggestions || !visible.length) return;
     if (e.key === "ArrowDown") {
@@ -148,20 +165,40 @@ export function PositionPlayerPicker({
 
       <div className="profile-top-picker-current">
         <label className="filter-label filter-label-compact">Atleta</label>
-        <button
-          type="button"
-          className="position-player-trigger position-player-trigger-compact"
-          aria-expanded={open && !query.trim()}
-          onClick={() => {
-            setOpen((v) => !v);
-            inputRef.current?.focus();
-          }}
-        >
-          {selected ? <PlayerOptionRow player={selected} selected /> : "Selecionar…"}
-          <span className="position-player-chevron" aria-hidden>
-            ▾
-          </span>
-        </button>
+        <div className="position-player-trigger-row">
+          <button
+            type="button"
+            className="position-player-step"
+            aria-label="Atleta anterior"
+            disabled={!canStep(-1)}
+            onClick={() => step(-1)}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            className="position-player-trigger position-player-trigger-compact"
+            aria-expanded={open && !query.trim()}
+            onClick={() => {
+              setOpen((v) => !v);
+              inputRef.current?.focus();
+            }}
+          >
+            {selected ? <PlayerOptionRow player={selected} selected /> : "Selecionar…"}
+            <span className="position-player-chevron" aria-hidden>
+              ▾
+            </span>
+          </button>
+          <button
+            type="button"
+            className="position-player-step"
+            aria-label="Próximo atleta"
+            disabled={!canStep(1)}
+            onClick={() => step(1)}
+          >
+            ›
+          </button>
+        </div>
 
         {open && !query.trim() ? (
           <ul className="position-player-menu position-player-menu-compact" role="listbox">
@@ -186,8 +223,12 @@ export function PositionPlayerPicker({
 }
 
 function PlayerOptionRow({ player, selected = false }: { player: PlayerProfile; selected?: boolean }) {
+  const tier = ratingTier(player.rating);
   return (
     <span className={`position-player-option position-player-option-inline position-player-option-compact${selected ? " is-selected" : ""}`}>
+      <span className="position-player-rating tabular" style={tierVars(tier)}>
+        {formatRating(player.rating)}
+      </span>
       <span className="position-player-name">{player.name}</span>
       <ClubLogo club={player.club} size={14} />
       <span className="position-player-club">{player.club}</span>
