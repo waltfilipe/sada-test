@@ -11,12 +11,10 @@ type Props = {
   player: PlayerProfile;
   family: PositionFamily;
   sectionGradeLookup: SectionGradeLookup;
-  poolSize: number;
 };
 
-export function PositionProfileView({ player, family, sectionGradeLookup, poolSize }: Props) {
+export function PositionProfileView({ player, family, sectionGradeLookup }: Props) {
   const overall = player.ratings.geral ?? player.rating;
-  const rank = player.ranks?.geral ?? null;
 
   return (
     <div className="profile-view-shell">
@@ -26,7 +24,7 @@ export function PositionProfileView({ player, family, sectionGradeLookup, poolSi
         <div className="pa-col pa-col-score">
           <div className="score-stack">
             <div className="player-card profile-grade-card">
-              <OverallGradePanel score={overall} rank={rank} poolSize={poolSize} />
+              <OverallGradePanel score={overall} />
             </div>
             <ProfilePillarBars player={player} />
           </div>

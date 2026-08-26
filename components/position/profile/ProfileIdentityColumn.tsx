@@ -219,11 +219,23 @@ export function ProfileIdentityColumn({ player, family }: Props) {
             </span>
             <strong>{contract ?? "—"}</strong>
           </div>
-          <div className="identity-meta-pill">
+          <div className="identity-meta-pill identity-meta-pill-minutes">
             <span>
               <FactIcon icon="fa-clock" /> Minutos
             </span>
             <strong className="tabular">{player.minutes.toLocaleString("pt-BR")}</strong>
+            {player.minutes_pct != null ? (
+              <span
+                className="identity-minutes-track"
+                role="img"
+                aria-label={`${Math.round(player.minutes_pct)}% dos minutos possíveis`}
+              >
+                <span
+                  className="identity-minutes-cover"
+                  style={{ left: `${Math.max(0, Math.min(100, player.minutes_pct))}%` }}
+                />
+              </span>
+            ) : null}
           </div>
         </div>
 

@@ -7,7 +7,6 @@ import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
 import { buildSectionGradeLookup } from "@/lib/sectionGrades";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
-import { PositionFilterBar } from "./profile/PositionFilterBar";
 import { PositionPlayerPicker } from "./profile/PositionPlayerPicker";
 import { PositionProfileView } from "./profile/PositionProfileView";
 
@@ -68,11 +67,6 @@ export function PositionScoutPage({ family, players }: Props) {
     );
   };
 
-  const clearProfileFilters = () => {
-    setProfilesFilter([]);
-    setClusterFilters([]);
-  };
-
   return (
     <div className="scout-root profile-page">
       <ScoutTopbar
@@ -107,17 +101,6 @@ export function PositionScoutPage({ family, players }: Props) {
             </div>
 
             <div className="profile-top-shell">
-              <PositionFilterBar
-                family={family}
-                clusterMode={clusterMode}
-                clusterFilters={clusterFilters}
-                profilesFilter={profilesFilter}
-                onToggleClusterFilter={toggleClusterFilter}
-                onToggleProfile={toggleProfile}
-                profilesAvailable={profilesAvailable}
-                onClearProfileFilters={clearProfileFilters}
-              />
-
               <PositionPlayerPicker
                 players={players}
                 family={family}
@@ -126,6 +109,9 @@ export function PositionScoutPage({ family, players }: Props) {
                 clusterMode={clusterMode}
                 clusterFilters={clusterFilters}
                 profilesFilter={profilesFilter}
+                onToggleClusterFilter={toggleClusterFilter}
+                onToggleProfile={toggleProfile}
+                profilesAvailable={profilesAvailable}
               />
             </div>
 
@@ -133,7 +119,6 @@ export function PositionScoutPage({ family, players }: Props) {
               player={selected}
               family={family}
               sectionGradeLookup={sectionGradeLookup}
-              poolSize={players.length}
             />
           </>
         )}

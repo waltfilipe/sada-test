@@ -129,7 +129,7 @@ export function ScoutStatsSections({
   return (
     <div className="pass-scores-panel">
       <div className="report-pass-accordion">
-        {sections.map((section, sectionIndex) => {
+        {sections.map((section) => {
           type MetricEntry = { item: AspectItem; groupTitle?: string };
           const metrics: MetricEntry[] = [];
           for (const label of section.labels) {
@@ -150,7 +150,6 @@ export function ScoutStatsSections({
             <details
               key={`${player.player_id}-${section.title}`}
               className="report-pass-accordion-item"
-              open={sectionIndex === 0}
             >
               <summary className="report-pass-accordion-trigger">
                 <span className="report-pass-accordion-left">

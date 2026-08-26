@@ -1,16 +1,17 @@
 /** Grade colors and bar helpers — brand scale: D vermelho → C amarelo → B verde claro → A+ verde escuro. */
 
+/** Stronger tones so the badge text can always stay white. */
 export const LETTER_GRADE_PILL_COLORS: Record<string, string> = {
-  "A+": "#0b7a3e",
-  A: "#159c4e",
-  "A-": "#21c468",
-  "B+": "#31e981",
-  B: "#6fef9f",
-  "B-": "#aaee8c",
-  "C+": "#dce976",
-  C: "#fed766",
-  "C-": "#fe9b52",
-  D: "#fe4a49",
+  "A+": "#0a5c31",
+  A: "#0e7a40",
+  "A-": "#12944a",
+  "B+": "#17ad57",
+  B: "#21bf66",
+  "B-": "#5ea62f",
+  "C+": "#98931d",
+  C: "#c09a16",
+  "C-": "#d0662a",
+  D: "#d63c3b",
 };
 
 const LETTER_GRADE_COLOR_SCORES: Record<string, number> = {

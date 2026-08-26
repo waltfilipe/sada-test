@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
+import { LAT_ARCHETYPE_META, ZAG_ARCHETYPE_META, latArchetypeTone, archetypeTone } from "@/lib/clusterMeta";
+import { profileAccent } from "@/lib/profileShares";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -16,15 +18,22 @@ type Props = {
   clusterMode?: boolean;
   clusterFilters?: string[];
   profilesFilter?: string[];
+  onToggleClusterFilter?: (key: string) => void;
+  onToggleProfile?: (profile: string) => void;
+  profilesAvailable?: string[];
 };
 
 export function PositionPlayerPicker({
   players,
+  family,
   selectedId,
   onSelect,
   clusterMode = false,
   clusterFilters = [],
   profilesFilter = [],
+  onToggleClusterFilter,
+  onToggleProfile,
+  profilesAvailable = [],
 }: Props) {
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("rating");
@@ -91,12 +100,59 @@ export function PositionPlayerPicker({
     );
   }
 
+  const archetypeFilters =
+    family === "laterais" ? LAT_ARCHETYPE_META : family === "zagueiros" ? ZAG_ARCHETYPE_META : null;
+
   return (
     <div className="player-strip player-card">
       <div className="player-strip-head">
         <div className="player-strip-title-wrap">
           <h3 className="profile-filter-panel-title">Atletas</h3>
           <span className="player-strip-count tabular">{visible.length}</span>
+
+          {clusterMode && archetypeFilters ? (
+            <div className="player-strip-profile-chips">
+              {archetypeFilters.map((item) => {
+                const tone =
+                  family === "laterais"
+                    ? latArchetypeTone(item.archetype as "Defensivo" | "Construtor" | "Ofensivo" | "Híbrido")
+                    : archetypeTone(item.archetype as "Defensor de Área" | "Construtor" | "Combativo");
+                const active = clusterFilters.includes(item.archetype);
+                const accent = profileAccent(item.archetype);
+                return (
+                  <button
+                    key={item.archetype}
+                    type="button"
+                    className={`profile-filter-chip profile-filter-chip-profile cluster-${tone}${active ? " active" : ""}`}
+                    style={{ "--chip-accent": accent } as React.CSSProperties}
+                    onClick={() => onToggleClusterFilter?.(item.archetype)}
+                    aria-pressed={active}
+                  >
+                    {item.archetype}
+                  </button>
+                );
+              })}
+            </div>
+          ) : profilesAvailable.length ? (
+            <div className="player-strip-profile-chips">
+              {profilesAvailable.map((profile) => {
+                const active = profilesFilter.includes(profile);
+                const accent = profileAccent(profile);
+                return (
+                  <button
+                    key={profile}
+                    type="button"
+                    className={`profile-filter-chip profile-filter-chip-profile${active ? " active" : ""}`}
+                    style={{ "--chip-accent": accent } as React.CSSProperties}
+                    onClick={() => onToggleProfile?.(profile)}
+                    aria-pressed={active}
+                  >
+                    {profile}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
         </div>
 
         <div className="player-strip-controls">

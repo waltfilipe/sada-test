@@ -1,4 +1,4 @@
-import { badgeTextColor, letterGradePillColor } from "@/lib/gradeColors";
+import { letterGradePillColor } from "@/lib/gradeColors";
 
 type Props = {
   letter: string | null | undefined;
@@ -9,11 +9,10 @@ type Props = {
 export function GradeBadge({ letter, displayScore, size = "md" }: Props) {
   const l = letter ?? "—";
   const bg = letterGradePillColor(letter, displayScore);
-  const color = badgeTextColor(bg);
   return (
     <span
       className={`grade-badge grade-badge-${size}`}
-      style={{ color, background: bg, borderColor: `${bg}88` }}
+      style={{ color: "#f8fafc", background: bg, borderColor: `${bg}88` }}
     >
       {l}
     </span>
