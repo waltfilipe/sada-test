@@ -1,7 +1,14 @@
 "use client";
 
 import { clampPercent } from "@/lib/scoutTheme";
+import { Tooltip } from "@/components/ui/Tooltip";
 import type { AspectItem } from "@/lib/types";
+
+export type TendencyBarEntry = {
+  item: AspectItem;
+  displayLabel?: string;
+  infoTip?: string;
+};
 
 function formatPct(value: number, decimals = 0): string {
   return `${value.toLocaleString("pt-BR", {
@@ -10,7 +17,19 @@ function formatPct(value: number, decimals = 0): string {
   })}%`;
 }
 
-function ShareBarClassic({ item }: { item: AspectItem }) {
+function InfoTip({ tip }: { tip?: string }) {
+  if (!tip) return null;
+  return (
+    <Tooltip content={tip}>
+      <button type="button" className="tendency-info-btn" aria-label="Mais informações">
+        <i className="fa-solid fa-circle-info" aria-hidden="true" />
+      </button>
+    </Tooltip>
+  );
+}
+
+function ShareBarClassic({ entry }: { entry: TendencyBarEntry }) {
+  const { item, displayLabel, infoTip } = entry;
   const share = item.share_pct ?? 0;
   const avg = item.pool_avg_pct ?? 0;
   const scale = Math.max(item.scale_max_pct ?? 40, share, avg, 1);
@@ -20,7 +39,10 @@ function ShareBarClassic({ item }: { item: AspectItem }) {
   return (
     <div className="constr-share-bar">
       <div className="constr-share-head">
-        <span className="constr-share-label">{item.label}</span>
+        <span className="constr-share-label">
+          {displayLabel ?? item.label}
+          <InfoTip tip={infoTip} />
+        </span>
         <span className="constr-share-value">{item.display_value ?? formatPct(share)}</span>
       </div>
 
@@ -39,7 +61,8 @@ function ShareBarClassic({ item }: { item: AspectItem }) {
   );
 }
 
-function SpectrumFillBar({ item }: { item: AspectItem }) {
+function SpectrumFillBar({ entry }: { entry: TendencyBarEntry }) {
+  const { item, displayLabel, infoTip } = entry;
   const share = item.share_pct ?? 0;
   const scale = Math.max(item.scale_max_pct ?? 100, 1);
   const fill = clampPercent((share / scale) * 100);
@@ -51,7 +74,10 @@ function SpectrumFillBar({ item }: { item: AspectItem }) {
   return (
     <div className="spectrum-fill-bar">
       <div className="constr-share-head">
-        <span className="constr-share-label">{item.label}</span>
+        <span className="constr-share-label">
+          {displayLabel ?? item.label}
+          <InfoTip tip={infoTip} />
+        </span>
       </div>
 
       <div className="spectrum-fill-wrap" aria-hidden>
@@ -75,18 +101,26 @@ function SpectrumFillBar({ item }: { item: AspectItem }) {
 }
 
 type Props = {
-  items: AspectItem[];
+  items?: AspectItem[];
+  entries?: TendencyBarEntry[];
   embedded?: boolean;
 };
 
-export function ConstructionProfileBars({ items, embedded = false }: Props) {
+export function ConstructionProfileBars({ items, entries, embedded = false }: Props) {
+  const rows: TendencyBarEntry[] =
+    entries ??
+    (items ?? []).map((item) => ({
+      item,
+      displayLabel: item.label,
+    }));
+
   const stack = (
     <div className="constr-share-stack">
-      {items.map((item) =>
-        item.bar_key ? (
-          <SpectrumFillBar key={item.label} item={item} />
+      {rows.map((entry) =>
+        entry.item.bar_key ? (
+          <SpectrumFillBar key={entry.displayLabel ?? entry.item.label} entry={entry} />
         ) : (
-          <ShareBarClassic key={item.label} item={item} />
+          <ShareBarClassic key={entry.displayLabel ?? entry.item.label} entry={entry} />
         ),
       )}
     </div>

@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { GradeBadge } from "@/components/ui/GradeBadge";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import type { SectionGradeLookup } from "@/lib/sectionGrades";
 import { getPlayerSectionGrade } from "@/lib/sectionGrades";
@@ -72,15 +73,29 @@ function StatMetricRow({ label, value, percentile, grade }: MetricRowProps) {
   );
 }
 
+const DEF_EFFICIENCY_TIP =
+  "Índice que combina volume de ações defensivas bem-sucedidas (interceptações, rebatidas) com baixo custo — duelos perdidos e faltas desnecessárias em relação ao total de ações defensivas.";
+
 function StatAspectBlock({ item, groupTitle }: { item: AspectItem; groupTitle?: string }) {
   const hasSubMetrics =
     (item.kind === "def_efficiency_group" || item.kind === "metric_group") &&
     Boolean(item.sub_metrics?.length);
+  const title = groupTitle ?? item.label;
+  const isDefEfficiency = item.kind === "def_efficiency_group";
 
   return (
     <div className="stat-aspect-group">
       <div className="stat-aspect-group-head">
-        <span className="stat-aspect-group-title">{groupTitle ?? item.label}</span>
+        <span className="stat-aspect-group-title">
+          {title}
+          {isDefEfficiency ? (
+            <Tooltip content={DEF_EFFICIENCY_TIP}>
+              <span className="stat-def-eff-star" aria-label="Destaque — Eficiência Defensiva">
+                <i className="fa-solid fa-star" aria-hidden="true" />
+              </span>
+            </Tooltip>
+          ) : null}
+        </span>
       </div>
       <div className="stat-aspect-group-body">
         {hasSubMetrics ? (

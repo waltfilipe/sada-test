@@ -3,6 +3,7 @@
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import type { SectionGradeLookup } from "@/lib/sectionGrades";
 import { OverallGradePanel } from "./OverallGradePanel";
+import { ProfileCard } from "./ProfileCard";
 import { ProfileIdentityColumn } from "./ProfileIdentityColumn";
 import { ProfilePillarBars } from "./ProfileSharePanel";
 import { ScoutStatsSections } from "./ScoutStatsSections";
@@ -26,6 +27,7 @@ export function PositionProfileView({ player, family, sectionGradeLookup }: Prop
             <div className="player-card profile-grade-card">
               <OverallGradePanel score={overall} />
             </div>
+            <ProfileCard player={player} family={family} />
             <ProfilePillarBars player={player} />
           </div>
         </div>

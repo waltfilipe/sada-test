@@ -1243,6 +1243,43 @@
   gap: 0.35rem;
 }
 
+.identity-subline-extended {
+  flex-wrap: wrap;
+  align-items: baseline;
+  line-height: 1.55;
+  margin-bottom: 0;
+}
+
+.identity-inline-sep {
+  color: rgba(148, 163, 184, 0.45);
+  font-weight: 700;
+  margin: 0 0.12rem;
+}
+
+.identity-inline-fact {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+
+.identity-inline-minutes {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.identity-minutes-track-inline {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 4px;
+  border-radius: 999px;
+  overflow: hidden;
+  vertical-align: middle;
+  background: linear-gradient(90deg, #d63c3b 0%, #fed766 50%, #31e981 100%);
+}
+
 .profile-identity-profile-card {
   margin-top: 0.35rem;
   border-radius: 12px;
@@ -1788,6 +1825,94 @@
   padding: 0.55rem 0.65rem 0.65rem;
 }
 
+/* Tendencies accordion */
+.tendencies-accordion {
+  overflow: hidden;
+}
+
+.tendencies-accordion-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.tendencies-accordion-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.tendencies-accordion-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.tendencies-accordion-title {
+  margin: 0;
+}
+
+.tendencies-accordion[open] .report-pass-accordion-chevron {
+  transform: rotate(90deg);
+}
+
+.tendencies-accordion-panel {
+  padding: 0 0.85rem 0.85rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.tendencies-accordion-panel .xp-profile-pillar-stack {
+  margin-top: 0.65rem;
+}
+
+.tendency-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.35rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(148, 163, 184, 0.55);
+  font-size: 0.62rem;
+  cursor: help;
+  vertical-align: middle;
+  transition: color 0.15s;
+}
+
+.tendency-info-btn:hover,
+.tendency-info-btn:focus-visible {
+  color: var(--accent);
+}
+
+.constr-share-label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.stat-aspect-group-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.stat-def-eff-star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #f5c542;
+  font-size: 0.68rem;
+  cursor: help;
+  filter: drop-shadow(0 0 4px rgba(245, 197, 66, 0.35));
+}
+
+.stat-def-eff-star:hover {
+  color: #fed766;
+}
+
 /* Stats accordion */
 .report-pass-accordion {
   display: flex;
@@ -1971,6 +2096,35 @@
   background: #f8fafc;
   border: 1px solid rgba(15, 23, 42, 0.8);
   transform: translate(-50%, -50%);
+}
+
+.profile-perfil-card-score {
+  margin-top: 0;
+}
+
+.profile-perfil-card-score .profile-perfil-card-head {
+  padding: 0.62rem 0.85rem 0.5rem;
+}
+
+.profile-perfil-card-score .profile-perfil-card-title {
+  font-size: 0.78rem;
+}
+
+.profile-perfil-card-score .profile-perfil-list {
+  padding: 0.5rem 0.65rem 0.65rem;
+  gap: 0.42rem;
+}
+
+.profile-perfil-card-score .profile-perfil-row {
+  padding: 0.52rem 0.62rem;
+}
+
+.profile-perfil-card-score .profile-perfil-row-label {
+  font-size: 0.82rem;
+}
+
+.profile-perfil-card-score .profile-perfil-row-meta {
+  font-size: 0.78rem;
 }
 
 .profile-perfil-card {
