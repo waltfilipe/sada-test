@@ -1147,7 +1147,7 @@
   padding: 1.05rem 1.15rem;
   margin-bottom: 0.75rem;
   position: relative;
-  overflow: hidden;
+  z-index: 30;
 }
 
 .player-hero::before {
@@ -1155,6 +1155,7 @@
   position: absolute;
   inset: 0 auto 0 0;
   width: 3px;
+  border-radius: var(--radius) 0 0 var(--radius);
   background: var(--accent);
   opacity: 0.85;
 }
@@ -1401,50 +1402,47 @@
   font-size: 0.52rem;
 }
 
+/* Rating anchor — fills the hero's full right corner */
+.player-hero > .tip-wrap-trigger:last-child {
+  display: flex;
+  align-self: stretch;
+}
+
 .player-hero-rating {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.28rem;
+  gap: 0.55rem;
   flex-shrink: 0;
-  min-width: 150px;
-  padding: 0.5rem 1.15rem;
+  height: 100%;
+  min-width: 210px;
+  padding: 0.5rem 1.4rem;
   border-left: 1px solid rgba(148, 163, 184, 0.14);
 }
 
 .player-hero-rating-label {
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
 .player-hero-rating-value {
-  font-size: 2.9rem;
+  font-size: 4.4rem;
   font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.045em;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
   color: var(--rating-accent, var(--accent));
 }
 
 .player-hero-rating-value small {
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--muted);
-  margin-left: 0.18rem;
+  margin-left: 0.22rem;
   letter-spacing: 0;
-}
-
-.player-hero-rating-tier {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--rating-accent, var(--text-secondary));
-  padding: 0.14rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--rating-accent, #94a3b8) 40%, transparent);
-  background: color-mix(in srgb, var(--rating-accent, #94a3b8) 10%, transparent);
 }
 
 /* ── Content grid below hero — heatmap | perfil | stats ──────────────────── */
@@ -1452,7 +1450,7 @@
   display: grid;
   grid-template-columns: minmax(280px, 1.05fr) minmax(0, 1fr) minmax(0, 0.95fr);
   gap: 0.75rem;
-  align-items: stretch;
+  align-items: start;
 }
 
 .profile-content-col {
@@ -1462,14 +1460,14 @@
   min-width: 0;
 }
 
-/* Heatmap keeps its own height; Perfil and Stats stretch to match each other. */
-.profile-col-heatmap {
-  align-self: start;
-}
-
+/* Heatmap is intentionally the tallest card; Perfil and Stats share a fixed
+   compact height so their internal rows stay tight with no bottom slack.
+   min-height lets the stats detail view grow when a section is open. */
 .profile-col-middle .profile-perfil-card,
 .profile-col-stats .pass-scores-shell {
-  flex: 1;
+  min-height: 342px;
+  display: flex;
+  flex-direction: column;
 }
 
 .profile-col-heatmap .heatmap-card {
@@ -1833,18 +1831,30 @@
 
 .tendencies-pop-panel {
   position: absolute;
-  z-index: 60;
-  top: calc(100% + 0.45rem);
+  z-index: 80;
+  top: calc(100% + 0.55rem);
   left: 0;
-  width: min(430px, calc(100vw - 2rem));
-  border-radius: 14px;
-  border: 1px solid rgba(27, 231, 255, 0.22);
-  background: rgba(9, 17, 29, 0.99);
-  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.55);
-  padding: 0.8rem 0.95rem 0.95rem;
+  width: min(460px, calc(100vw - 2rem));
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(10, 18, 30, 0.99);
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(27, 231, 255, 0.06);
+  padding: 1rem 1.1rem 1.1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
+  animation: tendencies-pop-in 0.16s ease;
+}
+
+@keyframes tendencies-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .tendencies-pop-head {
@@ -1852,7 +1862,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.6rem;
   border-bottom: 1px solid rgba(148, 163, 184, 0.12);
 }
 
@@ -1919,10 +1929,11 @@
 .stats-nav-list {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.5rem;
   margin-top: 0.6rem;
   flex: 1;
-  justify-content: flex-start;
+  min-height: 0;
+  justify-content: space-evenly;
 }
 
 .stats-nav-row {
@@ -1930,9 +1941,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.72rem 0.75rem;
+  flex: 1;
+  padding: 0.6rem 0.75rem;
   border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.14);
+  border: 1px solid rgba(148, 163, 184, 0.1);
   background: rgba(15, 23, 42, 0.35);
   color: var(--text);
   font-size: 0.8rem;
@@ -2234,21 +2246,36 @@
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  gap: 0.45rem;
+  gap: 0.5rem;
   flex: 1;
+  min-height: 0;
+}
+
+.profile-perfil-list > li {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .profile-perfil-list > li .tip-wrap-block {
+  display: block;
   height: 100%;
+}
+
+.profile-perfil-list > li .tip-wrap-block .profile-perfil-row {
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .profile-perfil-row {
   display: flex;
   flex-direction: column;
-  gap: 0.42rem;
-  padding: 0.55rem 0.65rem;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.72rem 0.75rem;
   border-radius: 10px;
-  border: 1px solid transparent;
+  border: 1px solid rgba(148, 163, 184, 0.1);
   background: rgba(18, 32, 50, 0.55);
   transition: border-color 0.15s, background 0.15s;
   cursor: help;
