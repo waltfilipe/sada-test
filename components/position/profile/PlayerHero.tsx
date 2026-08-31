@@ -98,7 +98,7 @@ export function PlayerHero({ player, family }: Props) {
       </div>
 
       {overall != null ? (
-        <Tooltip content="Nota geral do atleta no pool da posição." block>
+        <Tooltip content="Nota geral do atleta no pool da posição.">
           <div className="player-hero-rating" style={ratingGradientStyle(overall)}>
             <span className="player-hero-rating-label">Rating Geral</span>
             <span className="player-hero-rating-value tabular">
