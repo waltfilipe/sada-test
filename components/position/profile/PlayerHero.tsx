@@ -79,15 +79,6 @@ export function PlayerHero({ player, family }: Props) {
             </p>
           </div>
 
-          <dl className="player-hero-facts">
-            {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
-            {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
-            {player.foot ? <HeroFact label="Pé">{player.foot}</HeroFact> : null}
-            {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
-          </dl>
-        </div>
-
-        <div className="player-hero-bottom-row">
           <div className="hero-market-strip">
             <MarketCard icon="fa-coins" label="Valor de mercado">
               {tm?.market_value ?? "—"}
@@ -115,6 +106,15 @@ export function PlayerHero({ player, family }: Props) {
               </span>
             </MarketCard>
           </div>
+        </div>
+
+        <div className="player-hero-bottom-row">
+          <dl className="player-hero-facts">
+            {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
+            {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
+            {player.foot ? <HeroFact label="Pé">{player.foot}</HeroFact> : null}
+            {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
+          </dl>
 
           <div className="player-hero-actions">
             <Link

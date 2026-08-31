@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { AspectItem, PlayerProfile } from "@/lib/types";
 import { ConstructionProfileBars } from "../ConstructionProfileBars";
 
@@ -76,47 +76,76 @@ function mapDefensiveItems(items: AspectItem[]): TendencyEntry[] {
 export function ProfilePillarBars({ player }: { player: PlayerProfile }) {
   const constr = player.aspects.perfil_construcao ?? [];
   const def = player.aspects.perfil_defensivo ?? [];
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
   const constructionEntries = useMemo(() => mapConstructionItems(constr), [constr]);
   const defensiveEntries = useMemo(() => mapDefensiveItems(def), [def]);
 
+  useEffect(() => {
+    if (!open) return;
+    function onDocClick(event: MouseEvent) {
+      if (!wrapRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  if (!constructionEntries.length && !defensiveEntries.length) return null;
+
   return (
-    <details className="player-card xp-profile-panel-card tendencies-accordion">
-      <summary className="tendencies-accordion-trigger">
-        <span className="tendencies-accordion-left">
-          <span className="report-pass-accordion-chevron" aria-hidden="true">
-            ›
-          </span>
-          <span className="section-label tendencies-accordion-title">Tendências de jogo</span>
+    <div className="tendencies-pop-wrap" ref={wrapRef}>
+      <button
+        type="button"
+        className={`tendencies-pop-trigger${open ? " open" : ""}`}
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+      >
+        <span className="tendencies-pop-trigger-left">
+          <i className="fa-solid fa-chart-line" aria-hidden="true" />
+          Tendências de jogo
         </span>
-      </summary>
-      <div className="tendencies-accordion-panel">
-        <div className="xp-profile-pillar-stack">
+        <i className="fa-solid fa-chevron-down tendencies-pop-chevron" aria-hidden="true" />
+      </button>
+
+      {open ? (
+        <div className="tendencies-pop-panel" role="dialog" aria-label="Tendências de jogo">
+          <div className="tendencies-pop-head">
+            <span className="section-label">Tendências de jogo</span>
+            <button
+              type="button"
+              className="tendencies-pop-close"
+              onClick={() => setOpen(false)}
+              aria-label="Fechar"
+            >
+              <i className="fa-solid fa-xmark" aria-hidden="true" />
+            </button>
+          </div>
+
           {constructionEntries.length ? (
-            <article className="xp-profile-pillar-card xp-profile-pillar-productivity">
-              <div className="xp-profile-pillar-body">
-                <ConstructionProfileBars entries={constructionEntries} embedded />
-              </div>
-            </article>
+            <div className="tendencies-pop-section">
+              <ConstructionProfileBars entries={constructionEntries} embedded />
+            </div>
           ) : null}
 
           {defensiveEntries.length ? (
-            <article className="xp-profile-pillar-card xp-profile-pillar-precision">
-              <header className="xp-profile-pillar-head">
-                <span className="xp-profile-pillar-icon" aria-hidden="true">
-                  <i className="fa-solid fa-shield-halved" />
-                </span>
-                <div className="xp-profile-pillar-title-wrap">
-                  <h4 className="xp-profile-pillar-title">Perfil defensivo</h4>
-                </div>
-              </header>
-              <div className="xp-profile-pillar-body">
-                <ConstructionProfileBars entries={defensiveEntries} embedded />
-              </div>
-            </article>
+            <div className="tendencies-pop-section">
+              <span className="tendencies-pop-section-title">
+                <i className="fa-solid fa-shield-halved" aria-hidden="true" /> Perfil defensivo
+              </span>
+              <ConstructionProfileBars entries={defensiveEntries} embedded />
+            </div>
           ) : null}
         </div>
-      </div>
-    </details>
+      ) : null}
+    </div>
   );
 }
