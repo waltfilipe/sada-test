@@ -27,6 +27,28 @@ function HeroFact({ label, children }: { label: string; children: React.ReactNod
   );
 }
 
+function MarketCard({
+  icon,
+  label,
+  children,
+}: {
+  icon: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="hero-market-card">
+      <span className="hero-market-icon" aria-hidden="true">
+        <i className={`fa-solid ${icon}`} />
+      </span>
+      <span className="hero-market-copy">
+        <span className="hero-market-label">{label}</span>
+        <span className="hero-market-value">{children}</span>
+      </span>
+    </div>
+  );
+}
+
 export function PlayerHero({ player, family }: Props) {
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const tm = player.transfermarkt;
@@ -57,6 +79,43 @@ export function PlayerHero({ player, family }: Props) {
             </p>
           </div>
 
+          <dl className="player-hero-facts">
+            {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
+            {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
+            {player.foot ? <HeroFact label="Pé">{player.foot}</HeroFact> : null}
+            {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
+          </dl>
+        </div>
+
+        <div className="player-hero-bottom-row">
+          <div className="hero-market-strip">
+            <MarketCard icon="fa-coins" label="Valor de mercado">
+              {tm?.market_value ?? "—"}
+            </MarketCard>
+            <MarketCard icon="fa-file-signature" label="Contrato">
+              {contract ?? "—"}
+            </MarketCard>
+            <MarketCard icon="fa-clock" label="Minutos">
+              <span className="hero-market-minutes tabular">
+                {player.minutes.toLocaleString("pt-BR")}
+                {player.minutes_pct != null ? (
+                  <Tooltip content={`${Math.round(player.minutes_pct)}% dos minutos possíveis na competição`}>
+                    <span
+                      className="identity-minutes-track identity-minutes-track-inline"
+                      role="img"
+                      aria-label={`${Math.round(player.minutes_pct)}% dos minutos possíveis`}
+                    >
+                      <span
+                        className="identity-minutes-cover"
+                        style={{ left: `${Math.max(0, Math.min(100, player.minutes_pct))}%` }}
+                      />
+                    </span>
+                  </Tooltip>
+                ) : null}
+              </span>
+            </MarketCard>
+          </div>
+
           <div className="player-hero-actions">
             <Link
               className="btn btn-ghost btn-sm"
@@ -71,30 +130,6 @@ export function PlayerHero({ player, family }: Props) {
             ) : null}
           </div>
         </div>
-
-        <dl className="player-hero-facts">
-          {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
-          {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
-          {player.foot ? <HeroFact label="Pé">{player.foot}</HeroFact> : null}
-          {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
-          {tm?.market_value ? <HeroFact label="Valor">{tm.market_value}</HeroFact> : null}
-          {contract ? <HeroFact label="Contrato">{contract}</HeroFact> : null}
-          <HeroFact label="Minutos">
-            <span className="hero-fact-minutes tabular">
-              {player.minutes.toLocaleString("pt-BR")}
-              {player.minutes_pct != null ? (
-                <Tooltip content={`${Math.round(player.minutes_pct)}% dos minutos possíveis na competição`}>
-                  <span className="identity-minutes-track identity-minutes-track-inline" role="img" aria-label={`${Math.round(player.minutes_pct)}% dos minutos possíveis`}>
-                    <span
-                      className="identity-minutes-cover"
-                      style={{ left: `${Math.max(0, Math.min(100, player.minutes_pct))}%` }}
-                    />
-                  </span>
-                </Tooltip>
-              ) : null}
-            </span>
-          </HeroFact>
-        </dl>
       </div>
 
       {overall != null ? (

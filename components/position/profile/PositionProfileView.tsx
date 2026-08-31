@@ -19,19 +19,29 @@ export function PositionProfileView({ player, family, sectionGradeLookup }: Prop
       <PlayerHero player={player} family={family} />
 
       <div className="profile-content-grid">
-        <div className="profile-content-col">
-          <ProfileCard player={player} family={family} />
-          <ProfilePillarBars player={player} />
-          <div className="heatmap-placeholder" aria-label="Heatmap em breve">
-            <span className="section-label-sm">Heatmap</span>
-            <p className="heatmap-placeholder-copy">Mapa de origem de ações — em breve.</p>
+        <div className="profile-content-col profile-col-heatmap">
+          <div className="player-card heatmap-card">
+            <div className="profile-card-head">
+              <h3 className="section-label">Heatmap</h3>
+            </div>
+            <div className="heatmap-canvas">
+              <span className="heatmap-canvas-icon" aria-hidden="true">
+                <i className="fa-solid fa-fire" />
+              </span>
+              <p className="heatmap-placeholder-copy">Mapa de origem de ações — em breve.</p>
+            </div>
           </div>
         </div>
 
-        <div className="profile-content-col">
+        <div className="profile-content-col profile-col-middle">
+          <ProfileCard player={player} family={family} />
+          <ProfilePillarBars player={player} />
+        </div>
+
+        <div className="profile-content-col profile-col-stats">
           <div className="player-card pass-scores-shell">
             <div className="profile-card-head">
-              <h3 className="section-label">Stats</h3>
+              <h3 className="section-label">Stats &amp; Scores</h3>
               <span className="profile-card-head-hint">Percentis no pool da posição</span>
             </div>
             <ScoutStatsSections
