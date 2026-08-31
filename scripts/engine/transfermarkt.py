@@ -627,6 +627,7 @@ def _scrape_profile(path: str) -> dict[str, Any]:
 
     contract_raw = None
     current_club = None
+    on_loan_from = None
     spans = soup.select("span.info-table__content")
     for index, span in enumerate(spans):
         label = span.get_text(strip=True).lower()
@@ -637,6 +638,8 @@ def _scrape_profile(path: str) -> dict[str, Any]:
             contract_raw = value
         if label == "clube atual:":
             current_club = value
+        if label.startswith("emprestado de"):
+            on_loan_from = value
 
     contract_until = _parse_contract_date(contract_raw)
     return {
@@ -646,6 +649,7 @@ def _scrape_profile(path: str) -> dict[str, Any]:
         "market_value_eur": market_eur,
         "contract_until": contract_until,
         "contract_remaining": _contract_remaining(contract_until),
+        "on_loan_from": on_loan_from,
         "club": current_club,
         "profile_url": f"{BASE_URL}{path}",
     }

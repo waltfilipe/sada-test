@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { GradeBadge } from "@/components/ui/GradeBadge";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
@@ -29,14 +29,6 @@ function findAspect(items: AspectItem[], label: string): AspectItem | undefined 
 
 function metricValue(value?: string | null): string {
   return value ?? "—";
-}
-
-function sectionLetter(
-  lookup: SectionGradeLookup,
-  playerId: string,
-  sectionTitle: string,
-): string | undefined {
-  return getPlayerSectionGrade(lookup, playerId, sectionTitle);
 }
 
 const ROW_LABEL_ALIASES: Record<string, string> = {
@@ -129,6 +121,12 @@ function StatAspectBlock({ item, groupTitle }: { item: AspectItem; groupTitle?: 
   );
 }
 
+type SectionEntry = {
+  title: string;
+  letter?: string;
+  metrics: { item: AspectItem; groupTitle?: string }[];
+};
+
 export function ScoutStatsSections({
   player,
   family,
@@ -138,55 +136,85 @@ export function ScoutStatsSections({
   family: PositionFamily;
   sectionGradeLookup: SectionGradeLookup;
 }) {
+  const [active, setActive] = useState<string | null>(null);
   const all = useMemo(() => flattenAspects(player), [player]);
   const sections = statSectionsForFamily(family);
 
+  const entries = useMemo<SectionEntry[]>(() => {
+    const list: SectionEntry[] = [];
+    for (const section of sections) {
+      const metrics: SectionEntry["metrics"] = [];
+      for (const label of section.labels) {
+        const item = findAspect(all, label);
+        if (!item) continue;
+        const groupTitle =
+          family === "zagueiros" && section.title === "Ofensivo" && label === "Conduções Progressivas"
+            ? "Progressão"
+            : undefined;
+        metrics.push({ item, groupTitle });
+      }
+      if (metrics.length) {
+        list.push({
+          title: section.title,
+          letter: getPlayerSectionGrade(sectionGradeLookup, player.player_id, section.title),
+          metrics,
+        });
+      }
+    }
+    return list;
+  }, [sections, all, family, player.player_id, sectionGradeLookup]);
+
+  const activeEntry = active ? entries.find((entry) => entry.title === active) ?? null : null;
+
+  if (activeEntry) {
+    return (
+      <div className="stats-swap-panel" key={`${player.player_id}-${activeEntry.title}`}>
+        <div className="profile-card-head stats-swap-head">
+          <span className="stats-swap-title">
+            <h3 className="section-label">{activeEntry.title}</h3>
+            <GradeBadge letter={activeEntry.letter} size="sm" />
+          </span>
+          <button
+            type="button"
+            className="tendencies-pop-close"
+            onClick={() => setActive(null)}
+            aria-label="Voltar para Stats & Scores"
+          >
+            <i className="fa-solid fa-xmark" aria-hidden="true" />
+          </button>
+        </div>
+        <div className="stats-swap-body">
+          <div className="pass-score-metrics">
+            {activeEntry.metrics.map(({ item, groupTitle }) => (
+              <StatAspectBlock key={item.label} item={item} groupTitle={groupTitle} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="pass-scores-panel">
-      <div className="report-pass-accordion">
-        {sections.map((section) => {
-          type MetricEntry = { item: AspectItem; groupTitle?: string };
-          const metrics: MetricEntry[] = [];
-          for (const label of section.labels) {
-            const item = findAspect(all, label);
-            if (!item) continue;
-            const groupTitle =
-              family === "zagueiros" &&
-              section.title === "Ofensivo" &&
-              label === "Conduções Progressivas"
-                ? "Progressão"
-                : undefined;
-            metrics.push({ item, groupTitle });
-          }
-
-          if (!metrics.length) return null;
-
-          return (
-            <details
-              key={`${player.player_id}-${section.title}`}
-              className="report-pass-accordion-item"
-            >
-              <summary className="report-pass-accordion-trigger">
-                <span className="report-pass-accordion-left">
-                  <span className="report-pass-accordion-chevron" aria-hidden="true">
-                    ›
-                  </span>
-                  <span className="report-pass-accordion-title">{section.title}</span>
-                </span>
-                <span className="report-pass-accordion-right">
-                  <GradeBadge letter={sectionLetter(sectionGradeLookup, player.player_id, section.title)} size="sm" />
-                </span>
-              </summary>
-              <div className="report-pass-accordion-panel">
-                <div className="pass-score-metrics">
-                  {metrics.map(({ item, groupTitle }) => (
-                    <StatAspectBlock key={item.label} item={item} groupTitle={groupTitle} />
-                  ))}
-                </div>
-              </div>
-            </details>
-          );
-        })}
+    <div className="stats-swap-panel" key={`${player.player_id}-index`}>
+      <div className="profile-card-head">
+        <h3 className="section-label">Stats &amp; Scores</h3>
+        <span className="profile-card-head-hint">Percentis no pool da posição</span>
+      </div>
+      <div className="stats-nav-list">
+        {entries.map((entry) => (
+          <button
+            key={entry.title}
+            type="button"
+            className="stats-nav-row"
+            onClick={() => setActive(entry.title)}
+          >
+            <span className="stats-nav-row-title">{entry.title}</span>
+            <span className="stats-nav-row-meta">
+              <GradeBadge letter={entry.letter} size="sm" />
+              <i className="fa-solid fa-chevron-right" aria-hidden="true" />
+            </span>
+          </button>
+        ))}
       </div>
     </div>
   );

@@ -57,6 +57,7 @@ export type TransfermarktInfo = {
   market_value_eur: number | null;
   contract_until: string | null;
   contract_remaining: string | null;
+  on_loan_from?: string | null;
   club: string | null;
   profile_url: string | null;
 } | null;

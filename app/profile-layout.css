@@ -1354,6 +1354,53 @@
   gap: 0.45rem;
 }
 
+/* Contract status markers */
+.hero-market-card-warn {
+  border-color: rgba(254, 215, 102, 0.45);
+  background: linear-gradient(160deg, rgba(254, 215, 102, 0.1) 0%, rgba(15, 26, 41, 0.7) 55%);
+}
+
+.hero-market-card-warn .hero-market-icon {
+  border-color: rgba(254, 215, 102, 0.5);
+  color: #fed766;
+}
+
+.hero-market-card-danger {
+  border-color: rgba(254, 74, 73, 0.5);
+  background: linear-gradient(160deg, rgba(254, 74, 73, 0.1) 0%, rgba(15, 26, 41, 0.7) 55%);
+}
+
+.hero-market-card-danger .hero-market-icon {
+  border-color: rgba(254, 74, 73, 0.5);
+  background: rgba(254, 74, 73, 0.1);
+  color: #fe8a89;
+}
+
+.hero-contract-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hero-loan-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(137, 128, 245, 0.45);
+  background: rgba(137, 128, 245, 0.14);
+  color: #b7b1fa;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.hero-loan-pill i {
+  font-size: 0.52rem;
+}
+
 .player-hero-rating {
   display: flex;
   flex-direction: column;
@@ -1400,12 +1447,12 @@
   background: color-mix(in srgb, var(--rating-accent, #94a3b8) 10%, transparent);
 }
 
-/* ── Content grid below hero — heatmap | perfil+tendências | stats ───────── */
+/* ── Content grid below hero — heatmap | perfil | stats ──────────────────── */
 .profile-content-grid {
   display: grid;
   grid-template-columns: minmax(280px, 1.05fr) minmax(0, 1fr) minmax(0, 0.95fr);
   gap: 0.75rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 .profile-content-col {
@@ -1413,6 +1460,16 @@
   flex-direction: column;
   gap: 0.75rem;
   min-width: 0;
+}
+
+/* Heatmap keeps its own height; Perfil and Stats stretch to match each other. */
+.profile-col-heatmap {
+  align-self: start;
+}
+
+.profile-col-middle .profile-perfil-card,
+.profile-col-stats .pass-scores-shell {
+  flex: 1;
 }
 
 .profile-col-heatmap .heatmap-card {
@@ -1754,49 +1811,23 @@
   background: linear-gradient(90deg, #64748b, #67e8f9);
 }
 
-/* Tendencies — trigger button below Perfil card + styled popover */
+/* Tendencies — hero action button + styled popover */
 .tendencies-pop-wrap {
   position: relative;
 }
 
-.tendencies-pop-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.72rem 0.95rem;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--surface);
+.tendencies-pop-btn.open {
+  border-color: rgba(27, 231, 255, 0.5);
   color: var(--accent);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-}
-
-.tendencies-pop-trigger:hover,
-.tendencies-pop-trigger.open {
-  border-color: rgba(27, 231, 255, 0.45);
-  background: rgba(27, 231, 255, 0.05);
-}
-
-.tendencies-pop-trigger-left {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .tendencies-pop-chevron {
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   opacity: 0.7;
   transition: transform 0.18s;
 }
 
-.tendencies-pop-trigger.open .tendencies-pop-chevron {
+.tendencies-pop-btn.open .tendencies-pop-chevron {
   transform: rotate(180deg);
 }
 
@@ -1870,6 +1901,90 @@
 .tendencies-pop-section-title i {
   color: var(--accent);
   font-size: 0.62rem;
+}
+
+.tendencies-pop-panel-right {
+  left: auto;
+  right: 0;
+}
+
+/* ── Stats & Scores — panel-swap navigation ──────────────────────────────── */
+.stats-swap-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.stats-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.stats-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.72rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(15, 23, 42, 0.35);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+
+.stats-nav-row:hover {
+  border-color: rgba(27, 231, 255, 0.4);
+  background: rgba(27, 231, 255, 0.05);
+  transform: translateX(2px);
+}
+
+.stats-nav-row-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.stats-nav-row-meta i {
+  font-size: 0.6rem;
+  color: var(--muted);
+  transition: color 0.15s, transform 0.15s;
+}
+
+.stats-nav-row:hover .stats-nav-row-meta i {
+  color: var(--accent);
+  transform: translateX(2px);
+}
+
+.stats-swap-head .stats-swap-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stats-swap-body {
+  margin-top: 0.6rem;
+  animation: stats-swap-in 0.18s ease;
+}
+
+@keyframes stats-swap-in {
+  from {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .tendency-info-btn {
@@ -2118,8 +2233,13 @@
   padding: 0.65rem 0 0;
   display: flex;
   flex-direction: column;
+  justify-content: space-evenly;
   gap: 0.45rem;
   flex: 1;
+}
+
+.profile-perfil-list > li .tip-wrap-block {
+  height: 100%;
 }
 
 .profile-perfil-row {

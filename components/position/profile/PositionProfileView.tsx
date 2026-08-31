@@ -4,7 +4,6 @@ import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import type { SectionGradeLookup } from "@/lib/sectionGrades";
 import { PlayerHero } from "./PlayerHero";
 import { ProfileCard } from "./ProfileCard";
-import { ProfilePillarBars } from "./ProfileSharePanel";
 import { ScoutStatsSections } from "./ScoutStatsSections";
 
 type Props = {
@@ -35,15 +34,10 @@ export function PositionProfileView({ player, family, sectionGradeLookup }: Prop
 
         <div className="profile-content-col profile-col-middle">
           <ProfileCard player={player} family={family} />
-          <ProfilePillarBars player={player} />
         </div>
 
         <div className="profile-content-col profile-col-stats">
           <div className="player-card pass-scores-shell">
-            <div className="profile-card-head">
-              <h3 className="section-label">Stats &amp; Scores</h3>
-              <span className="profile-card-head-hint">Percentis no pool da posição</span>
-            </div>
             <ScoutStatsSections
               player={player}
               family={family}

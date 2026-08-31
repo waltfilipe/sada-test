@@ -73,7 +73,7 @@ function mapDefensiveItems(items: AspectItem[]): TendencyEntry[] {
   }));
 }
 
-export function ProfilePillarBars({ player }: { player: PlayerProfile }) {
+export function TendenciesButton({ player }: { player: PlayerProfile }) {
   const constr = player.aspects.perfil_construcao ?? [];
   const def = player.aspects.perfil_defensivo ?? [];
   const [open, setOpen] = useState(false);
@@ -104,20 +104,17 @@ export function ProfilePillarBars({ player }: { player: PlayerProfile }) {
     <div className="tendencies-pop-wrap" ref={wrapRef}>
       <button
         type="button"
-        className={`tendencies-pop-trigger${open ? " open" : ""}`}
+        className={`btn btn-ghost btn-sm tendencies-pop-btn${open ? " open" : ""}`}
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-haspopup="dialog"
       >
-        <span className="tendencies-pop-trigger-left">
-          <i className="fa-solid fa-chart-line" aria-hidden="true" />
-          Tendências de jogo
-        </span>
+        <i className="fa-solid fa-chart-line" aria-hidden="true" /> Tendências de jogo
         <i className="fa-solid fa-chevron-down tendencies-pop-chevron" aria-hidden="true" />
       </button>
 
       {open ? (
-        <div className="tendencies-pop-panel" role="dialog" aria-label="Tendências de jogo">
+        <div className="tendencies-pop-panel tendencies-pop-panel-right" role="dialog" aria-label="Tendências de jogo">
           <div className="tendencies-pop-head">
             <span className="section-label">Tendências de jogo</span>
             <button

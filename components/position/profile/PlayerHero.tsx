@@ -3,19 +3,24 @@
 import Link from "next/link";
 import { ClubLogo } from "@/components/ClubLogo";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { gradeTier } from "@/lib/gradeColors";
 import { playerInitials, ratingGradientStyle } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import { TendenciesButton } from "./ProfileSharePanel";
 
 type Props = {
   player: PlayerProfile;
   family: PositionFamily;
 };
 
-function formatDate(iso: string): string {
-  const [year, month, day] = iso.split("-");
-  if (!year || !month || !day) return iso;
-  return `${day}/${month}/${year}`;
+function monthsRemaining(iso?: string | null): number | null {
+  if (!iso) return null;
+  const [year, month, day] = iso.split("-").map(Number);
+  if (!year || !month) return null;
+  const end = new Date(year, month - 1, day || 1);
+  const now = new Date();
+  let months = (end.getFullYear() - now.getFullYear()) * 12 + (end.getMonth() - now.getMonth());
+  if (end.getDate() < now.getDate()) months -= 1;
+  return Math.max(0, months);
 }
 
 function HeroFact({ label, children }: { label: string; children: React.ReactNode }) {
@@ -30,14 +35,18 @@ function HeroFact({ label, children }: { label: string; children: React.ReactNod
 function MarketCard({
   icon,
   label,
+  tone,
+  tooltip,
   children,
 }: {
   icon: string;
   label: string;
+  tone?: "warn" | "danger";
+  tooltip?: string;
   children: React.ReactNode;
 }) {
-  return (
-    <div className="hero-market-card">
+  const card = (
+    <div className={`hero-market-card${tone ? ` hero-market-card-${tone}` : ""}`}>
       <span className="hero-market-icon" aria-hidden="true">
         <i className={`fa-solid ${icon}`} />
       </span>
@@ -47,14 +56,25 @@ function MarketCard({
       </span>
     </div>
   );
+  if (!tooltip) return card;
+  return <Tooltip content={tooltip}>{card}</Tooltip>;
 }
 
 export function PlayerHero({ player, family }: Props) {
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const tm = player.transfermarkt;
-  const contract =
-    tm?.contract_remaining ?? (tm?.contract_until ? formatDate(tm.contract_until) : null);
   const overall = player.ratings.geral ?? player.rating;
+
+  const months = monthsRemaining(tm?.contract_until);
+  const onLoanFrom = tm?.on_loan_from ?? null;
+  const contractTone: "warn" | "danger" | undefined =
+    months != null && months < 6 ? "danger" : months != null && months < 12 ? "warn" : undefined;
+  const contractTooltip =
+    months != null && months < 6
+      ? "Contrato termina em menos de 6 meses."
+      : months != null && months < 12
+        ? "Contrato termina em menos de 1 ano."
+        : undefined;
 
   return (
     <section className="player-hero player-card" aria-label={`Perfil de ${player.name}`}>
@@ -83,8 +103,24 @@ export function PlayerHero({ player, family }: Props) {
             <MarketCard icon="fa-coins" label="Valor de mercado">
               {tm?.market_value ?? "—"}
             </MarketCard>
-            <MarketCard icon="fa-file-signature" label="Contrato">
-              {contract ?? "—"}
+            <MarketCard
+              icon={onLoanFrom ? "fa-right-left" : "fa-file-signature"}
+              label={onLoanFrom ? "Contrato · Empréstimo" : "Contrato"}
+              tone={contractTone}
+              tooltip={
+                onLoanFrom
+                  ? `Emprestado por ${onLoanFrom}.${contractTooltip ? ` ${contractTooltip}` : ""}`
+                  : contractTooltip
+              }
+            >
+              <span className="hero-contract-value">
+                {months != null ? `${months} ${months === 1 ? "mês" : "meses"}` : "—"}
+                {onLoanFrom ? (
+                  <span className="hero-loan-pill">
+                    <i className="fa-solid fa-right-left" aria-hidden="true" /> {onLoanFrom}
+                  </span>
+                ) : null}
+              </span>
             </MarketCard>
             <MarketCard icon="fa-clock" label="Minutos">
               <span className="hero-market-minutes tabular">
@@ -128,6 +164,7 @@ export function PlayerHero({ player, family }: Props) {
                 <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
               </a>
             ) : null}
+            <TendenciesButton player={player} />
           </div>
         </div>
       </div>
@@ -140,7 +177,6 @@ export function PlayerHero({ player, family }: Props) {
               {overall.toFixed(1).replace(".", ",")}
               <small>/10</small>
             </span>
-            <span className="player-hero-rating-tier">{gradeTier(overall)}</span>
           </div>
         </Tooltip>
       ) : null}
