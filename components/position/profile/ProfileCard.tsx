@@ -84,8 +84,8 @@ export function ProfileCard({ player, family }: Props) {
   if (!shareRows.length) {
     return player.profile ? (
       <div className="player-card profile-perfil-card profile-perfil-card-score">
-        <div className="profile-perfil-card-head">
-          <span className="profile-perfil-card-title">Perfil</span>
+        <div className="profile-card-head">
+          <span className="section-label">Perfil</span>
         </div>
         <p className="profile-share-inline-fallback">{player.profile}</p>
       </div>
@@ -94,14 +94,16 @@ export function ProfileCard({ player, family }: Props) {
 
   return (
     <div className="player-card profile-perfil-card profile-perfil-card-score">
-      <div className="profile-perfil-card-head">
-        <span className="profile-perfil-card-title">Perfil</span>
+      <div className="profile-card-head">
+        <span className="section-label">Perfil</span>
+        <span className="profile-card-head-hint">Afinidade com cada arquétipo</span>
       </div>
       <ul className="profile-perfil-list">
         {shareRows.map((row) => {
           const token = ratingTier(row.rating);
           const active = row.key === activeKey;
           const accent = profileAccent(row.label);
+          const shareWidth = Math.max(3, Math.min(100, row.share));
           return (
             <li key={row.key}>
               <Tooltip
@@ -112,16 +114,21 @@ export function ProfileCard({ player, family }: Props) {
                   className={`profile-perfil-row cluster-${row.tone}${active ? " active" : ""}`}
                   style={{ "--profile-accent": accent } as React.CSSProperties}
                 >
-                  <span className="profile-perfil-row-label">
-                    {row.label}
-                    <i className="fa-solid fa-circle-info profile-perfil-row-info" aria-hidden="true" />
-                  </span>
-                  <span className="profile-perfil-row-meta tabular">
-                    <span className="profile-perfil-row-share">{Math.round(row.share)}%</span>
-                    <span className="profile-perfil-row-sep">·</span>
-                    <span className="profile-perfil-row-rating" style={tierVars(token)}>
-                      Rating {formatRating(row.rating)}
+                  <div className="profile-perfil-row-top">
+                    <span className="profile-perfil-row-label">
+                      {row.label}
+                      <i className="fa-solid fa-circle-info profile-perfil-row-info" aria-hidden="true" />
                     </span>
+                    <span className="profile-perfil-row-meta tabular">
+                      <span className="profile-perfil-row-share">{Math.round(row.share)}%</span>
+                      <span className="profile-perfil-row-sep">·</span>
+                      <span className="profile-perfil-row-rating" style={tierVars(token)}>
+                        Rating {formatRating(row.rating)}
+                      </span>
+                    </span>
+                  </div>
+                  <span className="profile-perfil-row-bar" aria-hidden="true">
+                    <span style={{ width: `${shareWidth}%` }} />
                   </span>
                 </div>
               </Tooltip>

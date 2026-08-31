@@ -2,9 +2,8 @@
 
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import type { SectionGradeLookup } from "@/lib/sectionGrades";
-import { OverallGradePanel } from "./OverallGradePanel";
+import { PlayerHero } from "./PlayerHero";
 import { ProfileCard } from "./ProfileCard";
-import { ProfileIdentityColumn } from "./ProfileIdentityColumn";
 import { ProfilePillarBars } from "./ProfileSharePanel";
 import { ScoutStatsSections } from "./ScoutStatsSections";
 
@@ -15,26 +14,26 @@ type Props = {
 };
 
 export function PositionProfileView({ player, family, sectionGradeLookup }: Props) {
-  const overall = player.ratings.geral ?? player.rating;
-
   return (
     <div className="profile-view-shell">
-      <div className="pa-layout">
-        <ProfileIdentityColumn player={player} family={family} />
+      <PlayerHero player={player} family={family} />
 
-        <div className="pa-col pa-col-score">
-          <div className="score-stack">
-            <div className="player-card profile-grade-card">
-              <OverallGradePanel score={overall} />
-            </div>
-            <ProfileCard player={player} family={family} />
-            <ProfilePillarBars player={player} />
+      <div className="profile-content-grid">
+        <div className="profile-content-col">
+          <ProfileCard player={player} family={family} />
+          <ProfilePillarBars player={player} />
+          <div className="heatmap-placeholder" aria-label="Heatmap em breve">
+            <span className="section-label-sm">Heatmap</span>
+            <p className="heatmap-placeholder-copy">Mapa de origem de ações — em breve.</p>
           </div>
         </div>
 
-        <div className="pa-col pa-col-pillars">
+        <div className="profile-content-col">
           <div className="player-card pass-scores-shell">
-            <h3 className="section-label">Stats</h3>
+            <div className="profile-card-head">
+              <h3 className="section-label">Stats</h3>
+              <span className="profile-card-head-hint">Percentis no pool da posição</span>
+            </div>
             <ScoutStatsSections
               player={player}
               family={family}
