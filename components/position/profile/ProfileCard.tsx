@@ -115,17 +115,16 @@ export function ProfileCard({ player, family }: Props) {
                   style={{ "--profile-accent": accent } as React.CSSProperties}
                 >
                   <div className="profile-perfil-row-top">
-                    <span className="profile-perfil-row-label">
-                      {row.label}
-                      <i className="fa-solid fa-circle-info profile-perfil-row-info" aria-hidden="true" />
-                    </span>
-                    <span className="profile-perfil-row-meta tabular">
-                      <span className="profile-perfil-row-share">{Math.round(row.share)}%</span>
-                      <span className="profile-perfil-row-sep">·</span>
-                      <span className="profile-perfil-row-rating" style={tierVars(token)}>
+                    <div className="profile-perfil-row-copy">
+                      <span className="profile-perfil-row-label">
+                        {row.label}
+                        <i className="fa-solid fa-circle-info profile-perfil-row-info" aria-hidden="true" />
+                      </span>
+                      <span className="profile-perfil-row-rating tabular" style={tierVars(token)}>
                         Rating {formatRating(row.rating)}
                       </span>
-                    </span>
+                    </div>
+                    <span className="profile-perfil-row-share tabular">{Math.round(row.share)}%</span>
                   </div>
                   <span className="profile-perfil-row-bar" aria-hidden="true">
                     <span style={{ width: `${shareWidth}%` }} />
