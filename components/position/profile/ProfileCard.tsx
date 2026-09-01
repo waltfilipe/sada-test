@@ -7,7 +7,7 @@ import {
   archetypeMetaFor,
   type ArchetypeTrait,
 } from "@/lib/clusterMeta";
-import { profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
+import { activeProfileKeys, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
 import { formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -79,7 +79,7 @@ function TraitList({
 
 export function ProfileCard({ player, family }: Props) {
   const shareRows = useMemo(() => sortedProfileShareRows(player), [player]);
-  const activeKey = player.cluster?.archetype === "Híbrido" ? null : player.cluster?.archetype;
+  const activeKeys = useMemo(() => activeProfileKeys(player, shareRows), [player, shareRows]);
 
   if (!shareRows.length) {
     return player.profile ? (
@@ -101,7 +101,7 @@ export function ProfileCard({ player, family }: Props) {
       <ul className="profile-perfil-list">
         {shareRows.map((row) => {
           const token = ratingTier(row.rating);
-          const active = row.key === activeKey;
+          const active = activeKeys.has(row.key);
           const accent = profileAccent(row.label);
           const shareWidth = Math.max(3, Math.min(100, row.share));
           return (

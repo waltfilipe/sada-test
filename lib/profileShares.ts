@@ -61,6 +61,20 @@ export function sortedProfileShareRows(player: PlayerProfile): ProfileShareRow[]
   return [...buildProfileShareRows(player)].sort((a, b) => b.share - a.share);
 }
 
+/** Primary profile keys to highlight — for híbridos, the two largest shares. */
+export function activeProfileKeys(player: PlayerProfile, shareRows: ProfileShareRow[]): Set<string> {
+  if (!player.cluster) return new Set();
+  if (player.cluster.archetype === "Híbrido") {
+    return new Set(
+      [...shareRows]
+        .sort((a, b) => b.share - a.share)
+        .slice(0, 2)
+        .map((row) => row.key),
+    );
+  }
+  return new Set([player.cluster.archetype]);
+}
+
 export function profileEmoji(label: string): string {
   const map: Record<string, string> = {
     "Defensor de Área": "🛡️",

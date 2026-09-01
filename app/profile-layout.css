@@ -434,8 +434,14 @@
 }
 
 .player-strip-grid-wrap {
+  flex: 1;
+  min-width: 0;
   margin: 0 -0.15rem;
   padding: 0.1rem 0.15rem 0.15rem;
+}
+
+.player-strip-body .player-strip-arrow {
+  align-self: center;
 }
 
 .player-strip-grid {
@@ -1558,7 +1564,7 @@
   font-weight: 800;
   line-height: 0.95;
   letter-spacing: -0.05em;
-  color: var(--accent);
+  color: var(--rating-accent, var(--tier-color, var(--accent)));
 }
 
 .player-hero-rating-value small {
@@ -1589,7 +1595,7 @@
    min-height lets the stats detail view grow when a section is open. */
 .profile-col-middle .profile-perfil-card,
 .profile-col-stats .pass-scores-shell {
-  min-height: 368px;
+  min-height: 318px;
   display: flex;
   flex-direction: column;
 }
@@ -2366,11 +2372,12 @@
 .profile-perfil-list {
   list-style: none;
   margin: 0;
-  padding: 0.5rem 0 0;
+  padding: 0;
+  margin-top: 0.6rem;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  gap: 0.32rem;
+  gap: 0.5rem;
   flex: 1;
   min-height: 0;
 }
@@ -2396,11 +2403,11 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.88rem 0.85rem;
+  gap: 0.35rem;
+  padding: 0.6rem 0.75rem;
   border-radius: 10px;
   border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(18, 32, 50, 0.55);
+  background: rgba(15, 23, 42, 0.35);
   transition: border-color 0.15s, background 0.15s;
   cursor: help;
 }
@@ -2448,7 +2455,7 @@
 }
 
 .profile-perfil-row-label {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 800;
   color: var(--text);
   line-height: 1.25;
@@ -2458,7 +2465,7 @@
   display: flex;
   align-items: center;
   gap: 0.28rem;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: #a8b3c5;
   white-space: nowrap;

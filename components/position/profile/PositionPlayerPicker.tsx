@@ -92,6 +92,13 @@ export function PositionPlayerPicker({
     );
   }
 
+  function scrollStrip(direction: -1 | 1) {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const step = Math.max(240, Math.round(grid.clientWidth * 0.72));
+    grid.scrollBy({ left: direction * step, behavior: "smooth" });
+  }
+
   const archetypeFilters =
     family === "laterais" ? LAT_ARCHETYPE_META : family === "zagueiros" ? ZAG_ARCHETYPE_META : null;
 
@@ -228,21 +235,39 @@ export function PositionPlayerPicker({
         </div>
       </div>
 
-      <div className="player-strip-grid-wrap">
-        <div className="player-strip-grid" ref={gridRef}>
-          {visible.length ? (
-            visible.map((player) => (
-              <PlayerStripCard
-                key={player.player_id}
-                player={player}
-                selected={player.player_id === selectedId}
-                onSelect={() => onSelect(player.player_id)}
-              />
-            ))
-          ) : (
-            <p className="player-strip-empty">Nenhum atleta encontrado com os filtros atuais.</p>
-          )}
+      <div className="player-strip-body">
+        <button
+          type="button"
+          className="player-strip-arrow"
+          onClick={() => scrollStrip(-1)}
+          aria-label="Atletas anteriores"
+        >
+          ‹
+        </button>
+        <div className="player-strip-grid-wrap">
+          <div className="player-strip-grid" ref={gridRef}>
+            {visible.length ? (
+              visible.map((player) => (
+                <PlayerStripCard
+                  key={player.player_id}
+                  player={player}
+                  selected={player.player_id === selectedId}
+                  onSelect={() => onSelect(player.player_id)}
+                />
+              ))
+            ) : (
+              <p className="player-strip-empty">Nenhum atleta encontrado com os filtros atuais.</p>
+            )}
+          </div>
         </div>
+        <button
+          type="button"
+          className="player-strip-arrow"
+          onClick={() => scrollStrip(1)}
+          aria-label="Próximos atletas"
+        >
+          ›
+        </button>
       </div>
     </div>
   );
