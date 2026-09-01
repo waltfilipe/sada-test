@@ -293,15 +293,18 @@ export function CompareStatsSections({ playerA, playerB, family }: Props) {
           <h4 className="stats-subsection-label">Stats</h4>
           <div className="stats-groups-stack">
             {entries.map((entry) => (
-              <div key={entry.title} className="stats-group-block">
-                <h5 className="stats-group-title">
-                  {entry.title}
-                  <span className="stats-group-medals-duel">
-                    <StatMedalCount count={entry.badgesA.length} />
-                    <span className="compare-section-vs">vs</span>
-                    <StatMedalCount count={entry.badgesB.length} />
+              <details key={entry.title} className="stats-group-accordion">
+                <summary className="stats-group-title">
+                  <span className="stats-group-title-text">{entry.title}</span>
+                  <span className="stats-group-title-meta">
+                    <span className="stats-group-medals-duel">
+                      <StatMedalCount count={entry.badgesA.length} />
+                      <span className="compare-section-vs">vs</span>
+                      <StatMedalCount count={entry.badgesB.length} />
+                    </span>
+                    <i className="fa-solid fa-chevron-down stats-group-chevron" aria-hidden="true" />
                   </span>
-                </h5>
+                </summary>
                 <div className="compare-stat-cards-stack">
                   {entry.metrics.map(({ label, groupTitle }) => (
                     <CompareAspectBlock
@@ -313,7 +316,7 @@ export function CompareStatsSections({ playerA, playerB, family }: Props) {
                     />
                   ))}
                 </div>
-              </div>
+              </details>
             ))}
           </div>
         </section>

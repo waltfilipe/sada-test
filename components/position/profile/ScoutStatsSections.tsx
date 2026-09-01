@@ -195,11 +195,14 @@ export function ScoutStatsSections({
           <h4 className="stats-subsection-label">Stats</h4>
           <div className="stats-groups-stack">
             {entries.map((entry) => (
-              <div key={entry.title} className="stats-group-block">
-                <h5 className="stats-group-title">
-                  {entry.title}
-                  <StatMedalCount count={entry.badges.length} />
-                </h5>
+              <details key={entry.title} className="stats-group-accordion">
+                <summary className="stats-group-title">
+                  <span className="stats-group-title-text">{entry.title}</span>
+                  <span className="stats-group-title-meta">
+                    <StatMedalCount count={entry.badges.length} />
+                    <i className="fa-solid fa-chevron-down stats-group-chevron" aria-hidden="true" />
+                  </span>
+                </summary>
                 <div className="stat-cards-stack">
                   {entry.metrics.map(({ item, groupTitle }) => (
                     <StatAspectBlock
@@ -210,7 +213,7 @@ export function ScoutStatsSections({
                     />
                   ))}
                 </div>
-              </div>
+              </details>
             ))}
           </div>
         </section>
