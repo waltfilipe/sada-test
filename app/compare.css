@@ -556,7 +556,8 @@
 }
 
 .compare-overview-chip-grades,
-.compare-overview-chip-badges {
+.compare-overview-chip-badges,
+.compare-overview-chip-medals {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -803,6 +804,13 @@
   min-width: 0;
 }
 
+.compare-section-summary-medals {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
 .compare-section-badge-row {
   display: flex;
   align-items: center;
@@ -941,6 +949,61 @@
   display: grid;
   gap: 0.9rem;
   padding: 0 0.85rem 0.85rem;
+}
+
+.compare-stats-badges-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.65rem;
+}
+
+.compare-stats-badges-col {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.compare-stats-badges-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.compare-stats-badges-col.side-a .compare-stats-badges-label {
+  color: color-mix(in srgb, var(--side-a) 75%, var(--text-3));
+}
+
+.compare-stats-badges-col.side-b .compare-stats-badges-label {
+  color: color-mix(in srgb, var(--side-b) 75%, var(--text-3));
+}
+
+.compare-stat-cards-stack {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.compare-stat-group-medals {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-shrink: 0;
+}
+
+.compare-section-accordion.tone-defensivos {
+  border-color: color-mix(in srgb, #60a5fa 18%, var(--line));
+}
+
+.compare-section-accordion.tone-passes {
+  border-color: color-mix(in srgb, #34d399 18%, var(--line));
+}
+
+.compare-section-accordion.tone-dribles {
+  border-color: color-mix(in srgb, #fbbf24 18%, var(--line));
+}
+
+.compare-section-accordion.tone-final {
+  border-color: color-mix(in srgb, #c084fc 18%, var(--line));
 }
 
 .compare-stat-group {

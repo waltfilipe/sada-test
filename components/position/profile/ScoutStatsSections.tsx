@@ -3,10 +3,10 @@
 import { useMemo, useState } from "react";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { statSectionsForFamily } from "@/lib/aspectStatSections";
+import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
 import { earnedStatBadges, metricEarnsStatBadge } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
-import { StatBadgeStrip, StatPassMedalCount } from "./StatBadgeStrip";
+import { StatBadgesPanel, StatMedalCount } from "./StatBadgeStrip";
 
 function flattenAspects(player: PlayerProfile): AspectItem[] {
   const groups = player.aspects;
@@ -72,29 +72,24 @@ const DEF_EFFICIENCY_TIP =
 function StatAspectBlock({
   item,
   groupTitle,
-  showPassMedal,
+  tone,
 }: {
   item: AspectItem;
   groupTitle?: string;
-  showPassMedal?: boolean;
+  tone: StatSectionTone;
 }) {
   const hasSubMetrics =
     (item.kind === "def_efficiency_group" || item.kind === "metric_group") &&
     Boolean(item.sub_metrics?.length);
   const title = groupTitle ?? item.label;
   const isDefEfficiency = item.kind === "def_efficiency_group";
-  const earned = metricEarnsStatBadge(item, title);
+  const medalCount = metricEarnsStatBadge(item, title) ? 1 : 0;
 
   return (
-    <div className={`stat-aspect-group${earned ? " has-stat-badge" : ""}`}>
+    <div className={`stat-aspect-group tone-${tone}${medalCount ? " has-stat-badge" : ""}`}>
       <div className="stat-aspect-group-head">
         <span className="stat-aspect-group-title">
           {title}
-          {showPassMedal && earned ? (
-            <span className="stat-aspect-medal" title="Badge de passe conquistado">
-              <i className="fa-solid fa-medal" aria-hidden="true" />
-            </span>
-          ) : null}
           {isDefEfficiency ? (
             <Tooltip content={DEF_EFFICIENCY_TIP}>
               <span className="stat-def-eff-star" aria-label="Destaque — Eficiência Defensiva">
@@ -103,6 +98,7 @@ function StatAspectBlock({
             </Tooltip>
           ) : null}
         </span>
+        <StatMedalCount count={medalCount} tone={tone} />
       </div>
       <div className="stat-aspect-group-body">
         {hasSubMetrics ? (
@@ -137,7 +133,7 @@ function StatAspectBlock({
 
 type SectionEntry = {
   title: string;
-  showPassMedals?: boolean;
+  tone: StatSectionTone;
   badges: ReturnType<typeof earnedStatBadges>;
   metrics: { item: AspectItem; groupTitle?: string }[];
 };
@@ -162,8 +158,7 @@ export function ScoutStatsSections({
       for (const label of section.labels) {
         const item = findAspect(all, label);
         if (!item) continue;
-        const groupTitle =
-          label === "Conduções Progressivas" ? "Progressão" : undefined;
+        const groupTitle = label === "Conduções Progressivas" ? "Progressão" : undefined;
         if (groupTitle) titleByItem.set(item.label, groupTitle);
         metrics.push({ item, groupTitle });
       }
@@ -173,7 +168,7 @@ export function ScoutStatsSections({
       const items = metrics.map((metric) => metric.item);
       list.push({
         title: section.title,
-        showPassMedals: section.showPassMedals,
+        tone: section.tone,
         badges: earnedStatBadges(items, titleByItem),
         metrics,
       });
@@ -186,11 +181,8 @@ export function ScoutStatsSections({
   if (activeEntry) {
     return (
       <div className="stats-swap-panel" key={`${player.player_id}-${activeEntry.title}`}>
-        <div className="profile-card-head stats-swap-head stats-badges-head">
-          <div className="stats-badges-title-block">
-            <h3 className="section-label">{activeEntry.title}</h3>
-            <StatBadgeStrip badges={activeEntry.badges} />
-          </div>
+        <div className="profile-card-head stats-swap-head">
+          <h3 className="section-label">{activeEntry.title}</h3>
           <button
             type="button"
             className="tendencies-pop-close"
@@ -200,14 +192,17 @@ export function ScoutStatsSections({
             <i className="fa-solid fa-xmark" aria-hidden="true" />
           </button>
         </div>
-        <div className="stats-swap-body">
-          <div className="pass-score-metrics">
+
+        <div className="stats-swap-body stats-badges-layout">
+          <StatBadgesPanel badges={activeEntry.badges} tone={activeEntry.tone} />
+
+          <div className="stat-cards-stack">
             {activeEntry.metrics.map(({ item, groupTitle }) => (
               <StatAspectBlock
                 key={item.label}
                 item={item}
                 groupTitle={groupTitle}
-                showPassMedal={activeEntry.showPassMedals}
+                tone={activeEntry.tone}
               />
             ))}
           </div>
@@ -224,21 +219,16 @@ export function ScoutStatsSections({
       </div>
       <div className="stats-nav-list">
         {entries.map((entry) => (
-          <button
-            key={entry.title}
-            type="button"
-            className="stats-nav-row stats-badges-nav-row"
-            onClick={() => setActive(entry.title)}
-          >
-            <span className="stats-badges-nav-copy">
+          <article key={entry.title} className={`stats-nav-card tone-${entry.tone}`}>
+            <button type="button" className="stats-nav-row" onClick={() => setActive(entry.title)}>
               <span className="stats-nav-row-title">{entry.title}</span>
-              <StatBadgeStrip badges={entry.badges} />
-            </span>
-            <span className="stats-nav-row-meta">
-              {entry.showPassMedals ? <StatPassMedalCount count={entry.badges.length} /> : null}
-              <i className="fa-solid fa-chevron-right" aria-hidden="true" />
-            </span>
-          </button>
+              <span className="stats-nav-row-meta">
+                <StatMedalCount count={entry.badges.length} tone={entry.tone} />
+                <i className="fa-solid fa-chevron-right" aria-hidden="true" />
+              </span>
+            </button>
+            <StatBadgesPanel badges={entry.badges} tone={entry.tone} />
+          </article>
         ))}
       </div>
     </div>

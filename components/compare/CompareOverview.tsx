@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { StatBadgeStrip } from "@/components/position/profile/StatBadgeStrip";
+import { StatBadgeStrip, StatMedalCount } from "@/components/position/profile/StatBadgeStrip";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { earnedStatBadges } from "@/lib/statBadges";
 import { playerSectionScore } from "@/lib/sectionGrades";
@@ -16,6 +16,7 @@ type Props = {
 
 type SectionSnapshot = {
   title: string;
+  tone: ReturnType<typeof statSectionsForFamily>[number]["tone"];
   badgesA: ReturnType<typeof earnedStatBadges>;
   badgesB: ReturnType<typeof earnedStatBadges>;
   scoreA: number | null;
@@ -91,6 +92,7 @@ export function CompareOverview({ playerA, playerB, family, verdict }: Props) {
 
       list.push({
         title: section.title,
+        tone: section.tone,
         badgesA: earnedStatBadges(itemsA, titleByItem),
         badgesB: earnedStatBadges(itemsB, titleByItem),
         scoreA: scoreA ?? null,
@@ -153,9 +155,14 @@ export function CompareOverview({ playerA, playerB, family, verdict }: Props) {
           >
             <span className="compare-overview-chip-title">{section.title}</span>
             <span className="compare-overview-chip-badges">
-              <StatBadgeStrip badges={section.badgesA} />
+              <StatBadgeStrip badges={section.badgesA} tone={section.tone} />
               <span className="compare-overview-chip-vs">vs</span>
-              <StatBadgeStrip badges={section.badgesB} />
+              <StatBadgeStrip badges={section.badgesB} tone={section.tone} />
+            </span>
+            <span className="compare-overview-chip-medals">
+              <StatMedalCount count={section.badgesA.length} tone={section.tone} />
+              <span className="compare-overview-chip-vs">vs</span>
+              <StatMedalCount count={section.badgesB.length} tone={section.tone} />
             </span>
           </article>
         ))}

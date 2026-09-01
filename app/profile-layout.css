@@ -2059,11 +2059,39 @@
 .stats-nav-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.55rem;
   margin-top: 0.6rem;
   flex: 1;
   min-height: 0;
-  justify-content: space-evenly;
+}
+
+.stats-nav-card {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.55rem;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(15, 23, 42, 0.28);
+}
+
+.stats-nav-card .stats-nav-row {
+  flex: 0 0 auto;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0.15rem 0.2rem;
+}
+
+.stats-nav-card .stats-nav-row:hover {
+  background: transparent;
+  border-color: transparent;
+  transform: none;
+}
+
+.stats-nav-row-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #e2e8f0;
 }
 
 .stats-nav-row {
@@ -2116,6 +2144,17 @@
 .stats-swap-body {
   margin-top: 0.6rem;
   animation: stats-swap-in 0.18s ease;
+}
+
+.stats-badges-layout {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.stat-cards-stack,
+.compare-stat-cards-stack {
+  display: grid;
+  gap: 0.55rem;
 }
 
 @keyframes stats-swap-in {
@@ -2255,6 +2294,13 @@
   gap: 0.4rem;
 }
 
+.stat-aspect-group.tone-defensivos .stat-aspect-group-head,
+.stat-aspect-group.tone-passes .stat-aspect-group-head,
+.stat-aspect-group.tone-dribles .stat-aspect-group-head,
+.stat-aspect-group.tone-final .stat-aspect-group-head {
+  border: 1px solid transparent;
+}
+
 .stat-aspect-group-head {
   display: flex;
   align-items: center;
@@ -2352,6 +2398,36 @@
   align-items: center;
 }
 
+.stat-badges-panel {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(15, 23, 42, 0.35);
+}
+
+.stat-badges-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.stat-badges-panel-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+}
+
+.stat-badges-panel-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
 .stat-badge-strip-empty {
   font-size: 0.68rem;
   color: #64748b;
@@ -2376,13 +2452,91 @@
   font-size: 0.78rem;
 }
 
-.stat-pass-medal-count {
+.stat-medal-count {
   display: inline-flex;
   align-items: center;
   gap: 0.12rem;
   color: #fbbf24;
   font-size: 0.72rem;
 }
+
+/* Badge + medal tones by stat section group */
+.tone-defensivos .stat-badge-chip,
+.stat-badges-panel.tone-defensivos .stat-badge-chip,
+.stat-badge-strip.tone-defensivos .stat-badge-chip {
+  border-color: rgba(96, 165, 250, 0.28);
+  background: rgba(59, 130, 246, 0.14);
+  color: #93c5fd;
+}
+
+.tone-defensivos.stat-medal-count,
+.stat-medal-count.tone-defensivos {
+  color: #60a5fa;
+}
+
+.tone-passes .stat-badge-chip,
+.stat-badges-panel.tone-passes .stat-badge-chip,
+.stat-badge-strip.tone-passes .stat-badge-chip {
+  border-color: rgba(52, 211, 153, 0.28);
+  background: rgba(16, 185, 129, 0.14);
+  color: #6ee7b7;
+}
+
+.tone-passes.stat-medal-count,
+.stat-medal-count.tone-passes {
+  color: #34d399;
+}
+
+.tone-dribles .stat-badge-chip,
+.stat-badges-panel.tone-dribles .stat-badge-chip,
+.stat-badge-strip.tone-dribles .stat-badge-chip {
+  border-color: rgba(251, 191, 36, 0.28);
+  background: rgba(245, 158, 11, 0.14);
+  color: #fcd34d;
+}
+
+.tone-dribles.stat-medal-count,
+.stat-medal-count.tone-dribles {
+  color: #fbbf24;
+}
+
+.tone-final .stat-badge-chip,
+.stat-badges-panel.tone-final .stat-badge-chip,
+.stat-badge-strip.tone-final .stat-badge-chip {
+  border-color: rgba(192, 132, 252, 0.28);
+  background: rgba(168, 85, 247, 0.14);
+  color: #d8b4fe;
+}
+
+.tone-final.stat-medal-count,
+.stat-medal-count.tone-final {
+  color: #c084fc;
+}
+
+.stats-nav-card.tone-defensivos {
+  border-color: rgba(96, 165, 250, 0.2);
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.stats-nav-card.tone-passes {
+  border-color: rgba(52, 211, 153, 0.2);
+  background: rgba(16, 185, 129, 0.06);
+}
+
+.stats-nav-card.tone-dribles {
+  border-color: rgba(251, 191, 36, 0.2);
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.stats-nav-card.tone-final {
+  border-color: rgba(192, 132, 252, 0.2);
+  background: rgba(168, 85, 247, 0.06);
+}
+
+.stat-badges-panel.tone-defensivos { border-color: rgba(96, 165, 250, 0.22); }
+.stat-badges-panel.tone-passes { border-color: rgba(52, 211, 153, 0.22); }
+.stat-badges-panel.tone-dribles { border-color: rgba(251, 191, 36, 0.22); }
+.stat-badges-panel.tone-final { border-color: rgba(192, 132, 252, 0.22); }
 
 .stat-aspect-medal {
   display: inline-flex;
@@ -2399,6 +2553,30 @@
 
 .stat-aspect-group.has-stat-badge .stat-aspect-group-head {
   border-color: rgba(251, 191, 36, 0.22);
+}
+
+.stat-aspect-group.tone-defensivos .stat-aspect-group-head,
+.compare-stat-group.tone-defensivos .compare-stat-group-head {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(96, 165, 250, 0.18);
+}
+
+.stat-aspect-group.tone-passes .stat-aspect-group-head,
+.compare-stat-group.tone-passes .compare-stat-group-head {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(52, 211, 153, 0.18);
+}
+
+.stat-aspect-group.tone-dribles .stat-aspect-group-head,
+.compare-stat-group.tone-dribles .compare-stat-group-head {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(251, 191, 36, 0.18);
+}
+
+.stat-aspect-group.tone-final .stat-aspect-group-head,
+.compare-stat-group.tone-final .compare-stat-group-head {
+  background: rgba(168, 85, 247, 0.1);
+  border-color: rgba(192, 132, 252, 0.18);
 }
 
 /* Section cards — geral + quantidade/qualidade */
