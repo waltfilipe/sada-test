@@ -42,6 +42,12 @@ FOOT_MAP = {
     "canhoto": "Canhoto",
 }
 
+# Manual corrections when Wyscout primary position is stale vs current role.
+PLAYER_POSITION_OVERRIDES: dict[str, str] = {
+    "Nicolás Acevedo": "Meio-campista",
+    "N. Acevedo": "Meio-campista",
+}
+
 
 def _slugify(name: str, club: str, index: int) -> str:
     base = re.sub(r"[^a-z0-9]+", "-", f"{name}-{club}".lower()).strip("-")
@@ -180,6 +186,10 @@ def load_players_dataframe() -> pd.DataFrame:
         _slugify(str(row["Jogador"]), str(row.get("Equipe", "")), i)
         for i, row in df.reset_index(drop=True).iterrows()
     ]
+    for name, position in PLAYER_POSITION_OVERRIDES.items():
+        mask = df["Jogador"].astype(str).str.strip() == name
+        if mask.any():
+            df.loc[mask, "Posição"] = position
     if "Idade" in df.columns:
         df["Nascimento"] = 2026 - pd.to_numeric(df["Idade"], errors="coerce")
     elif "Nascimento" not in df.columns:

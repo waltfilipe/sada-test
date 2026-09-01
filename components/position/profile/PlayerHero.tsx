@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ClubLogo } from "@/components/ClubLogo";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { playerInitials, ratingGradientStyle } from "@/lib/scoutTheme";
+import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { TendenciesButton } from "./ProfileSharePanel";
 
@@ -171,7 +171,7 @@ export function PlayerHero({ player, family }: Props) {
 
       {overall != null ? (
         <Tooltip content="Nota geral do atleta no pool da posição.">
-          <div className="player-hero-rating" style={ratingGradientStyle(overall)}>
+          <div className="player-hero-rating">
             <span className="player-hero-rating-label">Rating Geral</span>
             <span className="player-hero-rating-value tabular">
               {overall.toFixed(1).replace(".", ",")}

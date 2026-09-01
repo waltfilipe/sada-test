@@ -396,6 +396,130 @@
   padding: 0.75rem 0.5rem;
   font-size: 0.76rem;
   color: var(--muted);
+  grid-column: 1 / -1;
+}
+
+/* Expanded athlete picker — toolbar + two-row grid */
+.player-strip-expanded {
+  padding: 1rem 1.1rem 1.15rem;
+}
+
+.player-strip-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-bottom: 0.8rem;
+}
+
+.player-strip-toolbar-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.player-strip-filter-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.player-strip-filter-label {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.player-strip-grid-wrap {
+  margin: 0 -0.15rem;
+  padding: 0.1rem 0.15rem 0.15rem;
+}
+
+.player-strip-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(2, auto);
+  gap: 0.5rem 0.55rem;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+  padding-bottom: 0.2rem;
+}
+
+.player-strip-grid::-webkit-scrollbar {
+  height: 5px;
+}
+
+.player-strip-grid::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.35);
+}
+
+.player-strip-card-lg {
+  min-width: 196px;
+  padding: 0.55rem 0.7rem 0.55rem 0.55rem;
+  gap: 0.62rem;
+}
+
+.player-strip-card-lg .player-strip-card-photo {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  font-size: 0.68rem;
+}
+
+.player-strip-card-lg .player-strip-card-rating {
+  min-width: 2.25rem;
+  font-size: 0.72rem;
+  padding: 0.08rem 0.32rem;
+}
+
+.player-strip-card-lg .player-strip-card-name {
+  font-size: 0.84rem;
+  max-width: 132px;
+}
+
+.player-strip-card-lg .player-strip-card-club {
+  font-size: 0.72rem;
+}
+
+.profile-filter-chip-neutral {
+  --chip-accent: #94a3b8;
+  border-color: rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.72);
+  color: #e2e8f0;
+}
+
+.profile-filter-chip-neutral:hover {
+  border-color: rgba(148, 163, 184, 0.48);
+  transform: translateY(-1px);
+}
+
+.profile-filter-chip-neutral.active {
+  border-color: rgba(27, 231, 255, 0.6);
+  background: rgba(27, 231, 255, 0.12);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(27, 231, 255, 0.28);
+}
+
+.profile-detail-stage {
+  animation: profile-detail-enter 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: top center;
+}
+
+@keyframes profile-detail-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-22px) scale(0.988);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .profile-top-filters {
@@ -1422,11 +1546,11 @@
 }
 
 .player-hero-rating-label {
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.13em;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--accent);
 }
 
 .player-hero-rating-value {
@@ -1434,7 +1558,7 @@
   font-weight: 800;
   line-height: 0.95;
   letter-spacing: -0.05em;
-  color: var(--rating-accent, var(--accent));
+  color: var(--accent);
 }
 
 .player-hero-rating-value small {
@@ -1465,7 +1589,7 @@
    min-height lets the stats detail view grow when a section is open. */
 .profile-col-middle .profile-perfil-card,
 .profile-col-stats .pass-scores-shell {
-  min-height: 342px;
+  min-height: 368px;
   display: flex;
   flex-direction: column;
 }
@@ -2242,11 +2366,11 @@
 .profile-perfil-list {
   list-style: none;
   margin: 0;
-  padding: 0.65rem 0 0;
+  padding: 0.5rem 0 0;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  gap: 0.5rem;
+  gap: 0.32rem;
   flex: 1;
   min-height: 0;
 }
@@ -2272,8 +2396,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.45rem;
-  padding: 0.72rem 0.75rem;
+  gap: 0.5rem;
+  padding: 0.88rem 0.85rem;
   border-radius: 10px;
   border: 1px solid rgba(148, 163, 184, 0.1);
   background: rgba(18, 32, 50, 0.55);
@@ -2324,7 +2448,7 @@
 }
 
 .profile-perfil-row-label {
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   font-weight: 800;
   color: var(--text);
   line-height: 1.25;
@@ -2334,7 +2458,7 @@
   display: flex;
   align-items: center;
   gap: 0.28rem;
-  font-size: 0.76rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #a8b3c5;
   white-space: nowrap;

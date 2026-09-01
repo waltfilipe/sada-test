@@ -1187,21 +1187,10 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
     if family_key == "laterais":
         ofensivos.extend(
             [
-                _metric_group_aspect(
-                    "Progressão",
-                    percentile=max(float(row.get("_asp_cond_prog_vol", 0) or 0), float(row.get("_asp_acel_vol", 0) or 0)),
-                    sub_metrics=[
-                        _sub_metric(
-                            "Conduções Progressivas",
-                            percentile=row.get("_asp_cond_prog_vol", 0),
-                            display_value=_fmt_num(prog),
-                        ),
-                        _sub_metric(
-                            "Acelerações",
-                            percentile=row.get("_asp_acel_vol", 0),
-                            display_value=_fmt_per90(accel),
-                        ),
-                    ],
+                _metric_aspect(
+                    "Conduções Progressivas",
+                    percentile=row.get("_asp_cond_prog_vol", 0),
+                    display_value=_fmt_num(prog),
                 ),
                 _metric_aspect(
                     "Dribles",

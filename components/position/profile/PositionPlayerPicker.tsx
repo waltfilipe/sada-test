@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
-import { LAT_ARCHETYPE_META, ZAG_ARCHETYPE_META, latArchetypeTone, archetypeTone } from "@/lib/clusterMeta";
-import { profileAccent } from "@/lib/profileShares";
+import { LAT_ARCHETYPE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -40,7 +39,7 @@ export function PositionPlayerPicker({
   const [clubFilter, setClubFilter] = useState<string[]>([]);
   const [clubMenuOpen, setClubMenuOpen] = useState(false);
   const clubMenuRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const clubs = useMemo(
     () => [...new Set(players.map((p) => p.club))].sort((a, b) => a.localeCompare(b, "pt-BR")),
@@ -80,19 +79,12 @@ export function PositionPlayerPicker({
     };
   }, [clubMenuOpen]);
 
-  // Keep the selected card in view when the selection changes.
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const card = track.querySelector<HTMLElement>(`[data-player-id="${selectedId}"]`);
-    card?.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
+    const grid = gridRef.current;
+    if (!grid) return;
+    const card = grid.querySelector<HTMLElement>(`[data-player-id="${selectedId}"]`);
+    card?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   }, [selectedId]);
-
-  function scrollTrack(direction: -1 | 1) {
-    const track = trackRef.current;
-    if (!track) return;
-    track.scrollBy({ left: direction * track.clientWidth * 0.85, behavior: "smooth" });
-  }
 
   function toggleClub(club: string) {
     setClubFilter((current) =>
@@ -104,53 +96,53 @@ export function PositionPlayerPicker({
     family === "laterais" ? LAT_ARCHETYPE_META : family === "zagueiros" ? ZAG_ARCHETYPE_META : null;
 
   return (
-    <div className="player-strip player-card">
-      <div className="player-strip-head">
-        <div className="player-strip-title-wrap">
-          <h3 className="profile-filter-panel-title">Atletas</h3>
-          <span className="player-strip-count tabular">{visible.length}</span>
+    <div className="player-strip player-card player-strip-expanded">
+      <div className="player-strip-toolbar">
+        <div className="player-strip-toolbar-main">
+          <div className="player-strip-title-wrap">
+            <h3 className="profile-filter-panel-title">Atletas</h3>
+            <span className="player-strip-count tabular">{visible.length}</span>
+          </div>
 
           {clusterMode && archetypeFilters ? (
-            <div className="player-strip-profile-chips">
-              {archetypeFilters.map((item) => {
-                const tone =
-                  family === "laterais"
-                    ? latArchetypeTone(item.archetype as "Defensivo" | "Construtor" | "Ofensivo" | "Híbrido")
-                    : archetypeTone(item.archetype as "Defensor de Área" | "Construtor" | "Combativo");
-                const active = clusterFilters.includes(item.archetype);
-                const accent = profileAccent(item.archetype);
-                return (
-                  <button
-                    key={item.archetype}
-                    type="button"
-                    className={`profile-filter-chip profile-filter-chip-profile cluster-${tone}${active ? " active" : ""}`}
-                    style={{ "--chip-accent": accent } as React.CSSProperties}
-                    onClick={() => onToggleClusterFilter?.(item.archetype)}
-                    aria-pressed={active}
-                  >
-                    {item.archetype}
-                  </button>
-                );
-              })}
+            <div className="player-strip-filter-row">
+              <span className="player-strip-filter-label">Perfil</span>
+              <div className="player-strip-profile-chips">
+                {archetypeFilters.map((item) => {
+                  const active = clusterFilters.includes(item.archetype);
+                  return (
+                    <button
+                      key={item.archetype}
+                      type="button"
+                      className={`profile-filter-chip profile-filter-chip-neutral${active ? " active" : ""}`}
+                      onClick={() => onToggleClusterFilter?.(item.archetype)}
+                      aria-pressed={active}
+                    >
+                      {item.archetype}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           ) : profilesAvailable.length ? (
-            <div className="player-strip-profile-chips">
-              {profilesAvailable.map((profile) => {
-                const active = profilesFilter.includes(profile);
-                const accent = profileAccent(profile);
-                return (
-                  <button
-                    key={profile}
-                    type="button"
-                    className={`profile-filter-chip profile-filter-chip-profile${active ? " active" : ""}`}
-                    style={{ "--chip-accent": accent } as React.CSSProperties}
-                    onClick={() => onToggleProfile?.(profile)}
-                    aria-pressed={active}
-                  >
-                    {profile}
-                  </button>
-                );
-              })}
+            <div className="player-strip-filter-row">
+              <span className="player-strip-filter-label">Perfil</span>
+              <div className="player-strip-profile-chips">
+                {profilesAvailable.map((profile) => {
+                  const active = profilesFilter.includes(profile);
+                  return (
+                    <button
+                      key={profile}
+                      type="button"
+                      className={`profile-filter-chip profile-filter-chip-neutral${active ? " active" : ""}`}
+                      onClick={() => onToggleProfile?.(profile)}
+                      aria-pressed={active}
+                    >
+                      {profile}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           ) : null}
         </div>
@@ -236,17 +228,8 @@ export function PositionPlayerPicker({
         </div>
       </div>
 
-      <div className="player-strip-body">
-        <button
-          type="button"
-          className="player-strip-arrow player-strip-arrow-left"
-          aria-label="Atletas anteriores"
-          onClick={() => scrollTrack(-1)}
-        >
-          ‹
-        </button>
-
-        <div className="player-strip-track" ref={trackRef}>
+      <div className="player-strip-grid-wrap">
+        <div className="player-strip-grid" ref={gridRef}>
           {visible.length ? (
             visible.map((player) => (
               <PlayerStripCard
@@ -260,15 +243,6 @@ export function PositionPlayerPicker({
             <p className="player-strip-empty">Nenhum atleta encontrado com os filtros atuais.</p>
           )}
         </div>
-
-        <button
-          type="button"
-          className="player-strip-arrow player-strip-arrow-right"
-          aria-label="Próximos atletas"
-          onClick={() => scrollTrack(1)}
-        >
-          ›
-        </button>
       </div>
     </div>
   );
@@ -290,7 +264,7 @@ function PlayerStripCard({
     <button
       type="button"
       data-player-id={player.player_id}
-      className={`player-strip-card${selected ? " selected" : ""}`}
+      className={`player-strip-card player-strip-card-lg${selected ? " selected" : ""}`}
       onClick={onSelect}
       aria-pressed={selected}
     >
@@ -310,7 +284,7 @@ function PlayerStripCard({
       <span className="player-strip-card-copy">
         <span className="player-strip-card-name">{player.name}</span>
         <span className="player-strip-card-club">
-          <ClubLogo club={player.club} size={13} />
+          <ClubLogo club={player.club} size={14} />
           <span>{player.club}</span>
         </span>
       </span>

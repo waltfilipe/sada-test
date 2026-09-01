@@ -21,7 +21,7 @@ HYBRID_BADGE_TRIPLE = ("Lateral Completo", "Completo")
 
 DEF_COLS = ["DuelosDef", "total_clearance_p90", "interception_won_p90", "DuelosAr"]
 CON_COLS = ["PassesProg", "PTF", "RecPasse", "PassesLongos"]
-OFF_COLS = ["ToquesArea", "Cruz.", "Acelerações", "CorridasProg", "Dribles", "DuelosOfRaw", "AcoesAtW"]
+OFF_COLS = ["ToquesArea", "Cruz.", "CorridasProg", "Dribles", "DuelosOfRaw", "AcoesAtW"]
 
 
 def _zscore(series: pd.Series) -> pd.Series:

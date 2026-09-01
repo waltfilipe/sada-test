@@ -35,7 +35,7 @@ export const LAT_STAT_SECTIONS: StatSectionSpec[] = [
   },
   {
     title: "Ofensivo",
-    labels: ["Duelos Ofensivos", "Dribles", "Progressão"],
+    labels: ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
   },
   {
     title: "Terço Final",

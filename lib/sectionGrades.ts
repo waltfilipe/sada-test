@@ -81,6 +81,17 @@ function blockScore(item: AspectItem | undefined): number | undefined {
   return num(item.percentile);
 }
 
+/** Optional per-block weights when averaging a section letter (default 1). */
+const SECTION_BLOCK_WEIGHTS: Partial<
+  Record<PositionFamily, Partial<Record<string, Partial<Record<string, number>>>>>
+> = {
+  laterais: {
+    Construção: {
+      Distribuição: 0.35,
+    },
+  },
+};
+
 /** Block labels per section — used for composite section score. */
 const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string[]>>> = {
   zagueiros: {
@@ -92,7 +103,7 @@ const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string
   laterais: {
     Defensivo: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
     Construção: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
-    Ofensivo: ["Duelos Ofensivos", "Dribles", "Progressão"],
+    Ofensivo: ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
     "Terço Final": ["Cruzamentos", "Passes Finas", "Ofensividade"],
   },
 };
@@ -108,12 +119,20 @@ export function playerSectionScore(
   if (!blockLabels?.length) return undefined;
 
   const all = flattenAspects(player);
-  const blockScores = blockLabels
-    .map((label) => blockScore(findAspect(all, label)))
-    .filter((score): score is number => score != null);
+  const weights = SECTION_BLOCK_WEIGHTS[family]?.[sectionTitle] ?? {};
+  let weightedSum = 0;
+  let totalWeight = 0;
 
-  if (!blockScores.length) return undefined;
-  return blockScores.reduce((sum, score) => sum + score, 0) / blockScores.length;
+  for (const label of blockLabels) {
+    const score = blockScore(findAspect(all, label));
+    if (score == null) continue;
+    const weight = weights[label] ?? 1;
+    weightedSum += score * weight;
+    totalWeight += weight;
+  }
+
+  if (!totalWeight) return undefined;
+  return weightedSum / totalWeight;
 }
 
 /** Percentile rank within a pool (100 = best, 0 = worst). Ties use average rank. */

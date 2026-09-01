@@ -21,22 +21,22 @@
     "ofensivo": 6.4
   },
   "ranks": {
-    "geral": 58,
-    "defensivo": 63,
-    "construtor": 53,
-    "ofensivo": 37
+    "geral": 56,
+    "defensivo": 64,
+    "construtor": 52,
+    "ofensivo": 36
   },
   "profile": "Ofensivo",
   "profile_shares": {
-    "defensivo": 10.0,
-    "construtor": 12.0,
-    "ofensivo": 77.0
+    "defensivo": 9.0,
+    "construtor": 11.0,
+    "ofensivo": 79.0
   },
   "tendencies": {
-    "construcao": 31.0,
-    "ofensividade": 75.0,
+    "construcao": 30.0,
+    "ofensividade": 80.0,
     "def1v1": 9.0,
-    "contencao": 96.0,
+    "contencao": 95.0,
     "duelo_aereo": 73.0
   },
   "aspects": {
@@ -45,20 +45,20 @@
         "label": "Duelos Defensivos",
         "kind": "metric",
         "grade": "B-",
-        "percentile": 58.1,
+        "percentile": 59.0,
         "stats": [],
         "display_value": "6,0",
-        "efficiency_pct": 12.3,
+        "efficiency_pct": 12.5,
         "efficiency_value": "52%"
       },
       {
         "label": "Duelos Aéreos",
         "kind": "metric",
         "grade": "B+",
-        "percentile": 80.3,
+        "percentile": 80.0,
         "stats": [],
         "display_value": "2,9",
-        "efficiency_pct": 44.4,
+        "efficiency_pct": 45.3,
         "efficiency_value": "48%"
       },
       {
@@ -78,7 +78,7 @@
           },
           {
             "label": "Interceptações",
-            "percentile": 10.6,
+            "percentile": 10.8,
             "display_value": "0,5"
           },
           {
@@ -102,8 +102,8 @@
         "grade": "C-",
         "certos_per90": 6.01,
         "display_value": "6,0",
-        "percentile": 31.2,
-        "efficiency_pct": 20.3,
+        "percentile": 31.7,
+        "efficiency_pct": 20.6,
         "efficiency_value": "64%",
         "stats": []
       },
@@ -113,8 +113,8 @@
         "grade": "C+",
         "certos_per90": 4.05,
         "display_value": "4,0",
-        "percentile": 52.5,
-        "efficiency_pct": 20.7,
+        "percentile": 53.3,
+        "efficiency_pct": 21.1,
         "efficiency_value": "62%",
         "stats": []
       },
@@ -124,8 +124,8 @@
         "grade": "B",
         "certos_per90": 3.84,
         "display_value": "3,8",
-        "percentile": 67.7,
-        "efficiency_pct": 60.0,
+        "percentile": 68.8,
+        "efficiency_pct": 59.3,
         "efficiency_value": "53%",
         "stats": []
       },
@@ -142,7 +142,7 @@
           },
           {
             "label": "Passes Recebidos",
-            "percentile": 6.1,
+            "percentile": 6.2,
             "display_value": "19,9"
           }
         ],
@@ -154,7 +154,7 @@
         "label": "Tendência de Passe",
         "kind": "construction_share",
         "grade": "A",
-        "percentile": 94.0,
+        "percentile": 93.9,
         "display_value": "15%",
         "share_pct": 14.9,
         "pool_avg_pct": 9.6,
@@ -168,11 +168,11 @@
         "label": "Passes Progressivos",
         "kind": "construction_share",
         "grade": "A",
-        "percentile": 86.6,
+        "percentile": 86.4,
         "display_value": "23%",
         "share_pct": 23.3,
-        "pool_avg_pct": 18.9,
-        "scale_max_pct": 37.9,
+        "pool_avg_pct": 19.0,
+        "scale_max_pct": 38.0,
         "stats": [],
         "bar_key": "progressive_share",
         "axis_left": "Baixo",
@@ -184,9 +184,9 @@
         "label": "Estilo de defesa",
         "kind": "construction_share",
         "grade": "B+",
-        "percentile": 77.6,
+        "percentile": 77.3,
         "display_value": "1,90",
-        "share_pct": 77.6,
+        "share_pct": 77.3,
         "pool_avg_pct": 1.5,
         "scale_max_pct": 100.0,
         "stats": [],
@@ -199,8 +199,8 @@
         "kind": "construction_share",
         "grade": "C+",
         "percentile": 50.0,
-        "display_value": "44%",
-        "share_pct": 44.4,
+        "display_value": "45%",
+        "share_pct": 45.3,
         "pool_avg_pct": 1.1,
         "scale_max_pct": 100.0,
         "stats": [],
@@ -214,30 +214,19 @@
         "label": "Duelos Ofensivos",
         "kind": "metric",
         "grade": "B-",
-        "percentile": 61.7,
+        "percentile": 62.7,
         "stats": [],
         "display_value": "2,0",
-        "efficiency_pct": 65.5,
+        "efficiency_pct": 64.9,
         "efficiency_value": "53%"
       },
       {
-        "label": "Progressão",
-        "kind": "metric_group",
+        "label": "Conduções Progressivas",
+        "kind": "metric",
         "grade": "B+",
-        "percentile": 81.2,
-        "sub_metrics": [
-          {
-            "label": "Conduções Progressivas",
-            "percentile": 81.2,
-            "display_value": "1,8"
-          },
-          {
-            "label": "Acelerações",
-            "percentile": 26.5,
-            "display_value": "0,1"
-          }
-        ],
-        "stats": []
+        "percentile": 82.5,
+        "stats": [],
+        "display_value": "1,8"
       },
       {
         "label": "Dribles",
@@ -255,28 +244,28 @@
         "label": "Cruzamentos",
         "kind": "metric_group",
         "grade": "B+",
-        "percentile": 78.9,
+        "percentile": 78.6,
         "sub_metrics": [
           {
             "label": "Cruzamentos",
-            "percentile": 78.9,
+            "percentile": 78.6,
             "display_value": "3,1"
           },
           {
             "label": "Eficiência",
-            "percentile": 40.9,
+            "percentile": 41.9,
             "display_value": "31%"
           }
         ],
         "stats": [],
-        "efficiency_pct": 40.9,
+        "efficiency_pct": 41.9,
         "efficiency_value": "31%"
       },
       {
         "label": "Passes Finas",
         "kind": "metric_group",
         "grade": "C-",
-        "percentile": 33.3,
+        "percentile": 32.3,
         "sub_metrics": [
           {
             "label": "Passes Chave",
@@ -285,7 +274,7 @@
           },
           {
             "label": "Passes para Área",
-            "percentile": 33.3,
+            "percentile": 32.3,
             "display_value": "0,9"
           }
         ],
@@ -295,11 +284,11 @@
         "label": "Ofensividade",
         "kind": "metric_group",
         "grade": "B+",
-        "percentile": 78.0,
+        "percentile": 77.6,
         "sub_metrics": [
           {
             "label": "Ações Ofensivas",
-            "percentile": 78.0,
+            "percentile": 77.6,
             "display_value": "2,3"
           },
           {
@@ -322,7 +311,7 @@
     "cruzamentos": 3.14,
     "progressao": 1.8199999999999998,
     "xa": 0.79,
-    "construcao": 31.343283582089555,
+    "construcao": 30.303030303030305,
     "duelos_def": 6.01
   },
   "cluster": {
@@ -332,9 +321,9 @@
     "hybrid_badge": null,
     "hybrid_badge_short": null,
     "shares": {
-      "defensivo": 10.3,
-      "construtor": 12.4,
-      "ofensivo": 77.2
+      "defensivo": 9.3,
+      "construtor": 11.3,
+      "ofensivo": 79.3
     },
     "ratings": {
       "defensivo": 5.4,
