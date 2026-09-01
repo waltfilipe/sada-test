@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
-"""Rating composto zagueiros — tri-composite com ajuste de contexto de time.
+"""Rating composto zagueiros — média ponderada de 5 métricas com contexto de time.
 
 Métricas (z 50/50 eff/vol, 70% do ajuste por oferta do time):
   duelos_def, duelos_ar, def_acoes (inter+rebatidas), passes_prog, passes_long
 
-Perfis:
-  Construtor — passes prog + longos
-  Defensor de Área — ações defensivas + duelos aéreos
-  Combativo — duelos defensivos
-
-Shrinkage: 50 + %Minutos^0.45 × (raw − 50); nota = 5 + 0.045 × shrunk_final.
+Rating geral: média igual das 5 → shrinkage (%Minutos^0.45) → 5 + 0.045×shrunk.
+Perfis: mesma base com pesos maiores nas métricas do arquétipo.
 """
 
 from __future__ import annotations
