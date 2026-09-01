@@ -2323,6 +2323,84 @@
   font-size: 0.78rem;
 }
 
+/* Stats and Badges */
+.stats-badges-head {
+  align-items: flex-start;
+}
+
+.stats-badges-title-block {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.stats-badges-nav-row {
+  align-items: flex-start;
+}
+
+.stats-badges-nav-copy {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+  text-align: left;
+}
+
+.stat-badge-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.stat-badge-strip-empty {
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.stat-badge-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 8px;
+  border: 1px solid rgba(94, 234, 212, 0.22);
+  background: rgba(94, 234, 212, 0.1);
+  color: #99f6e4;
+  font-size: 0.72rem;
+}
+
+.stat-badge-strip-md .stat-badge-chip {
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 0.78rem;
+}
+
+.stat-pass-medal-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.12rem;
+  color: #fbbf24;
+  font-size: 0.72rem;
+}
+
+.stat-aspect-medal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.25rem;
+  color: #fbbf24;
+  font-size: 0.72rem;
+}
+
+.stat-aspect-medal.side-b {
+  color: #c4b5fd;
+}
+
+.stat-aspect-group.has-stat-badge .stat-aspect-group-head {
+  border-color: rgba(251, 191, 36, 0.22);
+}
+
 /* Section cards — geral + quantidade/qualidade */
 .section-grade-stack {
   display: inline-flex;

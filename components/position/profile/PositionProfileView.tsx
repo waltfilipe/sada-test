@@ -1,7 +1,6 @@
 "use client";
 
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
-import type { SectionGradeLookup } from "@/lib/sectionGrades";
 import { PlayerHero } from "./PlayerHero";
 import { ProfileCard } from "./ProfileCard";
 import { ScoutStatsSections } from "./ScoutStatsSections";
@@ -9,10 +8,9 @@ import { ScoutStatsSections } from "./ScoutStatsSections";
 type Props = {
   player: PlayerProfile;
   family: PositionFamily;
-  sectionGradeLookup: SectionGradeLookup;
 };
 
-export function PositionProfileView({ player, family, sectionGradeLookup }: Props) {
+export function PositionProfileView({ player, family }: Props) {
   return (
     <div className="profile-view-shell">
       <PlayerHero player={player} family={family} />
@@ -38,11 +36,7 @@ export function PositionProfileView({ player, family, sectionGradeLookup }: Prop
 
         <div className="profile-content-col profile-col-stats">
           <div className="player-card pass-scores-shell">
-            <ScoutStatsSections
-              player={player}
-              family={family}
-              sectionGradeLookup={sectionGradeLookup}
-            />
+            <ScoutStatsSections player={player} family={family} />
           </div>
         </div>
       </div>

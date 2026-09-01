@@ -555,10 +555,12 @@
   color: var(--text);
 }
 
-.compare-overview-chip-grades {
+.compare-overview-chip-grades,
+.compare-overview-chip-badges {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  flex-wrap: wrap;
 }
 
 .compare-overview-chip-vs {
@@ -786,13 +788,34 @@
 
 .compare-section-summary {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 0.65rem;
   padding: 0.7rem 0.85rem;
   cursor: pointer;
   list-style: none;
   user-select: none;
+}
+
+.compare-section-summary-copy {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.compare-section-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.compare-section-badge-row.side-a {
+  justify-content: flex-start;
+}
+
+.compare-section-badge-row.side-b {
+  justify-content: flex-end;
 }
 
 .compare-section-summary::-webkit-details-marker {

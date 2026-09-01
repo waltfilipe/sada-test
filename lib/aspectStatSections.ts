@@ -3,42 +3,46 @@ import type { PositionFamily } from "@/lib/types";
 export type StatSectionSpec = {
   title: string;
   labels: string[];
+  /** Show medal count on section nav when badges are earned (Passes group). */
+  showPassMedals?: boolean;
 };
 
-export const ZAG_STAT_SECTIONS: StatSectionSpec[] = [
+const ZAG_STAT_SECTIONS: StatSectionSpec[] = [
   {
-    title: "Defensivo",
-    labels: ["Duelos Defensivos", "Eficiência Defensiva"],
-  },
-  {
-    title: "Aéreo",
-    labels: ["Duelos Aéreos"],
-  },
-  {
-    title: "Construção",
-    labels: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos"],
-  },
-  {
-    title: "Ofensivo",
-    labels: ["Duelos Ofensivos", "Conduções Progressivas"],
-  },
-];
-
-export const LAT_STAT_SECTIONS: StatSectionSpec[] = [
-  {
-    title: "Defensivo",
+    title: "Defensivos",
     labels: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
   },
   {
-    title: "Construção",
-    labels: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
+    title: "Passes",
+    labels: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos"],
+    showPassMedals: true,
   },
   {
-    title: "Ofensivo",
+    title: "Dribles e Condução",
+    labels: ["Duelos Ofensivos", "Conduções Progressivas"],
+  },
+  {
+    title: "Passes Finais e Ofensividade",
+    labels: [],
+  },
+];
+
+const LAT_STAT_SECTIONS: StatSectionSpec[] = [
+  {
+    title: "Defensivos",
+    labels: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
+  },
+  {
+    title: "Passes",
+    labels: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
+    showPassMedals: true,
+  },
+  {
+    title: "Dribles e Condução",
     labels: ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
   },
   {
-    title: "Terço Final",
+    title: "Passes Finais e Ofensividade",
     labels: ["Cruzamentos", "Passes Finas", "Ofensividade"],
   },
 ];

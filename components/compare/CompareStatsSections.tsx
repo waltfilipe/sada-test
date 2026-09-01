@@ -1,12 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { SectionGradeStack } from "@/components/ui/SectionGradeStack";
+import { StatBadgeStrip, StatPassMedalCount } from "@/components/position/profile/StatBadgeStrip";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import type { SectionGradeLookup, SectionGradeTriple } from "@/lib/sectionGrades";
-import { getPlayerSectionGrades } from "@/lib/sectionGrades";
+import { earnedStatBadges, metricEarnsStatBadge } from "@/lib/statBadges";
+import type { StatMetricBadge } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 
 function flattenAspects(player: PlayerProfile): AspectItem[] {
@@ -72,8 +72,6 @@ function CompareMetricVersus({
   valueB,
   percentileA,
   percentileB,
-  gradeA,
-  gradeB,
 }: MetricVersusProps) {
   const leads =
     percentileA != null && percentileB != null
@@ -91,7 +89,7 @@ function CompareMetricVersus({
     <div className={`compare-stat-metric leads-${leads}`}>
       <div className="compare-stat-side side-a">
         <span className="compare-stat-value tabular">{metricValue(valueA)}</span>
-        <MetricGradientBar score={percentileA ?? null} letter={gradeA} scale="percent" />
+        <MetricGradientBar score={percentileA ?? null} scale="percent" />
         {delta != null && delta > 0 ? (
           <span className="compare-stat-delta side-a tabular">+{delta}</span>
         ) : null}
@@ -99,7 +97,7 @@ function CompareMetricVersus({
       <span className="compare-stat-label">{label}</span>
       <div className="compare-stat-side side-b">
         <span className="compare-stat-value tabular">{metricValue(valueB)}</span>
-        <MetricGradientBar score={percentileB ?? null} letter={gradeB} scale="percent" />
+        <MetricGradientBar score={percentileB ?? null} scale="percent" />
         {delta != null && delta < 0 ? (
           <span className="compare-stat-delta side-b tabular">+{Math.abs(delta)}</span>
         ) : null}
@@ -112,10 +110,12 @@ function CompareAspectBlock({
   itemA,
   itemB,
   groupTitle,
+  showPassMedal,
 }: {
   itemA?: AspectItem;
   itemB?: AspectItem;
   groupTitle?: string;
+  showPassMedal?: boolean;
 }) {
   const item = itemA ?? itemB;
   if (!item) return null;
@@ -125,6 +125,8 @@ function CompareAspectBlock({
     (item.kind === "def_efficiency_group" || item.kind === "metric_group") &&
     Boolean(itemA?.sub_metrics?.length || itemB?.sub_metrics?.length);
   const isDefEfficiency = item.kind === "def_efficiency_group";
+  const earnedA = itemA ? metricEarnsStatBadge(itemA, title) : false;
+  const earnedB = itemB ? metricEarnsStatBadge(itemB, title) : false;
 
   if (hasSubMetrics) {
     const labels = new Set([
@@ -137,6 +139,16 @@ function CompareAspectBlock({
         <div className="compare-stat-group-head">
           <span className="compare-stat-group-title">
             {title}
+            {showPassMedal && earnedA ? (
+              <span className="stat-aspect-medal side-a" title="Badge de passe — atleta 1">
+                <i className="fa-solid fa-medal" aria-hidden="true" />
+              </span>
+            ) : null}
+            {showPassMedal && earnedB ? (
+              <span className="stat-aspect-medal side-b" title="Badge de passe — atleta 2">
+                <i className="fa-solid fa-medal" aria-hidden="true" />
+              </span>
+            ) : null}
             {isDefEfficiency ? (
               <Tooltip content={DEF_EFFICIENCY_TIP}>
                 <span className="stat-def-eff-star" aria-label="Destaque — Eficiência Defensiva">
@@ -169,7 +181,19 @@ function CompareAspectBlock({
   return (
     <div className="compare-stat-group">
       <div className="compare-stat-group-head">
-        <span className="compare-stat-group-title">{title}</span>
+        <span className="compare-stat-group-title">
+          {title}
+          {showPassMedal && earnedA ? (
+            <span className="stat-aspect-medal side-a" title="Badge de passe — atleta 1">
+              <i className="fa-solid fa-medal" aria-hidden="true" />
+            </span>
+          ) : null}
+          {showPassMedal && earnedB ? (
+            <span className="stat-aspect-medal side-b" title="Badge de passe — atleta 2">
+              <i className="fa-solid fa-medal" aria-hidden="true" />
+            </span>
+          ) : null}
+        </span>
       </div>
       <div className="compare-stat-group-body">
         <CompareMetricVersus
@@ -178,8 +202,6 @@ function CompareAspectBlock({
           valueB={itemB?.display_value ?? (itemB?.certos_per90 != null ? itemB.certos_per90.toFixed(1).replace(".", ",") : undefined)}
           percentileA={itemA?.percentile}
           percentileB={itemB?.percentile}
-          gradeA={itemA?.grade}
-          gradeB={itemB?.grade}
         />
         {(itemA?.efficiency_pct != null || itemB?.efficiency_pct != null) && (
           <CompareMetricVersus
@@ -197,8 +219,9 @@ function CompareAspectBlock({
 
 type SectionEntry = {
   title: string;
-  gradesA?: SectionGradeTriple;
-  gradesB?: SectionGradeTriple;
+  showPassMedals?: boolean;
+  badgesA: StatMetricBadge[];
+  badgesB: StatMetricBadge[];
   metrics: { label: string; groupTitle?: string }[];
 };
 
@@ -206,10 +229,16 @@ type Props = {
   playerA: PlayerProfile;
   playerB: PlayerProfile;
   family: PositionFamily;
-  sectionGradeLookup: SectionGradeLookup;
 };
 
-export function CompareStatsSections({ playerA, playerB, family, sectionGradeLookup }: Props) {
+function sectionBadgesForPlayer(aspects: AspectItem[], labels: string[], titleByItem: Map<string, string>) {
+  const items = labels
+    .map((label) => findAspect(aspects, label))
+    .filter((item): item is AspectItem => Boolean(item));
+  return earnedStatBadges(items, titleByItem);
+}
+
+export function CompareStatsSections({ playerA, playerB, family }: Props) {
   const aspectsA = useMemo(() => flattenAspects(playerA), [playerA]);
   const aspectsB = useMemo(() => flattenAspects(playerB), [playerB]);
   const sections = statSectionsForFamily(family);
@@ -218,31 +247,34 @@ export function CompareStatsSections({ playerA, playerB, family, sectionGradeLoo
     const list: SectionEntry[] = [];
     for (const section of sections) {
       const metrics: SectionEntry["metrics"] = [];
+      const titleByItem = new Map<string, string>();
+      const labels: string[] = [];
+
       for (const label of section.labels) {
         if (!findAspect(aspectsA, label) && !findAspect(aspectsB, label)) continue;
-        const groupTitle =
-          family === "zagueiros" && section.title === "Ofensivo" && label === "Conduções Progressivas"
-            ? "Progressão"
-            : undefined;
+        const groupTitle = label === "Conduções Progressivas" ? "Progressão" : undefined;
+        if (groupTitle) titleByItem.set(label, groupTitle);
+        labels.push(label);
         metrics.push({ label, groupTitle });
       }
       if (metrics.length) {
         list.push({
           title: section.title,
-          gradesA: getPlayerSectionGrades(sectionGradeLookup, playerA.player_id, section.title),
-          gradesB: getPlayerSectionGrades(sectionGradeLookup, playerB.player_id, section.title),
+          showPassMedals: section.showPassMedals,
+          badgesA: sectionBadgesForPlayer(aspectsA, labels, titleByItem),
+          badgesB: sectionBadgesForPlayer(aspectsB, labels, titleByItem),
           metrics,
         });
       }
     }
     return list;
-  }, [sections, aspectsA, aspectsB, family, playerA.player_id, playerB.player_id, sectionGradeLookup]);
+  }, [sections, aspectsA, aspectsB]);
 
   return (
     <div className="player-card compare-stats-panel">
       <div className="profile-card-head compare-stats-panel-head">
-        <h3 className="section-label">Stats &amp; Scores</h3>
-        <span className="profile-card-head-hint">Percentis no pool da posição · todas as seções abertas</span>
+        <h3 className="section-label">Stats and Badges</h3>
+        <span className="profile-card-head-hint">Badge com vol. e efic. &gt; P60</span>
       </div>
 
       <div className="compare-stats-columns-head" aria-hidden="true">
@@ -255,11 +287,16 @@ export function CompareStatsSections({ playerA, playerB, family, sectionGradeLoo
         {entries.map((entry) => (
           <details key={entry.title} className="compare-section-accordion" open>
             <summary className="compare-section-summary">
-              <span className="compare-section-summary-title">{entry.title}</span>
-              <span className="compare-section-summary-grades">
-                <SectionGradeStack grades={entry.gradesA} size="sm" />
-                <span className="compare-section-vs">vs</span>
-                <SectionGradeStack grades={entry.gradesB} size="sm" />
+              <span className="compare-section-summary-copy">
+                <span className="compare-section-summary-title">{entry.title}</span>
+                <span className="compare-section-badge-row side-a">
+                  <StatBadgeStrip badges={entry.badgesA} />
+                  {entry.showPassMedals ? <StatPassMedalCount count={entry.badgesA.length} /> : null}
+                </span>
+                <span className="compare-section-badge-row side-b">
+                  <StatBadgeStrip badges={entry.badgesB} />
+                  {entry.showPassMedals ? <StatPassMedalCount count={entry.badgesB.length} /> : null}
+                </span>
               </span>
               <i className="fa-solid fa-chevron-down compare-section-chevron" aria-hidden="true" />
             </summary>
@@ -270,6 +307,7 @@ export function CompareStatsSections({ playerA, playerB, family, sectionGradeLoo
                   itemA={findAspect(aspectsA, label)}
                   itemB={findAspect(aspectsB, label)}
                   groupTitle={groupTitle}
+                  showPassMedal={entry.showPassMedals}
                 />
               ))}
             </div>

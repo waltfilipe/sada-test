@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { SectionGradeStack } from "@/components/ui/SectionGradeStack";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import type { SectionGradeLookup, SectionGradeTriple } from "@/lib/sectionGrades";
-import { getPlayerSectionGrades } from "@/lib/sectionGrades";
+import { earnedStatBadges, metricEarnsStatBadge } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
+import { StatBadgeStrip, StatPassMedalCount } from "./StatBadgeStrip";
 
 function flattenAspects(player: PlayerProfile): AspectItem[] {
   const groups = player.aspects;
@@ -22,6 +21,7 @@ function flattenAspects(player: PlayerProfile): AspectItem[] {
 function findAspect(items: AspectItem[], label: string): AspectItem | undefined {
   const aliases: Record<string, string[]> = {
     "Passes Finais": ["Passes Finas", "Passes Finais"],
+    Progressão: ["Progressão", "Conduções Progressivas"],
   };
   const candidates = aliases[label] ?? [label];
   return items.find((item) => candidates.some((c) => item.label === c || item.label.startsWith(c)));
@@ -46,21 +46,22 @@ function volumeRowLabel(item: AspectItem): string {
   return rowLabel(item.label);
 }
 
-type MetricRowProps = {
+function StatMetricRow({
+  label,
+  value,
+  percentile,
+}: {
   label: string;
   value?: string | null;
   percentile?: number | null;
-  grade?: string;
-};
-
-function StatMetricRow({ label, value, percentile, grade }: MetricRowProps) {
+}) {
   return (
     <div className="stat-metric-row">
       <div className="stat-metric-head">
         <span className="stat-metric-label">{label}</span>
         <span className="stat-metric-value tabular">{metricValue(value)}</span>
       </div>
-      <MetricGradientBar score={percentile ?? null} letter={grade} scale="percent" />
+      <MetricGradientBar score={percentile ?? null} scale="percent" />
     </div>
   );
 }
@@ -68,18 +69,32 @@ function StatMetricRow({ label, value, percentile, grade }: MetricRowProps) {
 const DEF_EFFICIENCY_TIP =
   "Índice que combina volume de ações defensivas bem-sucedidas (interceptações, rebatidas) com baixo custo — duelos perdidos e faltas desnecessárias em relação ao total de ações defensivas.";
 
-function StatAspectBlock({ item, groupTitle }: { item: AspectItem; groupTitle?: string }) {
+function StatAspectBlock({
+  item,
+  groupTitle,
+  showPassMedal,
+}: {
+  item: AspectItem;
+  groupTitle?: string;
+  showPassMedal?: boolean;
+}) {
   const hasSubMetrics =
     (item.kind === "def_efficiency_group" || item.kind === "metric_group") &&
     Boolean(item.sub_metrics?.length);
   const title = groupTitle ?? item.label;
   const isDefEfficiency = item.kind === "def_efficiency_group";
+  const earned = metricEarnsStatBadge(item, title);
 
   return (
-    <div className="stat-aspect-group">
+    <div className={`stat-aspect-group${earned ? " has-stat-badge" : ""}`}>
       <div className="stat-aspect-group-head">
         <span className="stat-aspect-group-title">
           {title}
+          {showPassMedal && earned ? (
+            <span className="stat-aspect-medal" title="Badge de passe conquistado">
+              <i className="fa-solid fa-medal" aria-hidden="true" />
+            </span>
+          ) : null}
           {isDefEfficiency ? (
             <Tooltip content={DEF_EFFICIENCY_TIP}>
               <span className="stat-def-eff-star" aria-label="Destaque — Eficiência Defensiva">
@@ -105,7 +120,6 @@ function StatAspectBlock({ item, groupTitle }: { item: AspectItem; groupTitle?: 
               label={volumeRowLabel(item)}
               value={item.display_value ?? (item.certos_per90 != null ? item.certos_per90.toFixed(1).replace(".", ",") : undefined)}
               percentile={item.percentile}
-              grade={item.grade}
             />
             {item.efficiency_pct != null ? (
               <StatMetricRow
@@ -123,18 +137,17 @@ function StatAspectBlock({ item, groupTitle }: { item: AspectItem; groupTitle?: 
 
 type SectionEntry = {
   title: string;
-  grades?: SectionGradeTriple;
+  showPassMedals?: boolean;
+  badges: ReturnType<typeof earnedStatBadges>;
   metrics: { item: AspectItem; groupTitle?: string }[];
 };
 
 export function ScoutStatsSections({
   player,
   family,
-  sectionGradeLookup,
 }: {
   player: PlayerProfile;
   family: PositionFamily;
-  sectionGradeLookup: SectionGradeLookup;
 }) {
   const [active, setActive] = useState<string | null>(null);
   const all = useMemo(() => flattenAspects(player), [player]);
@@ -144,41 +157,45 @@ export function ScoutStatsSections({
     const list: SectionEntry[] = [];
     for (const section of sections) {
       const metrics: SectionEntry["metrics"] = [];
+      const titleByItem = new Map<string, string>();
+
       for (const label of section.labels) {
         const item = findAspect(all, label);
         if (!item) continue;
         const groupTitle =
-          family === "zagueiros" && section.title === "Ofensivo" && label === "Conduções Progressivas"
-            ? "Progressão"
-            : undefined;
+          label === "Conduções Progressivas" ? "Progressão" : undefined;
+        if (groupTitle) titleByItem.set(item.label, groupTitle);
         metrics.push({ item, groupTitle });
       }
-      if (metrics.length) {
-        list.push({
-          title: section.title,
-          grades: getPlayerSectionGrades(sectionGradeLookup, player.player_id, section.title),
-          metrics,
-        });
-      }
+
+      if (!metrics.length) continue;
+
+      const items = metrics.map((metric) => metric.item);
+      list.push({
+        title: section.title,
+        showPassMedals: section.showPassMedals,
+        badges: earnedStatBadges(items, titleByItem),
+        metrics,
+      });
     }
     return list;
-  }, [sections, all, family, player.player_id, sectionGradeLookup]);
+  }, [sections, all]);
 
   const activeEntry = active ? entries.find((entry) => entry.title === active) ?? null : null;
 
   if (activeEntry) {
     return (
       <div className="stats-swap-panel" key={`${player.player_id}-${activeEntry.title}`}>
-        <div className="profile-card-head stats-swap-head">
-          <span className="stats-swap-title">
+        <div className="profile-card-head stats-swap-head stats-badges-head">
+          <div className="stats-badges-title-block">
             <h3 className="section-label">{activeEntry.title}</h3>
-            <SectionGradeStack grades={activeEntry.grades} size="sm" />
-          </span>
+            <StatBadgeStrip badges={activeEntry.badges} />
+          </div>
           <button
             type="button"
             className="tendencies-pop-close"
             onClick={() => setActive(null)}
-            aria-label="Voltar para Stats & Scores"
+            aria-label="Voltar para Stats and Badges"
           >
             <i className="fa-solid fa-xmark" aria-hidden="true" />
           </button>
@@ -186,7 +203,12 @@ export function ScoutStatsSections({
         <div className="stats-swap-body">
           <div className="pass-score-metrics">
             {activeEntry.metrics.map(({ item, groupTitle }) => (
-              <StatAspectBlock key={item.label} item={item} groupTitle={groupTitle} />
+              <StatAspectBlock
+                key={item.label}
+                item={item}
+                groupTitle={groupTitle}
+                showPassMedal={activeEntry.showPassMedals}
+              />
             ))}
           </div>
         </div>
@@ -197,20 +219,23 @@ export function ScoutStatsSections({
   return (
     <div className="stats-swap-panel" key={`${player.player_id}-index`}>
       <div className="profile-card-head">
-        <h3 className="section-label">Stats &amp; Scores</h3>
-        <span className="profile-card-head-hint">Percentis no pool da posição</span>
+        <h3 className="section-label">Stats and Badges</h3>
+        <span className="profile-card-head-hint">Badge com vol. e efic. &gt; P60</span>
       </div>
       <div className="stats-nav-list">
         {entries.map((entry) => (
           <button
             key={entry.title}
             type="button"
-            className="stats-nav-row"
+            className="stats-nav-row stats-badges-nav-row"
             onClick={() => setActive(entry.title)}
           >
-            <span className="stats-nav-row-title">{entry.title}</span>
+            <span className="stats-badges-nav-copy">
+              <span className="stats-nav-row-title">{entry.title}</span>
+              <StatBadgeStrip badges={entry.badges} />
+            </span>
             <span className="stats-nav-row-meta">
-              <SectionGradeStack grades={entry.grades} size="sm" />
+              {entry.showPassMedals ? <StatPassMedalCount count={entry.badges.length} /> : null}
               <i className="fa-solid fa-chevron-right" aria-hidden="true" />
             </span>
           </button>

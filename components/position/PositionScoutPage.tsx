@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
-import { buildSectionGradeLookup } from "@/lib/sectionGrades";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { PositionPlayerPicker } from "./profile/PositionPlayerPicker";
 import { PositionProfileView } from "./profile/PositionProfileView";
@@ -35,11 +34,6 @@ export function PositionScoutPage({ family, players }: Props) {
     }
     return [...set];
   }, [players]);
-
-  const sectionGradeLookup = useMemo(
-    () => buildSectionGradeLookup(players, family),
-    [players, family],
-  );
 
   const selected = players.find((player) => player.player_id === selectedId) ?? players[0] ?? null;
 
@@ -116,11 +110,7 @@ export function PositionScoutPage({ family, players }: Props) {
             </div>
 
             <div className="profile-detail-stage" key={selected.player_id}>
-              <PositionProfileView
-                player={selected}
-                family={family}
-                sectionGradeLookup={sectionGradeLookup}
-              />
+              <PositionProfileView player={selected} family={family} />
             </div>
           </>
         )}

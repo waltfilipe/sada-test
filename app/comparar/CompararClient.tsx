@@ -11,7 +11,7 @@ import { ProfileBarsVersus } from "@/components/compare/ProfileBarsVersus";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
-import { buildSectionGradeLookup, playerSectionScore } from "@/lib/sectionGrades";
+import { playerSectionScore } from "@/lib/sectionGrades";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Metric = { key: string; label: string };
@@ -67,8 +67,6 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
 
   const a = players.find((player) => player.player_id === idA) ?? players[0];
   const b = players.find((player) => player.player_id === idB) ?? players[1] ?? players[0];
-
-  const sectionGradeLookup = useMemo(() => buildSectionGradeLookup(players, family), [players, family]);
 
   const hasProfileBars =
     (a?.aspects.perfil_construcao?.length ?? 0) > 0 ||
@@ -144,7 +142,6 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
           playerA={a}
           playerB={b}
           family={family}
-          sectionGradeLookup={sectionGradeLookup}
           verdict={verdict}
         />
 
@@ -159,7 +156,6 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
             playerA={a}
             playerB={b}
             family={family}
-            sectionGradeLookup={sectionGradeLookup}
           />
         </div>
 

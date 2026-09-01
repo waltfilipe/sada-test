@@ -97,7 +97,7 @@ const SECTION_BLOCK_WEIGHTS: Partial<
   Record<PositionFamily, Partial<Record<string, Partial<Record<string, number>>>>>
 > = {
   laterais: {
-    Construção: {
+    Passes: {
       Distribuição: 0.35,
     },
   },
@@ -106,16 +106,16 @@ const SECTION_BLOCK_WEIGHTS: Partial<
 /** Block labels per section — used for composite section score. */
 const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string[]>>> = {
   zagueiros: {
-    Defensivo: ["Duelos Defensivos", "Eficiência Defensiva"],
-    Aéreo: ["Duelos Aéreos"],
-    Construção: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos"],
-    Ofensivo: ["Duelos Ofensivos", "Conduções Progressivas"],
+    Defensivos: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
+    Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos"],
+    "Dribles e Condução": ["Duelos Ofensivos", "Conduções Progressivas"],
+    "Passes Finais e Ofensividade": [],
   },
   laterais: {
-    Defensivo: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
-    Construção: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
-    Ofensivo: ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
-    "Terço Final": ["Cruzamentos", "Passes Finas", "Ofensividade"],
+    Defensivos: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
+    Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
+    "Dribles e Condução": ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
+    "Passes Finais e Ofensividade": ["Cruzamentos", "Passes Finas", "Ofensividade"],
   },
 };
 
