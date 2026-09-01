@@ -39,9 +39,6 @@ class ProfileCompositeSpec:
     metric_cols: tuple[str, ...]
     """Metric score columns averaged into ``raw_col``."""
 
-    metric_weights: tuple[float, ...] | None = None
-    """Optional weights for ``metric_cols`` (same length). Defaults to equal weights."""
-
 
 @dataclass(frozen=True)
 class TriCompositeRatingParams:
@@ -52,9 +49,6 @@ class TriCompositeRatingParams:
     nota_tau: float = 2.5
     geral_alpha: float = 0.25
     specialty_floor: bool = True
-    nota_from_shrunk_linear: bool = False
-    """When True, map shrunk 0–100 final directly to 5–10 via ``nota_linear_scale``."""
-    nota_linear_scale: float = 0.045
 
 
 @dataclass(frozen=True)
@@ -68,10 +62,6 @@ class TriCompositeFamilyConfig:
     perfil_col: str = "perfil"
     minutes_col: str = "%Minutos"
     blend_raw_prefix: str = "m8"
-    geral_metric_cols: tuple[str, ...] | None = None
-    """When set, overall rating = shrink(weighted mean of these metrics)."""
-    geral_metric_weights: tuple[float, ...] | None = None
-    geral_raw_col: str = "comp_geral_raw"
 
 
 def _shrink(raw: float, pct_minutes: float, params: TriCompositeRatingParams) -> float:
@@ -86,31 +76,6 @@ def _tanh_nota(series: pd.Series, params: TriCompositeRatingParams) -> pd.Series
         return pd.Series(params.nota_mu, index=series.index)
     z = (series - mu) / (sig * params.nota_tau)
     return params.nota_mu + params.nota_scale * np.tanh(z)
-
-
-def _nota_from_shrunk_final(series: pd.Series, params: TriCompositeRatingParams) -> pd.Series:
-    if params.nota_from_shrunk_linear:
-        return (5.0 + series.astype(float) * params.nota_linear_scale).clip(5.0, 10.0)
-    return _tanh_nota(series, params)
-
-
-def _weighted_cols_mean(
-    frame: pd.DataFrame,
-    cols: Sequence[str],
-    weights: Sequence[float] | None = None,
-) -> pd.Series:
-    values = frame[list(cols)].astype(float)
-    if weights is not None:
-        w = np.asarray(weights, dtype=float)
-        if len(w) != len(cols):
-            raise ValueError("metric_weights length mismatch")
-        denom = float(w.sum()) or 1.0
-        return (values * w).sum(axis=1) / denom
-    return values.mean(axis=1)
-
-
-def _weighted_metric_mean(frame: pd.DataFrame, spec: ProfileCompositeSpec) -> pd.Series:
-    return _weighted_cols_mean(frame, spec.metric_cols, spec.metric_weights)
 
 
 def _geral_from_profile_notas(
@@ -180,7 +145,7 @@ def apply_tri_composite_ratings(
     merged = pool.merge(build_metric_scores(pool), on="player_id", how="left")
 
     for spec in config.profiles:
-        merged[spec.raw_col] = _weighted_metric_mean(merged, spec)
+        merged[spec.raw_col] = merged[list(spec.metric_cols)].mean(axis=1)
 
     for spec in config.profiles:
         final_col = f"{prefix}_final_{spec.slug}"
@@ -188,33 +153,20 @@ def apply_tri_composite_ratings(
             lambda row, raw=spec.raw_col: _shrink(row[raw], row[config.minutes_col], params),
             axis=1,
         )
-        merged[spec.nota_col] = _nota_from_shrunk_final(merged[final_col], params).round(2)
+        merged[spec.nota_col] = _tanh_nota(merged[final_col], params).round(2)
 
-    if config.geral_metric_cols:
-        merged[config.geral_raw_col] = _weighted_cols_mean(
-            merged,
-            config.geral_metric_cols,
-            config.geral_metric_weights,
-        )
-        merged[f"{prefix}_raw"] = merged[config.geral_raw_col]
-        merged[f"{prefix}_final"] = merged.apply(
-            lambda row: _shrink(row[config.geral_raw_col], row[config.minutes_col], params),
-            axis=1,
-        )
-        merged["nota_global"] = _nota_from_shrunk_final(merged[f"{prefix}_final"], params).round(2)
-    else:
-        share_weights = [
-            merged[spec.share_col].fillna(0) / 100.0 for spec in config.profiles
-        ]
-        raw_blend = sum(w * merged[spec.raw_col] for w, spec in zip(share_weights, config.profiles))
-        merged[f"{prefix}_pre_shrink"] = raw_blend
-        merged[f"{prefix}_raw"] = raw_blend
-        merged[f"{prefix}_final"] = merged.apply(
-            lambda row: _shrink(row[f"{prefix}_raw"], row[config.minutes_col], params),
-            axis=1,
-        )
-        merged["nota_global"] = _geral_from_profile_notas(merged, config.profiles, params).round(2)
+    share_weights = [
+        merged[spec.share_col].fillna(0) / 100.0 for spec in config.profiles
+    ]
+    raw_blend = sum(w * merged[spec.raw_col] for w, spec in zip(share_weights, config.profiles))
+    merged[f"{prefix}_pre_shrink"] = raw_blend
+    merged[f"{prefix}_raw"] = raw_blend
+    merged[f"{prefix}_final"] = merged.apply(
+        lambda row: _shrink(row[f"{prefix}_raw"], row[config.minutes_col], params),
+        axis=1,
+    )
 
+    merged["nota_global"] = _geral_from_profile_notas(merged, config.profiles, params).round(2)
     merged = _apply_specialty_floor(merged, config)
 
     def active_nota(row: pd.Series) -> float:

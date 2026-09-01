@@ -19,15 +19,6 @@ SCRIPTS = Path(__file__).resolve().parents[1]
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-# Order: duelos_def, duelos_ar, def_acoes, passes_prog, passes_long
-ZAG_METRIC_COLS: tuple[str, ...] = (
-    "duelos_def",
-    "duelos_ar",
-    "def_acoes",
-    "passes_prog",
-    "passes_long",
-)
-
 ZAG_PROFILES: tuple[ProfileCompositeSpec, ...] = (
     ProfileCompositeSpec(
         slug="construtor",
@@ -35,8 +26,7 @@ ZAG_PROFILES: tuple[ProfileCompositeSpec, ...] = (
         nota_col="nota_construtor",
         share_col="cluster_share_construtor",
         raw_col="comp_construtor_raw",
-        metric_cols=ZAG_METRIC_COLS,
-        metric_weights=(0.05, 0.05, 0.10, 0.35, 0.35),
+        metric_cols=("passes_prog", "passes_long", "ptf_mitigated"),
     ),
     ProfileCompositeSpec(
         slug="defensor_area",
@@ -44,8 +34,7 @@ ZAG_PROFILES: tuple[ProfileCompositeSpec, ...] = (
         nota_col="nota_defensor_area",
         share_col="cluster_share_defensor_area",
         raw_col="comp_defensor_area_raw",
-        metric_cols=ZAG_METRIC_COLS,
-        metric_weights=(0.10, 0.35, 0.35, 0.10, 0.10),
+        metric_cols=("duelos_ar", "rebatidas", "eficiencia_def_v2"),
     ),
     ProfileCompositeSpec(
         slug="combativo",
@@ -53,22 +42,14 @@ ZAG_PROFILES: tuple[ProfileCompositeSpec, ...] = (
         nota_col="nota_combativo",
         share_col="cluster_share_combativo",
         raw_col="comp_combativo_raw",
-        metric_cols=ZAG_METRIC_COLS,
-        metric_weights=(0.50, 0.10, 0.10, 0.15, 0.15),
+        metric_cols=("duelos_def", "interceptions", "conducao_prog"),
     ),
 )
 
 ZAGUEIRO_TRI_COMPOSITE_CONFIG = TriCompositeFamilyConfig(
     family_key="zagueiros",
     profiles=ZAG_PROFILES,
-    params=TriCompositeRatingParams(
-        shrink_exp=0.45,
-        nota_from_shrunk_linear=True,
-        nota_linear_scale=0.045,
-        specialty_floor=True,
-    ),
-    geral_metric_cols=ZAG_METRIC_COLS,
-    geral_metric_weights=(0.20, 0.20, 0.20, 0.20, 0.20),
+    params=TriCompositeRatingParams(geral_alpha=0.25),
 )
 
 
