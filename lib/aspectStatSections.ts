@@ -39,7 +39,7 @@ export const LAT_STAT_SECTIONS: StatSectionSpec[] = [
   },
   {
     title: "Terço Final",
-    labels: ["Cruzamentos", "Passes Finas", "Passes Finais", "Ofensividade"],
+    labels: ["Cruzamentos", "Passes Finas", "Ofensividade"],
   },
 ];
 
