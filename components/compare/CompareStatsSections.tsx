@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { GradeBadge } from "@/components/ui/GradeBadge";
-import { AspectGradeStack } from "@/components/ui/AspectGradeStack";
+import { SectionGradeStack } from "@/components/ui/SectionGradeStack";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import type { SectionGradeLookup } from "@/lib/sectionGrades";
-import { getPlayerSectionGrade } from "@/lib/sectionGrades";
+import type { SectionGradeLookup, SectionGradeTriple } from "@/lib/sectionGrades";
+import { getPlayerSectionGrades } from "@/lib/sectionGrades";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 
 function flattenAspects(player: PlayerProfile): AspectItem[] {
@@ -146,7 +145,6 @@ function CompareAspectBlock({
               </Tooltip>
             ) : null}
           </span>
-          <AspectGradeStack item={item} size="sm" />
         </div>
         <div className="compare-stat-group-body">
           {[...labels].map((label) => {
@@ -172,7 +170,6 @@ function CompareAspectBlock({
     <div className="compare-stat-group">
       <div className="compare-stat-group-head">
         <span className="compare-stat-group-title">{title}</span>
-        <AspectGradeStack item={item} size="sm" />
       </div>
       <div className="compare-stat-group-body">
         <CompareMetricVersus
@@ -200,8 +197,8 @@ function CompareAspectBlock({
 
 type SectionEntry = {
   title: string;
-  letterA?: string;
-  letterB?: string;
+  gradesA?: SectionGradeTriple;
+  gradesB?: SectionGradeTriple;
   metrics: { label: string; groupTitle?: string }[];
 };
 
@@ -232,8 +229,8 @@ export function CompareStatsSections({ playerA, playerB, family, sectionGradeLoo
       if (metrics.length) {
         list.push({
           title: section.title,
-          letterA: getPlayerSectionGrade(sectionGradeLookup, playerA.player_id, section.title),
-          letterB: getPlayerSectionGrade(sectionGradeLookup, playerB.player_id, section.title),
+          gradesA: getPlayerSectionGrades(sectionGradeLookup, playerA.player_id, section.title),
+          gradesB: getPlayerSectionGrades(sectionGradeLookup, playerB.player_id, section.title),
           metrics,
         });
       }
@@ -260,9 +257,9 @@ export function CompareStatsSections({ playerA, playerB, family, sectionGradeLoo
             <summary className="compare-section-summary">
               <span className="compare-section-summary-title">{entry.title}</span>
               <span className="compare-section-summary-grades">
-                <GradeBadge letter={entry.letterA} size="sm" />
+                <SectionGradeStack grades={entry.gradesA} size="sm" />
                 <span className="compare-section-vs">vs</span>
-                <GradeBadge letter={entry.letterB} size="sm" />
+                <SectionGradeStack grades={entry.gradesB} size="sm" />
               </span>
               <i className="fa-solid fa-chevron-down compare-section-chevron" aria-hidden="true" />
             </summary>

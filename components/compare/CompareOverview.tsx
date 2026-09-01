@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { GradeBadge } from "@/components/ui/GradeBadge";
+import { SectionGradeStack } from "@/components/ui/SectionGradeStack";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import type { SectionGradeLookup } from "@/lib/sectionGrades";
-import { getPlayerSectionGrade, playerSectionScore } from "@/lib/sectionGrades";
+import { getPlayerSectionGrades, playerSectionScore } from "@/lib/sectionGrades";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Props = {
@@ -17,8 +17,8 @@ type Props = {
 
 type SectionSnapshot = {
   title: string;
-  letterA?: string;
-  letterB?: string;
+  gradesA?: ReturnType<typeof getPlayerSectionGrades>;
+  gradesB?: ReturnType<typeof getPlayerSectionGrades>;
   scoreA: number | null;
   scoreB: number | null;
   leader: "a" | "b" | "tie";
@@ -47,8 +47,8 @@ export function CompareOverview({ playerA, playerB, family, sectionGradeLookup, 
           : "tie";
       list.push({
         title: section.title,
-        letterA: getPlayerSectionGrade(sectionGradeLookup, playerA.player_id, section.title),
-        letterB: getPlayerSectionGrade(sectionGradeLookup, playerB.player_id, section.title),
+        gradesA: getPlayerSectionGrades(sectionGradeLookup, playerA.player_id, section.title),
+        gradesB: getPlayerSectionGrades(sectionGradeLookup, playerB.player_id, section.title),
         scoreA: scoreA ?? null,
         scoreB: scoreB ?? null,
         leader,
@@ -109,9 +109,9 @@ export function CompareOverview({ playerA, playerB, family, sectionGradeLookup, 
           >
             <span className="compare-overview-chip-title">{section.title}</span>
             <span className="compare-overview-chip-grades">
-              <GradeBadge letter={section.letterA} size="sm" />
+              <SectionGradeStack grades={section.gradesA} size="sm" />
               <span className="compare-overview-chip-vs">vs</span>
-              <GradeBadge letter={section.letterB} size="sm" />
+              <SectionGradeStack grades={section.gradesB} size="sm" />
             </span>
           </article>
         ))}

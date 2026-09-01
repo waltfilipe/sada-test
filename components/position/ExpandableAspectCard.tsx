@@ -2,7 +2,6 @@
 
 import { useId, useState } from "react";
 
-import { AspectGradeStack } from "@/components/ui/AspectGradeStack";
 import { resolveAspectBadge } from "@/lib/aspectBadges";
 import { clampPercent, percentileBarFillStyle, statValueStyle } from "@/lib/scoutTheme";
 import type { AspectItem } from "@/lib/types";
@@ -116,7 +115,6 @@ export function ExpandableAspectCard({ item, defaultOpen = false }: { item: Aspe
       >
         <span className="aspect-name">{item.label}</span>
         <span className="aspect-row-end">
-          <AspectGradeStack item={item} size="sm" />
           <HeaderBadge item={item} />
           <Chevron />
         </span>

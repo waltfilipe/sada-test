@@ -2323,21 +2323,21 @@
   font-size: 0.78rem;
 }
 
-/* Aspect subcard — geral + quantidade/qualidade */
-.aspect-grade-stack {
+/* Section cards — geral + quantidade/qualidade */
+.section-grade-stack {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   flex-shrink: 0;
 }
 
-.aspect-grade-mini-group {
+.section-grade-mini-group {
   display: inline-flex;
   align-items: center;
   gap: 0.18rem;
 }
 
-.aspect-grade-mini {
+.section-grade-mini {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2345,20 +2345,25 @@
   height: 1.12rem;
   padding: 0 0.18rem;
   border-radius: 4px;
+  border: 1px solid transparent;
   font-family: "Sora", sans-serif;
   font-size: 0.58rem;
   font-weight: 700;
   line-height: 1;
-  color: #94a3b8;
-  background: rgba(148, 163, 184, 0.1);
-  border: 1px solid rgba(148, 163, 184, 0.2);
   font-variant-numeric: tabular-nums;
 }
 
-.aspect-grade-stack-sm .aspect-grade-mini {
+.section-grade-stack-sm .section-grade-mini {
   min-width: 1.05rem;
   height: 1.05rem;
   font-size: 0.54rem;
+}
+
+.compare-overview-chip-grades {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
 }
 
 /* Gradient bars */

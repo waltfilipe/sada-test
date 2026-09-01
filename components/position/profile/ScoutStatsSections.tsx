@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { GradeBadge } from "@/components/ui/GradeBadge";
-import { AspectGradeStack } from "@/components/ui/AspectGradeStack";
+import { SectionGradeStack } from "@/components/ui/SectionGradeStack";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import type { SectionGradeLookup } from "@/lib/sectionGrades";
-import { getPlayerSectionGrade } from "@/lib/sectionGrades";
+import type { SectionGradeLookup, SectionGradeTriple } from "@/lib/sectionGrades";
+import { getPlayerSectionGrades } from "@/lib/sectionGrades";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 
 function flattenAspects(player: PlayerProfile): AspectItem[] {
@@ -89,7 +88,6 @@ function StatAspectBlock({ item, groupTitle }: { item: AspectItem; groupTitle?: 
             </Tooltip>
           ) : null}
         </span>
-        <AspectGradeStack item={item} size="sm" />
       </div>
       <div className="stat-aspect-group-body">
         {hasSubMetrics ? (
@@ -125,7 +123,7 @@ function StatAspectBlock({ item, groupTitle }: { item: AspectItem; groupTitle?: 
 
 type SectionEntry = {
   title: string;
-  letter?: string;
+  grades?: SectionGradeTriple;
   metrics: { item: AspectItem; groupTitle?: string }[];
 };
 
@@ -158,7 +156,7 @@ export function ScoutStatsSections({
       if (metrics.length) {
         list.push({
           title: section.title,
-          letter: getPlayerSectionGrade(sectionGradeLookup, player.player_id, section.title),
+          grades: getPlayerSectionGrades(sectionGradeLookup, player.player_id, section.title),
           metrics,
         });
       }
@@ -174,7 +172,7 @@ export function ScoutStatsSections({
         <div className="profile-card-head stats-swap-head">
           <span className="stats-swap-title">
             <h3 className="section-label">{activeEntry.title}</h3>
-            <GradeBadge letter={activeEntry.letter} size="sm" />
+            <SectionGradeStack grades={activeEntry.grades} size="sm" />
           </span>
           <button
             type="button"
@@ -212,7 +210,7 @@ export function ScoutStatsSections({
           >
             <span className="stats-nav-row-title">{entry.title}</span>
             <span className="stats-nav-row-meta">
-              <GradeBadge letter={entry.letter} size="sm" />
+              <SectionGradeStack grades={entry.grades} size="sm" />
               <i className="fa-solid fa-chevron-right" aria-hidden="true" />
             </span>
           </button>

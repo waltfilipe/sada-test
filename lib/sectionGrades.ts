@@ -1,4 +1,5 @@
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
+import { aspectQualityPercentile, aspectQuantityPercentile } from "@/lib/aspectGrades";
 import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
 
 function flattenAspects(player: PlayerProfile): AspectItem[] {
@@ -73,6 +74,16 @@ function metricGroupScore(item: AspectItem): number | undefined {
   return averageDefined(subs.map((row) => num(row.percentile)));
 }
 
+function blockQuantityScore(item: AspectItem | undefined): number | undefined {
+  if (!item) return undefined;
+  return aspectQuantityPercentile(item);
+}
+
+function blockQualityScore(item: AspectItem | undefined): number | undefined {
+  if (!item) return undefined;
+  return aspectQualityPercentile(item);
+}
+
 function blockScore(item: AspectItem | undefined): number | undefined {
   if (!item) return undefined;
   if (item.kind === "def_efficiency_group") return defEfficiencyGroupScore(item);
@@ -108,23 +119,39 @@ const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string
   },
 };
 
-export type SectionGradeLookup = Map<string, Record<string, string>>;
+export type SectionGradeTriple = {
+  geral: string;
+  quantidade: string;
+  qualidade: string;
+};
 
-export function playerSectionScore(
+export type SectionGradeLookup = Map<string, Record<string, SectionGradeTriple>>;
+
+type SectionAxis = "geral" | "quantidade" | "qualidade";
+
+function playerSectionAxisScore(
   player: PlayerProfile,
   family: PositionFamily,
   sectionTitle: string,
+  axis: SectionAxis,
 ): number | undefined {
   const blockLabels = SECTION_BLOCK_LABELS[family]?.[sectionTitle];
   if (!blockLabels?.length) return undefined;
 
   const all = flattenAspects(player);
   const weights = SECTION_BLOCK_WEIGHTS[family]?.[sectionTitle] ?? {};
+  const scoreFn =
+    axis === "quantidade"
+      ? blockQuantityScore
+      : axis === "qualidade"
+        ? blockQualityScore
+        : blockScore;
+
   let weightedSum = 0;
   let totalWeight = 0;
 
   for (const label of blockLabels) {
-    const score = blockScore(findAspect(all, label));
+    const score = scoreFn(findAspect(all, label));
     if (score == null) continue;
     const weight = weights[label] ?? 1;
     weightedSum += score * weight;
@@ -133,6 +160,38 @@ export function playerSectionScore(
 
   if (!totalWeight) return undefined;
   return weightedSum / totalWeight;
+}
+
+export function playerSectionScore(
+  player: PlayerProfile,
+  family: PositionFamily,
+  sectionTitle: string,
+): number | undefined {
+  return playerSectionAxisScore(player, family, sectionTitle, "geral");
+}
+
+function axisScoresForSection(
+  players: PlayerProfile[],
+  family: PositionFamily,
+  sectionTitle: string,
+  axis: SectionAxis,
+): { id: string; score: number }[] {
+  return players
+    .map((player) => ({
+      id: player.player_id,
+      score: playerSectionAxisScore(player, family, sectionTitle, axis),
+    }))
+    .filter((entry): entry is { id: string; score: number } => entry.score != null);
+}
+
+function letterFromAxisPool(scored: { id: string; score: number }[]): Map<string, string> {
+  const allScores = scored.map((entry) => entry.score);
+  const letters = new Map<string, string>();
+  for (const { id, score } of scored) {
+    const pct = poolPercentileRank(allScores, score);
+    letters.set(id, letterFromPoolPercentile(pct));
+  }
+  return letters;
 }
 
 /** Percentile rank within a pool (100 = best, 0 = worst). Ties use average rank. */
@@ -183,20 +242,22 @@ export function buildSectionGradeLookup(
   const sections = statSectionsForFamily(family);
 
   for (const section of sections) {
-    const scored = players
-      .map((player) => ({
-        id: player.player_id,
-        score: playerSectionScore(player, family, section.title),
-      }))
-      .filter((entry): entry is { id: string; score: number } => entry.score != null);
+    const geralLetters = letterFromAxisPool(axisScoresForSection(players, family, section.title, "geral"));
+    const qtyLetters = letterFromAxisPool(axisScoresForSection(players, family, section.title, "quantidade"));
+    const qualLetters = letterFromAxisPool(axisScoresForSection(players, family, section.title, "qualidade"));
 
-    const allScores = scored.map((entry) => entry.score);
-
-    for (const { id, score } of scored) {
-      const pct = poolPercentileRank(allScores, score);
-      const letter = letterFromPoolPercentile(pct);
+    const ids = new Set([...geralLetters.keys(), ...qtyLetters.keys(), ...qualLetters.keys()]);
+    for (const id of ids) {
+      const geral = geralLetters.get(id);
+      const quantidade = qtyLetters.get(id);
+      const qualidade = qualLetters.get(id);
+      if (!geral && !quantidade && !qualidade) continue;
       const existing = lookup.get(id) ?? {};
-      existing[section.title] = letter;
+      existing[section.title] = {
+        geral: geral ?? quantidade ?? qualidade ?? "D",
+        quantidade: quantidade ?? geral ?? "D",
+        qualidade: qualidade ?? geral ?? "D",
+      };
       lookup.set(id, existing);
     }
   }
@@ -204,12 +265,20 @@ export function buildSectionGradeLookup(
   return lookup;
 }
 
+export function getPlayerSectionGrades(
+  lookup: SectionGradeLookup,
+  playerId: string,
+  sectionTitle: string,
+): SectionGradeTriple | undefined {
+  return lookup.get(playerId)?.[sectionTitle];
+}
+
 export function getPlayerSectionGrade(
   lookup: SectionGradeLookup,
   playerId: string,
   sectionTitle: string,
 ): string | undefined {
-  return lookup.get(playerId)?.[sectionTitle];
+  return getPlayerSectionGrades(lookup, playerId, sectionTitle)?.geral;
 }
 
 export function playerSectionGrade(
@@ -226,9 +295,9 @@ export function allSectionGrades(
   lookup: SectionGradeLookup,
   playerId: string,
   family: PositionFamily,
-): Record<string, string | undefined> {
+): Record<string, SectionGradeTriple | undefined> {
   const sections = statSectionsForFamily(family);
   return Object.fromEntries(
-    sections.map((section) => [section.title, getPlayerSectionGrade(lookup, playerId, section.title)]),
+    sections.map((section) => [section.title, getPlayerSectionGrades(lookup, playerId, section.title)]),
   );
 }
