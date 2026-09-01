@@ -32,14 +32,19 @@ function averageDefined(values: (number | undefined)[]): number | undefined {
   return nums.reduce((sum, value) => sum + value, 0) / nums.length;
 }
 
-function blend5050(a: number | undefined, b: number | undefined): number | undefined {
-  if (a != null && b != null) return 0.5 * a + 0.5 * b;
-  return a ?? b;
+const SECTION_VOL_WEIGHT = 0.4;
+const SECTION_EFF_WEIGHT = 0.6;
+
+function blendVolEff(volume: number | undefined, efficiency: number | undefined): number | undefined {
+  if (volume != null && efficiency != null) {
+    return SECTION_VOL_WEIGHT * volume + SECTION_EFF_WEIGHT * efficiency;
+  }
+  return volume ?? efficiency;
 }
 
-/** 50% volume + 50% efficiency when both exist; otherwise whichever is available. */
+/** 40% volume + 60% efficiency when both exist; otherwise whichever is available. */
 function volEffScore(item: AspectItem): number | undefined {
-  return blend5050(num(item.percentile), num(item.efficiency_pct));
+  return blendVolEff(num(item.percentile), num(item.efficiency_pct));
 }
 
 function defEfficiencyGroupScore(item: AspectItem): number | undefined {
@@ -48,7 +53,7 @@ function defEfficiencyGroupScore(item: AspectItem): number | undefined {
   const cortes = subs.find((row) => row.label === "Rebatidas");
   const eff = subs.find((row) => row.label === "Eficiência Defensiva");
   const qty = averageDefined([num(inter?.percentile), num(cortes?.percentile)]);
-  return blend5050(qty, num(eff?.percentile));
+  return blendVolEff(qty, num(eff?.percentile));
 }
 
 function metricGroupScore(item: AspectItem): number | undefined {
@@ -58,7 +63,7 @@ function metricGroupScore(item: AspectItem): number | undefined {
   if (item.label === "Cruzamentos") {
     const vol = subs.find((row) => row.label === "Cruzamentos");
     const eff = subs.find((row) => row.label === "Eficiência");
-    return blend5050(num(vol?.percentile), num(eff?.percentile));
+    return blendVolEff(num(vol?.percentile), num(eff?.percentile));
   }
 
   if (item.label === "Progressão") {
