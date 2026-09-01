@@ -1009,6 +1009,15 @@
 .compare-stat-group {
   display: grid;
   gap: 0.45rem;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.28);
+  overflow: hidden;
+}
+
+.compare-stat-group.has-stat-badge {
+  border-color: rgba(251, 191, 36, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.08);
 }
 
 .compare-stat-group-head {
@@ -1016,8 +1025,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding-bottom: 0.35rem;
-  border-bottom: 1px solid var(--line);
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(30, 41, 59, 0.35);
+}
+
+.compare-stat-group.has-stat-badge .compare-stat-group-head {
+  border-bottom-color: rgba(251, 191, 36, 0.2);
 }
 
 .compare-stat-group-title {
@@ -1032,6 +1046,45 @@
 .compare-stat-group-body {
   display: grid;
   gap: 0.5rem;
+  padding: 0.5rem 0.6rem 0.6rem;
+}
+
+.compare-badges-duel {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.compare-badges-duel-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.65rem;
+}
+
+.compare-badges-duel-col {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.compare-badges-duel-name {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.compare-badges-duel-col.side-a .compare-badges-duel-name {
+  color: color-mix(in srgb, var(--side-a) 75%, var(--text-3));
+}
+
+.compare-badges-duel-col.side-b .compare-badges-duel-name {
+  color: color-mix(in srgb, var(--side-b) 75%, var(--text-3));
+}
+
+.stats-group-medals-duel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .compare-stat-metric {

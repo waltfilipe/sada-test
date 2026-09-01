@@ -4,6 +4,8 @@ import { Tooltip } from "@/components/ui/Tooltip";
 import type { StatSectionTone } from "@/lib/aspectStatSections";
 import type { StatMetricBadge } from "@/lib/statBadges";
 
+export type TonedStatBadge = StatMetricBadge & { tone: StatSectionTone };
+
 type StripProps = {
   badges: StatMetricBadge[];
   tone: StatSectionTone;
@@ -22,43 +24,63 @@ export function StatBadgeStrip({ badges, tone, size = "sm" }: StripProps) {
       aria-label="Badges conquistados"
     >
       {badges.map((badge) => (
-        <Tooltip key={badge.key} content={badge.title}>
-          <span className="stat-badge-chip" role="listitem" title={badge.title}>
-            <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
-          </span>
-        </Tooltip>
+        <StatBadgeChip key={badge.key} badge={badge} tone={tone} />
       ))}
     </div>
   );
 }
 
-type PanelProps = {
-  badges: StatMetricBadge[];
+type ChipProps = {
+  badge: StatMetricBadge;
   tone: StatSectionTone;
 };
 
-export function StatBadgesPanel({ badges, tone }: PanelProps) {
+export function StatBadgeChip({ badge, tone }: ChipProps) {
   return (
-    <section className={`stat-badges-panel tone-${tone}`} aria-label="Badges da seção">
-      <header className="stat-badges-panel-head">
-        <span className="stat-badges-panel-label">Badges</span>
-        <span className="stat-badges-panel-count tabular">{badges.length}</span>
-      </header>
-      <StatBadgeStrip badges={badges} tone={tone} />
+    <Tooltip content={badge.title}>
+      <span className={`stat-badge-chip tone-${tone}`} role="listitem" title={badge.title}>
+        <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
+      </span>
+    </Tooltip>
+  );
+}
+
+type CatalogProps = {
+  badges: TonedStatBadge[];
+  hideLabel?: boolean;
+};
+
+export function PlayerBadgesSection({ badges, hideLabel = false }: CatalogProps) {
+  return (
+    <section className="player-badges-section" aria-label="Badges do atleta">
+      {hideLabel ? null : <h4 className="stats-subsection-label">Badges</h4>}
+      {badges.length === 0 ? (
+        <p className="player-badges-empty">Nenhum badge conquistado</p>
+      ) : (
+        <div className="player-badges-catalog" role="list">
+          {badges.map((badge) => (
+            <Tooltip key={badge.key} content={badge.title}>
+              <span className={`player-badge-item tone-${badge.tone}`} role="listitem">
+                <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
+                <span>{badge.label}</span>
+              </span>
+            </Tooltip>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
 
 type MedalCountProps = {
   count: number;
-  tone?: StatSectionTone;
 };
 
-export function StatMedalCount({ count, tone = "passes" }: MedalCountProps) {
+export function StatMedalCount({ count }: MedalCountProps) {
   if (count <= 0) return null;
 
   return (
-    <span className={`stat-medal-count tone-${tone}`} title={`${count} medalha${count === 1 ? "" : "s"}`}>
+    <span className="stat-medal-count" title={`${count} medalha${count === 1 ? "" : "s"}`}>
       {Array.from({ length: count }, (_, index) => (
         <i key={index} className="fa-solid fa-medal" aria-hidden="true" />
       ))}

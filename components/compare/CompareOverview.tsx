@@ -160,9 +160,9 @@ export function CompareOverview({ playerA, playerB, family, verdict }: Props) {
               <StatBadgeStrip badges={section.badgesB} tone={section.tone} />
             </span>
             <span className="compare-overview-chip-medals">
-              <StatMedalCount count={section.badgesA.length} tone={section.tone} />
+              <StatMedalCount count={section.badgesA.length} />
               <span className="compare-overview-chip-vs">vs</span>
-              <StatMedalCount count={section.badgesB.length} tone={section.tone} />
+              <StatMedalCount count={section.badgesB.length} />
             </span>
           </article>
         ))}

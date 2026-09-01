@@ -1,11 +1,16 @@
 "use client";
 
 import { useMemo } from "react";
-import { StatBadgesPanel, StatMedalCount } from "@/components/position/profile/StatBadgeStrip";
+import {
+  PlayerBadgesSection,
+  StatBadgeChip,
+  StatMedalCount,
+  type TonedStatBadge,
+} from "@/components/position/profile/StatBadgeStrip";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
-import { earnedStatBadges, metricEarnsStatBadge } from "@/lib/statBadges";
+import { earnedStatBadges, statBadgeForMetric } from "@/lib/statBadges";
 import type { StatMetricBadge } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -113,7 +118,7 @@ function CompareAspectBlock({
   itemA?: AspectItem;
   itemB?: AspectItem;
   groupTitle?: string;
-  tone: SectionEntry["tone"];
+  tone: StatSectionTone;
 }) {
   const item = itemA ?? itemB;
   if (!item) return null;
@@ -123,8 +128,9 @@ function CompareAspectBlock({
     (item.kind === "def_efficiency_group" || item.kind === "metric_group") &&
     Boolean(itemA?.sub_metrics?.length || itemB?.sub_metrics?.length);
   const isDefEfficiency = item.kind === "def_efficiency_group";
-  const medalA = itemA && metricEarnsStatBadge(itemA, title) ? 1 : 0;
-  const medalB = itemB && metricEarnsStatBadge(itemB, title) ? 1 : 0;
+  const badgeA = itemA ? statBadgeForMetric(itemA, title) : null;
+  const badgeB = itemB ? statBadgeForMetric(itemB, title) : null;
+  const hasBadge = Boolean(badgeA || badgeB);
 
   if (hasSubMetrics) {
     const labels = new Set([
@@ -133,10 +139,12 @@ function CompareAspectBlock({
     ]);
 
     return (
-      <div className={`compare-stat-group tone-${tone}${medalA || medalB ? " has-stat-badge" : ""}`}>
+      <div className={`compare-stat-group${hasBadge ? " has-stat-badge" : ""}`}>
         <div className="compare-stat-group-head">
           <span className="compare-stat-group-title">
             {title}
+            {badgeA ? <StatBadgeChip badge={badgeA} tone={tone} /> : null}
+            {badgeB ? <StatBadgeChip badge={badgeB} tone={tone} /> : null}
             {isDefEfficiency ? (
               <Tooltip content={DEF_EFFICIENCY_TIP}>
                 <span className="stat-def-eff-star" aria-label="Destaque — Eficiência Defensiva">
@@ -144,10 +152,6 @@ function CompareAspectBlock({
                 </span>
               </Tooltip>
             ) : null}
-          </span>
-          <span className="compare-stat-group-medals">
-            <StatMedalCount count={medalA} tone={tone} />
-            <StatMedalCount count={medalB} tone={tone} />
           </span>
         </div>
         <div className="compare-stat-group-body">
@@ -171,12 +175,12 @@ function CompareAspectBlock({
   }
 
   return (
-    <div className={`compare-stat-group tone-${tone}${medalA || medalB ? " has-stat-badge" : ""}`}>
+    <div className={`compare-stat-group${hasBadge ? " has-stat-badge" : ""}`}>
       <div className="compare-stat-group-head">
-        <span className="compare-stat-group-title">{title}</span>
-        <span className="compare-stat-group-medals">
-          <StatMedalCount count={medalA} tone={tone} />
-          <StatMedalCount count={medalB} tone={tone} />
+        <span className="compare-stat-group-title">
+          {title}
+          {badgeA ? <StatBadgeChip badge={badgeA} tone={tone} /> : null}
+          {badgeB ? <StatBadgeChip badge={badgeB} tone={tone} /> : null}
         </span>
       </div>
       <div className="compare-stat-group-body">
@@ -254,6 +258,15 @@ export function CompareStatsSections({ playerA, playerB, family }: Props) {
     return list;
   }, [sections, aspectsA, aspectsB]);
 
+  const allBadgesA = useMemo<TonedStatBadge[]>(
+    () => entries.flatMap((entry) => entry.badgesA.map((badge) => ({ ...badge, tone: entry.tone }))),
+    [entries]
+  );
+  const allBadgesB = useMemo<TonedStatBadge[]>(
+    () => entries.flatMap((entry) => entry.badgesB.map((badge) => ({ ...badge, tone: entry.tone }))),
+    [entries]
+  );
+
   return (
     <div className="player-card compare-stats-panel">
       <div className="profile-card-head compare-stats-panel-head">
@@ -261,52 +274,49 @@ export function CompareStatsSections({ playerA, playerB, family }: Props) {
         <span className="profile-card-head-hint">Badge com vol. e efic. &gt; P60</span>
       </div>
 
-      <div className="compare-stats-columns-head" aria-hidden="true">
-        <span className="compare-stats-columns-section">Seção</span>
-        <span className="compare-stats-columns-a side-a">{shortName(playerA.name)}</span>
-        <span className="compare-stats-columns-b side-b">{shortName(playerB.name)}</span>
-      </div>
-
-      <div className="compare-stats-sections">
-        {entries.map((entry) => (
-          <details key={entry.title} className={`compare-section-accordion tone-${entry.tone}`} open>
-            <summary className="compare-section-summary">
-              <span className="compare-section-summary-copy">
-                <span className="compare-section-summary-title">{entry.title}</span>
-                <span className="compare-section-summary-medals">
-                  <StatMedalCount count={entry.badgesA.length} tone={entry.tone} />
-                  <span className="compare-section-vs">vs</span>
-                  <StatMedalCount count={entry.badgesB.length} tone={entry.tone} />
-                </span>
-              </span>
-              <i className="fa-solid fa-chevron-down compare-section-chevron" aria-hidden="true" />
-            </summary>
-            <div className="compare-stats-detail stats-badges-layout">
-              <div className="compare-stats-badges-row">
-                <div className="compare-stats-badges-col side-a">
-                  <span className="compare-stats-badges-label">{shortName(playerA.name)}</span>
-                  <StatBadgesPanel badges={entry.badgesA} tone={entry.tone} />
-                </div>
-                <div className="compare-stats-badges-col side-b">
-                  <span className="compare-stats-badges-label">{shortName(playerB.name)}</span>
-                  <StatBadgesPanel badges={entry.badgesB} tone={entry.tone} />
-                </div>
-              </div>
-
-              <div className="compare-stat-cards-stack">
-                {entry.metrics.map(({ label, groupTitle }) => (
-                  <CompareAspectBlock
-                    key={label}
-                    itemA={findAspect(aspectsA, label)}
-                    itemB={findAspect(aspectsB, label)}
-                    groupTitle={groupTitle}
-                    tone={entry.tone}
-                  />
-                ))}
-              </div>
+      <div className="stats-and-badges-body">
+        <section className="compare-badges-duel" aria-label="Badges dos atletas">
+          <h4 className="stats-subsection-label">Badges</h4>
+          <div className="compare-badges-duel-grid">
+            <div className="compare-badges-duel-col side-a">
+              <span className="compare-badges-duel-name">{shortName(playerA.name)}</span>
+              <PlayerBadgesSection badges={allBadgesA} hideLabel />
             </div>
-          </details>
-        ))}
+            <div className="compare-badges-duel-col side-b">
+              <span className="compare-badges-duel-name">{shortName(playerB.name)}</span>
+              <PlayerBadgesSection badges={allBadgesB} hideLabel />
+            </div>
+          </div>
+        </section>
+
+        <section className="stats-subsection" aria-label="Estatísticas por grupo">
+          <h4 className="stats-subsection-label">Stats</h4>
+          <div className="stats-groups-stack">
+            {entries.map((entry) => (
+              <div key={entry.title} className="stats-group-block">
+                <h5 className="stats-group-title">
+                  {entry.title}
+                  <span className="stats-group-medals-duel">
+                    <StatMedalCount count={entry.badgesA.length} />
+                    <span className="compare-section-vs">vs</span>
+                    <StatMedalCount count={entry.badgesB.length} />
+                  </span>
+                </h5>
+                <div className="compare-stat-cards-stack">
+                  {entry.metrics.map(({ label, groupTitle }) => (
+                    <CompareAspectBlock
+                      key={label}
+                      itemA={findAspect(aspectsA, label)}
+                      itemB={findAspect(aspectsB, label)}
+                      groupTitle={groupTitle}
+                      tone={entry.tone}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

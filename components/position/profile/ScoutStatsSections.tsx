@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
-import { earnedStatBadges, metricEarnsStatBadge } from "@/lib/statBadges";
+import { earnedStatBadges, statBadgeForMetric } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
-import { StatBadgesPanel, StatMedalCount } from "./StatBadgeStrip";
+import { PlayerBadgesSection, StatBadgeChip, StatMedalCount, type TonedStatBadge } from "./StatBadgeStrip";
 
 function flattenAspects(player: PlayerProfile): AspectItem[] {
   const groups = player.aspects;
@@ -83,13 +83,15 @@ function StatAspectBlock({
     Boolean(item.sub_metrics?.length);
   const title = groupTitle ?? item.label;
   const isDefEfficiency = item.kind === "def_efficiency_group";
-  const medalCount = metricEarnsStatBadge(item, title) ? 1 : 0;
+  const badge = statBadgeForMetric(item, title);
+  const hasBadge = Boolean(badge);
 
   return (
-    <div className={`stat-aspect-group tone-${tone}${medalCount ? " has-stat-badge" : ""}`}>
+    <div className={`stat-aspect-group${hasBadge ? " has-stat-badge" : ""}`}>
       <div className="stat-aspect-group-head">
         <span className="stat-aspect-group-title">
           {title}
+          {badge ? <StatBadgeChip badge={badge} tone={tone} /> : null}
           {isDefEfficiency ? (
             <Tooltip content={DEF_EFFICIENCY_TIP}>
               <span className="stat-def-eff-star" aria-label="Destaque — Eficiência Defensiva">
@@ -98,7 +100,6 @@ function StatAspectBlock({
             </Tooltip>
           ) : null}
         </span>
-        <StatMedalCount count={medalCount} tone={tone} />
       </div>
       <div className="stat-aspect-group-body">
         {hasSubMetrics ? (
@@ -145,7 +146,6 @@ export function ScoutStatsSections({
   player: PlayerProfile;
   family: PositionFamily;
 }) {
-  const [active, setActive] = useState<string | null>(null);
   const all = useMemo(() => flattenAspects(player), [player]);
   const sections = statSectionsForFamily(family);
 
@@ -176,60 +176,44 @@ export function ScoutStatsSections({
     return list;
   }, [sections, all]);
 
-  const activeEntry = active ? entries.find((entry) => entry.title === active) ?? null : null;
-
-  if (activeEntry) {
-    return (
-      <div className="stats-swap-panel" key={`${player.player_id}-${activeEntry.title}`}>
-        <div className="profile-card-head stats-swap-head">
-          <h3 className="section-label">{activeEntry.title}</h3>
-          <button
-            type="button"
-            className="tendencies-pop-close"
-            onClick={() => setActive(null)}
-            aria-label="Voltar para Stats and Badges"
-          >
-            <i className="fa-solid fa-xmark" aria-hidden="true" />
-          </button>
-        </div>
-
-        <div className="stats-swap-body stats-badges-layout">
-          <StatBadgesPanel badges={activeEntry.badges} tone={activeEntry.tone} />
-
-          <div className="stat-cards-stack">
-            {activeEntry.metrics.map(({ item, groupTitle }) => (
-              <StatAspectBlock
-                key={item.label}
-                item={item}
-                groupTitle={groupTitle}
-                tone={activeEntry.tone}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const allBadges = useMemo<TonedStatBadge[]>(
+    () => entries.flatMap((entry) => entry.badges.map((badge) => ({ ...badge, tone: entry.tone }))),
+    [entries]
+  );
 
   return (
-    <div className="stats-swap-panel" key={`${player.player_id}-index`}>
+    <div className="stats-swap-panel" key={player.player_id}>
       <div className="profile-card-head">
         <h3 className="section-label">Stats and Badges</h3>
         <span className="profile-card-head-hint">Badge com vol. e efic. &gt; P60</span>
       </div>
-      <div className="stats-nav-list">
-        {entries.map((entry) => (
-          <article key={entry.title} className={`stats-nav-card tone-${entry.tone}`}>
-            <button type="button" className="stats-nav-row" onClick={() => setActive(entry.title)}>
-              <span className="stats-nav-row-title">{entry.title}</span>
-              <span className="stats-nav-row-meta">
-                <StatMedalCount count={entry.badges.length} tone={entry.tone} />
-                <i className="fa-solid fa-chevron-right" aria-hidden="true" />
-              </span>
-            </button>
-            <StatBadgesPanel badges={entry.badges} tone={entry.tone} />
-          </article>
-        ))}
+
+      <div className="stats-and-badges-body">
+        <PlayerBadgesSection badges={allBadges} />
+
+        <section className="stats-subsection" aria-label="Estatísticas por grupo">
+          <h4 className="stats-subsection-label">Stats</h4>
+          <div className="stats-groups-stack">
+            {entries.map((entry) => (
+              <div key={entry.title} className="stats-group-block">
+                <h5 className="stats-group-title">
+                  {entry.title}
+                  <StatMedalCount count={entry.badges.length} />
+                </h5>
+                <div className="stat-cards-stack">
+                  {entry.metrics.map(({ item, groupTitle }) => (
+                    <StatAspectBlock
+                      key={item.label}
+                      item={item}
+                      groupTitle={groupTitle}
+                      tone={entry.tone}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
