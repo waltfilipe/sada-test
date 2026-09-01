@@ -1,15 +1,15 @@
 "use client";
 
 import { useMemo } from "react";
-import { Tooltip } from "@/components/ui/Tooltip";
 import {
   latArchetypeMetaFor,
   archetypeMetaFor,
   type ArchetypeTrait,
 } from "@/lib/clusterMeta";
 import { activeProfileKeys, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
-import { formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
+import { formatRating } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import { ProfilePolarChart } from "./ProfilePolarChart";
 
 type Props = {
   player: PlayerProfile;
@@ -93,48 +93,33 @@ export function ProfileCard({ player, family }: Props) {
   }
 
   return (
-    <div className="player-card profile-perfil-card profile-perfil-card-score">
+    <div className="player-card profile-perfil-card profile-perfil-card-polar">
       <div className="profile-card-head">
         <span className="section-label">Perfil</span>
         <span className="profile-card-head-hint">Afinidade com cada arquétipo</span>
       </div>
-      <ul className="profile-perfil-list">
-        {shareRows.map((row) => {
-          const token = ratingTier(row.rating);
-          const active = activeKeys.has(row.key);
-          const accent = profileAccent(row.label);
-          const shareWidth = Math.max(3, Math.min(100, row.share));
-          return (
-            <li key={row.key}>
-              <Tooltip
-                content={<ProfileTooltipContent label={row.label} rating={row.rating} family={family} />}
-                block
-              >
-                <div
-                  className={`profile-perfil-row cluster-${row.tone}${active ? " active" : ""}`}
-                  style={{ "--profile-accent": accent } as React.CSSProperties}
-                >
-                  <div className="profile-perfil-row-top">
-                    <div className="profile-perfil-row-copy">
-                      <span className="profile-perfil-row-label">
-                        {row.label}
-                        <i className="fa-solid fa-circle-info profile-perfil-row-info" aria-hidden="true" />
-                      </span>
-                      <span className="profile-perfil-row-rating tabular" style={tierVars(token)}>
-                        Rating {formatRating(row.rating)}
-                      </span>
-                    </div>
-                    <span className="profile-perfil-row-share tabular">{Math.round(row.share)}%</span>
-                  </div>
-                  <span className="profile-perfil-row-bar" aria-hidden="true">
-                    <span style={{ width: `${shareWidth}%` }} />
-                  </span>
-                </div>
-              </Tooltip>
-            </li>
-          );
-        })}
-      </ul>
+
+      <ProfilePolarChart
+        player={player}
+        rows={shareRows}
+        tooltipContent={(row) => (
+          <ProfileTooltipContent label={row.label} rating={row.rating} family={family} />
+        )}
+      />
+
+      <div className="profile-polar-active-tags" aria-label="Arquétipos em destaque">
+        {shareRows
+          .filter((row) => activeKeys.has(row.key))
+          .map((row) => (
+            <span
+              key={row.key}
+              className="profile-polar-active-tag"
+              style={{ "--sector-accent": profileAccent(row.label) } as React.CSSProperties}
+            >
+              {row.label}
+            </span>
+          ))}
+      </div>
     </div>
   );
 }
