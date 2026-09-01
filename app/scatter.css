@@ -21,6 +21,323 @@
   margin-bottom: 0.15rem;
 }
 
+/* ── Athlete slots + pivot (scatter header) ─────────────────────────────── */
+
+.compare-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 128px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.15rem 1.25rem 1.25rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(480px 180px at 50% 0%, var(--slot-glow), transparent 70%),
+    linear-gradient(180deg, #151d29 0%, #0e131b 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.slot.side-a {
+  --slot-accent: var(--side-a);
+  --slot-glow: rgba(52, 211, 153, 0.07);
+}
+
+.slot.side-b {
+  --slot-accent: var(--side-b);
+  --slot-glow: rgba(167, 139, 250, 0.07);
+}
+
+.slot::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--slot-accent);
+}
+
+.slot-picker {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.slot-picker > span {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: var(--slot-accent);
+  font-weight: 600;
+}
+
+.slot-picker select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  padding: 0.55rem 2rem 0.55rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-2);
+  background-color: rgba(10, 14, 20, 0.6);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b7c93' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 10px;
+  color: var(--text);
+  font-size: 0.84rem;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.16s ease;
+}
+
+.slot-picker select:focus {
+  border-color: var(--slot-accent);
+}
+
+.slot-picker select option {
+  background: #131a24;
+  color: var(--text);
+}
+
+.slot-body {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 1.1rem;
+  align-items: center;
+}
+
+.slot-photo {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 116px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: linear-gradient(180deg, #212c3d, #151c27);
+  border: 1px solid var(--line-2);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
+}
+
+.slot-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.slot-photo span {
+  font-family: "Sora", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.slot-identity {
+  min-width: 0;
+}
+
+.slot-identity h2 {
+  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+  line-height: 1.12;
+  color: #f6f9fd;
+}
+
+.slot-club {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.25rem 0 0.5rem;
+  font-size: 0.84rem;
+  color: var(--text-2);
+}
+
+.slot-club i {
+  font-style: normal;
+  color: var(--line-2);
+}
+
+.slot-club span {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+
+.slot-rating {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+
+.slot-rating strong {
+  font-family: "Sora", sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--tier-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.slot-rating em {
+  font-style: normal;
+  font-size: 0.68rem;
+  color: var(--text-3);
+}
+
+.slot-minutes {
+  margin-top: 0.15rem;
+}
+
+.slot-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem 0.75rem;
+  margin: 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+
+.slot-facts div {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.slot-facts dt {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+}
+
+.slot-facts dd {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.slot-facts dd em {
+  margin-left: 0.15rem;
+  font-style: normal;
+  font-size: 0.66rem;
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+.slot-market {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+
+.slot-market div {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.slot-market span {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+}
+
+.slot-market strong {
+  font-family: "Sora", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #d9f7ee;
+}
+
+.slot-market div:last-child strong {
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.compare-pivot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  text-align: center;
+}
+
+.pivot-mark {
+  font-family: "Sora", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--text-3);
+}
+
+.pivot-swap {
+  margin-top: 0.35rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: color 0.16s ease, border-color 0.16s ease;
+}
+
+.pivot-swap:hover {
+  color: var(--accent);
+  border-color: rgba(94, 234, 212, 0.45);
+}
+
+@media (max-width: 900px) {
+  .compare-stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .compare-pivot {
+    flex-direction: row;
+    gap: 0.9rem;
+    padding: 0.7rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .pivot-swap {
+    margin-top: 0;
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .slot-body {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 0.85rem;
+  }
+
+  .slot-photo {
+    width: 72px;
+    height: 92px;
+  }
+
+  .slot-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* ── Workspace: rail + chart ─────────────────────────────────────────────── */
 
 .scatter-workspace {

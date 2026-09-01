@@ -3,16 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { CompareAthleteHero } from "@/components/compare/CompareAthleteHero";
-import { CompareProfilePair } from "@/components/compare/CompareProfilePair";
+import { ArchetypeDuel } from "@/components/compare/ArchetypeDuel";
 import { CompareStatsSections } from "@/components/compare/CompareStatsSections";
+import { DuelHero } from "@/components/compare/DuelHero";
 import { ProfileBarsVersus } from "@/components/compare/ProfileBarsVersus";
-import { VersusBar } from "@/components/compare/VersusBar";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
 import { buildSectionGradeLookup, playerSectionScore } from "@/lib/sectionGrades";
-import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import { formatRating } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Metric = { key: string; label: string };
@@ -130,87 +128,34 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
       <ScoutTopbar active="comparar" center={positionTabs} />
 
       <main className="compare-canvas">
-        <header className="compare-page-head">
-          <div>
-            <p className="sc-eyebrow">Comparação</p>
-            <h1>{familyMeta.label}</h1>
-            <p className="compare-page-sub">{players.length} atletas · Série A 2025/26</p>
-          </div>
-        </header>
+        <DuelHero
+          a={a}
+          b={b}
+          players={players}
+          family={family}
+          verdict={verdict}
+          onChangeA={setIdA}
+          onChangeB={setIdB}
+          onSwap={swap}
+        />
 
-        <div className="compare-stage">
-          <CompareAthleteHero side="a" player={a} players={players} family={family} onChange={setIdA} />
+        <div className="compare-columns">
+          {hasCluster ? <ArchetypeDuel a={a} b={b} family={family} /> : null}
 
-          <div className="compare-pivot">
-            <span className="pivot-mark">VS</span>
-            {verdict && (
-              <p className="pivot-score">
-                <b className="side-a">{verdict.winsA}</b>
-                <i aria-hidden>–</i>
-                <b className="side-b">{verdict.winsB}</b>
-              </p>
-            )}
-            <span className="pivot-note">de {verdict?.total ?? 0} indicadores</span>
-            <button type="button" className="pivot-swap" onClick={swap}>
-              Inverter
-            </button>
-          </div>
-
-          <CompareAthleteHero side="b" player={b} players={players} family={family} onChange={setIdB} />
-        </div>
-
-        <section className="sc-panel compare-panel compare-rating-panel">
-          <header className="sc-panel-head">
-            <div>
-              <p className="sc-eyebrow">Confronto direto</p>
-              <h2>Rating Geral</h2>
-            </div>
-            <p className="sc-note">Escala 0–10</p>
-          </header>
-          <div className="versus-rows">
-            <VersusBar
-              label="Rating geral"
-              valueA={a.ratings.geral}
-              valueB={b.ratings.geral}
-              rankA={a.ranks.geral}
-              rankB={b.ranks.geral}
-              max={10}
-              format={formatRating}
-            />
-          </div>
-        </section>
-
-        {hasCluster ? (
-          <section className="compare-section-block">
-            <header className="compare-section-head">
-              <div>
-                <p className="sc-eyebrow">Perfil</p>
-                <h2>Afinidade com arquétipos</h2>
-              </div>
-              <p className="sc-note">Share % · rating por eixo</p>
-            </header>
-            <CompareProfilePair playerA={a} playerB={b} family={family} />
-          </section>
-        ) : null}
-
-        <section className="compare-section-block">
           <CompareStatsSections
             playerA={a}
             playerB={b}
             family={family}
             sectionGradeLookup={sectionGradeLookup}
           />
-        </section>
+        </div>
 
         {hasProfileBars ? (
-          <section className="sc-panel compare-panel">
-            <header className="sc-panel-head">
-              <div>
-                <p className="sc-eyebrow">Tendências de jogo</p>
-                <h2>Estilo de construção e defesa</h2>
-              </div>
-              <p className="sc-note">Ponto vs média do pool</p>
-            </header>
+          <section className="player-card compare-tendencies-card">
+            <div className="profile-card-head">
+              <h3 className="section-label">Tendências de jogo</h3>
+              <span className="profile-card-head-hint">Ponto do atleta vs média do pool</span>
+            </div>
             <div className="profile-bars-versus-grid">
               <ProfileBarsVersus title="Construção" a={a} b={b} aspectKey="perfil_construcao" />
               <ProfileBarsVersus title="Defensivo" a={a} b={b} aspectKey="perfil_defensivo" />
@@ -219,9 +164,9 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
         ) : null}
 
         <div className="compare-links">
-          <Link href={`/scatter?posicao=${family}&a=${a.player_id}&b=${b.player_id}`}>Ver scatter</Link>
-          <Link href={`/posicao/${family}?atleta=${a.player_id}`}>Perfil de {a.name}</Link>
-          <Link href={`/posicao/${family}?atleta=${b.player_id}`}>Perfil de {b.name}</Link>
+          <Link href={`/scatter?posicao=${family}&a=${a.player_id}&b=${b.player_id}`}>
+            <i className="fa-solid fa-chart-scatter" aria-hidden="true" /> Ver no scatter
+          </Link>
         </div>
       </main>
     </div>
