@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { GradeBadge } from "@/components/ui/GradeBadge";
+import { AspectGradeStack } from "@/components/ui/AspectGradeStack";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
@@ -145,6 +146,7 @@ function CompareAspectBlock({
               </Tooltip>
             ) : null}
           </span>
+          <AspectGradeStack item={item} size="sm" />
         </div>
         <div className="compare-stat-group-body">
           {[...labels].map((label) => {
@@ -170,6 +172,7 @@ function CompareAspectBlock({
     <div className="compare-stat-group">
       <div className="compare-stat-group-head">
         <span className="compare-stat-group-title">{title}</span>
+        <AspectGradeStack item={item} size="sm" />
       </div>
       <div className="compare-stat-group-body">
         <CompareMetricVersus

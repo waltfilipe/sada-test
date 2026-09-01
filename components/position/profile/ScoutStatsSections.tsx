@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { GradeBadge } from "@/components/ui/GradeBadge";
+import { AspectGradeStack } from "@/components/ui/AspectGradeStack";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
@@ -88,6 +89,7 @@ function StatAspectBlock({ item, groupTitle }: { item: AspectItem; groupTitle?: 
             </Tooltip>
           ) : null}
         </span>
+        <AspectGradeStack item={item} size="sm" />
       </div>
       <div className="stat-aspect-group-body">
         {hasSubMetrics ? (

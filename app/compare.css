@@ -924,6 +924,10 @@
 }
 
 .compare-stat-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   padding-bottom: 0.35rem;
   border-bottom: 1px solid var(--line);
 }
