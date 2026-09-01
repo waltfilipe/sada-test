@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ArchetypeDuel } from "@/components/compare/ArchetypeDuel";
+import { CompareOverview } from "@/components/compare/CompareOverview";
 import { CompareStatsSections } from "@/components/compare/CompareStatsSections";
 import { DuelHero } from "@/components/compare/DuelHero";
 import { ProfileBarsVersus } from "@/components/compare/ProfileBarsVersus";
@@ -139,8 +140,20 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
           onSwap={swap}
         />
 
-        <div className="compare-columns">
-          {hasCluster ? <ArchetypeDuel a={a} b={b} family={family} /> : null}
+        <CompareOverview
+          playerA={a}
+          playerB={b}
+          family={family}
+          sectionGradeLookup={sectionGradeLookup}
+          verdict={verdict}
+        />
+
+        <div className="compare-body">
+          {hasCluster ? (
+            <aside className="compare-sidebar">
+              <ArchetypeDuel a={a} b={b} family={family} />
+            </aside>
+          ) : null}
 
           <CompareStatsSections
             playerA={a}

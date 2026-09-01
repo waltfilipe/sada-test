@@ -64,8 +64,7 @@ def _hybrid_badge(strong: list[str], z_def: float, z_con: float, z_off: float) -
 
 
 def _primary_archetype(z_def: float, z_con: float, z_off: float) -> str:
-    if max(z_def, z_con, z_off) < 0:
-        return "Defensivo"
+    """Pick the strongest relative axis; when all are below pool mean, still use argmax."""
     zmap = {"Defensivo": z_def, "Construtor": z_con, "Ofensivo": z_off}
     primary = max(zmap, key=zmap.get)
     if primary == "Construtor" and (z_con < CONSTRUCTION_Z_THRESHOLD or z_off >= z_con):

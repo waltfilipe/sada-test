@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { GradeBadge } from "@/components/ui/GradeBadge";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
@@ -47,6 +47,12 @@ function metricValue(value?: string | null): string {
   return value ?? "—";
 }
 
+function shortName(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+}
+
 const DEF_EFFICIENCY_TIP =
   "Índice que combina volume de ações defensivas bem-sucedidas (interceptações, rebatidas) com baixo custo — duelos perdidos e faltas desnecessárias em relação ao total de ações defensivas.";
 
@@ -78,16 +84,25 @@ function CompareMetricVersus({
           : "b"
       : "tie";
 
+  const delta =
+    percentileA != null && percentileB != null ? Math.round(percentileA - percentileB) : null;
+
   return (
     <div className={`compare-stat-metric leads-${leads}`}>
       <div className="compare-stat-side side-a">
         <span className="compare-stat-value tabular">{metricValue(valueA)}</span>
         <MetricGradientBar score={percentileA ?? null} letter={gradeA} scale="percent" />
+        {delta != null && delta > 0 ? (
+          <span className="compare-stat-delta side-a tabular">+{delta}</span>
+        ) : null}
       </div>
       <span className="compare-stat-label">{label}</span>
       <div className="compare-stat-side side-b">
         <span className="compare-stat-value tabular">{metricValue(valueB)}</span>
         <MetricGradientBar score={percentileB ?? null} letter={gradeB} scale="percent" />
+        {delta != null && delta < 0 ? (
+          <span className="compare-stat-delta side-b tabular">+{Math.abs(delta)}</span>
+        ) : null}
       </div>
     </div>
   );
@@ -195,7 +210,6 @@ type Props = {
 };
 
 export function CompareStatsSections({ playerA, playerB, family, sectionGradeLookup }: Props) {
-  const [active, setActive] = useState<string | null>(null);
   const aspectsA = useMemo(() => flattenAspects(playerA), [playerA]);
   const aspectsB = useMemo(() => flattenAspects(playerB), [playerB]);
   const sections = statSectionsForFamily(family);
@@ -224,64 +238,42 @@ export function CompareStatsSections({ playerA, playerB, family, sectionGradeLoo
     return list;
   }, [sections, aspectsA, aspectsB, family, playerA.player_id, playerB.player_id, sectionGradeLookup]);
 
-  const activeEntry = active ? entries.find((entry) => entry.title === active) ?? null : null;
-
-  if (activeEntry) {
-    return (
-      <div className="player-card compare-stats-panel">
-        <div className="profile-card-head stats-swap-head">
-          <span className="stats-swap-title">
-            <h3 className="section-label">{activeEntry.title}</h3>
-            <span className="compare-section-grade-pair">
-              <GradeBadge letter={activeEntry.letterA} size="sm" />
-              <span className="compare-section-vs">vs</span>
-              <GradeBadge letter={activeEntry.letterB} size="sm" />
-            </span>
-          </span>
-          <button
-            type="button"
-            className="tendencies-pop-close"
-            onClick={() => setActive(null)}
-            aria-label="Voltar para Stats & Scores"
-          >
-            <i className="fa-solid fa-xmark" aria-hidden="true" />
-          </button>
-        </div>
-        <div className="compare-stats-detail">
-          {activeEntry.metrics.map(({ label, groupTitle }) => (
-            <CompareAspectBlock
-              key={label}
-              itemA={findAspect(aspectsA, label)}
-              itemB={findAspect(aspectsB, label)}
-              groupTitle={groupTitle}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="player-card compare-stats-panel">
-      <div className="profile-card-head">
+      <div className="profile-card-head compare-stats-panel-head">
         <h3 className="section-label">Stats &amp; Scores</h3>
-        <span className="profile-card-head-hint">Percentis no pool da posição</span>
+        <span className="profile-card-head-hint">Percentis no pool da posição · todas as seções abertas</span>
       </div>
-      <div className="compare-stats-index">
-        <div className="compare-stats-index-head" aria-hidden="true">
-          <span>Seção</span>
-          <span>{playerA.name.split(" ")[0]}</span>
-          <span>{playerB.name.split(" ")[0]}</span>
-        </div>
+
+      <div className="compare-stats-columns-head" aria-hidden="true">
+        <span className="compare-stats-columns-section">Seção</span>
+        <span className="compare-stats-columns-a side-a">{shortName(playerA.name)}</span>
+        <span className="compare-stats-columns-b side-b">{shortName(playerB.name)}</span>
+      </div>
+
+      <div className="compare-stats-sections">
         {entries.map((entry) => (
-          <button key={entry.title} type="button" className="compare-stats-nav-row" onClick={() => setActive(entry.title)}>
-            <span className="compare-stats-nav-title">{entry.title}</span>
-            <span className="compare-stats-nav-grades">
-              <GradeBadge letter={entry.letterA} size="sm" />
-              <GradeBadge letter={entry.letterB} size="sm" />
-              <i className="fa-solid fa-chevron-right" aria-hidden="true" />
-            </span>
-          </button>
+          <details key={entry.title} className="compare-section-accordion" open>
+            <summary className="compare-section-summary">
+              <span className="compare-section-summary-title">{entry.title}</span>
+              <span className="compare-section-summary-grades">
+                <GradeBadge letter={entry.letterA} size="sm" />
+                <span className="compare-section-vs">vs</span>
+                <GradeBadge letter={entry.letterB} size="sm" />
+              </span>
+              <i className="fa-solid fa-chevron-down compare-section-chevron" aria-hidden="true" />
+            </summary>
+            <div className="compare-stats-detail">
+              {entry.metrics.map(({ label, groupTitle }) => (
+                <CompareAspectBlock
+                  key={label}
+                  itemA={findAspect(aspectsA, label)}
+                  itemB={findAspect(aspectsB, label)}
+                  groupTitle={groupTitle}
+                />
+              ))}
+            </div>
+          </details>
         ))}
       </div>
     </div>
