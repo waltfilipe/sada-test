@@ -5,7 +5,7 @@ import {
   isLatCluster,
   latArchetypeTone,
 } from "@/lib/clusterMeta";
-import type { PlayerProfile } from "@/lib/types";
+import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 export type ProfileShareRow = {
   key: string;
@@ -97,4 +97,42 @@ export function profileAccent(label: string): string {
     Híbrido: "#fed766",
   };
   return map[label] ?? "#1be7ff";
+}
+
+export function archetypeClusterSlug(label: string): string | null {
+  const map: Record<string, string> = {
+    "Defensor de Área": "defensor_area",
+    Construtor: "construtor",
+    Combativo: "combativo",
+    Defensivo: "defensivo",
+    Ofensivo: "ofensivo",
+  };
+  return map[label] ?? null;
+}
+
+export function archetypeRank(
+  player: PlayerProfile,
+  players: PlayerProfile[],
+  label: string,
+  family: PositionFamily,
+): number | null {
+  const slug = archetypeClusterSlug(label);
+  if (!slug) return null;
+
+  const storedRank = player.ranks?.[slug];
+  if (family === "laterais" && storedRank) return storedRank;
+
+  const sorted = players
+    .filter((entry) => {
+      const ratings = entry.cluster?.ratings as Record<string, number> | undefined;
+      return ratings != null && ratings[slug] != null;
+    })
+    .sort((a, b) => {
+      const ratingA = (a.cluster!.ratings as Record<string, number>)[slug];
+      const ratingB = (b.cluster!.ratings as Record<string, number>)[slug];
+      return ratingB - ratingA;
+    });
+
+  const index = sorted.findIndex((entry) => entry.player_id === player.player_id);
+  return index >= 0 ? index + 1 : null;
 }

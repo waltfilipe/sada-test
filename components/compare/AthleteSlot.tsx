@@ -4,7 +4,7 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { MinutesStat } from "@/components/position/MinutesStat";
-import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
+import { playerInitials, ratingTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile } from "@/lib/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -67,9 +67,9 @@ export function AthleteSlot({ side, player, players, onChange }: Props) {
           {clusterProps ? <ClusterTag {...clusterProps} /> : <ProfileTag {...profileTagProps(player)} />}
 
           <div className="slot-rating">
-            <strong>{formatRating(player.ratings.geral)}</strong>
+            <strong>{ratingToLetterGrade(player.ratings.geral)}</strong>
             <em>
-              Rating geral · #{player.ranks.geral}
+              Avaliação · #{player.ranks.geral}
             </em>
           </div>
         </div>

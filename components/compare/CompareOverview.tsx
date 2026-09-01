@@ -5,6 +5,7 @@ import { StatBadgeStrip, StatMedalCount } from "@/components/position/profile/St
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { earnedStatBadges } from "@/lib/statBadges";
 import { playerSectionScore } from "@/lib/sectionGrades";
+import { ratingToLetterGrade } from "@/lib/scoutTheme";
 import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Props = {
@@ -111,8 +112,8 @@ export function CompareOverview({ playerA, playerB, family, verdict }: Props) {
       <div className="compare-overview-head">
         <div className="compare-overview-player side-a">
           <span className="compare-overview-name">{shortName(playerA.name)}</span>
-          <strong className="compare-overview-rating tabular">
-            {(playerA.ratings.geral ?? playerA.rating)?.toFixed(1) ?? "—"}
+          <strong className="compare-overview-rating compare-overview-evaluation">
+            {ratingToLetterGrade(playerA.ratings.geral ?? playerA.rating)}
           </strong>
         </div>
 
@@ -127,17 +128,17 @@ export function CompareOverview({ playerA, playerB, family, verdict }: Props) {
           <span className="compare-overview-caption">indicadores vencidos</span>
           <span
             className={`compare-overview-rating-delta tabular leader-${ratingLeader}`}
-            title="Diferença de rating geral"
+            title="Diferença de avaliação"
           >
             {ratingDelta > 0 ? "+" : ""}
-            {ratingDelta.toFixed(1)} rating
+            {ratingDelta.toFixed(1)} pts
           </span>
         </div>
 
         <div className="compare-overview-player side-b">
           <span className="compare-overview-name">{shortName(playerB.name)}</span>
-          <strong className="compare-overview-rating tabular">
-            {(playerB.ratings.geral ?? playerB.rating)?.toFixed(1) ?? "—"}
+          <strong className="compare-overview-rating compare-overview-evaluation">
+            {ratingToLetterGrade(playerB.ratings.geral ?? playerB.rating)}
           </strong>
         </div>
       </div>

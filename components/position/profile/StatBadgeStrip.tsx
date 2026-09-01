@@ -59,10 +59,9 @@ export function PlayerBadgesSection({ badges, hideLabel = false }: CatalogProps)
       ) : (
         <div className="player-badges-catalog" role="list">
           {badges.map((badge) => (
-            <Tooltip key={badge.key} content={badge.title}>
-              <span className={`player-badge-item tone-${badge.tone}`} role="listitem">
+            <Tooltip key={badge.key} content={badge.label}>
+              <span className={`player-badge-item tone-${badge.tone}`} role="listitem" title={badge.label}>
                 <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
-                <span>{badge.label}</span>
               </span>
             </Tooltip>
           ))}

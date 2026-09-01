@@ -8,9 +8,10 @@ import { ScoutStatsSections } from "./ScoutStatsSections";
 type Props = {
   player: PlayerProfile;
   family: PositionFamily;
+  players: PlayerProfile[];
 };
 
-export function PositionProfileView({ player, family }: Props) {
+export function PositionProfileView({ player, family, players }: Props) {
   return (
     <div className="profile-view-shell">
       <PlayerHero player={player} family={family} />
@@ -31,7 +32,7 @@ export function PositionProfileView({ player, family }: Props) {
         </div>
 
         <div className="profile-content-col profile-col-middle">
-          <ProfileCard player={player} family={family} />
+          <ProfileCard player={player} family={family} players={players} />
         </div>
 
         <div className="profile-content-col profile-col-stats">

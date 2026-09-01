@@ -6,6 +6,7 @@ import {
   formatRating,
   ratingGradientStyle,
   ratingTier,
+  ratingToLetterGrade,
   tierVars,
 } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -52,8 +53,8 @@ export function DossierRatings({ player, poolSize, family }: Props) {
             />
           </svg>
           <div className="dossier-rating-ring-center">
-            <strong className="dossier-rating-value">{formatRating(geral)}</strong>
-            <span className="dossier-rating-label">Rating</span>
+            <strong className="dossier-rating-value dossier-rating-letter">{ratingToLetterGrade(geral)}</strong>
+            <span className="dossier-rating-label">Avaliação</span>
           </div>
         </div>
 

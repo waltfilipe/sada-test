@@ -5,7 +5,7 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { formatRating, playerInitials, ratingGradientStyle } from "@/lib/scoutTheme";
+import { playerInitials, ratingTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Side = "a" | "b";
@@ -104,9 +104,9 @@ function DuelSide({
         </div>
 
         {overall != null ? (
-          <Tooltip content={`Rating geral no pool da posição · #${player.ranks.geral}`}>
-            <div className="duel-rating" style={ratingGradientStyle(overall)}>
-              <span className="duel-rating-value tabular">{formatRating(overall)}</span>
+          <Tooltip content={`Avaliação no pool da posição · #${player.ranks.geral}`}>
+            <div className="duel-rating" style={tierVars(ratingTier(overall))}>
+              <span className="duel-rating-value duel-rating-letter">{ratingToLetterGrade(overall)}</span>
               <span className="duel-rating-rank">#{player.ranks.geral}</span>
             </div>
           </Tooltip>

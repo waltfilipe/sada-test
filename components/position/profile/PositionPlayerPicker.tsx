@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
 import { LAT_ARCHETYPE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
-import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
+import { formatRating, playerInitials } from "@/lib/scoutTheme";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -283,7 +283,6 @@ function PlayerStripCard({
   onSelect: () => void;
 }) {
   const photo = player.transfermarkt?.photo;
-  const tier = ratingTier(player.rating);
 
   return (
     <button
@@ -301,9 +300,6 @@ function PlayerStripCard({
           ) : (
             <span>{playerInitials(player.name)}</span>
           )}
-        </span>
-        <span className="player-strip-card-rating tabular" style={tierVars(tier)}>
-          {formatRating(player.rating)}
         </span>
       </span>
       <span className="player-strip-card-copy">

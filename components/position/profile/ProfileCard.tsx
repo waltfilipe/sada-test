@@ -7,13 +7,14 @@ import {
   archetypeMetaFor,
   type ArchetypeTrait,
 } from "@/lib/clusterMeta";
-import { activeProfileKeys, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
+import { activeProfileKeys, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
 import { formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Props = {
   player: PlayerProfile;
   family: PositionFamily;
+  players: PlayerProfile[];
 };
 
 function profileMetaForLabel(label: string, family: PositionFamily) {
@@ -77,9 +78,10 @@ function TraitList({
   );
 }
 
-export function ProfileCard({ player, family }: Props) {
+export function ProfileCard({ player, family, players }: Props) {
   const shareRows = useMemo(() => sortedProfileShareRows(player), [player]);
   const activeKeys = useMemo(() => activeProfileKeys(player, shareRows), [player, shareRows]);
+  const poolSize = players.length;
 
   if (!shareRows.length) {
     return player.profile ? (
@@ -122,6 +124,9 @@ export function ProfileCard({ player, family }: Props) {
                       </span>
                       <span className="profile-perfil-row-rating tabular" style={tierVars(token)}>
                         Rating {formatRating(row.rating)}
+                        <span className="profile-perfil-row-rank">
+                          {archetypeRank(player, players, row.label, family) ?? "—"}/{poolSize}
+                        </span>
                       </span>
                     </div>
                     <span className="profile-perfil-row-share tabular">{Math.round(row.share)}%</span>

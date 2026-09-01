@@ -110,7 +110,7 @@ export function PositionScoutPage({ family, players }: Props) {
             </div>
 
             <div className="profile-detail-stage" key={selected.player_id}>
-              <PositionProfileView player={selected} family={family} />
+              <PositionProfileView player={selected} family={family} players={players} />
             </div>
           </>
         )}
