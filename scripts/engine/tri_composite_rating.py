@@ -39,6 +39,9 @@ class ProfileCompositeSpec:
     metric_cols: tuple[str, ...]
     """Metric score columns averaged into ``raw_col``."""
 
+    metric_weights: tuple[float, ...] | None = None
+    """Optional weights for ``metric_cols`` (same length). Defaults to equal weights."""
+
 
 @dataclass(frozen=True)
 class TriCompositeRatingParams:
@@ -49,6 +52,9 @@ class TriCompositeRatingParams:
     nota_tau: float = 2.5
     geral_alpha: float = 0.25
     specialty_floor: bool = True
+    nota_from_shrunk_linear: bool = False
+    """When True, map shrunk 0–100 final directly to 5–10 via ``nota_linear_scale``."""
+    nota_linear_scale: float = 0.045
 
 
 @dataclass(frozen=True)
@@ -76,6 +82,24 @@ def _tanh_nota(series: pd.Series, params: TriCompositeRatingParams) -> pd.Series
         return pd.Series(params.nota_mu, index=series.index)
     z = (series - mu) / (sig * params.nota_tau)
     return params.nota_mu + params.nota_scale * np.tanh(z)
+
+
+def _nota_from_shrunk_final(series: pd.Series, params: TriCompositeRatingParams) -> pd.Series:
+    if params.nota_from_shrunk_linear:
+        return (5.0 + series.astype(float) * params.nota_linear_scale).clip(5.0, 10.0)
+    return _tanh_nota(series, params)
+
+
+def _weighted_metric_mean(frame: pd.DataFrame, spec: ProfileCompositeSpec) -> pd.Series:
+    cols = list(spec.metric_cols)
+    values = frame[cols].astype(float)
+    if spec.metric_weights is not None:
+        weights = np.asarray(spec.metric_weights, dtype=float)
+        if len(weights) != len(cols):
+            raise ValueError(f"metric_weights length mismatch for profile {spec.slug}")
+        denom = float(weights.sum()) or 1.0
+        return (values * weights).sum(axis=1) / denom
+    return values.mean(axis=1)
 
 
 def _geral_from_profile_notas(
@@ -145,7 +169,7 @@ def apply_tri_composite_ratings(
     merged = pool.merge(build_metric_scores(pool), on="player_id", how="left")
 
     for spec in config.profiles:
-        merged[spec.raw_col] = merged[list(spec.metric_cols)].mean(axis=1)
+        merged[spec.raw_col] = _weighted_metric_mean(merged, spec)
 
     for spec in config.profiles:
         final_col = f"{prefix}_final_{spec.slug}"
@@ -153,7 +177,7 @@ def apply_tri_composite_ratings(
             lambda row, raw=spec.raw_col: _shrink(row[raw], row[config.minutes_col], params),
             axis=1,
         )
-        merged[spec.nota_col] = _tanh_nota(merged[final_col], params).round(2)
+        merged[spec.nota_col] = _nota_from_shrunk_final(merged[final_col], params).round(2)
 
     share_weights = [
         merged[spec.share_col].fillna(0) / 100.0 for spec in config.profiles

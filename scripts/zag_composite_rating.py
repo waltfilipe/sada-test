@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Rating composto zagueiros Serie A 26.
+"""Rating composto zagueiros — tri-composite com ajuste de contexto de time.
 
-Aspectos com regressão de impacto (pool A+B 2022–25):
-  50% resíduo certos/90 vs esperado(vol) + 50% certos/90 bruto (percentil)
+Métricas (z 50/50 eff/vol, 70% do ajuste por oferta do time):
+  duelos_def, duelos_ar, def_acoes (inter+rebatidas), passes_prog, passes_long
 
-Eficiência defensiva (sem regressão):
-  60% eficiência (−custo ajustado, menor = melhor) + 40% ações bem-sucedidas/90
+Perfis:
+  Construtor — passes prog + longos
+  Defensor de Área — ações defensivas + duelos aéreos
+  Combativo — duelos defensivos
 
-Rating geral = média simples dos 5 aspectos, com shrinkage final por %Minutos.
+Shrinkage: 50 + %Minutos^0.45 × (raw − 50); nota = 5 + 0.045 × shrunk_final.
 """
 
 from __future__ import annotations
@@ -42,6 +44,14 @@ SHRINK_MU = 50.0
 SHRINK_EXP = 0.65
 
 IMPACT_METRICS = ("duelos_def", "duelos_ar", "passes_prog", "passes_long")
+
+# Team-context z-score blend (70% of full supply adjustment)
+TEAM_ADJ_EFFECT_KEEP = 0.70
+TEAM_SUPPLY_CLIP = (0.70, 1.30)
+Z_SCORE_CLIP = 2.5
+Z_SCORE_SPREAD = 15.0
+Z_BLEND_EFF = 0.50
+Z_BLEND_VOL = 0.50
 
 
 def pct_rank(value: float, series: pd.Series) -> float:
@@ -235,49 +245,81 @@ def _scores_by_player_id(pool: pd.DataFrame, **columns: pd.Series) -> pd.DataFra
     return pd.DataFrame(data)
 
 
-def build_tri_composite_metric_scores(pool: pd.DataFrame) -> pd.DataFrame:
-    """Eight metric scores (0–100) for tri-composite zagueiro ratings."""
-    enriched = enrich_pool(pool)
-    enriched["block_p90"] = _pool_col(pool, "outfielder_block_p90")
-    enriched["faltas_p90"] = _pool_col(pool, "Faltas/90", "Faltas")
+def _zscore_clipped(series: pd.Series, clip: float = Z_SCORE_CLIP) -> pd.Series:
+    values = series.astype(float)
+    std = float(values.std(ddof=1))
+    if not std:
+        return pd.Series(0.0, index=series.index)
+    med = float(values.median())
+    return ((values - med) / std).clip(-clip, clip)
 
-    frames = []
-    for key in IMPACT_METRICS:
-        spec = next(m for m in METRICS if m.key == key)
-        frames.append(score_impact_5050_pool(enriched, spec)[["player_id", key]])
 
-    out = frames[0]
-    for df in frames[1:]:
-        out = out.merge(df, on="player_id", how="outer")
+def _z_linear_100(series: pd.Series) -> pd.Series:
+    z = _zscore_clipped(series)
+    return (50.0 + Z_SCORE_SPREAD * z).clip(0, 100)
 
-    clear = _pool_col(pool, "total_clearance_p90", "Cortes/90", "Cortes", "Carrinhos")
-    inter = _pool_col(pool, "interception_won_p90", "Interseções/90", "Interseções")
-    cond = _pool_col(pool, "Cond.Prog", "Corridas progressivas/90")
-    comp_ptf = _pool_col(pool, "CompPTF")
-    comp_pp = _pool_col(pool, "CompPassesProg")
-    ptf_res = _residualize_series(comp_ptf, comp_pp)
 
-    extra = _scores_by_player_id(
-        pool,
-        eficiencia_def_v2=score_eficiencia_def_v2_pool(enriched),
-        rebatidas=score_vol_impact_5050(clear, clear, conf_ref=8.0),
-        interceptions=score_vol_impact_5050(inter, inter, conf_ref=6.0),
-        conducao_prog=score_vol_impact_5050(cond, cond, conf_ref=4.0),
-        ptf_mitigated=ptf_res.apply(lambda r: pct_rank(r, ptf_res)),
+def _score_z5050(vol: pd.Series, eff: pd.Series) -> pd.Series:
+    return Z_BLEND_EFF * _z_linear_100(eff) + Z_BLEND_VOL * _z_linear_100(vol)
+
+
+def _team_supply(vol: pd.Series, club: pd.Series, minutes: pd.Series) -> pd.Series:
+    frame = pd.DataFrame({"vol": vol.astype(float), "club": club, "minutes": minutes.astype(float)})
+    teams = frame.groupby("club").apply(
+        lambda g: pd.Series({"team_vol": np.average(g["vol"], weights=g["minutes"])}),
+        include_groups=False,
     )
-    out = out.merge(extra, on="player_id", how="left")
+    mu = float(teams["team_vol"].median()) or 1.0
+    supply = club.map(teams["team_vol"]) / mu
+    return supply.clip(*TEAM_SUPPLY_CLIP)
 
-    return out[
-        [
-            "player_id",
-            *IMPACT_METRICS,
-            "eficiencia_def_v2",
-            "rebatidas",
-            "interceptions",
-            "conducao_prog",
-            "ptf_mitigated",
-        ]
-    ]
+
+def _team_adjusted_z5050(
+    vol: pd.Series,
+    eff: pd.Series,
+    club: pd.Series,
+    minutes: pd.Series,
+) -> pd.Series:
+    supply = _team_supply(vol, club, minutes)
+    raw = _score_z5050(vol, eff)
+    full = _score_z5050(vol / supply, eff)
+    return raw + TEAM_ADJ_EFFECT_KEEP * (full - raw)
+
+
+def _def_acoes_vol_eff(enriched: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
+    inter = _pool_col(enriched, "interception_won_p90", "Interseções/90", "Interseções")
+    clear = _pool_col(enriched, "total_clearance_p90", "Cortes/90", "Cortes", "Carrinhos")
+    vol = inter + clear
+    acoes = enriched["acoes_def"].astype(float)
+    custo = enriched["custo_def"].astype(float).replace(0, np.nan)
+    eff = (acoes / custo).fillna(acoes)
+    return vol, eff
+
+
+def build_tri_composite_metric_scores(pool: pd.DataFrame) -> pd.DataFrame:
+    """Five team-adjusted z-scores (0–100) for zagueiro tri-composite ratings."""
+    enriched = enrich_pool(pool)
+    club = pool["Equipe"]
+    minutes = _pool_col(pool, "Minutos jogados:")
+
+    dd_vol = enriched["duelos_def_vol"]
+    dd_eff = enriched["duelos_def_eff"]
+    da_vol = enriched["duelos_ar_vol"]
+    da_eff = enriched["duelos_ar_eff"]
+    pp_vol = enriched["passes_prog_vol"]
+    pp_eff = enriched["passes_prog_eff"]
+    pl_vol = enriched["passes_long_vol"]
+    pl_eff = enriched["passes_long_eff"]
+    def_vol, def_eff = _def_acoes_vol_eff(enriched)
+
+    return _scores_by_player_id(
+        pool,
+        duelos_def=_team_adjusted_z5050(dd_vol, dd_eff, club, minutes),
+        duelos_ar=_team_adjusted_z5050(da_vol, da_eff, club, minutes),
+        def_acoes=_team_adjusted_z5050(def_vol, def_eff, club, minutes),
+        passes_prog=_team_adjusted_z5050(pp_vol, pp_eff, club, minutes),
+        passes_long=_team_adjusted_z5050(pl_vol, pl_eff, club, minutes),
+    )
 
 
 def build_composite() -> pd.DataFrame:
