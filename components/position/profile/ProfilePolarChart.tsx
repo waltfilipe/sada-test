@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { activeProfileKeys, profileAccent, type ProfileShareRow } from "@/lib/profileShares";
 import { formatRating } from "@/lib/scoutTheme";
 import type { PlayerProfile } from "@/lib/types";
@@ -8,7 +9,8 @@ import type { PlayerProfile } from "@/lib/types";
 const SIZE = 300;
 const CENTER = SIZE / 2;
 const MAX_RADIUS = 96;
-const LABEL_RADIUS = 126;
+const LABEL_RADIUS = 118;
+const MIN_RADIUS = MAX_RADIUS * 0.14;
 const GRID_LEVELS = [0.25, 0.5, 0.75, 1];
 
 type Props = {
@@ -16,6 +18,8 @@ type Props = {
   rows: ProfileShareRow[];
   tooltipContent: (row: ProfileShareRow) => ReactNode;
 };
+
+type TooltipCoords = { x: number; y: number };
 
 function polarPoint(cx: number, cy: number, radius: number, angle: number) {
   return {
@@ -45,17 +49,68 @@ function sectorPath(
   ].join(" ");
 }
 
-function shortArchetypeLabel(label: string): string {
-  if (label === "Defensor de Área") return "Def. Área";
-  return label;
+function labelLayout(midAngle: number, point: { x: number; y: number }) {
+  const cos = Math.cos(midAngle);
+  const sin = Math.sin(midAngle);
+  const pad = 12;
+
+  if (Math.abs(cos) > Math.abs(sin)) {
+    if (cos > 0) {
+      return {
+        x: point.x + pad,
+        y: point.y,
+        textAnchor: "start" as const,
+        dominantBaseline: "middle" as const,
+      };
+    }
+    return {
+      x: point.x - pad,
+      y: point.y,
+      textAnchor: "end" as const,
+      dominantBaseline: "middle" as const,
+    };
+  }
+
+  if (sin > 0) {
+    return {
+      x: point.x,
+      y: point.y + pad,
+      textAnchor: "middle" as const,
+      dominantBaseline: "hanging" as const,
+    };
+  }
+
+  return {
+    x: point.x,
+    y: point.y - pad,
+    textAnchor: "middle" as const,
+    dominantBaseline: "auto" as const,
+  };
 }
 
 export function ProfilePolarChart({ player, rows, tooltipContent }: Props) {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
+  const [tooltipCoords, setTooltipCoords] = useState<TooltipCoords | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const chartRef = useRef<HTMLDivElement>(null);
   const gradientId = useId().replace(/:/g, "");
   const activeKeys = useMemo(() => activeProfileKeys(player, rows), [player, rows]);
   const count = rows.length;
   const gap = count > 1 ? 0.035 : 0;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const showTooltip = useCallback((key: string, coords: TooltipCoords) => {
+    setHoveredKey(key);
+    setTooltipCoords(coords);
+  }, []);
+
+  const hideTooltip = useCallback(() => {
+    setHoveredKey(null);
+    setTooltipCoords(null);
+  }, []);
 
   const sectors = useMemo(() => {
     const slice = (Math.PI * 2) / count;
@@ -63,8 +118,9 @@ export function ProfilePolarChart({ player, rows, tooltipContent }: Props) {
       const startAngle = -Math.PI / 2 + index * slice + gap / 2;
       const endAngle = -Math.PI / 2 + (index + 1) * slice - gap / 2;
       const midAngle = (startAngle + endAngle) / 2;
-      const outerRadius = Math.max(6, (row.share / 100) * MAX_RADIUS);
+      const outerRadius = Math.max(MIN_RADIUS, (row.share / 100) * MAX_RADIUS);
       const labelPoint = polarPoint(CENTER, CENTER, LABEL_RADIUS, midAngle);
+      const label = labelLayout(midAngle, labelPoint);
       const accent = profileAccent(row.label);
       const active = activeKeys.has(row.key);
       const hovered = hoveredKey === row.key;
@@ -76,6 +132,7 @@ export function ProfilePolarChart({ player, rows, tooltipContent }: Props) {
         midAngle,
         outerRadius,
         labelPoint,
+        label,
         accent,
         active,
         hovered,
@@ -84,10 +141,30 @@ export function ProfilePolarChart({ player, rows, tooltipContent }: Props) {
     });
   }, [rows, count, gap, activeKeys, hoveredKey]);
 
-  const primaryArchetype = player.cluster?.archetype ?? rows[0]?.label ?? "Perfil";
+  const hoveredRow = hoveredKey ? rows.find((row) => row.key === hoveredKey) ?? null : null;
+
+  const tooltipPortal =
+    mounted && hoveredRow && tooltipCoords
+      ? createPortal(
+          <div
+            className="profile-polar-tip-portal"
+            style={{ left: tooltipCoords.x, top: tooltipCoords.y }}
+            role="tooltip"
+          >
+            {tooltipContent(hoveredRow)}
+          </div>,
+          document.body
+        )
+      : null;
 
   return (
-    <div className="profile-polar-chart" role="img" aria-label={`Polar chart de afinidade: ${primaryArchetype}`}>
+    <div
+      ref={chartRef}
+      className="profile-polar-chart"
+      role="img"
+      aria-label="Polar chart de afinidade com arquétipos"
+      onMouseLeave={hideTooltip}
+    >
       <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="profile-polar-svg" aria-hidden="true">
         <defs>
           <radialGradient id={`profile-polar-bg-${gradientId}`} cx="50%" cy="50%" r="50%">
@@ -127,87 +204,51 @@ export function ProfilePolarChart({ player, rows, tooltipContent }: Props) {
           <g
             key={sector.row.key}
             className={`profile-polar-sector${sector.active ? " is-active" : ""}${sector.hovered ? " is-hovered" : ""}`}
-            onMouseEnter={() => setHoveredKey(sector.row.key)}
-            onMouseLeave={() => setHoveredKey(null)}
             style={{ "--sector-accent": sector.accent } as CSSProperties}
+            onMouseEnter={(event) => showTooltip(sector.row.key, { x: event.clientX, y: event.clientY })}
+            onMouseMove={(event) => showTooltip(sector.row.key, { x: event.clientX, y: event.clientY })}
           >
             <path d={sector.path} className="profile-polar-sector-hit" />
             <path d={sector.path} className="profile-polar-sector-fill" />
-            <title>
-              {sector.row.label}: {Math.round(sector.row.share)}% · Rating {formatRating(sector.row.rating)}
-            </title>
           </g>
         ))}
 
-        {sectors.map((sector) => {
-          const labelRotation = (sector.midAngle * 180) / Math.PI;
-          const flip = sector.midAngle > Math.PI / 2 || sector.midAngle < -Math.PI / 2;
-          return (
-            <g
-              key={`label-${sector.row.key}`}
-              transform={`translate(${sector.labelPoint.x} ${sector.labelPoint.y}) rotate(${flip ? labelRotation + 180 : labelRotation})`}
-              className="profile-polar-label"
-            >
-              <text
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="profile-polar-label-name"
-                style={{ fill: sector.accent }}
-              >
-                {shortArchetypeLabel(sector.row.label)}
-              </text>
-              <text
-                y={12}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="profile-polar-label-share tabular"
-              >
-                {Math.round(sector.row.share)}%
-              </text>
-            </g>
-          );
-        })}
-
-        <circle cx={CENTER} cy={CENTER} r={34} className="profile-polar-center-disc" />
-        <text x={CENTER} y={CENTER - 4} textAnchor="middle" className="profile-polar-center-kicker">
-          Perfil
-        </text>
-        <text x={CENTER} y={CENTER + 12} textAnchor="middle" className="profile-polar-center-title">
-          {primaryArchetype.length > 14 ? `${primaryArchetype.slice(0, 13)}…` : primaryArchetype}
-        </text>
+        {sectors.map((sector) => (
+          <text
+            key={`label-${sector.row.key}`}
+            x={sector.label.x}
+            y={sector.label.y}
+            textAnchor={sector.label.textAnchor}
+            dominantBaseline={sector.label.dominantBaseline}
+            className="profile-polar-label-name"
+            style={{ fill: sector.accent }}
+          >
+            {sector.row.label}
+          </text>
+        ))}
       </svg>
-
-      <div className="profile-polar-hover-slot" aria-live="polite">
-        {hoveredKey ? (
-          <div className="profile-polar-hover-panel">
-            {tooltipContent(sectors.find((sector) => sector.row.key === hoveredKey)!.row)}
-          </div>
-        ) : (
-          <p className="profile-polar-hover-hint">Passe o mouse sobre um setor para ver detalhes do arquétipo</p>
-        )}
-      </div>
 
       <ul className="profile-polar-legend" aria-label="Legenda de arquétipos">
         {rows.map((row) => {
           const accent = profileAccent(row.label);
           const active = activeKeys.has(row.key);
+          const hovered = hoveredKey === row.key;
           return (
             <li
               key={row.key}
-              className={`profile-polar-legend-item${active ? " is-active" : ""}`}
+              className={`profile-polar-legend-item${active ? " is-active" : ""}${hovered ? " is-hovered" : ""}`}
               style={{ "--sector-accent": accent } as CSSProperties}
+              onMouseEnter={(event) => showTooltip(row.key, { x: event.clientX, y: event.clientY })}
+              onMouseMove={(event) => showTooltip(row.key, { x: event.clientX, y: event.clientY })}
             >
-              <span className="profile-polar-legend-swatch" aria-hidden="true" />
-              <span className="profile-polar-legend-copy">
-                <span className="profile-polar-legend-label">{row.label}</span>
-                <span className="profile-polar-legend-meta tabular">
-                  {Math.round(row.share)}% · Rating {formatRating(row.rating)}
-                </span>
-              </span>
+              <span className="profile-polar-legend-label">{row.label}</span>
+              <span className="profile-polar-legend-share tabular">{Math.round(row.share)}%</span>
             </li>
           );
         })}
       </ul>
+
+      {tooltipPortal}
     </div>
   );
 }

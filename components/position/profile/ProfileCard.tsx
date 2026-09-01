@@ -1,12 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  latArchetypeMetaFor,
-  archetypeMetaFor,
-  type ArchetypeTrait,
-} from "@/lib/clusterMeta";
-import { activeProfileKeys, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
+import { profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
 import { formatRating } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { ProfilePolarChart } from "./ProfilePolarChart";
@@ -16,70 +11,20 @@ type Props = {
   family: PositionFamily;
 };
 
-function profileMetaForLabel(label: string, family: PositionFamily) {
-  if (family === "laterais") {
-    return latArchetypeMetaFor(label as "Defensivo" | "Construtor" | "Ofensivo" | "Híbrido");
-  }
-  if (family === "zagueiros") {
-    return archetypeMetaFor(label as "Defensor de Área" | "Construtor" | "Combativo");
-  }
-  return undefined;
-}
-
-function ProfileTooltipContent({
-  label,
-  rating,
-  family,
-}: {
-  label: string;
-  rating: number;
-  family: PositionFamily;
-}) {
-  const meta = profileMetaForLabel(label, family);
+function ProfilePolarHoverTip({ label, rating }: { label: string; rating: number }) {
   const accent = profileAccent(label);
-  const ups = meta?.traits.filter((item) => item.direction === "up") ?? [];
-  const downs = meta?.traits.filter((item) => item.direction === "down") ?? [];
 
   return (
-    <div className="profile-archetype-tip">
-      <div className="profile-archetype-tip-head">
-        <span className="profile-archetype-tip-label">{label}</span>
-        <span className="profile-archetype-tip-rating tabular" style={{ color: accent }}>
-          Rating {formatRating(rating)}
-        </span>
-      </div>
-      {meta?.description ? <p className="profile-archetype-tip-copy">{meta.description}</p> : null}
-      <TraitList title="Valoriza" traits={ups} direction="up" />
-      <TraitList title="Desvaloriza" traits={downs} direction="down" />
+    <div className="profile-polar-tip" style={{ "--sector-accent": accent } as React.CSSProperties}>
+      <span className="profile-polar-tip-label">{label}</span>
+      <strong className="profile-polar-tip-rating tabular">{formatRating(rating)}</strong>
+      <span className="profile-polar-tip-kicker">Rating do arquétipo</span>
     </div>
   );
 }
 
-function TraitList({
-  title,
-  traits,
-  direction,
-}: {
-  title: string;
-  traits: ArchetypeTrait[];
-  direction: "up" | "down";
-}) {
-  if (!traits.length) return null;
-  return (
-    <div className="profile-archetype-tip-traits">
-      <span className="profile-archetype-tip-traits-title">{title}</span>
-      <ul className={`profile-archetype-tip-list profile-archetype-tip-list-${direction}`}>
-        {traits.map((trait) => (
-          <li key={trait.label}>{trait.label}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export function ProfileCard({ player, family }: Props) {
+export function ProfileCard({ player }: Props) {
   const shareRows = useMemo(() => sortedProfileShareRows(player), [player]);
-  const activeKeys = useMemo(() => activeProfileKeys(player, shareRows), [player, shareRows]);
 
   if (!shareRows.length) {
     return player.profile ? (
@@ -102,24 +47,8 @@ export function ProfileCard({ player, family }: Props) {
       <ProfilePolarChart
         player={player}
         rows={shareRows}
-        tooltipContent={(row) => (
-          <ProfileTooltipContent label={row.label} rating={row.rating} family={family} />
-        )}
+        tooltipContent={(row) => <ProfilePolarHoverTip label={row.label} rating={row.rating} />}
       />
-
-      <div className="profile-polar-active-tags" aria-label="Arquétipos em destaque">
-        {shareRows
-          .filter((row) => activeKeys.has(row.key))
-          .map((row) => (
-            <span
-              key={row.key}
-              className="profile-polar-active-tag"
-              style={{ "--sector-accent": profileAccent(row.label) } as React.CSSProperties}
-            >
-              {row.label}
-            </span>
-          ))}
-      </div>
     </div>
   );
 }

@@ -2785,71 +2785,54 @@
 
 .profile-polar-label-name {
   font-family: "Sora", sans-serif;
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
-.profile-polar-label-share {
-  font-family: "Sora", sans-serif;
-  font-size: 8px;
-  font-weight: 700;
-  fill: #94a3b8;
+.profile-polar-tip-portal {
+  position: fixed;
+  z-index: 9999;
+  transform: translate(-50%, calc(-100% - 12px));
+  pointer-events: none;
 }
 
-.profile-polar-center-disc {
-  fill: rgba(13, 27, 42, 0.92);
-  stroke: rgba(148, 163, 184, 0.18);
-  stroke-width: 1;
-}
-
-.profile-polar-center-kicker {
-  font-family: "Sora", sans-serif;
-  font-size: 7px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  fill: #64748b;
-}
-
-.profile-polar-center-title {
-  font-family: "Sora", sans-serif;
-  font-size: 9px;
-  font-weight: 800;
-  fill: #e2e8f0;
-}
-
-.profile-polar-hover-slot {
-  min-height: 3.25rem;
-}
-
-.profile-polar-hover-hint {
-  margin: 0;
-  padding: 0.55rem 0.65rem;
-  border-radius: 8px;
-  border: 1px dashed rgba(148, 163, 184, 0.16);
-  background: rgba(15, 23, 42, 0.28);
-  font-size: 0.68rem;
-  color: #64748b;
+.profile-polar-tip {
+  display: grid;
+  gap: 0.2rem;
+  justify-items: center;
+  min-width: 7.5rem;
+  padding: 0.75rem 0.95rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--sector-accent, #1be7ff) 35%, rgba(148, 163, 184, 0.28));
+  background: rgba(10, 18, 30, 0.98);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.45),
+    0 0 24px color-mix(in srgb, var(--sector-accent, #1be7ff) 18%, transparent);
   text-align: center;
 }
 
-.profile-polar-hover-panel {
-  padding: 0.55rem 0.65rem;
-  border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  background: rgba(15, 23, 42, 0.45);
+.profile-polar-tip-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #e2e8f0;
 }
 
-.profile-polar-hover-panel .profile-archetype-tip {
-  gap: 0.45rem;
+.profile-polar-tip-rating {
+  font-family: "Sora", sans-serif;
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--sector-accent, #1be7ff);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--sector-accent, #1be7ff) 35%, transparent);
 }
 
-.profile-polar-hover-panel .profile-archetype-tip-copy {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.profile-polar-tip-kicker {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #64748b;
 }
 
 .profile-polar-legend {
@@ -2857,69 +2840,40 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.35rem;
+  gap: 0.45rem;
 }
 
 .profile-polar-legend-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.38rem 0.45rem;
-  border-radius: 8px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(15, 23, 42, 0.28);
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.62rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(15, 23, 42, 0.35);
+  cursor: default;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.profile-polar-legend-item.is-active {
-  border-color: color-mix(in srgb, var(--sector-accent, #1be7ff) 35%, rgba(148, 163, 184, 0.1));
-  background: color-mix(in srgb, var(--sector-accent, #1be7ff) 8%, rgba(15, 23, 42, 0.28));
-}
-
-.profile-polar-legend-swatch {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 999px;
-  background: var(--sector-accent, #1be7ff);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--sector-accent, #1be7ff) 45%, transparent);
-  flex-shrink: 0;
-}
-
-.profile-polar-legend-copy {
-  display: grid;
-  gap: 0.08rem;
-  min-width: 0;
+.profile-polar-legend-item.is-active,
+.profile-polar-legend-item.is-hovered {
+  border-color: color-mix(in srgb, var(--sector-accent, #1be7ff) 35%, rgba(148, 163, 184, 0.12));
+  background: color-mix(in srgb, var(--sector-accent, #1be7ff) 8%, rgba(15, 23, 42, 0.35));
 }
 
 .profile-polar-legend-label {
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: #e2e8f0;
 }
 
-.profile-polar-legend-meta {
-  font-size: 0.64rem;
-  color: #94a3b8;
-}
-
-.profile-polar-active-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: 0.15rem;
-}
-
-.profile-polar-active-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.22rem 0.5rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--sector-accent, #1be7ff) 35%, transparent);
-  background: color-mix(in srgb, var(--sector-accent, #1be7ff) 12%, transparent);
-  font-size: 0.62rem;
+.profile-polar-legend-share {
+  font-family: "Sora", sans-serif;
+  font-size: 1rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   color: var(--sector-accent, #1be7ff);
+  flex-shrink: 0;
 }
 
 .profile-perfil-list {
