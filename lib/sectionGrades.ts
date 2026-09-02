@@ -61,10 +61,16 @@ function metricGroupScore(item: AspectItem): number | undefined {
   const subs = item.sub_metrics ?? [];
   if (!subs.length) return num(item.percentile);
 
-  if (item.label === "Cruzamentos" || item.label === "Finalizações") {
+  if (item.label === "Cruzamentos") {
     const vol = subs.find((row) => row.label === "Cruzamentos");
     const eff = subs.find((row) => row.label === "Eficiência");
     return blendVolEff(num(vol?.percentile), num(eff?.percentile));
+  }
+
+  if (item.label === "Finalizações") {
+    const vol = subs.find((row) => row.label === "Finalizações");
+    const xg = subs.find((row) => row.label === "xG");
+    return blendVolEff(num(vol?.percentile), num(xg?.percentile));
   }
 
   if (item.label === "Progressão") {

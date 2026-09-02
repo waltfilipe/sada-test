@@ -27,8 +27,8 @@ export function aspectQuantityPercentile(item: AspectItem): number | undefined {
 
   if (item.kind === "metric_group") {
     const subs = item.sub_metrics ?? [];
-    if (item.label === "Cruzamentos") {
-      return num(subs.find((row) => row.label === "Cruzamentos")?.percentile);
+    if (item.label === "Cruzamentos" || item.label === "Finalizações") {
+      return num(subs.find((row) => row.label === item.label)?.percentile);
     }
     const eff = subs.find((row) => row.label === "Eficiência" || row.label === "Eficiência Defensiva");
     if (eff) {
@@ -50,6 +50,9 @@ export function aspectQualityPercentile(item: AspectItem): number | undefined {
   }
 
   if (item.kind === "metric_group") {
+    if (item.label === "Finalizações") {
+      return num(item.sub_metrics?.find((row) => row.label === "xG")?.percentile);
+    }
     const eff = item.sub_metrics?.find((row) => row.label === "Eficiência" || row.label === "Eficiência Defensiva");
     return num(eff?.percentile);
   }

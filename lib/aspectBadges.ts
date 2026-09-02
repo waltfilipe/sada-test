@@ -40,10 +40,12 @@ function metricGroupBadge(item: {
   const subs = item.sub_metrics;
   if (!subs?.length) return null;
 
-  const effSub = subs.find((s) => s.label === "Eficiência" || s.label === "Eficiência Defensiva");
-  if (effSub) {
-    const volSub = subs.find((s) => s !== effSub);
-    if (volSub) return dualMetricBadge(volSub.percentile, effSub.percentile);
+  const qualSub = subs.find(
+    (s) => s.label === "Eficiência" || s.label === "Eficiência Defensiva" || s.label === "xG",
+  );
+  if (qualSub) {
+    const volSub = subs.find((s) => s !== qualSub);
+    if (volSub) return dualMetricBadge(volSub.percentile, qualSub.percentile);
   }
   if (subs.length === 2) {
     return pairBadge(subs[0].percentile, subs[1].percentile);

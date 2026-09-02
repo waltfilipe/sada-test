@@ -961,7 +961,7 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "cruz_vol": _pool_percentile(out, "Cruzamentos/90", "Cruz."),
         "cruz_eff": _pct_eff(out, "Cruzamentos certos, %", "%EffCruz."),
         "fin_vol": _pool_percentile(out, "Remates/90", "Finalizações"),
-        "fin_eff": _pct_eff(out, "Remates à baliza, %", "%EffFin"),
+        "fin_xg": _pool_percentile(out, "Golos esperados/90", "npxG"),
         "passes_chave_vol": _pool_percentile(out, "Passes chave/90", "PassesChave"),
         "passe_area_certos90": _pool_percentile(out, "PasseAreaW"),
         "acoes_at_vol": _pool_percentile(out, "Acções atacantes com sucesso/90", "AcoesAtW", "AçõesAtW"),
@@ -1361,19 +1361,20 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
         ]
     elif family_key == "meio-campistas":
         fin_vol = _row_vol(row, "Finalizações", "Remates/90")
+        npxg = _row_vol(row, "npxG", "Golos esperados/90")
         passe_area = float(row.get("PasseAreaW") or 0)
         aspects["terco_final"] = [
             _metric_group_aspect(
                 "Finalizações",
                 percentile=row.get("_asp_fin_vol", 0),
-                eff_pct=row.get("_asp_fin_eff", 0),
-                eff_display=_raw_eff_display(row, "Remates à baliza, %", "%EffFin"),
+                eff_pct=row.get("_asp_fin_xg", 0),
+                eff_display=_fmt_num(npxg, decimals=2),
                 sub_metrics=[
                     _sub_metric("Finalizações", percentile=row.get("_asp_fin_vol", 0), display_value=_fmt_per90(fin_vol)),
                     _sub_metric(
-                        "Eficiência",
-                        percentile=row.get("_asp_fin_eff", 0),
-                        display_value=_raw_eff_display(row, "Remates à baliza, %", "%EffFin"),
+                        "xG",
+                        percentile=row.get("_asp_fin_xg", 0),
+                        display_value=_fmt_num(npxg, decimals=2),
                     ),
                 ],
             ),
