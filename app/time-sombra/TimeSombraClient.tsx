@@ -6,20 +6,22 @@ import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { BenchStrip, PitchView } from "@/components/shadow/PitchView";
 import { ShadowPlayerRow } from "@/components/shadow/ShadowPlayerChip";
+import { TeamProfileMap } from "@/components/shadow/TeamProfileMap";
+import { TeamStatsBar } from "@/components/shadow/TeamStatsBar";
 import { useShadowTeam } from "@/hooks/useShadowTeam";
 import { FORMATIONS, formationById } from "@/lib/formations";
 import { benchPlayerIds } from "@/lib/shadowTeamStorage";
 import { formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
-import type { PlayerSummary } from "@/lib/types";
+import type { PlayerSearchRow } from "@/lib/types";
 
 type Props = {
-  players: PlayerSummary[];
+  players: PlayerSearchRow[];
 };
 
 export function TimeSombraClient({ players }: Props) {
-  const { state, ready, changeFormation, assign, swap, removeFromSquad, removeFromWatchlist } = useShadowTeam();
+  const { state, ready, changeFormation, assign, dropOnSlot, removeFromSquad, removeFromWatchlist } =
+    useShadowTeam();
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
-  const [swapSourceId, setSwapSourceId] = useState<string | null>(null);
   const [placementPlayerId, setPlacementPlayerId] = useState<string | null>(null);
   const [panelTab, setPanelTab] = useState<"squad" | "watch">("squad");
 
@@ -41,10 +43,15 @@ export function TimeSombraClient({ players }: Props) {
 
   const squadPlayers = state.squadIds
     .map((id) => playersById.get(id))
-    .filter((p): p is PlayerSummary => Boolean(p));
+    .filter((p): p is PlayerSearchRow => Boolean(p));
   const watchPlayers = state.watchlistIds
     .map((id) => playersById.get(id))
-    .filter((p): p is PlayerSummary => Boolean(p));
+    .filter((p): p is PlayerSearchRow => Boolean(p));
+
+  const starters = Object.values(state.assignments)
+    .filter((id): id is string => Boolean(id))
+    .map((id) => playersById.get(id))
+    .filter((p): p is PlayerSearchRow => Boolean(p));
 
   const avgRating =
     squadPlayers.length > 0
@@ -76,7 +83,6 @@ export function TimeSombraClient({ players }: Props) {
                   onClick={() => {
                     changeFormation(f.id);
                     setSelectedSlotId(null);
-                    setSwapSourceId(null);
                     setPlacementPlayerId(null);
                   }}
                   aria-pressed={state.formationId === f.id}
@@ -88,30 +94,38 @@ export function TimeSombraClient({ players }: Props) {
           </div>
         </header>
 
+        <TeamStatsBar starters={starters} squad={squadPlayers} />
+
         <div className="shadow-layout">
           <section className="shadow-main player-card" aria-label="Campo e reservas">
-            <PitchView
-              formationId={state.formationId}
-              assignments={state.assignments}
-              playersById={playersById}
-              selectedSlotId={selectedSlotId}
-              swapSourceId={swapSourceId}
-              placementPlayerId={placementPlayerId}
-              onSelectSlot={(id) => {
-                setSelectedSlotId(id);
-                setPlacementPlayerId(null);
-              }}
-              onSwapSource={setSwapSourceId}
-              onAssign={(slotId, playerId) => {
-                assign(slotId, playerId);
-                setPlacementPlayerId(null);
-                setSelectedSlotId(playerId ? slotId : null);
-              }}
-              onSwap={(a, b) => {
-                swap(a, b);
-                setSwapSourceId(null);
-              }}
-            />
+            <div className="shadow-pitch-row">
+              <TeamProfileMap
+                formationId={state.formationId}
+                assignments={state.assignments}
+                playersById={playersById}
+              />
+              <PitchView
+                formationId={state.formationId}
+                assignments={state.assignments}
+                playersById={playersById}
+                selectedSlotId={selectedSlotId}
+                placementPlayerId={placementPlayerId}
+                onSelectSlot={(id) => {
+                  setSelectedSlotId(id);
+                  setPlacementPlayerId(null);
+                }}
+                onAssign={(slotId, playerId) => {
+                  assign(slotId, playerId);
+                  setPlacementPlayerId(null);
+                  setSelectedSlotId(playerId ? slotId : null);
+                }}
+                onDrop={(sourceSlotId, targetSlotId, playerId) => {
+                  dropOnSlot(sourceSlotId, targetSlotId, playerId);
+                  setPlacementPlayerId(null);
+                  setSelectedSlotId(targetSlotId);
+                }}
+              />
+            </div>
 
             <div className="shadow-bench">
               <div className="shadow-bench-head">

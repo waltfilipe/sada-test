@@ -33,7 +33,6 @@ export const FORMATIONS: Formation[] = [
     id: "4-3-3",
     label: "4-3-3",
     slots: [
-      { id: "gk", label: "GOL", x: 50, y: 90, families: [] },
       { id: "ld", label: "LD", x: 14, y: 72, families: F.lat },
       { id: "zag-e", label: "ZAG", x: 36, y: 74, families: F.zag },
       { id: "zag-d", label: "ZAG", x: 64, y: 74, families: F.zag },
@@ -50,7 +49,6 @@ export const FORMATIONS: Formation[] = [
     id: "4-4-2",
     label: "4-4-2",
     slots: [
-      { id: "gk", label: "GOL", x: 50, y: 90, families: [] },
       { id: "ld", label: "LD", x: 14, y: 72, families: F.lat },
       { id: "zag-e", label: "ZAG", x: 36, y: 74, families: F.zag },
       { id: "zag-d", label: "ZAG", x: 64, y: 74, families: F.zag },
@@ -67,7 +65,6 @@ export const FORMATIONS: Formation[] = [
     id: "4-2-3-1",
     label: "4-2-3-1",
     slots: [
-      { id: "gk", label: "GOL", x: 50, y: 90, families: [] },
       { id: "ld", label: "LD", x: 14, y: 72, families: F.lat },
       { id: "zag-e", label: "ZAG", x: 36, y: 74, families: F.zag },
       { id: "zag-d", label: "ZAG", x: 64, y: 74, families: F.zag },
@@ -84,7 +81,6 @@ export const FORMATIONS: Formation[] = [
     id: "3-5-2",
     label: "3-5-2",
     slots: [
-      { id: "gk", label: "GOL", x: 50, y: 90, families: [] },
       { id: "zag-e", label: "ZAG", x: 26, y: 74, families: F.zag },
       { id: "zag", label: "ZAG", x: 50, y: 76, families: F.zag },
       { id: "zag-d", label: "ZAG", x: 74, y: 74, families: F.zag },
@@ -101,7 +97,6 @@ export const FORMATIONS: Formation[] = [
     id: "3-4-3",
     label: "3-4-3",
     slots: [
-      { id: "gk", label: "GOL", x: 50, y: 90, families: [] },
       { id: "zag-e", label: "ZAG", x: 26, y: 74, families: F.zag },
       { id: "zag", label: "ZAG", x: 50, y: 76, families: F.zag },
       { id: "zag-d", label: "ZAG", x: 74, y: 74, families: F.zag },
@@ -118,7 +113,6 @@ export const FORMATIONS: Formation[] = [
     id: "5-3-2",
     label: "5-3-2",
     slots: [
-      { id: "gk", label: "GOL", x: 50, y: 90, families: [] },
       { id: "ala-e", label: "ALA", x: 8, y: 66, families: F.wing },
       { id: "zag-e", label: "ZAG", x: 28, y: 74, families: F.zag },
       { id: "zag", label: "ZAG", x: 50, y: 76, families: F.zag },
@@ -135,13 +129,17 @@ export const FORMATIONS: Formation[] = [
 
 export const DEFAULT_FORMATION_ID = "4-3-3";
 
+export function fieldSlots(formation: Formation): FormationSlot[] {
+  return formation.slots.filter((s) => s.families.length > 0);
+}
+
 export function formationById(id: string): Formation {
   return FORMATIONS.find((f) => f.id === id) ?? FORMATIONS[0];
 }
 
 /** Pick the best empty slot for a player given their position family. */
 export function suggestSlotId(formation: Formation, family: PositionFamily, taken: Set<string>): string | null {
-  const empty = formation.slots.filter((s) => !taken.has(s.id) && s.families.length > 0);
+  const empty = fieldSlots(formation).filter((s) => !taken.has(s.id));
   const exact = empty.find((s) => s.families.includes(family));
   if (exact) return exact.id;
   const loose = empty.find((s) => s.families.length > 1);
@@ -155,23 +153,23 @@ export function remapAssignments(
   assignments: Record<string, string | null>,
 ): Record<string, string | null> {
   const next: Record<string, string | null> = {};
-  for (const slot of to.slots) next[slot.id] = null;
+  for (const slot of fieldSlots(to)) next[slot.id] = null;
 
-  const players: { playerId: string; label: string; family: PositionFamily | null }[] = [];
-  for (const slot of from.slots) {
+  const players: { playerId: string; label: string }[] = [];
+  for (const slot of fieldSlots(from)) {
     const pid = assignments[slot.id];
-    if (pid) players.push({ playerId: pid, label: slot.label, family: null });
+    if (pid) players.push({ playerId: pid, label: slot.label });
   }
 
   const used = new Set<string>();
   for (const entry of players) {
-    const byLabel = to.slots.find((s) => s.label === entry.label && !next[s.id] && !used.has(s.id));
+    const byLabel = fieldSlots(to).find((s) => s.label === entry.label && !next[s.id] && !used.has(s.id));
     if (byLabel) {
       next[byLabel.id] = entry.playerId;
       used.add(byLabel.id);
       continue;
     }
-    const open = to.slots.find((s) => !next[s.id] && s.families.length > 0 && !used.has(s.id));
+    const open = fieldSlots(to).find((s) => !next[s.id] && !used.has(s.id));
     if (open) {
       next[open.id] = entry.playerId;
       used.add(open.id);
@@ -179,4 +177,23 @@ export function remapAssignments(
   }
 
   return next;
+}
+
+/** Group slots into lines for the profile map (attack → defense). */
+export function slotLines(formation: Formation): FormationSlot[][] {
+  const slots = [...fieldSlots(formation)].sort((a, b) => a.y - b.y || a.x - b.x);
+  const lines: FormationSlot[][] = [];
+  let current: FormationSlot[] = [];
+  let lastY = -1;
+
+  for (const slot of slots) {
+    if (current.length && Math.abs(slot.y - lastY) > 8) {
+      lines.push(current);
+      current = [];
+    }
+    current.push(slot);
+    lastY = slot.y;
+  }
+  if (current.length) lines.push(current);
+  return lines;
 }

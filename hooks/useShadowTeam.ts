@@ -11,6 +11,7 @@ import {
   saveShadowTeamState,
   setFormation,
   STORAGE_KEY,
+  dropPlayerOnSlot,
   swapSlots,
   type ShadowTeamState,
 } from "@/lib/shadowTeamStorage";
@@ -72,6 +73,14 @@ export function useShadowTeam() {
     [state, persist],
   );
 
+  const dropOnSlot = useCallback(
+    (sourceSlotId: string | null, targetSlotId: string, playerId: string) => {
+      if (!state) return;
+      persist(dropPlayerOnSlot(state, sourceSlotId, targetSlotId, playerId));
+    },
+    [state, persist],
+  );
+
   const changeFormation = useCallback(
     (formationId: string) => {
       if (!state) return;
@@ -97,6 +106,7 @@ export function useShadowTeam() {
     toggleSquad,
     assign,
     swap,
+    dropOnSlot,
     changeFormation,
     isWatchlisted,
     isInSquad,

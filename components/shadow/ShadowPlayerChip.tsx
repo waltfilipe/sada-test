@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { ClubLogo } from "@/components/ClubLogo";
+import { ShadowPlayerTooltip } from "@/components/shadow/ShadowPlayerMiniReport";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
-import type { PlayerSummary } from "@/lib/types";
+import type { PlayerSearchRow } from "@/lib/types";
 
 type Props = {
-  player: PlayerSummary;
+  player: PlayerSearchRow;
   size?: "sm" | "md";
   onRemove?: () => void;
   onClick?: () => void;
@@ -71,7 +72,7 @@ export function ShadowPlayerRow({
   profileLabel,
   onRemove,
 }: {
-  player: PlayerSummary;
+  player: PlayerSearchRow;
   profileLabel?: string | null;
   onRemove?: () => void;
 }) {
@@ -80,27 +81,29 @@ export function ShadowPlayerRow({
 
   return (
     <div className="shadow-player-row">
-      <Link href={`/posicao/${player.position_family}?atleta=${player.player_id}`} className="shadow-player-row-link">
-        <span className="shadow-player-row-photo">
-          {photo ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={photo} alt="" loading="lazy" />
-          ) : (
-            <span>{playerInitials(player.name)}</span>
-          )}
-        </span>
-        <span className="shadow-player-row-copy">
-          <strong>{player.name}</strong>
-          <em>
-            <ClubLogo club={player.club} size={13} />
-            {player.position}
-            {profileLabel ? ` · ${profileLabel}` : ""}
-          </em>
-        </span>
-        <span className="shadow-player-row-rating tabular" style={tierVars(token)}>
-          {formatRating(player.rating)}
-        </span>
-      </Link>
+      <ShadowPlayerTooltip player={player} block>
+        <Link href={`/posicao/${player.position_family}?atleta=${player.player_id}`} className="shadow-player-row-link">
+          <span className="shadow-player-row-photo">
+            {photo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={photo} alt="" loading="lazy" />
+            ) : (
+              <span>{playerInitials(player.name)}</span>
+            )}
+          </span>
+          <span className="shadow-player-row-copy">
+            <strong>{player.name}</strong>
+            <em>
+              <ClubLogo club={player.club} size={13} />
+              {player.position}
+              {profileLabel ? ` · ${profileLabel}` : ""}
+            </em>
+          </span>
+          <span className="shadow-player-row-rating tabular" style={tierVars(token)}>
+            {formatRating(player.rating)}
+          </span>
+        </Link>
+      </ShadowPlayerTooltip>
       {onRemove ? (
         <button type="button" className="shadow-player-row-remove" aria-label={`Remover ${player.name}`} onClick={onRemove}>
           <i className="fa-solid fa-trash-can" aria-hidden="true" />

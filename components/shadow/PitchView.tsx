@@ -1,21 +1,34 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ShadowPlayerChip } from "@/components/shadow/ShadowPlayerChip";
-import { formationById, type FormationSlot } from "@/lib/formations";
-import type { PlayerSummary } from "@/lib/types";
+import { ShadowPlayerTooltip } from "@/components/shadow/ShadowPlayerMiniReport";
+import { fieldSlots, formationById, type FormationSlot } from "@/lib/formations";
+import type { PlayerSearchRow } from "@/lib/types";
+
+const DRAG_MIME = "application/x-shadow-player";
+
+type DragPayload = { playerId: string; sourceSlotId: string | null };
+
+function parseDrag(data: DataTransfer): DragPayload | null {
+  const raw = data.getData(DRAG_MIME);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as DragPayload;
+  } catch {
+    return null;
+  }
+}
 
 type Props = {
   formationId: string;
   assignments: Record<string, string | null>;
-  playersById: Map<string, PlayerSummary>;
+  playersById: Map<string, PlayerSearchRow>;
   selectedSlotId: string | null;
-  swapSourceId: string | null;
   placementPlayerId: string | null;
   onSelectSlot: (slotId: string | null) => void;
-  onSwapSource: (slotId: string | null) => void;
   onAssign: (slotId: string, playerId: string | null) => void;
-  onSwap: (slotA: string, slotB: string) => void;
+  onDrop: (sourceSlotId: string | null, targetSlotId: string, playerId: string) => void;
 };
 
 export function PitchView({
@@ -23,26 +36,41 @@ export function PitchView({
   assignments,
   playersById,
   selectedSlotId,
-  swapSourceId,
   placementPlayerId,
   onSelectSlot,
-  onSwapSource,
   onAssign,
-  onSwap,
+  onDrop,
 }: Props) {
   const formation = useMemo(() => formationById(formationId), [formationId]);
+  const slots = useMemo(() => fieldSlots(formation), [formation]);
+  const [dragOverSlotId, setDragOverSlotId] = useState<string | null>(null);
 
   function handleSlotClick(slot: FormationSlot) {
-    if (swapSourceId && swapSourceId !== slot.id) {
-      onSwap(swapSourceId, slot.id);
-      onSwapSource(null);
-      return;
-    }
     if (placementPlayerId) {
-      onAssign(slot.id, placementPlayerId);
+      onDrop(null, slot.id, placementPlayerId);
       return;
     }
     onSelectSlot(selectedSlotId === slot.id ? null : slot.id);
+  }
+
+  function handleDragStart(e: React.DragEvent, playerId: string, sourceSlotId: string | null) {
+    const payload: DragPayload = { playerId, sourceSlotId };
+    e.dataTransfer.setData(DRAG_MIME, JSON.stringify(payload));
+    e.dataTransfer.effectAllowed = "move";
+  }
+
+  function handleDragOver(e: React.DragEvent, slotId: string) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverSlotId(slotId);
+  }
+
+  function handleDrop(e: React.DragEvent, slot: FormationSlot) {
+    e.preventDefault();
+    setDragOverSlotId(null);
+    const payload = parseDrag(e.dataTransfer);
+    if (!payload) return;
+    onDrop(payload.sourceSlotId, slot.id, payload.playerId);
   }
 
   return (
@@ -55,40 +83,41 @@ export function PitchView({
           <span className="shadow-pitch-box shadow-pitch-box-bottom" />
         </div>
 
-        {formation.slots.map((slot) => {
+        {slots.map((slot) => {
           const playerId = assignments[slot.id];
           const player = playerId ? playersById.get(playerId) : undefined;
           const isSelected = selectedSlotId === slot.id;
-          const isSwap = swapSourceId === slot.id;
+          const isDragOver = dragOverSlotId === slot.id;
           const isPlacementTarget = Boolean(placementPlayerId);
 
           return (
             <div
               key={slot.id}
-              className={`shadow-pitch-slot${isSelected ? " selected" : ""}${isSwap ? " swap-source" : ""}${isPlacementTarget ? " placement-mode" : ""}${player ? " filled" : " empty"}`}
+              className={`shadow-pitch-slot${isSelected ? " selected" : ""}${isDragOver ? " drag-over" : ""}${isPlacementTarget ? " placement-mode" : ""}${player ? " filled" : " empty"}`}
               style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
+              onDragOver={(e) => handleDragOver(e, slot.id)}
+              onDragLeave={() => setDragOverSlotId((id) => (id === slot.id ? null : id))}
+              onDrop={(e) => handleDrop(e, slot)}
             >
-              <button
-                type="button"
-                className="shadow-slot-hit"
-                onClick={() => handleSlotClick(slot)}
-                onDoubleClick={(e) => {
-                  e.preventDefault();
-                  onSwapSource(swapSourceId === slot.id ? null : slot.id);
-                }}
-                title={player ? `${player.name} — duplo clique para trocar` : `Posição ${slot.label}`}
-              >
-                <span className="shadow-slot-label">{slot.label}</span>
-                {player ? (
-                  <span className="shadow-slot-player">
+              <span className="shadow-slot-label">{slot.label}</span>
+              {player ? (
+                <div
+                  className="shadow-slot-draggable"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, player.player_id, slot.id)}
+                  onClick={() => handleSlotClick(slot)}
+                >
+                  <ShadowPlayerTooltip player={player} block>
                     <ShadowPlayerChip player={player} size="sm" />
-                  </span>
-                ) : (
+                  </ShadowPlayerTooltip>
+                </div>
+              ) : (
+                <button type="button" className="shadow-slot-hit" onClick={() => handleSlotClick(slot)}>
                   <span className="shadow-slot-empty">
                     <i className="fa-solid fa-plus" aria-hidden="true" />
                   </span>
-                )}
-              </button>
+                </button>
+              )}
               {player && isSelected ? (
                 <button
                   type="button"
@@ -104,20 +133,13 @@ export function PitchView({
         })}
       </div>
 
-      {swapSourceId ? (
-        <p className="shadow-pitch-hint">
-          <i className="fa-solid fa-right-left" aria-hidden="true" /> Clique em outra posição para trocar, ou{" "}
-          <button type="button" className="shadow-link-btn" onClick={() => onSwapSource(null)}>
-            cancelar
-          </button>
-        </p>
-      ) : placementPlayerId ? (
+      {placementPlayerId ? (
         <p className="shadow-pitch-hint">
           <i className="fa-solid fa-location-dot" aria-hidden="true" /> Clique na posição para escalar o reserva
         </p>
       ) : (
         <p className="shadow-pitch-hint">
-          Clique na posição para detalhes · duplo clique para trocar · use o banco para escalar reservas
+          Arraste jogadores entre posições · clique para detalhes · use o banco para escalar reservas
         </p>
       )}
     </div>
@@ -130,12 +152,14 @@ export function BenchStrip({
   placementPlayerId,
   onPlace,
   onRemove,
+  onDropStart,
 }: {
   playerIds: string[];
-  playersById: Map<string, PlayerSummary>;
+  playersById: Map<string, PlayerSearchRow>;
   placementPlayerId: string | null;
   onPlace: (playerId: string | null) => void;
   onRemove: (playerId: string) => void;
+  onDropStart?: (playerId: string) => void;
 }) {
   if (!playerIds.length) {
     return <p className="shadow-bench-empty">Nenhum reserva — adicione atletas pelo botão + no perfil.</p>;
@@ -149,13 +173,26 @@ export function BenchStrip({
         const placing = placementPlayerId === id;
         return (
           <li key={id}>
-            <ShadowPlayerChip
-              player={player}
-              size="md"
-              selected={placing}
-              onClick={() => onPlace(placing ? null : id)}
-              onRemove={() => onRemove(id)}
-            />
+            <div
+              className="shadow-bench-draggable"
+              draggable
+              onDragStart={(e) => {
+                const payload: DragPayload = { playerId: id, sourceSlotId: null };
+                e.dataTransfer.setData(DRAG_MIME, JSON.stringify(payload));
+                e.dataTransfer.effectAllowed = "move";
+                onDropStart?.(id);
+              }}
+            >
+              <ShadowPlayerTooltip player={player} block>
+                <ShadowPlayerChip
+                  player={player}
+                  size="md"
+                  selected={placing}
+                  onClick={() => onPlace(placing ? null : id)}
+                  onRemove={() => onRemove(id)}
+                />
+              </ShadowPlayerTooltip>
+            </div>
           </li>
         );
       })}

@@ -1,7 +1,7 @@
 import { TimeSombraClient } from "./TimeSombraClient";
-import { getPlayers } from "@/lib/data.server";
+import { getSearchRows } from "@/lib/data.server";
 
 export default function TimeSombraPage() {
-  const players = getPlayers();
+  const players = getSearchRows();
   return <TimeSombraClient players={players} />;
 }

@@ -1,5 +1,6 @@
 import {
   DEFAULT_FORMATION_ID,
+  fieldSlots,
   formationById,
   remapAssignments,
   suggestSlotId,
@@ -27,7 +28,7 @@ export const EMPTY_STATE: ShadowTeamState = {
 };
 
 function emptyAssignments(formation: Formation): Record<string, string | null> {
-  return Object.fromEntries(formation.slots.map((s) => [s.id, null]));
+  return Object.fromEntries(fieldSlots(formation).map((s) => [s.id, null]));
 }
 
 export function loadShadowTeamState(): ShadowTeamState {
@@ -124,6 +125,44 @@ export function swapSlots(state: ShadowTeamState, slotA: string, slotB: string):
   assignments[slotA] = b;
   assignments[slotB] = a;
   return { ...state, assignments };
+}
+
+/** Drag-and-drop: move or swap between slots; bench source has null sourceSlotId. */
+export function dropPlayerOnSlot(
+  state: ShadowTeamState,
+  sourceSlotId: string | null,
+  targetSlotId: string,
+  playerId: string,
+): ShadowTeamState {
+  const assignments = { ...state.assignments };
+  const occupant = assignments[targetSlotId] ?? null;
+
+  let squadIds = state.squadIds;
+  if (!squadIds.includes(playerId)) squadIds = [...squadIds, playerId];
+
+  if (sourceSlotId) {
+    if (occupant && occupant !== playerId) {
+      assignments[sourceSlotId] = occupant;
+      assignments[targetSlotId] = playerId;
+    } else {
+      assignments[sourceSlotId] = null;
+      for (const key of Object.keys(assignments)) {
+        if (key !== targetSlotId && assignments[key] === playerId) assignments[key] = null;
+      }
+      assignments[targetSlotId] = playerId;
+    }
+  } else {
+    for (const key of Object.keys(assignments)) {
+      if (assignments[key] === playerId) assignments[key] = null;
+    }
+    if (occupant && occupant !== playerId) {
+      assignments[targetSlotId] = playerId;
+    } else {
+      assignments[targetSlotId] = playerId;
+    }
+  }
+
+  return { ...state, squadIds, assignments };
 }
 
 export function setFormation(state: ShadowTeamState, formationId: string): ShadowTeamState {
