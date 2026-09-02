@@ -3,15 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ArchetypeDuel } from "@/components/compare/ArchetypeDuel";
-import { CompareOverview } from "@/components/compare/CompareOverview";
-import { CompareStatsSections } from "@/components/compare/CompareStatsSections";
-import { CompareTendenciesVersus } from "@/components/compare/CompareTendenciesVersus";
-import { DuelHero } from "@/components/compare/DuelHero";
+import { ComparePlayerColumn } from "@/components/compare/ComparePlayerColumn";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
-import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
-import { playerSectionScore } from "@/lib/sectionGrades";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Metric = { key: string; label: string };
@@ -22,74 +16,66 @@ type Props = {
   scatterMetrics: Metric[];
   initialA?: string;
   initialB?: string;
+  initialC?: string;
+  initialTriple?: boolean;
 };
 
-function countVersusMetrics(a: PlayerProfile, b: PlayerProfile, family: PositionFamily) {
-  const metrics: number[] = [a.ratings.geral - b.ratings.geral];
-
-  const sections = statSectionsForFamily(family);
-  for (const section of sections) {
-    const scoreA = playerSectionScore(a, family, section.title);
-    const scoreB = playerSectionScore(b, family, section.title);
-    if (scoreA != null && scoreB != null) metrics.push(scoreA - scoreB);
+function pickPlayer(
+  requested: string | undefined,
+  players: PlayerProfile[],
+  exclude: Set<string>,
+  fallbackIndex: number,
+): string {
+  if (requested && players.some((p) => p.player_id === requested) && !exclude.has(requested)) {
+    return requested;
   }
-
-  if (a.cluster && b.cluster) {
-    const archetypes = Object.keys(a.cluster.shares);
-    for (const key of archetypes) {
-      const shareA = a.cluster.shares[key as keyof typeof a.cluster.shares] ?? 0;
-      const shareB = b.cluster.shares[key as keyof typeof b.cluster.shares] ?? 0;
-      const ratingA = a.cluster.ratings[key as keyof typeof a.cluster.ratings] ?? 0;
-      const ratingB = b.cluster.ratings[key as keyof typeof b.cluster.ratings] ?? 0;
-      metrics.push(shareA - shareB, ratingA - ratingB);
-    }
-  }
-
-  return metrics;
+  const available = players.find((p, index) => index >= fallbackIndex && !exclude.has(p.player_id));
+  if (available) return available.player_id;
+  return players.find((p) => !exclude.has(p.player_id))?.player_id ?? players[0]?.player_id ?? "";
 }
 
-export function CompararClient({ family, players, initialA, initialB }: Props) {
+export function CompararClient({
+  family,
+  players,
+  initialA,
+  initialB,
+  initialC,
+  initialTriple,
+}: Props) {
   const router = useRouter();
   const familyMeta = familyBySlug(family);
 
-  const pick = (requested: string | undefined, fallbackIndex: number) => {
-    if (requested && players.some((player) => player.player_id === requested)) return requested;
-    return players[fallbackIndex]?.player_id ?? players[0]?.player_id ?? "";
-  };
-
-  const [idA, setIdA] = useState(() => pick(initialA, 0));
+  const [triple, setTriple] = useState(() => Boolean(initialTriple || initialC));
+  const [idA, setIdA] = useState(() => pickPlayer(initialA, players, new Set(), 0));
   const [idB, setIdB] = useState(() => {
-    const chosen = pick(initialB, 1);
-    const first = pick(initialA, 0);
-    if (chosen !== first) return chosen;
-    return players.find((player) => player.player_id !== first)?.player_id ?? chosen;
+    const first = pickPlayer(initialA, players, new Set(), 0);
+    return pickPlayer(initialB, players, new Set([first]), 1);
+  });
+  const [idC, setIdC] = useState(() => {
+    const first = pickPlayer(initialA, players, new Set(), 0);
+    const second = pickPlayer(initialB, players, new Set([first]), 1);
+    return pickPlayer(initialC, players, new Set([first, second]), 2);
   });
 
-  const a = players.find((player) => player.player_id === idA) ?? players[0];
-  const b = players.find((player) => player.player_id === idB) ?? players[1] ?? players[0];
-
-  const hasCluster = Boolean(a?.cluster && b?.cluster);
-
-  const swap = () => {
-    setIdA(idB);
-    setIdB(idA);
-  };
+  const playerA = players.find((p) => p.player_id === idA) ?? players[0];
+  const playerB = players.find((p) => p.player_id === idB) ?? players[1] ?? players[0];
+  const playerC = players.find((p) => p.player_id === idC) ?? players[2] ?? players[0];
 
   useEffect(() => {
     const params = new URLSearchParams();
     params.set("posicao", family);
     if (idA) params.set("a", idA);
     if (idB) params.set("b", idB);
+    if (triple && idC) {
+      params.set("c", idC);
+      params.set("triple", "1");
+    }
     router.replace(`/comparar?${params.toString()}`, { scroll: false });
-  }, [family, idA, idB, router]);
+  }, [family, idA, idB, idC, triple, router]);
 
-  const verdict = useMemo(() => {
-    if (!a || !b) return null;
-    const metrics = countVersusMetrics(a, b, family);
-    const winsA = metrics.filter((value) => value > 0).length;
-    const winsB = metrics.filter((value) => value < 0).length;
-    return { winsA, winsB, total: metrics.length };
-  }, [a, b, family]);
+  const excludeForA = useMemo(() => new Set(triple ? [idB, idC] : [idB]), [idB, idC, triple]);
+  const excludeForB = useMemo(() => new Set(triple ? [idA, idC] : [idA]), [idA, idC, triple]);
+  const excludeForC = useMemo(() => new Set([idA, idB]), [idA, idB]);
 
   const positionTabs = (
     <nav className="position-tabs" aria-label="Posições">
@@ -107,7 +93,7 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
     </nav>
   );
 
-  if (!a || !b) {
+  if (!playerA || !playerB || players.length < 2) {
     return (
       <div className="scout-root compare-root">
         <ScoutTopbar active="comparar" center={positionTabs} />
@@ -116,46 +102,81 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
     );
   }
 
+  const toggleTriple = () => {
+    if (triple) {
+      setTriple(false);
+      return;
+    }
+    if (players.length < 3) return;
+    setIdC((current) => pickPlayer(current, players, new Set([idA, idB]), 2));
+    setTriple(true);
+  };
+
   return (
     <div className="scout-root compare-root">
       <ScoutTopbar active="comparar" center={positionTabs} />
 
       <main className="compare-canvas">
-        <DuelHero
-          a={a}
-          b={b}
-          players={players}
-          family={family}
-          verdict={verdict}
-          onChangeA={setIdA}
-          onChangeB={setIdB}
-          onSwap={swap}
-        />
+        <div className="compare-toolbar">
+          <div className="compare-toolbar-copy">
+            <h1 className="compare-toolbar-title">Comparar atletas</h1>
+            <p className="compare-toolbar-sub">{familyMeta.label} · lado a lado</p>
+          </div>
 
-        <CompareOverview
-          playerA={a}
-          playerB={b}
-          family={family}
-          players={players}
-          verdict={verdict}
-        />
+          <div className="compare-toolbar-actions">
+            {players.length >= 3 ? (
+              <button
+                type="button"
+                className={`btn btn-ghost btn-sm compare-triple-toggle${triple ? " is-active" : ""}`}
+                onClick={toggleTriple}
+                aria-pressed={triple}
+              >
+                <i className={`fa-solid ${triple ? "fa-user-minus" : "fa-user-plus"}`} aria-hidden="true" />
+                {triple ? "Comparar 2 atletas" : "Comparar 3 atletas"}
+              </button>
+            ) : null}
 
-        <div className="compare-triple-grid">
-          {hasCluster ? (
-            <ArchetypeDuel a={a} b={b} family={family} />
-          ) : (
-            <div className="player-card compare-empty-panel" aria-hidden="true" />
-          )}
-
-          <CompareStatsSections playerA={a} playerB={b} family={family} />
-
-          <CompareTendenciesVersus playerA={a} playerB={b} />
+            <Link className="btn btn-ghost btn-sm" href={`/scatter?posicao=${family}&a=${idA}&b=${idB}`}>
+              <i className="fa-solid fa-chart-scatter" aria-hidden="true" /> Scatter
+            </Link>
+          </div>
         </div>
 
-        <div className="compare-links">
-          <Link href={`/scatter?posicao=${family}&a=${a.player_id}&b=${b.player_id}`}>
-            <i className="fa-solid fa-chart-scatter" aria-hidden="true" /> Ver no scatter
-          </Link>
+        <div className={`compare-player-columns${triple ? " is-triple" : ""}`}>
+          <ComparePlayerColumn
+            side="a"
+            label="Atleta 1"
+            player={playerA}
+            players={players}
+            family={family}
+            pool={players}
+            excludeIds={excludeForA}
+            onChange={setIdA}
+          />
+
+          <ComparePlayerColumn
+            side="b"
+            label="Atleta 2"
+            player={playerB}
+            players={players}
+            family={family}
+            pool={players}
+            excludeIds={excludeForB}
+            onChange={setIdB}
+          />
+
+          {triple && playerC ? (
+            <ComparePlayerColumn
+              side="c"
+              label="Atleta 3"
+              player={playerC}
+              players={players}
+              family={family}
+              pool={players}
+              excludeIds={excludeForC}
+              onChange={setIdC}
+            />
+          ) : null}
         </div>
       </main>
     </div>

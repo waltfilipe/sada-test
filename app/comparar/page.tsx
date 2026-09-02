@@ -4,11 +4,11 @@ import { familyBySlug } from "@/lib/positions";
 import type { PositionFamily } from "@/lib/types";
 
 type Props = {
-  searchParams: Promise<{ posicao?: string; a?: string; b?: string }>;
+  searchParams: Promise<{ posicao?: string; a?: string; b?: string; c?: string; triple?: string }>;
 };
 
 export default async function CompararPage({ searchParams }: Props) {
-  const { posicao, a, b } = await searchParams;
+  const { posicao, a, b, c, triple } = await searchParams;
   const family = familyBySlug(posicao ?? "zagueiros");
   const players = getFamilyPlayers(family.key as PositionFamily);
   const meta = getMeta();
@@ -22,6 +22,8 @@ export default async function CompararPage({ searchParams }: Props) {
       scatterMetrics={scatterMetrics}
       initialA={a}
       initialB={b}
+      initialC={c}
+      initialTriple={triple === "1" || Boolean(c)}
     />
   );
 }
