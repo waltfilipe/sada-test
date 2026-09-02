@@ -6,7 +6,6 @@ import { Tooltip } from "@/components/ui/Tooltip";
 import { playerInitials, ratingTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
-import { TendenciesButton } from "./ProfileSharePanel";
 
 type Props = {
   player: PlayerProfile;
@@ -167,7 +166,6 @@ export function PlayerHero({ player, family }: Props) {
                 <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
               </a>
             ) : null}
-            <TendenciesButton player={player} />
             <AddToShadowMenu playerId={player.player_id} family={family} />
           </div>
         </div>

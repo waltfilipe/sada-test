@@ -2,10 +2,11 @@
 
 import { useMemo } from "react";
 import { StatBadgeStrip, StatMedalCount } from "@/components/position/profile/StatBadgeStrip";
+import { GradeBadge } from "@/components/ui/GradeBadge";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { earnedStatBadges } from "@/lib/statBadges";
-import { playerSectionScore } from "@/lib/sectionGrades";
+import { buildSectionGradeLookup, getPlayerSectionGrade, playerSectionScore } from "@/lib/sectionGrades";
 import { ratingToLetterGrade } from "@/lib/scoutTheme";
 import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -13,6 +14,7 @@ type Props = {
   playerA: PlayerProfile;
   playerB: PlayerProfile;
   family: PositionFamily;
+  players: PlayerProfile[];
   verdict: { winsA: number; winsB: number; total: number } | null;
 };
 
@@ -23,6 +25,8 @@ type SectionSnapshot = {
   badgesB: ReturnType<typeof earnedStatBadges>;
   scoreA: number | null;
   scoreB: number | null;
+  gradeA: string | null;
+  gradeB: string | null;
   leader: "a" | "b" | "tie";
 };
 
@@ -32,9 +36,10 @@ function shortName(name: string): string {
   return `${parts[0]} ${parts[parts.length - 1][0]}.`;
 }
 
-export function CompareOverview({ playerA, playerB, family, verdict }: Props) {
+export function CompareOverview({ playerA, playerB, family, players, verdict }: Props) {
   const aspectsA = useMemo(() => flattenAspects(playerA), [playerA]);
   const aspectsB = useMemo(() => flattenAspects(playerB), [playerB]);
+  const gradeLookup = useMemo(() => buildSectionGradeLookup(players, family), [players, family]);
 
   const sections = useMemo<SectionSnapshot[]>(() => {
     const list: SectionSnapshot[] = [];
@@ -80,11 +85,13 @@ export function CompareOverview({ playerA, playerB, family, verdict }: Props) {
         badgesB: earnedStatBadges(itemsB, titleByItem),
         scoreA: scoreA ?? null,
         scoreB: scoreB ?? null,
+        gradeA: getPlayerSectionGrade(gradeLookup, playerA.player_id, section.title) ?? null,
+        gradeB: getPlayerSectionGrade(gradeLookup, playerB.player_id, section.title) ?? null,
         leader,
       });
     }
     return list;
-  }, [family, playerA, playerB, aspectsA, aspectsB]);
+  }, [family, playerA, playerB, aspectsA, aspectsB, gradeLookup]);
 
   const ratingDelta = (playerA.ratings.geral ?? playerA.rating) - (playerB.ratings.geral ?? playerB.rating);
   const ratingLeader = ratingDelta === 0 ? "tie" : ratingDelta > 0 ? "a" : "b";
@@ -137,6 +144,11 @@ export function CompareOverview({ playerA, playerB, family, verdict }: Props) {
             }
           >
             <span className="compare-overview-chip-title">{section.title}</span>
+            <span className="compare-overview-chip-grades">
+              <GradeBadge letter={section.gradeA} size="sm" />
+              <span className="compare-overview-chip-vs">vs</span>
+              <GradeBadge letter={section.gradeB} size="sm" />
+            </span>
             <span className="compare-overview-chip-badges">
               <StatBadgeStrip badges={section.badgesA} tone={section.tone} />
               <span className="compare-overview-chip-vs">vs</span>

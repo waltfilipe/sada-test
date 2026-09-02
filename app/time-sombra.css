@@ -258,47 +258,59 @@
 .shadow-mini-report-hero {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  flex-wrap: wrap;
+  gap: 0.65rem;
 }
 
 .shadow-mini-report-grade {
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   font-weight: 800;
   line-height: 1;
+  flex-shrink: 0;
 }
 
-.shadow-mini-report-rating {
-  font-size: 0.78rem;
-  color: var(--muted, #94a3b8);
+.shadow-mini-report-dominant {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.shadow-mini-report-dominant-rating {
+  font-family: "Sora", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text, #f8fafc);
 }
 
 .shadow-mini-report-profile {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--accent, #5eead4);
+  line-height: 1.2;
 }
 
-.shadow-mini-report-ratings {
+.shadow-mini-report-blocks {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
-.shadow-mini-report-rating-pill {
-  display: inline-flex;
+.shadow-mini-report-block-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.shadow-mini-report-block {
+  display: flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.15rem 0.45rem;
+  gap: 0.4rem;
+  padding: 0.3rem 0.45rem;
   border-radius: 6px;
-  background: rgba(15, 23, 42, 0.6);
-  font-size: 0.68rem;
-}
-
-.shadow-mini-report-rating-pill em {
-  font-style: normal;
-  color: var(--muted, #94a3b8);
-  text-transform: capitalize;
+  background: rgba(15, 23, 42, 0.55);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted, #cbd5e1);
 }
 
 .shadow-mini-report-section-label {
@@ -308,45 +320,7 @@
   letter-spacing: 0.07em;
   color: var(--muted, #94a3b8);
   font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-.shadow-mini-report-tendencies {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.shadow-mini-tendency-row {
-  display: grid;
-  grid-template-columns: 1fr 3.5rem 1.6rem;
-  gap: 0.35rem;
-  align-items: center;
-}
-
-.shadow-mini-tendency-label {
-  font-size: 0.68rem;
-  color: var(--muted, #cbd5e1);
-}
-
-.shadow-mini-tendency-track {
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(148, 163, 184, 0.2);
-  overflow: hidden;
-}
-
-.shadow-mini-tendency-track i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #1be7ff, #31e981);
-}
-
-.shadow-mini-tendency-val {
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-align: right;
+  margin-bottom: 0.15rem;
 }
 
 .shadow-mini-report-market {

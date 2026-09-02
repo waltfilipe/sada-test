@@ -1,16 +1,20 @@
 "use client";
 
+import { useMemo } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
+import { GradeBadge } from "@/components/ui/GradeBadge";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { useFamilyGradeLookup } from "@/hooks/useFamilyGradeLookup";
 import { usePlayerProfile } from "@/hooks/usePlayerProfileCache";
+import { sortedProfileShareRows } from "@/lib/profileShares";
+import { statSectionsForFamily } from "@/lib/aspectStatSections";
+import { getPlayerSectionGrade } from "@/lib/sectionGrades";
+import { sectionShortLabel } from "@/lib/sectionLabels";
 import {
-  clampPercent,
   formatRating,
-  playerInitials,
   ratingTier,
   ratingToLetterGrade,
   tierVars,
-  TENDENCY_META,
 } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
 
@@ -28,14 +32,34 @@ function monthsRemaining(iso?: string | null): string {
 
 export function ShadowPlayerMiniReport({ player }: { player: PlayerSearchRow }) {
   const { profile, loading } = usePlayerProfile(player.player_id, true);
-  const tm = player.transfermarkt ?? profile?.transfermarkt;
-  const rating = profile?.ratings.geral ?? player.rating;
-  const token = ratingTier(rating);
-  const archetype = player.cluster?.archetype_label ?? player.profile;
+  const { lookup: gradeLookup } = useFamilyGradeLookup(player.position_family, true);
 
-  const ratingEntries = profile
-    ? Object.entries(profile.ratings).filter(([key]) => key !== "geral" && key !== "perfil")
-    : [];
+  const tm = player.transfermarkt ?? profile?.transfermarkt;
+  const overall = profile?.ratings.geral ?? player.rating;
+  const overallToken = ratingTier(overall);
+  const overallLetter = ratingToLetterGrade(overall);
+
+  const dominant = useMemo(() => {
+    if (profile) {
+      const rows = sortedProfileShareRows(profile);
+      if (rows.length) return rows[0];
+    }
+    return {
+      label: player.cluster?.archetype_label ?? player.profile,
+      rating: overall,
+    };
+  }, [profile, player.cluster?.archetype_label, player.profile, overall]);
+
+  const sectionGrades = useMemo(() => {
+    if (!gradeLookup) return [];
+    return statSectionsForFamily(player.position_family)
+      .map((section) => {
+        const letter = getPlayerSectionGrade(gradeLookup, player.player_id, section.title);
+        if (!letter) return null;
+        return { title: section.title, short: sectionShortLabel(section.title), letter };
+      })
+      .filter((entry): entry is { title: string; short: string; letter: string } => Boolean(entry));
+  }, [gradeLookup, player.player_id, player.position_family]);
 
   return (
     <div className="shadow-mini-report">
@@ -48,42 +72,30 @@ export function ShadowPlayerMiniReport({ player }: { player: PlayerSearchRow }) 
       </div>
 
       <div className="shadow-mini-report-hero">
-        <span className="shadow-mini-report-grade" style={tierVars(token)}>
-          {ratingToLetterGrade(rating)}
+        <span className="shadow-mini-report-grade" style={tierVars(overallToken)}>
+          {overallLetter}
         </span>
-        <span className="shadow-mini-report-rating tabular">
-          Rating <strong>{formatRating(rating)}</strong>
-        </span>
-        <span className="shadow-mini-report-profile">{archetype}</span>
+        <div className="shadow-mini-report-dominant">
+          <span className="shadow-mini-report-dominant-rating tabular">
+            {formatRating(dominant.rating)}
+          </span>
+          <span className="shadow-mini-report-profile">{dominant.label}</span>
+        </div>
       </div>
 
-      {ratingEntries.length > 0 ? (
-        <div className="shadow-mini-report-ratings">
-          {ratingEntries.slice(0, 4).map(([key, value]) => (
-            <span key={key} className="shadow-mini-report-rating-pill tabular">
-              <em>{key.replace(/_/g, " ")}</em>
-              <strong style={tierVars(ratingTier(value))}>{formatRating(value)}</strong>
-            </span>
-          ))}
+      {sectionGrades.length > 0 ? (
+        <div className="shadow-mini-report-blocks">
+          <span className="shadow-mini-report-section-label">Blocos de posição</span>
+          <div className="shadow-mini-report-block-grid">
+            {sectionGrades.map((section) => (
+              <div key={section.title} className="shadow-mini-report-block">
+                <GradeBadge letter={section.letter} size="sm" />
+                <span>{section.short}</span>
+              </div>
+            ))}
+          </div>
         </div>
       ) : null}
-
-      <div className="shadow-mini-report-tendencies">
-        <span className="shadow-mini-report-section-label">Tendências</span>
-        {TENDENCY_META.map((item) => {
-          const raw = player.tendencies[item.key] ?? 0;
-          const value = clampPercent(raw);
-          return (
-            <div key={item.key} className="shadow-mini-tendency-row">
-              <span className="shadow-mini-tendency-label">{item.label}</span>
-              <span className="shadow-mini-tendency-track" aria-hidden="true">
-                <i style={{ width: `${value}%` }} />
-              </span>
-              <span className="shadow-mini-tendency-val tabular">{Math.round(value)}</span>
-            </div>
-          );
-        })}
-      </div>
 
       <div className="shadow-mini-report-market">
         <div>
@@ -96,7 +108,7 @@ export function ShadowPlayerMiniReport({ player }: { player: PlayerSearchRow }) 
         </div>
       </div>
 
-      {loading ? <p className="shadow-mini-report-loading">Carregando ratings…</p> : null}
+      {loading ? <p className="shadow-mini-report-loading">Carregando perfil…</p> : null}
     </div>
   );
 }

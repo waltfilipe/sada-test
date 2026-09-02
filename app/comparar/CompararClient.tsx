@@ -6,8 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 import { ArchetypeDuel } from "@/components/compare/ArchetypeDuel";
 import { CompareOverview } from "@/components/compare/CompareOverview";
 import { CompareStatsSections } from "@/components/compare/CompareStatsSections";
+import { CompareTendenciesVersus } from "@/components/compare/CompareTendenciesVersus";
 import { DuelHero } from "@/components/compare/DuelHero";
-import { ProfileBarsVersus } from "@/components/compare/ProfileBarsVersus";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
@@ -67,12 +67,6 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
 
   const a = players.find((player) => player.player_id === idA) ?? players[0];
   const b = players.find((player) => player.player_id === idB) ?? players[1] ?? players[0];
-
-  const hasProfileBars =
-    (a?.aspects.perfil_construcao?.length ?? 0) > 0 ||
-    (b?.aspects.perfil_construcao?.length ?? 0) > 0 ||
-    (a?.aspects.perfil_defensivo?.length ?? 0) > 0 ||
-    (b?.aspects.perfil_defensivo?.length ?? 0) > 0;
 
   const hasCluster = Boolean(a?.cluster && b?.cluster);
 
@@ -142,35 +136,21 @@ export function CompararClient({ family, players, initialA, initialB }: Props) {
           playerA={a}
           playerB={b}
           family={family}
+          players={players}
           verdict={verdict}
         />
 
-        <div className="compare-body">
+        <div className="compare-triple-grid">
           {hasCluster ? (
-            <aside className="compare-sidebar">
-              <ArchetypeDuel a={a} b={b} family={family} />
-            </aside>
-          ) : null}
+            <ArchetypeDuel a={a} b={b} family={family} />
+          ) : (
+            <div className="player-card compare-empty-panel" aria-hidden="true" />
+          )}
 
-          <CompareStatsSections
-            playerA={a}
-            playerB={b}
-            family={family}
-          />
+          <CompareStatsSections playerA={a} playerB={b} family={family} />
+
+          <CompareTendenciesVersus playerA={a} playerB={b} />
         </div>
-
-        {hasProfileBars ? (
-          <section className="player-card compare-tendencies-card">
-            <div className="profile-card-head">
-              <h3 className="section-label">Tendências de jogo</h3>
-              <span className="profile-card-head-hint">Ponto do atleta vs média do pool</span>
-            </div>
-            <div className="profile-bars-versus-grid">
-              <ProfileBarsVersus title="Construção" a={a} b={b} aspectKey="perfil_construcao" />
-              <ProfileBarsVersus title="Defensivo" a={a} b={b} aspectKey="perfil_defensivo" />
-            </div>
-          </section>
-        ) : null}
 
         <div className="compare-links">
           <Link href={`/scatter?posicao=${family}&a=${a.player_id}&b=${b.player_id}`}>
