@@ -1,7 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LAT_ARCHETYPE_META, LAT_HYBRID_BADGE_META, MC_ARCHETYPE_META, MC_HYBRID_BADGE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
+import {
+  EX_ARCHETYPE_META,
+  EX_HYBRID_BADGE_META,
+  LAT_ARCHETYPE_META,
+  LAT_HYBRID_BADGE_META,
+  MC_ARCHETYPE_META,
+  MC_HYBRID_BADGE_META,
+  ZAG_ARCHETYPE_META,
+} from "@/lib/clusterMeta";
 import { ClubLogo } from "@/components/ClubLogo";
 import { formatRating, playerInitials, ratingGradientStyle } from "@/lib/scoutTheme";
 import { profileTone, sortPlayers } from "@/lib/scoutUi";
@@ -100,7 +108,9 @@ export function RosterRail({
                   ? LAT_ARCHETYPE_META
                   : family === "meio-campistas"
                     ? MC_ARCHETYPE_META
-                    : ZAG_ARCHETYPE_META
+                    : family === "extremos"
+                      ? EX_ARCHETYPE_META
+                      : ZAG_ARCHETYPE_META
                 ).map((item) => (
                   <button
                     key={item.archetype}
@@ -132,6 +142,21 @@ export function RosterRail({
               ) : family === "meio-campistas" ? (
                 <div className="cluster-filter-row" role="group" aria-label="Filtrar por badge híbrido">
                   {MC_HYBRID_BADGE_META.map((item) => (
+                    <button
+                      key={item.badge}
+                      type="button"
+                      className={`filter-chip cluster-hibrido ${clusterFilters.includes(item.badge) ? "active" : ""}`}
+                      onClick={() => onToggleClusterFilter(item.badge)}
+                      aria-pressed={clusterFilters.includes(item.badge)}
+                      title={item.description}
+                    >
+                      {item.short_label}
+                    </button>
+                  ))}
+                </div>
+              ) : family === "extremos" ? (
+                <div className="cluster-filter-row" role="group" aria-label="Filtrar por badge híbrido">
+                  {EX_HYBRID_BADGE_META.map((item) => (
                     <button
                       key={item.badge}
                       type="button"

@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { StatBadgeStrip, StatMedalCount } from "@/components/position/profile/StatBadgeStrip";
+import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { earnedStatBadges } from "@/lib/statBadges";
 import { playerSectionScore } from "@/lib/sectionGrades";
@@ -29,25 +30,6 @@ function shortName(name: string): string {
   const parts = name.trim().split(/\s+/);
   if (parts.length === 1) return parts[0];
   return `${parts[0]} ${parts[parts.length - 1][0]}.`;
-}
-
-function flattenAspects(player: PlayerProfile): AspectItem[] {
-  const groups = player.aspects;
-  return [
-    ...(groups.defensivos ?? []),
-    ...(groups.construcao ?? []),
-    ...(groups.ofensivos ?? []),
-    ...(groups.terco_final ?? []),
-  ];
-}
-
-function findAspect(items: AspectItem[], label: string): AspectItem | undefined {
-  const aliases: Record<string, string[]> = {
-    "Passes Finais": ["Passes Finas", "Passes Finais"],
-    Progressão: ["Progressão", "Conduções Progressivas"],
-  };
-  const candidates = aliases[label] ?? [label];
-  return items.find((item) => candidates.some((c) => item.label === c || item.label.startsWith(c)));
 }
 
 export function CompareOverview({ playerA, playerB, family, verdict }: Props) {

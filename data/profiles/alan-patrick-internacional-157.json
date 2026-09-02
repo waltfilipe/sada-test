@@ -4,7 +4,7 @@
   "club": "Internacional",
   "label": "Alan Patrick (Internacional)",
   "position": "Meia Ofensivo",
-  "position_family": "meias-ofensivos",
+  "position_family": "extremos",
   "nationality": "Brazil",
   "birth_year": 1991,
   "height": 177,
@@ -16,82 +16,30 @@
   "rating": 6.7,
   "ratings": {
     "geral": 6.7,
-    "armador": 8.1,
-    "finalizador": 6.7
+    "driblador": 6.2,
+    "meia_ponta": 7.1,
+    "ruptura": 6.0
   },
   "ranks": {
-    "geral": 23,
-    "armador": 18,
-    "finalizador": 39
+    "geral": 42,
+    "driblador": 53,
+    "meia_ponta": 16,
+    "ruptura": 62
   },
-  "profile": "Armador",
+  "profile": "Meia Ponta",
   "profile_shares": {
-    "armador": 58.0,
-    "finalizador": 42.0
+    "driblador": 14.0,
+    "meia_ponta": 72.0,
+    "ruptura": 14.0
   },
   "tendencies": {
-    "construcao": 70.0,
-    "ofensividade": 44.0,
-    "def1v1": 3.0,
-    "contencao": 5.0,
+    "construcao": 67.0,
+    "ofensividade": 34.0,
+    "def1v1": 36.0,
+    "contencao": 0.0,
     "duelo_aereo": 0.0
   },
   "aspects": {
-    "defensivos": [
-      {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 8.8,
-        "stats": [],
-        "display_value": "2,8",
-        "efficiency_pct": 92.5,
-        "efficiency_value": "67%"
-      },
-      {
-        "label": "Duelos Aéreos",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 21.1,
-        "stats": [],
-        "display_value": "0,9",
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%"
-      },
-      {
-        "label": "Eficiência Defensiva",
-        "kind": "def_efficiency_group",
-        "grade": "C+",
-        "percentile": 50.0,
-        "pair_badge": [
-          30.2,
-          50.0
-        ],
-        "sub_metrics": [
-          {
-            "label": "Ações bem-sucedidas",
-            "percentile": 30.2,
-            "display_value": "3,1"
-          },
-          {
-            "label": "Interceptações",
-            "percentile": 34.4,
-            "display_value": "0,4"
-          },
-          {
-            "label": "Rebatidas",
-            "percentile": 65.1,
-            "display_value": "0,8"
-          },
-          {
-            "label": "Eficiência Defensiva",
-            "percentile": 50.0,
-            "display_value": "0,30"
-          }
-        ],
-        "stats": []
-      }
-    ],
     "construcao": [
       {
         "label": "Passes Progressivos",
@@ -99,8 +47,8 @@
         "grade": "B",
         "certos_per90": 5.06,
         "display_value": "5,1",
-        "percentile": 72.9,
-        "efficiency_pct": 66.7,
+        "percentile": 73.7,
+        "efficiency_pct": 67.1,
         "efficiency_value": "79%",
         "stats": []
       },
@@ -110,8 +58,8 @@
         "grade": "B+",
         "certos_per90": 5.34,
         "display_value": "5,3",
-        "percentile": 83.1,
-        "efficiency_pct": 50.0,
+        "percentile": 82.7,
+        "efficiency_pct": 54.5,
         "efficiency_value": "76%",
         "stats": []
       },
@@ -121,68 +69,178 @@
         "grade": "C-",
         "certos_per90": 1.14,
         "display_value": "1,1",
-        "percentile": 25.0,
-        "efficiency_pct": 14.6,
+        "percentile": 27.5,
+        "efficiency_pct": 14.8,
         "efficiency_value": "44%",
-        "stats": []
-      }
-    ],
-    "perfil_construcao": [
-      {
-        "label": "Passes Longos",
-        "kind": "construction_share",
-        "grade": "D",
-        "percentile": 19.0,
-        "display_value": "3%",
-        "share_pct": 3.4,
-        "pool_avg_pct": 5.8,
-        "scale_max_pct": 30.0,
         "stats": []
       },
       {
-        "label": "Passes Progressivos",
-        "kind": "construction_share",
+        "label": "Distribuição",
+        "kind": "metric_group",
         "grade": "B",
-        "percentile": 73.0,
-        "display_value": "15%",
-        "share_pct": 15.2,
-        "pool_avg_pct": 14.1,
-        "scale_max_pct": 30.0,
+        "percentile": 66.3,
+        "sub_metrics": [
+          {
+            "label": "Passes",
+            "percentile": 66.3,
+            "display_value": "33,2"
+          },
+          {
+            "label": "Passes Recebidos",
+            "percentile": 64.6,
+            "display_value": "25,9"
+          }
+        ],
         "stats": []
       }
     ],
-    "perfil_defensivo": [],
-    "ofensivos": [
+    "passes_finais": [
+      {
+        "label": "Passes Chave",
+        "kind": "metric",
+        "grade": "B-",
+        "percentile": 57.4,
+        "stats": [],
+        "display_value": "0,6"
+      },
+      {
+        "label": "Cruzamentos",
+        "kind": "metric_group",
+        "grade": "D",
+        "percentile": 16.2,
+        "sub_metrics": [
+          {
+            "label": "Cruzamentos",
+            "percentile": 16.2,
+            "display_value": "1,1"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 51.8,
+            "display_value": "33%"
+          }
+        ],
+        "stats": [],
+        "efficiency_pct": 51.8,
+        "efficiency_value": "33%"
+      },
+      {
+        "label": "Assistências e xA",
+        "kind": "metric_group",
+        "grade": "B+",
+        "percentile": 82.9,
+        "sub_metrics": [
+          {
+            "label": "Assistências",
+            "percentile": 0.0,
+            "display_value": "0"
+          },
+          {
+            "label": "xA",
+            "percentile": 82.9,
+            "display_value": "2,44"
+          }
+        ],
+        "stats": []
+      }
+    ],
+    "conducao_drible": [
       {
         "label": "Duelos Ofensivos",
         "kind": "metric",
         "grade": "C+",
-        "percentile": 53.2,
+        "percentile": 50.0,
         "stats": [],
         "display_value": "6,0",
-        "efficiency_pct": 50.8,
+        "efficiency_pct": 47.3,
         "efficiency_value": "45%"
       },
       {
-        "label": "Conduções Progressivas",
+        "label": "Dribles",
         "kind": "metric",
-        "grade": "B-",
-        "percentile": 61.0,
+        "grade": "C-",
+        "percentile": 26.0,
+        "stats": [],
+        "display_value": "2,0",
+        "efficiency_pct": 28.6,
+        "efficiency_value": "50%"
+      },
+      {
+        "label": "Progressão",
+        "kind": "metric_group",
+        "grade": "B",
+        "percentile": 65.8,
+        "sub_metrics": [
+          {
+            "label": "Conduções Progressivas",
+            "percentile": 65.8,
+            "display_value": "1,9"
+          },
+          {
+            "label": "Acelerações",
+            "percentile": 30.2,
+            "display_value": "0,2"
+          }
+        ],
+        "stats": []
+      }
+    ],
+    "ofensividade": [
+      {
+        "label": "Toques na Área",
+        "kind": "metric",
+        "grade": "C-",
+        "percentile": 32.9,
         "stats": [],
         "display_value": "1,9"
+      },
+      {
+        "label": "Ações Ofensivas",
+        "kind": "metric",
+        "grade": "D",
+        "percentile": 20.0,
+        "stats": [],
+        "display_value": "1,9"
+      },
+      {
+        "label": "Recepção de Passes Longos",
+        "kind": "metric",
+        "grade": "C-",
+        "percentile": 25.0,
+        "stats": [],
+        "display_value": "1,1"
       }
     ]
   },
   "profiles_available": [
-    "Armador",
-    "Finalizador",
+    "Driblador",
+    "Meia Ponta",
+    "Ruptura",
     "Híbrido"
   ],
   "scatter": {
-    "passes_chave": 0.57,
+    "dribles": 1.99,
     "xa": 2.44,
     "progressao": 1.9300000000000002,
-    "gols": 3.0
+    "cruzamentos": 1.07,
+    "toques_area": 1.92
+  },
+  "cluster": {
+    "family": "extremos",
+    "archetype": "Meia Ponta",
+    "archetype_label": "Meia Ponta",
+    "hybrid_badge": null,
+    "hybrid_badge_short": null,
+    "shares": {
+      "driblador": 13.7,
+      "meia_ponta": 72.0,
+      "ruptura": 14.3
+    },
+    "ratings": {
+      "driblador": 6.2,
+      "meia_ponta": 7.1,
+      "ruptura": 6.0
+    }
   },
   "transfermarkt": {
     "id": "104505",

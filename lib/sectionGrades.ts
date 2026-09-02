@@ -1,25 +1,7 @@
+import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { aspectQualityPercentile, aspectQuantityPercentile } from "@/lib/aspectGrades";
 import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
-
-function flattenAspects(player: PlayerProfile): AspectItem[] {
-  const groups = player.aspects;
-  return [
-    ...(groups.defensivos ?? []),
-    ...(groups.construcao ?? []),
-    ...(groups.ofensivos ?? []),
-    ...(groups.terco_final ?? []),
-  ];
-}
-
-function findAspect(items: AspectItem[], label: string): AspectItem | undefined {
-  const aliases: Record<string, string[]> = {
-    "Passes Finais": ["Passes Finas", "Passes Finais"],
-    Progressão: ["Progressão", "Conduções Progressivas"],
-  };
-  const candidates = aliases[label] ?? [label];
-  return items.find((item) => candidates.some((c) => item.label === c || item.label.startsWith(c)));
-}
 
 function num(value: unknown): number | undefined {
   if (value == null || value === "") return undefined;
@@ -73,7 +55,7 @@ function metricGroupScore(item: AspectItem): number | undefined {
     return blendVolEff(num(vol?.percentile), num(xg?.percentile));
   }
 
-  if (item.label === "Progressão") {
+  if (item.label === "Progressão" || item.label === "Assistências e xA") {
     return num(item.percentile) ?? averageDefined(subs.map((row) => num(row.percentile)));
   }
 
@@ -112,6 +94,11 @@ const SECTION_BLOCK_WEIGHTS: Partial<
       Distribuição: 0.35,
     },
   },
+  extremos: {
+    Passes: {
+      Distribuição: 0.35,
+    },
+  },
 };
 
 /** Block labels per section — used for composite section score. */
@@ -133,6 +120,12 @@ const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
     "Dribles e Condução": ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
     "Passes Finais e Ofensividade": ["Finalizações", "Passes Finas", "Ofensividade"],
+  },
+  extremos: {
+    Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
+    "Passes Finais": ["Passes Chave", "Cruzamentos", "Assistências e xA"],
+    "Condução e Drible": ["Duelos Ofensivos", "Dribles", "Progressão"],
+    Ofensividade: ["Toques na Área", "Ações Ofensivas", "Recepção de Passes Longos"],
   },
 };
 

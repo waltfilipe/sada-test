@@ -77,14 +77,38 @@ const MC_STAT_SECTIONS: StatSectionSpec[] = [
   },
 ];
 
+const EX_STAT_SECTIONS: StatSectionSpec[] = [
+  {
+    title: "Passes",
+    tone: "passes",
+    labels: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
+  },
+  {
+    title: "Passes Finais",
+    tone: "final",
+    labels: ["Passes Chave", "Cruzamentos", "Assistências e xA"],
+  },
+  {
+    title: "Condução e Drible",
+    tone: "dribles",
+    labels: ["Duelos Ofensivos", "Dribles", "Progressão"],
+  },
+  {
+    title: "Ofensividade",
+    tone: "final",
+    labels: ["Toques na Área", "Ações Ofensivas", "Recepção de Passes Longos"],
+  },
+];
+
 export function statSectionsForFamily(family: PositionFamily): StatSectionSpec[] {
   if (family === "laterais") return LAT_STAT_SECTIONS;
   if (family === "meio-campistas") return MC_STAT_SECTIONS;
+  if (family === "extremos") return EX_STAT_SECTIONS;
   if (family === "zagueiros") return ZAG_STAT_SECTIONS;
   return ZAG_STAT_SECTIONS;
 }
 
 export function statSectionTone(title: string): StatSectionTone {
-  const all = [...ZAG_STAT_SECTIONS, ...LAT_STAT_SECTIONS, ...MC_STAT_SECTIONS];
+  const all = [...ZAG_STAT_SECTIONS, ...LAT_STAT_SECTIONS, ...MC_STAT_SECTIONS, ...EX_STAT_SECTIONS];
   return all.find((section) => section.title === title)?.tone ?? "defensivos";
 }

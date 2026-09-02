@@ -238,12 +238,12 @@ def _compute_extremos_profiles(pool: pd.DataFrame) -> pd.DataFrame:
     out["blk_progressao"] = out.apply(progressao_row, axis=1)
     out["blk_desmarque"] = out.apply(desmarque_row, axis=1)
 
-    out["idx_criador"] = (out["blk_conducao"] + 2) * 1.025
+    out["idx_driblador"] = (out["blk_conducao"] + 2) * 1.025
     out["idx_meia_ponta"] = out["blk_construcao"] * 0.35 + out["blk_distribuicao"] * 0.35 + out["blk_cruz"] * 0.3 + 2
-    out["idx_vertical"] = out["blk_progressao"] * 0.7 + out["blk_desmarque"] * 0.3 + 2
+    out["idx_ruptura"] = out["blk_progressao"] * 0.7 + out["blk_desmarque"] * 0.3 + 2
 
-    index_cols = ["idx_criador", "idx_meia_ponta", "idx_vertical"]
-    keys = ["criador", "meia_ponta", "vertical"]
+    index_cols = ["idx_driblador", "idx_meia_ponta", "idx_ruptura"]
+    keys = ["driblador", "meia_ponta", "ruptura"]
     _attach_shares(out, index_cols)
     specs = FAMILY_PROFILE_CONFIG["extremos"].profiles
     out["perfil"] = out.apply(lambda r: _resolve_profile(r, list(specs), 0.03, "pct_idx_"), axis=1)
@@ -381,19 +381,11 @@ FAMILY_PROFILE_CONFIG: dict[str, FamilyProfileConfig] = {
     "extremos": FamilyProfileConfig(
         threshold=0.03,
         profiles=(
-            ProfileSpec("criador", "Criador", "Driblador"),
+            ProfileSpec("driblador", "Driblador", "Driblador"),
             ProfileSpec("meia_ponta", "Meia Ponta", "Meia Ponta"),
-            ProfileSpec("vertical", "Vertical", "Ruptura"),
+            ProfileSpec("ruptura", "Ruptura", "Ruptura"),
         ),
         compute_indices=_compute_extremos_profiles,
-    ),
-    "meias-ofensivos": FamilyProfileConfig(
-        threshold=0.05,
-        profiles=(
-            ProfileSpec("armador", "Armador", "Meia Armador"),
-            ProfileSpec("finalizador", "Finalizador", "Meia Atacante"),
-        ),
-        compute_indices=_compute_meias_profiles,
     ),
     "atacantes": FamilyProfileConfig(
         threshold=0.03,
@@ -428,6 +420,12 @@ def profile_shares_from_row(row: pd.Series, family_key: str) -> dict[str, float]
             "construtor": round(float(row.get("cluster_share_construtor") or 0), 0),
             "boxtobox": round(float(row.get("cluster_share_boxtobox") or 0), 0),
         }
+    if family_key == "extremos":
+        return {
+            "driblador": round(float(row.get("cluster_share_driblador") or 0), 0),
+            "meia_ponta": round(float(row.get("cluster_share_meia_ponta") or 0), 0),
+            "ruptura": round(float(row.get("cluster_share_ruptura") or 0), 0),
+        }
     config = FAMILY_PROFILE_CONFIG[family_key]
     shares: dict[str, float] = {}
     for spec in config.profiles:
@@ -454,6 +452,12 @@ def profile_ratings_from_row(row: pd.Series, family_key: str) -> dict[str, float
             "construtor": round(float(row.get("rating_construtor", 0)), 1),
             "boxtobox": round(float(row.get("rating_boxtobox", 0)), 1),
         }
+    if family_key == "extremos":
+        return {
+            "driblador": round(float(row.get("rating_driblador", 0)), 1),
+            "meia_ponta": round(float(row.get("rating_meia_ponta", 0)), 1),
+            "ruptura": round(float(row.get("rating_ruptura", 0)), 1),
+        }
     config = FAMILY_PROFILE_CONFIG[family_key]
     ratings: dict[str, float] = {}
     for spec in config.profiles:
@@ -479,6 +483,12 @@ def profile_ranks_from_row(row: pd.Series, family_key: str) -> dict[str, int]:
             "contencao": int(row.get("rank_contencao", 0)),
             "construtor": int(row.get("rank_construtor", 0)),
             "boxtobox": int(row.get("rank_boxtobox", 0)),
+        }
+    if family_key == "extremos":
+        return {
+            "driblador": int(row.get("rank_driblador", 0)),
+            "meia_ponta": int(row.get("rank_meia_ponta", 0)),
+            "ruptura": int(row.get("rank_ruptura", 0)),
         }
     config = FAMILY_PROFILE_CONFIG[family_key]
     ranks: dict[str, int] = {}

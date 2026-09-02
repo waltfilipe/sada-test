@@ -4,14 +4,18 @@ import { useMemo } from "react";
 
 import { formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
 import {
+  EX_ARCHETYPE_META,
   LAT_ARCHETYPE_META,
   MC_ARCHETYPE_META,
   ZAG_ARCHETYPE_META,
   archetypeTone,
+  exArchetypeTone,
+  isExCluster,
   isLatCluster,
   isMcCluster,
   latArchetypeTone,
   mcArchetypeTone,
+  type ExArchetype,
   type LatArchetype,
   type McArchetype,
   type PositionCluster,
@@ -29,7 +33,7 @@ type MixRow = {
   tone: string;
   share: number;
   rating: number;
-  tooltipArchetype?: ZagArchetype | LatArchetype | McArchetype;
+  tooltipArchetype?: ZagArchetype | LatArchetype | McArchetype | ExArchetype;
 };
 
 function buildRows(cluster: PositionCluster): MixRow[] {
@@ -73,6 +77,28 @@ function buildRows(cluster: PositionCluster): MixRow[] {
       tone: mcArchetypeTone(item.archetype),
       share: shareMap[item.archetype] ?? 0,
       rating: ratingMap[item.archetype as Exclude<McArchetype, "Híbrido">],
+      tooltipArchetype: item.archetype,
+    }));
+  }
+
+  if (isExCluster(cluster)) {
+    const shareMap: Record<ExArchetype, number | undefined> = {
+      Driblador: cluster.shares.driblador,
+      "Meia Ponta": cluster.shares.meia_ponta,
+      Ruptura: cluster.shares.ruptura,
+      Híbrido: undefined,
+    };
+    const ratingMap: Record<Exclude<ExArchetype, "Híbrido">, number> = {
+      Driblador: cluster.ratings.driblador,
+      "Meia Ponta": cluster.ratings.meia_ponta,
+      Ruptura: cluster.ratings.ruptura,
+    };
+    return EX_ARCHETYPE_META.filter((item) => item.archetype !== "Híbrido").map((item) => ({
+      key: item.archetype,
+      label: item.archetype,
+      tone: exArchetypeTone(item.archetype),
+      share: shareMap[item.archetype] ?? 0,
+      rating: ratingMap[item.archetype as Exclude<ExArchetype, "Híbrido">],
       tooltipArchetype: item.archetype,
     }));
   }
@@ -150,6 +176,8 @@ const MC_ARCHETYPES = new Set<string>(["Contenção", "Construtor", "Box-to-box"
 const CONSTRUTOR_BADGES = new Set<string>(["Construtor Âncora", "Construtor Nato"]);
 const LAT_HYBRID_BADGES = new Set<string>(["Lateral Base", "Lateral Moderno", "Lateral Projetivo", "Lateral Completo"]);
 const MC_HYBRID_BADGES = new Set<string>(["Volante Base", "MC Combativo", "MC Projetivo", "MC Completo"]);
+const EX_ARCHETYPES = new Set<string>(["Driblador", "Meia Ponta", "Ruptura", "Híbrido"]);
+const EX_HYBRID_BADGES = new Set<string>(["Ala Criativa", "Ala Direta", "Ala Projetiva", "Ala Completa"]);
 
 export function playerMatchesClusterFilter(
   player: { cluster?: PositionCluster | null },
@@ -172,6 +200,17 @@ export function playerMatchesClusterFilter(
   if (isMcCluster(player.cluster)) {
     const badgeFilters = filters.filter((key) => MC_HYBRID_BADGES.has(key));
     const archetypeFilters = filters.filter((key) => MC_ARCHETYPES.has(key));
+    if (badgeFilters.length) return badgeFilters.includes(player.cluster.hybrid_badge ?? "");
+    if (archetypeFilters.length) {
+      if (player.cluster.archetype === "Híbrido") return archetypeFilters.includes("Híbrido");
+      return archetypeFilters.includes(player.cluster.archetype);
+    }
+    return true;
+  }
+
+  if (isExCluster(player.cluster)) {
+    const badgeFilters = filters.filter((key) => EX_HYBRID_BADGES.has(key));
+    const archetypeFilters = filters.filter((key) => EX_ARCHETYPES.has(key));
     if (badgeFilters.length) return badgeFilters.includes(player.cluster.hybrid_badge ?? "");
     if (archetypeFilters.length) {
       if (player.cluster.archetype === "Híbrido") return archetypeFilters.includes("Híbrido");

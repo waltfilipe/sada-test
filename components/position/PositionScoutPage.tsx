@@ -24,7 +24,11 @@ export function PositionScoutPage({ family, players }: Props) {
   const [profilesFilter, setProfilesFilter] = useState<string[]>([]);
   const [clusterFilters, setClusterFilters] = useState<string[]>([]);
   const familyMeta = familyBySlug(family);
-  const clusterMode = family === "zagueiros" || family === "laterais" || family === "meio-campistas";
+  const clusterMode =
+    family === "zagueiros" ||
+    family === "laterais" ||
+    family === "meio-campistas" ||
+    family === "extremos";
 
   const profilesAvailable = useMemo(() => {
     const set = new Set<string>();

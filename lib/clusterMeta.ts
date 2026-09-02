@@ -77,18 +77,48 @@ export type McCluster = {
   ratings: McArchetypeRatings;
 };
 
-export type PositionCluster = ZagCluster | LatCluster | McCluster;
+export type ExArchetype = "Driblador" | "Meia Ponta" | "Ruptura" | "Híbrido";
+
+export type ExHybridBadge = "Ala Criativa" | "Ala Direta" | "Ala Projetiva" | "Ala Completa";
+
+export type ExClusterShares = {
+  driblador: number;
+  meia_ponta: number;
+  ruptura: number;
+};
+
+export type ExArchetypeRatings = {
+  driblador: number;
+  meia_ponta: number;
+  ruptura: number;
+};
+
+export type ExCluster = {
+  family: "extremos";
+  archetype: ExArchetype;
+  archetype_label: string;
+  hybrid_badge?: ExHybridBadge | string | null;
+  hybrid_badge_short?: string | null;
+  shares: ExClusterShares;
+  ratings: ExArchetypeRatings;
+};
+
+export type PositionCluster = ZagCluster | LatCluster | McCluster | ExCluster;
 
 export function isLatCluster(cluster: PositionCluster): cluster is LatCluster {
-  return cluster.family === "laterais" || ("defensivo" in cluster.shares && !("contencao" in cluster.shares));
+  return cluster.family === "laterais" || ("defensivo" in cluster.shares && !("contencao" in cluster.shares) && !("driblador" in cluster.shares));
 }
 
 export function isMcCluster(cluster: PositionCluster): cluster is McCluster {
-  return cluster.family === "meio-campistas" || "contencao" in cluster.shares;
+  return cluster.family === "meio-campistas" || ("contencao" in cluster.shares && !("driblador" in cluster.shares));
+}
+
+export function isExCluster(cluster: PositionCluster): cluster is ExCluster {
+  return cluster.family === "extremos" || "driblador" in cluster.shares;
 }
 
 export function isZagCluster(cluster: PositionCluster): cluster is ZagCluster {
-  return !isLatCluster(cluster) && !isMcCluster(cluster);
+  return !isLatCluster(cluster) && !isMcCluster(cluster) && !isExCluster(cluster);
 }
 
 export type ArchetypeTrait = {
@@ -445,6 +475,124 @@ export function mcArchetypeMetaFor(archetype: McArchetype) {
 
 export function mcHybridBadgeMetaFor(badge: string) {
   return MC_HYBRID_BADGE_META.find((item) => item.badge === badge);
+}
+
+export const EX_ARCHETYPES: ExArchetype[] = ["Driblador", "Meia Ponta", "Ruptura", "Híbrido"];
+
+export const EX_HYBRID_BADGE_META: {
+  badge: ExHybridBadge;
+  short_label: string;
+  description: string;
+  traits: ArchetypeTrait[];
+}[] = [
+  {
+    badge: "Ala Criativa",
+    short_label: "Criativa",
+    description: "Combina drible e distribuição — cria a partir da condução e do passe.",
+    traits: [
+      { label: "Dribles", direction: "up" },
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "Distribuição", direction: "up" },
+      { label: "Toques na Área", direction: "down" },
+    ],
+  },
+  {
+    badge: "Ala Direta",
+    short_label: "Direta",
+    description: "Dribla e rompe linhas — perfil de ponta vertical no terço final.",
+    traits: [
+      { label: "Dribles", direction: "up" },
+      { label: "Conduções Progressivas", direction: "up" },
+      { label: "Toques na Área", direction: "up" },
+      { label: "Passes Longos", direction: "down" },
+    ],
+  },
+  {
+    badge: "Ala Projetiva",
+    short_label: "Projetiva",
+    description: "Distribui e ataca espaços — combina passe e ruptura.",
+    traits: [
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "Toques na Área", direction: "up" },
+      { label: "Recepção Longa", direction: "up" },
+      { label: "Dribles", direction: "down" },
+    ],
+  },
+  {
+    badge: "Ala Completa",
+    short_label: "Completa",
+    description: "Elite nas três frentes — drible, passe e ruptura acima da média.",
+    traits: [
+      { label: "Dribles", direction: "up" },
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "Toques na Área", direction: "up" },
+      { label: "xA", direction: "up" },
+    ],
+  },
+];
+
+export const EX_ARCHETYPE_META: {
+  archetype: ExArchetype;
+  tone: string;
+  description: string;
+  traits: ArchetypeTrait[];
+}[] = [
+  {
+    archetype: "Driblador",
+    tone: "driblador",
+    description: "Referência em condução: dribles e duelos ofensivos.",
+    traits: [
+      { label: "Dribles", direction: "up" },
+      { label: "Duelos Ofensivos", direction: "up" },
+      { label: "Conduções Progressivas", direction: "up" },
+      { label: "Passes Longos", direction: "down" },
+    ],
+  },
+  {
+    archetype: "Meia Ponta",
+    tone: "meia-ponta",
+    description: "Criador de jogo: passes, PTF e distribuição.",
+    traits: [
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "PTF", direction: "up" },
+      { label: "Distribuição", direction: "up" },
+      { label: "Dribles", direction: "down" },
+    ],
+  },
+  {
+    archetype: "Ruptura",
+    tone: "ruptura",
+    description: "Rompe linhas: condução progressiva, toques na área e recepção de passes longos.",
+    traits: [
+      { label: "Conduções Progressivas", direction: "up" },
+      { label: "Toques na Área", direction: "up" },
+      { label: "Recepção Longa", direction: "up" },
+      { label: "Cruzamentos", direction: "down" },
+    ],
+  },
+  {
+    archetype: "Híbrido",
+    tone: "hibrido",
+    description: "Dois eixos fortes — perfil dual com identidade em mais de uma frente.",
+    traits: [
+      { label: "Versatilidade", direction: "up" },
+      { label: "Drible", direction: "up" },
+      { label: "Passe", direction: "up" },
+      { label: "Especialização", direction: "down" },
+    ],
+  },
+];
+
+export function exArchetypeTone(archetype: ExArchetype): string {
+  return EX_ARCHETYPE_META.find((item) => item.archetype === archetype)?.tone ?? "driblador";
+}
+
+export function exArchetypeMetaFor(archetype: ExArchetype) {
+  return EX_ARCHETYPE_META.find((item) => item.archetype === archetype);
+}
+
+export function exHybridBadgeMetaFor(badge: string) {
+  return EX_HYBRID_BADGE_META.find((item) => item.badge === badge);
 }
 
 /** @deprecated use archetypeCounts */

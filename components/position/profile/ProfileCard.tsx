@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { Tooltip } from "@/components/ui/Tooltip";
 import {
+  exArchetypeMetaFor,
   latArchetypeMetaFor,
   mcArchetypeMetaFor,
   archetypeMetaFor,
@@ -24,6 +25,9 @@ function profileMetaForLabel(label: string, family: PositionFamily) {
   }
   if (family === "meio-campistas") {
     return mcArchetypeMetaFor(label as "Contenção" | "Construtor" | "Box-to-box" | "Híbrido");
+  }
+  if (family === "extremos") {
+    return exArchetypeMetaFor(label as "Driblador" | "Meia Ponta" | "Ruptura" | "Híbrido");
   }
   if (family === "zagueiros") {
     return archetypeMetaFor(label as "Defensor de Área" | "Construtor" | "Combativo");

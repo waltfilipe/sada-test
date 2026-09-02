@@ -24,13 +24,9 @@ export const FAMILY_PROFILE_META: Record<PositionFamily, ProfileMetaItem[]> = {
     { key: "boxtobox", label: "Box-to-box", tone: "boxtobox" },
   ],
   extremos: [
-    { key: "criador", label: "Criador", tone: "criador" },
+    { key: "driblador", label: "Driblador", tone: "driblador" },
     { key: "meia_ponta", label: "Meia Ponta", tone: "meia-ponta" },
-    { key: "vertical", label: "Vertical", tone: "vertical" },
-  ],
-  "meias-ofensivos": [
-    { key: "armador", label: "Armador", tone: "armador" },
-    { key: "finalizador", label: "Finalizador", tone: "finalizador" },
+    { key: "ruptura", label: "Ruptura", tone: "ruptura" },
   ],
   atacantes: [
     { key: "finalizador", label: "Finalizador", tone: "finalizador" },

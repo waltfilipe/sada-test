@@ -48,31 +48,19 @@
     },
     {
       "key": "extremos",
-      "label": "Extremos",
+      "label": "Extremos + Meias",
       "positions": [
         "Extremo Direito",
-        "Extremo Esquerdo"
-      ],
-      "profiles": [
-        "Criador",
-        "Meia Ponta",
-        "Vertical",
-        "Híbrido"
-      ],
-      "count": 20
-    },
-    {
-      "key": "meias-ofensivos",
-      "label": "Meias Ofensivos",
-      "positions": [
+        "Extremo Esquerdo",
         "Meia Ofensivo"
       ],
       "profiles": [
-        "Armador",
-        "Finalizador",
+        "Driblador",
+        "Meia Ponta",
+        "Ruptura",
         "Híbrido"
       ],
-      "count": 64
+      "count": 84
     },
     {
       "key": "atacantes",
@@ -176,7 +164,7 @@
       2009
     ],
     "rating": [
-      4.4,
+      4.6,
       7.7
     ]
   },
@@ -294,31 +282,14 @@
         "field": "Cond.Prog"
       },
       {
-        "key": "finalizacao",
-        "label": "Finalizações",
-        "field": "Finalizações"
-      }
-    ],
-    "meias-ofensivos": [
-      {
-        "key": "passes_chave",
-        "label": "Passes Chave",
-        "field": "PassesChave"
+        "key": "cruzamentos",
+        "label": "Cruzamentos",
+        "field": "Cruz."
       },
       {
-        "key": "xa",
-        "label": "xA",
-        "field": "xA"
-      },
-      {
-        "key": "progressao",
-        "label": "Progressão",
-        "field": "Cond.Prog"
-      },
-      {
-        "key": "gols",
-        "label": "Gols",
-        "field": "Gols"
+        "key": "toques_area",
+        "label": "Toques na Área",
+        "field": "ToquesArea"
       }
     ],
     "atacantes": [

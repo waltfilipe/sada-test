@@ -9,29 +9,11 @@ import {
 } from "@/components/position/profile/StatBadgeStrip";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
 import { earnedStatBadges, statBadgeForMetric } from "@/lib/statBadges";
 import type { StatMetricBadge } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
-
-function flattenAspects(player: PlayerProfile): AspectItem[] {
-  const groups = player.aspects;
-  return [
-    ...(groups.defensivos ?? []),
-    ...(groups.construcao ?? []),
-    ...(groups.ofensivos ?? []),
-    ...(groups.terco_final ?? []),
-  ];
-}
-
-function findAspect(items: AspectItem[], label: string): AspectItem | undefined {
-  const aliases: Record<string, string[]> = {
-    "Passes Finais": ["Passes Finas", "Passes Finais"],
-    Progressão: ["Progressão", "Conduções Progressivas"],
-  };
-  const candidates = aliases[label] ?? [label];
-  return items.find((item) => candidates.some((c) => item.label === c || item.label.startsWith(c)));
-}
 
 const ROW_LABEL_ALIASES: Record<string, string> = {
   "Ações bem-sucedidas": "Ações Defensivas/90",

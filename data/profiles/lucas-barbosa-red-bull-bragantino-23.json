@@ -4,7 +4,7 @@
   "club": "Red Bull Bragantino",
   "label": "Lucas Barbosa (Red Bull Bragantino)",
   "position": "Meia Ofensivo",
-  "position_family": "meias-ofensivos",
+  "position_family": "extremos",
   "nationality": "Brazil",
   "birth_year": 2001,
   "height": 194,
@@ -13,176 +13,234 @@
   "minutes_pct": 84.3,
   "goals": 4,
   "assists": 2,
-  "rating": 6.3,
+  "rating": 6.5,
   "ratings": {
-    "geral": 6.3,
-    "armador": 6.7,
-    "finalizador": 7.8
+    "geral": 6.5,
+    "driblador": 6.0,
+    "meia_ponta": 5.4,
+    "ruptura": 7.0
   },
   "ranks": {
-    "geral": 39,
-    "armador": 39,
-    "finalizador": 24
+    "geral": 60,
+    "driblador": 65,
+    "meia_ponta": 83,
+    "ruptura": 21
   },
-  "profile": "Híbrido",
+  "profile": "Ruptura",
   "profile_shares": {
-    "armador": 48.0,
-    "finalizador": 52.0
+    "driblador": 15.0,
+    "meia_ponta": 14.0,
+    "ruptura": 71.0
   },
   "tendencies": {
-    "construcao": 32.0,
-    "ofensividade": 45.0,
-    "def1v1": 40.0,
-    "contencao": 71.0,
-    "duelo_aereo": 98.0
+    "construcao": 39.0,
+    "ofensividade": 70.0,
+    "def1v1": 41.0,
+    "contencao": 0.0,
+    "duelo_aereo": 0.0
   },
   "aspects": {
-    "defensivos": [
-      {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
-        "grade": "B-",
-        "percentile": 59.6,
-        "stats": [],
-        "display_value": "4,8",
-        "efficiency_pct": 7.5,
-        "efficiency_value": "45%"
-      },
-      {
-        "label": "Duelos Aéreos",
-        "kind": "metric",
-        "grade": "A",
-        "percentile": 94.7,
-        "stats": [],
-        "display_value": "3,4",
-        "efficiency_pct": 90.2,
-        "efficiency_value": "51%"
-      },
-      {
-        "label": "Eficiência Defensiva",
-        "kind": "def_efficiency_group",
-        "grade": "C+",
-        "percentile": 50.0,
-        "pair_badge": [
-          85.7,
-          50.0
-        ],
-        "sub_metrics": [
-          {
-            "label": "Ações bem-sucedidas",
-            "percentile": 85.7,
-            "display_value": "5,3"
-          },
-          {
-            "label": "Interceptações",
-            "percentile": 59.0,
-            "display_value": "0,6"
-          },
-          {
-            "label": "Rebatidas",
-            "percentile": 100.0,
-            "display_value": "2,2"
-          },
-          {
-            "label": "Eficiência Defensiva",
-            "percentile": 50.0,
-            "display_value": "0,60"
-          }
-        ],
-        "stats": []
-      }
-    ],
     "construcao": [
       {
         "label": "Passes Progressivos",
         "kind": "pass_certos",
-        "grade": "D",
+        "grade": "C-",
         "certos_per90": 3.18,
         "display_value": "3,2",
-        "percentile": 22.0,
-        "efficiency_pct": 11.1,
+        "percentile": 26.3,
+        "efficiency_pct": 14.3,
         "efficiency_value": "63%",
         "stats": []
       },
       {
         "label": "Passes para Terço Final",
         "kind": "pass_certos",
-        "grade": "C-",
+        "grade": "C",
         "certos_per90": 2.39,
         "display_value": "2,4",
-        "percentile": 32.2,
-        "efficiency_pct": 1.9,
+        "percentile": 38.7,
+        "efficiency_pct": 1.5,
         "efficiency_value": "53%",
         "stats": []
       },
       {
         "label": "Passes Longos",
         "kind": "pass_certos",
-        "grade": "A",
+        "grade": "B+",
         "certos_per90": 2.76,
         "display_value": "2,8",
-        "percentile": 87.5,
-        "efficiency_pct": 27.1,
+        "percentile": 82.6,
+        "efficiency_pct": 24.6,
         "efficiency_value": "47%",
-        "stats": []
-      }
-    ],
-    "perfil_construcao": [
-      {
-        "label": "Passes Longos",
-        "kind": "construction_share",
-        "grade": "A",
-        "percentile": 98.4,
-        "display_value": "13%",
-        "share_pct": 13.2,
-        "pool_avg_pct": 5.8,
-        "scale_max_pct": 30.0,
         "stats": []
       },
       {
-        "label": "Passes Progressivos",
-        "kind": "construction_share",
-        "grade": "B",
-        "percentile": 74.6,
-        "display_value": "15%",
-        "share_pct": 15.2,
-        "pool_avg_pct": 14.1,
-        "scale_max_pct": 30.0,
+        "label": "Distribuição",
+        "kind": "metric_group",
+        "grade": "D",
+        "percentile": 10.8,
+        "sub_metrics": [
+          {
+            "label": "Passes",
+            "percentile": 10.8,
+            "display_value": "20,9"
+          },
+          {
+            "label": "Passes Recebidos",
+            "percentile": 13.4,
+            "display_value": "16,5"
+          }
+        ],
         "stats": []
       }
     ],
-    "perfil_defensivo": [],
-    "ofensivos": [
+    "passes_finais": [
+      {
+        "label": "Passes Chave",
+        "kind": "metric",
+        "grade": "C+",
+        "percentile": 49.2,
+        "stats": [],
+        "display_value": "0,5"
+      },
+      {
+        "label": "Cruzamentos",
+        "kind": "metric_group",
+        "grade": "C+",
+        "percentile": 54.1,
+        "sub_metrics": [
+          {
+            "label": "Cruzamentos",
+            "percentile": 54.1,
+            "display_value": "2,1"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 19.6,
+            "display_value": "23%"
+          }
+        ],
+        "stats": [],
+        "efficiency_pct": 19.6,
+        "efficiency_value": "23%"
+      },
+      {
+        "label": "Assistências e xA",
+        "kind": "metric_group",
+        "grade": "B-",
+        "percentile": 63.2,
+        "sub_metrics": [
+          {
+            "label": "Assistências",
+            "percentile": 28.6,
+            "display_value": "2"
+          },
+          {
+            "label": "xA",
+            "percentile": 63.2,
+            "display_value": "1,75"
+          }
+        ],
+        "stats": []
+      }
+    ],
+    "conducao_drible": [
       {
         "label": "Duelos Ofensivos",
         "kind": "metric",
         "grade": "C+",
-        "percentile": 50.0,
+        "percentile": 46.2,
         "stats": [],
         "display_value": "4,9",
-        "efficiency_pct": 28.8,
+        "efficiency_pct": 27.0,
         "efficiency_value": "40%"
       },
       {
-        "label": "Conduções Progressivas",
+        "label": "Dribles",
         "kind": "metric",
-        "grade": "B-",
-        "percentile": 57.6,
+        "grade": "C",
+        "percentile": 42.9,
         "stats": [],
-        "display_value": "1,6"
+        "display_value": "2,7",
+        "efficiency_pct": 20.6,
+        "efficiency_value": "46%"
+      },
+      {
+        "label": "Progressão",
+        "kind": "metric_group",
+        "grade": "B+",
+        "percentile": 81.4,
+        "sub_metrics": [
+          {
+            "label": "Conduções Progressivas",
+            "percentile": 41.1,
+            "display_value": "1,6"
+          },
+          {
+            "label": "Acelerações",
+            "percentile": 81.4,
+            "display_value": "0,5"
+          }
+        ],
+        "stats": []
+      }
+    ],
+    "ofensividade": [
+      {
+        "label": "Toques na Área",
+        "kind": "metric",
+        "grade": "C+",
+        "percentile": 50.7,
+        "stats": [],
+        "display_value": "2,3"
+      },
+      {
+        "label": "Ações Ofensivas",
+        "kind": "metric",
+        "grade": "C+",
+        "percentile": 45.3,
+        "stats": [],
+        "display_value": "2,7"
+      },
+      {
+        "label": "Recepção de Passes Longos",
+        "kind": "metric",
+        "grade": "B",
+        "percentile": 69.1,
+        "stats": [],
+        "display_value": "1,7"
       }
     ]
   },
   "profiles_available": [
-    "Armador",
-    "Finalizador",
+    "Driblador",
+    "Meia Ponta",
+    "Ruptura",
     "Híbrido"
   ],
   "scatter": {
-    "passes_chave": 0.47,
+    "dribles": 2.67,
     "xa": 1.75,
     "progressao": 1.59,
-    "gols": 4.0
+    "cruzamentos": 2.06,
+    "toques_area": 2.34
+  },
+  "cluster": {
+    "family": "extremos",
+    "archetype": "Ruptura",
+    "archetype_label": "Ruptura",
+    "hybrid_badge": null,
+    "hybrid_badge_short": null,
+    "shares": {
+      "driblador": 14.9,
+      "meia_ponta": 14.0,
+      "ruptura": 71.1
+    },
+    "ratings": {
+      "driblador": 6.0,
+      "meia_ponta": 5.5,
+      "ruptura": 7.0
+    }
   },
   "transfermarkt": {
     "id": "816144",

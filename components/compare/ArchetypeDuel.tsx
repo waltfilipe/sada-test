@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { archetypeMetaFor, latArchetypeMetaFor, mcArchetypeMetaFor } from "@/lib/clusterMeta";
+import { archetypeMetaFor, exArchetypeMetaFor, latArchetypeMetaFor, mcArchetypeMetaFor } from "@/lib/clusterMeta";
 import { buildProfileShareRows, profileAccent, type ProfileShareRow } from "@/lib/profileShares";
 import { clampPercent, formatRating } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -19,6 +19,9 @@ function metaFor(label: string, family: PositionFamily) {
   }
   if (family === "meio-campistas") {
     return mcArchetypeMetaFor(label as "Contenção" | "Construtor" | "Box-to-box" | "Híbrido");
+  }
+  if (family === "extremos") {
+    return exArchetypeMetaFor(label as "Driblador" | "Meia Ponta" | "Ruptura" | "Híbrido");
   }
   if (family === "zagueiros") {
     return archetypeMetaFor(label as "Defensor de Área" | "Construtor" | "Combativo");

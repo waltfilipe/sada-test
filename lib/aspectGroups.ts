@@ -9,6 +9,9 @@ export const ASPECT_GROUP_META: Record<AspectGroupKey, { title: string; order: n
   perfil_defensivo: { title: "Perfil defensivo", order: 4 },
   ofensivos: { title: "Ofensivos", order: 5 },
   terco_final: { title: "Terço final", order: 6 },
+  passes_finais: { title: "Passes Finais", order: 7 },
+  conducao_drible: { title: "Condução e Drible", order: 8 },
+  ofensividade: { title: "Ofensividade", order: 9 },
 };
 
 export function aspectGroupsForPlayers(a: PlayerProfile, b: PlayerProfile) {

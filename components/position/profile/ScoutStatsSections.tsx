@@ -3,29 +3,11 @@
 import { useMemo } from "react";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
 import { earnedStatBadges, statBadgeForMetric } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 import { PlayerBadgesSection, StatBadgeChip, StatMedalCount, type TonedStatBadge } from "./StatBadgeStrip";
-
-function flattenAspects(player: PlayerProfile): AspectItem[] {
-  const groups = player.aspects;
-  return [
-    ...(groups.defensivos ?? []),
-    ...(groups.construcao ?? []),
-    ...(groups.ofensivos ?? []),
-    ...(groups.terco_final ?? []),
-  ];
-}
-
-function findAspect(items: AspectItem[], label: string): AspectItem | undefined {
-  const aliases: Record<string, string[]> = {
-    "Passes Finais": ["Passes Finas", "Passes Finais"],
-    Progressão: ["Progressão", "Conduções Progressivas"],
-  };
-  const candidates = aliases[label] ?? [label];
-  return items.find((item) => candidates.some((c) => item.label === c || item.label.startsWith(c)));
-}
 
 function metricValue(value?: string | null): string {
   return value ?? "—";

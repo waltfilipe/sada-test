@@ -9,13 +9,17 @@ export const POSITION_FAMILIES: {
   { key: "zagueiros", slug: "zagueiros", label: "Zagueiros", short: "ZAG" },
   { key: "laterais", slug: "laterais", label: "Laterais", short: "LAT" },
   { key: "meio-campistas", slug: "meio-campistas", label: "Meio-campistas", short: "MC" },
-  { key: "extremos", slug: "extremos", label: "Extremos", short: "EX" },
-  { key: "meias-ofensivos", slug: "meias-ofensivos", label: "Meias Ofensivos", short: "MO" },
+  { key: "extremos", slug: "extremos", label: "Extremos + Meias", short: "EX" },
   { key: "atacantes", slug: "atacantes", label: "Atacantes", short: "AT" },
 ];
 
+const FAMILY_SLUG_ALIASES: Record<string, PositionFamily> = {
+  "meias-ofensivos": "extremos",
+};
+
 export function familyBySlug(slug: string) {
-  return POSITION_FAMILIES.find((f) => f.slug === slug) ?? POSITION_FAMILIES[0];
+  const key = (FAMILY_SLUG_ALIASES[slug] ?? slug) as PositionFamily;
+  return POSITION_FAMILIES.find((f) => f.key === key) ?? POSITION_FAMILIES[0];
 }
 
 export function ratingColor(value: number): string {

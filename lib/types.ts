@@ -3,7 +3,6 @@ export type PositionFamily =
   | "laterais"
   | "meio-campistas"
   | "extremos"
-  | "meias-ofensivos"
   | "atacantes";
 
 export type AspectStat = {
@@ -116,12 +115,15 @@ export type PlayerProfile = PlayerSummary & {
   profile_shares: Record<string, number>;
   tendencies: Tendencies;
   aspects: {
-    defensivos: AspectItem[];
+    defensivos?: AspectItem[];
     construcao: AspectItem[];
-    perfil_construcao: AspectItem[];
+    perfil_construcao?: AspectItem[];
     perfil_defensivo?: AspectItem[];
-    ofensivos: AspectItem[];
+    ofensivos?: AspectItem[];
     terco_final?: AspectItem[];
+    passes_finais?: AspectItem[];
+    conducao_drible?: AspectItem[];
+    ofensividade?: AspectItem[];
   };
   profiles_available: string[];
   scatter: Record<string, number>;
