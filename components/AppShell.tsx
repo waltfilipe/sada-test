@@ -9,9 +9,10 @@ const NAV = [
   { href: "/posicao/zagueiros", label: "Posições", icon: "◎" },
   { href: "/comparar", label: "Comparar", icon: "⇄" },
   { href: "/scatter", label: "Scatter", icon: "◈" },
+  { href: "/time-sombra", label: "Time Sombra", icon: "☽" },
 ];
 
-const FULL_BLEED = ["/posicao/", "/filtros", "/comparar", "/scatter"];
+const FULL_BLEED = ["/posicao/", "/filtros", "/comparar", "/scatter", "/time-sombra"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

@@ -7,6 +7,7 @@ import "./profile-layout.css";
 import "./filters.css";
 import "./compare.css";
 import "./scatter.css";
+import "./time-sombra.css";
 
 export const metadata: Metadata = {
   title: "Série A Scout",

@@ -5,6 +5,7 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { playerInitials, ratingTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { TendenciesButton } from "./ProfileSharePanel";
 
 type Props = {
@@ -167,6 +168,7 @@ export function PlayerHero({ player, family }: Props) {
               </a>
             ) : null}
             <TendenciesButton player={player} />
+            <AddToShadowMenu playerId={player.player_id} family={family} />
           </div>
         </div>
       </div>

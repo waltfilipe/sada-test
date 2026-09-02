@@ -8,6 +8,7 @@ const NAV = [
   { key: "filtros", href: "/filtros", label: "Filtros" },
   { key: "comparar", href: "/comparar", label: "Comparar" },
   { key: "scatter", href: "/scatter", label: "Scatter" },
+  { key: "time-sombra", href: "/time-sombra", label: "Time Sombra" },
 ] as const;
 
 type Props = {
