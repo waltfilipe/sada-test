@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Tooltip } from "@/components/ui/Tooltip";
 import {
   latArchetypeMetaFor,
+  mcArchetypeMetaFor,
   archetypeMetaFor,
   type ArchetypeTrait,
 } from "@/lib/clusterMeta";
@@ -20,6 +21,9 @@ type Props = {
 function profileMetaForLabel(label: string, family: PositionFamily) {
   if (family === "laterais") {
     return latArchetypeMetaFor(label as "Defensivo" | "Construtor" | "Ofensivo" | "Híbrido");
+  }
+  if (family === "meio-campistas") {
+    return mcArchetypeMetaFor(label as "Contenção" | "Construtor" | "Box-to-box" | "Híbrido");
   }
   if (family === "zagueiros") {
     return archetypeMetaFor(label as "Defensor de Área" | "Construtor" | "Combativo");

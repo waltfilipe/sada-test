@@ -22,7 +22,6 @@ export const FAMILY_PROFILE_META: Record<PositionFamily, ProfileMetaItem[]> = {
     { key: "contencao", label: "Contenção", tone: "contencao" },
     { key: "construtor", label: "Construtor", tone: "construtor" },
     { key: "boxtobox", label: "Box-to-box", tone: "boxtobox" },
-    { key: "ofensivo", label: "Ofensivo", tone: "ofensivo" },
   ],
   extremos: [
     { key: "criador", label: "Criador", tone: "criador" },

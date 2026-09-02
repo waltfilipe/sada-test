@@ -18,6 +18,8 @@ from .normalize import (
 from .profiles import FAMILY_PROFILE_CONFIG, profile_ratings_from_row, profile_ranks_from_row, profile_shares_from_row
 from .lat_hierarchy import apply_lat_hierarchical_clusters
 from .lat_tri_composite_config import apply_lat_tri_composite_ratings
+from .mc_hierarchy import apply_mc_hierarchical_clusters
+from .mc_tri_composite_config import apply_mc_tri_composite_ratings
 from .zag_hierarchy import apply_zag_hierarchical_clusters
 from .zag_m8_rating import apply_zag_m8_ratings
 
@@ -40,8 +42,8 @@ POSITION_FAMILIES: dict[str, dict[str, Any]] = {
     "meio-campistas": {
         "label": "Meio-campistas",
         "positions": ["Meio-campista"],
-        "profiles": ["Contenção", "Construtor", "Box-to-box", "Ofensivo", "Híbrido"],
-        "profile_map": {"contencao": "Contenção", "construtor": "Construtor", "boxtobox": "Box-to-box", "ofensivo": "Ofensivo"},
+        "profiles": ["Contenção", "Construtor", "Box-to-box", "Híbrido"],
+        "profile_map": {"contencao": "Contenção", "construtor": "Construtor", "boxtobox": "Box-to-box"},
     },
     "extremos": {
         "label": "Extremos",
@@ -82,10 +84,11 @@ SCATTER_METRICS = {
         {"key": "duelos_def", "label": "Duelos Defensivos", "field": "DuelosDef"},
     ],
     "meio-campistas": [
-        {"key": "passes_prog", "label": "Passes Progressivos", "field": "PassesProg"},
+        {"key": "finalizacao", "label": "Finalizações", "field": "Finalizações"},
+        {"key": "progressao", "label": "Progressão", "field": "Cond.Prog"},
         {"key": "xa", "label": "xA", "field": "xA"},
         {"key": "construcao", "label": "Construção", "field": "n_construcao"},
-        {"key": "progressao", "label": "Progressão", "field": "Cond.Prog"},
+        {"key": "duelos_def", "label": "Duelos Defensivos", "field": "DuelosDef"},
     ],
     "extremos": [
         {"key": "dribles", "label": "Dribles", "field": "Dribles"},
@@ -732,6 +735,25 @@ def _compute_lat_indices(pool: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def _compute_mc_indices(pool: pd.DataFrame) -> pd.DataFrame:
+    out = pool.copy()
+    out["CorridasProg"] = pd.to_numeric(out.get("Corridas progressivas/90"), errors="coerce").fillna(0)
+    out["DuelosOfRaw"] = pd.to_numeric(out.get("Duelos ofensivos/90"), errors="coerce").fillna(0)
+    out["AcoesAtW"] = pd.to_numeric(out.get("Acções atacantes com sucesso/90"), errors="coerce").fillna(0)
+    out = apply_mc_hierarchical_clusters(out)
+    out["perfil"] = out["cluster_archetype"]
+    out = apply_mc_tri_composite_ratings(out)
+
+    out["n_construcao"] = percentile_rank(out["mc_z_con"], ascending=True)
+    out["n_conducao"] = percentile_rank(out["mc_z_b2b"], ascending=True)
+    out["n_duelos_def"] = percentile_rank(out["mc_z_cont"], ascending=True)
+    out["n_leitura_def"] = percentile_rank(out["LeituraDef."], ascending=True)
+    out["n_duelo_ar"] = percentile_rank(out["DuelosAr"] * out["%DuelosAr"], ascending=True)
+
+    out = attach_aspect_percentiles(out)
+    return out
+
+
 def _compute_generic_ratings(pool: pd.DataFrame, prefix: str) -> pd.DataFrame:
     out = pool.copy()
     out["_minutes_pool_pct"] = _minutes_pool_pct(out)
@@ -789,6 +811,8 @@ def compute_family_metrics(df: pd.DataFrame, family_key: str) -> pd.DataFrame:
         return _compute_zag_indices(pool)
     if family_key == "laterais":
         return _compute_lat_indices(pool)
+    if family_key == "meio-campistas":
+        return _compute_mc_indices(pool)
     return FAMILY_PROFILE_CONFIG[family_key].compute_indices(pool)
 
 
@@ -936,6 +960,8 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "dribles_eff": _pct_eff(out, "Dribles com sucesso, %", "%EffDribles"),
         "cruz_vol": _pool_percentile(out, "Cruzamentos/90", "Cruz."),
         "cruz_eff": _pct_eff(out, "Cruzamentos certos, %", "%EffCruz."),
+        "fin_vol": _pool_percentile(out, "Remates/90", "Finalizações"),
+        "fin_eff": _pct_eff(out, "Remates à baliza, %", "%EffFin"),
         "passes_chave_vol": _pool_percentile(out, "Passes chave/90", "PassesChave"),
         "passe_area_certos90": _pool_percentile(out, "PasseAreaW"),
         "acoes_at_vol": _pool_percentile(out, "Acções atacantes com sucesso/90", "AcoesAtW", "AçõesAtW"),
@@ -1130,7 +1156,8 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
     pp_e = row.get("_asp_passes_prog_eff", 0)
     ptf_e = row.get("_asp_ptf_eff", 0)
     pl_e = row.get("_asp_passes_long_eff", 0)
-    spectrum_family = family_key in ("zagueiros", "laterais")
+    spectrum_family = family_key in ("zagueiros", "laterais", "meio-campistas")
+    tri_axis_family = family_key in ("laterais", "meio-campistas")
 
     construcao = [
             _pass_aspect(
@@ -1155,7 +1182,7 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 eff_display=_raw_eff_display(row, "Passes longos certos, %", "%EffPassesLng"),
             ),
         ]
-    if family_key == "laterais":
+    if tri_axis_family:
         construcao.append(
             _metric_group_aspect(
                 "Distribuição",
@@ -1184,7 +1211,7 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
             eff_display=_raw_eff_display(row, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
         ),
     ]
-    if family_key == "laterais":
+    if tri_axis_family:
         ofensivos.extend(
             [
                 _metric_aspect(
@@ -1332,6 +1359,57 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 ],
             ),
         ]
+    elif family_key == "meio-campistas":
+        fin_vol = _row_vol(row, "Finalizações", "Remates/90")
+        passe_area = float(row.get("PasseAreaW") or 0)
+        aspects["terco_final"] = [
+            _metric_group_aspect(
+                "Finalizações",
+                percentile=row.get("_asp_fin_vol", 0),
+                eff_pct=row.get("_asp_fin_eff", 0),
+                eff_display=_raw_eff_display(row, "Remates à baliza, %", "%EffFin"),
+                sub_metrics=[
+                    _sub_metric("Finalizações", percentile=row.get("_asp_fin_vol", 0), display_value=_fmt_per90(fin_vol)),
+                    _sub_metric(
+                        "Eficiência",
+                        percentile=row.get("_asp_fin_eff", 0),
+                        display_value=_raw_eff_display(row, "Remates à baliza, %", "%EffFin"),
+                    ),
+                ],
+            ),
+            _metric_group_aspect(
+                "Passes Finas",
+                percentile=max(float(row.get("_asp_passes_chave_vol", 0) or 0), float(row.get("_asp_passe_area_certos90", 0) or 0)),
+                sub_metrics=[
+                    _sub_metric(
+                        "Passes Chave",
+                        percentile=row.get("_asp_passes_chave_vol", 0),
+                        display_value=_fmt_per90(_row_vol(row, "PassesChave", "Passes chave/90")),
+                    ),
+                    _sub_metric(
+                        "Passes para Área",
+                        percentile=row.get("_asp_passe_area_certos90", 0),
+                        display_value=_fmt_per90(passe_area),
+                    ),
+                ],
+            ),
+            _metric_group_aspect(
+                "Ofensividade",
+                percentile=max(float(row.get("_asp_acoes_at_vol", 0) or 0), float(row.get("_asp_toques_area_vol", 0) or 0)),
+                sub_metrics=[
+                    _sub_metric(
+                        "Ações Ofensivas",
+                        percentile=row.get("_asp_acoes_at_vol", 0),
+                        display_value=_fmt_per90(_row_vol(row, "AcoesAtW", "Acções atacantes com sucesso/90")),
+                    ),
+                    _sub_metric(
+                        "Toques na Área",
+                        percentile=row.get("_asp_toques_area_vol", 0),
+                        display_value=_fmt_per90(_row_vol(row, "ToquesArea", "Toques na área/90")),
+                    ),
+                ],
+            ),
+        ]
 
     return aspects
 
@@ -1424,6 +1502,29 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
                     "defensivo": round(float(row.get("nota_defensivo") or row.get("rating_defensivo") or row["rating_geral"]), 1),
                     "construtor": round(float(row.get("nota_construtor") or row.get("rating_construtor") or row["rating_geral"]), 1),
                     "ofensivo": round(float(row.get("nota_ofensivo") or row.get("rating_ofensivo") or row["rating_geral"]), 1),
+                },
+            }
+    if family_key == "meio-campistas":
+        archetype = row.get("cluster_archetype")
+        if pd.notna(archetype) and archetype:
+            badge = row.get("cluster_hybrid_badge")
+            badge_short = row.get("cluster_hybrid_badge_short")
+            label = row.get("cluster_archetype_label")
+            payload["cluster"] = {
+                "family": "meio-campistas",
+                "archetype": str(archetype),
+                "archetype_label": str(label if pd.notna(label) and label else archetype),
+                "hybrid_badge": str(badge) if pd.notna(badge) and badge else None,
+                "hybrid_badge_short": str(badge_short) if pd.notna(badge_short) and badge_short else None,
+                "shares": {
+                    "contencao": float(row.get("cluster_share_contencao") or 0),
+                    "construtor": float(row.get("cluster_share_construtor") or 0),
+                    "boxtobox": float(row.get("cluster_share_boxtobox") or 0),
+                },
+                "ratings": {
+                    "contencao": round(float(row.get("nota_contencao") or row.get("rating_contencao") or row["rating_geral"]), 1),
+                    "construtor": round(float(row.get("nota_construtor") or row.get("rating_construtor") or row["rating_geral"]), 1),
+                    "boxtobox": round(float(row.get("nota_boxtobox") or row.get("rating_boxtobox") or row["rating_geral"]), 1),
                 },
             }
     return payload

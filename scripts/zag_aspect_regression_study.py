@@ -139,6 +139,9 @@ def enrich_base(df: pd.DataFrame) -> pd.DataFrame:
     out["cruzamentos_vol"] = _num(out, "Cruzamentos/90", "Cruz.")
     out["cruzamentos_eff"] = _num(out, "Cruzamentos certos, %")
     out["cruzamentos_impact"] = out["cruzamentos_vol"] * out["cruzamentos_eff"] / 100.0
+    out["finalizacoes_vol"] = _num(out, "Remates/90", "Finalizações")
+    out["finalizacoes_eff"] = _num(out, "Remates à baliza, %")
+    out["finalizacoes_impact"] = out["finalizacoes_vol"] * out["finalizacoes_eff"] / 100.0
 
     return out
 
@@ -209,9 +212,19 @@ METRICS: list[MetricSpec] = [
         conf_ref=50,
         resid_cap=RESID_CAP_PP,
     ),
+    MetricSpec(
+        key="finalizacoes",
+        title="Finalizações",
+        vol_label="Remates/90",
+        eff_label="Eff %",
+        impact_label="À baliza/90",
+        conf_ref=40,
+        resid_cap=RESID_CAP_PP,
+    ),
 ]
 
 LAT_HISTORICAL_METRICS = frozenset({"dribles", "cruzamentos"})
+MC_HISTORICAL_METRICS = frozenset({"finalizacoes"})
 
 
 def metric_columns(spec: MetricSpec) -> tuple[str, str, str, str]:
@@ -227,6 +240,8 @@ def metric_columns(spec: MetricSpec) -> tuple[str, str, str, str]:
         return "dribles_vol", "dribles_eff", "dribles_impact", "dribles_vol"
     if spec.key == "cruzamentos":
         return "cruzamentos_vol", "cruzamentos_eff", "cruzamentos_impact", "cruzamentos_vol"
+    if spec.key == "finalizacoes":
+        return "finalizacoes_vol", "finalizacoes_eff", "finalizacoes_impact", "finalizacoes_vol"
     return "acoes_def", "custo_def", "inter_clear_p90", "acoes_def"
 
 
@@ -264,6 +279,10 @@ def load_zagueiros(path: Path) -> pd.DataFrame:
 
 def load_laterais(path: Path) -> pd.DataFrame:
     return _load_position_pool(path, frozenset({"Lateral Direito", "Lateral Esquerdo"}))
+
+
+def load_meio_campistas(path: Path) -> pd.DataFrame:
+    return _load_position_pool(path, frozenset({"Meio-campista"}))
 
 
 def fit_eff_regression(pool: pd.DataFrame) -> dict[str, float]:

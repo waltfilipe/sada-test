@@ -4,14 +4,17 @@ import type { ReactNode } from "react";
 import {
   archetypeMetaFor,
   isLatCluster,
+  isMcCluster,
   latArchetypeMetaFor,
+  mcArchetypeMetaFor,
   type LatArchetype,
+  type McArchetype,
   type PositionCluster,
   type ZagArchetype,
 } from "@/lib/clusterMeta";
 
 type Props = {
-  archetype: ZagArchetype | LatArchetype;
+  archetype: ZagArchetype | LatArchetype | McArchetype;
   cluster?: PositionCluster;
   children: ReactNode;
   className?: string;
@@ -38,7 +41,9 @@ export function ArchetypeTooltip({ archetype, cluster, children, className = "",
   const meta =
     cluster && isLatCluster(cluster)
       ? latArchetypeMetaFor(archetype as LatArchetype)
-      : archetypeMetaFor(archetype as ZagArchetype);
+      : cluster && isMcCluster(cluster)
+        ? mcArchetypeMetaFor(archetype as McArchetype)
+        : archetypeMetaFor(archetype as ZagArchetype);
   if (!meta) return <>{children}</>;
 
   const wrapClass = ["archetype-tip-wrap", block ? "is-block" : "", className].filter(Boolean).join(" ");

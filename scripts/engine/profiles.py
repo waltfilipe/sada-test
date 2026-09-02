@@ -372,10 +372,9 @@ FAMILY_PROFILE_CONFIG: dict[str, FamilyProfileConfig] = {
     "meio-campistas": FamilyProfileConfig(
         threshold=0.03,
         profiles=(
-            ProfileSpec("construtor", "Construtor", "Construtor"),
             ProfileSpec("contencao", "Contenção", "Contenção"),
+            ProfileSpec("construtor", "Construtor", "Construtor"),
             ProfileSpec("boxtobox", "Box-to-box", "Box to Box"),
-            ProfileSpec("ofensivo", "Ofensivo", "Ofensivo"),
         ),
         compute_indices=_compute_meio_profiles,
     ),
@@ -423,6 +422,12 @@ def profile_shares_from_row(row: pd.Series, family_key: str) -> dict[str, float]
             "construtor": round(float(row.get("cluster_share_construtor") or 0), 0),
             "ofensivo": round(float(row.get("cluster_share_ofensivo") or 0), 0),
         }
+    if family_key == "meio-campistas":
+        return {
+            "contencao": round(float(row.get("cluster_share_contencao") or 0), 0),
+            "construtor": round(float(row.get("cluster_share_construtor") or 0), 0),
+            "boxtobox": round(float(row.get("cluster_share_boxtobox") or 0), 0),
+        }
     config = FAMILY_PROFILE_CONFIG[family_key]
     shares: dict[str, float] = {}
     for spec in config.profiles:
@@ -443,6 +448,12 @@ def profile_ratings_from_row(row: pd.Series, family_key: str) -> dict[str, float
             "construtor": round(float(row.get("rating_construtor", 0)), 1),
             "ofensivo": round(float(row.get("rating_ofensivo", 0)), 1),
         }
+    if family_key == "meio-campistas":
+        return {
+            "contencao": round(float(row.get("rating_contencao", 0)), 1),
+            "construtor": round(float(row.get("rating_construtor", 0)), 1),
+            "boxtobox": round(float(row.get("rating_boxtobox", 0)), 1),
+        }
     config = FAMILY_PROFILE_CONFIG[family_key]
     ratings: dict[str, float] = {}
     for spec in config.profiles:
@@ -462,6 +473,12 @@ def profile_ranks_from_row(row: pd.Series, family_key: str) -> dict[str, int]:
             "defensivo": int(row.get("rank_defensivo", 0)),
             "construtor": int(row.get("rank_construtor", 0)),
             "ofensivo": int(row.get("rank_ofensivo", 0)),
+        }
+    if family_key == "meio-campistas":
+        return {
+            "contencao": int(row.get("rank_contencao", 0)),
+            "construtor": int(row.get("rank_construtor", 0)),
+            "boxtobox": int(row.get("rank_boxtobox", 0)),
         }
     config = FAMILY_PROFILE_CONFIG[family_key]
     ranks: dict[str, int] = {}

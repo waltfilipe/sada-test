@@ -11,13 +11,15 @@ const BAR_GROUPS = [
 
 const LAT_EXTRA_GROUP = { key: "terco_final", title: "Terço Final" } as const;
 
+const TRI_AXIS_FAMILIES = new Set<PositionFamily>(["laterais", "meio-campistas"]);
+
 export function AspectMatrix({ player, family }: { player: PlayerProfile; family?: PositionFamily }) {
   const groups =
-    family === "laterais"
+    family && TRI_AXIS_FAMILIES.has(family)
       ? [...BAR_GROUPS, LAT_EXTRA_GROUP]
       : BAR_GROUPS;
 
-  const groupsClass = family === "laterais" ? "aspect-groups aspect-groups-quad" : "aspect-groups";
+  const groupsClass = family && TRI_AXIS_FAMILIES.has(family) ? "aspect-groups aspect-groups-quad" : "aspect-groups";
 
   return (
     <div className={groupsClass}>

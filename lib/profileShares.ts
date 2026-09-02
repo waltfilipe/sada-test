@@ -1,9 +1,12 @@
 import {
   LAT_ARCHETYPE_META,
+  MC_ARCHETYPE_META,
   ZAG_ARCHETYPE_META,
   archetypeTone,
   isLatCluster,
+  isMcCluster,
   latArchetypeTone,
+  mcArchetypeTone,
 } from "@/lib/clusterMeta";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -35,6 +38,26 @@ export function buildProfileShareRows(player: PlayerProfile): ProfileShareRow[] 
           : item.archetype === "Construtor"
             ? cluster.ratings.construtor
             : cluster.ratings.ofensivo,
+    }));
+  }
+  if (isMcCluster(player.cluster)) {
+    const cluster = player.cluster;
+    return MC_ARCHETYPE_META.filter((m) => m.archetype !== "Híbrido").map((item) => ({
+      key: item.archetype,
+      label: item.archetype,
+      tone: mcArchetypeTone(item.archetype),
+      share:
+        item.archetype === "Contenção"
+          ? cluster.shares.contencao
+          : item.archetype === "Construtor"
+            ? cluster.shares.construtor
+            : cluster.shares.boxtobox,
+      rating:
+        item.archetype === "Contenção"
+          ? cluster.ratings.contencao
+          : item.archetype === "Construtor"
+            ? cluster.ratings.construtor
+            : cluster.ratings.boxtobox,
     }));
   }
   const cluster = player.cluster;
@@ -83,6 +106,8 @@ export function profileEmoji(label: string): string {
     Defensivo: "🛡️",
     Ofensivo: "⚡",
     Híbrido: "🔀",
+    Contenção: "🛡️",
+    "Box-to-box": "⚡",
   };
   return map[label] ?? "📊";
 }
@@ -95,6 +120,8 @@ export function profileAccent(label: string): string {
     Defensivo: "#1be7ff",
     Ofensivo: "#31e981",
     Híbrido: "#fed766",
+    Contenção: "#1be7ff",
+    "Box-to-box": "#31e981",
   };
   return map[label] ?? "#1be7ff";
 }
@@ -106,6 +133,8 @@ export function archetypeClusterSlug(label: string): string | null {
     Combativo: "combativo",
     Defensivo: "defensivo",
     Ofensivo: "ofensivo",
+    Contenção: "contencao",
+    "Box-to-box": "boxtobox",
   };
   return map[label] ?? null;
 }
@@ -120,7 +149,7 @@ export function archetypeRank(
   if (!slug) return null;
 
   const storedRank = player.ranks?.[slug];
-  if (family === "laterais" && storedRank) return storedRank;
+  if ((family === "laterais" || family === "meio-campistas") && storedRank) return storedRank;
 
   const sorted = players
     .filter((entry) => {

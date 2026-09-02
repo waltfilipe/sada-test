@@ -25,7 +25,9 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from zag_aspect_regression_study import (  # noqa: E402
     HISTORICAL_FILES,
     LAT_HISTORICAL_METRICS,
+    MC_HISTORICAL_METRICS,
     METRICS,
+    load_meio_campistas,
     enrich_base,
     load_laterais,
     load_zagueiros,
@@ -79,7 +81,12 @@ def _score_impact_5050_frame(scored: pd.DataFrame, spec, coef: dict[str, float])
 
 
 def _impact_coef(spec) -> dict[str, float]:
-    loader = load_laterais if spec.key in LAT_HISTORICAL_METRICS else load_zagueiros
+    if spec.key in LAT_HISTORICAL_METRICS:
+        loader = load_laterais
+    elif spec.key in MC_HISTORICAL_METRICS:
+        loader = load_meio_campistas
+    else:
+        loader = load_zagueiros
     hist = pd.concat([enrich_base(loader(p)) for p in HISTORICAL_FILES], ignore_index=True)
     return fit_impact_regression(prepare_metric_df(hist, spec))
 
@@ -175,6 +182,11 @@ def enrich_pool(pool: pd.DataFrame) -> pd.DataFrame:
     out["cruzamentos_vol"] = _pool_col(out, "Cruz.", "Cruzamentos/90")
     out["cruzamentos_eff"] = _pool_col(out, "%EffCruz.", "Cruzamentos certos, %")
     out["cruzamentos_impact"] = out["cruzamentos_vol"] * out["cruzamentos_eff"] / 100.0
+    out["finalizacoes_vol"] = _pool_col(out, "Finalizações", "Remates/90")
+    out["finalizacoes_eff"] = _pool_col(out, "Remates à baliza, %")
+    if (out["finalizacoes_eff"] == 0).all():
+        out["finalizacoes_eff"] = _pool_col(out, "%EffFin") * 100
+    out["finalizacoes_impact"] = out["finalizacoes_vol"] * out["finalizacoes_eff"] / 100.0
     return out
 
 

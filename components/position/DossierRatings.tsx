@@ -12,7 +12,7 @@ import {
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 function secondaryAxes(family: PositionFamily) {
-  if (family === "zagueiros" || family === "laterais") return [];
+  if (family === "zagueiros" || family === "laterais" || family === "meio-campistas") return [];
 
   return profileMetaForFamily(family)
     .filter((item) => item.key !== "perfil" && item.key !== "geral")

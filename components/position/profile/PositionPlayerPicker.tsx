@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
-import { LAT_ARCHETYPE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
+import { LAT_ARCHETYPE_META, MC_ARCHETYPE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
 import { formatRating, playerInitials } from "@/lib/scoutTheme";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -100,7 +100,13 @@ export function PositionPlayerPicker({
   }
 
   const archetypeFilters =
-    family === "laterais" ? LAT_ARCHETYPE_META : family === "zagueiros" ? ZAG_ARCHETYPE_META : null;
+    family === "laterais"
+      ? LAT_ARCHETYPE_META
+      : family === "meio-campistas"
+        ? MC_ARCHETYPE_META
+        : family === "zagueiros"
+          ? ZAG_ARCHETYPE_META
+          : null;
 
   return (
     <div className="player-strip player-card player-strip-expanded">

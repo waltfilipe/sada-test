@@ -51,14 +51,44 @@ export type LatCluster = {
   ratings: LatArchetypeRatings;
 };
 
-export type PositionCluster = ZagCluster | LatCluster;
+export type McArchetype = "Contenção" | "Construtor" | "Box-to-box" | "Híbrido";
+
+export type McHybridBadge = "Volante Base" | "MC Combativo" | "MC Projetivo" | "MC Completo";
+
+export type McClusterShares = {
+  contencao: number;
+  construtor: number;
+  boxtobox: number;
+};
+
+export type McArchetypeRatings = {
+  contencao: number;
+  construtor: number;
+  boxtobox: number;
+};
+
+export type McCluster = {
+  family: "meio-campistas";
+  archetype: McArchetype;
+  archetype_label: string;
+  hybrid_badge?: McHybridBadge | string | null;
+  hybrid_badge_short?: string | null;
+  shares: McClusterShares;
+  ratings: McArchetypeRatings;
+};
+
+export type PositionCluster = ZagCluster | LatCluster | McCluster;
 
 export function isLatCluster(cluster: PositionCluster): cluster is LatCluster {
-  return cluster.family === "laterais" || "defensivo" in cluster.shares;
+  return cluster.family === "laterais" || ("defensivo" in cluster.shares && !("contencao" in cluster.shares));
+}
+
+export function isMcCluster(cluster: PositionCluster): cluster is McCluster {
+  return cluster.family === "meio-campistas" || "contencao" in cluster.shares;
 }
 
 export function isZagCluster(cluster: PositionCluster): cluster is ZagCluster {
-  return !isLatCluster(cluster);
+  return !isLatCluster(cluster) && !isMcCluster(cluster);
 }
 
 export type ArchetypeTrait = {
@@ -297,6 +327,124 @@ export function latArchetypeMetaFor(archetype: LatArchetype) {
 
 export function latHybridBadgeMetaFor(badge: string) {
   return LAT_HYBRID_BADGE_META.find((item) => item.badge === badge);
+}
+
+export const MC_ARCHETYPES: McArchetype[] = ["Contenção", "Construtor", "Box-to-box", "Híbrido"];
+
+export const MC_HYBRID_BADGE_META: {
+  badge: McHybridBadge;
+  short_label: string;
+  description: string;
+  traits: ArchetypeTrait[];
+}[] = [
+  {
+    badge: "Volante Base",
+    short_label: "Base",
+    description: "Combina contenção e construção — volante de referência na fase defensiva e de saída.",
+    traits: [
+      { label: "Duelos Defensivos", direction: "up" },
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "Interceptações", direction: "up" },
+      { label: "Finalizações", direction: "down" },
+    ],
+  },
+  {
+    badge: "MC Combativo",
+    short_label: "Combativo",
+    description: "Contém e chega à área — perfil de meio completo no jogo moderno.",
+    traits: [
+      { label: "Duelos Defensivos", direction: "up" },
+      { label: "Finalizações", direction: "up" },
+      { label: "Ofensividade", direction: "up" },
+      { label: "Passes Longos", direction: "down" },
+    ],
+  },
+  {
+    badge: "MC Projetivo",
+    short_label: "Projetivo",
+    description: "Constrói e avança — combina distribuição com presença ofensiva.",
+    traits: [
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "Finalizações", direction: "up" },
+      { label: "Ofensividade", direction: "up" },
+      { label: "Duelos Aéreos", direction: "down" },
+    ],
+  },
+  {
+    badge: "MC Completo",
+    short_label: "Completo",
+    description: "Elite nas três frentes — contém, constrói e chega ao ataque em volume acima da média.",
+    traits: [
+      { label: "Duelos Defensivos", direction: "up" },
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "Finalizações", direction: "up" },
+      { label: "Interceptações", direction: "up" },
+    ],
+  },
+];
+
+export const MC_ARCHETYPE_META: {
+  archetype: McArchetype;
+  tone: string;
+  description: string;
+  traits: ArchetypeTrait[];
+}[] = [
+  {
+    archetype: "Contenção",
+    tone: "contencao",
+    description: "Prioridade na fase defensiva: duelos, interceptações e jogo aéreo.",
+    traits: [
+      { label: "Duelos Defensivos", direction: "up" },
+      { label: "Rebatidas", direction: "up" },
+      { label: "Duelos Aéreos", direction: "up" },
+      { label: "Finalizações", direction: "down" },
+    ],
+  },
+  {
+    archetype: "Construtor",
+    tone: "construtor",
+    description: "Iniciador de jogo: passes progressivos, PTF e distribuição.",
+    traits: [
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "PTF", direction: "up" },
+      { label: "Passes Recebidos", direction: "up" },
+      { label: "Finalizações", direction: "down" },
+    ],
+  },
+  {
+    archetype: "Box-to-box",
+    tone: "boxtobox",
+    description: "Meio completo: ofensividade, duelos defensivos, interceptações e finalizações.",
+    traits: [
+      { label: "Finalizações", direction: "up" },
+      { label: "Ofensividade", direction: "up" },
+      { label: "Duelos Defensivos", direction: "up" },
+      { label: "Interceptações", direction: "up" },
+    ],
+  },
+  {
+    archetype: "Híbrido",
+    tone: "hibrido",
+    description: "Dois eixos fortes — perfil dual com identidade em mais de uma frente.",
+    traits: [
+      { label: "Versatilidade", direction: "up" },
+      { label: "Volume Defensivo", direction: "up" },
+      { label: "Projeção Ofensiva", direction: "up" },
+      { label: "Especialização", direction: "down" },
+    ],
+  },
+];
+
+export function mcArchetypeTone(archetype: McArchetype): string {
+  return MC_ARCHETYPE_META.find((item) => item.archetype === archetype)?.tone ?? "construtor";
+}
+
+export function mcArchetypeMetaFor(archetype: McArchetype) {
+  return MC_ARCHETYPE_META.find((item) => item.archetype === archetype);
+}
+
+export function mcHybridBadgeMetaFor(badge: string) {
+  return MC_HYBRID_BADGE_META.find((item) => item.badge === badge);
 }
 
 /** @deprecated use archetypeCounts */

@@ -13,33 +13,30 @@
   "minutes_pct": 27.6,
   "goals": 0,
   "assists": 0,
-  "rating": 6.3,
+  "rating": 6.8,
   "ratings": {
-    "geral": 6.3,
-    "construtor": 7.9,
-    "contencao": 6.8,
-    "boxtobox": 7.2,
-    "ofensivo": 6.0
+    "geral": 6.8,
+    "contencao": 7.1,
+    "construtor": 6.6,
+    "boxtobox": 6.7
   },
   "ranks": {
-    "geral": 46,
-    "construtor": 27,
-    "contencao": 48,
-    "boxtobox": 39,
-    "ofensivo": 63
+    "geral": 36,
+    "contencao": 16,
+    "construtor": 36,
+    "boxtobox": 30
   },
-  "profile": "Construtor",
+  "profile": "Híbrido",
   "profile_shares": {
-    "construtor": 31.0,
-    "contencao": 23.0,
-    "boxtobox": 26.0,
-    "ofensivo": 20.0
+    "contencao": 35.0,
+    "construtor": 46.0,
+    "boxtobox": 19.0
   },
   "tendencies": {
-    "construcao": 62.0,
-    "ofensividade": 7.0,
-    "def1v1": 57.0,
-    "contencao": 12.0,
+    "construcao": 73.0,
+    "ofensividade": 38.0,
+    "def1v1": 74.0,
+    "contencao": 62.0,
     "duelo_aereo": 70.0
   },
   "aspects": {
@@ -131,11 +128,30 @@
         "efficiency_pct": 65.6,
         "efficiency_value": "64%",
         "stats": []
+      },
+      {
+        "label": "Distribuição",
+        "kind": "metric_group",
+        "grade": "B+",
+        "percentile": 81.0,
+        "sub_metrics": [
+          {
+            "label": "Passes",
+            "percentile": 81.0,
+            "display_value": "50,7"
+          },
+          {
+            "label": "Passes Recebidos",
+            "percentile": 68.8,
+            "display_value": "35,4"
+          }
+        ],
+        "stats": []
       }
     ],
     "perfil_construcao": [
       {
-        "label": "Passes Longos",
+        "label": "Tendência de Passe",
         "kind": "construction_share",
         "grade": "B+",
         "percentile": 79.0,
@@ -143,7 +159,10 @@
         "share_pct": 9.3,
         "pool_avg_pct": 7.3,
         "scale_max_pct": 30.0,
-        "stats": []
+        "stats": [],
+        "bar_key": "pass_tendency",
+        "axis_left": "Curto",
+        "axis_right": "Longo"
       },
       {
         "label": "Passes Progressivos",
@@ -154,10 +173,42 @@
         "share_pct": 13.2,
         "pool_avg_pct": 13.4,
         "scale_max_pct": 30.0,
-        "stats": []
+        "stats": [],
+        "bar_key": "progressive_share",
+        "axis_left": "Baixo",
+        "axis_right": "Alto"
       }
     ],
-    "perfil_defensivo": [],
+    "perfil_defensivo": [
+      {
+        "label": "Estilo de defesa",
+        "kind": "construction_share",
+        "grade": "C",
+        "percentile": 37.0,
+        "display_value": "1,84",
+        "share_pct": 37.0,
+        "pool_avg_pct": 2.5,
+        "scale_max_pct": 100.0,
+        "stats": [],
+        "bar_key": "def_contact_style",
+        "axis_left": "Cobertura",
+        "axis_right": "Agressivo"
+      },
+      {
+        "label": "Disciplina defensiva",
+        "kind": "construction_share",
+        "grade": "B-",
+        "percentile": 55.9,
+        "display_value": "33%",
+        "share_pct": 33.3,
+        "pool_avg_pct": 1.5,
+        "scale_max_pct": 100.0,
+        "stats": [],
+        "bar_key": "def_foul_style",
+        "axis_left": "Disciplinado",
+        "axis_right": "Faltoso"
+      }
+    ],
     "ofensivos": [
       {
         "label": "Duelos Ofensivos",
@@ -173,9 +224,80 @@
         "label": "Conduções Progressivas",
         "kind": "metric",
         "grade": "D",
-        "percentile": 5.9,
+        "percentile": 6.9,
         "stats": [],
         "display_value": "0,1"
+      },
+      {
+        "label": "Dribles",
+        "kind": "metric",
+        "grade": "D",
+        "percentile": 19.4,
+        "stats": [],
+        "display_value": "0,3",
+        "efficiency_pct": 32.4,
+        "efficiency_value": "50%"
+      }
+    ],
+    "terco_final": [
+      {
+        "label": "Finalizações",
+        "kind": "metric_group",
+        "grade": "A",
+        "percentile": 85.0,
+        "sub_metrics": [
+          {
+            "label": "Finalizações",
+            "percentile": 85.0,
+            "display_value": "1,3"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 36.4,
+            "display_value": "22%"
+          }
+        ],
+        "stats": [],
+        "efficiency_pct": 36.4,
+        "efficiency_value": "22%"
+      },
+      {
+        "label": "Passes Finas",
+        "kind": "metric_group",
+        "grade": "D",
+        "percentile": 0.0,
+        "sub_metrics": [
+          {
+            "label": "Passes Chave",
+            "percentile": 0.0,
+            "display_value": "0,0"
+          },
+          {
+            "label": "Passes para Área",
+            "percentile": 0.0,
+            "display_value": "0,0"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Ofensividade",
+        "kind": "metric_group",
+        "grade": "C",
+        "percentile": 39.0,
+        "sub_metrics": [
+          {
+            "label": "Ações Ofensivas",
+            "percentile": 21.2,
+            "display_value": "0,4"
+          },
+          {
+            "label": "Toques na Área",
+            "percentile": 39.0,
+            "display_value": "0,6"
+          }
+        ],
+        "stats": []
       }
     ]
   },
@@ -183,14 +305,31 @@
     "Contenção",
     "Construtor",
     "Box-to-box",
-    "Ofensivo",
     "Híbrido"
   ],
   "scatter": {
-    "passes_prog": 6.71,
+    "finalizacao": 1.29,
+    "progressao": 0.14,
     "xa": 0.0,
-    "construcao": 61.72839506172839,
-    "progressao": 0.14
+    "construcao": 72.8395061728395,
+    "duelos_def": 7.86
+  },
+  "cluster": {
+    "family": "meio-campistas",
+    "archetype": "Híbrido",
+    "archetype_label": "Híbrido",
+    "hybrid_badge": "Volante Base",
+    "hybrid_badge_short": "Base",
+    "shares": {
+      "contencao": 34.9,
+      "construtor": 45.6,
+      "boxtobox": 19.4
+    },
+    "ratings": {
+      "contencao": 7.1,
+      "construtor": 6.5,
+      "boxtobox": 6.7
+    }
   },
   "transfermarkt": null
 }

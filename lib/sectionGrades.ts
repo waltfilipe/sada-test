@@ -61,7 +61,7 @@ function metricGroupScore(item: AspectItem): number | undefined {
   const subs = item.sub_metrics ?? [];
   if (!subs.length) return num(item.percentile);
 
-  if (item.label === "Cruzamentos") {
+  if (item.label === "Cruzamentos" || item.label === "Finalizações") {
     const vol = subs.find((row) => row.label === "Cruzamentos");
     const eff = subs.find((row) => row.label === "Eficiência");
     return blendVolEff(num(vol?.percentile), num(eff?.percentile));
@@ -101,6 +101,11 @@ const SECTION_BLOCK_WEIGHTS: Partial<
       Distribuição: 0.35,
     },
   },
+  "meio-campistas": {
+    Passes: {
+      Distribuição: 0.35,
+    },
+  },
 };
 
 /** Block labels per section — used for composite section score. */
@@ -116,6 +121,12 @@ const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
     "Dribles e Condução": ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
     "Passes Finais e Ofensividade": ["Cruzamentos", "Passes Finas", "Ofensividade"],
+  },
+  "meio-campistas": {
+    Defensivos: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
+    Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
+    "Dribles e Condução": ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
+    "Passes Finais e Ofensividade": ["Finalizações", "Passes Finas", "Ofensividade"],
   },
 };
 
