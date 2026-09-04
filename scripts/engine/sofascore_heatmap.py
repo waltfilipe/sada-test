@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import time
 from pathlib import Path
 from typing import Any
@@ -14,6 +15,7 @@ from .sofascore import SS_PATH, aggregate_sofascore, match_ss_row
 
 ROOT = Path(__file__).resolve().parents[2]
 HEATMAP_DIR = ROOT / "data" / "heatmaps"
+PUBLIC_HEATMAP_DIR = ROOT / "public" / "heatmaps"
 HEATMAPS_BR26_DIR = ROOT / "HeatmapsBR26"
 DEFAULT_TOURNAMENT_ID = 325
 API_BASE = "https://api.sofascore.com/api/v1"
@@ -203,10 +205,12 @@ def import_heatmaps_from_br26(
     *,
     source_dir: Path | None = None,
     out_dir: Path | None = None,
+    public_dir: Path | None = None,
 ) -> int:
-    """Copy HeatmapsBR26 JSONs into data/heatmaps keyed by site player_id."""
+    """Copy HeatmapsBR26 JSONs into data/heatmaps and PNGs into public/heatmaps."""
     source = source_dir or HEATMAPS_BR26_DIR
     target = out_dir or HEATMAP_DIR
+    public_target = public_dir or PUBLIC_HEATMAP_DIR
     if not source.exists():
         return 0
 
@@ -219,6 +223,7 @@ def import_heatmaps_from_br26(
             ss_to_site[ss_id] = site_id
 
     target.mkdir(parents=True, exist_ok=True)
+    public_target.mkdir(parents=True, exist_ok=True)
     imported = 0
     for ss_id, site_id in ss_to_site.items():
         src = source / f"{ss_id}.json"
@@ -233,15 +238,27 @@ def import_heatmaps_from_br26(
         data["player_id"] = site_id
         data["source"] = "heatmaps_br26"
         save_heatmap(site_id, data, target)
+        png_src = source / f"{ss_id}.png"
+        if png_src.exists():
+            shutil.copy2(png_src, public_target / f"{site_id}.png")
         imported += 1
     return imported
 
 
-def attach_heatmaps_to_players(players: list[dict[str, Any]], out_dir: Path | None = None) -> int:
+def attach_heatmaps_to_players(
+    players: list[dict[str, Any]],
+    out_dir: Path | None = None,
+    public_dir: Path | None = None,
+) -> int:
     attached = 0
+    public_target = public_dir or PUBLIC_HEATMAP_DIR
     for player in players:
         hm = load_heatmap(player["player_id"], out_dir)
         if hm and hm.get("points"):
+            image_url = None
+            png_path = public_target / f"{player['player_id']}.png"
+            if png_path.exists():
+                image_url = f"/heatmaps/{player['player_id']}.png"
             player["heatmap"] = {
                 "tournament_id": hm.get("tournament_id"),
                 "season_id": hm.get("season_id"),
@@ -249,6 +266,7 @@ def attach_heatmaps_to_players(players: list[dict[str, Any]], out_dir: Path | No
                 "competition": hm.get("competition"),
                 "points": hm.get("points"),
                 "point_count": hm.get("point_count", len(hm.get("points", []))),
+                "image_url": image_url,
             }
             attached += 1
         else:

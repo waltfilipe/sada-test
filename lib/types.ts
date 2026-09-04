@@ -108,6 +108,7 @@ export type PlayerHeatmapData = {
   competition?: string | null;
   point_count?: number;
   points: { x: number; y: number }[];
+  image_url?: string | null;
 };
 
 export type PlayerProfile = PlayerSummary & {

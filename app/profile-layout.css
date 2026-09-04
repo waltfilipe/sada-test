@@ -1608,50 +1608,18 @@
   flex: 1;
 }
 
-.heatmap-canvas {
+.heatmap-body {
   flex: 1;
   min-height: 0;
-  margin-top: 0.55rem;
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
+}
+
+.heatmap-img {
+  width: 100%;
   border-radius: var(--radius-sm);
-  border: 1px dashed rgba(148, 163, 184, 0.22);
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(34, 197, 94, 0.04), transparent 70%),
-    rgba(15, 23, 42, 0.35);
-  text-align: center;
-  padding: 0.55rem;
-}
-
-.heatmap-canvas-live {
-  border-style: solid;
-  border-color: rgba(148, 163, 184, 0.12);
-  background:
-    radial-gradient(ellipse 90% 70% at 50% 35%, rgba(34, 211, 238, 0.04), transparent 72%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.92));
-  padding: 0.5rem 0.55rem 0.45rem;
-}
-
-.heatmap-pitch-wrap {
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 10px 28px rgba(0, 0, 0, 0.28);
-}
-
-.heatmap-pitch-canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: 10px;
+  margin-top: 0.5rem;
 }
 
 .heatmap-meta {
@@ -1663,7 +1631,25 @@
   text-align: center;
 }
 
-.heatmap-canvas-icon {
+.heatmap-empty {
+  flex: 1;
+  min-height: 0;
+  margin-top: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border-radius: var(--radius-sm);
+  border: 1px dashed rgba(148, 163, 184, 0.22);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(34, 197, 94, 0.04), transparent 70%),
+    rgba(15, 23, 42, 0.35);
+  text-align: center;
+  padding: 0.55rem;
+}
+
+.heatmap-empty-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2961,7 +2947,8 @@
 @media (max-width: 1240px) {
   .profile-content-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .profile-col-heatmap { grid-column: 1 / -1; order: 3; }
-  .profile-col-heatmap .heatmap-canvas { min-height: 180px; }
+  .profile-col-heatmap .heatmap-body,
+  .profile-col-heatmap .heatmap-empty { min-height: 180px; }
 }
 
 @media (max-width: 1100px) {
