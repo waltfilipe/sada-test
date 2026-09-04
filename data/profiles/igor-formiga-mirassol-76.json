@@ -211,7 +211,7 @@
     ],
     "ofensivos": [
       {
-        "label": "Duelos Ofensivos",
+        "label": "Disputas com Bola",
         "kind": "metric",
         "grade": "B",
         "percentile": 72.9,
@@ -229,7 +229,7 @@
         "display_value": "2,2"
       },
       {
-        "label": "Dribles",
+        "label": "1v1 - Ofensivo",
         "kind": "metric",
         "grade": "B+",
         "percentile": 84.5,
@@ -239,7 +239,7 @@
         "efficiency_value": "57%"
       }
     ],
-    "terco_final": [
+    "passes_finais": [
       {
         "label": "Cruzamentos",
         "kind": "metric_group",
@@ -281,15 +281,15 @@
         "stats": []
       },
       {
-        "label": "Assistências e xA",
+        "label": "Pré Assistências e xA",
         "kind": "metric_group",
         "grade": "A",
         "percentile": 86.2,
         "sub_metrics": [
           {
-            "label": "Assistências",
-            "percentile": 20.0,
-            "display_value": "1"
+            "label": "Pré Assistências",
+            "percentile": 0.0,
+            "display_value": "0"
           },
           {
             "label": "xA",
@@ -300,35 +300,17 @@
         "stats": []
       },
       {
-        "label": "Pré-Assists",
+        "label": "Passes Criativos",
         "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0"
-      },
-      {
-        "label": "Passes Inteligentes",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 0.06,
-        "display_value": "0,1",
-        "percentile": 13.3,
-        "efficiency_pct": 31.8,
-        "efficiency_value": "77%",
-        "stats": []
-      },
-      {
-        "label": "Passes em Profundidade",
-        "kind": "pass_certos",
         "grade": "B-",
-        "certos_per90": 0.34,
-        "display_value": "0,3",
-        "percentile": 59.5,
-        "efficiency_pct": 36.4,
-        "efficiency_value": "33%",
-        "stats": []
-      },
+        "percentile": 58.5,
+        "stats": [],
+        "display_value": "0,4",
+        "efficiency_pct": 34.1,
+        "efficiency_value": "55%"
+      }
+    ],
+    "ofensividade": [
       {
         "label": "Ofensividade",
         "kind": "metric_group",

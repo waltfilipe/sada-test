@@ -55,7 +55,7 @@ function metricGroupScore(item: AspectItem): number | undefined {
     return blendVolEff(num(vol?.percentile), num(xg?.percentile));
   }
 
-  if (item.label === "Progressão" || item.label === "Assistências e xA") {
+  if (item.label === "Progressão" || item.label === "Pré Assistências e xA") {
     return num(item.percentile) ?? averageDefined(subs.map((row) => num(row.percentile)));
   }
 
@@ -106,49 +106,27 @@ const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string
   zagueiros: {
     Defensivos: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos"],
-    "Dribles e Condução": ["Duelos Ofensivos", "Conduções Progressivas"],
-    "Passes Finais e Ofensividade": [],
+    "Dribles e Condução": ["Disputas com Bola", "Conduções Progressivas"],
   },
   laterais: {
     Defensivos: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
-    "Dribles e Condução": ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
-    "Passes Finais e Ofensividade": [
-      "Cruzamentos",
-      "Passes Chave e Área",
-      "Assistências e xA",
-      "Pré-Assists",
-      "Passes Inteligentes",
-      "Passes em Profundidade",
-      "Ofensividade",
-    ],
+    "Dribles e Condução": ["Disputas com Bola", "1v1 - Ofensivo", "Conduções Progressivas"],
+    "Passes Finais": ["Cruzamentos", "Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
+    Ofensividade: ["Ofensividade"],
   },
   "meio-campistas": {
     Defensivos: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
-    "Dribles e Condução": ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
-    "Passes Finais e Ofensividade": [
-      "Finalizações",
-      "Passes Chave e Área",
-      "Assistências e xA",
-      "Pré-Assists",
-      "Passes Inteligentes",
-      "Passes em Profundidade",
-      "Ofensividade",
-    ],
+    "Dribles e Condução": ["Disputas com Bola", "1v1 - Ofensivo", "Conduções Progressivas"],
+    "Passes Finais": ["Finalizações", "Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
+    Ofensividade: ["Ofensividade"],
   },
   extremos: {
     Defensivos: ["Duelos Vencidos", "Ações Defensivas"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
-    "Passes Finais": [
-      "Passes Chave e Área",
-      "Cruzamentos",
-      "Assistências e xA",
-      "Pré-Assists",
-      "Passes Inteligentes",
-      "Passes em Profundidade",
-    ],
-    "Condução e Drible": ["Duelos Ofensivos", "Dribles", "Progressão"],
+    "Passes Finais": ["Passes Chave e Área", "Cruzamentos", "Pré Assistências e xA", "Passes Criativos"],
+    "Condução e Drible": ["Disputas com Bola", "1v1 - Ofensivo", "Progressão"],
     Finalização: ["Gols e xG", "Finalizações"],
     Ofensividade: ["Ações Terminais", "Verticalidade"],
   },

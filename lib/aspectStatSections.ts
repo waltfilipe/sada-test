@@ -22,12 +22,7 @@ const ZAG_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Dribles e Condução",
     tone: "dribles",
-    labels: ["Duelos Ofensivos", "Conduções Progressivas"],
-  },
-  {
-    title: "Passes Finais e Ofensividade",
-    tone: "final",
-    labels: [],
+    labels: ["Disputas com Bola", "Conduções Progressivas"],
   },
 ];
 
@@ -45,20 +40,17 @@ const LAT_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Dribles e Condução",
     tone: "dribles",
-    labels: ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
+    labels: ["Disputas com Bola", "1v1 - Ofensivo", "Conduções Progressivas"],
   },
   {
-    title: "Passes Finais e Ofensividade",
+    title: "Passes Finais",
     tone: "final",
-    labels: [
-      "Cruzamentos",
-      "Passes Chave e Área",
-      "Assistências e xA",
-      "Pré-Assists",
-      "Passes Inteligentes",
-      "Passes em Profundidade",
-      "Ofensividade",
-    ],
+    labels: ["Cruzamentos", "Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
+  },
+  {
+    title: "Ofensividade",
+    tone: "final",
+    labels: ["Ofensividade"],
   },
 ];
 
@@ -76,20 +68,17 @@ const MC_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Dribles e Condução",
     tone: "dribles",
-    labels: ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
+    labels: ["Disputas com Bola", "1v1 - Ofensivo", "Conduções Progressivas"],
   },
   {
-    title: "Passes Finais e Ofensividade",
+    title: "Passes Finais",
     tone: "final",
-    labels: [
-      "Finalizações",
-      "Passes Chave e Área",
-      "Assistências e xA",
-      "Pré-Assists",
-      "Passes Inteligentes",
-      "Passes em Profundidade",
-      "Ofensividade",
-    ],
+    labels: ["Finalizações", "Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
+  },
+  {
+    title: "Ofensividade",
+    tone: "final",
+    labels: ["Ofensividade"],
   },
 ];
 
@@ -107,19 +96,12 @@ const EX_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Passes Finais",
     tone: "final",
-    labels: [
-      "Passes Chave e Área",
-      "Cruzamentos",
-      "Assistências e xA",
-      "Pré-Assists",
-      "Passes Inteligentes",
-      "Passes em Profundidade",
-    ],
+    labels: ["Passes Chave e Área", "Cruzamentos", "Pré Assistências e xA", "Passes Criativos"],
   },
   {
     title: "Condução e Drible",
     tone: "dribles",
-    labels: ["Duelos Ofensivos", "Dribles", "Progressão"],
+    labels: ["Disputas com Bola", "1v1 - Ofensivo", "Progressão"],
   },
   {
     title: "Finalização",

@@ -211,7 +211,7 @@
     ],
     "ofensivos": [
       {
-        "label": "Duelos Ofensivos",
+        "label": "Disputas com Bola",
         "kind": "metric",
         "grade": "A",
         "percentile": 86.4,
@@ -229,7 +229,7 @@
         "display_value": "1,9"
       },
       {
-        "label": "Dribles",
+        "label": "1v1 - Ofensivo",
         "kind": "metric",
         "grade": "B+",
         "percentile": 77.6,
@@ -239,7 +239,7 @@
         "efficiency_value": "55%"
       }
     ],
-    "terco_final": [
+    "passes_finais": [
       {
         "label": "Cruzamentos",
         "kind": "metric_group",
@@ -281,13 +281,13 @@
         "stats": []
       },
       {
-        "label": "Assistências e xA",
+        "label": "Pré Assistências e xA",
         "kind": "metric_group",
         "grade": "D",
         "percentile": 3.4,
         "sub_metrics": [
           {
-            "label": "Assistências",
+            "label": "Pré Assistências",
             "percentile": 0.0,
             "display_value": "0"
           },
@@ -300,35 +300,17 @@
         "stats": []
       },
       {
-        "label": "Pré-Assists",
+        "label": "Passes Criativos",
         "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0"
-      },
-      {
-        "label": "Passes Inteligentes",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 0.0,
-        "display_value": "0,0",
-        "percentile": 0.0,
-        "efficiency_pct": 66.7,
-        "efficiency_value": "83%",
-        "stats": []
-      },
-      {
-        "label": "Passes em Profundidade",
-        "kind": "pass_certos",
         "grade": "C-",
-        "certos_per90": 0.17,
+        "percentile": 26.8,
+        "stats": [],
         "display_value": "0,2",
-        "percentile": 32.4,
-        "efficiency_pct": 100.0,
-        "efficiency_value": "100%",
-        "stats": []
-      },
+        "efficiency_pct": 83.3,
+        "efficiency_value": "91%"
+      }
+    ],
+    "ofensividade": [
       {
         "label": "Ofensividade",
         "kind": "metric_group",

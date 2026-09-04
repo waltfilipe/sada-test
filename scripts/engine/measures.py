@@ -80,7 +80,15 @@ def compute_base_measures(row: pd.Series, max_minutes: float) -> dict[str, float
         "Assist2": _num(row.get("Segundas assistências/90")),
         "Assist3": _num(row.get("Terceiras assistências/90")),
         "PreAssists": _num(row.get("Segundas assistências/90")) + _num(row.get("Terceiras assistências/90")),
+        "PreAssistsTotal": (
+            (_num(row.get("Segundas assistências/90")) + _num(row.get("Terceiras assistências/90")))
+            * minutes
+            / 90
+            if minutes
+            else 0.0
+        ),
         "xA": _num(row.get("Assistências esperadas")),
+        "xGTotal": _num(row.get("Golos esperados")),
         "Finalizações": _num(row.get("Remates/90")),
         "ToquesArea": _num(row.get("Toques na área/90")),
         "Cruz.": _num(row.get("Cruzamentos/90")),

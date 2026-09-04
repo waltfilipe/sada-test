@@ -156,15 +156,15 @@
         "efficiency_value": "30%"
       },
       {
-        "label": "Assistências e xA",
+        "label": "Pré Assistências e xA",
         "kind": "metric_group",
         "grade": "B-",
         "percentile": 57.9,
         "sub_metrics": [
           {
-            "label": "Assistências",
-            "percentile": 28.6,
-            "display_value": "2"
+            "label": "Pré Assistências",
+            "percentile": 0.0,
+            "display_value": "0"
           },
           {
             "label": "xA",
@@ -175,52 +175,32 @@
         "stats": []
       },
       {
-        "label": "Pré-Assists",
+        "label": "Passes Criativos",
         "kind": "metric",
         "grade": "D",
-        "percentile": 0.0,
+        "percentile": 18.4,
         "stats": [],
-        "display_value": "0,0"
-      },
-      {
-        "label": "Passes Inteligentes",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 0.0,
-        "display_value": "0,0",
-        "percentile": 0.0,
-        "efficiency_pct": 85.0,
-        "efficiency_value": "84%",
-        "stats": []
-      },
-      {
-        "label": "Passes em Profundidade",
-        "kind": "pass_certos",
-        "grade": "C-",
-        "certos_per90": 0.21,
         "display_value": "0,2",
-        "percentile": 29.3,
-        "efficiency_pct": 76.5,
-        "efficiency_value": "50%",
-        "stats": []
+        "efficiency_pct": 80.7,
+        "efficiency_value": "67%"
       }
     ],
     "finalizacao": [
       {
         "label": "Gols e xG",
         "kind": "metric_group",
-        "grade": "B+",
-        "percentile": 79.3,
+        "grade": "B",
+        "percentile": 70.0,
         "sub_metrics": [
           {
             "label": "Gols",
-            "percentile": 45.7,
-            "display_value": "2,0"
+            "percentile": 28.6,
+            "display_value": "2"
           },
           {
             "label": "xG",
-            "percentile": 79.3,
-            "display_value": "0,27"
+            "percentile": 70.0,
+            "display_value": "2,59"
           }
         ],
         "stats": []
@@ -249,7 +229,7 @@
     ],
     "conducao_drible": [
       {
-        "label": "Duelos Ofensivos",
+        "label": "Disputas com Bola",
         "kind": "metric",
         "grade": "B",
         "percentile": 71.2,
@@ -259,7 +239,7 @@
         "efficiency_value": "40%"
       },
       {
-        "label": "Dribles",
+        "label": "1v1 - Ofensivo",
         "kind": "metric",
         "grade": "B-",
         "percentile": 57.1,

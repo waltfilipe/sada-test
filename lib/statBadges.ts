@@ -44,17 +44,17 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
   Distribuição: {
     label: "Distribuição",
     icon: "fa-share-nodes",
-    title: "Distribuição de passe — volume acima de P60",
+    title: "Distribuição de passe — ambas métricas acima de P60",
   },
-  "Duelos Ofensivos": {
-    label: "Duelos Ofensivos",
+  "Disputas com Bola": {
+    label: "Disputas com Bola",
     icon: "fa-bolt",
-    title: "Duelos ofensivos — volume e eficiência acima de P60",
+    title: "Disputas com bola — volume e eficiência acima de P60",
   },
-  Dribles: {
-    label: "Dribles",
+  "1v1 - Ofensivo": {
+    label: "1v1 - Ofensivo",
     icon: "fa-person-running",
-    title: "Dribles — volume e eficiência acima de P60",
+    title: "1v1 ofensivo — volume e eficiência acima de P60",
   },
   "Conduções Progressivas": {
     label: "Conduções Progressivas",
@@ -69,26 +69,83 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
   Cruzamentos: {
     label: "Cruzamentos",
     icon: "fa-crosshairs",
-    title: "Cruzamentos — volume e eficiência acima de P60",
+    title: "Cruzamentos — ambas métricas acima de P60",
   },
-  "Passes Finas": {
-    label: "Passes Finas",
+  "Passes Chave e Área": {
+    label: "Passes Chave e Área",
     icon: "fa-key",
-    title: "Passes finais — volume acima de P60",
+    title: "Passes chave e área — ambas métricas acima de P60",
+  },
+  "Pré Assistências e xA": {
+    label: "Pré Assistências e xA",
+    icon: "fa-handshake",
+    title: "Pré assistências e xA — ambas métricas acima de P60",
+  },
+  "Passes Criativos": {
+    label: "Passes Criativos",
+    icon: "fa-wand-magic-sparkles",
+    title: "Passes criativos — volume e eficiência acima de P60",
+  },
+  "Gols e xG": {
+    label: "Gols e xG",
+    icon: "fa-futbol",
+    title: "Gols e xG — ambas métricas acima de P60",
+  },
+  Finalizações: {
+    label: "Finalizações",
+    icon: "fa-bullseye",
+    title: "Finalizações — ambas métricas acima de P60",
   },
   Ofensividade: {
     label: "Ofensividade",
     icon: "fa-fire",
-    title: "Ofensividade no terço final — volume acima de P60",
+    title: "Ofensividade — ambas métricas acima de P60",
+  },
+  "Ações Terminais": {
+    label: "Ações Terminais",
+    icon: "fa-fire",
+    title: "Ações terminais — ambas métricas acima de P60",
+  },
+  Verticalidade: {
+    label: "Verticalidade",
+    icon: "fa-arrow-up",
+    title: "Verticalidade — ambas métricas acima de P60",
+  },
+  "Duelos Vencidos": {
+    label: "Duelos Vencidos",
+    icon: "fa-shield-halved",
+    title: "Duelos vencidos — volume e eficiência acima de P60",
+  },
+  "Ações Defensivas": {
+    label: "Ações Defensivas",
+    icon: "fa-shield",
+    title: "Ações defensivas — volume acima de P60",
   },
 };
+
+function num(value: unknown): number | undefined {
+  if (value == null || value === "") return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
 
 function aboveThreshold(value: number | undefined): boolean {
   return value != null && value > STAT_BADGE_THRESHOLD;
 }
 
+/** Miniblock badge: every sub-metric percentile must be above P60. */
+function metricGroupEarnsBadge(item: AspectItem): boolean {
+  const subs = item.sub_metrics ?? [];
+  if (subs.length < 2) return false;
+  return subs.every((sub) => aboveThreshold(num(sub.percentile)));
+}
+
 /** Player earns a stat badge when quantity and efficiency (when available) are both > P60. */
 export function metricEarnsStatBadge(item: AspectItem, displayLabel?: string): boolean {
+  if (item.kind === "metric_group") {
+    return metricGroupEarnsBadge(item);
+  }
+
   const qty = aspectQuantityPercentile(item);
   if (!aboveThreshold(qty)) return false;
 

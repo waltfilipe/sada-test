@@ -984,13 +984,14 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "toques_area_vol": _pool_percentile(out, "Toques na área/90", "ToquesArea"),
         "cond_prog_vol": _pool_percentile(out, "Cond.Prog"),
         "rec_passes_long_vol": _pool_percentile(out, "Passes longos recebidos/90", "RecPassesLngs"),
-        "assist_vol": _pool_percentile(out, "Assistências", "Assist"),
         "xa_vol": _pool_percentile(out, "Assistências esperadas", "xA"),
-        "pre_assist_vol": _pool_percentile(out, "PreAssists"),
+        "pre_assist_total_vol": _pool_percentile(out, "PreAssistsTotal"),
         "passes_criativos_vol": _pool_percentile(out, "Passes inteligentes/90", "PassesCriativos"),
         "passes_criativos_eff": _pct_eff(out, "Passes certos, %", "%EffPasse"),
         "passes_prof_vol": _pool_percentile(out, "Passes em profundidade/90", "PassesProf"),
         "passes_prof_eff": _pct_eff(out, "Passes em profundidade certos, %", "%EffPassesProf"),
+        "gols_total_vol": _pool_percentile(out, "Golos"),
+        "xg_total_vol": _pool_percentile(out, "xGTotal", "Golos esperados"),
         "gols_vol": _pool_percentile(out, "Golos/90", "Gols"),
         "fin_on_target_eff": _pct_eff(out, "Remates à baliza, %", "%EffFin"),
         "def_actions_vol": percentile_rank(
@@ -1003,6 +1004,11 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     touch_share = (toques / rec.replace(0, np.nan)).fillna(0.0)
     out["_touch_area_share"] = touch_share
     mappings["touch_area_share"] = percentile_rank(touch_share, ascending=True)
+    passes_criativos_comb = (
+        _feat_col(out, "Passes inteligentes/90", "PassesCriativos").astype(float)
+        + _feat_col(out, "Passes em profundidade/90", "PassesProf").astype(float)
+    )
+    mappings["passes_criativos_combined_vol"] = percentile_rank(passes_criativos_comb, ascending=True)
     for key, series in mappings.items():
         out[f"_asp_{key}"] = series
     return out
@@ -1180,40 +1186,57 @@ def _def_efficiency_group_aspect(row: pd.Series, *, inter: float, cortes: float)
     }
 
 
-def _passes_criacao_extras(row: pd.Series) -> list[dict[str, Any]]:
-    assist = float(row.get("Assist") or 0)
-    xa = float(row.get("xA") or 0)
-    pre = float(row.get("PreAssists") or 0)
+def _avg_eff_display(row: pd.Series, raw_col_a: str, eng_col_a: str, raw_col_b: str, eng_col_b: str) -> str:
+    if raw_col_a in row.index and pd.notna(row.get(raw_col_a)):
+        pct_a = float(row[raw_col_a])
+    else:
+        pct_a = float(row.get(eng_col_a, 0) or 0) * 100
+    if raw_col_b in row.index and pd.notna(row.get(raw_col_b)):
+        pct_b = float(row[raw_col_b])
+    else:
+        pct_b = float(row.get(eng_col_b, 0) or 0) * 100
+    return f"{(pct_a + pct_b) / 2:.0f}%"
+
+
+def _passes_criativos_aspect(row: pd.Series) -> dict[str, Any]:
     criativos = _row_vol(row, "PassesCriativos", "Passes inteligentes/90")
     prof = _row_vol(row, "PassesProf", "Passes em profundidade/90")
+    vol_combined = criativos + prof
+    eff_pi = float(row.get("_asp_passes_criativos_eff", 0) or 0)
+    eff_pp = float(row.get("_asp_passes_prof_eff", 0) or 0)
+    eff_avg = (eff_pi + eff_pp) / 2
+    return _metric_aspect(
+        "Passes Criativos",
+        percentile=row.get("_asp_passes_criativos_combined_vol", 0),
+        display_value=_fmt_per90(vol_combined),
+        eff_pct=round(eff_avg, 1),
+        eff_display=_avg_eff_display(
+            row,
+            "Passes certos, %",
+            "%EffPasse",
+            "Passes em profundidade certos, %",
+            "%EffPassesProf",
+        ),
+    )
+
+
+def _passes_criacao_extras(row: pd.Series) -> list[dict[str, Any]]:
+    pre_total = float(row.get("PreAssistsTotal") or 0)
+    xa_total = float(row.get("xA") or 0)
     return [
         _metric_group_aspect(
-            "Assistências e xA",
-            percentile=max(float(row.get("_asp_assist_vol", 0) or 0), float(row.get("_asp_xa_vol", 0) or 0)),
+            "Pré Assistências e xA",
+            percentile=max(float(row.get("_asp_pre_assist_total_vol", 0) or 0), float(row.get("_asp_xa_vol", 0) or 0)),
             sub_metrics=[
-                _sub_metric("Assistências", percentile=row.get("_asp_assist_vol", 0), display_value=_fmt_num(assist, decimals=0)),
-                _sub_metric("xA", percentile=row.get("_asp_xa_vol", 0), display_value=_fmt_num(xa, decimals=2)),
+                _sub_metric(
+                    "Pré Assistências",
+                    percentile=row.get("_asp_pre_assist_total_vol", 0),
+                    display_value=_fmt_num(pre_total, decimals=0),
+                ),
+                _sub_metric("xA", percentile=row.get("_asp_xa_vol", 0), display_value=_fmt_num(xa_total, decimals=2)),
             ],
         ),
-        _metric_aspect(
-            "Pré-Assists",
-            percentile=row.get("_asp_pre_assist_vol", 0),
-            display_value=_fmt_per90(pre),
-        ),
-        _pass_aspect(
-            "Passes Inteligentes",
-            vol_per90=criativos,
-            vol_pct=row.get("_asp_passes_criativos_vol", 0),
-            eff_pct=row.get("_asp_passes_criativos_eff", 0),
-            eff_display=_raw_eff_display(row, "Passes certos, %", "%EffPasse"),
-        ),
-        _pass_aspect(
-            "Passes em Profundidade",
-            vol_per90=prof,
-            vol_pct=row.get("_asp_passes_prof_vol", 0),
-            eff_pct=row.get("_asp_passes_prof_eff", 0),
-            eff_display=_raw_eff_display(row, "Passes em profundidade certos, %", "%EffPassesProf"),
-        ),
+        _passes_criativos_aspect(row),
     ]
 
 
@@ -1251,8 +1274,8 @@ def _build_ex_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
     inter = float(row.get("interception_won_p90") or row.get("Interseções") or 0)
     cortes = float(row.get("total_clearance_p90") or row.get("Carrinhos") or 0)
     def_actions = inter + cortes
-    gols = float(row.get("Gols") or 0)
-    npxg = float(row.get("npxG") or 0)
+    gols_total = float(row.get("Gols") or 0)
+    xg_total = float(row.get("xGTotal") or 0)
     fin_vol = _row_vol(row, "Finalizações", "Remates/90")
     toques = _row_vol(row, "ToquesArea", "Toques na área/90")
     rec = _row_vol(row, "RecPasse", "Passes recebidos/90")
@@ -1335,10 +1358,10 @@ def _build_ex_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
     finalizacao = [
         _metric_group_aspect(
             "Gols e xG",
-            percentile=max(float(row.get("_asp_gols_vol", 0) or 0), float(row.get("_asp_fin_xg", 0) or 0)),
+            percentile=max(float(row.get("_asp_gols_total_vol", 0) or 0), float(row.get("_asp_xg_total_vol", 0) or 0)),
             sub_metrics=[
-                _sub_metric("Gols", percentile=row.get("_asp_gols_vol", 0), display_value=_fmt_per90(gols)),
-                _sub_metric("xG", percentile=row.get("_asp_fin_xg", 0), display_value=_fmt_num(npxg, decimals=2)),
+                _sub_metric("Gols", percentile=row.get("_asp_gols_total_vol", 0), display_value=_fmt_num(gols_total, decimals=0)),
+                _sub_metric("xG", percentile=row.get("_asp_xg_total_vol", 0), display_value=_fmt_num(xg_total, decimals=2)),
             ],
         ),
         _metric_group_aspect(
@@ -1359,14 +1382,14 @@ def _build_ex_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
 
     conducao_drible = [
         _metric_aspect(
-            "Duelos Ofensivos",
+            "Disputas com Bola",
             percentile=row.get("_asp_duelos_of_vol", 0),
             display_value=_fmt_per90(do_vol),
             eff_pct=row.get("_asp_duelos_of_eff", 0),
             eff_display=_raw_eff_display(row, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
         ),
         _metric_aspect(
-            "Dribles",
+            "1v1 - Ofensivo",
             percentile=row.get("_asp_dribles_vol", 0),
             display_value=_fmt_per90(_row_vol(row, "Dribles", "Dribles/90")),
             eff_pct=row.get("_asp_dribles_eff", 0),
@@ -1485,7 +1508,7 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
 
     ofensivos = [
         _metric_aspect(
-            "Duelos Ofensivos",
+            "Disputas com Bola",
             percentile=row.get("_asp_duelos_of_vol", 0),
             display_value=_fmt_per90(do_vol),
             eff_pct=row.get("_asp_duelos_of_eff", 0),
@@ -1501,7 +1524,7 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                     display_value=_fmt_num(prog),
                 ),
                 _metric_aspect(
-                    "Dribles",
+                    "1v1 - Ofensivo",
                     percentile=row.get("_asp_dribles_vol", 0),
                     display_value=_fmt_per90(_row_vol(row, "Dribles", "Dribles/90")),
                     eff_pct=row.get("_asp_dribles_eff", 0),
@@ -1591,7 +1614,7 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
 
     if family_key == "laterais":
         cruz_vol = _row_vol(row, "Cruz.", "Cruzamentos/90")
-        aspects["terco_final"] = [
+        aspects["passes_finais"] = [
             _metric_group_aspect(
                 "Cruzamentos",
                 percentile=row.get("_asp_cruz_vol", 0),
@@ -1608,6 +1631,8 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
             ),
             _passes_chave_area_group(row),
             *_passes_criacao_extras(row),
+        ]
+        aspects["ofensividade"] = [
             _metric_group_aspect(
                 "Ofensividade",
                 percentile=max(float(row.get("_asp_acoes_at_vol", 0) or 0), float(row.get("_asp_toques_area_vol", 0) or 0)),
@@ -1628,7 +1653,7 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
     elif family_key == "meio-campistas":
         fin_vol = _row_vol(row, "Finalizações", "Remates/90")
         npxg = _row_vol(row, "npxG", "Golos esperados/90")
-        aspects["terco_final"] = [
+        aspects["passes_finais"] = [
             _metric_group_aspect(
                 "Finalizações",
                 percentile=row.get("_asp_fin_vol", 0),
@@ -1645,6 +1670,8 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
             ),
             _passes_chave_area_group(row),
             *_passes_criacao_extras(row),
+        ]
+        aspects["ofensividade"] = [
             _metric_group_aspect(
                 "Ofensividade",
                 percentile=max(float(row.get("_asp_acoes_at_vol", 0) or 0), float(row.get("_asp_toques_area_vol", 0) or 0)),

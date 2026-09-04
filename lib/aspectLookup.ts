@@ -19,6 +19,9 @@ export function findAspect(items: AspectItem[], label: string): AspectItem | und
     "Passes Chave e Área": ["Passes Chave e Área", "Passes Finas"],
     Progressão: ["Progressão", "Conduções Progressivas"],
     "Passes Chave": ["Passes Chave", "Passes Finas"],
+    "Disputas com Bola": ["Disputas com Bola", "Duelos Ofensivos"],
+    "1v1 - Ofensivo": ["1v1 - Ofensivo", "Dribles"],
+    "Pré Assistências e xA": ["Pré Assistências e xA", "Assistências e xA"],
   };
   const candidates = aliases[label] ?? [label];
   return items.find((item) => candidates.some((c) => item.label === c || item.label.startsWith(c)));

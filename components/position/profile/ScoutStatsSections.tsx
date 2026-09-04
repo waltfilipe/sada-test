@@ -203,7 +203,7 @@ export function ScoutStatsSections({
     <div className="stats-swap-panel" key={`${player.player_id}-index`}>
       <div className="profile-card-head">
         <h3 className="section-label">Stats and Badges</h3>
-        <span className="profile-card-head-hint">Badge com vol. e efic. &gt; P60</span>
+        <span className="profile-card-head-hint">Badge quando ambas métricas &gt; P60</span>
       </div>
 
       <div className="stats-and-badges-body">
