@@ -113,19 +113,44 @@ const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string
     Defensivos: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
     "Dribles e Condução": ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
-    "Passes Finais e Ofensividade": ["Cruzamentos", "Passes Finas", "Ofensividade"],
+    "Passes Finais e Ofensividade": [
+      "Cruzamentos",
+      "Passes Chave e Área",
+      "Assistências e xA",
+      "Pré-Assists",
+      "Passes Inteligentes",
+      "Passes em Profundidade",
+      "Ofensividade",
+    ],
   },
   "meio-campistas": {
     Defensivos: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
     "Dribles e Condução": ["Duelos Ofensivos", "Dribles", "Conduções Progressivas"],
-    "Passes Finais e Ofensividade": ["Finalizações", "Passes Finas", "Ofensividade"],
+    "Passes Finais e Ofensividade": [
+      "Finalizações",
+      "Passes Chave e Área",
+      "Assistências e xA",
+      "Pré-Assists",
+      "Passes Inteligentes",
+      "Passes em Profundidade",
+      "Ofensividade",
+    ],
   },
   extremos: {
+    Defensivos: ["Duelos Vencidos", "Ações Defensivas"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
-    "Passes Finais": ["Passes Chave", "Cruzamentos", "Assistências e xA"],
+    "Passes Finais": [
+      "Passes Chave e Área",
+      "Cruzamentos",
+      "Assistências e xA",
+      "Pré-Assists",
+      "Passes Inteligentes",
+      "Passes em Profundidade",
+    ],
     "Condução e Drible": ["Duelos Ofensivos", "Dribles", "Progressão"],
-    Ofensividade: ["Toques na Área", "Ações Ofensivas", "Recepção de Passes Longos"],
+    Finalização: ["Gols e xG", "Finalizações"],
+    Ofensividade: ["Ações Terminais", "Verticalidade"],
   },
 };
 
@@ -214,17 +239,15 @@ export function poolPercentileRank(scores: number[], value: number): number {
   return ((avgRank - 1) / (scores.length - 1)) * 100;
 }
 
-/** Letter from pool percentile — 10-step scale: D vermelho → A+ verde escuro. */
+/** Letter from pool percentile — compressed scale for more homogeneous grades. */
 export function letterFromPoolPercentile(pct: number): string {
-  if (pct >= 97) return "A+";
-  if (pct >= 92) return "A";
-  if (pct >= 87) return "A-";
-  if (pct >= 80) return "B+";
-  if (pct >= 70) return "B";
-  if (pct >= 60) return "B-";
-  if (pct >= 50) return "C+";
-  if (pct >= 40) return "C";
-  if (pct >= 30) return "C-";
+  if (pct >= 85) return "A";
+  if (pct >= 72) return "B+";
+  if (pct >= 58) return "B";
+  if (pct >= 45) return "B-";
+  if (pct >= 32) return "C+";
+  if (pct >= 20) return "C";
+  if (pct >= 10) return "C-";
   return "D";
 }
 

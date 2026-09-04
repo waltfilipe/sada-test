@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
@@ -128,6 +128,7 @@ export function ScoutStatsSections({
   player: PlayerProfile;
   family: PositionFamily;
 }) {
+  const [active, setActive] = useState<string | null>(null);
   const all = useMemo(() => flattenAspects(player), [player]);
   const sections = statSectionsForFamily(family);
 
@@ -160,11 +161,46 @@ export function ScoutStatsSections({
 
   const allBadges = useMemo<TonedStatBadge[]>(
     () => entries.flatMap((entry) => entry.badges.map((badge) => ({ ...badge, tone: entry.tone }))),
-    [entries]
+    [entries],
   );
 
+  const activeEntry = active ? entries.find((entry) => entry.title === active) ?? null : null;
+
+  if (activeEntry) {
+    return (
+      <div className="stats-swap-panel" key={`${player.player_id}-${activeEntry.title}`}>
+        <div className="profile-card-head stats-swap-head">
+          <span className="stats-swap-title">
+            <h3 className="section-label">{activeEntry.title}</h3>
+            <StatMedalCount count={activeEntry.badges.length} />
+          </span>
+          <button
+            type="button"
+            className="tendencies-pop-close"
+            onClick={() => setActive(null)}
+            aria-label="Voltar para Stats and Badges"
+          >
+            <i className="fa-solid fa-xmark" aria-hidden="true" />
+          </button>
+        </div>
+        <div className="stats-swap-body">
+          <div className="stat-cards-stack">
+            {activeEntry.metrics.map(({ item, groupTitle }) => (
+              <StatAspectBlock
+                key={item.label}
+                item={item}
+                groupTitle={groupTitle}
+                tone={activeEntry.tone}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="stats-swap-panel" key={player.player_id}>
+    <div className="stats-swap-panel" key={`${player.player_id}-index`}>
       <div className="profile-card-head">
         <h3 className="section-label">Stats and Badges</h3>
         <span className="profile-card-head-hint">Badge com vol. e efic. &gt; P60</span>
@@ -175,27 +211,20 @@ export function ScoutStatsSections({
 
         <section className="stats-subsection" aria-label="Estatísticas por grupo">
           <h4 className="stats-subsection-label">Stats</h4>
-          <div className="stats-groups-stack">
+          <div className="stats-nav-list">
             {entries.map((entry) => (
-              <details key={entry.title} className="stats-group-accordion">
-                <summary className="stats-group-title">
-                  <span className="stats-group-title-text">{entry.title}</span>
-                  <span className="stats-group-title-meta">
-                    <StatMedalCount count={entry.badges.length} />
-                    <i className="fa-solid fa-chevron-down stats-group-chevron" aria-hidden="true" />
-                  </span>
-                </summary>
-                <div className="stat-cards-stack">
-                  {entry.metrics.map(({ item, groupTitle }) => (
-                    <StatAspectBlock
-                      key={item.label}
-                      item={item}
-                      groupTitle={groupTitle}
-                      tone={entry.tone}
-                    />
-                  ))}
-                </div>
-              </details>
+              <button
+                key={entry.title}
+                type="button"
+                className={`stats-nav-row tone-${entry.tone}`}
+                onClick={() => setActive(entry.title)}
+              >
+                <span className="stats-nav-row-title">{entry.title}</span>
+                <span className="stats-nav-row-meta">
+                  <StatMedalCount count={entry.badges.length} />
+                  <i className="fa-solid fa-chevron-right" aria-hidden="true" />
+                </span>
+              </button>
             ))}
           </div>
         </section>

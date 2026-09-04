@@ -13,15 +13,15 @@
   "minutes_pct": 45.7,
   "goals": 3,
   "assists": 1,
-  "rating": 7.1,
+  "rating": 7.0,
   "ratings": {
-    "geral": 7.1,
+    "geral": 7.0,
     "driblador": 7.1,
     "meia_ponta": 7.2,
     "ruptura": 6.7
   },
   "ranks": {
-    "geral": 19,
+    "geral": 18,
     "driblador": 15,
     "meia_ponta": 14,
     "ruptura": 34
@@ -40,6 +40,26 @@
     "duelo_aereo": 0.0
   },
   "aspects": {
+    "defensivos": [
+      {
+        "label": "Duelos Vencidos",
+        "kind": "metric",
+        "grade": "D",
+        "percentile": 19.3,
+        "stats": [],
+        "display_value": "1,6",
+        "efficiency_pct": 50.7,
+        "efficiency_value": "53%"
+      },
+      {
+        "label": "Ações Defensivas",
+        "kind": "metric",
+        "grade": "D",
+        "percentile": 1.2,
+        "stats": [],
+        "display_value": "0,3"
+      }
+    ],
     "construcao": [
       {
         "label": "Passes Progressivos",
@@ -96,12 +116,23 @@
     ],
     "passes_finais": [
       {
-        "label": "Passes Chave",
-        "kind": "metric",
+        "label": "Passes Chave e Área",
+        "kind": "metric_group",
         "grade": "A",
-        "percentile": 90.2,
-        "stats": [],
-        "display_value": "1,0"
+        "percentile": 100.0,
+        "sub_metrics": [
+          {
+            "label": "Passes Chave",
+            "percentile": 90.2,
+            "display_value": "1,0"
+          },
+          {
+            "label": "Passes para Área",
+            "percentile": 100.0,
+            "display_value": "2,8"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Cruzamentos",
@@ -142,6 +173,78 @@
           }
         ],
         "stats": []
+      },
+      {
+        "label": "Pré-Assists",
+        "kind": "metric",
+        "grade": "A",
+        "percentile": 100.0,
+        "stats": [],
+        "display_value": "0,3"
+      },
+      {
+        "label": "Passes Inteligentes",
+        "kind": "pass_certos",
+        "grade": "B+",
+        "certos_per90": 0.34,
+        "display_value": "0,3",
+        "percentile": 76.7,
+        "efficiency_pct": 71.2,
+        "efficiency_value": "83%",
+        "stats": []
+      },
+      {
+        "label": "Passes em Profundidade",
+        "kind": "pass_certos",
+        "grade": "B",
+        "certos_per90": 0.52,
+        "display_value": "0,5",
+        "percentile": 68.3,
+        "efficiency_pct": 41.2,
+        "efficiency_value": "33%",
+        "stats": []
+      }
+    ],
+    "finalizacao": [
+      {
+        "label": "Gols e xG",
+        "kind": "metric_group",
+        "grade": "A",
+        "percentile": 100.0,
+        "sub_metrics": [
+          {
+            "label": "Gols",
+            "percentile": 60.0,
+            "display_value": "3,0"
+          },
+          {
+            "label": "xG",
+            "percentile": 100.0,
+            "display_value": "0,40"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Finalizações",
+        "kind": "metric_group",
+        "grade": "A",
+        "percentile": 91.8,
+        "sub_metrics": [
+          {
+            "label": "Finalizações",
+            "percentile": 91.8,
+            "display_value": "2,6"
+          },
+          {
+            "label": "Finalizações certas",
+            "percentile": 46.0,
+            "display_value": "33%"
+          }
+        ],
+        "stats": [],
+        "efficiency_pct": 46.0,
+        "efficiency_value": "33%"
       }
     ],
     "conducao_drible": [
@@ -187,28 +290,42 @@
     ],
     "ofensividade": [
       {
-        "label": "Toques na Área",
-        "kind": "metric",
+        "label": "Ações Terminais",
+        "kind": "metric_group",
         "grade": "A",
         "percentile": 93.2,
-        "stats": [],
-        "display_value": "3,9"
+        "sub_metrics": [
+          {
+            "label": "Toques na Área",
+            "percentile": 93.2,
+            "display_value": "3,9"
+          },
+          {
+            "label": "Ações Ofensivas",
+            "percentile": 56.0,
+            "display_value": "3,1"
+          }
+        ],
+        "stats": []
       },
       {
-        "label": "Ações Ofensivas",
-        "kind": "metric",
+        "label": "Verticalidade",
+        "kind": "metric_group",
         "grade": "B-",
-        "percentile": 56.0,
-        "stats": [],
-        "display_value": "3,1"
-      },
-      {
-        "label": "Recepção de Passes Longos",
-        "kind": "metric",
-        "grade": "C",
-        "percentile": 41.2,
-        "stats": [],
-        "display_value": "1,3"
+        "percentile": 57.8,
+        "sub_metrics": [
+          {
+            "label": "% Toque na Área",
+            "percentile": 57.8,
+            "display_value": "11%"
+          },
+          {
+            "label": "Recepção de Passes Longos",
+            "percentile": 41.2,
+            "display_value": "1,3"
+          }
+        ],
+        "stats": []
       }
     ]
   },

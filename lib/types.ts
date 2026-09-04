@@ -123,6 +123,7 @@ export type PlayerProfile = PlayerSummary & {
     terco_final?: AspectItem[];
     passes_finais?: AspectItem[];
     conducao_drible?: AspectItem[];
+    finalizacao?: AspectItem[];
     ofensividade?: AspectItem[];
   };
   profiles_available: string[];

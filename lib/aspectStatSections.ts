@@ -50,7 +50,15 @@ const LAT_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Passes Finais e Ofensividade",
     tone: "final",
-    labels: ["Cruzamentos", "Passes Finas", "Ofensividade"],
+    labels: [
+      "Cruzamentos",
+      "Passes Chave e Área",
+      "Assistências e xA",
+      "Pré-Assists",
+      "Passes Inteligentes",
+      "Passes em Profundidade",
+      "Ofensividade",
+    ],
   },
 ];
 
@@ -73,11 +81,24 @@ const MC_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Passes Finais e Ofensividade",
     tone: "final",
-    labels: ["Finalizações", "Passes Finas", "Ofensividade"],
+    labels: [
+      "Finalizações",
+      "Passes Chave e Área",
+      "Assistências e xA",
+      "Pré-Assists",
+      "Passes Inteligentes",
+      "Passes em Profundidade",
+      "Ofensividade",
+    ],
   },
 ];
 
 const EX_STAT_SECTIONS: StatSectionSpec[] = [
+  {
+    title: "Defensivos",
+    tone: "defensivos",
+    labels: ["Duelos Vencidos", "Ações Defensivas"],
+  },
   {
     title: "Passes",
     tone: "passes",
@@ -86,7 +107,14 @@ const EX_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Passes Finais",
     tone: "final",
-    labels: ["Passes Chave", "Cruzamentos", "Assistências e xA"],
+    labels: [
+      "Passes Chave e Área",
+      "Cruzamentos",
+      "Assistências e xA",
+      "Pré-Assists",
+      "Passes Inteligentes",
+      "Passes em Profundidade",
+    ],
   },
   {
     title: "Condução e Drible",
@@ -94,9 +122,14 @@ const EX_STAT_SECTIONS: StatSectionSpec[] = [
     labels: ["Duelos Ofensivos", "Dribles", "Progressão"],
   },
   {
+    title: "Finalização",
+    tone: "final",
+    labels: ["Gols e xG", "Finalizações"],
+  },
+  {
     title: "Ofensividade",
     tone: "final",
-    labels: ["Toques na Área", "Ações Ofensivas", "Recepção de Passes Longos"],
+    labels: ["Ações Terminais", "Verticalidade"],
   },
 ];
 

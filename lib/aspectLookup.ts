@@ -9,13 +9,14 @@ export function flattenAspects(player: PlayerProfile): AspectItem[] {
     ...(groups.terco_final ?? []),
     ...(groups.passes_finais ?? []),
     ...(groups.conducao_drible ?? []),
+    ...(groups.finalizacao ?? []),
     ...(groups.ofensividade ?? []),
   ];
 }
 
 export function findAspect(items: AspectItem[], label: string): AspectItem | undefined {
   const aliases: Record<string, string[]> = {
-    "Passes Finais": ["Passes Finas", "Passes Finais"],
+    "Passes Chave e Área": ["Passes Chave e Área", "Passes Finas"],
     Progressão: ["Progressão", "Conduções Progressivas"],
     "Passes Chave": ["Passes Chave", "Passes Finas"],
   };

@@ -13,15 +13,15 @@
   "minutes_pct": 28.7,
   "goals": 1,
   "assists": 0,
-  "rating": 7.2,
+  "rating": 6.8,
   "ratings": {
-    "geral": 7.2,
+    "geral": 6.8,
     "contencao": 7.4,
     "construtor": 6.8,
     "boxtobox": 6.9
   },
   "ranks": {
-    "geral": 10,
+    "geral": 34,
     "contencao": 7,
     "construtor": 25,
     "boxtobox": 22
@@ -262,7 +262,7 @@
         "efficiency_value": "0,02"
       },
       {
-        "label": "Passes Finas",
+        "label": "Passes Chave e Área",
         "kind": "metric_group",
         "grade": "D",
         "percentile": 23.7,
@@ -278,6 +278,55 @@
             "display_value": "0,1"
           }
         ],
+        "stats": []
+      },
+      {
+        "label": "Assistências e xA",
+        "kind": "metric_group",
+        "grade": "D",
+        "percentile": 16.4,
+        "sub_metrics": [
+          {
+            "label": "Assistências",
+            "percentile": 0.0,
+            "display_value": "0"
+          },
+          {
+            "label": "xA",
+            "percentile": 16.4,
+            "display_value": "0,14"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Pré-Assists",
+        "kind": "metric",
+        "grade": "C+",
+        "percentile": 47.4,
+        "stats": [],
+        "display_value": "0,1"
+      },
+      {
+        "label": "Passes Inteligentes",
+        "kind": "pass_certos",
+        "grade": "D",
+        "certos_per90": 0.0,
+        "display_value": "0,0",
+        "percentile": 0.0,
+        "efficiency_pct": 94.7,
+        "efficiency_value": "92%",
+        "stats": []
+      },
+      {
+        "label": "Passes em Profundidade",
+        "kind": "pass_certos",
+        "grade": "D",
+        "certos_per90": 0.14,
+        "display_value": "0,1",
+        "percentile": 18.6,
+        "efficiency_pct": 0.0,
+        "efficiency_value": "0%",
         "stats": []
       },
       {

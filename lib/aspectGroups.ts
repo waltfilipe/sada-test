@@ -11,7 +11,8 @@ export const ASPECT_GROUP_META: Record<AspectGroupKey, { title: string; order: n
   terco_final: { title: "Terço final", order: 6 },
   passes_finais: { title: "Passes Finais", order: 7 },
   conducao_drible: { title: "Condução e Drible", order: 8 },
-  ofensividade: { title: "Ofensividade", order: 9 },
+  finalizacao: { title: "Finalização", order: 9 },
+  ofensividade: { title: "Ofensividade", order: 10 },
 };
 
 export function aspectGroupsForPlayers(a: PlayerProfile, b: PlayerProfile) {

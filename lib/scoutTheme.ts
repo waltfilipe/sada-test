@@ -206,20 +206,14 @@ export function tierVars(token: TierToken): CSSProperties {
 
 export function ratingToLetterGrade(rating: number, max = 10): string {
   const score = (rating / max) * 100;
-  if (score >= 97) return "A+";
-  if (score >= 92) return "A";
-  if (score >= 87) return "A-";
-  if (score >= 80) return "B+";
-  if (score >= 70) return "B";
-  if (score >= 60) return "B-";
+  if (score >= 82) return "A";
+  if (score >= 74) return "B+";
+  if (score >= 66) return "B";
+  if (score >= 58) return "B-";
   if (score >= 50) return "C+";
-  if (score >= 40) return "C";
-  if (score >= 30) return "C-";
-  if (score >= 22) return "D+";
-  if (score >= 15) return "D";
-  if (score >= 10) return "D-";
-  if (score >= 6) return "E";
-  return "F";
+  if (score >= 42) return "C";
+  if (score >= 34) return "C-";
+  return "D";
 }
 
 export function formatRating(value: number): string {
