@@ -101,9 +101,19 @@ export type PlayerSearchRow = PlayerSummary & {
   tendencies: Tendencies;
 };
 
+export type PlayerHeatmapData = {
+  tournament_id?: number;
+  season_id?: number;
+  scope?: string;
+  competition?: string | null;
+  point_count?: number;
+  points: { x: number; y: number }[];
+};
+
 export type PlayerProfile = PlayerSummary & {
   goals: number;
   assists: number;
+  heatmap?: PlayerHeatmapData;
   ratings: {
     geral: number;
     [profileKey: string]: number;

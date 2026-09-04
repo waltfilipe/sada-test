@@ -2,6 +2,7 @@
 
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { PlayerHero } from "./PlayerHero";
+import { PlayerHeatmap } from "./PlayerHeatmap";
 import { ProfileCard } from "./ProfileCard";
 import { ScoutStatsSections } from "./ScoutStatsSections";
 
@@ -22,12 +23,7 @@ export function PositionProfileView({ player, family, players }: Props) {
             <div className="profile-card-head">
               <h3 className="section-label">Heatmap</h3>
             </div>
-            <div className="heatmap-canvas">
-              <span className="heatmap-canvas-icon" aria-hidden="true">
-                <i className="fa-solid fa-fire" />
-              </span>
-              <p className="heatmap-placeholder-copy">Mapa de origem de ações — em breve.</p>
-            </div>
+            <PlayerHeatmap heatmap={player.heatmap} playerName={player.name} />
           </div>
         </div>
 

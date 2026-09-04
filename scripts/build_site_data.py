@@ -10,6 +10,7 @@ from pathlib import Path
 from engine.load_data import load_players_dataframe
 from engine.measures import attach_base_measures
 from engine.sofascore import attach_sofascore_metrics
+from engine.sofascore_heatmap import attach_heatmaps_to_players
 from engine.positions import (
     POSITION_FAMILIES,
     SCATTER_METRICS,
@@ -50,6 +51,8 @@ def main() -> None:
 
     print("Enriquecendo com Transfermarkt (foto, valor e contrato)…")
     all_players = enrich_players_with_transfermarkt(all_players)
+    attached = attach_heatmaps_to_players(all_players)
+    print(f"  Heatmaps anexados: {attached}/{len(all_players)}")
     family_payloads = {}
     for family_key in POSITION_FAMILIES:
         family_payloads[family_key] = [player for player in all_players if player["position_family"] == family_key]
