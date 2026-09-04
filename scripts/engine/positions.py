@@ -1460,8 +1460,26 @@ def _build_ex_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
     }
 
 
+def _build_at_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
+    aspects = _build_ex_aspects(row)
+    da_vol = _row_vol(row, "DuelosAr", "Duelos aérios/90")
+    aspects.pop("defensivos", None)
+    aspects["aereo"] = [
+        _metric_aspect(
+            "Duelos Aéreos",
+            percentile=row.get("_asp_duelos_ar_vol", 0),
+            display_value=_fmt_per90(da_vol),
+            eff_pct=row.get("_asp_duelos_ar_eff", 0),
+            eff_display=_raw_eff_display(row, "Duelos aéreos ganhos, %", "%DuelosAr"),
+        ),
+    ]
+    return aspects
+
+
 def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, list[dict[str, Any]]]:
-    if family_key in ("extremos", "atacantes"):
+    if family_key == "atacantes":
+        return _build_at_aspects(row)
+    if family_key == "extremos":
         return _build_ex_aspects(row)
 
     dd_vol = _row_vol(row, "DuelosDef", "Duelos defensivos/90")

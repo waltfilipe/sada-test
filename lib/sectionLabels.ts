@@ -12,6 +12,7 @@ export function sectionShortLabel(title: string): string {
     "Condução e Drible": "Condução",
     Ofensividade: "Ofensivo",
     Finalização: "Finalização",
+    "Duelos Aéreos": "Aéreo",
     "Ações Terminais": "Ações terminais",
     Verticalidade: "Verticalidade",
     "Gols e xG": "Finalização",

@@ -131,6 +131,14 @@ const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string
     Finalização: ["Gols e xG", "Finalizações"],
     Ofensividade: ["Ações Terminais", "Verticalidade"],
   },
+  atacantes: {
+    "Duelos Aéreos": ["Duelos Aéreos"],
+    Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
+    "Passes Finais": ["Passes Chave e Área", "Cruzamentos", "Pré Assistências e xA", "Passes Criativos"],
+    "Condução e Drible": ["Disputas com Bola", "1v1 - Ofensivo", "Progressão"],
+    Finalização: ["Gols e xG", "Finalizações"],
+    Ofensividade: ["Ações Terminais", "Verticalidade"],
+  },
 };
 
 export type SectionGradeTriple = {
