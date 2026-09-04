@@ -1585,7 +1585,7 @@
   display: grid;
   grid-template-columns: minmax(280px, 1.05fr) minmax(0, 1fr) minmax(0, 0.95fr);
   gap: 0.75rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 .profile-content-col {
@@ -1595,9 +1595,8 @@
   min-width: 0;
 }
 
-/* Heatmap is intentionally the tallest card; Perfil and Stats share a fixed
-   compact height so their internal rows stay tight with no bottom slack.
-   min-height lets the stats detail view grow when a section is open. */
+/* Heatmap and Perfil cards share the same compact height in the profile grid. */
+.profile-col-heatmap .heatmap-card,
 .profile-col-middle .profile-perfil-card,
 .profile-col-stats .pass-scores-shell {
   min-height: 318px;
@@ -1606,54 +1605,62 @@
 }
 
 .profile-col-heatmap .heatmap-card {
-  display: flex;
-  flex-direction: column;
+  flex: 1;
 }
 
 .heatmap-canvas {
-  min-height: 340px;
-  margin-top: 0.65rem;
+  flex: 1;
+  min-height: 0;
+  margin-top: 0.55rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   border-radius: var(--radius-sm);
   border: 1px dashed rgba(148, 163, 184, 0.22);
   background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(148, 163, 184, 0.03) 0,
-      rgba(148, 163, 184, 0.03) 1px,
-      transparent 1px,
-      transparent 34px
-    ),
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(34, 197, 94, 0.04), transparent 70%),
     rgba(15, 23, 42, 0.35);
   text-align: center;
-  padding: 1rem;
+  padding: 0.55rem;
 }
 
 .heatmap-canvas-live {
   border-style: solid;
-  border-color: rgba(148, 163, 184, 0.14);
-  background: rgba(15, 23, 42, 0.5);
-  padding: 0.65rem 0.75rem 0.55rem;
+  border-color: rgba(148, 163, 184, 0.12);
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 35%, rgba(34, 211, 238, 0.04), transparent 72%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.92));
+  padding: 0.5rem 0.55rem 0.45rem;
+}
+
+.heatmap-pitch-wrap {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 10px 28px rgba(0, 0, 0, 0.28);
 }
 
 .heatmap-pitch-canvas {
+  display: block;
   width: 100%;
-  max-width: 280px;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  height: 100%;
+  border-radius: 10px;
 }
 
 .heatmap-meta {
-  margin: 0.15rem 0 0;
+  margin: 0;
   font-size: 0.68rem;
   font-weight: 600;
   color: var(--muted);
   letter-spacing: 0.01em;
+  text-align: center;
 }
 
 .heatmap-canvas-icon {

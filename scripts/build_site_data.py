@@ -10,7 +10,7 @@ from pathlib import Path
 from engine.load_data import load_players_dataframe
 from engine.measures import attach_base_measures
 from engine.sofascore import attach_sofascore_metrics
-from engine.sofascore_heatmap import attach_heatmaps_to_players
+from engine.sofascore_heatmap import attach_heatmaps_to_players, import_heatmaps_from_br26
 from engine.positions import (
     POSITION_FAMILIES,
     SCATTER_METRICS,
@@ -51,6 +51,8 @@ def main() -> None:
 
     print("Enriquecendo com Transfermarkt (foto, valor e contrato)…")
     all_players = enrich_players_with_transfermarkt(all_players)
+    imported = import_heatmaps_from_br26(df)
+    print(f"  Heatmaps importados de HeatmapsBR26: {imported}")
     attached = attach_heatmaps_to_players(all_players)
     print(f"  Heatmaps anexados: {attached}/{len(all_players)}")
     family_payloads = {}

@@ -14,6 +14,7 @@ from .sofascore import SS_PATH, aggregate_sofascore, match_ss_row
 
 ROOT = Path(__file__).resolve().parents[2]
 HEATMAP_DIR = ROOT / "data" / "heatmaps"
+HEATMAPS_BR26_DIR = ROOT / "HeatmapsBR26"
 DEFAULT_TOURNAMENT_ID = 325
 API_BASE = "https://api.sofascore.com/api/v1"
 
@@ -195,6 +196,45 @@ def load_heatmap(site_player_id: str, out_dir: Path | None = None) -> dict[str, 
     if not path.exists():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def import_heatmaps_from_br26(
+    df: pd.DataFrame,
+    *,
+    source_dir: Path | None = None,
+    out_dir: Path | None = None,
+) -> int:
+    """Copy HeatmapsBR26 JSONs into data/heatmaps keyed by site player_id."""
+    source = source_dir or HEATMAPS_BR26_DIR
+    target = out_dir or HEATMAP_DIR
+    if not source.exists():
+        return 0
+
+    mapping = build_sofascore_player_map(df)
+    ss_to_site: dict[str, str] = {}
+    for site_id, meta in mapping.items():
+        ss_id = str(meta["sofascore_player_id"])
+        prev = ss_to_site.get(ss_id)
+        if prev is None or float(meta.get("match_score") or 0) > float(mapping[prev].get("match_score") or 0):
+            ss_to_site[ss_id] = site_id
+
+    target.mkdir(parents=True, exist_ok=True)
+    imported = 0
+    for ss_id, site_id in ss_to_site.items():
+        src = source / f"{ss_id}.json"
+        if not src.exists():
+            continue
+        try:
+            data = json.loads(src.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if not data.get("points"):
+            continue
+        data["player_id"] = site_id
+        data["source"] = "heatmaps_br26"
+        save_heatmap(site_id, data, target)
+        imported += 1
+    return imported
 
 
 def attach_heatmaps_to_players(players: list[dict[str, Any]], out_dir: Path | None = None) -> int:

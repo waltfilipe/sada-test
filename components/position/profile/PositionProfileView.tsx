@@ -19,7 +19,7 @@ export function PositionProfileView({ player, family, players }: Props) {
 
       <div className="profile-content-grid">
         <div className="profile-content-col profile-col-heatmap">
-          <div className="player-card heatmap-card">
+          <div className="player-card heatmap-card profile-perfil-card-score">
             <div className="profile-card-head">
               <h3 className="section-label">Heatmap</h3>
             </div>
