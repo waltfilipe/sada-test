@@ -16,6 +16,7 @@ from .normalize import (
     zscore_linear_100,
 )
 from .profiles import FAMILY_PROFILE_CONFIG, profile_ratings_from_row, profile_ranks_from_row, profile_shares_from_row
+from .at_tri_composite_config import AT_TRI_COMPOSITE_CONFIG, apply_at_tri_composite_ratings
 from .ex_hierarchy import apply_ex_hierarchical_clusters
 from .ex_tri_composite_config import EX_TRI_COMPOSITE_CONFIG, apply_ex_tri_composite_ratings
 from .lat_hierarchy import apply_lat_hierarchical_clusters
@@ -774,9 +775,14 @@ def _compute_at_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out["cluster_archetype_label"] = out["perfil"]
     for key in ("finalizador", "alvo", "movel"):
         out[f"cluster_share_{key}"] = pd.to_numeric(out.get(f"pct_idx_{key}", 0), errors="coerce").fillna(0) * 100
-        rating_col = f"rating_idx_{key}" if f"rating_idx_{key}" in out.columns else f"rating_{key}"
-        out[f"nota_{key}"] = pd.to_numeric(out.get(rating_col, out["rating_geral"]), errors="coerce")
+    out = apply_at_tri_composite_ratings(out)
+
+    out["n_construcao"] = percentile_rank(out.get("blk_criacao", out["Cond.Prog"]), ascending=True)
+    out["n_conducao"] = percentile_rank(out.get("blk_conducao", out["Cond.Prog"]), ascending=True)
+    out["n_duelo_ar"] = percentile_rank(out["DuelosAr"] * out["%DuelosAr"], ascending=True)
+
     out = attach_aspect_percentiles(out)
+    out = apply_profile_z_geral_rating(out, AT_TRI_COMPOSITE_CONFIG)
     return out
 
 
@@ -1894,9 +1900,9 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
                     "movel": float(row.get("cluster_share_movel") or 0),
                 },
                 "ratings": {
-                    "finalizador": round(float(row.get("nota_finalizador") or row.get("rating_idx_finalizador") or row["rating_geral"]), 1),
-                    "alvo": round(float(row.get("nota_alvo") or row.get("rating_idx_alvo") or row["rating_geral"]), 1),
-                    "movel": round(float(row.get("nota_movel") or row.get("rating_idx_movel") or row["rating_geral"]), 1),
+                    "finalizador": round(float(row.get("nota_finalizador") or row.get("rating_finalizador") or row["rating_geral"]), 1),
+                    "alvo": round(float(row.get("nota_alvo") or row.get("rating_alvo") or row["rating_geral"]), 1),
+                    "movel": round(float(row.get("nota_movel") or row.get("rating_movel") or row["rating_geral"]), 1),
                 },
             }
     return payload

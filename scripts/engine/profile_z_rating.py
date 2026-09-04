@@ -24,6 +24,7 @@ METRIC_TO_COLUMNS: dict[str, tuple[str, ...]] = {
     "passes_finais": ("PassesChave", "PasseAreaW"),
     "ofensividade": ("ToquesArea", "AcoesAtW"),
     "finalizacoes": ("Finalizações", "npxG"),
+    "efetividade_gol": ("Gols", "GolspTq", "Golsxg"),
     "conducao_prog": ("Cond.Prog",),
     "progressao": ("Cond.Prog", "Acelerações"),
     "toques_area": ("ToquesArea",),
