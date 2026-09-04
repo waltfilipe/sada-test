@@ -104,7 +104,8 @@ const SECTION_BLOCK_WEIGHTS: Partial<
 /** Block labels per section — used for composite section score. */
 const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string[]>>> = {
   zagueiros: {
-    Defensivos: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
+    Defensivos: ["Duelos Defensivos", "Eficiência Defensiva"],
+    Aéreo: ["Aéreo"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos"],
     "Dribles e Condução": ["Disputas com Bola", "Conduções Progressivas"],
   },

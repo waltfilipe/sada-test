@@ -4,6 +4,7 @@ export type AspectGroupKey = keyof PlayerProfile["aspects"];
 
 export const ASPECT_GROUP_META: Record<AspectGroupKey, { title: string; order: number }> = {
   defensivos: { title: "Defensivos", order: 1 },
+  aereo: { title: "Aéreo", order: 1.5 },
   construcao: { title: "Construção", order: 2 },
   perfil_construcao: { title: "Perfil de construção", order: 3 },
   perfil_defensivo: { title: "Perfil defensivo", order: 4 },

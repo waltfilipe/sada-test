@@ -6,7 +6,6 @@ import {
   StatMedalCount,
 } from "@/components/position/profile/StatBadgeStrip";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
-import { Tooltip } from "@/components/ui/Tooltip";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
 import { earnedStatBadges, statBadgeForMetric } from "@/lib/statBadges";
@@ -37,9 +36,6 @@ function shortName(name: string): string {
   if (parts.length === 1) return parts[0];
   return `${parts[0]} ${parts[parts.length - 1][0]}.`;
 }
-
-const DEF_EFFICIENCY_TIP =
-  "Índice que combina volume de ações defensivas bem-sucedidas (interceptações, rebatidas) com baixo custo — duelos perdidos e faltas desnecessárias em relação ao total de ações defensivas.";
 
 type MetricVersusProps = {
   label: string;
@@ -107,7 +103,6 @@ function CompareAspectBlock({
   const hasSubMetrics =
     (item.kind === "def_efficiency_group" || item.kind === "metric_group") &&
     Boolean(itemA?.sub_metrics?.length || itemB?.sub_metrics?.length);
-  const isDefEfficiency = item.kind === "def_efficiency_group";
   const badgeA = itemA ? statBadgeForMetric(itemA, title) : null;
   const badgeB = itemB ? statBadgeForMetric(itemB, title) : null;
   const hasBadge = Boolean(badgeA || badgeB);
@@ -125,13 +120,6 @@ function CompareAspectBlock({
             {title}
             {badgeA ? <StatBadgeChip badge={badgeA} tone={tone} /> : null}
             {badgeB ? <StatBadgeChip badge={badgeB} tone={tone} /> : null}
-            {isDefEfficiency ? (
-              <Tooltip content={DEF_EFFICIENCY_TIP}>
-                <span className="stat-def-eff-star" aria-label="Destaque — Eficiência Defensiva">
-                  <i className="fa-solid fa-star" aria-hidden="true" />
-                </span>
-              </Tooltip>
-            ) : null}
           </span>
         </div>
         <div className="compare-stat-group-body">

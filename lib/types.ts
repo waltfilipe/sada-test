@@ -116,6 +116,7 @@ export type PlayerProfile = PlayerSummary & {
   tendencies: Tendencies;
   aspects: {
     defensivos?: AspectItem[];
+    aereo?: AspectItem[];
     construcao: AspectItem[];
     perfil_construcao?: AspectItem[];
     perfil_defensivo?: AspectItem[];

@@ -1550,12 +1550,18 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 eff_pct=row.get("_asp_duelos_def_eff", 0),
                 eff_display=_raw_eff_display(row, "Duelos defensivos ganhos, %", "%DuelosDefW"),
             ),
-            _metric_aspect(
-                "Duelos Aéreos",
-                percentile=row.get("_asp_duelos_ar_vol", 0),
-                display_value=_fmt_per90(da_vol),
-                eff_pct=row.get("_asp_duelos_ar_eff", 0),
-                eff_display=_raw_eff_display(row, "Duelos aéreos ganhos, %", "%DuelosAr"),
+            *(
+                [
+                    _metric_aspect(
+                        "Duelos Aéreos",
+                        percentile=row.get("_asp_duelos_ar_vol", 0),
+                        display_value=_fmt_per90(da_vol),
+                        eff_pct=row.get("_asp_duelos_ar_eff", 0),
+                        eff_display=_raw_eff_display(row, "Duelos aéreos ganhos, %", "%DuelosAr"),
+                    )
+                ]
+                if family_key != "zagueiros"
+                else []
             ),
             _def_efficiency_group_aspect(row, inter=inter, cortes=cortes),
         ],
@@ -1611,6 +1617,17 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
         ),
         "ofensivos": ofensivos,
     }
+
+    if family_key == "zagueiros":
+        aspects["aereo"] = [
+            _metric_aspect(
+                "Aéreo",
+                percentile=row.get("_asp_duelos_ar_vol", 0),
+                display_value=_fmt_per90(da_vol),
+                eff_pct=row.get("_asp_duelos_ar_eff", 0),
+                eff_display=_raw_eff_display(row, "Duelos aéreos ganhos, %", "%DuelosAr"),
+            ),
+        ]
 
     if family_key == "laterais":
         cruz_vol = _row_vol(row, "Cruz.", "Cruzamentos/90")

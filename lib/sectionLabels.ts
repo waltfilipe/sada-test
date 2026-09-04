@@ -2,6 +2,7 @@
 export function sectionShortLabel(title: string): string {
   const map: Record<string, string> = {
     Defensivos: "Defensivo",
+    Aéreo: "Aéreo",
     Passes: "Passe",
     "Dribles e Condução": "Condução",
     "Passes Finais e Ofensividade": "Passe final",

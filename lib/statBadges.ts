@@ -26,6 +26,11 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
     icon: "fa-cloud",
     title: "Duelos aéreos — volume e eficiência acima de P60",
   },
+  Aéreo: {
+    label: "Aéreo",
+    icon: "fa-cloud",
+    title: "Duelo aéreo — volume e eficiência acima de P60",
+  },
   "Passes Progressivos": {
     label: "Passes Progressivos",
     icon: "fa-forward",

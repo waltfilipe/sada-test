@@ -12,7 +12,12 @@ const ZAG_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Defensivos",
     tone: "defensivos",
-    labels: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
+    labels: ["Duelos Defensivos", "Eficiência Defensiva"],
+  },
+  {
+    title: "Aéreo",
+    tone: "defensivos",
+    labels: ["Aéreo"],
   },
   {
     title: "Passes",
