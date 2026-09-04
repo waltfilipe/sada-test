@@ -4,7 +4,9 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { MinutesStat } from "@/components/position/MinutesStat";
-import { playerInitials, ratingTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
+import { dominantRatingKey } from "@/lib/profileMeta";
+import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
+import { positionRating } from "@/lib/scoutUi";
 import type { PlayerProfile } from "@/lib/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -17,7 +19,7 @@ type Props = {
 };
 
 export function AthleteSlot({ side, player, players, onChange }: Props) {
-  const token = ratingTier(player.ratings.geral);
+  const token = ratingTier(positionRating(player));
   const age = player.birth_year ? CURRENT_YEAR - player.birth_year : null;
   const tm = player.transfermarkt;
   const clusterProps = clusterTagProps(player);
@@ -67,9 +69,9 @@ export function AthleteSlot({ side, player, players, onChange }: Props) {
           {clusterProps ? <ClusterTag {...clusterProps} /> : <ProfileTag {...profileTagProps(player)} />}
 
           <div className="slot-rating">
-            <strong>{ratingToLetterGrade(player.ratings.geral)}</strong>
+            <strong>{formatRating(positionRating(player))}</strong>
             <em>
-              Avaliação · #{player.ranks.geral}
+              {player.profile} · #{player.ranks[dominantRatingKey(player.profile, player.position_family, player.hybrid_lean) ?? "geral"] ?? player.ranks.geral}
             </em>
           </div>
         </div>

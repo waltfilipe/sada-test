@@ -1,6 +1,8 @@
 import {
   archetypeTone,
+  atArchetypeTone,
   exArchetypeTone,
+  isAtCluster,
   isExCluster,
   isLatCluster,
   isMcCluster,
@@ -18,17 +20,18 @@ function clusterTone(cluster: PositionCluster) {
   if (isLatCluster(cluster)) return latArchetypeTone(cluster.archetype);
   if (isMcCluster(cluster)) return mcArchetypeTone(cluster.archetype);
   if (isExCluster(cluster)) return exArchetypeTone(cluster.archetype);
+  if (isAtCluster(cluster)) return atArchetypeTone(cluster.archetype);
   return archetypeTone(cluster.archetype);
 }
 
 export function ClusterTag({ cluster, className = "" }: Props) {
   const tone = clusterTone(cluster);
   const badgeShort =
-    isLatCluster(cluster) || isMcCluster(cluster) || isExCluster(cluster)
+    isLatCluster(cluster) || isMcCluster(cluster) || isExCluster(cluster) || isAtCluster(cluster)
       ? cluster.hybrid_badge_short
       : cluster.construtor_badge_short;
   const badgeTitle =
-    isLatCluster(cluster) || isMcCluster(cluster) || isExCluster(cluster)
+    isLatCluster(cluster) || isMcCluster(cluster) || isExCluster(cluster) || isAtCluster(cluster)
       ? cluster.hybrid_badge
       : cluster.construtor_badge;
 

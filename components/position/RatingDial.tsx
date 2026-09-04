@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { formatRating, ratingTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
+import { formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
 
 const SWEEP = 252;
 const START = -SWEEP / 2;
@@ -76,8 +76,8 @@ export function RatingDial({ value, rank, poolSize, reference, max = 10 }: Props
       </svg>
 
       <div className="dial-center">
-        <strong style={{ color: token.color }}>{ratingToLetterGrade(value, max)}</strong>
-        <span>Avaliação</span>
+        <strong style={{ color: token.color }}>{formatRating(value)}</strong>
+        <span>Rating</span>
       </div>
 
       <div className="dial-foot">

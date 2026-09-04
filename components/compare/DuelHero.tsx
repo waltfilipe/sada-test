@@ -5,7 +5,9 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { playerInitials, ratingTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
+import { playerInitials, ratingTier, formatRating, tierVars } from "@/lib/scoutTheme";
+import { positionRating } from "@/lib/scoutUi";
+import { dominantRatingKey } from "@/lib/profileMeta";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Side = "a" | "b";
@@ -70,7 +72,10 @@ function DuelSide({
   family: PositionFamily;
 }) {
   const tm = player.transfermarkt;
-  const overall = player.ratings.geral ?? player.rating;
+  const profileRating = positionRating(player);
+  const profileRank =
+    player.ranks[dominantRatingKey(player.profile, family, player.hybrid_lean) ?? "geral"] ??
+    player.ranks.geral;
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const months = monthsRemaining(tm?.contract_until);
   const onLoanFrom = tm?.on_loan_from ?? null;
@@ -103,11 +108,11 @@ function DuelSide({
           </div>
         </div>
 
-        {overall != null ? (
-          <Tooltip content={`Avaliação no pool da posição · #${player.ranks.geral}`}>
-            <div className="duel-rating" style={tierVars(ratingTier(overall))}>
-              <span className="duel-rating-value duel-rating-letter">{ratingToLetterGrade(overall)}</span>
-              <span className="duel-rating-rank">#{player.ranks.geral}</span>
+        {profileRating != null ? (
+          <Tooltip content={`${player.profile} · #${profileRank}`}>
+            <div className="duel-rating" style={tierVars(ratingTier(profileRating))}>
+              <span className="duel-rating-value">{formatRating(profileRating)}</span>
+              <span className="duel-rating-rank">#{profileRank}</span>
             </div>
           </Tooltip>
         ) : null}

@@ -768,6 +768,18 @@ def _compute_ex_indices(pool: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def _compute_at_indices(pool: pd.DataFrame) -> pd.DataFrame:
+    out = FAMILY_PROFILE_CONFIG["atacantes"].compute_indices(pool)
+    out["cluster_archetype"] = out["perfil"]
+    out["cluster_archetype_label"] = out["perfil"]
+    for key in ("finalizador", "alvo", "movel"):
+        out[f"cluster_share_{key}"] = pd.to_numeric(out.get(f"pct_idx_{key}", 0), errors="coerce").fillna(0) * 100
+        rating_col = f"rating_idx_{key}" if f"rating_idx_{key}" in out.columns else f"rating_{key}"
+        out[f"nota_{key}"] = pd.to_numeric(out.get(rating_col, out["rating_geral"]), errors="coerce")
+    out = attach_aspect_percentiles(out)
+    return out
+
+
 def _compute_generic_ratings(pool: pd.DataFrame, prefix: str) -> pd.DataFrame:
     out = pool.copy()
     out["_minutes_pool_pct"] = _minutes_pool_pct(out)
@@ -829,6 +841,8 @@ def compute_family_metrics(df: pd.DataFrame, family_key: str) -> pd.DataFrame:
         return _compute_mc_indices(pool)
     if family_key == "extremos":
         return _compute_ex_indices(pool)
+    if family_key == "atacantes":
+        return _compute_at_indices(pool)
     return FAMILY_PROFILE_CONFIG[family_key].compute_indices(pool)
 
 
@@ -1447,7 +1461,7 @@ def _build_ex_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
 
 
 def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, list[dict[str, Any]]]:
-    if family_key == "extremos":
+    if family_key in ("extremos", "atacantes"):
         return _build_ex_aspects(row)
 
     dd_vol = _row_vol(row, "DuelosDef", "Duelos defensivos/90")
@@ -1844,6 +1858,27 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
                     "driblador": round(float(row.get("nota_driblador") or row.get("rating_driblador") or row["rating_geral"]), 1),
                     "meia_ponta": round(float(row.get("nota_meia_ponta") or row.get("rating_meia_ponta") or row["rating_geral"]), 1),
                     "ruptura": round(float(row.get("nota_ruptura") or row.get("rating_ruptura") or row["rating_geral"]), 1),
+                },
+            }
+    if family_key == "atacantes":
+        archetype = row.get("cluster_archetype")
+        if pd.notna(archetype) and archetype:
+            label = row.get("cluster_archetype_label")
+            payload["cluster"] = {
+                "family": "atacantes",
+                "archetype": str(archetype),
+                "archetype_label": str(label if pd.notna(label) and label else archetype),
+                "hybrid_badge": None,
+                "hybrid_badge_short": None,
+                "shares": {
+                    "finalizador": float(row.get("cluster_share_finalizador") or 0),
+                    "alvo": float(row.get("cluster_share_alvo") or 0),
+                    "movel": float(row.get("cluster_share_movel") or 0),
+                },
+                "ratings": {
+                    "finalizador": round(float(row.get("nota_finalizador") or row.get("rating_idx_finalizador") or row["rating_geral"]), 1),
+                    "alvo": round(float(row.get("nota_alvo") or row.get("rating_idx_alvo") or row["rating_geral"]), 1),
+                    "movel": round(float(row.get("nota_movel") or row.get("rating_idx_movel") or row["rating_geral"]), 1),
                 },
             }
     return payload

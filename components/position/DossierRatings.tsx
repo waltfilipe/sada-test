@@ -6,9 +6,10 @@ import {
   formatRating,
   ratingGradientStyle,
   ratingTier,
-  ratingToLetterGrade,
   tierVars,
 } from "@/lib/scoutTheme";
+import { positionRating } from "@/lib/scoutUi";
+import { dominantRatingKey } from "@/lib/profileMeta";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 function secondaryAxes(family: PositionFamily) {
@@ -16,7 +17,8 @@ function secondaryAxes(family: PositionFamily) {
     family === "zagueiros" ||
     family === "laterais" ||
     family === "meio-campistas" ||
-    family === "extremos"
+    family === "extremos" ||
+    family === "atacantes"
   ) {
     return [];
   }
@@ -33,18 +35,22 @@ type Props = {
 };
 
 export function DossierRatings({ player, poolSize, family }: Props) {
-  const geral = player.ratings.geral;
-  const geralRank = player.ranks.geral ?? poolSize;
-  const geralToken = ratingTier(geral);
-  const percentile = poolSize > 0 ? Math.max(1, 100 - Math.round(((poolSize - geralRank) / poolSize) * 100)) : 0;
+  const profileKey = dominantRatingKey(player.profile, family, player.hybrid_lean);
+  const profileRating =
+    (profileKey ? player.ratings[profileKey] : null) ??
+    positionRating(player);
+  const profileRank =
+    (profileKey ? player.ranks[profileKey] : null) ?? player.ranks.geral ?? poolSize;
+  const profileToken = ratingTier(profileRating);
+  const percentile = poolSize > 0 ? Math.max(1, 100 - Math.round(((poolSize - profileRank) / poolSize) * 100)) : 0;
   const axes = secondaryAxes(family);
-  const ratingStyle = ratingGradientStyle(geral);
+  const ratingStyle = ratingGradientStyle(profileRating);
 
   return (
     <div className={`dossier-ratings ${axes.length === 0 ? "dossier-ratings-solo" : ""}`}>
       <article
         className="dossier-rating-hero dossier-rating-hero-modern dossier-rating-gradient"
-        style={{ ...tierVars(geralToken), ...ratingStyle }}
+        style={{ ...tierVars(profileToken), ...ratingStyle }}
       >
         <div className="dossier-rating-ring" aria-hidden>
           <svg viewBox="0 0 120 120">
@@ -55,19 +61,19 @@ export function DossierRatings({ player, poolSize, family }: Props) {
               r="52"
               className="dossier-rating-ring-fill"
               style={{
-                strokeDasharray: `${clampPercent(geral * 10) * 3.27} 999`,
+                strokeDasharray: `${clampPercent(profileRating * 10) * 3.27} 999`,
               }}
             />
           </svg>
           <div className="dossier-rating-ring-center">
-            <strong className="dossier-rating-value dossier-rating-letter">{ratingToLetterGrade(geral)}</strong>
-            <span className="dossier-rating-label">Avaliação</span>
+            <strong className="dossier-rating-value">{formatRating(profileRating)}</strong>
+            <span className="dossier-rating-label">{player.profile}</span>
           </div>
         </div>
 
         <div className="dossier-rating-side">
           <div className="dossier-rating-meta">
-            <span className="dossier-rating-rank">#{geralRank}</span>
+            <span className="dossier-rating-rank">#{profileRank}</span>
             <span>Top {percentile}%</span>
           </div>
         </div>

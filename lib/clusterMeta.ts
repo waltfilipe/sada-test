@@ -103,22 +103,50 @@ export type ExCluster = {
   ratings: ExArchetypeRatings;
 };
 
-export type PositionCluster = ZagCluster | LatCluster | McCluster | ExCluster;
+export type AtArchetype = "Finalizador" | "Alvo" | "Móvel" | "Híbrido";
+
+export type AtClusterShares = {
+  finalizador: number;
+  alvo: number;
+  movel: number;
+};
+
+export type AtArchetypeRatings = {
+  finalizador: number;
+  alvo: number;
+  movel: number;
+};
+
+export type AtCluster = {
+  family: "atacantes";
+  archetype: AtArchetype;
+  archetype_label: string;
+  hybrid_badge?: string | null;
+  hybrid_badge_short?: string | null;
+  shares: AtClusterShares;
+  ratings: AtArchetypeRatings;
+};
+
+export type PositionCluster = ZagCluster | LatCluster | McCluster | ExCluster | AtCluster;
+
+export function isAtCluster(cluster: PositionCluster): cluster is AtCluster {
+  return cluster.family === "atacantes" || "finalizador" in cluster.shares;
+}
 
 export function isLatCluster(cluster: PositionCluster): cluster is LatCluster {
-  return cluster.family === "laterais" || ("defensivo" in cluster.shares && !("contencao" in cluster.shares) && !("driblador" in cluster.shares));
+  return cluster.family === "laterais" || ("defensivo" in cluster.shares && !("contencao" in cluster.shares) && !("driblador" in cluster.shares) && !("finalizador" in cluster.shares));
 }
 
 export function isMcCluster(cluster: PositionCluster): cluster is McCluster {
-  return cluster.family === "meio-campistas" || ("contencao" in cluster.shares && !("driblador" in cluster.shares));
+  return cluster.family === "meio-campistas" || ("contencao" in cluster.shares && !("driblador" in cluster.shares) && !("finalizador" in cluster.shares));
 }
 
 export function isExCluster(cluster: PositionCluster): cluster is ExCluster {
-  return cluster.family === "extremos" || "driblador" in cluster.shares;
+  return cluster.family === "extremos" || ("driblador" in cluster.shares && !("finalizador" in cluster.shares));
 }
 
 export function isZagCluster(cluster: PositionCluster): cluster is ZagCluster {
-  return !isLatCluster(cluster) && !isMcCluster(cluster) && !isExCluster(cluster);
+  return !isLatCluster(cluster) && !isMcCluster(cluster) && !isExCluster(cluster) && !isAtCluster(cluster);
 }
 
 export type ArchetypeTrait = {
@@ -593,6 +621,68 @@ export function exArchetypeMetaFor(archetype: ExArchetype) {
 
 export function exHybridBadgeMetaFor(badge: string) {
   return EX_HYBRID_BADGE_META.find((item) => item.badge === badge);
+}
+
+export const AT_ARCHETYPES: AtArchetype[] = ["Finalizador", "Alvo", "Móvel", "Híbrido"];
+
+export const AT_ARCHETYPE_META: {
+  archetype: AtArchetype;
+  tone: string;
+  description: string;
+  traits: ArchetypeTrait[];
+}[] = [
+  {
+    archetype: "Alvo",
+    tone: "alvo",
+    description: "Referência aérea: duelos de cabeça e presença na área.",
+    traits: [
+      { label: "Duelos Aéreos", direction: "up" },
+      { label: "Gols de Cabeça", direction: "up" },
+      { label: "Toques na Área", direction: "up" },
+      { label: "Dribles", direction: "down" },
+    ],
+  },
+  {
+    archetype: "Finalizador",
+    tone: "finalizador",
+    description: "Referência em finalização: volume de chutes e xG.",
+    traits: [
+      { label: "Finalizações", direction: "up" },
+      { label: "xG", direction: "up" },
+      { label: "Gols", direction: "up" },
+      { label: "Passes Criativos", direction: "down" },
+    ],
+  },
+  {
+    archetype: "Móvel",
+    tone: "movel",
+    description: "Atacante de movimento: dribles, conduções progressivas e passes.",
+    traits: [
+      { label: "Dribles", direction: "up" },
+      { label: "Conduções Progressivas", direction: "up" },
+      { label: "Passes Progressivos", direction: "up" },
+      { label: "Duelos Aéreos", direction: "down" },
+    ],
+  },
+  {
+    archetype: "Híbrido",
+    tone: "hibrido",
+    description: "Dois eixos fortes — perfil dual com identidade em mais de uma frente.",
+    traits: [
+      { label: "Versatilidade", direction: "up" },
+      { label: "Finalização", direction: "up" },
+      { label: "Mobilidade", direction: "up" },
+      { label: "Especialização", direction: "down" },
+    ],
+  },
+];
+
+export function atArchetypeTone(archetype: AtArchetype): string {
+  return AT_ARCHETYPE_META.find((item) => item.archetype === archetype)?.tone ?? "finalizador";
+}
+
+export function atArchetypeMetaFor(archetype: AtArchetype) {
+  return AT_ARCHETYPE_META.find((item) => item.archetype === archetype);
 }
 
 /** @deprecated use archetypeCounts */

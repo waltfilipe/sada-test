@@ -1,4 +1,6 @@
 import type { PlayerProfile } from "@/lib/types";
+import { dominantRatingKey } from "./profileMeta";
+import { archetypeClusterSlug } from "./profileShares";
 
 /** Maps a profile name to the CSS tone class used for its accent colour. */
 export function profileTone(profile: string): string {
@@ -51,5 +53,25 @@ export function sortPlayers(players: PlayerProfile[], sort: "rating" | "name" | 
   const copy = [...players];
   if (sort === "name") return copy.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
   if (sort === "minutes") return copy.sort((a, b) => b.minutes - a.minutes);
-  return copy.sort((a, b) => b.rating - a.rating);
+  return copy.sort((a, b) => positionRating(b) - positionRating(a));
+}
+
+/** Rating do perfil classificado do atleta (não usa rating geral). */
+export function positionRating(player: PlayerProfile): number {
+  const key = dominantRatingKey(player.profile, player.position_family, player.hybrid_lean);
+  if (key && player.ratings[key] != null) return player.ratings[key];
+
+  if (player.cluster?.ratings) {
+    const slug = archetypeClusterSlug(player.cluster.archetype);
+    if (slug) {
+      const value = (player.cluster.ratings as Record<string, number>)[slug];
+      if (value != null) return value;
+    }
+  }
+
+  const profileRatings = Object.entries(player.ratings)
+    .filter(([ratingKey]) => ratingKey !== "geral")
+    .map(([, value]) => value);
+  if (profileRatings.length) return Math.max(...profileRatings);
+  return player.rating;
 }

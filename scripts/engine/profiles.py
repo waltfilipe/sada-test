@@ -426,6 +426,12 @@ def profile_shares_from_row(row: pd.Series, family_key: str) -> dict[str, float]
             "meia_ponta": round(float(row.get("cluster_share_meia_ponta") or 0), 0),
             "ruptura": round(float(row.get("cluster_share_ruptura") or 0), 0),
         }
+    if family_key == "atacantes":
+        return {
+            "finalizador": round(float(row.get("cluster_share_finalizador") or row.get("pct_idx_finalizador", 0) * 100), 0),
+            "alvo": round(float(row.get("cluster_share_alvo") or row.get("pct_idx_alvo", 0) * 100), 0),
+            "movel": round(float(row.get("cluster_share_movel") or row.get("pct_idx_movel", 0) * 100), 0),
+        }
     config = FAMILY_PROFILE_CONFIG[family_key]
     shares: dict[str, float] = {}
     for spec in config.profiles:

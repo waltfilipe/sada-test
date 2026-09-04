@@ -28,7 +28,8 @@ export function PositionScoutPage({ family, players }: Props) {
     family === "zagueiros" ||
     family === "laterais" ||
     family === "meio-campistas" ||
-    family === "extremos";
+    family === "extremos" ||
+    family === "atacantes";
 
   const profilesAvailable = useMemo(() => {
     const set = new Set<string>();

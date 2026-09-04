@@ -7,7 +7,8 @@ import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { earnedStatBadges } from "@/lib/statBadges";
 import { buildSectionGradeLookup, getPlayerSectionGrade, playerSectionScore } from "@/lib/sectionGrades";
-import { ratingToLetterGrade } from "@/lib/scoutTheme";
+import { formatRating } from "@/lib/scoutTheme";
+import { positionRating } from "@/lib/scoutUi";
 import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Props = {
@@ -93,7 +94,7 @@ export function CompareOverview({ playerA, playerB, family, players, verdict }: 
     return list;
   }, [family, playerA, playerB, aspectsA, aspectsB, gradeLookup]);
 
-  const ratingDelta = (playerA.ratings.geral ?? playerA.rating) - (playerB.ratings.geral ?? playerB.rating);
+  const ratingDelta = positionRating(playerA) - positionRating(playerB);
   const ratingLeader = ratingDelta === 0 ? "tie" : ratingDelta > 0 ? "a" : "b";
 
   return (
@@ -102,7 +103,7 @@ export function CompareOverview({ playerA, playerB, family, players, verdict }: 
         <div className="compare-overview-player side-a">
           <span className="compare-overview-name">{shortName(playerA.name)}</span>
           <strong className="compare-overview-rating compare-overview-evaluation">
-            {ratingToLetterGrade(playerA.ratings.geral ?? playerA.rating)}
+            {formatRating(positionRating(playerA))}
           </strong>
         </div>
 
@@ -127,7 +128,7 @@ export function CompareOverview({ playerA, playerB, family, players, verdict }: 
         <div className="compare-overview-player side-b">
           <span className="compare-overview-name">{shortName(playerB.name)}</span>
           <strong className="compare-overview-rating compare-overview-evaluation">
-            {ratingToLetterGrade(playerB.ratings.geral ?? playerB.rating)}
+            {formatRating(positionRating(playerB))}
           </strong>
         </div>
       </div>

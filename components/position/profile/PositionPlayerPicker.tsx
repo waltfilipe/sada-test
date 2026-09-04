@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
-import { EX_ARCHETYPE_META, LAT_ARCHETYPE_META, MC_ARCHETYPE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
+import { AT_ARCHETYPE_META, EX_ARCHETYPE_META, LAT_ARCHETYPE_META, MC_ARCHETYPE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
 import { formatRating, playerInitials } from "@/lib/scoutTheme";
+import { positionRating } from "@/lib/scoutUi";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -59,7 +60,7 @@ export function PositionPlayerPicker({
       return player.name.toLowerCase().includes(q) || player.club.toLowerCase().includes(q);
     });
     return [...filtered].sort((a, b) =>
-      sortKey === "minutes" ? b.minutes - a.minutes : b.rating - a.rating,
+      sortKey === "minutes" ? b.minutes - a.minutes : positionRating(b) - positionRating(a),
     );
   }, [players, clusterMode, clusterFilters, profilesFilter, clubFilter, sortKey, query]);
 
@@ -106,6 +107,8 @@ export function PositionPlayerPicker({
         ? MC_ARCHETYPE_META
         : family === "extremos"
           ? EX_ARCHETYPE_META
+          : family === "atacantes"
+            ? AT_ARCHETYPE_META
           : family === "zagueiros"
             ? ZAG_ARCHETYPE_META
             : null;

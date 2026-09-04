@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ClubLogo } from "@/components/ClubLogo";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { playerInitials, ratingTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
+import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 
@@ -63,9 +63,6 @@ function MarketCard({
 export function PlayerHero({ player, family }: Props) {
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const tm = player.transfermarkt;
-  const overall = player.ratings.geral ?? player.rating;
-  const evaluationGrade = overall != null ? ratingToLetterGrade(overall) : null;
-  const evaluationToken = overall != null ? ratingTier(overall) : null;
 
   const months = monthsRemaining(tm?.contract_until);
   const onLoanFrom = tm?.on_loan_from ?? null;
@@ -170,17 +167,6 @@ export function PlayerHero({ player, family }: Props) {
           </div>
         </div>
       </div>
-
-      {evaluationGrade && evaluationToken ? (
-        <Tooltip content="Avaliação geral do atleta no pool da posição.">
-          <div className="player-hero-rating">
-            <span className="player-hero-rating-label">Avaliação</span>
-            <span className="player-hero-rating-value player-hero-rating-letter" style={tierVars(evaluationToken)}>
-              {evaluationGrade}
-            </span>
-          </div>
-        </Tooltip>
-      ) : null}
     </section>
   );
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { BenchStrip, PitchView } from "@/components/shadow/PitchView";
+import { ClubLogo } from "@/components/ClubLogo";
 import { ShadowPlayerRow } from "@/components/shadow/ShadowPlayerChip";
 import { TeamProfileMap } from "@/components/shadow/TeamProfileMap";
 import { TeamStatsBar } from "@/components/shadow/TeamStatsBar";
@@ -38,8 +39,23 @@ export function TimeSombraClient({ players }: Props) {
 
   const formation = formationById(state.formationId);
   const benchIds = benchPlayerIds(state);
+  const selectedSlot = selectedSlotId ? formation.slots.find((slot) => slot.id === selectedSlotId) : null;
   const selectedPlayerId = selectedSlotId ? state.assignments[selectedSlotId] : null;
   const selectedPlayer = selectedPlayerId ? playersById.get(selectedPlayerId) : null;
+  const assignedIds = new Set(
+    Object.values(state.assignments).filter((id): id is string => Boolean(id)),
+  );
+
+  const slotCandidates = useMemo(() => {
+    if (!selectedSlot || selectedPlayerId) return [];
+    return players
+      .filter(
+        (player) =>
+          selectedSlot.families.includes(player.position_family) &&
+          (!assignedIds.has(player.player_id) || state.assignments[selectedSlot.id] === player.player_id),
+      )
+      .sort((a, b) => b.rating - a.rating);
+  }, [players, selectedSlot, selectedPlayerId, assignedIds, state.assignments]);
 
   const squadPlayers = state.squadIds
     .map((id) => playersById.get(id))
@@ -143,7 +159,43 @@ export function TimeSombraClient({ players }: Props) {
           </section>
 
           <aside className="shadow-side">
-            {selectedPlayer && selectedSlotId ? (
+            {selectedSlot && !selectedPlayer ? (
+              <article className="player-card shadow-slot-picker">
+                <div className="profile-card-head">
+                  <h3 className="section-label">Escalar em {selectedSlot.label}</h3>
+                  <button type="button" className="shadow-link-btn" onClick={() => setSelectedSlotId(null)}>
+                    Fechar
+                  </button>
+                </div>
+                {slotCandidates.length ? (
+                  <ul className="shadow-slot-picker-list">
+                    {slotCandidates.map((player) => (
+                      <li key={player.player_id}>
+                        <button
+                          type="button"
+                          className="shadow-slot-picker-item"
+                          onClick={() => {
+                            assign(selectedSlot.id, player.player_id);
+                            setSelectedSlotId(selectedSlot.id);
+                          }}
+                        >
+                          <ClubLogo club={player.club} size={16} />
+                          <span className="shadow-slot-picker-copy">
+                            <strong>{player.name}</strong>
+                            <em>
+                              {player.club} · {player.position} · {player.profile}
+                            </em>
+                          </span>
+                          <span className="shadow-slot-picker-rating tabular">{formatRating(player.rating)}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="shadow-roster-empty">Nenhum atleta disponível para esta posição.</p>
+                )}
+              </article>
+            ) : selectedPlayer && selectedSlotId ? (
               <article className="player-card shadow-slot-detail">
                 <div className="profile-card-head">
                   <h3 className="section-label">

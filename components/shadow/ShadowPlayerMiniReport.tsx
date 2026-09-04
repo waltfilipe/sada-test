@@ -13,9 +13,9 @@ import { sectionShortLabel } from "@/lib/sectionLabels";
 import {
   formatRating,
   ratingTier,
-  ratingToLetterGrade,
   tierVars,
 } from "@/lib/scoutTheme";
+import { positionRating } from "@/lib/scoutUi";
 import type { PlayerSearchRow } from "@/lib/types";
 
 function monthsRemaining(iso?: string | null): string {
@@ -35,9 +35,8 @@ export function ShadowPlayerMiniReport({ player }: { player: PlayerSearchRow }) 
   const { lookup: gradeLookup } = useFamilyGradeLookup(player.position_family, true);
 
   const tm = player.transfermarkt ?? profile?.transfermarkt;
-  const overall = profile?.ratings.geral ?? player.rating;
-  const overallToken = ratingTier(overall);
-  const overallLetter = ratingToLetterGrade(overall);
+  const profileRating = profile ? positionRating(profile) : player.rating;
+  const profileToken = ratingTier(profileRating);
 
   const dominant = useMemo(() => {
     if (profile) {
@@ -46,9 +45,9 @@ export function ShadowPlayerMiniReport({ player }: { player: PlayerSearchRow }) 
     }
     return {
       label: player.cluster?.archetype_label ?? player.profile,
-      rating: overall,
+      rating: profileRating,
     };
-  }, [profile, player.cluster?.archetype_label, player.profile, overall]);
+  }, [profile, player.cluster?.archetype_label, player.profile, profileRating]);
 
   const sectionGrades = useMemo(() => {
     if (!gradeLookup) return [];
@@ -72,12 +71,9 @@ export function ShadowPlayerMiniReport({ player }: { player: PlayerSearchRow }) 
       </div>
 
       <div className="shadow-mini-report-hero">
-        <span className="shadow-mini-report-grade" style={tierVars(overallToken)}>
-          {overallLetter}
-        </span>
-        <div className="shadow-mini-report-dominant">
-          <span className="shadow-mini-report-dominant-rating tabular">
-            {formatRating(dominant.rating)}
+        <div className="shadow-mini-report-dominant shadow-mini-report-dominant-only">
+          <span className="shadow-mini-report-dominant-rating tabular" style={tierVars(profileToken)}>
+            {formatRating(profileRating)}
           </span>
           <span className="shadow-mini-report-profile">{dominant.label}</span>
         </div>

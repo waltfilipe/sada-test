@@ -12,7 +12,9 @@ import { Tooltip } from "@/components/ui/Tooltip";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { sectionShortLabel } from "@/lib/sectionLabels";
 import { allSectionGrades, buildSectionGradeLookup } from "@/lib/sectionGrades";
-import { playerInitials, ratingTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
+import { dominantRatingKey } from "@/lib/profileMeta";
+import { playerInitials, ratingTier, formatRating, tierVars } from "@/lib/scoutTheme";
+import { positionRating } from "@/lib/scoutUi";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { ComparePlayerTendencies } from "./ComparePlayerTendencies";
 
@@ -52,7 +54,10 @@ export function ComparePlayerColumn({
   onChange,
 }: Props) {
   const tm = player.transfermarkt;
-  const overall = player.ratings.geral ?? player.rating;
+  const profileRating = positionRating(player);
+  const profileRank =
+    player.ranks[dominantRatingKey(player.profile, family, player.hybrid_lean) ?? "geral"] ??
+    player.ranks.geral;
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const clusterProps = clusterTagProps(player);
 
@@ -120,11 +125,11 @@ export function ComparePlayerColumn({
           </div>
         </div>
 
-        {overall != null ? (
-          <Tooltip content={`Avaliação no pool · #${player.ranks.geral}`}>
-            <div className="compare-col-rating" style={tierVars(ratingTier(overall))}>
-              <span className="compare-col-rating-letter">{ratingToLetterGrade(overall)}</span>
-              <span className="compare-col-rating-rank">#{player.ranks.geral}</span>
+        {profileRating != null ? (
+          <Tooltip content={`${player.profile} · #${profileRank}`}>
+            <div className="compare-col-rating" style={tierVars(ratingTier(profileRating))}>
+              <span className="compare-col-rating-letter">{formatRating(profileRating)}</span>
+              <span className="compare-col-rating-rank">#{profileRank}</span>
             </div>
           </Tooltip>
         ) : null}

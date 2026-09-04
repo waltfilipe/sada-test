@@ -120,15 +120,18 @@ const EX_STAT_SECTIONS: StatSectionSpec[] = [
   },
 ];
 
+const AT_STAT_SECTIONS: StatSectionSpec[] = EX_STAT_SECTIONS;
+
 export function statSectionsForFamily(family: PositionFamily): StatSectionSpec[] {
   if (family === "laterais") return LAT_STAT_SECTIONS;
   if (family === "meio-campistas") return MC_STAT_SECTIONS;
   if (family === "extremos") return EX_STAT_SECTIONS;
+  if (family === "atacantes") return AT_STAT_SECTIONS;
   if (family === "zagueiros") return ZAG_STAT_SECTIONS;
   return ZAG_STAT_SECTIONS;
 }
 
 export function statSectionTone(title: string): StatSectionTone {
-  const all = [...ZAG_STAT_SECTIONS, ...LAT_STAT_SECTIONS, ...MC_STAT_SECTIONS, ...EX_STAT_SECTIONS];
+  const all = [...ZAG_STAT_SECTIONS, ...LAT_STAT_SECTIONS, ...MC_STAT_SECTIONS, ...EX_STAT_SECTIONS, ...AT_STAT_SECTIONS];
   return all.find((section) => section.title === title)?.tone ?? "defensivos";
 }
