@@ -1616,6 +1616,31 @@
   gap: 0.45rem;
 }
 
+.heatmap-body-live {
+  margin-top: 0.35rem;
+}
+
+.heatmap-pitch-wrap {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.heatmap-pitch-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+}
+
 .heatmap-img {
   width: 100%;
   border-radius: var(--radius-sm);
