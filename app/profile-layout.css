@@ -511,6 +511,7 @@
 }
 
 .player-strip-card-copy {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.18rem;
@@ -606,8 +607,8 @@
 }
 
 .player-strip-card-lg {
-  min-width: 196px;
-  padding: 0.55rem 0.7rem 0.55rem 0.55rem;
+  min-width: 232px;
+  padding: 0.55rem 0.6rem 0.55rem 0.55rem;
   gap: 0.62rem;
 }
 
@@ -620,7 +621,7 @@
 
 .player-strip-card-lg .player-strip-card-name {
   font-size: 0.84rem;
-  max-width: 132px;
+  max-width: none;
 }
 
 .player-strip-card-lg .player-strip-card-club {
