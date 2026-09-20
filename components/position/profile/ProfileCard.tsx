@@ -167,7 +167,8 @@ export function ProfileCard({ player, family, players }: Props) {
                       {grade ?? "—"}
                     </span>
                   </div>
-                  <div className="profile-perfil-row-affinity">
+                  <div className="profile-perfil-row-affinity" title="Afinidade com o arquétipo">
+                    <span className="profile-perfil-row-affinity-label">Afinidade</span>
                     <span className="profile-perfil-row-bar" aria-hidden="true">
                       <span style={{ width: `${shareWidth}%` }} />
                     </span>
