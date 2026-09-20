@@ -20,15 +20,15 @@ const GRID_W = 105;
 const GRID_H = 68;
 const SIGMA = 3.4;
 
-/** Elegant low→high ramp: teal → green → amber → coral. */
+/** Elegant low→high ramp; cold zones stay clear so the grass reads through. */
 const RAMP: { stop: number; rgba: [number, number, number, number] }[] = [
-  { stop: 0.0, rgba: [13, 148, 136, 0] },
-  { stop: 0.18, rgba: [14, 165, 233, 0.16] },
-  { stop: 0.36, rgba: [45, 212, 191, 0.34] },
-  { stop: 0.54, rgba: [163, 230, 53, 0.48] },
-  { stop: 0.7, rgba: [250, 204, 21, 0.6] },
-  { stop: 0.85, rgba: [249, 146, 60, 0.7] },
-  { stop: 1.0, rgba: [244, 94, 92, 0.78] },
+  { stop: 0.0, rgba: [56, 189, 248, 0] },
+  { stop: 0.22, rgba: [56, 189, 248, 0.05] },
+  { stop: 0.42, rgba: [45, 212, 191, 0.16] },
+  { stop: 0.6, rgba: [190, 230, 80, 0.3] },
+  { stop: 0.76, rgba: [250, 204, 21, 0.46] },
+  { stop: 0.89, rgba: [249, 132, 52, 0.6] },
+  { stop: 1.0, rgba: [239, 78, 78, 0.72] },
 ];
 
 function rampColor(t: number): [number, number, number, number] {
@@ -76,8 +76,8 @@ function buildDensity(points: Point[]): Float32Array {
   }
   if (max > 0) {
     for (let i = 0; i < grid.length; i += 1) {
-      // Gentle gamma lifts mid-range zones so the map reads as a smooth field.
-      grid[i] = Math.pow(grid[i] / max, 0.78);
+      // Slight gamma above 1 keeps low-traffic zones clear and hotspots tight.
+      grid[i] = Math.pow(grid[i] / max, 1.15);
     }
   }
   return grid;
@@ -86,7 +86,7 @@ function buildDensity(points: Point[]): Float32Array {
 type Rect = { x: number; y: number; w: number; h: number };
 
 function pitchRect(w: number, h: number): Rect {
-  const pad = Math.max(6, Math.min(w, h) * 0.045);
+  const pad = Math.max(4, Math.min(w, h) * 0.028);
   const availW = w - pad * 2;
   const availH = h - pad * 2;
   let pw = availW;
