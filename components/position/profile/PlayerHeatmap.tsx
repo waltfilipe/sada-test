@@ -87,8 +87,8 @@ type Rect = { x: number; y: number; w: number; h: number };
 
 function pitchRect(w: number, h: number): Rect {
   const pad = Math.max(4, Math.min(w, h) * 0.028);
-  const availW = w - pad * 2;
-  const availH = h - pad * 2;
+  const availW = Math.max(0, w - pad * 2);
+  const availH = Math.max(0, h - pad * 2);
   let pw = availW;
   let ph = pw / PITCH_RATIO;
   if (ph > availH) {
@@ -282,8 +282,11 @@ function render(canvas: HTMLCanvasElement, points: Point[]) {
   const wrap = canvas.parentElement;
   if (!wrap) return;
 
-  const width = Math.max(1, Math.floor(wrap.clientWidth));
-  const height = Math.max(1, Math.floor(wrap.clientHeight));
+  const width = Math.floor(wrap.clientWidth);
+  const height = Math.floor(wrap.clientHeight);
+  // The observer also fires while the card is collapsed, where no pitch fits.
+  if (width < 80 || height < 60) return;
+
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
   canvas.width = Math.floor(width * dpr);
@@ -297,7 +300,8 @@ function render(canvas: HTMLCanvasElement, points: Point[]) {
   ctx.clearRect(0, 0, width, height);
 
   const rect = pitchRect(width, height);
-  const radius = Math.min(10, rect.h * 0.06);
+  if (rect.w <= 0 || rect.h <= 0) return;
+  const radius = Math.max(0, Math.min(10, rect.h * 0.06));
 
   drawGrass(ctx, rect, radius);
   if (points.length) drawHeat(ctx, rect, radius, points);
