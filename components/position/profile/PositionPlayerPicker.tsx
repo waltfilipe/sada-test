@@ -5,6 +5,7 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { AT_ARCHETYPE_META, EX_ARCHETYPE_META, LAT_ARCHETYPE_META, MC_ARCHETYPE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
 import { gradeTier, playerInitials, profileGradeFromRank, tierVars } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
+import { archetypeRank, sortedProfileShareRows } from "@/lib/profileShares";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
 import { PickerFilterMenu, type FilterOption } from "./PickerFilterMenu";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -117,16 +118,21 @@ export function PositionPlayerPicker({
   const [originFilter, setOriginFilter] = useState<string[]>([]);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  /** Letter grade of each athlete's classified profile, ranked across the pool. */
+  /**
+   * Grade of the athlete's dominant archetype, ranked inside that archetype, so
+   * the badge matches the top row of the Perfil card.
+   */
   const gradeById = useMemo(() => {
-    const ranked = [...players].sort((a, b) => positionRating(b) - positionRating(a));
-    const map = new Map<string, string>();
-    ranked.forEach((player, index) => {
-      const grade = profileGradeFromRank(index + 1, ranked.length);
-      if (grade) map.set(player.player_id, grade);
-    });
+    const map = new Map<string, { grade: string; label: string }>();
+    for (const player of players) {
+      const label = sortedProfileShareRows(player)[0]?.label;
+      if (!label) continue;
+      const rank = archetypeRank(player, players, label, family);
+      const grade = rank ? profileGradeFromRank(rank, players.length) : null;
+      if (grade) map.set(player.player_id, { grade, label });
+    }
     return map;
-  }, [players]);
+  }, [players, family]);
 
   const clubOptions = useMemo<FilterOption[]>(() => {
     const counts = new Map<string, number>();
@@ -184,8 +190,8 @@ export function PositionPlayerPicker({
     const minMinutes = minutesFilter.length
       ? Math.min(...minutesFilter.map((value) => Number(value)))
       : 0;
-    const allowedGrades = gradeFilter.length
-      ? new Set(
+      const allowedGrades = gradeFilter.length
+        ? new Set(
           gradeFilter.flatMap(
             (value) => GRADE_BANDS.find((band) => band.value === value)?.allowed ?? [],
           ),
@@ -213,7 +219,7 @@ export function PositionPlayerPicker({
       }
       if (minMinutes && player.minutes < minMinutes) return false;
       if (allowedGrades) {
-        const grade = gradeById.get(player.player_id);
+        const grade = gradeById.get(player.player_id)?.grade;
         if (!grade || !allowedGrades.has(grade)) return false;
       }
       if (originFilter.length) {
@@ -573,14 +579,14 @@ function PlayerStripCard({
   onSelect,
 }: {
   player: PlayerProfile;
-  grade: string | null;
+  grade: { grade: string; label: string } | null;
   selected: boolean;
   onSelect: () => void;
 }) {
   const photo = player.transfermarkt?.photo;
   const age = playerAge(player);
   const value = formatMarketValue(player.transfermarkt?.market_value_eur);
-  const token = gradeTier(grade ?? "C");
+  const token = gradeTier(grade?.grade ?? "C");
 
   const meta = [positionShort(player.position), age ? `${age}a` : null, value]
     .filter(Boolean)
@@ -611,8 +617,12 @@ function PlayerStripCard({
         <span className="player-strip-card-meta tabular">{meta}</span>
       </span>
       {grade ? (
-        <span className="player-strip-card-grade tabular" style={tierVars(token)}>
-          {grade}
+        <span
+          className="player-strip-card-grade tabular"
+          style={tierVars(token)}
+          title={`Classificação ${grade.grade} em ${grade.label}`}
+        >
+          {grade.grade}
         </span>
       ) : null}
     </button>
