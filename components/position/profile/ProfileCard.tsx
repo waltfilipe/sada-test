@@ -11,7 +11,7 @@ import {
   type ArchetypeTrait,
 } from "@/lib/clusterMeta";
 import { activeProfileKeys, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
-import { formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
+import { gradeTier, profileGradeFromRank, tierVars } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Props = {
@@ -41,11 +41,15 @@ function profileMetaForLabel(label: string, family: PositionFamily) {
 
 function ProfileTooltipContent({
   label,
-  rating,
+  grade,
+  rank,
+  poolSize,
   family,
 }: {
   label: string;
-  rating: number;
+  grade: string | null;
+  rank: number | null;
+  poolSize: number;
   family: PositionFamily;
 }) {
   const meta = profileMetaForLabel(label, family);
@@ -58,7 +62,8 @@ function ProfileTooltipContent({
       <div className="profile-archetype-tip-head">
         <span className="profile-archetype-tip-label">{label}</span>
         <span className="profile-archetype-tip-rating tabular" style={{ color: accent }}>
-          Rating {formatRating(rating)}
+          {grade ?? "—"}
+          {rank ? ` · ${rank}º de ${poolSize}` : ""}
         </span>
       </div>
       {meta?.description ? <p className="profile-archetype-tip-copy">{meta.description}</p> : null}
@@ -110,18 +115,28 @@ export function ProfileCard({ player, family, players }: Props) {
     <div className="player-card profile-perfil-card profile-perfil-card-score">
       <div className="profile-card-head">
         <span className="section-label">Perfil</span>
-        <span className="profile-card-head-hint">Afinidade com cada arquétipo</span>
+        <span className="profile-card-head-hint">Classificação e colocação</span>
       </div>
       <ul className="profile-perfil-list">
         {shareRows.map((row) => {
-          const token = ratingTier(row.rating);
           const active = activeKeys.has(row.key);
           const accent = profileAccent(row.label);
+          const rank = archetypeRank(player, players, row.label, family);
+          const grade = rank ? profileGradeFromRank(rank, poolSize) : null;
+          const token = gradeTier(grade ?? "C");
           const shareWidth = Math.max(3, Math.min(100, row.share));
           return (
             <li key={row.key}>
               <Tooltip
-                content={<ProfileTooltipContent label={row.label} rating={row.rating} family={family} />}
+                content={
+                  <ProfileTooltipContent
+                    label={row.label}
+                    grade={grade}
+                    rank={rank}
+                    poolSize={poolSize}
+                    family={family}
+                  />
+                }
                 block
               >
                 <div
@@ -134,18 +149,30 @@ export function ProfileCard({ player, family, players }: Props) {
                         {row.label}
                         <i className="fa-solid fa-circle-info profile-perfil-row-info" aria-hidden="true" />
                       </span>
-                      <span className="profile-perfil-row-rating tabular" style={tierVars(token)}>
-                        Rating {formatRating(row.rating)}
-                        <span className="profile-perfil-row-rank">
-                          {archetypeRank(player, players, row.label, family) ?? "—"}/{poolSize}
-                        </span>
+                      <span className="profile-perfil-row-rank tabular">
+                        {rank ? (
+                          <>
+                            <strong>{rank}º</strong> de {poolSize}
+                          </>
+                        ) : (
+                          "Sem colocação"
+                        )}
                       </span>
                     </div>
+                    <span
+                      className="profile-perfil-grade tabular"
+                      style={tierVars(token)}
+                      aria-label={`Classificação ${grade ?? "indisponível"}`}
+                    >
+                      {grade ?? "—"}
+                    </span>
+                  </div>
+                  <div className="profile-perfil-row-affinity">
+                    <span className="profile-perfil-row-bar" aria-hidden="true">
+                      <span style={{ width: `${shareWidth}%` }} />
+                    </span>
                     <span className="profile-perfil-row-share tabular">{Math.round(row.share)}%</span>
                   </div>
-                  <span className="profile-perfil-row-bar" aria-hidden="true">
-                    <span style={{ width: `${shareWidth}%` }} />
-                  </span>
                 </div>
               </Tooltip>
             </li>
