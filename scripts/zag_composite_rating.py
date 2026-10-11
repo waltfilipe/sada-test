@@ -161,8 +161,9 @@ def enrich_pool(pool: pd.DataFrame) -> pd.DataFrame:
 
     beta = 0.45
     faltas = _pool_col(out, "Faltas/90", "Faltas")
+    err_shot = _pool_col(out, "error_lead_to_a_shot_p90")
     dd_perd = dd * (1 - pct_w)
-    num = dd_perd + np.maximum(0, faltas - beta * dd_perd)
+    num = dd_perd + np.maximum(0, faltas - beta * dd_perd) + err_shot
     den = out["acoes_def"].replace(0, np.nan)
     out["custo_def"] = (num / den).fillna(num)
     out["inter_clear_p90"] = inter + clear

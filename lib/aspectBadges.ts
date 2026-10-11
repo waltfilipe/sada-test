@@ -62,7 +62,9 @@ export function resolveAspectBadge(item: {
   sub_metrics?: { label: string; percentile: number }[];
 }): AccuracyBadgeKind | null {
   if (item.kind === "def_efficiency_group" && item.pair_badge) {
-    return pairBadge(item.pair_badge[0], item.pair_badge[1]);
+    const [actionsPct, efficiencyPct] = item.pair_badge;
+    if (actionsPct <= P50 || efficiencyPct <= P50) return null;
+    return pairBadge(actionsPct, efficiencyPct);
   }
   if (item.kind === "metric_group") {
     const groupBadge = metricGroupBadge(item);

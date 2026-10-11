@@ -898,8 +898,9 @@ def _custo_def_ajustado(pool: pd.DataFrame) -> pd.Series:
     dd = pool["DuelosDef"].astype(float)
     pct_w = pool["%DuelosDefW"].astype(float)
     faltas = pd.to_numeric(pool.get("Faltas/90", 0), errors="coerce").fillna(0)
+    err_shot = pd.to_numeric(pool.get("error_lead_to_a_shot_p90", 0), errors="coerce").fillna(0)
     dd_perd = dd * (1 - pct_w)
-    num_adj = dd_perd + np.maximum(0, faltas - beta * dd_perd)
+    num_adj = dd_perd + np.maximum(0, faltas - beta * dd_perd) + err_shot
     if "_acoes_def_comp" in pool.columns:
         den = pool["_acoes_def_comp"].astype(float)
     else:
@@ -932,6 +933,9 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     out["_def_sample_w"] = _def_eff_sample_weight(out["_acoes_def_comp"], out["_minutes_pool_pct"])
     custo_eff_raw = percentile_rank(-out["_custo_def_raw"], ascending=True)
     custo_eff_adj = out["_def_sample_w"] * custo_eff_raw + (1.0 - out["_def_sample_w"]) * DEF_EFF_SHRINK_MEDIAN
+    out["_def_eff_nota_10"] = (custo_eff_adj / 10.0).round(1)
+    err_shot_total = pd.to_numeric(out.get("error_lead_to_a_shot_total", 0), errors="coerce").fillna(0)
+    out["_asp_error_shot_inv"] = percentile_rank(-err_shot_total, ascending=True)
 
     share_long_pct = (share_long.fillna(0) * 100).astype(float)
     share_prog_pct = (share_prog.fillna(0) * 100).astype(float)
@@ -1181,27 +1185,45 @@ def _pass_aspect(
     }
 
 
-def _def_efficiency_group_aspect(row: pd.Series, *, inter: float, cortes: float) -> dict[str, Any]:
+def _def_efficiency_group_aspect(
+    row: pd.Series,
+    *,
+    inter: float,
+    cortes: float,
+    family_key: str,
+) -> dict[str, Any]:
     eff_pct = round(float(row.get("_asp_custo_def_eff", 0) or 0), 1)
     ad_pct = round(float(row.get("_asp_ad_vol", 0) or 0), 1)
     ad = float(row.get("_acoes_def_comp") or 0)
-    custo = float(row.get("_custo_def_raw", 0) or 0)
+    nota = float(row.get("_def_eff_nota_10", 0) or 0)
+    err_total = int(row.get("error_lead_to_a_shot_total", 0) or 0)
+    sub_metrics: list[dict[str, Any]] = [
+        _sub_metric("Ações bem-sucedidas", percentile=ad_pct, display_value=_fmt_num(ad)),
+        _sub_metric("Interceptações", percentile=row.get("_asp_inter_vol", 0), display_value=_fmt_num(inter)),
+        _sub_metric("Rebatidas", percentile=row.get("_asp_cortes_vol", 0), display_value=_fmt_num(cortes)),
+    ]
+    if family_key == "zagueiros":
+        sub_metrics.append(
+            _sub_metric(
+                "Erros → chute",
+                percentile=row.get("_asp_error_shot_inv", 0),
+                display_value=str(err_total),
+            ),
+        )
+    sub_metrics.append(
+        _sub_metric(
+            "Eficiência Defensiva",
+            percentile=eff_pct,
+            display_value=_fmt_num(nota, decimals=1),
+        ),
+    )
     return {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
         "grade": _grade_from_pct(eff_pct),
         "percentile": eff_pct,
         "pair_badge": [ad_pct, eff_pct],
-        "sub_metrics": [
-            _sub_metric("Ações bem-sucedidas", percentile=ad_pct, display_value=_fmt_num(ad)),
-            _sub_metric("Interceptações", percentile=row.get("_asp_inter_vol", 0), display_value=_fmt_num(inter)),
-            _sub_metric("Rebatidas", percentile=row.get("_asp_cortes_vol", 0), display_value=_fmt_num(cortes)),
-            _sub_metric(
-                "Eficiência Defensiva",
-                percentile=eff_pct,
-                display_value=_fmt_num(custo, decimals=2),
-            ),
-        ],
+        "sub_metrics": sub_metrics,
         "stats": [],
     }
 
@@ -1601,7 +1623,7 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 if family_key != "zagueiros"
                 else []
             ),
-            _def_efficiency_group_aspect(row, inter=inter, cortes=cortes),
+            _def_efficiency_group_aspect(row, inter=inter, cortes=cortes, family_key=family_key),
         ],
         "construcao": construcao,
         "perfil_construcao": [
