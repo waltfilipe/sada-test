@@ -12,13 +12,8 @@ import { earnedStatBadges, statBadgeForMetric } from "@/lib/statBadges";
 import type { StatMetricBadge } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 
-const ROW_LABEL_ALIASES: Record<string, string> = {
-  "Ações bem-sucedidas": "Ações Defensivas/90",
-};
-
 function rowLabel(label: string): string {
-  if (ROW_LABEL_ALIASES[label]) return ROW_LABEL_ALIASES[label];
-  if (label === "Eficiência" || label === "Eficiência Defensiva") return label;
+  if (label === "Eficiência" || label === "Eficiência Defensiva" || label === "Erros Totais") return label;
   if (label.includes("/90") || label.includes("/ 90")) return label;
   return `${label}/90`;
 }

@@ -62,19 +62,15 @@
         "efficiency_value": "43%"
       },
       {
-        "label": "Eficiência Defensiva",
-        "kind": "def_efficiency_group",
-        "grade": "C+",
-        "percentile": 50.0,
-        "pair_badge": [
-          9.1,
-          50.0
-        ],
+        "label": "Ações Defensivas",
+        "kind": "metric_group",
+        "grade": "C",
+        "percentile": 35.8,
         "sub_metrics": [
           {
-            "label": "Ações bem-sucedidas",
-            "percentile": 9.1,
-            "display_value": "5,6"
+            "label": "Rebatidas",
+            "percentile": 24.6,
+            "display_value": "2,2"
           },
           {
             "label": "Interceptações",
@@ -82,12 +78,25 @@
             "display_value": "1,0"
           },
           {
-            "label": "Rebatidas",
-            "percentile": 24.6,
-            "display_value": "2,2"
-          },
+            "label": "Chutes Bloqueados",
+            "percentile": 30.4,
+            "display_value": "0,2"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Eficiência Defensiva",
+        "kind": "def_efficiency_group",
+        "grade": "C+",
+        "percentile": 50.0,
+        "pair_badge": [
+          100.0,
+          50.0
+        ],
+        "sub_metrics": [
           {
-            "label": "Erros",
+            "label": "Erros Totais",
             "percentile": 100.0,
             "display_value": "0"
           },

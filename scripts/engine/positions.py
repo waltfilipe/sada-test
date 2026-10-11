@@ -977,6 +977,10 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "duelos_ar_won_vol": percentile_rank(da_won, ascending=True),
         "inter_vol": percentile_rank(_ss_inter_col(out), ascending=True),
         "cortes_vol": percentile_rank(_ss_clearance_col(out), ascending=True),
+        "block_vol": percentile_rank(
+            pd.to_numeric(out.get("outfielder_block_p90", 0), errors="coerce").fillna(0),
+            ascending=True,
+        ),
         "duelos_of_vol": _pool_percentile(out, "Duelos ofensivos/90", "DuelosOf"),
         "duelos_of_eff": _pct_eff(out, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
         "duelos_of_won_vol": percentile_rank(do_won, ascending=True),
@@ -1189,50 +1193,57 @@ def _pass_aspect(
     }
 
 
-def _def_efficiency_group_aspect(
+def _def_actions_group_aspect(
     row: pd.Series,
     *,
     inter: float,
     cortes: float,
-    family_key: str,
+    blocks: float,
 ) -> dict[str, Any]:
+    inter_pct = round(float(row.get("_asp_inter_vol", 0) or 0), 1)
+    cortes_pct = round(float(row.get("_asp_cortes_vol", 0) or 0), 1)
+    block_pct = round(float(row.get("_asp_block_vol", 0) or 0), 1)
+    header_pct = round((inter_pct + cortes_pct + block_pct) / 3.0, 1)
+    return {
+        "label": "Ações Defensivas",
+        "kind": "metric_group",
+        "grade": _grade_from_pct(header_pct),
+        "percentile": header_pct,
+        "sub_metrics": [
+            _sub_metric("Rebatidas", percentile=cortes_pct, display_value=_fmt_num(cortes)),
+            _sub_metric("Interceptações", percentile=inter_pct, display_value=_fmt_num(inter)),
+            _sub_metric("Chutes Bloqueados", percentile=block_pct, display_value=_fmt_num(blocks)),
+        ],
+        "stats": [],
+    }
+
+
+def _def_efficiency_group_aspect(row: pd.Series) -> dict[str, Any]:
     eff_pct = round(float(row.get("_asp_custo_def_eff", 0) or 0), 1)
-    ad_pct = round(float(row.get("_asp_ad_vol", 0) or 0), 1)
-    ad = float(row.get("_acoes_def_comp") or 0)
     nota = float(row.get("_def_eff_nota_10", 0) or 0)
     err_total = int(row.get("ss_def_error_total", 0) or 0)
     if not err_total:
         err_total = int(row.get("error_lead_to_a_shot_total", 0) or 0) + int(
             row.get("error_lead_to_a_goal_total", 0) or 0
         )
-    show_def_errors = family_key in ("zagueiros", "laterais", "meio-campistas")
-    sub_metrics: list[dict[str, Any]] = [
-        _sub_metric("Ações bem-sucedidas", percentile=ad_pct, display_value=_fmt_num(ad)),
-        _sub_metric("Interceptações", percentile=row.get("_asp_inter_vol", 0), display_value=_fmt_num(inter)),
-        _sub_metric("Rebatidas", percentile=row.get("_asp_cortes_vol", 0), display_value=_fmt_num(cortes)),
-    ]
-    if show_def_errors:
-        sub_metrics.append(
-            _sub_metric(
-                "Erros",
-                percentile=row.get("_asp_error_def_inv", row.get("_asp_error_shot_inv", 0)),
-                display_value=str(err_total),
-            ),
-        )
-    sub_metrics.append(
-        _sub_metric(
-            "Eficiência Defensiva",
-            percentile=eff_pct,
-            display_value=_fmt_num(nota, decimals=1),
-        ),
+    err_pct = round(
+        float(row.get("_asp_error_def_inv", row.get("_asp_error_shot_inv", 0)) or 0),
+        1,
     )
     return {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
         "grade": _grade_from_pct(eff_pct),
         "percentile": eff_pct,
-        "pair_badge": [ad_pct, eff_pct],
-        "sub_metrics": sub_metrics,
+        "pair_badge": [err_pct, eff_pct],
+        "sub_metrics": [
+            _sub_metric("Erros Totais", percentile=err_pct, display_value=str(err_total)),
+            _sub_metric(
+                "Eficiência Defensiva",
+                percentile=eff_pct,
+                display_value=_fmt_num(nota, decimals=1),
+            ),
+        ],
         "stats": [],
     }
 
@@ -1524,6 +1535,7 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
     do_vol = _row_vol(row, "DuelosOf", "Duelos ofensivos/90")
     inter = float(row.get("interception_won_p90") or row.get("Interseções") or 0)
     cortes = float(row.get("total_clearance_p90") or row.get("Carrinhos") or 0)
+    blocks = float(row.get("outfielder_block_p90") or row.get("Remates intercetados/90") or 0)
     prog = float(row.get("Cond.Prog") or 0)
     accel = _row_vol(row, "Acelerações", "Acelerações/90")
     pp_e = row.get("_asp_passes_prog_eff", 0)
@@ -1632,7 +1644,12 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 if family_key != "zagueiros"
                 else []
             ),
-            _def_efficiency_group_aspect(row, inter=inter, cortes=cortes, family_key=family_key),
+            _def_actions_group_aspect(row, inter=inter, cortes=cortes, blocks=blocks),
+            *(
+                [_def_efficiency_group_aspect(row)]
+                if family_key in ("zagueiros", "laterais", "meio-campistas")
+                else []
+            ),
         ],
         "construcao": construcao,
         "perfil_construcao": [

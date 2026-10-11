@@ -16,10 +16,15 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
     icon: "fa-shield-halved",
     title: "Duelos defensivos — volume e eficiência acima de P50",
   },
+  "Ações Defensivas": {
+    label: "Ações Defensivas",
+    icon: "fa-shield-halved",
+    title: "Ações defensivas — rebatidas, interceptações e bloqueios acima de P50",
+  },
   "Eficiência Defensiva": {
     label: "Eficiência Defensiva",
     icon: "fa-shield-virus",
-    title: "Eficiência defensiva — volume e eficiência acima de P50",
+    title: "Eficiência defensiva — erros e nota acima de P50",
   },
   "Duelos Aéreos": {
     label: "Duelos Aéreos",
@@ -120,11 +125,6 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
     label: "Duelos Vencidos",
     icon: "fa-shield-halved",
     title: "Duelos vencidos — volume e eficiência acima de P50",
-  },
-  "Ações Defensivas": {
-    label: "Ações Defensivas",
-    icon: "fa-shield",
-    title: "Ações defensivas — volume acima de P50",
   },
 };
 

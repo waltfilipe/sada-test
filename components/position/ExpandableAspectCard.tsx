@@ -64,10 +64,7 @@ function ExpandableBody({ item }: { item: AspectItem }) {
             label={sub.label}
             pct={sub.percentile}
             value={sub.display_value}
-            muted={
-              sub.label !== "Eficiência Defensiva" &&
-              sub.label !== "Ações bem-sucedidas"
-            }
+            muted={item.kind === "def_efficiency_group" && sub.label !== "Eficiência Defensiva"}
           />
         ))}
       </div>
