@@ -200,6 +200,21 @@
   color: var(--text);
 }
 
+.topbar-links a.active {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.topbar-links a:focus-visible,
+.position-tabs a:focus-visible,
+.scout-brand:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid rgba(125, 241, 222, 0.9);
+  outline-offset: 2px;
+}
+
 /* ── Page frame ──────────────────────────────────────────────────────────── */
 
 .scout-body {
@@ -3141,8 +3156,38 @@
     width: 100%;
   }
 
+  .scout-topbar {
+    height: auto;
+    flex-wrap: wrap;
+    row-gap: 0.55rem;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+  }
+
   .topbar-links {
-    display: none;
+    display: flex;
+    width: 100%;
+    order: 3;
+    gap: 0.35rem;
+    margin-left: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 0.1rem;
+  }
+
+  .topbar-links a {
+    flex-shrink: 0;
+    padding: 0.28rem 0.62rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.74rem;
+  }
+
+  .topbar-links a.active {
+    border-color: rgba(52, 211, 153, 0.45);
+    background: rgba(52, 211, 153, 0.12);
+    color: #d1fae5;
   }
 }
 

@@ -654,8 +654,11 @@
 .profile-context-header {
   display: flex;
   align-items: baseline;
+  justify-content: space-between;
   gap: 0.7rem;
-  margin: 0.55rem 0 0.8rem;
+  margin: 0.7rem 0 0.85rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
 }
 
 .profile-context-title {

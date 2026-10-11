@@ -1,7 +1,7 @@
 import { aspectQualityPercentile, aspectQuantityPercentile } from "@/lib/aspectGrades";
 import type { AspectItem } from "@/lib/types";
 
-export const STAT_BADGE_THRESHOLD = 60;
+export const STAT_BADGE_THRESHOLD = 50;
 
 export type StatMetricBadge = {
   key: string;
@@ -14,117 +14,117 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
   "Duelos Defensivos": {
     label: "Duelos Defensivos",
     icon: "fa-shield-halved",
-    title: "Duelos defensivos — volume e eficiência acima de P60",
+    title: "Duelos defensivos — volume e eficiência acima de P50",
   },
   "Eficiência Defensiva": {
     label: "Eficiência Defensiva",
     icon: "fa-shield-virus",
-    title: "Eficiência defensiva — volume e eficiência acima de P60",
+    title: "Eficiência defensiva — volume e eficiência acima de P50",
   },
   "Duelos Aéreos": {
     label: "Duelos Aéreos",
     icon: "fa-cloud",
-    title: "Duelos aéreos — volume e eficiência acima de P60",
+    title: "Duelos aéreos — volume e eficiência acima de P50",
   },
   Aéreo: {
     label: "Aéreo",
     icon: "fa-cloud",
-    title: "Duelo aéreo — volume e eficiência acima de P60",
+    title: "Duelo aéreo — volume e eficiência acima de P50",
   },
   "Passes Progressivos": {
     label: "Passes Progressivos",
     icon: "fa-forward",
-    title: "Passes progressivos — volume e eficiência acima de P60",
+    title: "Passes progressivos — volume e eficiência acima de P50",
   },
   "Passes para Terço Final": {
     label: "Passes para Terço Final",
     icon: "fa-bullseye",
-    title: "Passes para terço final — volume e eficiência acima de P60",
+    title: "Passes para terço final — volume e eficiência acima de P50",
   },
   "Passes Longos": {
     label: "Passes Longos",
     icon: "fa-arrows-left-right",
-    title: "Passes longos — volume e eficiência acima de P60",
+    title: "Passes longos — volume e eficiência acima de P50",
   },
   Distribuição: {
     label: "Distribuição",
     icon: "fa-share-nodes",
-    title: "Distribuição de passe — ambas métricas acima de P60",
+    title: "Distribuição de passe — ambas métricas acima de P50",
   },
   "Disputas com Bola": {
     label: "Disputas com Bola",
     icon: "fa-bolt",
-    title: "Disputas com bola — volume e eficiência acima de P60",
+    title: "Disputas com bola — volume e eficiência acima de P50",
   },
   "1v1 - Ofensivo": {
     label: "1v1 - Ofensivo",
     icon: "fa-person-running",
-    title: "1v1 ofensivo — volume e eficiência acima de P60",
+    title: "1v1 ofensivo — volume e eficiência acima de P50",
   },
   "Conduções Progressivas": {
     label: "Conduções Progressivas",
     icon: "fa-road",
-    title: "Conduções progressivas — volume acima de P60",
+    title: "Conduções progressivas — volume acima de P50",
   },
   Progressão: {
     label: "Conduções Progressivas",
     icon: "fa-road",
-    title: "Conduções progressivas — volume acima de P60",
+    title: "Conduções progressivas — volume acima de P50",
   },
   Cruzamentos: {
     label: "Cruzamentos",
     icon: "fa-crosshairs",
-    title: "Cruzamentos — ambas métricas acima de P60",
+    title: "Cruzamentos — ambas métricas acima de P50",
   },
   "Passes Chave e Área": {
     label: "Passes Chave e Área",
     icon: "fa-key",
-    title: "Passes chave e área — ambas métricas acima de P60",
+    title: "Passes chave e área — ambas métricas acima de P50",
   },
   "Pré Assistências e xA": {
     label: "Pré Assistências e xA",
     icon: "fa-handshake",
-    title: "Pré assistências e xA — ambas métricas acima de P60",
+    title: "Pré assistências e xA — ambas métricas acima de P50",
   },
   "Passes Criativos": {
     label: "Passes Criativos",
     icon: "fa-wand-magic-sparkles",
-    title: "Passes criativos — volume e eficiência acima de P60",
+    title: "Passes criativos — volume e eficiência acima de P50",
   },
   "Gols e xG": {
     label: "Gols e xG",
     icon: "fa-futbol",
-    title: "Gols e xG — ambas métricas acima de P60",
+    title: "Gols e xG — ambas métricas acima de P50",
   },
   Finalizações: {
     label: "Finalizações",
     icon: "fa-bullseye",
-    title: "Finalizações — ambas métricas acima de P60",
+    title: "Finalizações — ambas métricas acima de P50",
   },
   Ofensividade: {
     label: "Ofensividade",
     icon: "fa-fire",
-    title: "Ofensividade — ambas métricas acima de P60",
+    title: "Ofensividade — ambas métricas acima de P50",
   },
   "Ações Terminais": {
     label: "Ações Terminais",
     icon: "fa-fire",
-    title: "Ações terminais — ambas métricas acima de P60",
+    title: "Ações terminais — ambas métricas acima de P50",
   },
   Verticalidade: {
     label: "Verticalidade",
     icon: "fa-arrow-up",
-    title: "Verticalidade — ambas métricas acima de P60",
+    title: "Verticalidade — ambas métricas acima de P50",
   },
   "Duelos Vencidos": {
     label: "Duelos Vencidos",
     icon: "fa-shield-halved",
-    title: "Duelos vencidos — volume e eficiência acima de P60",
+    title: "Duelos vencidos — volume e eficiência acima de P50",
   },
   "Ações Defensivas": {
     label: "Ações Defensivas",
     icon: "fa-shield",
-    title: "Ações defensivas — volume acima de P60",
+    title: "Ações defensivas — volume acima de P50",
   },
 };
 
@@ -138,14 +138,14 @@ function aboveThreshold(value: number | undefined): boolean {
   return value != null && value > STAT_BADGE_THRESHOLD;
 }
 
-/** Miniblock badge: every sub-metric percentile must be above P60. */
+/** Miniblock badge: every sub-metric percentile must be above P50. */
 function metricGroupEarnsBadge(item: AspectItem): boolean {
   const subs = item.sub_metrics ?? [];
   if (subs.length < 2) return false;
   return subs.every((sub) => aboveThreshold(num(sub.percentile)));
 }
 
-/** Player earns a stat badge when quantity and efficiency (when available) are both > P60. */
+/** Player earns a stat badge when quantity and efficiency (when available) are both > P50. */
 export function metricEarnsStatBadge(item: AspectItem, displayLabel?: string): boolean {
   if (item.kind === "metric_group") {
     return metricGroupEarnsBadge(item);

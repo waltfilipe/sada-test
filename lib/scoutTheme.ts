@@ -255,7 +255,7 @@ export function playerInitials(name: string): string {
 export const MEDAL_META = {
   gold: { label: "Top 10%", short: "Top 10", tone: "Ouro" },
   silver: { label: "Top 25%", short: "Top 25", tone: "Prata" },
-  bronze: { label: "Top 40%", short: "Top 40", tone: "Bronze" },
+  bronze: { label: "Acima de P50", short: "P50+", tone: "Bronze" },
 } as const;
 
 export type MedalKind = keyof typeof MEDAL_META;
