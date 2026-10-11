@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SS_PATH = ROOT / "BR26_defensive.csv"
 
 SS_STAT_COLS = ["interception_won", "total_clearance", "outfielder_block", "ball_recovery"]
-SS_ERROR_COLS = ["error_lead_to_a_shot"]
+SS_ERROR_COLS = ["error_lead_to_a_shot", "error_lead_to_a_goal"]
 
 SS_CLUB_ALIASES: dict[str, list[str]] = {
     "athletico paranaense": ["athletico"],
@@ -156,6 +156,10 @@ def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None) -> pd.D
         out[f"{col}_p90"] = 0.0
     out["error_lead_to_a_shot_total"] = 0
     out["error_lead_to_a_shot_p90"] = 0.0
+    out["error_lead_to_a_goal_total"] = 0
+    out["error_lead_to_a_goal_p90"] = 0.0
+    out["ss_def_error_total"] = 0
+    out["ss_def_error_p90"] = 0.0
 
     if not csv_path.exists():
         return out
@@ -167,6 +171,10 @@ def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None) -> pd.D
     recovery_vals: list[float] = []
     err_shot_total: list[int] = []
     err_shot_p90: list[float] = []
+    err_goal_total: list[int] = []
+    err_goal_p90: list[float] = []
+    err_combined_total: list[int] = []
+    err_combined_p90: list[float] = []
 
     for _, row in out.iterrows():
         hit = match_ss_row(row, ss)
@@ -177,13 +185,25 @@ def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None) -> pd.D
             recovery_vals.append(0.0)
             err_shot_total.append(0)
             err_shot_p90.append(0.0)
+            err_goal_total.append(0)
+            err_goal_p90.append(0.0)
+            err_combined_total.append(0)
+            err_combined_p90.append(0.0)
             continue
         inter_vals.append(float(hit["interception_won_p90"]))
         clearance_vals.append(float(hit["total_clearance_p90"]))
         block_vals.append(float(hit["outfielder_block_p90"]))
         recovery_vals.append(float(hit["ball_recovery_p90"]))
-        err_shot_total.append(int(hit.get("error_lead_to_a_shot", 0) or 0))
-        err_shot_p90.append(float(hit.get("error_lead_to_a_shot_p90", 0) or 0))
+        shot_n = int(hit.get("error_lead_to_a_shot", 0) or 0)
+        goal_n = int(hit.get("error_lead_to_a_goal", 0) or 0)
+        shot_p90 = float(hit.get("error_lead_to_a_shot_p90", 0) or 0)
+        goal_p90 = float(hit.get("error_lead_to_a_goal_p90", 0) or 0)
+        err_shot_total.append(shot_n)
+        err_shot_p90.append(shot_p90)
+        err_goal_total.append(goal_n)
+        err_goal_p90.append(goal_p90)
+        err_combined_total.append(shot_n + goal_n)
+        err_combined_p90.append(shot_p90 + goal_p90)
 
     out["interception_won_p90"] = inter_vals
     out["total_clearance_p90"] = clearance_vals
@@ -191,6 +211,10 @@ def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None) -> pd.D
     out["ball_recovery_p90"] = recovery_vals
     out["error_lead_to_a_shot_total"] = err_shot_total
     out["error_lead_to_a_shot_p90"] = err_shot_p90
+    out["error_lead_to_a_goal_total"] = err_goal_total
+    out["error_lead_to_a_goal_p90"] = err_goal_p90
+    out["ss_def_error_total"] = err_combined_total
+    out["ss_def_error_p90"] = err_combined_p90
 
     # Engine fields usados em ratings e aspectos passam a refletir o SS.
     out["Interseções"] = out["interception_won_p90"]

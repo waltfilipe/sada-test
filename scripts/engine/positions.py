@@ -898,9 +898,9 @@ def _custo_def_ajustado(pool: pd.DataFrame) -> pd.Series:
     dd = pool["DuelosDef"].astype(float)
     pct_w = pool["%DuelosDefW"].astype(float)
     faltas = pd.to_numeric(pool.get("Faltas/90", 0), errors="coerce").fillna(0)
-    err_shot = pd.to_numeric(pool.get("error_lead_to_a_shot_p90", 0), errors="coerce").fillna(0)
+    err_def = pd.to_numeric(pool.get("ss_def_error_p90", pool.get("error_lead_to_a_shot_p90", 0)), errors="coerce").fillna(0)
     dd_perd = dd * (1 - pct_w)
-    num_adj = dd_perd + np.maximum(0, faltas - beta * dd_perd) + err_shot
+    num_adj = dd_perd + np.maximum(0, faltas - beta * dd_perd) + err_def
     if "_acoes_def_comp" in pool.columns:
         den = pool["_acoes_def_comp"].astype(float)
     else:
@@ -934,8 +934,12 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     custo_eff_raw = percentile_rank(-out["_custo_def_raw"], ascending=True)
     custo_eff_adj = out["_def_sample_w"] * custo_eff_raw + (1.0 - out["_def_sample_w"]) * DEF_EFF_SHRINK_MEDIAN
     out["_def_eff_nota_10"] = (custo_eff_adj / 10.0).round(1)
-    err_shot_total = pd.to_numeric(out.get("error_lead_to_a_shot_total", 0), errors="coerce").fillna(0)
-    out["_asp_error_shot_inv"] = percentile_rank(-err_shot_total, ascending=True)
+    err_def_total = pd.to_numeric(out.get("ss_def_error_total", 0), errors="coerce").fillna(0)
+    if (err_def_total == 0).all():
+        err_shot = pd.to_numeric(out.get("error_lead_to_a_shot_total", 0), errors="coerce").fillna(0)
+        err_goal = pd.to_numeric(out.get("error_lead_to_a_goal_total", 0), errors="coerce").fillna(0)
+        err_def_total = err_shot + err_goal
+    out["_asp_error_def_inv"] = percentile_rank(-err_def_total, ascending=True)
 
     share_long_pct = (share_long.fillna(0) * 100).astype(float)
     share_prog_pct = (share_prog.fillna(0) * 100).astype(float)
@@ -1196,17 +1200,22 @@ def _def_efficiency_group_aspect(
     ad_pct = round(float(row.get("_asp_ad_vol", 0) or 0), 1)
     ad = float(row.get("_acoes_def_comp") or 0)
     nota = float(row.get("_def_eff_nota_10", 0) or 0)
-    err_total = int(row.get("error_lead_to_a_shot_total", 0) or 0)
+    err_total = int(row.get("ss_def_error_total", 0) or 0)
+    if not err_total:
+        err_total = int(row.get("error_lead_to_a_shot_total", 0) or 0) + int(
+            row.get("error_lead_to_a_goal_total", 0) or 0
+        )
+    show_def_errors = family_key in ("zagueiros", "laterais", "meio-campistas")
     sub_metrics: list[dict[str, Any]] = [
         _sub_metric("Ações bem-sucedidas", percentile=ad_pct, display_value=_fmt_num(ad)),
         _sub_metric("Interceptações", percentile=row.get("_asp_inter_vol", 0), display_value=_fmt_num(inter)),
         _sub_metric("Rebatidas", percentile=row.get("_asp_cortes_vol", 0), display_value=_fmt_num(cortes)),
     ]
-    if family_key == "zagueiros":
+    if show_def_errors:
         sub_metrics.append(
             _sub_metric(
-                "Erros → chute",
-                percentile=row.get("_asp_error_shot_inv", 0),
+                "Erros",
+                percentile=row.get("_asp_error_def_inv", row.get("_asp_error_shot_inv", 0)),
                 display_value=str(err_total),
             ),
         )
