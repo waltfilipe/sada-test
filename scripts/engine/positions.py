@@ -223,6 +223,22 @@ DEF_SAMPLE_ACTIONS_HI = 10.0
 DEF_MINUTES_BELOW_P75_EXP = 0.38
 DEF_EFF_SHRINK_MEDIAN = 50.0
 
+# Explicit error cost (p90): shot vs goal. Tuned so weighted errors ≈15% of the
+# mean defensive cost numerator for zagueiros in the BR26 pool.
+DEF_ERROR_WEIGHT_SHOT = 2.5
+DEF_ERROR_WEIGHT_GOAL = 10.0
+
+
+def _error_cost_p90(pool: pd.DataFrame) -> pd.Series:
+    """Weighted error rate per 90 — enters defensive cost numerator."""
+    shot = pd.to_numeric(pool.get("error_lead_to_a_shot_p90", 0), errors="coerce").fillna(0)
+    goal = pd.to_numeric(pool.get("error_lead_to_a_goal_p90", 0), errors="coerce").fillna(0)
+    if (shot + goal).sum() == 0:
+        combined = pd.to_numeric(pool.get("ss_def_error_p90", 0), errors="coerce").fillna(0)
+        return combined * DEF_ERROR_WEIGHT_SHOT
+    return DEF_ERROR_WEIGHT_SHOT * shot + DEF_ERROR_WEIGHT_GOAL * goal
+
+
 # Core/abs geral rating: badge bonus on efficiency-backed core metrics
 ZAG_RATING_BADGE_BONUS = {"gold": 0.20, "silver": 0.15, "bronze": 0.10}
 
@@ -898,7 +914,7 @@ def _custo_def_ajustado(pool: pd.DataFrame) -> pd.Series:
     dd = pool["DuelosDef"].astype(float)
     pct_w = pool["%DuelosDefW"].astype(float)
     faltas = pd.to_numeric(pool.get("Faltas/90", 0), errors="coerce").fillna(0)
-    err_def = pd.to_numeric(pool.get("ss_def_error_p90", pool.get("error_lead_to_a_shot_p90", 0)), errors="coerce").fillna(0)
+    err_def = _error_cost_p90(pool)
     dd_perd = dd * (1 - pct_w)
     num_adj = dd_perd + np.maximum(0, faltas - beta * dd_perd) + err_def
     if "_acoes_def_comp" in pool.columns:
