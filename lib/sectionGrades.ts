@@ -121,7 +121,7 @@ const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string
   laterais: {
     Defensivos: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
-    "Dribles e Condução": ["Disputas com Bola", "1v1 - Ofensivo", "Conduções Progressivas"],
+    "Dribles e Condução": ["Disputas com Bola", "1v1 - Ofensivo", "Conduções Progressivas", "Acelerações"],
     "Passes Finais": ["Cruzamentos", "Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
     Ofensividade: ["Ofensividade"],
   },
@@ -129,16 +129,16 @@ const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string
     Defensivos: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
     "Dribles e Condução": ["Disputas com Bola", "1v1 - Ofensivo", "Conduções Progressivas"],
-    "Passes Finais": ["Finalizações", "Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
-    Ofensividade: ["Ofensividade"],
+    "Passes Finais": ["Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
+    Ofensividade: ["Finalizações", "Ofensividade"],
   },
   extremos: {
-    Defensivos: ["Duelos Vencidos", "Ações Defensivas"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
     "Passes Finais": ["Passes Chave e Área", "Cruzamentos", "Pré Assistências e xA", "Passes Criativos"],
     "Condução e Drible": ["Disputas com Bola", "1v1 - Ofensivo", "Progressão"],
     Finalização: ["Gols e xG", "Finalizações"],
     Ofensividade: ["Ações Terminais", "Verticalidade"],
+    Defensivos: ["Duelos Vencidos", "Ações Defensivas"],
   },
   atacantes: {
     "Duelos Aéreos": ["Duelos Aéreos"],

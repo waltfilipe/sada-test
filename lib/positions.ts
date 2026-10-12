@@ -9,7 +9,7 @@ export const POSITION_FAMILIES: {
   { key: "zagueiros", slug: "zagueiros", label: "Zagueiros", short: "ZAG" },
   { key: "laterais", slug: "laterais", label: "Laterais", short: "LAT" },
   { key: "meio-campistas", slug: "meio-campistas", label: "Meio-campistas", short: "MC" },
-  { key: "extremos", slug: "extremos", label: "Extremos + Meias", short: "EX" },
+  { key: "extremos", slug: "extremos", label: "Meias Ofensivos", short: "MO" },
   { key: "atacantes", slug: "atacantes", label: "Atacantes", short: "AT" },
 ];
 

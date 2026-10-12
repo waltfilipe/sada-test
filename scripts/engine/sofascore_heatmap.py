@@ -245,6 +245,18 @@ def import_heatmaps_from_br26(
     return imported
 
 
+def infer_extremo_flank_from_points(points: list[dict[str, float]], *, min_points: int = 8) -> str | None:
+    """Map heatmap width (y) to Extremo Esquerdo / Direito (SofaScore 0–100)."""
+    if len(points) < min_points:
+        return None
+    avg_y = sum(float(p.get("y", 0)) for p in points) / len(points)
+    if avg_y <= 42:
+        return "Extremo Esquerdo"
+    if avg_y >= 58:
+        return "Extremo Direito"
+    return None
+
+
 def attach_heatmaps_to_players(
     players: list[dict[str, Any]],
     out_dir: Path | None = None,
@@ -268,6 +280,10 @@ def attach_heatmaps_to_players(
                 "point_count": hm.get("point_count", len(hm.get("points", []))),
                 "image_url": image_url,
             }
+            if player.get("position_family") == "extremos":
+                flank = infer_extremo_flank_from_points(hm.get("points") or [])
+                if flank:
+                    player["position"] = flank
             attached += 1
         else:
             player.pop("heatmap", None)

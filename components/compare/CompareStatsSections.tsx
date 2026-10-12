@@ -13,7 +13,14 @@ import type { StatMetricBadge } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 
 function rowLabel(label: string): string {
-  if (label === "Eficiência" || label === "Eficiência Defensiva" || label === "Erros Totais") return label;
+  if (
+    label === "Eficiência" ||
+    label === "Eficiência Defensiva" ||
+    label === "Erros Totais" ||
+    label === "Eficiência de finalização"
+  ) {
+    return label;
+  }
   if (label.includes("/90") || label.includes("/ 90")) return label;
   return `${label}/90`;
 }
