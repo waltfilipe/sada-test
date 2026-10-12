@@ -1,20 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
 import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { ProfileCard } from "@/components/position/profile/ProfileCard";
 import { ScoutStatsSections } from "@/components/position/profile/ScoutStatsSections";
-import { GradeBadge } from "@/components/ui/GradeBadge";
-import { Tooltip } from "@/components/ui/Tooltip";
-import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import { sectionShortLabel } from "@/lib/sectionLabels";
-import { allSectionGrades, buildSectionGradeLookup } from "@/lib/sectionGrades";
-import { dominantRatingKey } from "@/lib/profileMeta";
-import { playerInitials, ratingTier, formatRating, tierVars } from "@/lib/scoutTheme";
-import { positionRating } from "@/lib/scoutUi";
+import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 export type CompareSide = "a" | "b" | "c";
@@ -28,7 +20,6 @@ type Props = {
   pool: PlayerProfile[];
   excludeIds: Set<string>;
   onChange: (id: string) => void;
-  showStats?: boolean;
 };
 
 function monthsRemaining(iso?: string | null): string {
@@ -52,33 +43,10 @@ export function ComparePlayerColumn({
   pool,
   excludeIds,
   onChange,
-  showStats = false,
 }: Props) {
   const tm = player.transfermarkt;
-  const profileRating = positionRating(player);
-  const profileRank =
-    player.ranks[dominantRatingKey(player.profile, family, player.hybrid_lean) ?? "geral"] ??
-    player.ranks.geral;
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const clusterProps = clusterTagProps(player);
-
-  const gradeLookup = useMemo(() => buildSectionGradeLookup(pool, family), [pool, family]);
-  const sectionGrades = useMemo(
-    () => allSectionGrades(gradeLookup, player.player_id, family),
-    [gradeLookup, player.player_id, family],
-  );
-
-  const gradeEntries = useMemo(
-    () =>
-      statSectionsForFamily(family)
-        .map((section) => {
-          const triple = sectionGrades[section.title];
-          if (!triple?.geral) return null;
-          return { title: section.title, short: sectionShortLabel(section.title), letter: triple.geral };
-        })
-        .filter((entry): entry is { title: string; short: string; letter: string } => Boolean(entry)),
-    [family, sectionGrades],
-  );
 
   return (
     <article className={`compare-player-column side-${side}`} aria-label={`Coluna ${label}: ${player.name}`}>
@@ -125,15 +93,6 @@ export function ComparePlayerColumn({
             {clusterProps ? <ClusterTag {...clusterProps} /> : <ProfileTag {...profileTagProps(player)} />}
           </div>
         </div>
-
-        {profileRating != null ? (
-          <Tooltip content={`${player.profile} · #${profileRank}`}>
-            <div className="compare-col-rating" style={tierVars(ratingTier(profileRating))}>
-              <span className="compare-col-rating-letter">{formatRating(profileRating)}</span>
-              <span className="compare-col-rating-rank">#{profileRank}</span>
-            </div>
-          </Tooltip>
-        ) : null}
       </header>
 
       <dl className="compare-col-facts">
@@ -160,27 +119,14 @@ export function ComparePlayerColumn({
         ) : null}
       </dl>
 
-      {gradeEntries.length > 0 ? (
-        <div className="compare-col-grades">
-          {gradeEntries.map((entry) => (
-            <span key={entry.title} className="compare-col-grade-chip" title={entry.title}>
-              <GradeBadge letter={entry.letter} size="sm" />
-              <em>{entry.short}</em>
-            </span>
-          ))}
-        </div>
-      ) : null}
-
       <div className="compare-col-stack">
         <div className="compare-col-profile">
           <ProfileCard player={player} family={family} players={pool} />
         </div>
 
-        {showStats ? (
-          <div className="player-card compare-col-stats">
-            <ScoutStatsSections player={player} family={family} />
-          </div>
-        ) : null}
+        <div className="player-card compare-col-stats">
+          <ScoutStatsSections player={player} family={family} />
+        </div>
       </div>
 
       <footer className="compare-col-foot">

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { ClubLogo } from "@/components/ClubLogo";
 import { MinutesStat } from "@/components/position/MinutesStat";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
+import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { FamilyBadgeOption } from "@/lib/statBadges";
 import type { PlayerSearchRow } from "@/lib/types";
@@ -28,50 +30,54 @@ export function PlayerResultRow({
     { label: "Minutos", value: player.minutes.toLocaleString("pt-BR") },
   ];
 
+  const profileHref = `/posicao/${player.position_family}?atleta=${player.player_id}&origem=filtros`;
+
   return (
-    <Link
-      href={`/posicao/${player.position_family}?atleta=${player.player_id}&origem=filtros`}
-      className="result-row"
-    >
-      <div className="row-photo">
+    <article className="result-row">
+      <Link href={profileHref} className="row-photo" aria-label={player.name}>
         {tm?.photo ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={tm.photo} alt="" loading="lazy" />
         ) : (
           <span>{playerInitials(player.name)}</span>
         )}
-      </div>
+      </Link>
 
       <div className="row-identity">
-        <div className="row-name">
-          <h3>{player.name}</h3>
-          <ProfileTag {...profileTagProps(player)} />
-        </div>
-        <p className="row-club">
-          <ClubLogo club={player.club} size={16} />
-          {player.club}
-          <i aria-hidden>·</i>
-          <span>{player.position}</span>
-        </p>
+        <Link href={profileHref} className="row-identity-link">
+          <div className="row-name">
+            <h3>{player.name}</h3>
+            <ProfileTag {...profileTagProps(player)} />
+          </div>
+          <p className="row-club">
+            <ClubLogo club={player.club} size={16} />
+            {player.club}
+            <i aria-hidden>·</i>
+            <span>{player.position}</span>
+          </p>
 
-        <dl className="row-facts">
-          {facts.map((fact) => (
-            <div key={fact.label}>
-              <dt>{fact.label}</dt>
-              <dd>
-                {fact.value}
-                {fact.unit && <em>{fact.unit}</em>}
-              </dd>
-            </div>
-          ))}
-        </dl>
+          <dl className="row-facts">
+            {facts.map((fact) => (
+              <div key={fact.label}>
+                <dt>{fact.label}</dt>
+                <dd>
+                  {fact.value}
+                  {fact.unit && <em>{fact.unit}</em>}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </Link>
 
         {earned.length ? (
           <ul className="row-badges" aria-label="Badges">
             {earned.map((badge) => (
-              <li key={badge.key} className={`row-badge tone-${badge.tone}`} title={badge.title}>
-                <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
-                {badge.label}
+              <li key={badge.key}>
+                <Tooltip content={`${badge.label}. ${badge.title}`}>
+                  <span className={`row-badge-icon tone-${badge.tone}`} aria-label={badge.label}>
+                    <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
+                  </span>
+                </Tooltip>
               </li>
             ))}
           </ul>
@@ -98,7 +104,17 @@ export function PlayerResultRow({
             <strong>{tm?.contract_remaining ?? "—"}</strong>
           </div>
         </div>
+
+        <div className="row-actions">
+          {tm?.profile_url ? (
+            <a className="btn btn-ghost btn-sm row-action" href={tm.profile_url} target="_blank" rel="noreferrer">
+              <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
+              Transfermarkt
+            </a>
+          ) : null}
+          <AddToShadowMenu playerId={player.player_id} family={player.position_family} />
+        </div>
       </div>
-    </Link>
+    </article>
   );
 }

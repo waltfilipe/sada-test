@@ -186,37 +186,39 @@ export function ZagueirosV2Client({ players }: Props) {
             <p className="zag-v2-note">Quem tem todos os badges marcados.</p>
           </section>
 
-          <section>
-            <h2>Idade</h2>
-            <div className="zag-v2-chips">
-              {AGE_BANDS.map((band) => (
-                <button
-                  key={band.value}
-                  type="button"
-                  className={ageBand === band.value ? "active" : ""}
-                  onClick={() => setAgeBand(ageBand === band.value ? null : band.value)}
-                >
-                  {band.label}
-                </button>
-              ))}
-            </div>
-          </section>
+          <div className="zag-v2-pairs">
+            <section>
+              <h2>Idade</h2>
+              <div className="zag-v2-chips">
+                {AGE_BANDS.map((band) => (
+                  <button
+                    key={band.value}
+                    type="button"
+                    className={ageBand === band.value ? "active" : ""}
+                    onClick={() => setAgeBand(ageBand === band.value ? null : band.value)}
+                  >
+                    {band.label}
+                  </button>
+                ))}
+              </div>
+            </section>
 
-          <section>
-            <h2>Minutagem</h2>
-            <div className="zag-v2-chips">
-              {MINUTES_BANDS.map((band) => (
-                <button
-                  key={band.value}
-                  type="button"
-                  className={minutesBand === band.value ? "active" : ""}
-                  onClick={() => setMinutesBand(minutesBand === band.value ? null : band.value)}
-                >
-                  {band.label}
-                </button>
-              ))}
-            </div>
-          </section>
+            <section>
+              <h2>Minutagem</h2>
+              <div className="zag-v2-chips">
+                {MINUTES_BANDS.map((band) => (
+                  <button
+                    key={band.value}
+                    type="button"
+                    className={minutesBand === band.value ? "active" : ""}
+                    onClick={() => setMinutesBand(minutesBand === band.value ? null : band.value)}
+                  >
+                    {band.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+          </div>
 
           <section className="zag-v2-selects">
             <label>
