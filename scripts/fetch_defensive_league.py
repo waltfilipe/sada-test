@@ -196,46 +196,98 @@ class FileCacheHttp:
 class CdpSofascoreHttp:
     """Conecta ao Chrome/Edge que VOCÊ abriu (--remote-debugging-port)."""
 
-    def __init__(self, cdp_url: str, get_retries: int = 6) -> None:
+    def __init__(
+        self,
+        cdp_url: str,
+        *,
+        warmup_url: str | None = None,
+        get_retries: int = 6,
+    ) -> None:
         from playwright.sync_api import sync_playwright
 
         self._get_retries = max(1, get_retries)
         self._get_retry_delay_s = 2.0
         self._pw = sync_playwright().start()
         self._browser = self._pw.chromium.connect_over_cdp(cdp_url)
-        self._ctx = self._browser.contexts[0] if self._browser.contexts else self._browser.new_context()
-        self._page = self._ctx.pages[0] if self._ctx.pages else self._ctx.new_page()
-        log(f"CDP: conectado · {len(self._ctx.pages)} aba(s) · use uma aba já em sofascore.com")
+        if not self._browser.contexts:
+            raise RuntimeError("CDP: nenhum contexto no Chrome. Abra o Chrome com --remote-debugging-port.")
+
+        self._page = self._pick_sofascore_page()
+        log(f"CDP: aba ativa → {self._page.url or '(vazia)'}")
+        self._ensure_sofascore_origin(warmup_url)
+
+    def _pick_sofascore_page(self) -> Any:
+        for ctx in self._browser.contexts:
+            for page in ctx.pages:
+                url = page.url or ""
+                if "sofascore.com" in url and not url.startswith("devtools:"):
+                    return page
+        ctx = self._browser.contexts[0]
+        return ctx.pages[0] if ctx.pages else ctx.new_page()
+
+    def _ensure_sofascore_origin(self, warmup_url: str | None) -> None:
+        url = self._page.url or ""
+        if "sofascore.com" not in url:
+            log("CDP: aba não estava no SofaScore — abrindo sofascore.com …")
+            self._page.goto("https://www.sofascore.com/", wait_until="domcontentloaded", timeout=90_000)
+            self._page.wait_for_timeout(3000)
+        if warmup_url:
+            log(f"CDP: warm-up liga → {warmup_url}")
+            self._page.goto(warmup_url, wait_until="domcontentloaded", timeout=90_000)
+            self._page.wait_for_timeout(4000)
 
     def _fetch_once(self, url: str) -> tuple[int, str]:
-        payload = self._page.evaluate(
-            """async (url) => {
-                const res = await fetch(url, {
-                    credentials: "include",
-                    headers: { accept: "application/json, text/plain, */*" },
-                });
-                return { status: res.status, text: await res.text() };
-            }""",
-            url,
-        )
-        return int(payload["status"]), str(payload["text"])
+        try:
+            payload = self._page.evaluate(
+                """async (url) => {
+                    const res = await fetch(url, {
+                        credentials: "include",
+                        headers: { accept: "application/json, text/plain, */*" },
+                    });
+                    return { status: res.status, text: await res.text() };
+                }""",
+                url,
+            )
+            return int(payload["status"]), str(payload["text"])
+        except Exception as exc:
+            log(f"  CDP fetch falhou ({type(exc).__name__}) — tentando goto …")
+            return 0, str(exc)
+
+    def _get_via_goto(self, url: str) -> tuple[int, str]:
+        nav = self._page.goto(url, wait_until="domcontentloaded", timeout=90_000)
+        status = nav.status if nav else 0
+        if status != 200:
+            return status, ""
+        body = self._page.locator("body").inner_text().strip()
+        return status, body
 
     def get(self, path: str) -> dict[str, Any]:
         url = api_url(path)
         last_status, last_text = 0, ""
+
         for attempt in range(1, self._get_retries + 1):
             status, text = self._fetch_once(url)
-            last_status, last_text = status, text
             if status == 200:
                 return load_json_dict_from_text(text, url)
-            if status == 403 and attempt < self._get_retries:
-                log(f"  CDP 403 em {path} ({attempt}/{self._get_retries}) — aguarde e tente de novo …")
+            last_status, last_text = status, text
+
+            goto_status, goto_text = self._get_via_goto(url)
+            if goto_status == 200 and goto_text:
+                return load_json_dict_from_text(goto_text, url)
+            last_status, last_text = goto_status, goto_text or last_text
+
+            if last_status == 403 and attempt < self._get_retries:
+                log(f"  CDP 403 em {path} ({attempt}/{self._get_retries}) — aguardando …")
                 self._page.wait_for_timeout(int(self._get_retry_delay_s * 1000))
+                if warmup_url_hint := self._page.url:
+                    if "sofascore.com" not in warmup_url_hint:
+                        self._page.goto("https://www.sofascore.com/", wait_until="domcontentloaded", timeout=90_000)
                 continue
             break
+
         raise RuntimeError(
-            f"HTTP {last_status} em {url}: {last_text[:300]}\n"
-            "Abra a liga no MESMO Chrome (porta debug) e confirme que a URL da API abre na barra."
+            f"HTTP {last_status} em {url}: {str(last_text)[:300]}\n"
+            "No Chrome da porta 9222, abra a Série C e teste a URL da API na barra de endereço."
         )
 
     def close(self) -> None:
@@ -716,7 +768,7 @@ def main() -> int:
         patch_tacoscore_client(client, http_backend)
     elif transport == "cdp":
         log(f"Transport: CDP → {args.cdp_url}")
-        http_backend = CdpSofascoreHttp(args.cdp_url)
+        http_backend = CdpSofascoreHttp(args.cdp_url, warmup_url=league_page)
         patch_tacoscore_client(client, http_backend)
     elif transport == "cookies":
         if not args.cookies_file:
