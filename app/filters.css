@@ -488,7 +488,7 @@
 .result-row {
   position: relative;
   display: grid;
-  grid-template-columns: 108px minmax(0, 1fr) 132px auto;
+  grid-template-columns: 108px minmax(0, 1fr) 176px auto;
   grid-template-areas: "photo identity heatmap actions";
   align-items: stretch;
   gap: 0.85rem;
@@ -694,7 +694,7 @@
 
 .row-mini-heatmap {
   grid-area: heatmap;
-  width: 132px;
+  width: 176px;
   align-self: center;
 }
 
@@ -707,8 +707,8 @@
 .result-row .heatmap-compact .heatmap-pitch-wrap,
 .result-row .heatmap-compact-empty {
   flex: none;
-  width: 132px;
-  height: 86px;
+  width: 176px;
+  height: 114px;
   min-height: 0;
 }
 
@@ -719,8 +719,8 @@
 }
 
 .result-row .heatmap-compact .heatmap-img {
-  width: 132px;
-  height: 86px;
+  width: 176px;
+  height: 114px;
   margin: 0;
   object-fit: cover;
   border-radius: 8px;
@@ -1050,7 +1050,7 @@
 
 @media (max-width: 1400px) {
   .result-row {
-    grid-template-columns: 96px minmax(0, 1fr) 118px auto;
+    grid-template-columns: 96px minmax(0, 1fr) 156px auto;
     gap: 0.75rem;
   }
 
@@ -1058,13 +1058,13 @@
   .result-row .heatmap-compact .heatmap-pitch-wrap,
   .result-row .heatmap-compact-empty,
   .result-row .heatmap-compact .heatmap-img {
-    width: 118px;
+    width: 156px;
   }
 
   .result-row .heatmap-compact .heatmap-pitch-wrap,
   .result-row .heatmap-compact-empty,
   .result-row .heatmap-compact .heatmap-img {
-    height: 78px;
+    height: 102px;
   }
 
   .row-photo {
@@ -1084,7 +1084,7 @@
 
 @media (max-width: 1240px) {
   .result-row {
-    grid-template-columns: 96px minmax(0, 1fr) 112px auto;
+    grid-template-columns: 96px minmax(0, 1fr) 148px auto;
     grid-template-areas: "photo identity heatmap actions";
     gap: 0.7rem;
     align-items: stretch;
@@ -1094,13 +1094,13 @@
   .result-row .heatmap-compact .heatmap-pitch-wrap,
   .result-row .heatmap-compact-empty,
   .result-row .heatmap-compact .heatmap-img {
-    width: 112px;
+    width: 148px;
   }
 
   .result-row .heatmap-compact .heatmap-pitch-wrap,
   .result-row .heatmap-compact-empty,
   .result-row .heatmap-compact .heatmap-img {
-    height: 74px;
+    height: 96px;
   }
 
   .row-indices {
@@ -1119,6 +1119,19 @@
       "photo identity"
       "heatmap heatmap"
       "actions actions";
+  }
+
+  .row-mini-heatmap,
+  .result-row .heatmap-compact .heatmap-pitch-wrap,
+  .result-row .heatmap-compact-empty,
+  .result-row .heatmap-compact .heatmap-img {
+    width: 200px;
+  }
+
+  .result-row .heatmap-compact .heatmap-pitch-wrap,
+  .result-row .heatmap-compact-empty,
+  .result-row .heatmap-compact .heatmap-img {
+    height: 130px;
   }
 
   .row-mini-heatmap {

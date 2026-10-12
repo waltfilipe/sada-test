@@ -1664,7 +1664,25 @@
 }
 
 .compare-player-columns.is-triple .compare-col-hero {
-  grid-template-columns: 56px minmax(0, 1fr);
+  grid-template-columns: 120px minmax(0, 1fr);
+}
+
+.compare-player-columns.is-triple .compare-col-media,
+.compare-player-columns.is-triple .compare-col-photo,
+.compare-player-columns.is-triple .compare-col-media .heatmap-compact .heatmap-pitch-wrap,
+.compare-player-columns.is-triple .compare-col-media .heatmap-compact-empty,
+.compare-player-columns.is-triple .compare-col-media .heatmap-compact .heatmap-img {
+  width: 120px;
+}
+
+.compare-player-columns.is-triple .compare-col-photo {
+  height: 72px;
+}
+
+.compare-player-columns.is-triple .compare-col-media .heatmap-compact .heatmap-pitch-wrap,
+.compare-player-columns.is-triple .compare-col-media .heatmap-compact-empty,
+.compare-player-columns.is-triple .compare-col-media .heatmap-compact .heatmap-img {
+  height: 78px;
 }
 
 .compare-player-columns.is-triple .compare-col-actions {
@@ -1690,9 +1708,10 @@
 
 .compare-identity-card {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.5rem;
   position: relative;
   overflow: visible;
+  padding: 0.65rem 0.75rem;
 }
 
 .compare-identity-card::before {
@@ -1721,7 +1740,7 @@
 .compare-fact-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.4rem;
+  gap: 0.28rem;
   margin: 0;
 }
 
@@ -1740,7 +1759,7 @@
   display: grid;
   gap: 0.12rem;
   min-width: 0;
-  padding: 0.42rem 0.5rem;
+  padding: 0.26rem 0.4rem;
   border-radius: 10px;
   border: 1px solid rgba(148, 163, 184, 0.14);
   background: rgba(8, 12, 18, 0.45);
@@ -1809,16 +1828,22 @@
 
 .compare-col-hero {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) auto;
-  gap: 0.7rem;
-  align-items: center;
+  grid-template-columns: 168px minmax(0, 1fr) auto;
+  gap: 0.6rem;
+  align-items: start;
+}
+
+.compare-col-media {
+  display: grid;
+  gap: 0.35rem;
+  width: 168px;
 }
 
 .compare-col-photo {
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 80px;
+  width: 168px;
+  height: 92px;
   border-radius: var(--radius);
   overflow: hidden;
   background: linear-gradient(180deg, #212c3d, #151c27);
@@ -1829,7 +1854,34 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top center;
+  object-position: center 18%;
+}
+
+.compare-col-media .heatmap-compact {
+  margin: 0;
+  gap: 0;
+  flex: none;
+}
+
+.compare-col-media .heatmap-compact .heatmap-pitch-wrap,
+.compare-col-media .heatmap-compact-empty,
+.compare-col-media .heatmap-compact .heatmap-img {
+  flex: none;
+  width: 168px;
+  height: 110px;
+  min-height: 0;
+  margin: 0;
+}
+
+.compare-col-media .heatmap-compact-empty {
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: linear-gradient(180deg, #1c7a45, #145c34);
+}
+
+.compare-col-media .heatmap-compact .heatmap-img {
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 .compare-col-photo-fallback {
@@ -1954,7 +2006,38 @@
 
 .compare-col-stack {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.45rem;
+}
+
+.compare-player-column .player-card {
+  padding: 0.55rem 0.65rem;
+}
+
+.compare-col-profile .profile-card-head {
+  padding-bottom: 0.28rem;
+}
+
+.compare-col-profile .profile-perfil-list {
+  margin-top: 0.3rem;
+  gap: 0.28rem;
+}
+
+.compare-col-profile .profile-perfil-row {
+  gap: 0.22rem;
+  padding: 0.32rem 0.45rem 0.32rem 0.6rem;
+}
+
+.compare-player-column .stats-and-badges-body {
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+}
+
+.compare-player-column .stats-nav-row {
+  padding: 0.38rem 0.5rem;
+}
+
+.compare-player-column .stats-subsection-label {
+  margin-bottom: 0.3rem;
 }
 
 .compare-col-profile .profile-perfil-card {
@@ -2065,8 +2148,27 @@
     grid-template-columns: 1fr;
   }
 
-  .compare-col-hero {
-    grid-template-columns: 64px minmax(0, 1fr);
+  .compare-col-hero,
+  .compare-player-columns.is-triple .compare-col-hero {
+    grid-template-columns: 168px minmax(0, 1fr);
+  }
+
+  .compare-player-columns.is-triple .compare-col-media,
+  .compare-player-columns.is-triple .compare-col-photo,
+  .compare-player-columns.is-triple .compare-col-media .heatmap-compact .heatmap-pitch-wrap,
+  .compare-player-columns.is-triple .compare-col-media .heatmap-compact-empty,
+  .compare-player-columns.is-triple .compare-col-media .heatmap-compact .heatmap-img {
+    width: 168px;
+  }
+
+  .compare-player-columns.is-triple .compare-col-photo {
+    height: 92px;
+  }
+
+  .compare-player-columns.is-triple .compare-col-media .heatmap-compact .heatmap-pitch-wrap,
+  .compare-player-columns.is-triple .compare-col-media .heatmap-compact-empty,
+  .compare-player-columns.is-triple .compare-col-media .heatmap-compact .heatmap-img {
+    height: 110px;
   }
 
   .compare-col-actions {

@@ -44,6 +44,13 @@
   cursor: default;
 }
 
+.zag-v2-title-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
 .zag-v2-shell {
   display: grid;
   grid-template-columns: 430px minmax(0, 1fr);
@@ -78,7 +85,7 @@
 .zag-v2-rail {
   position: sticky;
   top: 0;
-  height: calc(100vh - 180px);
+  height: calc(100vh - 228px);
   overflow: auto;
   padding: 0.85rem;
   border-right: 1px solid var(--line);

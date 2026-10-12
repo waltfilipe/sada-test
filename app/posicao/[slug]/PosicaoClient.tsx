@@ -12,7 +12,7 @@ type Props = {
 export function PosicaoClient({ family, players }: Props) {
   return (
     <Suspense fallback={<div className="scout-root" />}>
-      <PositionScoutPage family={family} players={players} />
+      <PositionScoutPage key={family} family={family} players={players} />
     </Suspense>
   );
 }

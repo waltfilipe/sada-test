@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ClubLogo } from "@/components/ClubLogo";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
+import { PlayerHeatmap } from "@/components/position/profile/PlayerHeatmap";
 import { ProfileCard } from "@/components/position/profile/ProfileCard";
 import { ScoutStatsSections } from "@/components/position/profile/ScoutStatsSections";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
@@ -78,13 +79,16 @@ export function ComparePlayerColumn({
         </label>
 
         <div className="compare-col-hero">
-          <div className="compare-col-photo">
-            {tm?.photo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={tm.photo} alt={player.name} />
-            ) : (
-              <span className="compare-col-photo-fallback">{playerInitials(player.name)}</span>
-            )}
+          <div className="compare-col-media">
+            <div className="compare-col-photo">
+              {tm?.photo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={tm.photo} alt={player.name} />
+              ) : (
+                <span className="compare-col-photo-fallback">{playerInitials(player.name)}</span>
+              )}
+            </div>
+            <PlayerHeatmap compact heatmap={player.heatmap} playerName={player.name} />
           </div>
 
           <div className="compare-col-identity">
