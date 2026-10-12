@@ -17,7 +17,7 @@ METRIC_TO_COLUMNS: dict[str, tuple[str, ...]] = {
     "duelos_def": ("DuelosDef",),
     "rebatidas": ("Carrinhos",),
     "interceptions": ("Interseções",),
-    "eficiencia_def_v2": ("_acoes_def_comp",),
+    "eficiencia_def_v2": ("_def_eff_z",),
     "duelos_ar": ("DuelosAr",),
     "dribles": ("Dribles",),
     "cruzamentos": ("Cruz.",),
@@ -43,6 +43,8 @@ def _zscore_series(series: pd.Series, clip: float = 2.5) -> pd.Series:
 
 
 def _metric_z(pool: pd.DataFrame, metric_key: str) -> pd.Series:
+    if metric_key == "eficiencia_def_v2" and "_def_eff_z" in pool.columns:
+        return pd.to_numeric(pool["_def_eff_z"], errors="coerce").fillna(0.0).clip(-2.5, 2.5)
     cols = METRIC_TO_COLUMNS.get(metric_key)
     if not cols:
         return pd.Series(0.0, index=pool.index)
@@ -50,6 +52,8 @@ def _metric_z(pool: pd.DataFrame, metric_key: str) -> pd.Series:
         col = cols[0]
         if col not in pool.columns:
             return pd.Series(0.0, index=pool.index)
+        if col == "_def_eff_z":
+            return pd.to_numeric(pool[col], errors="coerce").fillna(0.0).clip(-2.5, 2.5)
         return _zscore_series(pool[col])
     present = [col for col in cols if col in pool.columns]
     if not present:

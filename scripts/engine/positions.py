@@ -718,9 +718,8 @@ def _compute_zag_indices(pool: pd.DataFrame) -> pd.DataFrame:
     _apply_zag_k3_classification(out)
     out = apply_zag_hierarchical_clusters(out)
     out["perfil"] = out["cluster_archetype"]
-    out = apply_zag_m8_ratings(out)
-
     out = attach_aspect_percentiles(out)
+    out = apply_zag_m8_ratings(out)
     out = apply_profile_z_geral_rating(out, ZAGUEIRO_TRI_COMPOSITE_CONFIG)
     out["rank_construcao"] = rank_players(out["rating_construcao"])
     out["rank_defesa"] = rank_players(out["rating_defesa"])
@@ -734,6 +733,7 @@ def _compute_lat_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out["AcoesAtW"] = pd.to_numeric(out.get("Acções atacantes com sucesso/90"), errors="coerce").fillna(0)
     out = apply_lat_hierarchical_clusters(out)
     out["perfil"] = out["cluster_archetype"]
+    out = attach_aspect_percentiles(out)
     out = apply_lat_tri_composite_ratings(out)
 
     out["n_construcao"] = percentile_rank(out["lat_z_con"], ascending=True)
@@ -742,7 +742,6 @@ def _compute_lat_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out["n_leitura_def"] = percentile_rank(out["LeituraDef."], ascending=True)
     out["n_duelo_ar"] = percentile_rank(out["DuelosAr"] * out["%DuelosAr"], ascending=True)
 
-    out = attach_aspect_percentiles(out)
     out = apply_profile_z_geral_rating(out, LATERAL_TRI_COMPOSITE_CONFIG)
     return out
 
@@ -754,6 +753,7 @@ def _compute_mc_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out["AcoesAtW"] = pd.to_numeric(out.get("Acções atacantes com sucesso/90"), errors="coerce").fillna(0)
     out = apply_mc_hierarchical_clusters(out)
     out["perfil"] = out["cluster_archetype"]
+    out = attach_aspect_percentiles(out)
     out = apply_mc_tri_composite_ratings(out)
 
     out["n_construcao"] = percentile_rank(out["mc_z_con"], ascending=True)
@@ -762,7 +762,6 @@ def _compute_mc_indices(pool: pd.DataFrame) -> pd.DataFrame:
     out["n_leitura_def"] = percentile_rank(out["LeituraDef."], ascending=True)
     out["n_duelo_ar"] = percentile_rank(out["DuelosAr"] * out["%DuelosAr"], ascending=True)
 
-    out = attach_aspect_percentiles(out)
     out = apply_profile_z_geral_rating(out, MC_TRI_COMPOSITE_CONFIG)
     return out
 

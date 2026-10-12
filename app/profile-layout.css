@@ -1704,7 +1704,7 @@
   display: grid;
   grid-template-columns: minmax(280px, 1.05fr) minmax(0, 1fr) minmax(0, 0.95fr);
   gap: 0.75rem;
-  align-items: stretch;
+  align-items: start;
 }
 
 .profile-content-col {
@@ -1714,20 +1714,15 @@
   min-width: 0;
 }
 
-/* Heatmap and Perfil cards share the same compact height in the profile grid. */
+/* Heatmap and Perfil stay compact; stats column may grow when a group is open. */
 .profile-col-heatmap .heatmap-card,
 .profile-col-middle .profile-perfil-card,
 .profile-col-stats .pass-scores-shell {
   min-height: 318px;
   display: flex;
   flex-direction: column;
-}
-
-/* All three cards fill the row so their heights stay in sync. */
-.profile-col-heatmap .heatmap-card,
-.profile-col-middle .profile-perfil-card,
-.profile-col-stats .pass-scores-shell {
-  flex: 1;
+  flex: 0 0 auto;
+  height: auto;
 }
 
 .heatmap-body {
@@ -2214,7 +2209,7 @@
 .stats-swap-panel {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 0 0 auto;
   min-height: 0;
 }
 
