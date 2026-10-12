@@ -3,10 +3,10 @@
 
 from __future__ import annotations
 
-import json
 import shutil
 from pathlib import Path
 
+from engine.json_util import dumps_json
 from engine.leagues import LEAGUES
 from engine.load_data import load_players_dataframe
 from engine.measures import attach_base_measures
@@ -98,7 +98,7 @@ def build_league(league_id: str) -> None:
             }
         )
         (profiles_dir / f"{player['player_id']}.json").write_text(
-            json.dumps(player, ensure_ascii=False, indent=2),
+            dumps_json(player),
             encoding="utf-8",
         )
 
@@ -136,14 +136,14 @@ def build_league(league_id: str) -> None:
     }
 
     (out_dir / "players.json").write_text(
-        json.dumps({"players": players_index, "total": len(players_index)}, ensure_ascii=False, indent=2),
+        dumps_json({"players": players_index, "total": len(players_index)}),
         encoding="utf-8",
     )
-    (out_dir / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+    (out_dir / "meta.json").write_text(dumps_json(meta), encoding="utf-8")
 
     for family_key, players in family_payloads.items():
         (out_dir / f"family-{family_key}.json").write_text(
-            json.dumps({"family": family_key, "players": players}, ensure_ascii=False, indent=2),
+            dumps_json({"family": family_key, "players": players}),
             encoding="utf-8",
         )
 

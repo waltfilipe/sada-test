@@ -1903,7 +1903,7 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
         "label": row["NomeExibicao"],
         "position": row["Posição"],
         "position_family": family_key,
-        "nationality": row.get("Naturalidade"),
+        "nationality": row.get("Naturalidade") if pd.notna(row.get("Naturalidade")) else None,
         "birth_year": int(row["Nascimento"]) if pd.notna(row.get("Nascimento")) else None,
         "height": int(row["Altura"]) if pd.notna(row.get("Altura")) else None,
         "foot": row.get("Pé"),
