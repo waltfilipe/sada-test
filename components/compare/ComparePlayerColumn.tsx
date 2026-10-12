@@ -78,17 +78,14 @@ export function ComparePlayerColumn({
           </select>
         </label>
 
-        <div className="compare-col-hero">
-          <div className="compare-col-media">
-            <div className="compare-col-photo">
-              {tm?.photo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={tm.photo} alt={player.name} />
-              ) : (
-                <span className="compare-col-photo-fallback">{playerInitials(player.name)}</span>
-              )}
-            </div>
-            <PlayerHeatmap compact heatmap={player.heatmap} playerName={player.name} />
+        <div className="compare-head-top">
+          <div className="compare-col-photo">
+            {tm?.photo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={tm.photo} alt={player.name} />
+            ) : (
+              <span className="compare-col-photo-fallback">{playerInitials(player.name)}</span>
+            )}
           </div>
 
           <div className="compare-col-side">
@@ -119,8 +116,11 @@ export function ComparePlayerColumn({
           </div>
         </div>
 
-        <dl className="compare-fact-grid">
-          <div className="compare-fact-pair">
+        <div className="compare-head-bottom">
+          <div className="compare-col-pitch">
+            <PlayerHeatmap compact heatmap={player.heatmap} playerName={player.name} />
+          </div>
+          <dl className="compare-fact-grid">
             <div>
               <dt>Valor</dt>
               <dd>{tm?.market_value ?? "—"}</dd>
@@ -129,27 +129,27 @@ export function ComparePlayerColumn({
               <dt>Contrato</dt>
               <dd>{monthsRemaining(tm?.contract_until)}</dd>
             </div>
-          </div>
-          <div>
-            <dt>Minutos</dt>
-            <dd className="tabular">
-              {player.minutes.toLocaleString("pt-BR")}
-              {player.minutes_pct != null ? <em>{Math.round(player.minutes_pct)}%</em> : null}
-            </dd>
-          </div>
-          <div>
-            <dt>Idade</dt>
-            <dd>{age ?? "—"}</dd>
-          </div>
-          <div>
-            <dt>Gols</dt>
-            <dd className="tabular">{player.goals}</dd>
-          </div>
-          <div>
-            <dt>Assistências</dt>
-            <dd className="tabular">{player.assists}</dd>
-          </div>
-        </dl>
+            <div>
+              <dt>Minutos</dt>
+              <dd className="tabular">
+                {player.minutes.toLocaleString("pt-BR")}
+                {player.minutes_pct != null ? <em>{Math.round(player.minutes_pct)}%</em> : null}
+              </dd>
+            </div>
+            <div>
+              <dt>Idade</dt>
+              <dd>{age ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Gols</dt>
+              <dd className="tabular">{player.goals}</dd>
+            </div>
+            <div>
+              <dt>Assistências</dt>
+              <dd className="tabular">{player.assists}</dd>
+            </div>
+          </dl>
+        </div>
       </header>
 
       <div className="compare-col-stack">
