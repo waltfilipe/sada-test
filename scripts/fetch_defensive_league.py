@@ -8,12 +8,8 @@ Dependências:
   pip install tacoscore curl_cffi pandas playwright
   python -m playwright install chromium
 
-Exemplo (Windows — se der 403 "challenge", use Chrome visível):
-  python -u allmatch/fetch_defensive_league.py ^
-    --url "https://www.sofascore.com/football/tournament/brazil/brasileirao-serie-c/1281#id:90642" ^
-    --output ./BRC26_Defensive/BRC26_defensive.csv ^
-    --channel chrome --headed --warmup-wait 20 ^
-    --resume --rate-limit 5.0
+Exemplo (CDP — Chrome com --remote-debugging-port=9222):
+  python -u allmatch/fetch_defensive_league.py --url "https://www.sofascore.com/football/tournament/brazil/brasileirao-serie-c/1281#id:90642" --output ./BRC26_Defensive/BRC26_defensive.csv --transport cdp --cdp-url http://127.0.0.1:9222 --resume --rate-limit 5.0
 """
 
 from __future__ import annotations
