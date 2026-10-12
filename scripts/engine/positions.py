@@ -908,21 +908,40 @@ def _acoes_def_bem_sucedidas(pool: pd.DataFrame) -> pd.Series:
     return inter + clear + dd_won + block
 
 
-def _custo_def_ajustado(pool: pd.DataFrame) -> pd.Series:
-    """Adjusted defensive cost: lower is better (β=0.45 overlap correction)."""
+def _def_cost_numerator_p90(pool: pd.DataFrame) -> pd.Series:
+    """Defensive cost rate per 90 (duelos perdidos + faltas ajustadas + erros ponderados)."""
     beta = 0.45
     dd = pool["DuelosDef"].astype(float)
     pct_w = pool["%DuelosDefW"].astype(float)
     faltas = pd.to_numeric(pool.get("Faltas/90", 0), errors="coerce").fillna(0)
-    err_def = _error_cost_p90(pool)
     dd_perd = dd * (1 - pct_w)
-    num_adj = dd_perd + np.maximum(0, faltas - beta * dd_perd) + err_def
+    return dd_perd + np.maximum(0, faltas - beta * dd_perd) + _error_cost_p90(pool)
+
+
+def _custo_def_ajustado(pool: pd.DataFrame) -> pd.Series:
+    """Adjusted defensive cost: lower is better (β=0.45 overlap correction)."""
+    num_adj = _def_cost_numerator_p90(pool)
     if "_acoes_def_comp" in pool.columns:
         den = pool["_acoes_def_comp"].astype(float)
     else:
         den = _acoes_def_bem_sucedidas(pool)
     den = den.replace(0, np.nan)
     return (num_adj / den).fillna(num_adj)
+
+
+def _def_efficiency_z_scores(pool: pd.DataFrame) -> tuple[pd.Series, float, float]:
+    """Z-score of ações/custo vs pool aggregate benchmark μ = Σações/Σcusto."""
+    acoes = pool["_acoes_def_comp"].astype(float)
+    cost = _def_cost_numerator_p90(pool)
+    ratio = acoes / cost.replace(0, np.nan)
+    cost_sum = float(cost.sum())
+    mu = float(acoes.sum() / cost_sum) if cost_sum > 0 else float(ratio.mean())
+    sigma = float(ratio.std(ddof=0))
+    if sigma <= 0 or np.isnan(sigma):
+        z = pd.Series(0.0, index=pool.index)
+    else:
+        z = (ratio.fillna(mu) - mu) / sigma
+    return z.astype(float), mu, sigma
 
 
 def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
@@ -946,10 +965,11 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     out["_custo_def_raw"] = _custo_def_ajustado(out)
     if "_minutes_pool_pct" not in out.columns:
         out["_minutes_pool_pct"] = _minutes_pool_pct(out)
-    out["_def_sample_w"] = _def_eff_sample_weight(out["_acoes_def_comp"], out["_minutes_pool_pct"])
-    custo_eff_raw = percentile_rank(-out["_custo_def_raw"], ascending=True)
-    custo_eff_adj = out["_def_sample_w"] * custo_eff_raw + (1.0 - out["_def_sample_w"]) * DEF_EFF_SHRINK_MEDIAN
-    out["_def_eff_nota_10"] = (custo_eff_adj / 10.0).round(1)
+    def_z, def_mu, _def_sigma = _def_efficiency_z_scores(out)
+    out["_def_eff_z"] = def_z
+    out["_def_eff_benchmark_mu"] = def_mu
+    out["_asp_custo_def_eff"] = percentile_rank(def_z, ascending=True)
+    out["_def_eff_nota_10"] = def_z.round(1)
     err_def_total = pd.to_numeric(out.get("ss_def_error_total", 0), errors="coerce").fillna(0)
     if (err_def_total == 0).all():
         err_shot = pd.to_numeric(out.get("error_lead_to_a_shot_total", 0), errors="coerce").fillna(0)
@@ -1001,7 +1021,7 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "duelos_of_eff": _pct_eff(out, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
         "duelos_of_won_vol": percentile_rank(do_won, ascending=True),
         "prog_vol": _pool_percentile(out, "Corridas progressivas/90", "Cond.Prog"),
-        "custo_def_eff": custo_eff_adj,
+        "custo_def_eff": out["_asp_custo_def_eff"],
         "passes_prog_eff": _pct_eff(out, "Passes progressivos certos, %", "%EffPassProg"),
         "passes_prog_vol": _pool_percentile(out, "Passes progressivos/90", "PassesProg"),
         "passes_long_vol": _pool_percentile(out, "Passes longos/90", "PassesLongos"),
@@ -1079,6 +1099,10 @@ def _fmt_per90(value: float) -> str:
 
 def _fmt_num(value: float, *, decimals: int = 1) -> str:
     return f"{value:.{decimals}f}".replace(".", ",")
+
+
+def _fmt_z_score(value: float) -> str:
+    return f"{value:+.1f}".replace(".", ",")
 
 
 def _raw_eff_display(row: pd.Series, raw_col: str, engine_col: str) -> str:
@@ -1236,7 +1260,7 @@ def _def_actions_group_aspect(
 
 def _def_efficiency_group_aspect(row: pd.Series) -> dict[str, Any]:
     eff_pct = round(float(row.get("_asp_custo_def_eff", 0) or 0), 1)
-    nota = float(row.get("_def_eff_nota_10", 0) or 0)
+    z = float(row.get("_def_eff_z", row.get("_def_eff_nota_10", 0)) or 0)
     err_total = int(row.get("ss_def_error_total", 0) or 0)
     if not err_total:
         err_total = int(row.get("error_lead_to_a_shot_total", 0) or 0) + int(
@@ -1257,7 +1281,7 @@ def _def_efficiency_group_aspect(row: pd.Series) -> dict[str, Any]:
             _sub_metric(
                 "Eficiência Defensiva",
                 percentile=eff_pct,
-                display_value=_fmt_num(nota, decimals=1),
+                display_value=_fmt_z_score(z),
             ),
         ],
         "stats": [],

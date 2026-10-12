@@ -24,7 +24,7 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
   "Eficiência Defensiva": {
     label: "Eficiência Defensiva",
     icon: "fa-shield-virus",
-    title: "Eficiência defensiva — erros e nota acima de P50",
+    title: "Eficiência defensiva — erros e z-score vs pool acima de P50",
   },
   "Duelos Aéreos": {
     label: "Duelos Aéreos",
