@@ -6,8 +6,9 @@ import { useEffect, useMemo, useState } from "react";
 import { AthleteSlot } from "@/components/compare/AthleteSlot";
 import { MetricAxisPicker } from "@/components/scatter/MetricAxisPicker";
 import { ScatterPlot } from "@/components/scatter/ScatterPlot";
+import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
-import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
+import { familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Metric = { key: string; label: string };
@@ -127,26 +128,12 @@ export function ScatterClient({
     router.replace(`/scatter?${params.toString()}`, { scroll: false });
   }, [family, idA, idB, xKey, yKey, router]);
 
-  const positionTabs = (
-    <nav className="position-tabs" aria-label="Posições">
-      {POSITION_FAMILIES.map((item) => (
-        <Link
-          key={item.key}
-          href={`/scatter?posicao=${item.slug}`}
-          className={item.key === family ? "active" : ""}
-          aria-current={item.key === family ? "page" : undefined}
-        >
-          <span className="tab-full">{item.label}</span>
-          <span className="tab-short">{item.short}</span>
-        </Link>
-      ))}
-    </nav>
-  );
+  const positionTabs = <PositionFamilyTabs active={family} hrefFor={(slug) => `/scatter?posicao=${slug}`} />;
 
   if (!a || !b) {
     return (
       <div className="scout-root scatter-root">
-        <ScoutTopbar active="scatter" center={positionTabs} />
+        <ScoutTopbar active="scatter" subnav={positionTabs} />
         <div className="scout-empty">Nenhum atleta disponível para {familyMeta.label.toLowerCase()}.</div>
       </div>
     );
@@ -154,7 +141,7 @@ export function ScatterClient({
 
   return (
     <div className="scout-root scatter-root">
-      <ScoutTopbar active="scatter" center={positionTabs} />
+        <ScoutTopbar active="scatter" subnav={positionTabs} />
 
       <main className="scatter-canvas">
         <div className="compare-stage scatter-stage">

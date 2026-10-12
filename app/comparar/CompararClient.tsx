@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ComparePlayerColumn } from "@/components/compare/ComparePlayerColumn";
+import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
-import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
+import { familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Metric = { key: string; label: string };
@@ -77,26 +78,12 @@ export function CompararClient({
   const excludeForB = useMemo(() => new Set(triple ? [idA, idC] : [idA]), [idA, idC, triple]);
   const excludeForC = useMemo(() => new Set([idA, idB]), [idA, idB]);
 
-  const positionTabs = (
-    <nav className="position-tabs" aria-label="Posições">
-      {POSITION_FAMILIES.map((item) => (
-        <Link
-          key={item.key}
-          href={`/comparar?posicao=${item.slug}`}
-          className={item.key === family ? "active" : ""}
-          aria-current={item.key === family ? "page" : undefined}
-        >
-          <span className="tab-full">{item.label}</span>
-          <span className="tab-short">{item.short}</span>
-        </Link>
-      ))}
-    </nav>
-  );
+  const positionTabs = <PositionFamilyTabs active={family} hrefFor={(slug) => `/comparar?posicao=${slug}`} />;
 
   if (!playerA || !playerB || players.length < 2) {
     return (
       <div className="scout-root compare-root">
-        <ScoutTopbar active="comparar" center={positionTabs} />
+        <ScoutTopbar active="comparar" subnav={positionTabs} />
         <div className="scout-empty">Nenhum atleta disponível para {familyMeta.label.toLowerCase()}.</div>
       </div>
     );
@@ -114,7 +101,7 @@ export function CompararClient({
 
   return (
     <div className="scout-root compare-root">
-      <ScoutTopbar active="comparar" center={positionTabs} />
+        <ScoutTopbar active="comparar" subnav={positionTabs} />
 
       <main className="compare-canvas">
         <div className="compare-toolbar">

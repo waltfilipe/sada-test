@@ -8,6 +8,7 @@ import "./filters.css";
 import "./compare.css";
 import "./scatter.css";
 import "./time-sombra.css";
+import "./home.css";
 
 export const metadata: Metadata = {
   title: "Série A Scout",

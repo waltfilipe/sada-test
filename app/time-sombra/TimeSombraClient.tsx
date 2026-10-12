@@ -25,8 +25,29 @@ export function TimeSombraClient({ players }: Props) {
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [placementPlayerId, setPlacementPlayerId] = useState<string | null>(null);
   const [panelTab, setPanelTab] = useState<"squad" | "watch">("squad");
+  const [slotQuery, setSlotQuery] = useState("");
 
   const playersById = useMemo(() => new Map(players.map((p) => [p.player_id, p])), [players]);
+
+  const slotCandidates = useMemo(() => {
+    if (!state || !selectedSlotId) return [];
+    const formation = formationById(state.formationId);
+    const selectedSlot = formation.slots.find((slot) => slot.id === selectedSlotId);
+    const occupantId = state.assignments[selectedSlotId];
+    if (!selectedSlot || occupantId) return [];
+    const query = slotQuery.trim().toLowerCase();
+    const assignedIds = new Set(
+      Object.values(state.assignments).filter((id): id is string => Boolean(id)),
+    );
+    return players
+      .filter((player) => {
+        if (!selectedSlot.families.includes(player.position_family)) return false;
+        if (assignedIds.has(player.player_id)) return false;
+        if (!query) return true;
+        return player.name.toLowerCase().includes(query) || player.club.toLowerCase().includes(query);
+      })
+      .sort((a, b) => b.rating - a.rating);
+  }, [players, state, selectedSlotId, slotQuery]);
 
   if (!ready || !state) {
     return (
@@ -42,20 +63,6 @@ export function TimeSombraClient({ players }: Props) {
   const selectedSlot = selectedSlotId ? formation.slots.find((slot) => slot.id === selectedSlotId) : null;
   const selectedPlayerId = selectedSlotId ? state.assignments[selectedSlotId] : null;
   const selectedPlayer = selectedPlayerId ? playersById.get(selectedPlayerId) : null;
-  const assignedIds = new Set(
-    Object.values(state.assignments).filter((id): id is string => Boolean(id)),
-  );
-
-  const slotCandidates = useMemo(() => {
-    if (!selectedSlot || selectedPlayerId) return [];
-    return players
-      .filter(
-        (player) =>
-          selectedSlot.families.includes(player.position_family) &&
-          (!assignedIds.has(player.player_id) || state.assignments[selectedSlot.id] === player.player_id),
-      )
-      .sort((a, b) => b.rating - a.rating);
-  }, [players, selectedSlot, selectedPlayerId, assignedIds, state.assignments]);
 
   const squadPlayers = state.squadIds
     .map((id) => playersById.get(id))
@@ -129,6 +136,7 @@ export function TimeSombraClient({ players }: Props) {
                 onSelectSlot={(id) => {
                   setSelectedSlotId(id);
                   setPlacementPlayerId(null);
+                  setSlotQuery("");
                 }}
                 onAssign={(slotId, playerId) => {
                   assign(slotId, playerId);
@@ -167,6 +175,14 @@ export function TimeSombraClient({ players }: Props) {
                     Fechar
                   </button>
                 </div>
+                <input
+                  className="shadow-slot-search"
+                  type="search"
+                  value={slotQuery}
+                  placeholder="Buscar atleta ou clube…"
+                  aria-label="Buscar atleta para escalar"
+                  onChange={(event) => setSlotQuery(event.target.value)}
+                />
                 {slotCandidates.length ? (
                   <ul className="shadow-slot-picker-list">
                     {slotCandidates.map((player) => (
@@ -280,7 +296,9 @@ export function TimeSombraClient({ players }: Props) {
                     </ul>
                   ) : (
                     <p className="shadow-roster-empty">
-                      Nenhum atleta no time. Use o botão <strong>+</strong> na página do jogador.
+                      Nenhum atleta no time. Abra uma{" "}
+                      <Link href="/posicao/zagueiros">posição</Link> e use o botão <strong>+</strong> no perfil,
+                      ou clique numa vaga vazia do campo.
                     </p>
                   )
                 ) : watchPlayers.length ? (

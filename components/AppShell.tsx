@@ -16,7 +16,7 @@ const FULL_BLEED = ["/posicao/", "/filtros", "/comparar", "/scatter", "/time-som
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isScoutPage = FULL_BLEED.some((prefix) => pathname.startsWith(prefix));
+  const isScoutPage = pathname === "/" || FULL_BLEED.some((prefix) => pathname.startsWith(prefix));
 
   if (isScoutPage) {
     return <div className="app-shell scout-shell">{children}</div>;

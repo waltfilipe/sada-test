@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 const NAV = [
+  { key: "inicio", href: "/", label: "Início" },
   { key: "posicoes", href: "/posicao/zagueiros", label: "Posições" },
   { key: "filtros", href: "/filtros", label: "Filtros" },
   { key: "comparar", href: "/comparar", label: "Comparar" },
@@ -11,36 +12,41 @@ const NAV = [
   { key: "time-sombra", href: "/time-sombra", label: "Time Sombra" },
 ] as const;
 
+export type ScoutSection = (typeof NAV)[number]["key"];
+
 type Props = {
-  active: (typeof NAV)[number]["key"];
-  center?: ReactNode;
+  active: ScoutSection;
+  /** Position-family switcher, rendered on a second sticky row. */
+  subnav?: ReactNode;
 };
 
-export function ScoutTopbar({ active, center }: Props) {
+export function ScoutTopbar({ active, subnav }: Props) {
   return (
-    <header className="scout-topbar">
-      <Link href="/" className="scout-brand">
-        <span className="sc-brand-mark">SA</span>
-        <span className="sc-brand-copy">
-          <strong>Série A Scout</strong>
-          <em>Temporada 2025/26</em>
-        </span>
-      </Link>
+    <div className="scout-topbar-wrap">
+      <header className="scout-topbar">
+        <Link href="/" className="scout-brand">
+          <span className="sc-brand-mark">SA</span>
+          <span className="sc-brand-copy">
+            <strong>Série A Scout</strong>
+            <em>Temporada 2025/26</em>
+          </span>
+        </Link>
 
-      {center}
+        <nav className="topbar-links" aria-label="Seções">
+          {NAV.map((item) => (
+            <Link
+              key={item.key}
+              href={item.href}
+              className={item.key === active ? "active" : ""}
+              aria-current={item.key === active ? "page" : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </header>
 
-      <nav className="topbar-links" aria-label="Seções">
-        {NAV.map((item) => (
-          <Link
-            key={item.key}
-            href={item.href}
-            className={item.key === active ? "active" : ""}
-            aria-current={item.key === active ? "page" : undefined}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-    </header>
+      {subnav ? <div className="scout-subnav">{subnav}</div> : null}
+    </div>
   );
 }

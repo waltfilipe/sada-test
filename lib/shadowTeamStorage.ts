@@ -9,6 +9,7 @@ import {
 import type { PositionFamily } from "@/lib/types";
 
 export const STORAGE_KEY = "serie-a-scout:shadow-team-v1";
+export const SHADOW_CHANGE_EVENT = "serie-a-scout:shadow-change";
 
 export type ShadowTeamState = {
   formationId: string;
@@ -54,6 +55,7 @@ export function loadShadowTeamState(): ShadowTeamState {
 export function saveShadowTeamState(state: ShadowTeamState): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  window.dispatchEvent(new Event(SHADOW_CHANGE_EVENT));
 }
 
 function takenSlots(assignments: Record<string, string | null>): Set<string> {

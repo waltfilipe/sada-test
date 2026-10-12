@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
-import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
+import { familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { topRatedPlayerId } from "@/lib/scoutUi";
 import { PositionPlayerPicker } from "./profile/PositionPlayerPicker";
@@ -68,21 +68,7 @@ export function PositionScoutPage({ family, players }: Props) {
     <div className="scout-root profile-page">
       <ScoutTopbar
         active="posicoes"
-        center={
-          <nav className="position-tabs" aria-label="Posições">
-            {POSITION_FAMILIES.map((item) => (
-              <Link
-                key={item.key}
-                href={`/posicao/${item.slug}`}
-                className={item.key === family ? "active" : ""}
-                aria-current={item.key === family ? "page" : undefined}
-              >
-                <span className="tab-full">{item.label}</span>
-                <span className="tab-short">{item.short}</span>
-              </Link>
-            ))}
-          </nav>
-        }
+        subnav={<PositionFamilyTabs active={family} hrefFor={(slug) => `/posicao/${slug}`} />}
       />
 
       <div className="profile-page-body">

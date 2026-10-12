@@ -10,6 +10,7 @@ import {
   removeFromWatchlist,
   saveShadowTeamState,
   setFormation,
+  SHADOW_CHANGE_EVENT,
   STORAGE_KEY,
   dropPlayerOnSlot,
   swapSlots,
@@ -26,8 +27,15 @@ export function useShadowTeam() {
     function onStorage(event: StorageEvent) {
       if (event.key === STORAGE_KEY) setState(loadShadowTeamState());
     }
+    function onLocalChange() {
+      setState(loadShadowTeamState());
+    }
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    window.addEventListener(SHADOW_CHANGE_EVENT, onLocalChange);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(SHADOW_CHANGE_EVENT, onLocalChange);
+    };
   }, []);
 
   const persist = useCallback((next: ShadowTeamState) => {
