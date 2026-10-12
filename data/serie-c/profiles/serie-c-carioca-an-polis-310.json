@@ -13,29 +13,29 @@
   "minutes_pct": 28.7,
   "goals": 0,
   "assists": 0,
-  "rating": 6.8,
+  "rating": 6.4,
   "ratings": {
-    "geral": 6.8,
+    "geral": 6.4,
     "construcao": 7.1,
-    "defesa": 8.3,
-    "perfil": 7.0
+    "defesa": 7.6,
+    "perfil": 6.6
   },
   "ranks": {
-    "geral": 30,
-    "construcao": 41,
-    "defesa": 4,
-    "perfil": 27
+    "geral": 62,
+    "construcao": 38,
+    "defesa": 16,
+    "perfil": 47
   },
   "profile": "Combativo",
   "profile_shares": {
-    "construcao": 45.0,
-    "defesa": 55.0
+    "construcao": 42.0,
+    "defesa": 58.0
   },
   "tendencies": {
     "construcao": 34.0,
     "ofensividade": 66.0,
     "def1v1": 100.0,
-    "contencao": 100.0,
+    "contencao": 4.0,
     "duelo_aereo": 73.0
   },
   "aspects": {
@@ -53,23 +53,23 @@
       {
         "label": "Ações Defensivas",
         "kind": "metric_group",
-        "grade": "A",
-        "percentile": 100.0,
+        "grade": "D",
+        "percentile": 3.3,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 100.0,
-            "display_value": "0,2"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Interceptações",
-            "percentile": 100.0,
-            "display_value": "5,8"
+            "percentile": 4.1,
+            "display_value": "0,6"
           },
           {
             "label": "Chutes Bloqueados",
-            "percentile": 100.0,
-            "display_value": "1,1"
+            "percentile": 5.8,
+            "display_value": "0,1"
           }
         ],
         "stats": []
@@ -77,22 +77,22 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "A",
-        "percentile": 100.0,
+        "grade": "D",
+        "percentile": 16.2,
         "pair_badge": [
-          100.0,
-          100.0
+          72.7,
+          16.2
         ],
         "sub_metrics": [
           {
             "label": "Erros Totais",
-            "percentile": 100.0,
-            "display_value": "0"
+            "percentile": 72.7,
+            "display_value": "3"
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 100.0,
-            "display_value": "+3,3"
+            "percentile": 16.2,
+            "display_value": "-0,6"
           }
         ],
         "stats": []
@@ -167,11 +167,11 @@
       {
         "label": "Estilo de defesa",
         "kind": "construction_share",
-        "grade": "B+",
-        "percentile": 78.1,
-        "display_value": "1,25",
-        "share_pct": 78.1,
-        "pool_avg_pct": 1.0,
+        "grade": "A",
+        "percentile": 95.9,
+        "display_value": "1,37",
+        "share_pct": 95.9,
+        "pool_avg_pct": 0.8,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -181,8 +181,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "A",
-        "percentile": 100.0,
+        "grade": "D",
+        "percentile": 16.2,
         "display_value": "2%",
         "share_pct": 1.7,
         "pool_avg_pct": 1.1,
@@ -232,16 +232,16 @@
     "Híbrido"
   ],
   "scatter": {
-    "intervencoes": 0.0,
+    "intervencoes": 0.5741626794258373,
     "confrontos_of": 0.83,
     "construcao": 33.78378378378378,
     "duelo_ar": 72.6027397260274,
-    "contencao": 100.0,
+    "contencao": 4.225352112676056,
     "ofensividade": 66.21621621621621,
     "passes_prog": 5.92,
     "duelos_def": 5.76
   },
-  "hybrid_lean": "+ Defensivo",
+  "hybrid_lean": null,
   "cluster": {
     "family": "zagueiros",
     "archetype": "Combativo",
@@ -249,14 +249,14 @@
     "construtor_badge": null,
     "construtor_badge_short": null,
     "shares": {
-      "defensor_area": 7.8,
-      "construtor": 4.2,
-      "combativo": 88.0
+      "defensor_area": 4.4,
+      "construtor": 8.5,
+      "combativo": 87.1
     },
     "ratings": {
-      "defensor_area": 7.3,
+      "defensor_area": 6.1,
       "construtor": 6.5,
-      "combativo": 7.0
+      "combativo": 6.6
     }
   },
   "transfermarkt": null

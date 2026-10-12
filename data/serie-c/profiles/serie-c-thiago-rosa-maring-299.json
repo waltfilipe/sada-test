@@ -22,9 +22,9 @@
   },
   "ranks": {
     "geral": 12,
-    "defensivo": 27,
+    "defensivo": 20,
     "construtor": 7,
-    "ofensivo": 29
+    "ofensivo": 28
   },
   "profile": "Construtor",
   "profile_shares": {
@@ -35,7 +35,7 @@
   "tendencies": {
     "construcao": 73.0,
     "ofensividade": 18.0,
-    "def1v1": 64.0,
+    "def1v1": 66.0,
     "contencao": 49.0,
     "duelo_aereo": 69.0
   },
@@ -64,22 +64,22 @@
       {
         "label": "Ações Defensivas",
         "kind": "metric_group",
-        "grade": "A",
-        "percentile": 100.0,
+        "grade": "C",
+        "percentile": 36.7,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 100.0,
-            "display_value": "0,0"
-          },
-          {
-            "label": "Interceptações",
-            "percentile": 100.0,
+            "percentile": 84.8,
             "display_value": "2,9"
           },
           {
+            "label": "Interceptações",
+            "percentile": 18.2,
+            "display_value": "0,8"
+          },
+          {
             "label": "Chutes Bloqueados",
-            "percentile": 100.0,
+            "percentile": 7.0,
             "display_value": "0,1"
           }
         ],
@@ -88,22 +88,22 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "B+",
-        "percentile": 81.8,
+        "grade": "A",
+        "percentile": 88.1,
         "pair_badge": [
-          100.0,
-          81.8
+          80.0,
+          88.1
         ],
         "sub_metrics": [
           {
             "label": "Erros Totais",
-            "percentile": 100.0,
-            "display_value": "0"
+            "percentile": 80.0,
+            "display_value": "2"
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 81.8,
-            "display_value": "+1,0"
+            "percentile": 88.1,
+            "display_value": "+1,5"
           }
         ],
         "stats": []
@@ -198,10 +198,10 @@
         "label": "Estilo de defesa",
         "kind": "construction_share",
         "grade": "D",
-        "percentile": 6.0,
-        "display_value": "1,42",
-        "share_pct": 6.0,
-        "pool_avg_pct": 2.9,
+        "percentile": 1.5,
+        "display_value": "0,92",
+        "share_pct": 1.5,
+        "pool_avg_pct": 1.9,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -211,8 +211,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "B+",
-        "percentile": 81.8,
+        "grade": "A",
+        "percentile": 88.1,
         "display_value": "17%",
         "share_pct": 16.7,
         "pool_avg_pct": 1.3,
@@ -377,8 +377,8 @@
     "hybrid_badge": null,
     "hybrid_badge_short": null,
     "shares": {
-      "defensivo": 18.0,
-      "construtor": 73.4,
+      "defensivo": 18.5,
+      "construtor": 73.0,
       "ofensivo": 8.6
     },
     "ratings": {
