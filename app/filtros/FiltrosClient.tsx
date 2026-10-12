@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { BadgeFilterBox } from "@/components/filters/BadgeFilterBox";
 import { PlayerResultRow } from "@/components/filters/PlayerResultRow";
 import { RangeSlider } from "@/components/filters/RangeSlider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { saveFilters, takeFiltersReturn } from "@/lib/filterSession";
 import { POSITION_FAMILIES } from "@/lib/positions";
 import { badgeCatalogForFamily } from "@/lib/statBadges";
 import { positionRating, profileTone } from "@/lib/scoutUi";
@@ -58,6 +60,42 @@ export function FiltrosClient({ meta, players }: Props) {
   const [age, setAge] = useState<Range>(ageBounds);
   const [height, setHeight] = useState<Range>(bounds.height);
   const [minutes, setMinutes] = useState<Range>(bounds.minutes);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const saved = takeFiltersReturn();
+    if (saved && POSITION_FAMILIES.some((item) => item.key === saved.family)) {
+      setFamily(saved.family as PositionFamily);
+      setQuery(saved.query ?? "");
+      setClub(saved.club ?? "all");
+      setOrigin(saved.origin ?? "all");
+      setFoot(saved.foot ?? "all");
+      setProfiles(saved.profiles ?? []);
+      setBadges(saved.badges ?? []);
+      setSort(saved.sort ?? "destaque");
+      if (saved.age) setAge(saved.age);
+      if (saved.height) setHeight(saved.height);
+      if (saved.minutes) setMinutes(saved.minutes);
+    }
+    setReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    saveFilters({
+      family,
+      query,
+      club,
+      origin,
+      foot,
+      profiles,
+      badges,
+      sort,
+      age,
+      height,
+      minutes,
+    });
+  }, [ready, family, query, club, origin, foot, profiles, badges, sort, age, height, minutes]);
 
   const familyMeta = meta.families.find((item) => item.key === family)!;
   const badgeOptions = useMemo(() => badgeCatalogForFamily(family), [family]);
@@ -244,25 +282,8 @@ export function FiltrosClient({ meta, players }: Props) {
             </section>
 
             <section className="filter-block">
-              <h2>Badges</h2>
+              <BadgeFilterBox options={badgeOptions} selected={badges} onToggle={toggleBadge} />
               <p className="filter-block-note">Mostra quem conquistou todos os badges marcados.</p>
-              <div className="chip-row badge-filter-row">
-                {badgeOptions.map((badge) => (
-                  <button
-                    key={badge.key}
-                    type="button"
-                    className={`filter-chip badge-filter-chip tone-${badge.tone} ${
-                      badges.includes(badge.key) ? "active" : ""
-                    }`}
-                    onClick={() => toggleBadge(badge.key)}
-                    aria-pressed={badges.includes(badge.key)}
-                    title={badge.title}
-                  >
-                    <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
-                    {badge.label}
-                  </button>
-                ))}
-              </div>
             </section>
 
             <section className="filter-block">

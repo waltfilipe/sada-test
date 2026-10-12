@@ -759,6 +759,26 @@
   font-weight: 700;
 }
 
+.profile-back-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-right: 0.75rem;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 241, 222, 0.45);
+  background: rgba(125, 241, 222, 0.08);
+  color: #d1fae5;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile-back-filters:hover {
+  background: rgba(125, 241, 222, 0.16);
+}
+
 .profile-filter-clear {
   display: inline-flex;
   align-items: center;

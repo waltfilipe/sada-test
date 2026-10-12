@@ -29,7 +29,10 @@ export function PlayerResultRow({
   ];
 
   return (
-    <Link href={`/posicao/${player.position_family}?atleta=${player.player_id}`} className="result-row">
+    <Link
+      href={`/posicao/${player.position_family}?atleta=${player.player_id}&origem=filtros`}
+      className="result-row"
+    >
       <div className="row-photo">
         {tm?.photo ? (
           // eslint-disable-next-line @next/next/no-img-element

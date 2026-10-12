@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ComparePlayerColumn } from "@/components/compare/ComparePlayerColumn";
+import { CompareStatsSections } from "@/components/compare/CompareStatsSections";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { familyBySlug } from "@/lib/positions";
+import { compareNarrative } from "@/lib/compareNarrative";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Metric = { key: string; label: string };
@@ -139,6 +141,7 @@ export function CompararClient({
             pool={players}
             excludeIds={excludeForA}
             onChange={setIdA}
+            showStats={triple}
           />
 
           <ComparePlayerColumn
@@ -150,6 +153,7 @@ export function CompararClient({
             pool={players}
             excludeIds={excludeForB}
             onChange={setIdB}
+            showStats={triple}
           />
 
           {triple && playerC ? (
@@ -162,9 +166,20 @@ export function CompararClient({
               pool={players}
               excludeIds={excludeForC}
               onChange={setIdC}
+              showStats
             />
           ) : null}
         </div>
+
+        {!triple ? (
+          <>
+            <section className="compare-brief player-card">
+              <h2 className="section-label">Leitura</h2>
+              <p>{compareNarrative(playerA, playerB, family)}</p>
+            </section>
+            <CompareStatsSections playerA={playerA} playerB={playerB} family={family} />
+          </>
+        ) : null}
       </main>
     </div>
   );

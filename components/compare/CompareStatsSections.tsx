@@ -175,6 +175,38 @@ function CompareAspectBlock({
   );
 }
 
+function joinPt(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? "";
+  if (items.length === 2) return `${items[0]} e ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")} e ${items[items.length - 1]}`;
+}
+
+function sectionLead(
+  entry: SectionEntry,
+  aspectsA: AspectItem[],
+  aspectsB: AspectItem[],
+  nameA: string,
+  nameB: string,
+): string | null {
+  const winsA: string[] = [];
+  const winsB: string[] = [];
+  for (const metric of entry.metrics) {
+    const itemA = findAspect(aspectsA, metric.label);
+    const itemB = findAspect(aspectsB, metric.label);
+    const scoreA = itemA?.percentile;
+    const scoreB = itemB?.percentile;
+    if (scoreA == null || scoreB == null || Math.abs(scoreA - scoreB) < 4) continue;
+    const label = metric.groupTitle ?? metric.label;
+    if (scoreA > scoreB) winsA.push(label);
+    else winsB.push(label);
+  }
+  const parts: string[] = [];
+  if (winsA.length) parts.push(`${nameA} leva em ${joinPt(winsA)}`);
+  if (winsB.length) parts.push(`${nameB} leva em ${joinPt(winsB)}`);
+  if (!parts.length) return "Os dois estão próximos neste bloco.";
+  return `${parts.join(". ")}.`;
+}
+
 type SectionEntry = {
   title: string;
   tone: StatSectionTone;
@@ -243,7 +275,7 @@ export function CompareStatsSections({ playerA, playerB, family }: Props) {
 
       <div className="stats-groups-stack compare-stats-groups">
         {entries.map((entry) => (
-          <details key={entry.title} className={`stats-group-accordion tone-${entry.tone}`} open>
+            <details key={entry.title} className={`stats-group-accordion tone-${entry.tone}`}>
             <summary className="stats-group-title">
               <span className="stats-group-title-text">{entry.title}</span>
               <span className="stats-group-title-meta">
@@ -255,6 +287,9 @@ export function CompareStatsSections({ playerA, playerB, family }: Props) {
                 <i className="fa-solid fa-chevron-down stats-group-chevron" aria-hidden="true" />
               </span>
             </summary>
+            <p className="compare-section-lead">
+              {sectionLead(entry, aspectsA, aspectsB, shortName(playerA.name), shortName(playerB.name))}
+            </p>
             <div className="compare-stat-cards-stack">
               {entry.metrics.map(({ label, groupTitle }) => (
                 <CompareAspectBlock

@@ -639,8 +639,71 @@
   color: var(--text-3);
 }
 
-.badge-filter-row {
+.badge-filter-box {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.badge-filter-box summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.badge-filter-box summary::-webkit-details-marker {
+  display: none;
+}
+
+.badge-filter-box summary em {
+  font-style: normal;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.badge-filter-icons {
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.35rem;
+  padding: 0 0.7rem 0.7rem;
+}
+
+.badge-filter-icons .tip-wrap {
+  display: inline-flex;
+}
+
+.badge-filter-icon {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  border: 1px solid var(--line-2);
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.badge-filter-icon i {
+  font-size: 0.78rem;
+}
+
+.badge-filter-icon.active {
+  color: #05201d;
+  border-color: transparent;
+  background: linear-gradient(140deg, #7df1de, #34d399);
+}
+
+.badge-filter-box + .filter-block-note,
+.zag-v2-note {
+  margin-top: 0.4rem;
 }
 
 .badge-filter-chip {

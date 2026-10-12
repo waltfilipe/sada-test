@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import { markFiltersReturn } from "@/lib/filterSession";
 import { topRatedPlayerId } from "@/lib/scoutUi";
 import { PositionPlayerPicker } from "./profile/PositionPlayerPicker";
 import { PositionProfileView } from "./profile/PositionProfileView";
@@ -17,7 +18,9 @@ type Props = {
 };
 
 export function PositionScoutPage({ family, players }: Props) {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const fromFilters = searchParams.get("origem") === "filtros";
   const requestedId = searchParams.get("atleta");
 
   const [selectedId, setSelectedId] = useState(
@@ -80,6 +83,19 @@ export function PositionScoutPage({ family, players }: Props) {
             <div className="profile-context-header">
               <h1 className="profile-context-title">{familyMeta.label}</h1>
               <span className="profile-context-meta">
+                {fromFilters ? (
+                  <button
+                    type="button"
+                    className="profile-back-filters"
+                    onClick={() => {
+                      markFiltersReturn();
+                      router.push("/filtros");
+                    }}
+                  >
+                    <i className="fa-solid fa-arrow-left" aria-hidden="true" />
+                    Voltar aos filtros
+                  </button>
+                ) : null}
                 {players.length} atletas · Série A 2025/26
                 {family === "zagueiros" ? (
                   <>

@@ -16,7 +16,6 @@ import { dominantRatingKey } from "@/lib/profileMeta";
 import { playerInitials, ratingTier, formatRating, tierVars } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
-import { ComparePlayerTendencies } from "./ComparePlayerTendencies";
 
 export type CompareSide = "a" | "b" | "c";
 
@@ -29,6 +28,7 @@ type Props = {
   pool: PlayerProfile[];
   excludeIds: Set<string>;
   onChange: (id: string) => void;
+  showStats?: boolean;
 };
 
 function monthsRemaining(iso?: string | null): string {
@@ -52,6 +52,7 @@ export function ComparePlayerColumn({
   pool,
   excludeIds,
   onChange,
+  showStats = false,
 }: Props) {
   const tm = player.transfermarkt;
   const profileRating = positionRating(player);
@@ -175,13 +176,11 @@ export function ComparePlayerColumn({
           <ProfileCard player={player} family={family} players={pool} />
         </div>
 
-        <div className="player-card compare-col-stats">
-          <ScoutStatsSections player={player} family={family} />
-        </div>
-
-        <div className="player-card compare-col-tendencies-wrap">
-          <ComparePlayerTendencies player={player} />
-        </div>
+        {showStats ? (
+          <div className="player-card compare-col-stats">
+            <ScoutStatsSections player={player} family={family} />
+          </div>
+        ) : null}
       </div>
 
       <footer className="compare-col-foot">

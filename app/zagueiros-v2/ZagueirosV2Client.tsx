@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { BadgeFilterBox } from "@/components/filters/BadgeFilterBox";
 import { PositionProfileView } from "@/components/position/profile/PositionProfileView";
 import { ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
 import { playerInitials } from "@/lib/scoutTheme";
@@ -137,6 +138,7 @@ export function ZagueirosV2Client({ players }: Props) {
     <div className="scout-root zag-v2">
       <ScoutTopbar active="posicoes" />
 
+      <div className="zag-v2-frame">
       <div className="zag-v2-shell">
         <aside className="zag-v2-rail">
           <header className="zag-v2-rail-head">
@@ -180,23 +182,8 @@ export function ZagueirosV2Client({ players }: Props) {
           </section>
 
           <section>
-            <h2>Badges</h2>
+            <BadgeFilterBox options={badgeOptions} selected={badges} onToggle={toggleBadge} />
             <p className="zag-v2-note">Quem tem todos os badges marcados.</p>
-            <div className="zag-v2-chips">
-              {badgeOptions.map((badge) => (
-                <button
-                  key={badge.key}
-                  type="button"
-                  className={`zag-v2-badge${badges.includes(badge.key) ? " active" : ""}`}
-                  title={badge.title}
-                  aria-pressed={badges.includes(badge.key)}
-                  onClick={() => toggleBadge(badge.key)}
-                >
-                  <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
-                  {badge.label}
-                </button>
-              ))}
-            </div>
           </section>
 
           <section>
@@ -312,6 +299,7 @@ export function ZagueirosV2Client({ players }: Props) {
             <p className="zag-v2-empty">Escolha um atleta na lista.</p>
           )}
         </main>
+      </div>
       </div>
     </div>
   );
