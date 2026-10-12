@@ -12,8 +12,8 @@ import "./home.css";
 import "./zag-v2.css";
 
 export const metadata: Metadata = {
-  title: "Série A Scout",
-  description: "Dashboard de scouting da Série A com ratings, perfis e comparações.",
+  title: "Brasil Scout",
+  description: "Dashboard de scouting da Série A e Série C com ratings, perfis e comparações.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

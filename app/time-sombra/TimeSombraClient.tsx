@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { BenchStrip, PitchView } from "@/components/shadow/PitchView";
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export function TimeSombraClient({ players }: Props) {
+  const { href } = useLeague();
   const { state, ready, changeFormation, assign, dropOnSlot, removeFromSquad, removeFromWatchlist } =
     useShadowTeam();
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
@@ -244,7 +246,9 @@ export function TimeSombraClient({ players }: Props) {
                   <div className="shadow-slot-detail-actions">
                     <Link
                       className="btn btn-ghost btn-sm"
-                      href={`/posicao/${selectedPlayer.position_family}?atleta=${selectedPlayer.player_id}`}
+                      href={href(
+                        `/posicao/${selectedPlayer.position_family}?atleta=${selectedPlayer.player_id}`,
+                      )}
                     >
                       Ver perfil
                     </Link>
@@ -297,7 +301,7 @@ export function TimeSombraClient({ players }: Props) {
                   ) : (
                     <p className="shadow-roster-empty">
                       Nenhum atleta no time. Abra uma{" "}
-                      <Link href="/posicao/zagueiros">posição</Link> e use o botão <strong>+</strong> no perfil,
+                      <Link href={href("/posicao/zagueiros")}>posição</Link> e use o botão <strong>+</strong> no perfil,
                       ou clique numa vaga vazia do campo.
                     </p>
                   )

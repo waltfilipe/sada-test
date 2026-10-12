@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { PlayerHeatmap } from "@/components/position/profile/PlayerHeatmap";
@@ -50,7 +51,9 @@ export function ComparePlayerColumn({
   activeSection,
   onSectionChange,
   peers,
-}: Props) {
+  heatmapsEnabled = true,
+}: Props & { heatmapsEnabled?: boolean }) {
+  const { href } = useLeague();
   const tm = player.transfermarkt;
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
 
@@ -103,7 +106,7 @@ export function ComparePlayerColumn({
             </div>
 
             <div className="compare-col-actions">
-              <Link className="btn btn-ghost btn-sm" href={`/posicao/${family}?atleta=${player.player_id}`}>
+              <Link className="btn btn-ghost btn-sm" href={href(`/posicao/${family}?atleta=${player.player_id}`)}>
                 <i className="fa-solid fa-user" aria-hidden="true" /> Ver perfil
               </Link>
               {tm?.profile_url ? (
@@ -116,10 +119,12 @@ export function ComparePlayerColumn({
           </div>
         </div>
 
-        <div className="compare-head-bottom">
-          <div className="compare-col-pitch">
-            <PlayerHeatmap compact heatmap={player.heatmap} playerName={player.name} />
-          </div>
+        <div className={`compare-head-bottom${heatmapsEnabled ? "" : " compare-head-bottom-no-heatmap"}`}>
+          {heatmapsEnabled ? (
+            <div className="compare-col-pitch">
+              <PlayerHeatmap compact heatmap={player.heatmap} playerName={player.name} />
+            </div>
+          ) : null}
           <dl className="compare-fact-grid">
             <div>
               <dt>Valor</dt>

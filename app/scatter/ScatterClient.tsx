@@ -7,6 +7,7 @@ import { AthleteSlot } from "@/components/compare/AthleteSlot";
 import { MetricAxisPicker } from "@/components/scatter/MetricAxisPicker";
 import { ScatterPlot } from "@/components/scatter/ScatterPlot";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
+import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
@@ -60,6 +61,7 @@ export function ScatterClient({
   initialX,
   initialY,
 }: Props) {
+  const { href } = useLeague();
   const router = useRouter();
   const familyMeta = familyBySlug(family);
   const axisMetrics = useMemo(() => {
@@ -142,10 +144,12 @@ export function ScatterClient({
     if (idB) params.set("b", idB);
     params.set("x", xKey);
     params.set("y", yKey);
-    router.replace(`/scatter?${params.toString()}`, { scroll: false });
-  }, [family, idA, idB, xKey, yKey, router]);
+    router.replace(href(`/scatter?${params.toString()}`), { scroll: false });
+  }, [family, idA, idB, xKey, yKey, router, href]);
 
-  const positionTabs = <PositionFamilyTabs active={family} hrefFor={(slug) => `/scatter?posicao=${slug}`} />;
+  const positionTabs = (
+    <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/scatter?posicao=${slug}`)} />
+  );
 
   if (!a || !b) {
     return (
@@ -286,11 +290,11 @@ export function ScatterClient({
         </div>
 
         <div className="scatter-links">
-          <Link href={`/comparar?posicao=${family}&a=${a.player_id}&b=${b.player_id}`}>
+          <Link href={href(`/comparar?posicao=${family}&a=${a.player_id}&b=${b.player_id}`)}>
             Comparar atletas
           </Link>
-          <Link href={`/posicao/${family}?atleta=${a.player_id}`}>Dossiê de {a.name}</Link>
-          <Link href={`/posicao/${family}?atleta=${b.player_id}`}>Dossiê de {b.name}</Link>
+          <Link href={href(`/posicao/${family}?atleta=${a.player_id}`)}>Dossiê de {a.name}</Link>
+          <Link href={href(`/posicao/${family}?atleta=${b.player_id}`)}>Dossiê de {b.name}</Link>
         </div>
       </main>
     </div>

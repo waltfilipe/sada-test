@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { BadgeFilterBox } from "@/components/filters/BadgeFilterBox";
 import { PlayerResultRow } from "@/components/filters/PlayerResultRow";
 import { RangeSlider } from "@/components/filters/RangeSlider";
+import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { saveFilters, takeFiltersReturn } from "@/lib/filterSession";
 import { POSITION_FAMILIES } from "@/lib/positions";
@@ -35,6 +36,7 @@ type Props = {
 };
 
 export function FiltrosClient({ meta, players }: Props) {
+  const { leagueId } = useLeague();
   const bounds = useMemo(() => {
     const heights = players.map((p) => p.height).filter((value): value is number => !!value);
     const years = players.map((p) => p.birth_year).filter((value): value is number => !!value);
@@ -63,7 +65,7 @@ export function FiltrosClient({ meta, players }: Props) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const saved = takeFiltersReturn();
+    const saved = takeFiltersReturn(leagueId);
     if (saved && POSITION_FAMILIES.some((item) => item.key === saved.family)) {
       setFamily(saved.family as PositionFamily);
       setQuery(saved.query ?? "");
@@ -78,11 +80,11 @@ export function FiltrosClient({ meta, players }: Props) {
       if (saved.minutes) setMinutes(saved.minutes);
     }
     setReady(true);
-  }, []);
+  }, [leagueId]);
 
   useEffect(() => {
     if (!ready) return;
-    saveFilters({
+    saveFilters(leagueId, {
       family,
       query,
       club,
@@ -95,7 +97,7 @@ export function FiltrosClient({ meta, players }: Props) {
       height,
       minutes,
     });
-  }, [ready, family, query, club, origin, foot, profiles, badges, sort, age, height, minutes]);
+  }, [ready, leagueId, family, query, club, origin, foot, profiles, badges, sort, age, height, minutes]);
 
   const familyMeta = meta.families.find((item) => item.key === family)!;
   const badgeOptions = useMemo(() => badgeCatalogForFamily(family), [family]);

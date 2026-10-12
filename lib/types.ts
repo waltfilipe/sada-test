@@ -147,9 +147,11 @@ export type PlayerProfile = PlayerSummary & {
 };
 
 export type SiteMeta = {
+  league_id?: string;
   league: string;
   season: string;
   source: string;
+  heatmaps_enabled?: boolean;
   player_count: number;
   families: {
     key: PositionFamily;

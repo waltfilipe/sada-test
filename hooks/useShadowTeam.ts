@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useLeague } from "@/components/LeagueProvider";
 import {
   addToSquad,
   addToWatchlist,
@@ -10,8 +11,8 @@ import {
   removeFromWatchlist,
   saveShadowTeamState,
   setFormation,
-  SHADOW_CHANGE_EVENT,
-  STORAGE_KEY,
+  shadowChangeEvent,
+  storageKey,
   dropPlayerOnSlot,
   swapSlots,
   type ShadowTeamState,
@@ -19,29 +20,36 @@ import {
 import type { PositionFamily } from "@/lib/types";
 
 export function useShadowTeam() {
+  const { leagueId } = useLeague();
   const [state, setState] = useState<ShadowTeamState | null>(null);
 
   useEffect(() => {
-    setState(loadShadowTeamState());
+    setState(loadShadowTeamState(leagueId));
+
+    const key = storageKey(leagueId);
+    const changeEvent = shadowChangeEvent(leagueId);
 
     function onStorage(event: StorageEvent) {
-      if (event.key === STORAGE_KEY) setState(loadShadowTeamState());
+      if (event.key === key) setState(loadShadowTeamState(leagueId));
     }
     function onLocalChange() {
-      setState(loadShadowTeamState());
+      setState(loadShadowTeamState(leagueId));
     }
     window.addEventListener("storage", onStorage);
-    window.addEventListener(SHADOW_CHANGE_EVENT, onLocalChange);
+    window.addEventListener(changeEvent, onLocalChange);
     return () => {
       window.removeEventListener("storage", onStorage);
-      window.removeEventListener(SHADOW_CHANGE_EVENT, onLocalChange);
+      window.removeEventListener(changeEvent, onLocalChange);
     };
-  }, []);
+  }, [leagueId]);
 
-  const persist = useCallback((next: ShadowTeamState) => {
-    setState(next);
-    saveShadowTeamState(next);
-  }, []);
+  const persist = useCallback(
+    (next: ShadowTeamState) => {
+      setState(next);
+      saveShadowTeamState(next, leagueId);
+    },
+    [leagueId],
+  );
 
   const toggleWatchlist = useCallback(
     (playerId: string) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
@@ -19,6 +20,7 @@ export function PlayerResultRow({
   player: PlayerSearchRow;
   catalog: FamilyBadgeOption[];
 }) {
+  const { href, heatmaps } = useLeague();
   const age = player.birth_year ? CURRENT_YEAR - player.birth_year : null;
   const tm = player.transfermarkt;
   const earned = catalog.filter((badge) => player.badges.includes(badge.key));
@@ -32,7 +34,9 @@ export function PlayerResultRow({
     { label: "Contrato", value: tm?.contract_remaining ?? "—" },
   ];
 
-  const profileHref = `/posicao/${player.position_family}?atleta=${player.player_id}&origem=filtros`;
+  const profileHref = href(
+    `/posicao/${player.position_family}?atleta=${player.player_id}&origem=filtros`,
+  );
 
   return (
     <article className="result-row">
@@ -89,9 +93,11 @@ export function PlayerResultRow({
         </div>
       </div>
 
-      <div className="row-mini-heatmap">
-        <PlayerHeatmap compact heatmap={player.heatmap} playerName={player.name} />
-      </div>
+      {heatmaps ? (
+        <div className="row-mini-heatmap">
+          <PlayerHeatmap compact heatmap={player.heatmap} playerName={player.name} />
+        </div>
+      ) : null}
 
       <div className="row-actions">
           {tm?.profile_url ? (

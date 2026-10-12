@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ComparePlayerColumn } from "@/components/compare/ComparePlayerColumn";
 import { StatSectionPanel, StatWindow } from "@/components/position/profile/ScoutStatsSections";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
+import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { compareSummary } from "@/lib/compareNarrative";
 import { familyBySlug } from "@/lib/positions";
@@ -21,6 +22,7 @@ type Props = {
   initialB?: string;
   initialC?: string;
   initialTriple?: boolean;
+  heatmapsEnabled?: boolean;
 };
 
 function pickPlayer(
@@ -44,7 +46,9 @@ export function CompararClient({
   initialB,
   initialC,
   initialTriple,
+  heatmapsEnabled = true,
 }: Props) {
+  const { href } = useLeague();
   const router = useRouter();
   const familyMeta = familyBySlug(family);
 
@@ -74,14 +78,16 @@ export function CompararClient({
       params.set("c", idC);
       params.set("triple", "1");
     }
-    router.replace(`/comparar?${params.toString()}`, { scroll: false });
-  }, [family, idA, idB, idC, triple, router]);
+    router.replace(href(`/comparar?${params.toString()}`), { scroll: false });
+  }, [family, idA, idB, idC, triple, router, href]);
 
   const excludeForA = useMemo(() => new Set(triple ? [idB, idC] : [idB]), [idB, idC, triple]);
   const excludeForB = useMemo(() => new Set(triple ? [idA, idC] : [idA]), [idA, idC, triple]);
   const excludeForC = useMemo(() => new Set([idA, idB]), [idA, idB]);
 
-  const positionTabs = <PositionFamilyTabs active={family} hrefFor={(slug) => `/comparar?posicao=${slug}`} />;
+  const positionTabs = (
+    <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/comparar?posicao=${slug}`)} />
+  );
 
   if (!playerA || !playerB || players.length < 2) {
     return (
@@ -126,7 +132,7 @@ export function CompararClient({
               </button>
             ) : null}
 
-            <Link className="btn btn-ghost btn-sm" href={`/scatter?posicao=${family}&a=${idA}&b=${idB}`}>
+            <Link className="btn btn-ghost btn-sm" href={href(`/scatter?posicao=${family}&a=${idA}&b=${idB}`)}>
               <i className="fa-solid fa-chart-scatter" aria-hidden="true" /> Scatter
             </Link>
           </div>
@@ -145,6 +151,7 @@ export function CompararClient({
             activeSection={openSection}
             onSectionChange={setOpenSection}
             peers={triple && playerC ? [playerB, playerC] : [playerB]}
+            heatmapsEnabled={heatmapsEnabled}
           />
 
           <ComparePlayerColumn
@@ -159,6 +166,7 @@ export function CompararClient({
             activeSection={openSection}
             onSectionChange={setOpenSection}
             peers={triple && playerC ? [playerA, playerC] : [playerA]}
+            heatmapsEnabled={heatmapsEnabled}
           />
 
           {triple && playerC ? (
@@ -174,6 +182,7 @@ export function CompararClient({
               activeSection={openSection}
               onSectionChange={setOpenSection}
               peers={[playerA, playerB]}
+              heatmapsEnabled={heatmapsEnabled}
             />
           ) : null}
         </div>

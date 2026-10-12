@@ -1,5 +1,4 @@
-const STATE_KEY = "serie-a-scout:filters-state";
-const RESTORE_KEY = "serie-a-scout:filters-restore";
+import type { LeagueId } from "@/lib/leagues";
 
 export type SavedFilters = {
   family: string;
@@ -15,21 +14,29 @@ export type SavedFilters = {
   minutes: [number, number];
 };
 
-export function saveFilters(state: SavedFilters) {
-  if (typeof window === "undefined") return;
-  sessionStorage.setItem(STATE_KEY, JSON.stringify(state));
+function keys(league: LeagueId) {
+  return {
+    state: `${league}-scout:filters-state`,
+    restore: `${league}-scout:filters-restore`,
+  };
 }
 
-export function markFiltersReturn() {
+export function saveFilters(league: LeagueId, state: SavedFilters) {
   if (typeof window === "undefined") return;
-  sessionStorage.setItem(RESTORE_KEY, "1");
+  sessionStorage.setItem(keys(league).state, JSON.stringify(state));
 }
 
-export function takeFiltersReturn(): SavedFilters | null {
+export function markFiltersReturn(league: LeagueId) {
+  if (typeof window === "undefined") return;
+  sessionStorage.setItem(keys(league).restore, "1");
+}
+
+export function takeFiltersReturn(league: LeagueId): SavedFilters | null {
   if (typeof window === "undefined") return null;
-  if (sessionStorage.getItem(RESTORE_KEY) !== "1") return null;
-  sessionStorage.removeItem(RESTORE_KEY);
-  const raw = sessionStorage.getItem(STATE_KEY);
+  const { state, restore } = keys(league);
+  if (sessionStorage.getItem(restore) !== "1") return null;
+  sessionStorage.removeItem(restore);
+  const raw = sessionStorage.getItem(state);
   if (!raw) return null;
   try {
     return JSON.parse(raw) as SavedFilters;

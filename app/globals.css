@@ -513,6 +513,66 @@ input[type="range"] {
   font-size: 11px;
 }
 
+.league-switcher {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.league-switcher a {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.league-switcher a.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text);
+}
+
+.hub-league-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.hub-league-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  text-decoration: none;
+  color: inherit;
+}
+
+.hub-league-mark {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  font-weight: 800;
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+
+.profile-content-grid-no-heatmap {
+  grid-template-columns: 1fr 1fr !important;
+}
+
+.compare-head-bottom-no-heatmap {
+  grid-template-columns: 1fr !important;
+}
+
 @media (max-width: 1280px) {
   .filtros-layout,
   .compare-layout,

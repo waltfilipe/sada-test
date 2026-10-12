@@ -13,6 +13,7 @@ import {
   MC_ARCHETYPE_META,
   ZAG_ARCHETYPE_META,
 } from "@/lib/clusterMeta";
+import { useLeague } from "@/components/LeagueProvider";
 import { markFiltersReturn } from "@/lib/filterSession";
 import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
@@ -50,9 +51,11 @@ function archetypesFor(family: PositionFamily): string[] {
 type Props = {
   family: PositionFamily;
   players: PlayerProfile[];
+  heatmapsEnabled?: boolean;
 };
 
-export function PositionScoutPage({ family, players }: Props) {
+export function PositionScoutPage({ family, players, heatmapsEnabled = true }: Props) {
+  const { leagueId, href } = useLeague();
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedId = searchParams.get("atleta");
@@ -179,7 +182,7 @@ export function PositionScoutPage({ family, players }: Props) {
     <div className="scout-root zag-v2">
       <ScoutTopbar
         active="posicoes"
-        subnav={<PositionFamilyTabs active={family} hrefFor={(slug) => `/posicao/${slug}`} />}
+        subnav={<PositionFamilyTabs active={family} hrefFor={(slug) => href(`/posicao/${slug}`)} />}
       />
 
       <div className="zag-v2-frame">
@@ -193,8 +196,8 @@ export function PositionScoutPage({ family, players }: Props) {
               <button
                 type="button"
                 onClick={() => {
-                  markFiltersReturn();
-                  router.push("/filtros");
+                  markFiltersReturn(leagueId);
+                  router.push(href("/filtros"));
                 }}
               >
                 Voltar aos filtros
@@ -352,7 +355,12 @@ export function PositionScoutPage({ family, players }: Props) {
 
           <main className="zag-v2-detail">
             {selected ? (
-              <PositionProfileView player={selected} family={family} players={players} />
+              <PositionProfileView
+                player={selected}
+                family={family}
+                players={players}
+                heatmapsEnabled={heatmapsEnabled}
+              />
             ) : (
               <p className="zag-v2-empty">Escolha um atleta na lista.</p>
             )}

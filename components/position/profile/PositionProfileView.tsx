@@ -10,22 +10,25 @@ type Props = {
   player: PlayerProfile;
   family: PositionFamily;
   players: PlayerProfile[];
+  heatmapsEnabled?: boolean;
 };
 
-export function PositionProfileView({ player, family, players }: Props) {
+export function PositionProfileView({ player, family, players, heatmapsEnabled = true }: Props) {
   return (
     <div className="profile-view-shell">
       <PlayerHero player={player} family={family} />
 
-      <div className="profile-content-grid">
-        <div className="profile-content-col profile-col-heatmap">
-          <div className="player-card heatmap-card profile-perfil-card-score">
-            <div className="profile-card-head">
-              <h3 className="section-label">Heatmap</h3>
+      <div className={`profile-content-grid${heatmapsEnabled ? "" : " profile-content-grid-no-heatmap"}`}>
+        {heatmapsEnabled ? (
+          <div className="profile-content-col profile-col-heatmap">
+            <div className="player-card heatmap-card profile-perfil-card-score">
+              <div className="profile-card-head">
+                <h3 className="section-label">Heatmap</h3>
+              </div>
+              <PlayerHeatmap heatmap={player.heatmap} playerName={player.name} />
             </div>
-            <PlayerHeatmap heatmap={player.heatmap} playerName={player.name} />
           </div>
-        </div>
+        ) : null}
 
         <div className="profile-content-col profile-col-middle">
           <ProfileCard player={player} family={family} players={players} />

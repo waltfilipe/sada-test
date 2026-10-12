@@ -1,7 +1,5 @@
-import { TimeSombraClient } from "./TimeSombraClient";
-import { getSearchRows } from "@/lib/data.server";
+import { redirect } from "next/navigation";
 
-export default function TimeSombraPage() {
-  const players = getSearchRows();
-  return <TimeSombraClient players={players} />;
+export default function LegacyShadowRedirect() {
+  redirect("/serie-a/time-sombra");
 }

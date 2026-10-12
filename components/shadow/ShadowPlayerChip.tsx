@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
 import { ShadowPlayerTooltip } from "@/components/shadow/ShadowPlayerMiniReport";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
@@ -76,13 +77,17 @@ export function ShadowPlayerRow({
   profileLabel?: string | null;
   onRemove?: () => void;
 }) {
+  const { href } = useLeague();
   const token = ratingTier(player.rating);
   const photo = player.transfermarkt?.photo;
 
   return (
     <div className="shadow-player-row">
       <ShadowPlayerTooltip player={player} block>
-        <Link href={`/posicao/${player.position_family}?atleta=${player.player_id}`} className="shadow-player-row-link">
+        <Link
+          href={href(`/posicao/${player.position_family}?atleta=${player.player_id}`)}
+          className="shadow-player-row-link"
+        >
           <span className="shadow-player-row-photo">
             {photo ? (
               // eslint-disable-next-line @next/next/no-img-element

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { playerInitials } from "@/lib/scoutTheme";
@@ -61,6 +62,7 @@ function MarketCard({
 }
 
 export function PlayerHero({ player, family }: Props) {
+  const { href } = useLeague();
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const tm = player.transfermarkt;
 
@@ -154,7 +156,7 @@ export function PlayerHero({ player, family }: Props) {
           <div className="player-hero-actions">
             <Link
               className="btn btn-ghost btn-sm"
-              href={`/comparar?posicao=${family}&a=${player.player_id}`}
+              href={href(`/comparar?posicao=${family}&a=${player.player_id}`)}
             >
               <i className="fa-solid fa-scale-balanced" aria-hidden="true" /> Comparar
             </Link>
