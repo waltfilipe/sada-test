@@ -91,29 +91,31 @@ export function ComparePlayerColumn({
             <PlayerHeatmap compact heatmap={player.heatmap} playerName={player.name} />
           </div>
 
-          <div className="compare-col-identity">
-            <h2 className="compare-col-name">{player.name}</h2>
-            <p className="compare-col-club">
-              <ClubLogo club={player.club} size={16} />
-              <span>{player.club}</span>
-              <span aria-hidden="true">·</span>
-              <span className="compare-col-position">{player.position}</span>
-            </p>
-            <div className="compare-col-tag-row">
-              <ProfileTag {...profileTagProps(player)} />
+          <div className="compare-col-side">
+            <div className="compare-col-identity">
+              <h2 className="compare-col-name">{player.name}</h2>
+              <p className="compare-col-club">
+                <ClubLogo club={player.club} size={16} />
+                <span>{player.club}</span>
+                <span aria-hidden="true">·</span>
+                <span className="compare-col-position">{player.position}</span>
+              </p>
+              <div className="compare-col-tag-row">
+                <ProfileTag {...profileTagProps(player)} />
+              </div>
             </div>
-          </div>
 
-          <div className="compare-col-actions">
-            <Link className="btn btn-ghost btn-sm" href={`/posicao/${family}?atleta=${player.player_id}`}>
-              <i className="fa-solid fa-user" aria-hidden="true" /> Ver perfil
-            </Link>
-            {tm?.profile_url ? (
-              <a className="btn btn-ghost btn-sm" href={tm.profile_url} target="_blank" rel="noreferrer">
-                <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
-              </a>
-            ) : null}
-            <AddToShadowMenu playerId={player.player_id} family={family} />
+            <div className="compare-col-actions">
+              <Link className="btn btn-ghost btn-sm" href={`/posicao/${family}?atleta=${player.player_id}`}>
+                <i className="fa-solid fa-user" aria-hidden="true" /> Ver perfil
+              </Link>
+              {tm?.profile_url ? (
+                <a className="btn btn-ghost btn-sm" href={tm.profile_url} target="_blank" rel="noreferrer">
+                  <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
+                </a>
+              ) : null}
+              <AddToShadowMenu playerId={player.player_id} family={family} />
+            </div>
           </div>
         </div>
 
