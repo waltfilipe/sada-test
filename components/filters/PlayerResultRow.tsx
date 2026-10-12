@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ClubLogo } from "@/components/ClubLogo";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
+import { PlayerHeatmap } from "@/components/position/profile/PlayerHeatmap";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { FamilyBadgeOption } from "@/lib/statBadges";
@@ -27,6 +28,8 @@ export function PlayerResultRow({
     { label: "Altura", value: player.height ? `${player.height}` : "—", unit: player.height ? "cm" : undefined },
     { label: "Pé", value: player.foot ?? "—" },
     { label: "Minutos", value: player.minutes.toLocaleString("pt-BR") },
+    { label: "Valor", value: tm?.market_value ?? "—" },
+    { label: "Contrato", value: tm?.contract_remaining ?? "—" },
   ];
 
   const profileHref = `/posicao/${player.position_family}?atleta=${player.player_id}&origem=filtros`;
@@ -83,17 +86,11 @@ export function PlayerResultRow({
               </strong>
             </div>
           ))}
-          <div className="row-stat-market">
-            <div>
-              <span>Valor</span>
-              <strong>{tm?.market_value ?? "—"}</strong>
-            </div>
-            <div>
-              <span>Contrato</span>
-              <strong>{tm?.contract_remaining ?? "—"}</strong>
-            </div>
-          </div>
         </div>
+      </div>
+
+      <div className="row-mini-heatmap">
+        <PlayerHeatmap compact heatmap={player.heatmap} playerName={player.name} />
       </div>
 
       <div className="row-actions">

@@ -6,6 +6,7 @@ import type { PlayerHeatmapData } from "@/lib/types";
 type Props = {
   heatmap?: PlayerHeatmapData | null;
   playerName: string;
+  compact?: boolean;
 };
 
 type Point = { x: number; y: number };
@@ -84,10 +85,10 @@ function buildDensity(points: Point[]): Float32Array {
 
 type Rect = { x: number; y: number; w: number; h: number };
 
-function pitchRect(w: number, h: number): Rect {
-  const padX = Math.max(8, w * 0.04);
-  const padTop = Math.max(6, h * 0.03);
-  const padBottom = Math.max(18, h * 0.09);
+function pitchRect(w: number, h: number, compact = false): Rect {
+  const padX = compact ? Math.max(2, w * 0.025) : Math.max(8, w * 0.04);
+  const padTop = compact ? Math.max(2, h * 0.04) : Math.max(6, h * 0.03);
+  const padBottom = compact ? Math.max(2, h * 0.04) : Math.max(18, h * 0.09);
   const availW = Math.max(0, w - padX * 2);
   const availH = Math.max(0, h - padTop - padBottom);
   let pw = availW;
@@ -138,7 +139,7 @@ function drawGrass(ctx: CanvasRenderingContext2D, r: Rect, radius: number) {
   ctx.restore();
 }
 
-function drawHeat(ctx: CanvasRenderingContext2D, r: Rect, radius: number, points: Point[]) {
+function drawHeat(ctx: CanvasRenderingContext2D, r: Rect, radius: number, points: Point[], compact = false) {
   const density = buildDensity(points);
 
   const off = document.createElement("canvas");
@@ -164,13 +165,13 @@ function drawHeat(ctx: CanvasRenderingContext2D, r: Rect, radius: number, points
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   // Bilinear upscale plus a light blur removes the per-cell grid entirely.
-  ctx.filter = `blur(${Math.max(1.4, r.w * 0.012)}px)`;
+  ctx.filter = compact ? `blur(${Math.max(0.55, r.w * 0.008)}px)` : `blur(${Math.max(1.4, r.w * 0.012)}px)`;
   ctx.drawImage(off, r.x, r.y, r.w, r.h);
   ctx.filter = "none";
   ctx.restore();
 }
 
-function drawLines(ctx: CanvasRenderingContext2D, r: Rect, radius: number) {
+function drawLines(ctx: CanvasRenderingContext2D, r: Rect, radius: number, compact = false) {
   const mx = (m: number) => r.x + (m / PITCH_L) * r.w;
   const my = (m: number) => r.y + (m / PITCH_W) * r.h;
   const scale = r.w / PITCH_L;
@@ -180,7 +181,7 @@ function drawLines(ctx: CanvasRenderingContext2D, r: Rect, radius: number) {
   ctx.clip();
 
   ctx.strokeStyle = "rgba(255, 255, 255, 0.78)";
-  ctx.lineWidth = Math.max(1.1, r.w * 0.0022);
+  ctx.lineWidth = compact ? Math.max(0.65, r.w * 0.004) : Math.max(1.1, r.w * 0.0022);
   ctx.lineJoin = "round";
 
   ctx.strokeRect(r.x, r.y, r.w, r.h);
@@ -275,14 +276,16 @@ function drawAttackHint(ctx: CanvasRenderingContext2D, r: Rect) {
   ctx.restore();
 }
 
-function render(canvas: HTMLCanvasElement, points: Point[]) {
+function render(canvas: HTMLCanvasElement, points: Point[], compact = false) {
   const wrap = canvas.parentElement;
   if (!wrap) return;
 
   const width = Math.floor(wrap.clientWidth);
   const height = Math.floor(wrap.clientHeight);
   // The observer also fires while the card is collapsed, where no pitch fits.
-  if (width < 80 || height < 60) return;
+  if (compact) {
+    if (width < 48 || height < 32) return;
+  } else if (width < 80 || height < 60) return;
 
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -296,17 +299,17 @@ function render(canvas: HTMLCanvasElement, points: Point[]) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
 
-  const rect = pitchRect(width, height);
+  const rect = pitchRect(width, height, compact);
   if (rect.w <= 0 || rect.h <= 0) return;
   const radius = Math.max(2, Math.min(6, rect.h * 0.02));
 
   drawGrass(ctx, rect, radius);
-  if (points.length) drawHeat(ctx, rect, radius, points);
-  drawLines(ctx, rect, radius);
-  drawAttackHint(ctx, rect);
+  if (points.length) drawHeat(ctx, rect, radius, points, compact);
+  drawLines(ctx, rect, radius, compact);
+  if (!compact) drawAttackHint(ctx, rect);
 }
 
-export function PlayerHeatmap({ heatmap, playerName }: Props) {
+export function PlayerHeatmap({ heatmap, playerName, compact = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -318,16 +321,28 @@ export function PlayerHeatmap({ heatmap, playerName }: Props) {
     const wrap = wrapRef.current;
     if (!canvas || !wrap || !hasPoints) return;
 
-    const paint = () => render(canvas, points);
-    paint();
+    let seen = false;
+    const paint = () => {
+      if (seen) render(canvas, points, compact);
+    };
+    const onScreen = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      seen = true;
+      render(canvas, points, compact);
+    }, { rootMargin: "240px" });
+    onScreen.observe(wrap);
 
     const observer = new ResizeObserver(paint);
     observer.observe(wrap);
-    return () => observer.disconnect();
+    return () => {
+      onScreen.disconnect();
+      observer.disconnect();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [heatmap, hasPoints]);
+  }, [heatmap, hasPoints, compact]);
 
   if (!hasPoints && !heatmap?.image_url) {
+    if (compact) return <div className="heatmap-compact-empty" aria-hidden="true" />;
     return (
       <div className="heatmap-empty">
         <span className="heatmap-empty-icon" aria-hidden="true">
@@ -349,7 +364,7 @@ export function PlayerHeatmap({ heatmap, playerName }: Props) {
   const ariaLabel = `Heatmap de ${playerName}${meta ? ` — ${meta}` : ""}`;
 
   return (
-    <div className="heatmap-body heatmap-body-live">
+    <div className={`heatmap-body heatmap-body-live${compact ? " heatmap-compact" : ""}`}>
       {hasPoints ? (
         <div ref={wrapRef} className="heatmap-pitch-wrap">
           <canvas ref={canvasRef} className="heatmap-pitch-canvas" role="img" aria-label={ariaLabel} />
@@ -357,7 +372,7 @@ export function PlayerHeatmap({ heatmap, playerName }: Props) {
       ) : heatmap?.image_url ? (
         <img src={heatmap.image_url} alt={ariaLabel} className="heatmap-img" />
       ) : null}
-      {meta ? <p className="heatmap-meta">{meta}</p> : null}
+      {meta && !compact ? <p className="heatmap-meta">{meta}</p> : null}
     </div>
   );
 }

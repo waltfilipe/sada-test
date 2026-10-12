@@ -3,7 +3,7 @@ import "server-only";
 import fs from "fs";
 import path from "path";
 import { playerStatBadges } from "./statBadges";
-import type { PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
+import type { PlayerHeatmapData, PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -23,6 +23,22 @@ export function getMeta(): SiteMeta {
 export function getPlayers(): PlayerSummary[] {
   if (!playersCache) playersCache = readJson("players.json");
   return playersCache!.players;
+}
+
+const HEATMAP_SAMPLE = 72;
+
+/** Keep the touch cloud small enough to ship on every filter card. */
+function compactHeatmap(heatmap: PlayerHeatmapData | undefined): PlayerHeatmapData | undefined {
+  const points = heatmap?.points;
+  if (!points?.length) return undefined;
+  const step = Math.max(1, Math.ceil(points.length / HEATMAP_SAMPLE));
+  const sampled = step === 1 ? points : points.filter((_, index) => index % step === 0);
+  return {
+    points: sampled.map((point) => ({
+      x: Math.round(point.x),
+      y: Math.round(point.y),
+    })),
+  };
 }
 
 let searchRowsCache: PlayerSearchRow[] | null = null;
@@ -50,6 +66,7 @@ export function getSearchRows(): PlayerSearchRow[] {
         duelo_aereo: 0,
       },
       badges: profile ? playerStatBadges(profile).map((badge) => badge.key) : [],
+      heatmap: compactHeatmap(profile?.heatmap),
     };
   });
 

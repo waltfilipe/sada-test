@@ -101,6 +101,8 @@ export type PlayerSearchRow = PlayerSummary & {
   tendencies: Tendencies;
   /** Stat badges earned on the position page. */
   badges: string[];
+  /** Downsampled touch map for the filter-card preview. */
+  heatmap?: PlayerHeatmapData;
 };
 
 export type PlayerHeatmapData = {
