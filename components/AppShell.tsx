@@ -12,11 +12,17 @@ const NAV = [
   { href: "/time-sombra", label: "Time Sombra", icon: "☽" },
 ];
 
-const FULL_BLEED = ["/posicao/", "/filtros", "/comparar", "/scatter", "/time-sombra", "/zagueiros-v2"];
+const LEGACY_SCOUT_PREFIXES = ["/posicao/", "/filtros", "/comparar", "/scatter", "/time-sombra", "/zagueiros-v2"];
+
+function isScoutRoute(pathname: string): boolean {
+  if (pathname === "/") return true;
+  if (/^\/(serie-a|serie-c)(\/|$)/.test(pathname)) return true;
+  return LEGACY_SCOUT_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isScoutPage = pathname === "/" || FULL_BLEED.some((prefix) => pathname.startsWith(prefix));
+  const isScoutPage = isScoutRoute(pathname);
 
   if (isScoutPage) {
     return <div className="app-shell scout-shell">{children}</div>;
