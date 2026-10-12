@@ -504,7 +504,7 @@ export function PositionPlayerPicker({
           <i className="fa-solid fa-chevron-left" aria-hidden="true" />
         </button>
         <div className="player-strip-grid-wrap">
-          <div className="player-strip-grid player-strip-grid-single" ref={gridRef}>
+          <div className="player-strip-rail" ref={gridRef}>
             {visible.length ? (
               visible.map((player) => (
                 <PlayerStripCard

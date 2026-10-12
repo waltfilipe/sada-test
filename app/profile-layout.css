@@ -585,10 +585,6 @@
   align-self: center;
 }
 
-.player-strip-grid-single {
-  grid-template-rows: auto;
-}
-
 .player-strip-grid {
   display: grid;
   grid-auto-flow: column;
@@ -606,6 +602,35 @@
 }
 
 .player-strip-grid::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.35);
+}
+
+/* Slim picker: one horizontal row of compact chips (photo + name) */
+.player-strip-slim .player-strip-body {
+  align-items: center;
+}
+
+.player-strip-slim .player-strip-rail {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+  padding: 0.15rem 0.1rem 0.35rem;
+  min-height: 3.25rem;
+}
+
+.player-strip-slim .player-strip-rail::-webkit-scrollbar {
+  height: 6px;
+}
+
+.player-strip-slim .player-strip-rail::-webkit-scrollbar-thumb {
   border-radius: 999px;
   background: rgba(148, 163, 184, 0.35);
 }
@@ -633,36 +658,53 @@
 }
 
 .player-strip-slim .player-strip-empty {
-  min-height: 72px;
+  flex: 1;
+  min-height: 3.25rem;
+  min-width: 100%;
 }
 
-.player-strip-card-slim {
-  min-width: 0;
-  max-width: 148px;
-  flex-direction: column;
+.player-strip-slim .player-strip-card-slim {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  flex-direction: row;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.4rem 0.45rem 0.45rem;
-  text-align: center;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  width: 11.5rem;
+  min-width: 11.5rem;
+  max-width: 11.5rem;
+  padding: 0.4rem 0.65rem 0.4rem 0.4rem;
+  border-radius: 999px;
+  text-align: left;
 }
 
-.player-strip-card-slim .player-strip-card-photo {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  font-size: 0.58rem;
+.player-strip-slim .player-strip-card-slim .player-strip-card-photo {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  font-size: 0.62rem;
 }
 
-.player-strip-card-slim .player-strip-card-name {
-  font-size: 0.68rem;
+.player-strip-slim .player-strip-card-slim .player-strip-card-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.76rem;
   font-weight: 700;
-  line-height: 1.15;
-  max-width: 100%;
-  white-space: normal;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  line-height: 1.2;
+  max-width: none;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-strip-slim .player-strip-card-slim.selected {
+  box-shadow: 0 0 0 2px rgba(27, 231, 255, 0.45);
+}
+
+.player-strip-slim .player-strip-card-slim:hover {
+  transform: none;
+  background: rgba(27, 231, 255, 0.05);
 }
 
 .profile-detail-stage {
