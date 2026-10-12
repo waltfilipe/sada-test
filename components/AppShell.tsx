@@ -12,7 +12,7 @@ const NAV = [
   { href: "/time-sombra", label: "Time Sombra", icon: "☽" },
 ];
 
-const FULL_BLEED = ["/posicao/", "/filtros", "/comparar", "/scatter", "/time-sombra"];
+const FULL_BLEED = ["/posicao/", "/filtros", "/comparar", "/scatter", "/time-sombra", "/zagueiros-v2"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

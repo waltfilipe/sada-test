@@ -94,6 +94,13 @@ export default function HomePage() {
         <section className="home-section" aria-labelledby="home-positions-title">
           <h2 id="home-positions-title">Entrar por posição</h2>
           <div className="home-positions">
+            <Link href="/zagueiros-v2" className="home-position">
+              <span className="home-position-short">V2</span>
+              <span className="home-position-copy">
+                <strong>Zagueiros v2</strong>
+                <em>Lista à esquerda · teste</em>
+              </span>
+            </Link>
             {POSITION_FAMILIES.map((family) => (
               <Link key={family.key} href={`/posicao/${family.slug}`} className="home-position">
                 <span className="home-position-short">{family.short}</span>

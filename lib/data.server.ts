@@ -2,6 +2,7 @@ import "server-only";
 
 import fs from "fs";
 import path from "path";
+import { playerStatBadges } from "./statBadges";
 import type { PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -48,6 +49,7 @@ export function getSearchRows(): PlayerSearchRow[] {
         contencao: 0,
         duelo_aereo: 0,
       },
+      badges: profile ? playerStatBadges(profile).map((badge) => badge.key) : [],
     };
   });
 

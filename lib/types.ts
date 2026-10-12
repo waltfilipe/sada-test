@@ -99,6 +99,8 @@ export type PlayerSearchRow = PlayerSummary & {
   goals: number;
   assists: number;
   tendencies: Tendencies;
+  /** Stat badges earned on the position page. */
+  badges: string[];
 };
 
 export type PlayerHeatmapData = {

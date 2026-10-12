@@ -63,9 +63,12 @@ export function topRatedPlayerId(players: PlayerProfile[]): string {
 }
 
 /** Rating do perfil classificado do atleta (não usa rating geral). */
-export function positionRating(player: PlayerProfile): number {
+export function positionRating(
+  player: Pick<PlayerProfile, "profile" | "position_family" | "rating"> &
+    Partial<Pick<PlayerProfile, "ratings" | "hybrid_lean" | "cluster">>,
+): number {
   const key = dominantRatingKey(player.profile, player.position_family, player.hybrid_lean);
-  if (key && player.ratings[key] != null) return player.ratings[key];
+  if (key && player.ratings?.[key] != null) return player.ratings[key];
 
   if (player.cluster?.ratings) {
     const slug = archetypeClusterSlug(player.cluster.archetype);
@@ -75,9 +78,11 @@ export function positionRating(player: PlayerProfile): number {
     }
   }
 
-  const profileRatings = Object.entries(player.ratings)
-    .filter(([ratingKey]) => ratingKey !== "geral")
-    .map(([, value]) => value);
+  const profileRatings = player.ratings
+    ? Object.entries(player.ratings)
+        .filter(([ratingKey]) => ratingKey !== "geral")
+        .map(([, value]) => value)
+    : [];
   if (profileRatings.length) return Math.max(...profileRatings);
   return player.rating;
 }

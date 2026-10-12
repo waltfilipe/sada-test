@@ -3,11 +3,6 @@
    Design tokens are inherited from `.scout-root` in scout.css
    ========================================================================== */
 
-.topbar-links a.active {
-  color: var(--text);
-  font-weight: 500;
-}
-
 .filters-body {
   display: grid;
   grid-template-columns: 332px minmax(0, 1fr);
@@ -492,7 +487,7 @@
 
 .result-row {
   display: grid;
-  grid-template-columns: 92px minmax(0, 0.85fr) minmax(0, 1fr) 164px;
+  grid-template-columns: 92px minmax(0, 1fr) 168px;
   align-items: center;
   gap: 1.5rem;
   padding: 1rem 1.15rem;
@@ -576,7 +571,7 @@
 
 .row-facts {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.5rem 0.75rem;
   margin: 0.85rem 0 0;
 }
@@ -609,6 +604,58 @@
   font-size: 0.68rem;
   font-weight: 400;
   color: var(--text-3);
+}
+
+.row-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  padding: 0.18rem 0.48rem;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  font-size: 0.68rem;
+  font-weight: 650;
+  color: var(--text-2);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.row-badge i {
+  font-size: 0.62rem;
+  color: #7df1de;
+}
+
+.row-badges-empty {
+  margin: 0.7rem 0 0;
+  font-size: 0.72rem;
+  color: var(--text-3);
+}
+
+.badge-filter-row {
+  gap: 0.35rem;
+}
+
+.badge-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.badge-filter-chip i {
+  font-size: 0.68rem;
+  opacity: 0.75;
+}
+
+.badge-filter-chip.active i {
+  opacity: 1;
 }
 
 /* Normalised indices */
@@ -824,7 +871,7 @@
 
 @media (max-width: 1400px) {
   .result-row {
-    grid-template-columns: 84px minmax(0, 0.8fr) minmax(0, 1fr) 150px;
+    grid-template-columns: 84px minmax(0, 1fr) 150px;
     gap: 1.1rem;
   }
 
@@ -846,9 +893,7 @@
 @media (max-width: 1240px) {
   .result-row {
     grid-template-columns: 84px minmax(0, 1fr) 148px;
-    grid-template-areas:
-      "photo identity aside"
-      "indices indices indices";
+    grid-template-areas: "photo identity aside";
     gap: 1rem 1.2rem;
     align-items: start;
   }
@@ -871,8 +916,7 @@
     grid-template-columns: 72px minmax(0, 1fr);
     grid-template-areas:
       "photo identity"
-      "aside aside"
-      "indices indices";
+      "aside aside";
   }
 
   .row-photo {

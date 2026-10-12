@@ -1,40 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import {
-  TENDENCY_META,
-  clampPercent,
-  formatRating,
-  percentileTier,
-  playerInitials,
-  ratingTier,
-  tierVars,
-} from "@/lib/scoutTheme";
 import { ClubLogo } from "@/components/ClubLogo";
 import { MinutesStat } from "@/components/position/MinutesStat";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
+import { playerInitials } from "@/lib/scoutTheme";
+import type { FamilyBadgeOption } from "@/lib/statBadges";
 import type { PlayerSearchRow } from "@/lib/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-export function PlayerResultRow({ player }: { player: PlayerSearchRow }) {
-  const token = ratingTier(player.rating);
+export function PlayerResultRow({
+  player,
+  catalog,
+}: {
+  player: PlayerSearchRow;
+  catalog: FamilyBadgeOption[];
+}) {
   const age = player.birth_year ? CURRENT_YEAR - player.birth_year : null;
   const tm = player.transfermarkt;
+  const earned = catalog.filter((badge) => player.badges.includes(badge.key));
 
   const facts = [
     { label: "Idade", value: age ? `${age}` : "—", unit: age ? "anos" : undefined },
     { label: "Altura", value: player.height ? `${player.height}` : "—", unit: player.height ? "cm" : undefined },
     { label: "Pé", value: player.foot ?? "—" },
-    { label: "G/A", value: `${player.goals}/${player.assists}` },
+    { label: "Minutos", value: player.minutes.toLocaleString("pt-BR") },
   ];
 
   return (
-    <Link
-      href={`/posicao/${player.position_family}?atleta=${player.player_id}`}
-      className="result-row"
-      style={tierVars(token)}
-    >
+    <Link href={`/posicao/${player.position_family}?atleta=${player.player_id}`} className="result-row">
       <div className="row-photo">
         {tm?.photo ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -67,22 +62,19 @@ export function PlayerResultRow({ player }: { player: PlayerSearchRow }) {
             </div>
           ))}
         </dl>
-      </div>
 
-      <div className="row-indices">
-        {TENDENCY_META.map((item) => {
-          const value = clampPercent(player.tendencies[item.key]);
-          const indexToken = percentileTier(value);
-          return (
-            <div key={item.key} className="row-index" style={tierVars(indexToken)} title={item.hint}>
-              <span className="row-index-label">{item.compact}</span>
-              <strong>{Math.round(value)}</strong>
-              <span className="row-index-track">
-                <i style={{ width: `${Math.max(3, value)}%` }} />
-              </span>
-            </div>
-          );
-        })}
+        {earned.length ? (
+          <ul className="row-badges" aria-label="Badges">
+            {earned.map((badge) => (
+              <li key={badge.key} className={`row-badge tone-${badge.tone}`} title={badge.title}>
+                <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
+                {badge.label}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="row-badges-empty">Sem badges nesta posição</p>
+        )}
       </div>
 
       <div className="row-aside">
@@ -92,11 +84,6 @@ export function PlayerResultRow({ player }: { player: PlayerSearchRow }) {
           variant="compact"
           className="row-minutes"
         />
-
-        <div className="row-rating">
-          <strong>{formatRating(player.rating)}</strong>
-          <span>Rating</span>
-        </div>
 
         <div className="row-market">
           <div>

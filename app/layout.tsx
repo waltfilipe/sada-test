@@ -9,6 +9,7 @@ import "./compare.css";
 import "./scatter.css";
 import "./time-sombra.css";
 import "./home.css";
+import "./zag-v2.css";
 
 export const metadata: Metadata = {
   title: "Série A Scout",

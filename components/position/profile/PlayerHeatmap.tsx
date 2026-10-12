@@ -18,17 +18,16 @@ const PITCH_RATIO = PITCH_L / PITCH_W;
 /** One density cell per metre keeps the gaussian smooth after upscaling. */
 const GRID_W = 105;
 const GRID_H = 68;
-const SIGMA = 3.4;
+const SIGMA = 4.6;
 
-/** Elegant low→high ramp; cold zones stay clear so the grass reads through. */
+/** Broadcast-style density: cool and quiet until the real hotspots. */
 const RAMP: { stop: number; rgba: [number, number, number, number] }[] = [
-  { stop: 0.0, rgba: [56, 189, 248, 0] },
-  { stop: 0.22, rgba: [56, 189, 248, 0.05] },
-  { stop: 0.42, rgba: [45, 212, 191, 0.16] },
-  { stop: 0.6, rgba: [190, 230, 80, 0.3] },
-  { stop: 0.76, rgba: [250, 204, 21, 0.46] },
-  { stop: 0.89, rgba: [249, 132, 52, 0.6] },
-  { stop: 1.0, rgba: [239, 78, 78, 0.72] },
+  { stop: 0.0, rgba: [20, 90, 160, 0] },
+  { stop: 0.28, rgba: [32, 140, 190, 0.05] },
+  { stop: 0.48, rgba: [40, 170, 120, 0.22] },
+  { stop: 0.66, rgba: [232, 196, 48, 0.5] },
+  { stop: 0.82, rgba: [230, 110, 28, 0.68] },
+  { stop: 1.0, rgba: [176, 28, 36, 0.82] },
 ];
 
 function rampColor(t: number): [number, number, number, number] {
@@ -77,7 +76,7 @@ function buildDensity(points: Point[]): Float32Array {
   if (max > 0) {
     for (let i = 0; i < grid.length; i += 1) {
       // Slight gamma above 1 keeps low-traffic zones clear and hotspots tight.
-      grid[i] = Math.pow(grid[i] / max, 1.15);
+      grid[i] = Math.pow(grid[i] / max, 1.45);
     }
   }
   return grid;
@@ -86,16 +85,18 @@ function buildDensity(points: Point[]): Float32Array {
 type Rect = { x: number; y: number; w: number; h: number };
 
 function pitchRect(w: number, h: number): Rect {
-  const pad = Math.max(4, Math.min(w, h) * 0.028);
-  const availW = Math.max(0, w - pad * 2);
-  const availH = Math.max(0, h - pad * 2);
+  const padX = Math.max(8, w * 0.04);
+  const padTop = Math.max(6, h * 0.03);
+  const padBottom = Math.max(18, h * 0.09);
+  const availW = Math.max(0, w - padX * 2);
+  const availH = Math.max(0, h - padTop - padBottom);
   let pw = availW;
   let ph = pw / PITCH_RATIO;
   if (ph > availH) {
     ph = availH;
     pw = ph * PITCH_RATIO;
   }
-  return { x: (w - pw) / 2, y: (h - ph) / 2, w: pw, h: ph };
+  return { x: (w - pw) / 2, y: padTop + (availH - ph) / 2, w: pw, h: ph };
 }
 
 function roundedPath(ctx: CanvasRenderingContext2D, r: Rect, radius: number) {
@@ -109,24 +110,31 @@ function roundedPath(ctx: CanvasRenderingContext2D, r: Rect, radius: number) {
 }
 
 function drawGrass(ctx: CanvasRenderingContext2D, r: Rect, radius: number) {
-  const grad = ctx.createLinearGradient(r.x, r.y, r.x, r.y + r.h);
-  grad.addColorStop(0, "#15412a");
-  grad.addColorStop(0.5, "#123a25");
-  grad.addColorStop(1, "#0f321f");
+  const base = ctx.createLinearGradient(r.x, r.y, r.x + r.w, r.y + r.h);
+  base.addColorStop(0, "#1c7a45");
+  base.addColorStop(0.45, "#176b3c");
+  base.addColorStop(1, "#145c34");
 
   ctx.save();
   roundedPath(ctx, r, radius);
   ctx.clip();
-  ctx.fillStyle = grad;
+  ctx.fillStyle = base;
   ctx.fillRect(r.x, r.y, r.w, r.h);
 
-  const bands = 9;
+  const bands = 10;
   const bandW = r.w / bands;
   for (let i = 0; i < bands; i += 1) {
     if (i % 2 === 0) continue;
-    ctx.fillStyle = "rgba(255, 255, 255, 0.022)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.035)";
     ctx.fillRect(r.x + i * bandW, r.y, bandW, r.h);
   }
+
+  const shade = ctx.createLinearGradient(r.x, r.y, r.x, r.y + r.h);
+  shade.addColorStop(0, "rgba(255, 255, 255, 0.07)");
+  shade.addColorStop(0.45, "rgba(0, 0, 0, 0)");
+  shade.addColorStop(1, "rgba(0, 0, 0, 0.16)");
+  ctx.fillStyle = shade;
+  ctx.fillRect(r.x, r.y, r.w, r.h);
   ctx.restore();
 }
 
@@ -156,7 +164,7 @@ function drawHeat(ctx: CanvasRenderingContext2D, r: Rect, radius: number, points
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   // Bilinear upscale plus a light blur removes the per-cell grid entirely.
-  ctx.filter = `blur(${Math.max(1, r.w * 0.008)}px)`;
+  ctx.filter = `blur(${Math.max(1.4, r.w * 0.012)}px)`;
   ctx.drawImage(off, r.x, r.y, r.w, r.h);
   ctx.filter = "none";
   ctx.restore();
@@ -171,8 +179,8 @@ function drawLines(ctx: CanvasRenderingContext2D, r: Rect, radius: number) {
   roundedPath(ctx, r, radius);
   ctx.clip();
 
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
-  ctx.lineWidth = Math.max(1, r.w * 0.0028);
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.78)";
+  ctx.lineWidth = Math.max(1.1, r.w * 0.0022);
   ctx.lineJoin = "round";
 
   ctx.strokeRect(r.x, r.y, r.w, r.h);
@@ -210,7 +218,7 @@ function drawLines(ctx: CanvasRenderingContext2D, r: Rect, radius: number) {
     );
 
     const spotX = mx(goalLine + dir * 11);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
     ctx.beginPath();
     ctx.arc(spotX, my(PITCH_W / 2), Math.max(1.2, r.w * 0.0032), 0, Math.PI * 2);
     ctx.fill();
@@ -230,14 +238,14 @@ function drawLines(ctx: CanvasRenderingContext2D, r: Rect, radius: number) {
     ctx.restore();
 
     const goalDepth = 1.6;
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
     ctx.strokeRect(
       mx(goalLine + (dir === 1 ? -goalDepth : 0)),
       my(PITCH_W / 2 - 3.66),
       goalDepth * scale,
       7.32 * scale,
     );
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.78)";
   }
 
   const cornerR = 1 * scale;
@@ -257,24 +265,13 @@ function drawLines(ctx: CanvasRenderingContext2D, r: Rect, radius: number) {
 }
 
 function drawAttackHint(ctx: CanvasRenderingContext2D, r: Rect) {
-  const y = r.y + r.h + Math.max(8, r.h * 0.055);
-  const w = Math.min(r.w * 0.2, 64);
-  const x = r.x + r.w - w;
-
+  const y = r.y + r.h + Math.max(12, r.h * 0.07);
   ctx.save();
-  ctx.strokeStyle = "rgba(148, 163, 184, 0.45)";
-  ctx.fillStyle = "rgba(148, 163, 184, 0.45)";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(x, y);
-  ctx.lineTo(x + w - 5, y);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(x + w, y);
-  ctx.lineTo(x + w - 6, y - 3);
-  ctx.lineTo(x + w - 6, y + 3);
-  ctx.closePath();
-  ctx.fill();
+  ctx.fillStyle = "rgba(226, 232, 240, 0.72)";
+  ctx.font = `600 ${Math.max(9, r.h * 0.045)}px "DM Sans", system-ui, sans-serif`;
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  ctx.fillText("Ataque  →", r.x + r.w, y);
   ctx.restore();
 }
 
@@ -301,7 +298,7 @@ function render(canvas: HTMLCanvasElement, points: Point[]) {
 
   const rect = pitchRect(width, height);
   if (rect.w <= 0 || rect.h <= 0) return;
-  const radius = Math.max(0, Math.min(10, rect.h * 0.06));
+  const radius = Math.max(2, Math.min(6, rect.h * 0.02));
 
   drawGrass(ctx, rect, radius);
   if (points.length) drawHeat(ctx, rect, radius, points);

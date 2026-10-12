@@ -1,5 +1,7 @@
+import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { aspectQualityPercentile, aspectQuantityPercentile } from "@/lib/aspectGrades";
-import type { AspectItem } from "@/lib/types";
+import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
+import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
 
 export const STAT_BADGE_THRESHOLD = 50;
 
@@ -180,5 +182,40 @@ export function earnedStatBadges(items: AspectItem[], groupTitleByItem?: Map<str
     badges.push(badge);
   }
 
+  return badges;
+}
+
+export type FamilyBadgeOption = StatMetricBadge & { tone: StatSectionTone };
+
+/** Badges that can appear for a position, in the same order as the profile stats. */
+export function badgeCatalogForFamily(family: PositionFamily): FamilyBadgeOption[] {
+  const options: FamilyBadgeOption[] = [];
+  const seen = new Set<string>();
+  for (const section of statSectionsForFamily(family)) {
+    for (const label of section.labels) {
+      const meta = METRIC_BADGE_CATALOG[label];
+      if (!meta || seen.has(label)) continue;
+      seen.add(label);
+      options.push({ key: label, tone: section.tone, ...meta });
+    }
+  }
+  return options;
+}
+
+/** Badges this athlete actually earned, using the position-page sections. */
+export function playerStatBadges(player: PlayerProfile): StatMetricBadge[] {
+  const all = flattenAspects(player);
+  const badges: StatMetricBadge[] = [];
+  const seen = new Set<string>();
+  for (const section of statSectionsForFamily(player.position_family)) {
+    for (const label of section.labels) {
+      const item = findAspect(all, label);
+      if (!item || seen.has(label)) continue;
+      const badge = statBadgeForMetric(item, label);
+      if (!badge) continue;
+      seen.add(label);
+      badges.push(badge);
+    }
+  }
   return badges;
 }

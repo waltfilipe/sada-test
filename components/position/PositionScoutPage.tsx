@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
@@ -80,6 +81,12 @@ export function PositionScoutPage({ family, players }: Props) {
               <h1 className="profile-context-title">{familyMeta.label}</h1>
               <span className="profile-context-meta">
                 {players.length} atletas · Série A 2025/26
+                {family === "zagueiros" ? (
+                  <>
+                    {" · "}
+                    <Link href="/zagueiros-v2">Ver layout v2</Link>
+                  </>
+                ) : null}
               </span>
             </div>
 
