@@ -114,6 +114,146 @@ def playwright_proxy_settings(proxy_url: str | None) -> dict[str, str] | None:
     return out
 
 
+def api_url(path: str) -> str:
+    return f"{API_ROOT}/{path.lstrip('/')}"
+
+
+def cache_file_for_path(cache_dir: Path, path: str) -> Path:
+    safe = path.strip("/").replace("/", "__")
+    return cache_dir / f"{safe}.json"
+
+
+def load_json_dict(path: Path) -> dict[str, Any]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise RuntimeError(f"JSON em {path} não é um objeto")
+    return data
+
+
+class CookieCffiHttp:
+    """GET com header Cookie copiado do DevTools (Chrome/Edge) — sem Playwright."""
+
+    def __init__(self, cookies_file: Path, proxy_url: str | None = None) -> None:
+        from curl_cffi import requests
+
+        raw = cookies_file.read_text(encoding="utf-8").strip()
+        if not raw:
+            raise ValueError(f"Arquivo de cookies vazio: {cookies_file}")
+        if raw.lower().startswith("cookie:"):
+            raw = raw.split(":", 1)[1].strip()
+        self._cookie = raw
+        self._session = requests.Session()
+        self._proxies = proxy_dict(proxy_url)
+        self._headers = {
+            "accept": "application/json, text/plain, */*",
+            "referer": "https://www.sofascore.com/",
+            "origin": "https://www.sofascore.com",
+            "user-agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/131.0.0.0 Safari/537.36"
+            ),
+            "cookie": self._cookie,
+        }
+
+    def get(self, path: str) -> dict[str, Any]:
+        url = api_url(path)
+        res = self._session.get(
+            url,
+            headers=self._headers,
+            proxies=self._proxies,
+            impersonate="chrome131",
+            timeout=60,
+        )
+        if res.status_code != 200:
+            raise RuntimeError(f"HTTP {res.status_code} em {url}: {res.text[:300]}")
+        data = res.json()
+        if not isinstance(data, dict):
+            raise RuntimeError(f"Resposta inesperada em {url}")
+        return data
+
+    def close(self) -> None:
+        self._session.close()
+
+
+class FileCacheHttp:
+    """Lê JSON salvos manualmente no disco (modo offline / semi-manual)."""
+
+    def __init__(self, cache_dir: Path) -> None:
+        self.cache_dir = cache_dir
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+
+    def get(self, path: str) -> dict[str, Any]:
+        fpath = cache_file_for_path(self.cache_dir, path)
+        if not fpath.is_file():
+            raise RuntimeError(
+                f"Cache ausente: {fpath}\n"
+                f"Baixe no navegador (onde a API abre) e salve o JSON como:\n"
+                f"  {api_url(path)}"
+            )
+        return load_json_dict(fpath)
+
+    def close(self) -> None:
+        pass
+
+
+class CdpSofascoreHttp:
+    """Conecta ao Chrome/Edge que VOCÊ abriu (--remote-debugging-port)."""
+
+    def __init__(self, cdp_url: str, get_retries: int = 6) -> None:
+        from playwright.sync_api import sync_playwright
+
+        self._get_retries = max(1, get_retries)
+        self._get_retry_delay_s = 2.0
+        self._pw = sync_playwright().start()
+        self._browser = self._pw.chromium.connect_over_cdp(cdp_url)
+        self._ctx = self._browser.contexts[0] if self._browser.contexts else self._browser.new_context()
+        self._page = self._ctx.pages[0] if self._ctx.pages else self._ctx.new_page()
+        log(f"CDP: conectado · {len(self._ctx.pages)} aba(s) · use uma aba já em sofascore.com")
+
+    def _fetch_once(self, url: str) -> tuple[int, str]:
+        payload = self._page.evaluate(
+            """async (url) => {
+                const res = await fetch(url, {
+                    credentials: "include",
+                    headers: { accept: "application/json, text/plain, */*" },
+                });
+                return { status: res.status, text: await res.text() };
+            }""",
+            url,
+        )
+        return int(payload["status"]), str(payload["text"])
+
+    def get(self, path: str) -> dict[str, Any]:
+        url = api_url(path)
+        last_status, last_text = 0, ""
+        for attempt in range(1, self._get_retries + 1):
+            status, text = self._fetch_once(url)
+            last_status, last_text = status, text
+            if status == 200:
+                return load_json_dict_from_text(text, url)
+            if status == 403 and attempt < self._get_retries:
+                log(f"  CDP 403 em {path} ({attempt}/{self._get_retries}) — aguarde e tente de novo …")
+                self._page.wait_for_timeout(int(self._get_retry_delay_s * 1000))
+                continue
+            break
+        raise RuntimeError(
+            f"HTTP {last_status} em {url}: {last_text[:300]}\n"
+            "Abra a liga no MESMO Chrome (porta debug) e confirme que a URL da API abre na barra."
+        )
+
+    def close(self) -> None:
+        self._browser.close()
+        self._pw.stop()
+
+
+def load_json_dict_from_text(text: str, url: str) -> dict[str, Any]:
+    data = json.loads(text)
+    if not isinstance(data, dict):
+        raise RuntimeError(f"Resposta inesperada (não é objeto JSON) em {url}")
+    return data
+
+
 class BrowserSofascoreHttp:
     """GET na API SofaScore usando fetch dentro da aba (mesmos cookies da sessão)."""
 
@@ -258,7 +398,7 @@ class BrowserSofascoreHttp:
         return "challenge" in text.lower() or '"reason"' in text
 
     def get(self, path: str) -> dict[str, Any]:
-        url = f"{API_ROOT}/{path.lstrip('/')}"
+        url = api_url(path)
         last_status = 0
         last_text = ""
 
@@ -266,10 +406,7 @@ class BrowserSofascoreHttp:
             status, text = self._fetch_once(url)
             last_status, last_text = status, text
             if status == 200:
-                data = json.loads(text)
-                if not isinstance(data, dict):
-                    raise RuntimeError(f"Resposta inesperada (não é objeto JSON) em {url}")
-                return data
+                return load_json_dict_from_text(text, url)
 
             if self._is_challenge_response(status, text) and attempt < self._get_retries:
                 log(
@@ -291,15 +428,15 @@ class BrowserSofascoreHttp:
                 return data
 
         hint = (
-            "\n\nAkamai ainda bloqueou (403 challenge). Tente:\n"
-            "  1) python -m playwright install chromium\n"
-            "  2) Rode com Chrome real e janela visível:\n"
-            '     --channel chrome --headed --warmup-wait 25000\n'
-            "  3) Salve cookies após abrir o site manualmente uma vez:\n"
-            "     --save-storage ./sofascore_state.json\n"
-            "     (depois use --load-storage ./sofascore_state.json)\n"
-            "  4) Perfil persistente:\n"
-            "     --user-data-dir ./pw_sofascore_profile"
+            "\n\nAkamai ainda bloqueou (403 challenge). Alternativas:\n"
+            "  A) Chrome com porta debug (recomendado):\n"
+            '     --transport cdp --cdp-url http://127.0.0.1:9222\n'
+            "  B) Cookie do DevTools → arquivo cookies.txt:\n"
+            "     --transport cookies --cookies-file ./cookies.txt\n"
+            "  C) JSON offline:\n"
+            "     --transport cache --cache-dir ./sofascore_cache\n"
+            "  D) Playwright visível:\n"
+            '     --channel chrome --headed --warmup-wait 25000'
         )
         raise RuntimeError(
             f"HTTP {last_status} (fetch) / {nav_status} (goto) em {url}: "
@@ -323,9 +460,26 @@ class BrowserSofascoreHttp:
         self._pw.stop()
 
 
-def patch_tacoscore_client(client: Any, browser_http: BrowserSofascoreHttp) -> None:
-    """Substitui client._http.get pelo fetch via browser."""
-    client._http.get = browser_http.get  # type: ignore[method-assign]
+def patch_tacoscore_client(client: Any, http_backend: Any) -> None:
+    """Substitui client._http.get pelo transport escolhido."""
+    client._http.get = http_backend.get  # type: ignore[method-assign]
+
+
+def print_api_urls(tournament_id: int, season_id: int, limit: int | None) -> None:
+    """Lista URLs para baixar manualmente (Network → Save response)."""
+    paths = [f"unique-tournament/{tournament_id}/season/{season_id}/rounds"]
+    log("URLs da API (abra no Chrome onde o site funciona):\n")
+    for p in paths:
+        log(f"  {api_url(p)}")
+    log(
+        "\nDepois de obter os event_id em rounds, para cada jogo:\n"
+        "  .../event/{event_id}\n"
+        "  .../event/{event_id}/lineups\n"
+        "\nSalve cada resposta em --cache-dir com o nome gerado pelo script, ex.:\n"
+        f"  {cache_file_for_path(Path('./sofascore_cache'), paths[0]).name}"
+    )
+    if limit:
+        log(f"\n(use --limit {limit} no modo online para não listar centenas de jogos)")
 
 
 def list_finished_matches(client: Any, tournament_id: int, season_id: int) -> list[Any]:
@@ -494,6 +648,34 @@ def main() -> int:
         default=None,
         help="Perfil Chromium persistente (reutiliza cookies entre execuções)",
     )
+    parser.add_argument(
+        "--transport",
+        choices=("playwright", "cdp", "cookies", "cache", "curl"),
+        default="playwright",
+        help="playwright (default), cdp, cookies, cache (offline), curl (tacoscore puro)",
+    )
+    parser.add_argument(
+        "--cdp-url",
+        default="http://127.0.0.1:9222",
+        help="URL do Chrome com --remote-debugging-port (modo cdp)",
+    )
+    parser.add_argument(
+        "--cookies-file",
+        type=Path,
+        default=None,
+        help="Arquivo com header Cookie copiado do DevTools (modo cookies)",
+    )
+    parser.add_argument(
+        "--cache-dir",
+        type=Path,
+        default=Path("./sofascore_cache"),
+        help="Pasta de JSON offline (modo cache)",
+    )
+    parser.add_argument(
+        "--print-api-urls",
+        action="store_true",
+        help="Só imprime URLs para download manual; não coleta",
+    )
     args = parser.parse_args()
 
     try:
@@ -505,20 +687,27 @@ def main() -> int:
         return 1
 
     tournament_id, season_id = parse_tournament_url(args.url)
+
+    if args.print_api_urls:
+        print_api_urls(tournament_id, season_id, args.limit)
+        return 0
+
     out_path = args.output
     out_path.parent.mkdir(parents=True, exist_ok=True)
     proxy_url = resolve_proxy(args.proxy)
     league_page = tournament_page_url(args.url)
+
+    transport = "curl" if args.no_playwright else args.transport
 
     client = TacosScoreClient(
         rate_limit_seconds=max(0.0, args.rate_limit),
         proxies=proxy_dict(proxy_url),
     )
 
-    browser_http: BrowserSofascoreHttp | None = None
-    if not args.no_playwright:
-        log("Abrindo sessão Playwright para passar a Akamai …")
-        browser_http = BrowserSofascoreHttp(
+    http_backend: Any | None = None
+    if transport == "playwright":
+        log("Transport: Playwright …")
+        http_backend = BrowserSofascoreHttp(
             proxy_url=proxy_url,
             headless=not args.headed,
             channel=args.channel,
@@ -528,7 +717,27 @@ def main() -> int:
             user_data_dir=args.user_data_dir,
             get_retries=10 if args.headed else 8,
         )
-        patch_tacoscore_client(client, browser_http)
+        patch_tacoscore_client(client, http_backend)
+    elif transport == "cdp":
+        log(f"Transport: CDP → {args.cdp_url}")
+        http_backend = CdpSofascoreHttp(args.cdp_url)
+        patch_tacoscore_client(client, http_backend)
+    elif transport == "cookies":
+        if not args.cookies_file:
+            log("Modo cookies exige --cookies-file ./cookies.txt")
+            return 1
+        log(f"Transport: Cookie header ← {args.cookies_file}")
+        http_backend = CookieCffiHttp(args.cookies_file, proxy_url=proxy_url)
+        patch_tacoscore_client(client, http_backend)
+    elif transport == "cache":
+        log(f"Transport: cache offline ← {args.cache_dir.resolve()}")
+        http_backend = FileCacheHttp(args.cache_dir)
+        patch_tacoscore_client(client, http_backend)
+    elif transport == "curl":
+        log("Transport: curl_cffi do tacoscore (sem bypass Akamai)")
+    else:
+        log(f"Transport desconhecido: {transport}")
+        return 1
 
     try:
         return run_collection(
@@ -541,10 +750,11 @@ def main() -> int:
             rate_limit=args.rate_limit,
         )
     finally:
-        if browser_http is not None:
-            if args.save_storage:
-                browser_http.save_storage_state(args.save_storage)
-            browser_http.close()
+        if http_backend is not None:
+            if args.save_storage and hasattr(http_backend, "save_storage_state"):
+                http_backend.save_storage_state(args.save_storage)
+            if hasattr(http_backend, "close"):
+                http_backend.close()
 
 
 if __name__ == "__main__":
