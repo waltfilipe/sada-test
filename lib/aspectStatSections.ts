@@ -45,7 +45,7 @@ const LAT_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Dribles e Condução",
     tone: "dribles",
-    labels: ["Disputas com Bola", "1v1 - Ofensivo", "Conduções Progressivas", "Acelerações"],
+    labels: ["Disputas com Bola", "1v1 - Ofensivo", "Progressão"],
   },
   {
     title: "Passes Finais",

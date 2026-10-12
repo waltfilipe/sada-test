@@ -21,7 +21,7 @@ export function PositionScoutPage({ family, players }: Props) {
   const [selectedId, setSelectedId] = useState(
     () => (requestedId && players.some((p) => p.player_id === requestedId) ? requestedId : players[0]?.player_id) ?? "",
   );
-  const [profilesFilter, setProfilesFilter] = useState<string[]>([]);
+  const [profileFilter, setProfileFilter] = useState<string | null>(null);
   const [clusterFilters, setClusterFilters] = useState<string[]>([]);
   const familyMeta = familyBySlug(family);
   const clusterMode =
@@ -53,12 +53,6 @@ export function PositionScoutPage({ family, players }: Props) {
       setSelectedId(requestedId);
     }
   }, [requestedId, players]);
-
-  const toggleProfile = (profile: string) => {
-    setProfilesFilter((current) =>
-      current.includes(profile) ? current.filter((item) => item !== profile) : [...current, profile],
-    );
-  };
 
   const toggleClusterFilter = (key: string) => {
     setClusterFilters((current) =>
@@ -107,9 +101,10 @@ export function PositionScoutPage({ family, players }: Props) {
                 onSelect={setSelectedId}
                 clusterMode={clusterMode}
                 clusterFilters={clusterFilters}
-                profilesFilter={profilesFilter}
+                profileFilter={profileFilter}
+                onProfileFilterChange={setProfileFilter}
                 onToggleClusterFilter={toggleClusterFilter}
-                onToggleProfile={toggleProfile}
+                onClearClusterFilters={() => setClusterFilters([])}
                 profilesAvailable={profilesAvailable}
               />
             </div>

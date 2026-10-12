@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ClubLogo } from "@/components/ClubLogo";
 import { AT_ARCHETYPE_META, EX_ARCHETYPE_META, LAT_ARCHETYPE_META, MC_ARCHETYPE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
-import { gradeTier, playerInitials, profileGradeFromRank, tierVars } from "@/lib/scoutTheme";
+import { playerInitials, profileGradeFromRank } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
 import { archetypeRank, sortedProfileShareRows } from "@/lib/profileShares";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
@@ -11,16 +10,7 @@ import { PickerFilterMenu, type FilterOption } from "./PickerFilterMenu";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
-
-type SortKey = "rating" | "minutes" | "age" | "value" | "name";
-
-const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-  { key: "rating", label: "Rating" },
-  { key: "minutes", label: "Minutos" },
-  { key: "age", label: "Mais jovem" },
-  { key: "value", label: "Valor" },
-  { key: "name", label: "Nome" },
-];
+const TODOS_PROFILE = "__todos__";
 
 const AGE_BANDS: { value: string; label: string; min: number; max: number }[] = [
   { value: "u21", label: "Até 21 anos", min: 0, max: 21 },
@@ -48,21 +38,6 @@ const ORIGIN_OPTIONS: FilterOption[] = [
   { value: "out", label: "Estrangeiros" },
 ];
 
-const POSITION_SHORT: Record<string, string> = {
-  Zagueiro: "ZAG",
-  "Lateral Esquerdo": "LE",
-  "Lateral Direito": "LD",
-  "Meio-campista": "MC",
-  "Extremo Esquerdo": "EE",
-  "Extremo Direito": "ED",
-  "Meia Ofensivo": "MO",
-  Atacante: "ATA",
-};
-
-function positionShort(position: string): string {
-  return POSITION_SHORT[position] ?? position.slice(0, 3).toUpperCase();
-}
-
 function playerAge(player: PlayerProfile): number | null {
   return player.birth_year ? CURRENT_YEAR - player.birth_year : null;
 }
@@ -73,15 +48,6 @@ function hasKnownFoot(foot: string | null | undefined): foot is string {
   return normalized !== "unknown" && normalized !== "nan" && normalized !== "";
 }
 
-function formatMarketValue(value: number | null | undefined): string | null {
-  if (!value) return null;
-  if (value >= 1_000_000) {
-    const millions = value / 1_000_000;
-    return `€ ${millions.toFixed(millions >= 10 ? 0 : 1).replace(".", ",")} mi`;
-  }
-  return `€ ${Math.round(value / 1000)} mil`;
-}
-
 type Props = {
   players: PlayerProfile[];
   family: PositionFamily;
@@ -89,9 +55,10 @@ type Props = {
   onSelect: (id: string) => void;
   clusterMode?: boolean;
   clusterFilters?: string[];
-  profilesFilter?: string[];
+  profileFilter?: string | null;
+  onProfileFilterChange?: (profile: string | null) => void;
   onToggleClusterFilter?: (key: string) => void;
-  onToggleProfile?: (profile: string) => void;
+  onClearClusterFilters?: () => void;
   profilesAvailable?: string[];
 };
 
@@ -102,13 +69,13 @@ export function PositionPlayerPicker({
   onSelect,
   clusterMode = false,
   clusterFilters = [],
-  profilesFilter = [],
+  profileFilter = null,
+  onProfileFilterChange,
   onToggleClusterFilter,
-  onToggleProfile,
+  onClearClusterFilters,
   profilesAvailable = [],
 }: Props) {
   const [query, setQuery] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("rating");
   const [clubFilter, setClubFilter] = useState<string[]>([]);
   const [positionFilter, setPositionFilter] = useState<string[]>([]);
   const [footFilter, setFootFilter] = useState<string[]>([]);
@@ -118,10 +85,6 @@ export function PositionPlayerPicker({
   const [originFilter, setOriginFilter] = useState<string[]>([]);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  /**
-   * Grade of the athlete's dominant archetype, ranked inside that archetype, so
-   * the badge matches the top row of the Perfil card.
-   */
   const gradeById = useMemo(() => {
     const map = new Map<string, { grade: string; label: string }>();
     for (const player of players) {
@@ -174,6 +137,8 @@ export function PositionPlayerPicker({
     })).filter((option) => (option.count ?? 0) > 0);
   }, [players]);
 
+  const profileFilterActive = clusterMode ? clusterFilters.length > 0 : profileFilter != null;
+
   const activeFilterCount =
     clubFilter.length +
     positionFilter.length +
@@ -182,7 +147,7 @@ export function PositionPlayerPicker({
     minutesFilter.length +
     gradeFilter.length +
     originFilter.length +
-    (clusterMode ? clusterFilters.length : profilesFilter.length) +
+    (profileFilterActive ? 1 : 0) +
     (query.trim() ? 1 : 0);
 
   const visible = useMemo(() => {
@@ -190,8 +155,8 @@ export function PositionPlayerPicker({
     const minMinutes = minutesFilter.length
       ? Math.min(...minutesFilter.map((value) => Number(value)))
       : 0;
-      const allowedGrades = gradeFilter.length
-        ? new Set(
+    const allowedGrades = gradeFilter.length
+      ? new Set(
           gradeFilter.flatMap(
             (value) => GRADE_BANDS.find((band) => band.value === value)?.allowed ?? [],
           ),
@@ -200,8 +165,8 @@ export function PositionPlayerPicker({
 
     const filtered = players.filter((player) => {
       if (clusterMode) {
-        if (!playerMatchesClusterFilter(player, clusterFilters)) return false;
-      } else if (profilesFilter.length && !profilesFilter.includes(player.profile)) {
+        if (clusterFilters.length && !playerMatchesClusterFilter(player, clusterFilters)) return false;
+      } else if (profileFilter != null && player.profile !== profileFilter) {
         return false;
       }
       if (clubFilter.length && !clubFilter.includes(player.club)) return false;
@@ -233,22 +198,12 @@ export function PositionPlayerPicker({
       return player.name.toLowerCase().includes(q) || player.club.toLowerCase().includes(q);
     });
 
-    return [...filtered].sort((a, b) => {
-      if (sortKey === "minutes") return b.minutes - a.minutes;
-      if (sortKey === "name") return a.name.localeCompare(b.name, "pt-BR");
-      if (sortKey === "age") return (b.birth_year ?? 0) - (a.birth_year ?? 0);
-      if (sortKey === "value") {
-        return (
-          (b.transfermarkt?.market_value_eur ?? 0) - (a.transfermarkt?.market_value_eur ?? 0)
-        );
-      }
-      return positionRating(b) - positionRating(a);
-    });
+    return [...filtered].sort((a, b) => positionRating(b) - positionRating(a));
   }, [
     players,
     clusterMode,
     clusterFilters,
-    profilesFilter,
+    profileFilter,
     clubFilter,
     positionFilter,
     footFilter,
@@ -257,7 +212,6 @@ export function PositionPlayerPicker({
     gradeFilter,
     originFilter,
     gradeById,
-    sortKey,
     query,
   ]);
 
@@ -289,16 +243,16 @@ export function PositionPlayerPicker({
     setGradeFilter([]);
     setOriginFilter([]);
     if (clusterMode) {
-      clusterFilters.forEach((key) => onToggleClusterFilter?.(key));
+      onClearClusterFilters?.();
     } else {
-      profilesFilter.forEach((profile) => onToggleProfile?.(profile));
+      onProfileFilterChange?.(null);
     }
   }
 
   function scrollStrip(direction: -1 | 1) {
     const grid = gridRef.current;
     if (!grid) return;
-    const step = Math.max(240, Math.round(grid.clientWidth * 0.72));
+    const step = Math.max(200, Math.round(grid.clientWidth * 0.65));
     grid.scrollBy({ left: direction * step, behavior: "smooth" });
   }
 
@@ -315,22 +269,52 @@ export function PositionPlayerPicker({
               ? ZAG_ARCHETYPE_META
               : null;
 
-  const profileChips = clusterMode && archetypeFilters
-    ? archetypeFilters.map((item) => ({
-        key: item.archetype,
-        active: clusterFilters.includes(item.archetype),
-        onToggle: () => onToggleClusterFilter?.(item.archetype),
-      }))
-    : profilesAvailable.map((profile) => ({
-        key: profile,
-        active: profilesFilter.includes(profile),
-        onToggle: () => onToggleProfile?.(profile),
-      }));
+  const profileChipKeys = clusterMode && archetypeFilters
+    ? archetypeFilters.map((item) => item.archetype)
+    : profilesAvailable;
+
+  const profileChips = [
+    {
+      key: TODOS_PROFILE,
+      label: "Todos",
+      active: !profileFilterActive,
+      onToggle: () => {
+        if (clusterMode) onClearClusterFilters?.();
+        else onProfileFilterChange?.(null);
+      },
+    },
+    ...profileChipKeys.map((key) => ({
+      key,
+      label: key,
+      active: clusterMode ? clusterFilters.includes(key) : profileFilter === key,
+      onToggle: () => {
+        if (clusterMode) {
+          onToggleClusterFilter?.(key);
+        } else if (profileFilter === key) {
+          onProfileFilterChange?.(null);
+        } else {
+          onProfileFilterChange?.(key);
+        }
+      },
+    })),
+  ];
 
   const activePills: { key: string; label: string; onRemove: () => void }[] = [
-    ...profileChips
-      .filter((chip) => chip.active)
-      .map((chip) => ({ key: `perfil-${chip.key}`, label: chip.key, onRemove: chip.onToggle })),
+    ...(clusterMode
+      ? clusterFilters.map((key) => ({
+          key: `perfil-${key}`,
+          label: key,
+          onRemove: () => onToggleClusterFilter?.(key),
+        }))
+      : profileFilter
+        ? [
+            {
+              key: `perfil-${profileFilter}`,
+              label: profileFilter,
+              onRemove: () => onProfileFilterChange?.(null),
+            },
+          ]
+        : []),
     ...positionFilter.map((value) => ({
       key: `pos-${value}`,
       label: value,
@@ -369,7 +353,7 @@ export function PositionPlayerPicker({
   ];
 
   return (
-    <div className="player-strip player-card player-strip-expanded">
+    <div className="player-strip player-card player-strip-expanded player-strip-slim">
       <header className="picker-head">
         <div className="picker-head-title">
           <h3 className="picker-title">Atletas</h3>
@@ -403,7 +387,7 @@ export function PositionPlayerPicker({
       </header>
 
       <div className="picker-toolbar">
-        {profileChips.length ? (
+        {profileChips.length > 1 ? (
           <div className="picker-group">
             <span className="picker-group-label">Perfil</span>
             <div className="picker-group-chips">
@@ -415,7 +399,7 @@ export function PositionPlayerPicker({
                   onClick={chip.onToggle}
                   aria-pressed={chip.active}
                 >
-                  {chip.key}
+                  {chip.label}
                 </button>
               ))}
             </div>
@@ -491,23 +475,6 @@ export function PositionPlayerPicker({
             />
           </div>
         </div>
-
-        <div className="picker-group">
-          <span className="picker-group-label">Ordenar</span>
-          <div className="picker-sort" role="group" aria-label="Ordenar atletas">
-            {SORT_OPTIONS.map((option) => (
-              <button
-                key={option.key}
-                type="button"
-                className={`picker-sort-chip${sortKey === option.key ? " active" : ""}`}
-                onClick={() => setSortKey(option.key)}
-                aria-pressed={sortKey === option.key}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
       {activePills.length ? (
@@ -537,13 +504,12 @@ export function PositionPlayerPicker({
           <i className="fa-solid fa-chevron-left" aria-hidden="true" />
         </button>
         <div className="player-strip-grid-wrap">
-          <div className="player-strip-grid" ref={gridRef}>
+          <div className="player-strip-grid player-strip-grid-single" ref={gridRef}>
             {visible.length ? (
               visible.map((player) => (
                 <PlayerStripCard
                   key={player.player_id}
                   player={player}
-                  grade={gradeById.get(player.player_id) ?? null}
                   selected={player.player_id === selectedId}
                   onSelect={() => onSelect(player.player_id)}
                 />
@@ -574,31 +540,23 @@ export function PositionPlayerPicker({
 
 function PlayerStripCard({
   player,
-  grade,
   selected,
   onSelect,
 }: {
   player: PlayerProfile;
-  grade: { grade: string; label: string } | null;
   selected: boolean;
   onSelect: () => void;
 }) {
   const photo = player.transfermarkt?.photo;
-  const age = playerAge(player);
-  const value = formatMarketValue(player.transfermarkt?.market_value_eur);
-  const token = gradeTier(grade?.grade ?? "C");
-
-  const meta = [positionShort(player.position), age ? `${age}a` : null, value]
-    .filter(Boolean)
-    .join(" · ");
 
   return (
     <button
       type="button"
       data-player-id={player.player_id}
-      className={`player-strip-card player-strip-card-lg${selected ? " selected" : ""}`}
+      className={`player-strip-card player-strip-card-slim${selected ? " selected" : ""}`}
       onClick={onSelect}
       aria-pressed={selected}
+      title={player.name}
     >
       <span className="player-strip-card-photo">
         {photo ? (
@@ -608,23 +566,7 @@ function PlayerStripCard({
           <span>{playerInitials(player.name)}</span>
         )}
       </span>
-      <span className="player-strip-card-copy">
-        <span className="player-strip-card-name">{player.name}</span>
-        <span className="player-strip-card-club">
-          <ClubLogo club={player.club} size={13} />
-          <span>{player.club}</span>
-        </span>
-        <span className="player-strip-card-meta tabular">{meta}</span>
-      </span>
-      {grade ? (
-        <span
-          className="player-strip-card-grade tabular"
-          style={tierVars(token)}
-          title={`Classificação ${grade.grade} em ${grade.label}`}
-        >
-          {grade.grade}
-        </span>
-      ) : null}
+      <span className="player-strip-card-name">{player.name}</span>
     </button>
   );
 }

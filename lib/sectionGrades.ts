@@ -121,7 +121,7 @@ const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string
   laterais: {
     Defensivos: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
-    "Dribles e Condução": ["Disputas com Bola", "1v1 - Ofensivo", "Conduções Progressivas", "Acelerações"],
+    "Dribles e Condução": ["Disputas com Bola", "1v1 - Ofensivo", "Progressão"],
     "Passes Finais": ["Cruzamentos", "Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
     Ofensividade: ["Ofensividade"],
   },

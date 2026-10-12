@@ -245,20 +245,23 @@
         "efficiency_value": "70%"
       },
       {
-        "label": "Conduções Progressivas",
-        "kind": "metric",
+        "label": "Progressão",
+        "kind": "metric_group",
         "grade": "C",
         "percentile": 38.1,
-        "stats": [],
-        "display_value": "1,1"
-      },
-      {
-        "label": "Acelerações",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 15.2,
-        "stats": [],
-        "display_value": "0,1"
+        "sub_metrics": [
+          {
+            "label": "Conduções Progressivas",
+            "percentile": 38.1,
+            "display_value": "1,1"
+          },
+          {
+            "label": "Acelerações",
+            "percentile": 15.2,
+            "display_value": "0,1"
+          }
+        ],
+        "stats": []
       }
     ],
     "passes_finais": [

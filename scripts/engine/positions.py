@@ -1648,6 +1648,10 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
     ]
     if tri_axis_family:
         if family_key == "laterais":
+            lat_prog_pct = max(
+                float(row.get("_asp_cond_prog_vol", 0) or 0),
+                float(row.get("_asp_acel_vol", 0) or 0),
+            )
             ofensivos.extend(
                 [
                     _metric_aspect(
@@ -1657,15 +1661,21 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                         eff_pct=row.get("_asp_dribles_eff", 0),
                         eff_display=_raw_eff_display(row, "Dribles com sucesso, %", "%EffDribles"),
                     ),
-                    _metric_aspect(
-                        "Conduções Progressivas",
-                        percentile=row.get("_asp_cond_prog_vol", 0),
-                        display_value=_fmt_num(prog),
-                    ),
-                    _metric_aspect(
-                        "Acelerações",
-                        percentile=row.get("_asp_acel_vol", 0),
-                        display_value=_fmt_per90(accel),
+                    _metric_group_aspect(
+                        "Progressão",
+                        percentile=lat_prog_pct,
+                        sub_metrics=[
+                            _sub_metric(
+                                "Conduções Progressivas",
+                                percentile=row.get("_asp_cond_prog_vol", 0),
+                                display_value=_fmt_num(prog),
+                            ),
+                            _sub_metric(
+                                "Acelerações",
+                                percentile=row.get("_asp_acel_vol", 0),
+                                display_value=_fmt_per90(accel),
+                            ),
+                        ],
                     ),
                 ]
             )

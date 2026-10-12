@@ -585,6 +585,10 @@
   align-self: center;
 }
 
+.player-strip-grid-single {
+  grid-template-rows: auto;
+}
+
 .player-strip-grid {
   display: grid;
   grid-auto-flow: column;
@@ -626,6 +630,39 @@
 
 .player-strip-card-lg .player-strip-card-club {
   font-size: 0.72rem;
+}
+
+.player-strip-slim .player-strip-empty {
+  min-height: 72px;
+}
+
+.player-strip-card-slim {
+  min-width: 0;
+  max-width: 148px;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.45rem 0.45rem;
+  text-align: center;
+}
+
+.player-strip-card-slim .player-strip-card-photo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 0.58rem;
+}
+
+.player-strip-card-slim .player-strip-card-name {
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.15;
+  max-width: 100%;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .profile-detail-stage {
