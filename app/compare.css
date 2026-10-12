@@ -1692,7 +1692,7 @@
   display: grid;
   gap: 0.75rem;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .compare-identity-card::before {
@@ -1720,12 +1720,23 @@
 
 .compare-fact-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.4rem;
   margin: 0;
 }
 
-.compare-fact-grid > div {
+.compare-fact-pair {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.compare-fact-grid > div:not(.compare-fact-pair),
+.compare-fact-pair > div {
   display: grid;
   gap: 0.12rem;
   min-width: 0;
@@ -1733,6 +1744,11 @@
   border-radius: 10px;
   border: 1px solid rgba(148, 163, 184, 0.14);
   background: rgba(8, 12, 18, 0.45);
+}
+
+.compare-fact-pair > div {
+  border-color: rgba(254, 215, 102, 0.28);
+  background: rgba(254, 215, 102, 0.07);
 }
 
 .compare-fact-grid dt {

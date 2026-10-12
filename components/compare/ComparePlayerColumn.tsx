@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { ClubLogo } from "@/components/ClubLogo";
-import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { ProfileCard } from "@/components/position/profile/ProfileCard";
 import { ScoutStatsSections } from "@/components/position/profile/ScoutStatsSections";
+import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -52,7 +52,6 @@ export function ComparePlayerColumn({
 }: Props) {
   const tm = player.transfermarkt;
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
-  const clusterProps = clusterTagProps(player);
 
   return (
     <article className={`compare-player-column side-${side}`} aria-label={`Coluna ${label}: ${player.name}`}>
@@ -97,7 +96,7 @@ export function ComparePlayerColumn({
               <span className="compare-col-position">{player.position}</span>
             </p>
             <div className="compare-col-tag-row">
-              {clusterProps ? <ClusterTag {...clusterProps} /> : <ProfileTag {...profileTagProps(player)} />}
+              <ProfileTag {...profileTagProps(player)} />
             </div>
           </div>
 
@@ -110,13 +109,20 @@ export function ComparePlayerColumn({
                 <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
               </a>
             ) : null}
+            <AddToShadowMenu playerId={player.player_id} family={family} />
           </div>
         </div>
 
         <dl className="compare-fact-grid">
-          <div>
-            <dt>Valor</dt>
-            <dd>{tm?.market_value ?? "—"}</dd>
+          <div className="compare-fact-pair">
+            <div>
+              <dt>Valor</dt>
+              <dd>{tm?.market_value ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Contrato</dt>
+              <dd>{monthsRemaining(tm?.contract_until)}</dd>
+            </div>
           </div>
           <div>
             <dt>Minutos</dt>
@@ -136,10 +142,6 @@ export function ComparePlayerColumn({
           <div>
             <dt>Assistências</dt>
             <dd className="tabular">{player.assists}</dd>
-          </div>
-          <div>
-            <dt>Contrato</dt>
-            <dd>{monthsRemaining(tm?.contract_until)}</dd>
           </div>
         </dl>
       </header>

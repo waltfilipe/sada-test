@@ -78,3 +78,37 @@ export function compareNarrative(
   }
   return `${profileLine} ${body}`;
 }
+
+/** Resumo da página de comparação, inclusive quando há um terceiro atleta. */
+export function compareSummary(players: PlayerProfile[], family: PositionFamily): string {
+  const cast = players.filter(Boolean).slice(0, 3);
+  if (cast.length < 2) return "";
+  if (cast.length === 2) return compareNarrative(cast[0]!, cast[1]!, family);
+
+  const names = cast.map((player) => givenName(player.name));
+  const profiles = [...new Set(cast.map((player) => player.profile))];
+  const profileLine =
+    profiles.length === 1
+      ? `Os três têm perfil de ${profiles[0]}.`
+      : `${names[0]} tem perfil de ${cast[0]!.profile}, ${names[1]} de ${cast[1]!.profile} e ${names[2]} de ${cast[2]!.profile}.`;
+
+  const leads = new Map<number, string[]>();
+  for (const section of statSectionsForFamily(family)) {
+    const scored = cast
+      .map((player, index) => ({ index, score: playerSectionScore(player, family, section.title) }))
+      .filter((item): item is { index: number; score: number } => item.score != null);
+    if (scored.length < 2) continue;
+    scored.sort((a, b) => b.score - a.score);
+    if (scored[0]!.score - scored[1]!.score < 6) continue;
+    const areas = leads.get(scored[0]!.index) ?? [];
+    areas.push(sectionPhrase(section.title));
+    leads.set(scored[0]!.index, areas);
+  }
+
+  if (!leads.size) {
+    return `${profileLine} Nos blocos da posição, os três estão próximos. A diferença aparece mais no detalhe de cada métrica.`;
+  }
+
+  const sentences = [...leads.entries()].map(([index, areas]) => `${names[index]} se destaca em ${joinPt(areas)}`);
+  return `${profileLine} ${sentences.join(". ")}.`;
+}

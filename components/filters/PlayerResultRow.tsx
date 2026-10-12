@@ -55,17 +55,6 @@ export function PlayerResultRow({
             <span>{player.position}</span>
           </p>
 
-          <dl className="row-facts">
-            {facts.map((fact) => (
-              <div key={fact.label}>
-                <dt>{fact.label}</dt>
-                <dd>
-                  {fact.value}
-                  {fact.unit && <em>{fact.unit}</em>}
-                </dd>
-              </div>
-            ))}
-          </dl>
         </Link>
 
         {earned.length ? (
@@ -83,21 +72,31 @@ export function PlayerResultRow({
         ) : (
           <p className="row-badges-empty">Sem badges nesta posição</p>
         )}
-      </div>
 
-      <div className="row-aside">
-        <div className="row-market">
-          <div>
-            <span>Valor</span>
-            <strong>{tm?.market_value ?? "—"}</strong>
-          </div>
-          <div>
-            <span>Contrato</span>
-            <strong>{tm?.contract_remaining ?? "—"}</strong>
+        <div className="row-stat-strip">
+          {facts.map((fact) => (
+            <div key={fact.label} className="row-stat-chip">
+              <span>{fact.label}</span>
+              <strong>
+                {fact.value}
+                {fact.unit ? <em>{fact.unit}</em> : null}
+              </strong>
+            </div>
+          ))}
+          <div className="row-stat-market">
+            <div>
+              <span>Valor</span>
+              <strong>{tm?.market_value ?? "—"}</strong>
+            </div>
+            <div>
+              <span>Contrato</span>
+              <strong>{tm?.contract_remaining ?? "—"}</strong>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="row-actions">
+      <div className="row-actions">
           {tm?.profile_url ? (
             <a className="btn btn-ghost btn-sm row-action" href={tm.profile_url} target="_blank" rel="noreferrer">
               <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
@@ -105,7 +104,6 @@ export function PlayerResultRow({
             </a>
           ) : null}
           <AddToShadowMenu playerId={player.player_id} family={player.position_family} />
-        </div>
       </div>
     </article>
   );

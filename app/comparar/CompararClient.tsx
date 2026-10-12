@@ -4,9 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ComparePlayerColumn } from "@/components/compare/ComparePlayerColumn";
+import { StatSectionPanel, StatWindow } from "@/components/position/profile/ScoutStatsSections";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
-import { compareNarrative } from "@/lib/compareNarrative";
+import { compareSummary } from "@/lib/compareNarrative";
 import { familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -121,7 +122,7 @@ export function CompararClient({
                 aria-pressed={triple}
               >
                 <i className={`fa-solid ${triple ? "fa-user-minus" : "fa-user-plus"}`} aria-hidden="true" />
-                {triple ? "Comparar 2 atletas" : "Comparar 3 atletas"}
+                {triple ? "Voltar a 2 jogadores" : "Comparar 3 jogadores"}
               </button>
             ) : null}
 
@@ -130,11 +131,6 @@ export function CompararClient({
             </Link>
           </div>
         </div>
-
-        <section className="compare-brief player-card">
-          <h2 className="section-label">Diferença</h2>
-          <p>{compareNarrative(playerA, playerB, family)}</p>
-        </section>
 
         <div className={`compare-player-columns${triple ? " is-triple" : ""}`}>
           <ComparePlayerColumn
@@ -181,6 +177,41 @@ export function CompararClient({
             />
           ) : null}
         </div>
+
+        <section className="compare-brief player-card">
+          <h2 className="section-label">Resumo</h2>
+          <p>{compareSummary(triple && playerC ? [playerA, playerB, playerC] : [playerA, playerB], family)}</p>
+        </section>
+
+        {openSection ? (
+          <StatWindow title={openSection} onClose={() => setOpenSection(null)}>
+            <div className={`stat-window-grid${triple ? " is-triple" : ""}`}>
+              <StatSectionPanel
+                player={playerA}
+                family={family}
+                title={openSection}
+                heading={playerA.name}
+                peers={triple && playerC ? [playerB, playerC] : [playerB]}
+              />
+              <StatSectionPanel
+                player={playerB}
+                family={family}
+                title={openSection}
+                heading={playerB.name}
+                peers={triple && playerC ? [playerA, playerC] : [playerA]}
+              />
+              {triple && playerC ? (
+                <StatSectionPanel
+                  player={playerC}
+                  family={family}
+                  title={openSection}
+                  heading={playerC.name}
+                  peers={[playerA, playerB]}
+                />
+              ) : null}
+            </div>
+          </StatWindow>
+        ) : null}
       </main>
     </div>
   );

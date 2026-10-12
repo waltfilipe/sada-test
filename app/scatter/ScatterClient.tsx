@@ -8,6 +8,8 @@ import { MetricAxisPicker } from "@/components/scatter/MetricAxisPicker";
 import { ScatterPlot } from "@/components/scatter/ScatterPlot";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { findAspect, flattenAspects } from "@/lib/aspectLookup";
+import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -22,6 +24,17 @@ type Props = {
   initialX?: string;
   initialY?: string;
 };
+
+function positionMetrics(family: PositionFamily): Metric[] {
+  const labels = statSectionsForFamily(family).flatMap((section) => section.labels);
+  return [...new Set(labels)].map((label) => ({ key: label, label }));
+}
+
+function axisValue(player: PlayerProfile, key: string): number {
+  const item = findAspect(flattenAspects(player), key);
+  if (item?.percentile != null) return item.percentile;
+  return player.scatter[key] ?? 0;
+}
 
 function formatMetric(value: number): string {
   if (Math.abs(value) >= 100) return value.toFixed(1);
@@ -49,14 +62,18 @@ export function ScatterClient({
 }: Props) {
   const router = useRouter();
   const familyMeta = familyBySlug(family);
+  const axisMetrics = useMemo(() => {
+    const fromPosition = positionMetrics(family);
+    return fromPosition.length ? fromPosition : metrics;
+  }, [family, metrics]);
 
   const pick = (requested: string | undefined, fallbackIndex: number) => {
     if (requested && players.some((player) => player.player_id === requested)) return requested;
     return players[fallbackIndex]?.player_id ?? players[0]?.player_id ?? "";
   };
 
-  const defaultX = metrics[0]?.key ?? "intervencoes";
-  const defaultY = metrics[1]?.key ?? metrics[0]?.key ?? "confrontos_of";
+  const defaultX = axisMetrics[0]?.key ?? "intervencoes";
+  const defaultY = axisMetrics[1]?.key ?? axisMetrics[0]?.key ?? "confrontos_of";
 
   const [idA, setIdA] = useState(() => pick(initialA, 0));
   const [idB, setIdB] = useState(() => {
@@ -66,16 +83,16 @@ export function ScatterClient({
     return players.find((player) => player.player_id !== first)?.player_id ?? chosen;
   });
   const [xKey, setXKey] = useState(() => {
-    if (initialX && metrics.some((metric) => metric.key === initialX && metric.key !== initialY)) {
+    if (initialX && axisMetrics.some((metric) => metric.key === initialX && metric.key !== initialY)) {
       return initialX;
     }
     return defaultX;
   });
   const [yKey, setYKey] = useState(() => {
-    if (initialY && metrics.some((metric) => metric.key === initialY && metric.key !== initialX)) {
+    if (initialY && axisMetrics.some((metric) => metric.key === initialY && metric.key !== initialX)) {
       return initialY;
     }
-    const fallback = metrics.find((metric) => metric.key !== xKey)?.key ?? defaultY;
+    const fallback = axisMetrics.find((metric) => metric.key !== defaultX)?.key ?? defaultY;
     return fallback;
   });
 
@@ -87,8 +104,8 @@ export function ScatterClient({
       players.map((player) => ({
         player_id: player.player_id,
         label: player.label,
-        x: player.scatter[xKey] ?? 0,
-        y: player.scatter[yKey] ?? 0,
+        x: axisValue(player, xKey),
+        y: axisValue(player, yKey),
       })),
     [players, xKey, yKey],
   );
@@ -105,8 +122,8 @@ export function ScatterClient({
   const pointA = points.find((point) => point.player_id === idA);
   const pointB = points.find((point) => point.player_id === idB);
 
-  const xLabel = metrics.find((metric) => metric.key === xKey)?.label ?? xKey;
-  const yLabel = metrics.find((metric) => metric.key === yKey)?.label ?? yKey;
+  const xLabel = axisMetrics.find((metric) => metric.key === xKey)?.label ?? xKey;
+  const yLabel = axisMetrics.find((metric) => metric.key === yKey)?.label ?? yKey;
 
   const swapAthletes = () => {
     setIdA(idB);
@@ -171,7 +188,7 @@ export function ScatterClient({
 
               <MetricAxisPicker
                 axis="x"
-                metrics={metrics}
+                metrics={axisMetrics}
                 value={xKey}
                 otherValue={yKey}
                 onChange={setXKey}
@@ -179,7 +196,7 @@ export function ScatterClient({
               />
               <MetricAxisPicker
                 axis="y"
-                metrics={metrics}
+                metrics={axisMetrics}
                 value={yKey}
                 otherValue={xKey}
                 onChange={setYKey}
