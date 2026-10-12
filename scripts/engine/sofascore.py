@@ -162,6 +162,7 @@ def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None) -> pd.D
     out["ss_def_error_p90"] = 0.0
 
     if not csv_path.exists():
+        print(f"  SofaScore CSV ausente ({csv_path.name}) — usando só Wyscout para defesa.")
         return out
 
     ss = aggregate_sofascore(csv_path)
