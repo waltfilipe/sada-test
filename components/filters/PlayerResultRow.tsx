@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { ClubLogo } from "@/components/ClubLogo";
-import { MinutesStat } from "@/components/position/MinutesStat";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { Tooltip } from "@/components/ui/Tooltip";
@@ -87,13 +86,6 @@ export function PlayerResultRow({
       </div>
 
       <div className="row-aside">
-        <MinutesStat
-          minutes={player.minutes}
-          minutesPct={player.minutes_pct}
-          variant="compact"
-          className="row-minutes"
-        />
-
         <div className="row-market">
           <div>
             <span>Valor</span>

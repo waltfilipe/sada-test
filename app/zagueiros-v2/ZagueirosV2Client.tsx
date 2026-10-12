@@ -139,18 +139,17 @@ export function ZagueirosV2Client({ players }: Props) {
       <ScoutTopbar active="posicoes" />
 
       <div className="zag-v2-frame">
+      <header className="zag-v2-title-card">
+        <div>
+          <p className="zag-v2-kicker">Scouting</p>
+          <h1>Zagueiros</h1>
+        </div>
+        <button type="button" onClick={clearAll} disabled={!activeCount}>
+          Limpar filtros
+        </button>
+      </header>
       <div className="zag-v2-shell">
         <aside className="zag-v2-rail">
-          <header className="zag-v2-rail-head">
-            <div>
-              <p className="zag-v2-kicker">Teste de layout</p>
-              <h1>Zagueiros</h1>
-            </div>
-            <button type="button" onClick={clearAll} disabled={!activeCount}>
-              Limpar
-            </button>
-          </header>
-
           <label className="zag-v2-search">
             <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
             <input
@@ -162,7 +161,7 @@ export function ZagueirosV2Client({ players }: Props) {
             />
           </label>
 
-          <section>
+          <section className="zag-v2-block">
             <h2>Perfil</h2>
             <div className="zag-v2-chips">
               <button type="button" className={!profile ? "active" : ""} onClick={() => setProfile(null)}>
@@ -187,7 +186,7 @@ export function ZagueirosV2Client({ players }: Props) {
           </section>
 
           <div className="zag-v2-pairs">
-            <section>
+            <section className="zag-v2-block">
               <h2>Idade</h2>
               <div className="zag-v2-chips">
                 {AGE_BANDS.map((band) => (
@@ -203,7 +202,7 @@ export function ZagueirosV2Client({ players }: Props) {
               </div>
             </section>
 
-            <section>
+            <section className="zag-v2-block">
               <h2>Minutagem</h2>
               <div className="zag-v2-chips">
                 {MINUTES_BANDS.map((band) => (
@@ -220,7 +219,7 @@ export function ZagueirosV2Client({ players }: Props) {
             </section>
           </div>
 
-          <section className="zag-v2-selects">
+          <section className="zag-v2-selects zag-v2-block">
             <label>
               Pé
               <select value={foot ?? ""} onChange={(event) => setFoot(event.target.value || null)}>

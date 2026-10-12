@@ -29,19 +29,37 @@ function volumeRowLabel(item: AspectItem): string {
   return rowLabel(item.label);
 }
 
+export type StatEdge = "up" | "down" | null;
+
+function StatEdgeMark({ edge }: { edge?: StatEdge }) {
+  if (!edge) return null;
+  const more = edge === "up";
+  return (
+    <i
+      className={`fa-solid fa-arrow-${edge} stat-edge stat-edge-${edge}`}
+      aria-label={more ? "Mais que o outro atleta" : "Menos que o outro atleta"}
+    />
+  );
+}
+
 function StatMetricRow({
   label,
   value,
   percentile,
+  edge,
 }: {
   label: string;
   value?: string | null;
   percentile?: number | null;
+  edge?: StatEdge;
 }) {
   return (
     <div className="stat-metric-row">
       <div className="stat-metric-head">
-        <span className="stat-metric-label">{label}</span>
+        <span className="stat-metric-label">
+          {label}
+          <StatEdgeMark edge={edge} />
+        </span>
         <span className="stat-metric-value tabular">{metricValue(value)}</span>
       </div>
       <MetricGradientBar score={percentile ?? null} scale="percent" />
@@ -53,10 +71,16 @@ function StatAspectBlock({
   item,
   groupTitle,
   tone,
+  volumeEdge,
+  efficiencyEdge,
+  subEdges,
 }: {
   item: AspectItem;
   groupTitle?: string;
   tone: StatSectionTone;
+  volumeEdge?: StatEdge;
+  efficiencyEdge?: StatEdge;
+  subEdges?: Record<string, StatEdge>;
 }) {
   const hasSubMetrics =
     (item.kind === "def_efficiency_group" || item.kind === "metric_group") &&
@@ -81,6 +105,7 @@ function StatAspectBlock({
               label={rowLabel(sub.label)}
               value={sub.display_value}
               percentile={sub.percentile}
+              edge={subEdges?.[sub.label]}
             />
           ))
         ) : (
@@ -89,12 +114,14 @@ function StatAspectBlock({
               label={volumeRowLabel(item)}
               value={item.display_value ?? (item.certos_per90 != null ? item.certos_per90.toFixed(1).replace(".", ",") : undefined)}
               percentile={item.percentile}
+              edge={volumeEdge}
             />
             {item.efficiency_pct != null ? (
               <StatMetricRow
                 label="Eficiência"
                 value={item.efficiency_value}
                 percentile={item.efficiency_pct}
+                edge={efficiencyEdge}
               />
             ) : null}
           </>
@@ -111,15 +138,39 @@ type SectionEntry = {
   metrics: { item: AspectItem; groupTitle?: string }[];
 };
 
+const NO_PEERS: PlayerProfile[] = [];
+
+function edgeAgainst(mine: number | null | undefined, others: Array<number | null | undefined>): StatEdge {
+  const peers = others.filter((value): value is number => value != null);
+  if (mine == null || !peers.length) return null;
+  const highest = Math.max(...peers);
+  const lowest = Math.min(...peers);
+  if (mine > highest) return "up";
+  if (mine < lowest) return "down";
+  return null;
+}
+
 export function ScoutStatsSections({
   player,
   family,
+  active: activeProp,
+  onActiveChange,
+  peers = NO_PEERS,
 }: {
   player: PlayerProfile;
   family: PositionFamily;
+  active?: string | null;
+  onActiveChange?: (title: string | null) => void;
+  peers?: PlayerProfile[];
 }) {
-  const [active, setActive] = useState<string | null>(null);
+  const [localActive, setLocalActive] = useState<string | null>(null);
+  const active = onActiveChange ? (activeProp ?? null) : localActive;
+  const setActive = (title: string | null) => {
+    if (onActiveChange) onActiveChange(title);
+    else setLocalActive(title);
+  };
   const all = useMemo(() => flattenAspects(player), [player]);
+  const peerAspects = useMemo(() => peers.map((peer) => flattenAspects(peer)), [peers]);
   const sections = statSectionsForFamily(family);
 
   const entries = useMemo<SectionEntry[]>(() => {
@@ -154,39 +205,14 @@ export function ScoutStatsSections({
     [entries],
   );
 
-  const activeEntry = active ? entries.find((entry) => entry.title === active) ?? null : null;
-
-  if (activeEntry) {
-    return (
-      <div className="stats-swap-panel" key={`${player.player_id}-${activeEntry.title}`}>
-        <div className="profile-card-head stats-swap-head">
-          <span className="stats-swap-title">
-            <h3 className="section-label">{activeEntry.title}</h3>
-            <StatMedalCount count={activeEntry.badges.length} />
-          </span>
-          <button
-            type="button"
-            className="tendencies-pop-close"
-            onClick={() => setActive(null)}
-            aria-label="Voltar para Stats and Badges"
-          >
-            <i className="fa-solid fa-xmark" aria-hidden="true" />
-          </button>
-        </div>
-        <div className="stats-swap-body">
-          <div className="stat-cards-stack">
-            {activeEntry.metrics.map(({ item, groupTitle }) => (
-              <StatAspectBlock
-                key={item.label}
-                item={item}
-                groupTitle={groupTitle}
-                tone={activeEntry.tone}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+  function peerValues(itemLabel: string, kind: "volume" | "efficiency", subLabel?: string): Array<number | null> {
+    return peerAspects.map((aspects) => {
+      const item = findAspect(aspects, itemLabel);
+      if (!item) return null;
+      if (subLabel) return item.sub_metrics?.find((sub) => sub.label === subLabel)?.percentile ?? null;
+      if (kind === "efficiency") return item.efficiency_pct ?? null;
+      return item.percentile ?? null;
+    });
   }
 
   return (
@@ -201,21 +227,47 @@ export function ScoutStatsSections({
 
         <section className="stats-subsection" aria-label="Estatísticas por grupo">
           <h4 className="stats-subsection-label">Stats</h4>
-          <div className="stats-nav-list">
-            {entries.map((entry) => (
-              <button
-                key={entry.title}
-                type="button"
-                className={`stats-nav-row tone-${entry.tone}`}
-                onClick={() => setActive(entry.title)}
-              >
-                <span className="stats-nav-row-title">{entry.title}</span>
-                <span className="stats-nav-row-meta">
-                  <StatMedalCount count={entry.badges.length} />
-                  <i className="fa-solid fa-chevron-right" aria-hidden="true" />
-                </span>
-              </button>
-            ))}
+          <div className="stats-nav-grid">
+            {entries.map((entry) => {
+              const open = active === entry.title;
+              return (
+                <div key={entry.title} className={`stats-nav-cell${open ? " is-open" : ""}`}>
+                  <button
+                    type="button"
+                    className={`stats-nav-row tone-${entry.tone}${open ? " is-open" : ""}`}
+                    aria-expanded={open}
+                    onClick={() => setActive(open ? null : entry.title)}
+                  >
+                    <span className="stats-nav-row-title">{entry.title}</span>
+                    <span className="stats-nav-row-meta">
+                      <StatMedalCount count={entry.badges.length} />
+                      <i className={`fa-solid ${open ? "fa-chevron-down" : "fa-chevron-right"}`} aria-hidden="true" />
+                    </span>
+                  </button>
+                  {open ? (
+                    <div className="stats-nav-cell-body">
+                      {entry.metrics.map(({ item, groupTitle }) => {
+                        const subEdges: Record<string, StatEdge> = {};
+                        for (const sub of item.sub_metrics ?? []) {
+                          subEdges[sub.label] = edgeAgainst(sub.percentile, peerValues(item.label, "volume", sub.label));
+                        }
+                        return (
+                          <StatAspectBlock
+                            key={item.label}
+                            item={item}
+                            groupTitle={groupTitle}
+                            tone={entry.tone}
+                            volumeEdge={edgeAgainst(item.percentile, peerValues(item.label, "volume"))}
+                            efficiencyEdge={edgeAgainst(item.efficiency_pct, peerValues(item.label, "efficiency"))}
+                            subEdges={subEdges}
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
         </section>
       </div>

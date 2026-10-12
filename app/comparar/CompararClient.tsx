@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ComparePlayerColumn } from "@/components/compare/ComparePlayerColumn";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { compareNarrative } from "@/lib/compareNarrative";
 import { familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -47,6 +48,7 @@ export function CompararClient({
   const familyMeta = familyBySlug(family);
 
   const [triple, setTriple] = useState(() => Boolean(initialTriple || initialC));
+  const [openSection, setOpenSection] = useState<string | null>(null);
   const [idA, setIdA] = useState(() => pickPlayer(initialA, players, new Set(), 0));
   const [idB, setIdB] = useState(() => {
     const first = pickPlayer(initialA, players, new Set(), 0);
@@ -129,6 +131,11 @@ export function CompararClient({
           </div>
         </div>
 
+        <section className="compare-brief player-card">
+          <h2 className="section-label">Diferença</h2>
+          <p>{compareNarrative(playerA, playerB, family)}</p>
+        </section>
+
         <div className={`compare-player-columns${triple ? " is-triple" : ""}`}>
           <ComparePlayerColumn
             side="a"
@@ -139,6 +146,9 @@ export function CompararClient({
             pool={players}
             excludeIds={excludeForA}
             onChange={setIdA}
+            activeSection={openSection}
+            onSectionChange={setOpenSection}
+            peers={triple && playerC ? [playerB, playerC] : [playerB]}
           />
 
           <ComparePlayerColumn
@@ -150,6 +160,9 @@ export function CompararClient({
             pool={players}
             excludeIds={excludeForB}
             onChange={setIdB}
+            activeSection={openSection}
+            onSectionChange={setOpenSection}
+            peers={triple && playerC ? [playerA, playerC] : [playerA]}
           />
 
           {triple && playerC ? (
@@ -162,6 +175,9 @@ export function CompararClient({
               pool={players}
               excludeIds={excludeForC}
               onChange={setIdC}
+              activeSection={openSection}
+              onSectionChange={setOpenSection}
+              peers={[playerA, playerB]}
             />
           ) : null}
         </div>

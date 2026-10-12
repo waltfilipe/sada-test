@@ -2326,6 +2326,57 @@
   min-height: 0;
 }
 
+.stats-nav-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  align-items: start;
+}
+
+.stats-nav-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.35rem;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(15, 23, 42, 0.28);
+}
+
+.stats-nav-cell.is-open {
+  border-color: rgba(125, 241, 222, 0.32);
+}
+
+.stats-nav-cell .stats-nav-row {
+  flex: none;
+  width: 100%;
+}
+
+.stats-nav-cell .stats-nav-row.is-open {
+  border-color: rgba(125, 241, 222, 0.28);
+  background: rgba(125, 241, 222, 0.06);
+}
+
+.stats-nav-cell-body {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.1rem 0.2rem 0.3rem;
+}
+
+.stat-edge {
+  margin-left: 0.35rem;
+  font-size: 0.62rem;
+}
+
+.stat-edge-up {
+  color: #34d399;
+}
+
+.stat-edge-down {
+  color: #f87171;
+}
+
 .stats-nav-card {
   display: grid;
   gap: 0.45rem;
@@ -3273,4 +3324,5 @@
   .hero-fact { margin-right: 0.75rem; padding-right: 0.75rem; }
   .player-hero-bottom-row { align-items: stretch; }
   .player-hero-actions { justify-content: flex-start; }
+  .stats-nav-grid { grid-template-columns: 1fr; }
 }
