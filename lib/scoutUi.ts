@@ -56,6 +56,12 @@ export function sortPlayers(players: PlayerProfile[], sort: "rating" | "name" | 
   return copy.sort((a, b) => positionRating(b) - positionRating(a));
 }
 
+/** Highest position-scoped rating in the pool (same order as the athlete strip). */
+export function topRatedPlayerId(players: PlayerProfile[]): string {
+  if (!players.length) return "";
+  return sortPlayers(players, "rating")[0]!.player_id;
+}
+
 /** Rating do perfil classificado do atleta (não usa rating geral). */
 export function positionRating(player: PlayerProfile): number {
   const key = dominantRatingKey(player.profile, player.position_family, player.hybrid_lean);

@@ -215,6 +215,48 @@ export function PositionPlayerPicker({
     query,
   ]);
 
+  /** Clicks on Perfil / Filtros (not search typing) → show top-rated athlete in the new set. */
+  const pickerFilterKey = useMemo(
+    () =>
+      JSON.stringify({
+        clusterMode,
+        clusterFilters,
+        profileFilter,
+        clubFilter,
+        positionFilter,
+        footFilter,
+        ageFilter,
+        minutesFilter,
+        gradeFilter,
+        originFilter,
+      }),
+    [
+      clusterMode,
+      clusterFilters,
+      profileFilter,
+      clubFilter,
+      positionFilter,
+      footFilter,
+      ageFilter,
+      minutesFilter,
+      gradeFilter,
+      originFilter,
+    ],
+  );
+
+  useEffect(() => {
+    if (!visible.length) return;
+    onSelect(visible[0]!.player_id);
+    // visible is derived from pickerFilterKey (search query excluded)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- pick top rating after filter clicks
+  }, [pickerFilterKey, onSelect]);
+
+  useEffect(() => {
+    if (!visible.length) return;
+    if (visible.some((player) => player.player_id === selectedId)) return;
+    onSelect(visible[0]!.player_id);
+  }, [query, visible, selectedId, onSelect]);
+
   useEffect(() => {
     const grid = gridRef.current;
     if (!grid) return;

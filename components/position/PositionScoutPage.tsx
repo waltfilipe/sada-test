@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { POSITION_FAMILIES, familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import { topRatedPlayerId } from "@/lib/scoutUi";
 import { PositionPlayerPicker } from "./profile/PositionPlayerPicker";
 import { PositionProfileView } from "./profile/PositionProfileView";
 
@@ -19,7 +20,10 @@ export function PositionScoutPage({ family, players }: Props) {
   const requestedId = searchParams.get("atleta");
 
   const [selectedId, setSelectedId] = useState(
-    () => (requestedId && players.some((p) => p.player_id === requestedId) ? requestedId : players[0]?.player_id) ?? "",
+    () =>
+      (requestedId && players.some((p) => p.player_id === requestedId)
+        ? requestedId
+        : topRatedPlayerId(players)) ?? "",
   );
   const [profileFilter, setProfileFilter] = useState<string | null>(null);
   const [clusterFilters, setClusterFilters] = useState<string[]>([]);
@@ -44,7 +48,7 @@ export function PositionScoutPage({ family, players }: Props) {
 
   useEffect(() => {
     if (players.length && !players.some((player) => player.player_id === selectedId)) {
-      setSelectedId(players[0].player_id);
+      setSelectedId(topRatedPlayerId(players));
     }
   }, [players, selectedId]);
 
