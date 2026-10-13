@@ -17,6 +17,7 @@ function readJson<T>(filePath: string): T {
 }
 
 const metaCache = new Map<LeagueId, SiteMeta>();
+const wyscoutPositionsCache = new Map<LeagueId, Record<string, string[]>>();
 const playersCache = new Map<LeagueId, { players: PlayerSummary[]; total: number }>();
 const profileCache = new Map<string, PlayerProfile>();
 const searchRowsCache = new Map<LeagueId, PlayerSearchRow[]>();
@@ -77,6 +78,20 @@ export function getSearchRows(league?: string): PlayerSearchRow[] {
   return searchRowsCache.get(id)!;
 }
 
+function wyscoutPositions(league: LeagueId): Record<string, string[]> {
+  if (!wyscoutPositionsCache.has(league)) {
+    const filePath = path.join(leagueDir(league), "wyscout-positions.json");
+    wyscoutPositionsCache.set(league, fs.existsSync(filePath) ? readJson(filePath) : {});
+  }
+  return wyscoutPositionsCache.get(league) ?? {};
+}
+
+function withWyscoutPositions<T extends PlayerProfile>(player: T, league: LeagueId): T {
+  const codes = wyscoutPositions(league)[player.player_id];
+  if (!codes?.length || !player.heatmap?.points?.length) return player;
+  return { ...player, wyscout_positions: codes };
+}
+
 export function getPlayerProfile(playerId: string, league?: string): PlayerProfile | null {
   const id = resolveLeague(league);
   const cacheKey = `${id}:${playerId}`;
@@ -85,7 +100,8 @@ export function getPlayerProfile(playerId: string, league?: string): PlayerProfi
     if (!fs.existsSync(filePath)) return null;
     profileCache.set(cacheKey, readJson(filePath));
   }
-  return profileCache.get(cacheKey) ?? null;
+  const profile = profileCache.get(cacheKey);
+  return profile ? withWyscoutPositions(profile, id) : null;
 }
 
 export function getFamilyPlayers(family: PositionFamily, league?: string): PlayerProfile[] {
@@ -93,7 +109,7 @@ export function getFamilyPlayers(family: PositionFamily, league?: string): Playe
   const filePath = path.join(leagueDir(id), `family-${family}.json`);
   if (!fs.existsSync(filePath)) return [];
   const payload = readJson<{ players: PlayerProfile[] }>(filePath);
-  return payload.players;
+  return payload.players.map((player) => withWyscoutPositions(player, id));
 }
 
 export function filterPlayers(
