@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
@@ -14,31 +14,70 @@ import { TeamProfileMap } from "@/components/shadow/TeamProfileMap";
 import { TeamStatsBar } from "@/components/shadow/TeamStatsBar";
 import { useShadowTeam } from "@/hooks/useShadowTeam";
 import { FORMATIONS, formationById, type FormationSlot } from "@/lib/formations";
-import { benchPlayerIds, boardAssignments, boardSquad, type TeamBoard } from "@/lib/shadowTeamStorage";
+import { LEAGUES, type LeagueId } from "@/lib/leagues";
+import { benchPlayerIds, boardAssignments, boardSquad, type ShadowScope, type TeamBoard } from "@/lib/shadowTeamStorage";
 import { gradeTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
 
-const BOARD_LABEL: Record<TeamBoard, string> = {
-  proprio: "Time próprio",
-  sombra: "Time sombra",
-};
+type SquadSource = "elenco" | "sombra" | "sombra-todas";
+type SquadPlayer = PlayerSearchRow & { sourceLeague: LeagueId };
+
+const SOURCE_KEY = "scout:elenco-source";
+const SOMBRA_LEAGUE_KEY = "scout:elenco-sombra-league";
+
+function readSource(): SquadSource {
+  if (typeof window === "undefined") return "elenco";
+  const value = sessionStorage.getItem(SOURCE_KEY);
+  if (value === "sombra" || value === "sombra-todas" || value === "elenco") return value;
+  return "elenco";
+}
+
+function fold(value: string): string {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+function readSombraLeague(fallback: LeagueId): LeagueId {
+  if (typeof window === "undefined") return fallback;
+  const value = sessionStorage.getItem(SOMBRA_LEAGUE_KEY);
+  return value === "serie-a" || value === "serie-c" ? value : fallback;
+}
 
 type Props = {
-  players: PlayerSearchRow[];
+  playersByLeague: Record<LeagueId, PlayerSearchRow[]>;
 };
 
-export function TimeSombraClient({ players }: Props) {
-  const { href } = useLeague();
+export function TimeSombraClient({ playersByLeague }: Props) {
+  const { href, leagueId, name } = useLeague();
+  const [mode, setMode] = useState<SquadSource>("elenco");
+  const [sombraLeague, setSombraLeague] = useState<LeagueId>(leagueId);
+
+  useEffect(() => {
+    setMode(readSource());
+    setSombraLeague(readSombraLeague(leagueId));
+  }, [leagueId]);
+  const scope: ShadowScope = mode === "sombra-todas" ? "todas" : mode === "sombra" ? sombraLeague : leagueId;
+  const board: TeamBoard = mode === "elenco" ? "proprio" : "sombra";
   const { state, ready, changeFormation, assign, dropOnSlot, reserve, removeFromSquad, removeFromWatchlist } =
-    useShadowTeam();
-  const [board, setBoard] = useState<TeamBoard>("sombra");
+    useShadowTeam(scope);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [placementPlayerId, setPlacementPlayerId] = useState<string | null>(null);
   const [panelTab, setPanelTab] = useState<"squad" | "watch">("squad");
   const [slotQuery, setSlotQuery] = useState("");
   const [picker, setPicker] = useState<{ slot: FormationSlot; mode: "starter" | "reserve" } | null>(null);
 
-  const playersById = useMemo(() => new Map(players.map((p) => [p.player_id, p])), [players]);
+  const taggedPlayers = useMemo(() => {
+    const rows: SquadPlayer[] = [];
+    for (const league of LEAGUES) {
+      for (const player of playersByLeague[league.id] ?? []) {
+        rows.push({ ...player, sourceLeague: league.id });
+      }
+    }
+    return rows;
+  }, [playersByLeague]);
+
+  const pickerPool = taggedPlayers;
+
+  const playersById = useMemo(() => new Map(taggedPlayers.map((player) => [player.player_id, player])), [taggedPlayers]);
 
   const slotCandidates = useMemo(() => {
     if (!state || !picker) return [];
@@ -52,21 +91,23 @@ export function TimeSombraClient({ players }: Props) {
         ? (Object.values(assignments).filter((id): id is string => Boolean(id)))
         : squadIds,
     );
-    return players
+    return pickerPool
       .filter((player) => {
         if (!picker.slot.families.includes(player.position_family)) return false;
         if (taken.has(player.player_id)) return false;
         if (!query) return true;
-        return player.name.toLowerCase().includes(query) || player.club.toLowerCase().includes(query);
+        const leagueName = LEAGUES.find((league) => league.id === player.sourceLeague)?.name ?? "";
+        const q = fold(query);
+        return fold(player.name).includes(q) || fold(player.club).includes(q) || fold(leagueName).includes(q);
       })
       .sort((a, b) => b.rating - a.rating);
-  }, [players, state, picker, slotQuery, board]);
+  }, [pickerPool, state, picker, slotQuery, board]);
 
   if (!ready || !state) {
     return (
       <div className="scout-root profile-page">
-        <ScoutTopbar active="time-sombra" />
-        <div className="scout-empty">Carregando Time Sombra…</div>
+        <ScoutTopbar active="elenco" />
+        <div className="scout-empty">Carregando elenco…</div>
       </div>
     );
   }
@@ -80,58 +121,122 @@ export function TimeSombraClient({ players }: Props) {
 
   const squadPlayers = activeSquadIds
     .map((id) => playersById.get(id))
-    .filter((p): p is PlayerSearchRow => Boolean(p));
+    .filter((p): p is SquadPlayer => Boolean(p));
   const watchPlayers = state.watchlistIds
     .map((id) => playersById.get(id))
-    .filter((p): p is PlayerSearchRow => Boolean(p));
+    .filter((p): p is SquadPlayer => Boolean(p));
 
   const starters = Object.values(assignments)
     .filter((id): id is string => Boolean(id))
     .map((id) => playersById.get(id))
-    .filter((p): p is PlayerSearchRow => Boolean(p));
+    .filter((p): p is SquadPlayer => Boolean(p));
 
   const avgLetter =
     starters.length > 0
       ? ratingToLetterGrade(starters.reduce((sum, p) => sum + p.rating, 0) / starters.length)
       : null;
 
-  function openBoard(next: TeamBoard) {
-    setBoard(next);
+  function setSource(next: SquadSource) {
+    setMode(next);
+    sessionStorage.setItem(SOURCE_KEY, next);
     setSelectedSlotId(null);
     setPlacementPlayerId(null);
     setPicker(null);
     setSlotQuery("");
   }
 
+  function chooseSombraLeague(next: LeagueId) {
+    setSombraLeague(next);
+    sessionStorage.setItem(SOMBRA_LEAGUE_KEY, next);
+    setSelectedSlotId(null);
+    setPlacementPlayerId(null);
+    setPicker(null);
+    setSlotQuery("");
+  }
+
+  const sourceLabel =
+    mode === "elenco"
+      ? `Elenco atual · ${name}`
+      : mode === "sombra-todas"
+        ? "Time sombra · todas as competições"
+        : `Time sombra · ${LEAGUES.find((league) => league.id === sombraLeague)?.name ?? ""}`;
+  const rosterLabel = mode === "elenco" ? "Elenco" : mode === "sombra-todas" ? "Todas" : "Time sombra";
+
   return (
     <div className="scout-root profile-page shadow-page">
-      <ScoutTopbar active="time-sombra" />
+      <ScoutTopbar active="elenco" />
 
       <div className="shadow-page-body">
         <header className="shadow-page-header">
           <div className="shadow-page-heading">
-            <h1 className="shadow-page-title">Time Sombra</h1>
+            <h1 className="shadow-page-title">Elenco + Time Sombra</h1>
             <p className="shadow-page-sub">
-              {BOARD_LABEL[board]} · {starters.length} titulares · {benchIds.length} reservas
+              {sourceLabel} · {starters.length} titulares · {benchIds.length} reservas
               {avgLetter != null ? ` · letra ${avgLetter}` : ""}
             </p>
           </div>
 
           <div className="shadow-page-controls">
-            <div className="shadow-board-switch" role="tablist" aria-label="Seleção">
-              {(["proprio", "sombra"] as const).map((id) => (
-                <button
-                  key={id}
-                  type="button"
-                  role="tab"
-                  aria-selected={board === id}
-                  className={`shadow-board-tab${board === id ? " active" : ""}`}
-                  onClick={() => openBoard(id)}
-                >
-                  {BOARD_LABEL[id]}
-                </button>
-              ))}
+            <div className="shadow-board-switch" role="tablist" aria-label="Fonte do elenco">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mode === "elenco"}
+                className={`shadow-board-tab${mode === "elenco" ? " active" : ""}`}
+                onClick={() => setSource("elenco")}
+              >
+                Elenco atual
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mode === "sombra"}
+                className={`shadow-board-tab${mode === "sombra" ? " active" : ""}`}
+                onClick={() => setSource("sombra")}
+              >
+                Time sombra
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mode === "sombra-todas"}
+                className={`shadow-board-tab${mode === "sombra-todas" ? " active" : ""}`}
+                onClick={() => setSource("sombra-todas")}
+              >
+                Todas as competições
+              </button>
             </div>
+
+            {mode === "elenco" ? (
+              <div className="shadow-formation-chips" role="group" aria-label="Competição do elenco">
+                {LEAGUES.map((league) => (
+                  <Link
+                    key={league.id}
+                    href={`/${league.id}/time-sombra`}
+                    className={`shadow-formation-chip${league.id === leagueId ? " active" : ""}`}
+                    aria-current={league.id === leagueId ? "true" : undefined}
+                  >
+                    {league.name}
+                  </Link>
+                ))}
+              </div>
+            ) : null}
+
+            {mode === "sombra" ? (
+              <div className="shadow-formation-chips" role="group" aria-label="Competição do time sombra">
+                {LEAGUES.map((league) => (
+                  <button
+                    key={league.id}
+                    type="button"
+                    className={`shadow-formation-chip${league.id === sombraLeague ? " active" : ""}`}
+                    aria-pressed={league.id === sombraLeague}
+                    onClick={() => chooseSombraLeague(league.id)}
+                  >
+                    {league.name}
+                  </button>
+                ))}
+              </div>
+            ) : null}
 
             <div className="shadow-formation-picker" role="group" aria-label="Formação tática">
               <span className="shadow-formation-label">Formação</span>
@@ -268,7 +373,8 @@ export function TimeSombraClient({ players }: Props) {
                           <span className="shadow-slot-picker-copy">
                             <strong>{player.name}</strong>
                             <em>
-                              {player.club} · {player.position} · {player.profile}
+                              {player.club} · {LEAGUES.find((league) => league.id === player.sourceLeague)?.name} ·{" "}
+                              {player.position} · {player.profile}
                             </em>
                           </span>
                           <span className="shadow-slot-picker-rating tabular">
@@ -314,9 +420,7 @@ export function TimeSombraClient({ players }: Props) {
                   <div className="shadow-slot-detail-actions">
                     <Link
                       className="btn btn-ghost btn-sm"
-                      href={href(
-                        `/posicao/${selectedPlayer.position_family}?atleta=${selectedPlayer.player_id}`,
-                      )}
+                      href={`/${selectedPlayer.sourceLeague}/posicao/${selectedPlayer.position_family}?atleta=${selectedPlayer.player_id}`}
                     >
                       Ver perfil
                     </Link>
@@ -340,7 +444,7 @@ export function TimeSombraClient({ players }: Props) {
                   className={panelTab === "squad" ? "active" : ""}
                   onClick={() => setPanelTab("squad")}
                 >
-                  {BOARD_LABEL[board]} ({squadPlayers.length})
+                  {rosterLabel} ({squadPlayers.length})
                 </button>
                 <button
                   type="button"

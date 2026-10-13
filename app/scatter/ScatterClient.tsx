@@ -43,13 +43,20 @@ function formatMetric(value: number): string {
   return value.toFixed(2);
 }
 
-function quadrantLabel(x: number, y: number, avgX: number, avgY: number): string {
+function quadrantLabel(
+  x: number,
+  y: number,
+  avgX: number,
+  avgY: number,
+  xLabel: string,
+  yLabel: string,
+): string {
   const highX = x >= avgX;
   const highY = y >= avgY;
-  if (highX && highY) return "Alto em ambos";
-  if (!highX && highY) return "Alto em Y";
-  if (highX && !highY) return "Alto em X";
-  return "Abaixo da média";
+  if (highX && highY) return `Quadrante Alto em ${xLabel} e ${yLabel}`;
+  if (highY) return `Quadrante Alto em ${yLabel}`;
+  if (highX) return `Quadrante Alto em ${xLabel}`;
+  return `Abaixo da média em ${xLabel} e ${yLabel}`;
 }
 
 export function ScatterClient({
@@ -264,24 +271,18 @@ export function ScatterClient({
                 const side = index === 0 ? "a" : "b";
                 return (
                   <article key={point.player_id} className={`scatter-stat side-${side}`}>
-                    <header>
-                      <span>Atleta {index + 1}</span>
-                      <strong>{player.name}</strong>
-                    </header>
-                    <dl>
-                      <div>
-                        <dt>{xLabel}</dt>
-                        <dd>{formatMetric(point.x)}</dd>
-                      </div>
-                      <div>
-                        <dt>{yLabel}</dt>
-                        <dd>{formatMetric(point.y)}</dd>
-                      </div>
-                      <div>
-                        <dt>Quadrante</dt>
-                        <dd>{quadrantLabel(point.x, point.y, avgX, avgY)}</dd>
-                      </div>
-                    </dl>
+                    <p className="scatter-stat-line">
+                      <span>Atleta {index + 1}</span> {quadrantLabel(point.x, point.y, avgX, avgY, xLabel, yLabel)}
+                    </p>
+                    <strong className="scatter-stat-name">{player.name}</strong>
+                    <p className="scatter-stat-values">
+                      <span>
+                        {xLabel} <b>{formatMetric(point.x)}</b>
+                      </span>
+                      <span>
+                        {yLabel} <b>{formatMetric(point.y)}</b>
+                      </span>
+                    </p>
                   </article>
                 );
               })}

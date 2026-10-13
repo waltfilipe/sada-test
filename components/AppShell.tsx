@@ -9,7 +9,6 @@ const NAV = [
   { href: "/posicao/zagueiros", label: "Posições", icon: "◎" },
   { href: "/comparar", label: "Comparar", icon: "⇄" },
   { href: "/scatter", label: "Scatter", icon: "◈" },
-  { href: "/time-sombra", label: "Time Sombra", icon: "☽" },
 ];
 
 const LEGACY_SCOUT_PREFIXES = ["/posicao/", "/filtros", "/comparar", "/scatter", "/time-sombra", "/zagueiros-v2"];

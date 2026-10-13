@@ -12,10 +12,9 @@ const NAV = [
   { key: "filtros", path: "/filtros", label: "Filtros" },
   { key: "comparar", path: "/comparar", label: "Comparar" },
   { key: "scatter", path: "/scatter", label: "Scatter" },
-  { key: "time-sombra", path: "/time-sombra", label: "Time Sombra" },
 ] as const;
 
-export type ScoutSection = (typeof NAV)[number]["key"];
+export type ScoutSection = (typeof NAV)[number]["key"] | "elenco";
 
 type Props = {
   active: ScoutSection;
@@ -57,6 +56,13 @@ export function ScoutTopbar({ active, subnav }: Props) {
               {league.name}
             </Link>
           ))}
+          <Link
+            href={href("/time-sombra")}
+            className={active === "elenco" ? "active" : ""}
+            aria-current={active === "elenco" ? "page" : undefined}
+          >
+            Elenco + Time Sombra
+          </Link>
         </div>
 
         <nav className="topbar-links" aria-label="Seções">

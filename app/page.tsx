@@ -9,7 +9,7 @@ export default function HubPage() {
           <p className="home-kicker">Brasil · Scouting</p>
           <h1>Escolha a competição</h1>
           <p className="home-lead">
-            Mesmas ferramentas para cada liga: posições, filtros, comparar, scatter e time sombra.
+            Mesmas ferramentas para cada liga: posições, filtros, comparar, scatter e elenco.
           </p>
         </section>
 

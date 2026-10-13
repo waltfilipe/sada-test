@@ -57,6 +57,10 @@
   gap: 0.35rem;
 }
 
+a.shadow-formation-chip {
+  text-decoration: none;
+}
+
 .shadow-formation-chip {
   border: 1px solid rgba(148, 163, 184, 0.22);
   background: rgba(15, 23, 42, 0.55);
@@ -81,6 +85,7 @@
 
 .shadow-board-switch {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.35rem;
   padding: 0.2rem;
   border-radius: 999px;

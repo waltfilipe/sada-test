@@ -1842,21 +1842,84 @@
 .compare-player-column.side-b .compare-col-picker > span { color: var(--side-b); }
 .compare-player-column.side-c .compare-col-picker > span { color: var(--side-c); }
 
-.compare-col-picker select {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 100%;
-  padding: 0.5rem 2rem 0.5rem 0.75rem;
-  border-radius: var(--radius-sm);
+.compare-col-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.7rem;
+  border-radius: 10px;
   border: 1px solid var(--line-2);
-  background-color: rgba(10, 14, 20, 0.6);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b7c93' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 10px;
+  background: rgba(10, 14, 20, 0.6);
+}
+
+.compare-col-search i {
+  font-size: 0.72rem;
+  color: var(--text-3);
+}
+
+.compare-col-search input {
+  width: 100%;
+  border: 0;
+  background: transparent;
   color: var(--text);
+  font: inherit;
   font-size: 0.82rem;
+}
+
+.compare-col-search input:focus {
+  outline: none;
+}
+
+.compare-col-results {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 260px;
+  overflow: auto;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  border-radius: 10px;
+  border: 1px solid var(--line-2);
+  background: #121820;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.4);
+}
+
+.compare-col-results button {
+  width: 100%;
+  display: grid;
+  gap: 0.05rem;
+  text-align: left;
+  padding: 0.4rem 0.55rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
   cursor: pointer;
+}
+
+.compare-col-results button strong {
+  font-size: 0.82rem;
+}
+
+.compare-col-results button em {
+  font-style: normal;
+  font-size: 0.7rem;
+  color: var(--text-3);
+}
+
+.compare-col-results button:hover,
+.compare-col-results button.is-current {
+  background: rgba(125, 241, 222, 0.1);
+}
+
+.compare-col-results-empty {
+  padding: 0.55rem 0.65rem;
+  font-size: 0.78rem;
+  color: var(--text-3);
 }
 
 .compare-head-top {

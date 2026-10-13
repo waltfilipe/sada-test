@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
@@ -27,6 +28,10 @@ type Props = {
   onSectionChange: (title: string | null) => void;
   peers: PlayerProfile[];
 };
+
+function fold(value: string): string {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
 
 function monthsRemaining(iso?: string | null): string {
   if (!iso) return "—";
@@ -57,30 +62,88 @@ export function ComparePlayerColumn({
   const { href } = useLeague();
   const tm = player.transfermarkt;
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const matches = useMemo(() => {
+    const q = fold(query.trim());
+    return players.filter((option) => {
+      if (excludeIds.has(option.player_id) && option.player_id !== player.player_id) return false;
+      if (!q) return true;
+      return fold(option.name).includes(q) || fold(option.club).includes(q);
+    });
+  }, [players, query, excludeIds, player.player_id]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDoc(event: MouseEvent) {
+      if (!searchRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  function pick(id: string) {
+    if (!excludeIds.has(id) || id === player.player_id) onChange(id);
+    setQuery("");
+    setOpen(false);
+  }
 
   return (
     <article className={`compare-player-column side-${side}`} aria-label={`Coluna ${label}: ${player.name}`}>
       <header className={`compare-identity-card player-card side-${side}`}>
-        <label className="compare-col-picker">
+        <div className="compare-col-picker">
           <span>{label}</span>
-          <select
-            value={player.player_id}
-            onChange={(event) => {
-              const next = event.target.value;
-              if (!excludeIds.has(next)) onChange(next);
-            }}
-          >
-            {players.map((option) => (
-              <option
-                key={option.player_id}
-                value={option.player_id}
-                disabled={excludeIds.has(option.player_id) && option.player_id !== player.player_id}
-              >
-                {option.name} — {option.club}
-              </option>
-            ))}
-          </select>
-        </label>
+          <div className="compare-col-search" ref={searchRef}>
+            <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+            <input
+              type="search"
+              value={query}
+              placeholder="Buscar atleta ou clube"
+              aria-label={`Buscar atleta da coluna ${label}`}
+              aria-expanded={open}
+              aria-controls={`compare-results-${side}`}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setOpen(true);
+              }}
+              onFocus={() => setOpen(true)}
+            />
+            {open ? (
+              <ul className="compare-col-results" id={`compare-results-${side}`} role="listbox">
+                {matches.length ? (
+                  matches.slice(0, 30).map((option) => (
+                    <li key={option.player_id}>
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={option.player_id === player.player_id}
+                        className={option.player_id === player.player_id ? "is-current" : ""}
+                        onMouseDown={(event) => {
+                          event.preventDefault();
+                          pick(option.player_id);
+                        }}
+                      >
+                        <strong>{option.name}</strong>
+                        <em>{option.club}</em>
+                      </button>
+                    </li>
+                  ))
+                ) : (
+                  <li className="compare-col-results-empty">Nenhum atleta com esse nome.</li>
+                )}
+              </ul>
+            ) : null}
+          </div>
+        </div>
 
         <div className="compare-head-top">
           <div className="compare-col-photo">

@@ -9,12 +9,16 @@ import {
 import type { LeagueId } from "@/lib/leagues";
 import type { PositionFamily } from "@/lib/types";
 
-export function storageKey(league: LeagueId) {
-  return `${league}-scout:shadow-team-v1`;
+export type ShadowScope = LeagueId | "todas";
+
+export function storageKey(scope: ShadowScope) {
+  if (scope === "todas") return "all-competitions-scout:shadow-team-v1";
+  return `${scope}-scout:shadow-team-v1`;
 }
 
-export function shadowChangeEvent(league: LeagueId) {
-  return `${league}-scout:shadow-change`;
+export function shadowChangeEvent(scope: ShadowScope) {
+  if (scope === "todas") return "all-competitions-scout:shadow-change";
+  return `${scope}-scout:shadow-change`;
 }
 
 /** @deprecated use storageKey(league) */
@@ -50,7 +54,7 @@ function emptyAssignments(formation: Formation): Record<string, string | null> {
   return Object.fromEntries(fieldSlots(formation).map((s) => [s.id, null]));
 }
 
-export function loadShadowTeamState(league: LeagueId = "serie-a"): ShadowTeamState {
+export function loadShadowTeamState(league: ShadowScope = "serie-a"): ShadowTeamState {
   if (typeof window === "undefined") return { ...EMPTY_STATE };
   try {
     const raw = localStorage.getItem(storageKey(league));
@@ -76,7 +80,7 @@ export function loadShadowTeamState(league: LeagueId = "serie-a"): ShadowTeamSta
   }
 }
 
-export function saveShadowTeamState(state: ShadowTeamState, league: LeagueId = "serie-a"): void {
+export function saveShadowTeamState(state: ShadowTeamState, league: ShadowScope = "serie-a"): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(storageKey(league), JSON.stringify(state));
   window.dispatchEvent(new Event(shadowChangeEvent(league)));

@@ -575,7 +575,7 @@
 }
 
 .scatter-stat {
-  padding: 0.85rem 1rem;
+  padding: 0.65rem 0.8rem;
   border-radius: var(--radius);
   border: 1px solid var(--line);
   background: rgba(10, 14, 20, 0.35);
@@ -601,46 +601,40 @@
   --stat-accent: var(--side-b);
 }
 
-.scatter-stat header {
-  display: grid;
-  gap: 0.15rem;
-  margin-bottom: 0.7rem;
+.scatter-stat-line {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--text);
 }
 
-.scatter-stat header span {
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+.scatter-stat-line span {
+  margin-right: 0.35rem;
   color: var(--stat-accent);
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.scatter-stat header strong {
+.scatter-stat-name {
+  display: block;
+  margin-top: 0.2rem;
   font-family: "Sora", sans-serif;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   color: #f6f9fd;
   font-weight: 600;
 }
 
-.scatter-stat dl {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.5rem;
-  margin: 0;
-}
-
-.scatter-stat dt {
-  font-size: 0.68rem;
+.scatter-stat-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
   color: var(--text-3);
-  margin-bottom: 0.2rem;
 }
 
-.scatter-stat dd {
-  margin: 0;
-  font-family: "Sora", sans-serif;
-  font-size: 0.88rem;
+.scatter-stat-values b {
   color: var(--text);
-  font-weight: 600;
+  font-weight: 650;
 }
 
 /* ── Footer links ────────────────────────────────────────────────────────── */
@@ -686,18 +680,10 @@
   .scatter-stats {
     grid-template-columns: 1fr;
   }
-
-  .scatter-stat dl {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 640px) {
   .scatter-canvas {
     padding: 1rem 0.9rem 2.5rem;
-  }
-
-  .scatter-stat dl {
-    grid-template-columns: 1fr 1fr;
   }
 }

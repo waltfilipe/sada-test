@@ -10,7 +10,7 @@ const SECTIONS = [
   { path: "/filtros", kicker: "Busca", title: "Filtros", text: "Cruze clube, idade, minutagem, pé e tendências para achar o perfil certo." },
   { path: "/comparar", kicker: "Duelo", title: "Comparar", text: "Coloque dois ou três atletas da mesma posição lado a lado." },
   { path: "/scatter", kicker: "Mapa", title: "Scatter", text: "Veja a posição inteira num gráfico e encontre quem se destaca." },
-  { path: "/time-sombra", kicker: "Elenco", title: "Time Sombra", text: "Monte a escalação, o banco e a lista de observação." },
+  { path: "/time-sombra", kicker: "Elenco", title: "Elenco + Time Sombra", text: "Elenco da competição, time sombra de uma liga ou de todas, com atletas de qualquer série." },
 ] as const;
 
 export function LeagueHomeMain({ leagueId }: { leagueId: LeagueId }) {
@@ -29,7 +29,7 @@ export function LeagueHomeMain({ leagueId }: { leagueId: LeagueId }) {
           </p>
           <h1>Scouting da {meta.league} em um só lugar.</h1>
           <p className="home-lead">
-            Ratings por perfil, comparações e um time sombra para acompanhar os atletas da temporada.
+            Ratings por perfil, comparações e um elenco com time sombra para acompanhar os atletas da temporada.
             {!meta.heatmaps_enabled ? " Mapas de calor não disponíveis nesta liga." : null}
           </p>
           <div className="home-hero-actions">
@@ -37,7 +37,7 @@ export function LeagueHomeMain({ leagueId }: { leagueId: LeagueId }) {
               Explorar posições
             </Link>
             <Link className="home-cta home-cta-ghost" href={href("/time-sombra")}>
-              Abrir Time Sombra
+              Elenco + Time Sombra
             </Link>
           </div>
           <dl className="home-stats">
