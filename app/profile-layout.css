@@ -2,11 +2,11 @@
 
 :root {
   --surface: rgba(13, 27, 42, 0.72);
-  --border: rgba(27, 231, 255, 0.16);
-  --border-subtle: rgba(27, 231, 255, 0.12);
+  --border: rgba(186, 204, 224, 0.16);
+  --border-subtle: rgba(186, 204, 224, 0.1);
   --radius: 14px;
   --radius-sm: 10px;
-  --text-secondary: #8980f5;
+  --text-secondary: #9aabc0;
 }
 
 .scout-shell .profile-page-body {
@@ -205,7 +205,7 @@
   gap: 0.35rem;
   border: 1px solid rgba(27, 231, 255, 0.2);
   background: rgba(15, 26, 41, 0.66);
-  color: #1be7ff;
+  color: var(--text);
   border-radius: 999px;
   padding: 0.3rem 0.68rem;
   font-size: 0.72rem;
@@ -303,7 +303,7 @@
   width: 100%;
   border: none;
   background: transparent;
-  color: #1be7ff;
+  color: var(--text);
   text-align: left;
   padding: 0.34rem 0.42rem;
   border-radius: 8px;
@@ -475,7 +475,7 @@
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.03em;
-  color: var(--tier-color, #1be7ff);
+  color: var(--tier-color, #e8eef6);
   background: var(--tier-soft, rgba(27, 231, 255, 0.1));
   border: 1px solid var(--tier-border, rgba(27, 231, 255, 0.2));
 }
@@ -534,7 +534,7 @@
   gap: 0.28rem;
   font-size: 0.68rem;
   font-weight: 600;
-  color: #8980f5;
+  color: var(--text-3);
   white-space: nowrap;
   overflow: hidden;
 }
@@ -828,7 +828,7 @@
 .profile-filter-panel-hint {
   font-size: 0.68rem;
   font-weight: 600;
-  color: #8980f5;
+  color: var(--text-3);
 }
 
 .profile-filter-panel-empty {
@@ -853,7 +853,7 @@
   gap: 0.35rem;
   border: 1px solid color-mix(in srgb, var(--chip-accent, #1be7ff) 28%, transparent);
   background: color-mix(in srgb, var(--chip-accent, #1be7ff) 8%, rgba(13, 27, 42, 0.72));
-  color: #1be7ff;
+  color: var(--text);
   border-radius: 999px;
   padding: 0.32rem 0.72rem;
   font-size: 0.74rem;
@@ -1034,7 +1034,7 @@
   font-size: 0.78rem;
   font-weight: 800;
   line-height: 1.25;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .profile-archetype-card-copy {
@@ -1046,7 +1046,7 @@
   font-size: 0.68rem;
   line-height: 1.35;
   font-weight: 600;
-  color: #8980f5;
+  color: var(--text-3);
 }
 
 .profile-stat-filter-card {
@@ -1066,7 +1066,7 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .profile-stat-filter-card-actions {
@@ -1119,7 +1119,7 @@
   width: 100%;
   border: none;
   background: transparent;
-  color: #1be7ff;
+  color: var(--text);
   text-align: left;
   padding: 0.28rem 0.42rem;
   border-radius: 6px;
@@ -1381,7 +1381,7 @@
   border-radius: 6px;
   font-size: 0.72rem;
   font-weight: 800;
-  color: var(--tier-color, #1be7ff);
+  color: var(--tier-color, #e8eef6);
   background: var(--tier-soft, rgba(27, 231, 255, 0.1));
   border: 1px solid var(--tier-border, rgba(27, 231, 255, 0.2));
 }
@@ -1541,7 +1541,7 @@
   min-height: 128px;
   font-size: 1.5rem;
   font-weight: 800;
-  color: #8980f5;
+  color: var(--text-3);
 }
 
 .player-hero-copy {
@@ -1571,7 +1571,7 @@
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.08;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .player-hero-club {
@@ -1581,7 +1581,7 @@
   gap: 0.4rem;
   font-size: 0.86rem;
   font-weight: 700;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .player-hero-club-sep {
@@ -1634,7 +1634,7 @@
 .hero-fact-value {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #1be7ff;
+  color: var(--text);
   white-space: nowrap;
 }
 
@@ -1697,7 +1697,7 @@
 .hero-market-value {
   font-size: 0.94rem;
   font-weight: 800;
-  color: #1be7ff;
+  color: var(--text);
   white-space: nowrap;
   line-height: 1.1;
 }
@@ -1958,7 +1958,7 @@
   gap: 0.35rem;
   font-size: 0.7rem;
   font-weight: 700;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .profile-share-stack-emoji {
@@ -2009,7 +2009,7 @@
   margin: 0;
   font-size: 0.86rem;
   font-weight: 800;
-  color: #1be7ff;
+  color: var(--text);
   line-height: 1.25;
 }
 
@@ -2048,7 +2048,7 @@
 .profile-share-inline-label {
   font-size: 0.72rem;
   font-weight: 800;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .profile-share-inline-meta {
@@ -2072,7 +2072,7 @@
   margin: 0.35rem 0 0;
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--text);
 }
 
 /* Minutos — gradient gauge of % de minutos jogados */
@@ -2296,7 +2296,7 @@
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .tendencies-pop-section-title i {
@@ -2495,7 +2495,7 @@
   gap: 0.5rem;
   margin-bottom: 0.55rem;
   font-size: 0.82rem;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .similar-results-list {
@@ -2572,7 +2572,7 @@
 .stat-window-column h4 {
   margin: 0 0 0.55rem;
   font-size: 0.82rem;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .stat-window-column .stat-cards-stack {
@@ -2606,7 +2606,7 @@
 .stats-nav-row-title {
   font-size: 0.82rem;
   font-weight: 800;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .stats-nav-row {
@@ -2673,7 +2673,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #8980f5;
+  color: var(--text-3);
 }
 
 .stats-groups-stack {
@@ -2701,7 +2701,7 @@
   padding: 0.65rem 0.75rem;
   font-size: 0.82rem;
   font-weight: 800;
-  color: #1be7ff;
+  color: var(--text);
   cursor: pointer;
   list-style: none;
   user-select: none;
@@ -2728,7 +2728,7 @@
 
 .stats-group-chevron {
   font-size: 0.62rem;
-  color: #8980f5;
+  color: var(--text-3);
   transition: transform 0.16s ease, color 0.16s ease;
 }
 
@@ -2912,7 +2912,7 @@
 .stat-aspect-group-title {
   font-size: 0.74rem;
   font-weight: 800;
-  color: #1be7ff;
+  color: var(--text);
   letter-spacing: -0.01em;
 }
 
@@ -2939,13 +2939,13 @@
 .stat-metric-label {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #8980f5;
+  color: var(--text-3);
 }
 
 .stat-metric-value {
   font-size: 0.72rem;
   font-weight: 700;
-  color: #1be7ff;
+  color: var(--text);
   flex-shrink: 0;
 }
 
@@ -3327,7 +3327,7 @@
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.04em;
-  color: var(--tier-color, #8980f5);
+  color: var(--tier-color, #c5d0de);
   background: var(--tier-soft, rgba(27, 231, 255, 0.1));
   border: 1px solid var(--tier-border, rgba(27, 231, 255, 0.25));
   box-shadow: inset 0 1px 0 rgba(27, 231, 255, 0.05);
@@ -3398,19 +3398,19 @@
   font-size: 0.74rem;
   font-weight: 700;
   line-height: 1;
-  color: #8980f5;
+  color: var(--text-3);
 }
 
 .profile-perfil-row-rank {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #8980f5;
+  color: var(--text-3);
 }
 
 .profile-perfil-row-rank strong {
   font-size: 0.82rem;
   font-weight: 800;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .profile-archetype-tip {
@@ -3431,7 +3431,7 @@
 .profile-archetype-tip-label {
   font-size: 0.78rem;
   font-weight: 800;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .profile-archetype-tip-rating {
@@ -3443,7 +3443,7 @@
   margin: 0;
   font-size: 0.72rem;
   line-height: 1.45;
-  color: #1be7ff;
+  color: var(--text);
 }
 
 .profile-archetype-tip-traits-title {
@@ -3452,7 +3452,7 @@
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #8980f5;
+  color: var(--text-3);
   margin-bottom: 0.2rem;
 }
 

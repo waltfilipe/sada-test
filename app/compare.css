@@ -187,7 +187,7 @@
 .duel-name {
   font-size: clamp(1.05rem, 1.6vw, 1.3rem);
   line-height: 1.12;
-  color: #1be7ff;
+  color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1812,7 +1812,7 @@
   margin: 0;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #1be7ff;
+  color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1823,7 +1823,7 @@
   font-style: normal;
   font-size: 0.62rem;
   font-weight: 600;
-  color: #1be7ff;
+  color: var(--text-3);
 }
 
 .compare-col-picker {
@@ -2009,7 +2009,7 @@
   margin: 0;
   font-size: 1rem;
   line-height: 1.15;
-  color: #1be7ff;
+  color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
