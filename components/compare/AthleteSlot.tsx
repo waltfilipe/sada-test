@@ -17,13 +17,49 @@ type Props = {
   player: PlayerProfile;
   players: PlayerProfile[];
   onChange: (playerId: string) => void;
+  compact?: boolean;
 };
 
-export function AthleteSlot({ side, player, players, onChange }: Props) {
+export function AthleteSlot({ side, player, players, onChange, compact = false }: Props) {
   const token = ratingTier(positionRating(player));
   const age = player.birth_year ? CURRENT_YEAR - player.birth_year : null;
   const tm = player.transfermarkt;
   const clusterProps = clusterTagProps(player);
+  const rating = formatRating(positionRating(player));
+
+  const picker = (
+    <label className="slot-picker">
+      <span>Atleta {side === "a" ? "1" : "2"}</span>
+      <select value={player.player_id} onChange={(event) => onChange(event.target.value)}>
+        {players.map((option) => (
+          <option key={option.player_id} value={option.player_id}>
+            {option.name} — {option.club}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+
+  if (compact) {
+    return (
+      <section className={`slot slot-compact side-${side}`} style={tierVars(token)}>
+        {picker}
+        <div className="slot-compact-row">
+          <div className="slot-photo">
+            {tm?.photo ? <PlayerPhoto src={tm.photo} alt="" /> : <span>{playerInitials(player.name)}</span>}
+          </div>
+          <div className="slot-identity">
+            <h2>{player.name}</h2>
+            <p className="slot-club">
+              <ClubLogo club={player.club} size={16} />
+              {player.club}
+            </p>
+          </div>
+          <strong className="slot-compact-rating">{rating}</strong>
+        </div>
+      </section>
+    );
+  }
 
   const facts = [
     { label: "Idade", value: age ? `${age}` : "—", unit: age ? "anos" : undefined },
@@ -38,16 +74,7 @@ export function AthleteSlot({ side, player, players, onChange }: Props) {
 
   return (
     <section className={`slot side-${side}`} style={tierVars(token)}>
-      <label className="slot-picker">
-        <span>Atleta {side === "a" ? "1" : "2"}</span>
-        <select value={player.player_id} onChange={(event) => onChange(event.target.value)}>
-          {players.map((option) => (
-            <option key={option.player_id} value={option.player_id}>
-              {option.name} — {option.club}
-            </option>
-          ))}
-        </select>
-      </label>
+      {picker}
 
       <div className="slot-body">
         <div className="slot-photo">
@@ -69,7 +96,7 @@ export function AthleteSlot({ side, player, players, onChange }: Props) {
           {clusterProps ? <ClusterTag {...clusterProps} /> : <ProfileTag {...profileTagProps(player)} />}
 
           <div className="slot-rating">
-            <strong>{formatRating(positionRating(player))}</strong>
+            <strong>{rating}</strong>
             <em>
               {player.profile} · #{player.ranks[dominantRatingKey(player.profile, player.position_family, player.hybrid_lean) ?? "geral"] ?? player.ranks.geral}
             </em>

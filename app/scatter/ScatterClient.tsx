@@ -173,17 +173,15 @@ export function ScatterClient({
 
       <main className="scatter-canvas">
         <div className="compare-stage scatter-stage">
-          <AthleteSlot side="a" player={a} players={players} onChange={setIdA} />
+          <AthleteSlot compact side="a" player={a} players={players} onChange={setIdA} />
 
           <div className="compare-pivot">
-            <span className="pivot-mark">×</span>
-            <span className="pivot-note">dois perfis no plano</span>
             <button type="button" className="pivot-swap" onClick={swapAthletes}>
               Inverter
             </button>
           </div>
 
-          <AthleteSlot side="b" player={b} players={players} onChange={setIdB} />
+          <AthleteSlot compact side="b" player={b} players={players} onChange={setIdB} />
         </div>
 
         <div className="scatter-workspace">
@@ -290,13 +288,25 @@ export function ScatterClient({
           </section>
         </div>
 
-        <div className="scatter-links">
-          <Link href={href(`/comparar?posicao=${family}&a=${a.player_id}&b=${b.player_id}`)}>
-            Comparar atletas
-          </Link>
-          <Link href={href(`/posicao/${family}?atleta=${a.player_id}`)}>Dossiê de {a.name}</Link>
-          <Link href={href(`/posicao/${family}?atleta=${b.player_id}`)}>Dossiê de {b.name}</Link>
-        </div>
+        <section className="scatter-guide">
+          <h2>Como ler este gráfico</h2>
+          <p>
+            Cada ponto é um atleta da posição. A horizontal é o percentil no eixo X e a vertical, no eixo Y,
+            sempre em relação aos colegas do mesmo grupo. Mais à direita ou mais acima significa melhor
+            naquela métrica.
+          </p>
+          <p>
+            As linhas tracejadas marcam a média do grupo. Escolha dois atletas, troque os eixos e leia o
+            quadrante para ver quem está alto em um eixo, nos dois, ou abaixo da média.
+          </p>
+          <div className="scatter-links">
+            <Link href={href(`/comparar?posicao=${family}&a=${a.player_id}&b=${b.player_id}`)}>
+              Comparar atletas
+            </Link>
+            <Link href={href(`/posicao/${family}?atleta=${a.player_id}`)}>Dossiê de {a.name}</Link>
+            <Link href={href(`/posicao/${family}?atleta=${b.player_id}`)}>Dossiê de {b.name}</Link>
+          </div>
+        </section>
       </main>
     </div>
   );
