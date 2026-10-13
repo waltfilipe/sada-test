@@ -146,6 +146,17 @@ def fetch_market(api: SofascoreApi, player_id: str) -> dict[str, Any]:
     return parse_market_from_player_payload(payload)
 
 
+def _cdp_http(fd: Any, cdp_url: str, warmup_url: str | None) -> SofascoreApi:
+    """Compatível com fetch_defensive_league antigo (sem warmup_url no CDP)."""
+    import inspect
+
+    params = inspect.signature(fd.CdpSofascoreHttp.__init__).parameters
+    if "warmup_url" in params:
+        return fd.CdpSofascoreHttp(cdp_url, warmup_url=warmup_url)
+    log("CDP: fetch_defensive_league antigo — abra o SofaScore manualmente no Chrome 9222.")
+    return fd.CdpSofascoreHttp(cdp_url)
+
+
 def open_sofascore_api(args: argparse.Namespace) -> SofascoreApi | None:
     if args.skip_market:
         return None
@@ -169,7 +180,7 @@ def open_sofascore_api(args: argparse.Namespace) -> SofascoreApi | None:
         )
     if transport == "cdp":
         log(f"API mercado: CDP → {args.cdp_url}")
-        return fd.CdpSofascoreHttp(args.cdp_url, warmup_url=warmup)
+        return _cdp_http(fd, args.cdp_url, warmup)
     if transport == "cookies":
         if not args.cookies_file:
             raise SystemExit("Modo cookies exige --cookies-file ./cookies.txt")
