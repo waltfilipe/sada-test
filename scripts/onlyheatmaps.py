@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """Standalone SofaScore season heatmap downloader.
 
-No repo dependencies — only needs: pip install curl_cffi pandas
+Deps: pip install curl_cffi pandas  (+ playwright se usar --transport cdp)
 
-Example:
-  python -u scripts/onlyheatmaps.py ^
-    --url "https://www.sofascore.com/football/tournament/brazil/brasileirao-serie-a/325#id:87678" ^
-    --csv "BR26_defensive.csv" ^
-    --output-dir "./HeatmapsBR26" ^
-    --resume --rate-limit 5.0 --png
+Série A (curl):
+  python -u scripts/onlyheatmaps.py --url "https://www.sofascore.com/football/tournament/brazil/brasileirao-serie-a/325#id:87678" --csv BR26_defensive.csv --output-dir ./HeatmapsBR26 --resume --rate-limit 5.0
+
+Série C (mesmo fluxo que photo&mercado — use allmatch/onlyheatmaps.py):
+  python -u "allmatch/onlyheatmaps.py" --url "https://www.sofascore.com/football/tournament/brazil/brasileirao-serie-c/1281#id:90642" --csv ./BRC26_defensive.csv --output-dir ./HeatmapsBRC26 --transport cdp --cdp-url http://127.0.0.1:9222 --warmup-url "https://www.sofascore.com/football/tournament/brazil/brasileirao-serie-c/1281#id:90642" --resume --rate-limit 0.35 --apply-site --league serie-c
 """
 
 from __future__ import annotations
@@ -22,7 +21,7 @@ import time
 import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 import pandas as pd
 
@@ -32,6 +31,15 @@ API_BASE = "https://api.sofascore.com/api/v1"
 DEFAULT_TOURNAMENT_ID = 325
 STATE_FILE = ".onlyheatmaps_state.json"
 DEFAULT_URL = "https://www.sofascore.com/football/tournament/brazil/brasileirao-serie-a/325#id:87678"
+
+
+class SofascoreApi(Protocol):
+    def get(self, path: str) -> dict[str, Any]: ...
+
+    def close(self) -> None: ...
+
+
+_SOFA_API: SofascoreApi | None = None
 
 
 # ── SofaScore API ─────────────────────────────────────────────────────────────
@@ -53,6 +61,9 @@ def _proxy_cfg() -> dict[str, str] | None:
 
 
 def fetch_api_json(path: str) -> dict[str, Any]:
+    if _SOFA_API is not None:
+        return _SOFA_API.get(path.lstrip("/"))
+
     url = f"{API_BASE}/{path.lstrip('/')}"
     proxy_cfg = _proxy_cfg()
     last_err: Exception | None = None
@@ -246,7 +257,54 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--player-id", type=int, action="append", dest="player_ids", help="SofaScore numeric id")
     parser.add_argument("--use-slug", action="store_true", help="Save as name-team slug instead of numeric id")
     parser.add_argument("--sync-site", type=Path, default=None, metavar="DIR", help="Copy JSONs into site data/heatmaps dir")
+    parser.add_argument(
+        "--transport",
+        default="auto",
+        choices=["auto", "cdp", "playwright", "cookies"],
+        help="auto=curl_cffi+playwright | cdp=Chrome na 9222 (recomendado no PC)",
+    )
+    parser.add_argument("--cdp-url", default="http://127.0.0.1:9222")
+    parser.add_argument("--warmup-url", default=None, help="Abrir esta URL no Chrome CDP antes das chamadas")
+    parser.add_argument("--proxy", default=None)
+    parser.add_argument("--cookies-file", type=Path, default=None)
     return parser.parse_args()
+
+
+def _cdp_http(fd: Any, cdp_url: str, warmup_url: str | None) -> SofascoreApi:
+    import inspect
+
+    params = inspect.signature(fd.CdpSofascoreHttp.__init__).parameters
+    if "warmup_url" in params:
+        return fd.CdpSofascoreHttp(cdp_url, warmup_url=warmup_url)
+    print("CDP: abra o SofaScore manualmente no Chrome 9222.", flush=True)
+    return fd.CdpSofascoreHttp(cdp_url)
+
+
+def open_sofascore_api(args: argparse.Namespace) -> SofascoreApi | None:
+    if args.transport == "auto":
+        return None
+
+    import fetch_defensive_league as fd
+
+    proxy_url = fd.resolve_proxy(args.proxy)
+    warmup = args.warmup_url or args.url or "https://www.sofascore.com/"
+
+    if args.transport == "playwright":
+        print("API heatmap: Playwright …", flush=True)
+        return fd.BrowserSofascoreHttp(
+            proxy_url=proxy_url,
+            headless=True,
+            warmup_url=warmup,
+        )
+    if args.transport == "cdp":
+        print(f"API heatmap: CDP → {args.cdp_url}", flush=True)
+        return _cdp_http(fd, args.cdp_url, warmup)
+    if args.transport == "cookies":
+        if not args.cookies_file:
+            raise SystemExit("Modo cookies exige --cookies-file")
+        print(f"API heatmap: cookies ← {args.cookies_file}", flush=True)
+        return fd.CookieCffiHttp(args.cookies_file, proxy_url=proxy_url)
+    raise SystemExit(f"Transport desconhecido: {args.transport}")
 
 
 def parse_tournament_url(url: str) -> tuple[int, int | None]:
@@ -344,7 +402,7 @@ def write_index(out_dir: Path) -> None:
 
 def resolve_season(tournament_id: int, season_id: int | None, season_hint: str, sample_id: int) -> tuple[int, str | None]:
     if season_id:
-        return season_id, "Brasileirão Série A"
+        return season_id, None
     payload = fetch_api_json(f"player/{sample_id}/statistics/seasons")
     picked = pick_season_entry(payload, tournament_id, season_hint=season_hint)
     if not picked:
@@ -391,7 +449,10 @@ def build_targets(args: argparse.Namespace, csv_path: Path) -> list[dict[str, An
 
 
 def main() -> None:
+    global _SOFA_API
     args = parse_args()
+    api = open_sofascore_api(args)
+    _SOFA_API = api
     csv_path = args.csv or (PROJECT_ROOT / "BR26_defensive.csv")
     if not csv_path.is_absolute():
         for candidate in [Path.cwd() / csv_path, PROJECT_ROOT / csv_path, SCRIPT_DIR / csv_path]:
@@ -419,9 +480,11 @@ def main() -> None:
     print(f"Targets: {len(targets)}")
 
     sample_id = int(targets[0]["sofascore_player_id"])
-    competition = "Brasileirão Série A"
+    competition: str | None = None
     if not season_id:
         season_id, competition = resolve_season(tournament_id, None, args.season_hint, sample_id)
+    if not competition:
+        competition = f"tournament {tournament_id}"
 
     state = load_state(out_dir)
     state.setdefault("completed", [])
@@ -489,6 +552,13 @@ def main() -> None:
         print(f"Synced → {sync_dir}")
 
     print(f"Done: {ok} saved, {skipped} skipped, {fail} failed")
+
+    if api is not None:
+        try:
+            api.close()
+        except Exception:
+            pass
+    _SOFA_API = None
 
 
 if __name__ == "__main__":
