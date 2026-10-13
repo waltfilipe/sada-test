@@ -5,6 +5,7 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { playerInitials, ratingTier, formatRating, tierVars } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
 import { dominantRatingKey } from "@/lib/profileMeta";
@@ -87,12 +88,11 @@ function DuelSide({
     <div className={`duel-side side-${side}`}>
       <div className="duel-identity">
         <div className="duel-photo">
-          {tm?.photo ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={tm.photo} alt={player.name} />
-          ) : (
-            <span className="duel-photo-fallback">{playerInitials(player.name)}</span>
-          )}
+          <PlayerPhoto
+            src={tm?.photo}
+            alt={player.name}
+            fallback={<span className="duel-photo-fallback">{playerInitials(player.name)}</span>}
+          />
         </div>
 
         <div className="duel-copy">

@@ -4,6 +4,7 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { MinutesStat } from "@/components/position/MinutesStat";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { dominantRatingKey } from "@/lib/profileMeta";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
@@ -51,8 +52,7 @@ export function AthleteSlot({ side, player, players, onChange }: Props) {
       <div className="slot-body">
         <div className="slot-photo">
           {tm?.photo ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={tm.photo} alt="" />
+            <PlayerPhoto src={tm.photo} alt="" />
           ) : (
             <span>{playerInitials(player.name)}</span>
           )}

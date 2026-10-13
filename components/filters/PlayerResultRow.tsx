@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLeague } from "@/components/LeagueProvider";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { ClubLogo } from "@/components/ClubLogo";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
@@ -42,8 +43,7 @@ export function PlayerResultRow({
     <article className="result-row">
       <Link href={profileHref} className="row-photo" aria-label={player.name}>
         {tm?.photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={tm.photo} alt="" loading="lazy" />
+          <PlayerPhoto src={tm.photo} alt="" loading="lazy" />
         ) : (
           <span>{playerInitials(player.name)}</span>
         )}

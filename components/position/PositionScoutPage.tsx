@@ -6,6 +6,7 @@ import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { BadgeFilterBox } from "@/components/filters/BadgeFilterBox";
 import { PositionProfileView } from "@/components/position/profile/PositionProfileView";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import {
   AT_ARCHETYPE_META,
   EX_ARCHETYPE_META,
@@ -375,8 +376,7 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
                     >
                       <span className="zag-v2-photo">
                         {photo ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={photo} alt="" />
+                          <PlayerPhoto src={photo} alt="" />
                         ) : (
                           <span>{playerInitials(player.name)}</span>
                         )}

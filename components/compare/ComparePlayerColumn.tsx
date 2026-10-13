@@ -9,6 +9,7 @@ import { ProfileCard } from "@/components/position/profile/ProfileCard";
 import { ScoutStatsSections } from "@/components/position/profile/ScoutStatsSections";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { playerInitials } from "@/lib/scoutTheme";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 export type CompareSide = "a" | "b" | "c";
@@ -83,12 +84,11 @@ export function ComparePlayerColumn({
 
         <div className="compare-head-top">
           <div className="compare-col-photo">
-            {tm?.photo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={tm.photo} alt={player.name} />
-            ) : (
-              <span className="compare-col-photo-fallback">{playerInitials(player.name)}</span>
-            )}
+            <PlayerPhoto
+              src={tm?.photo}
+              alt={player.name}
+              fallback={<span className="compare-col-photo-fallback">{playerInitials(player.name)}</span>}
+            />
           </div>
 
           <div className="compare-col-side">

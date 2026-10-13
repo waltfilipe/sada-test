@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ClubLogo } from "@/components/ClubLogo";
 import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { DossierRatings } from "./DossierRatings";
 import { ClusterTag, clusterTagProps } from "./ClusterTag";
@@ -35,8 +36,7 @@ export function DossierHeader({ player, poolSize, family }: Props) {
     <section className="dossier-card">
       <div className="dossier-portrait">
         {tm?.photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={tm.photo} alt={player.name} />
+          <PlayerPhoto src={tm.photo} alt={player.name} />
         ) : (
           <span className="portrait-fallback">{playerInitials(player.name)}</span>
         )}

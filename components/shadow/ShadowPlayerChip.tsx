@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { ShadowPlayerTooltip } from "@/components/shadow/ShadowPlayerMiniReport";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
@@ -23,8 +24,7 @@ export function ShadowPlayerChip({ player, size = "md", onRemove, onClick, selec
     <>
       <span className={`shadow-chip-photo shadow-chip-photo-${size}`}>
         {photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} alt="" loading="lazy" />
+          <PlayerPhoto src={photo} alt="" loading="lazy" />
         ) : (
           <span>{playerInitials(player.name)}</span>
         )}
@@ -90,8 +90,7 @@ export function ShadowPlayerRow({
         >
           <span className="shadow-player-row-photo">
             {photo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={photo} alt="" loading="lazy" />
+              <PlayerPhoto src={photo} alt="" loading="lazy" />
             ) : (
               <span>{playerInitials(player.name)}</span>
             )}

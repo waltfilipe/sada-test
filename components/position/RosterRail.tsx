@@ -11,6 +11,7 @@ import {
   ZAG_ARCHETYPE_META,
 } from "@/lib/clusterMeta";
 import { ClubLogo } from "@/components/ClubLogo";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { formatRating, playerInitials, ratingGradientStyle } from "@/lib/scoutTheme";
 import { profileTone, sortPlayers } from "@/lib/scoutUi";
 import { playerMatchesClusterFilter } from "./ArchetypeMixCard";
@@ -210,8 +211,7 @@ export function RosterRail({
 
                 <span className="roster-avatar">
                   {player.transfermarkt?.photo ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={player.transfermarkt.photo} alt="" loading="lazy" />
+                    <PlayerPhoto src={player.transfermarkt.photo} alt="" loading="lazy" />
                   ) : (
                     playerInitials(player.name)
                   )}

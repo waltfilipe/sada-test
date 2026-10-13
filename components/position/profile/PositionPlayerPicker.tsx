@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { AT_ARCHETYPE_META, EX_ARCHETYPE_META, LAT_ARCHETYPE_META, MC_ARCHETYPE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
 import { playerInitials, profileGradeFromRank } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
@@ -602,8 +603,7 @@ function PlayerStripCard({
     >
       <span className="player-strip-card-photo">
         {photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} alt="" loading="lazy" />
+          <PlayerPhoto src={photo} alt="" loading="lazy" />
         ) : (
           <span>{playerInitials(player.name)}</span>
         )}

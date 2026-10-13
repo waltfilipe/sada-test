@@ -9,6 +9,7 @@ import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { SimilarCrossLeagueModal } from "@/components/position/profile/SimilarCrossLeagueModal";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 
 type Props = {
   player: PlayerProfile;
@@ -83,12 +84,11 @@ export function PlayerHero({ player, family }: Props) {
   return (
     <section className="player-hero player-card" aria-label={`Perfil de ${player.name}`}>
       <div className="player-hero-photo">
-        {tm?.photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={tm.photo} alt={player.name} />
-        ) : (
-          <span className="player-hero-photo-fallback">{playerInitials(player.name)}</span>
-        )}
+        <PlayerPhoto
+          src={tm?.photo}
+          alt={player.name}
+          fallback={<span className="player-hero-photo-fallback">{playerInitials(player.name)}</span>}
+        />
       </div>
 
       <div className="player-hero-copy">
