@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SiteLogo } from "@/components/SiteLogo";
 import { POSITION_FAMILIES } from "@/lib/positions";
 
 const NAV = [
@@ -31,7 +32,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <span className="brand-mark">SA</span>
+          <SiteLogo height={42} />
           <div>
             <strong>Série A Scout</strong>
             <small>2025/26</small>

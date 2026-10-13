@@ -24,7 +24,7 @@
 }
 
 .shadow-page-title {
-  font-family: var(--font-display, "Sora", sans-serif);
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1.65rem;
   font-weight: 700;
   margin: 0 0 0.2rem;
@@ -47,7 +47,7 @@
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--accent, #5eead4);
+  color: var(--accent, #1be7ff);
   font-weight: 600;
 }
 
@@ -74,13 +74,13 @@ a.shadow-formation-chip {
 }
 
 .shadow-formation-chip:hover {
-  border-color: rgba(94, 234, 212, 0.45);
+  border-color: rgba(27, 231, 255, 0.45);
 }
 
 .shadow-formation-chip.active {
-  background: rgba(94, 234, 212, 0.14);
-  border-color: rgba(94, 234, 212, 0.55);
-  color: #5eead4;
+  background: rgba(27, 231, 255, 0.14);
+  border-color: rgba(27, 231, 255, 0.55);
+  color: #1be7ff;
 }
 
 .shadow-board-switch {
@@ -105,8 +105,8 @@ a.shadow-formation-chip {
 }
 
 .shadow-board-tab.active {
-  background: rgba(94, 234, 212, 0.16);
-  color: #5eead4;
+  background: rgba(27, 231, 255, 0.16);
+  color: #1be7ff;
 }
 
 .shadow-layout {
@@ -166,7 +166,7 @@ a.shadow-formation-chip {
 .shadow-stat-profiles {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--accent, #5eead4);
+  color: var(--accent, #1be7ff);
 }
 
 /* Profile map (campinho) */
@@ -190,7 +190,7 @@ a.shadow-formation-chip {
 .shadow-profile-map-formation {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--accent, #5eead4);
+  color: var(--accent, #1be7ff);
 }
 
 .shadow-profile-map-mini-pitch {
@@ -214,8 +214,8 @@ a.shadow-formation-chip {
 }
 
 .shadow-profile-map-dot.filled {
-  background: rgba(94, 234, 212, 0.85);
-  box-shadow: 0 0 8px rgba(94, 234, 212, 0.5);
+  background: rgba(27, 231, 255, 0.85);
+  box-shadow: 0 0 8px rgba(27, 231, 255, 0.5);
 }
 
 .shadow-profile-map-lines {
@@ -270,7 +270,7 @@ a.shadow-formation-chip {
 .shadow-profile-list-prof {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--accent, #5eead4);
+  color: var(--accent, #1be7ff);
   line-height: 1.2;
 }
 
@@ -317,7 +317,7 @@ a.shadow-formation-chip {
 }
 
 .shadow-mini-report-dominant-rating {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1rem;
   font-weight: 700;
   color: var(--text, #f8fafc);
@@ -326,7 +326,7 @@ a.shadow-formation-chip {
 .shadow-mini-report-profile {
   font-size: 0.76rem;
   font-weight: 700;
-  color: var(--accent, #5eead4);
+  color: var(--accent, #1be7ff);
   line-height: 1.2;
 }
 
@@ -535,7 +535,7 @@ a.shadow-formation-chip {
 
 .shadow-pitch-slot.drag-over .shadow-slot-empty,
 .shadow-pitch-slot.drag-over .shadow-slot-draggable {
-  outline: 2px dashed rgba(94, 234, 212, 0.85);
+  outline: 2px dashed rgba(27, 231, 255, 0.85);
   outline-offset: 3px;
   border-radius: 10px;
 }
@@ -598,19 +598,19 @@ a.shadow-formation-chip {
 
 .shadow-pitch-slot:hover .shadow-slot-empty,
 .shadow-pitch-slot.placement-mode .shadow-slot-empty {
-  border-color: rgba(94, 234, 212, 0.7);
-  background: rgba(94, 234, 212, 0.12);
-  color: #5eead4;
+  border-color: rgba(27, 231, 255, 0.7);
+  background: rgba(27, 231, 255, 0.12);
+  color: #1be7ff;
 }
 
 .shadow-pitch-slot.selected .shadow-slot-label,
 .shadow-pitch-slot.swap-source .shadow-slot-label {
-  color: #5eead4;
+  color: #1be7ff;
 }
 
 .shadow-pitch-slot.swap-source .shadow-slot-player,
 .shadow-pitch-slot.selected .shadow-slot-player {
-  outline: 2px solid rgba(94, 234, 212, 0.75);
+  outline: 2px solid rgba(27, 231, 255, 0.75);
   outline-offset: 2px;
   border-radius: 10px;
 }
@@ -672,9 +672,9 @@ a.shadow-formation-chip {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 1px solid rgba(94, 234, 212, 0.55);
+  border: 1px solid rgba(27, 231, 255, 0.55);
   background: rgba(15, 23, 42, 0.94);
-  color: #5eead4;
+  color: #1be7ff;
   font-size: 0.62rem;
   display: grid;
   place-items: center;
@@ -683,7 +683,7 @@ a.shadow-formation-chip {
 }
 
 .shadow-slot-plus:hover {
-  background: rgba(94, 234, 212, 0.18);
+  background: rgba(27, 231, 255, 0.18);
 }
 
 .shadow-slot-clear {
@@ -693,7 +693,7 @@ a.shadow-formation-chip {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  border: 1px solid rgba(248, 113, 113, 0.5);
+  border: 1px solid rgba(254, 74, 73, 0.5);
   background: rgba(15, 23, 42, 0.9);
   color: #fca5a5;
   font-size: 0.65rem;
@@ -712,7 +712,7 @@ a.shadow-formation-chip {
 .shadow-link-btn {
   border: none;
   background: none;
-  color: var(--accent, #5eead4);
+  color: var(--accent, #1be7ff);
   cursor: pointer;
   text-decoration: underline;
   font: inherit;
@@ -741,8 +741,8 @@ a.shadow-formation-chip {
 
 .shadow-player-chip.is-clickable:hover,
 .shadow-player-chip.selected {
-  border-color: rgba(94, 234, 212, 0.5);
-  background: rgba(94, 234, 212, 0.08);
+  border-color: rgba(27, 231, 255, 0.5);
+  background: rgba(27, 231, 255, 0.08);
 }
 
 .shadow-player-chip-sm {
@@ -827,7 +827,7 @@ a.shadow-formation-chip {
   height: 24px;
   border: none;
   border-radius: 6px;
-  background: rgba(248, 113, 113, 0.12);
+  background: rgba(254, 74, 73, 0.12);
   color: #fca5a5;
   cursor: pointer;
   display: grid;
@@ -922,7 +922,7 @@ a.shadow-formation-chip {
 .shadow-slot-detail-profile {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--accent, #5eead4);
+  color: var(--accent, #1be7ff);
   font-weight: 600;
 }
 
@@ -950,12 +950,12 @@ a.shadow-formation-chip {
 }
 
 .shadow-slot-search:focus {
-  outline: 2px solid rgba(125, 241, 222, 0.7);
+  outline: 2px solid rgba(27, 231, 255, 0.7);
   outline-offset: 1px;
 }
 
 .shadow-roster-empty a {
-  color: #7df1de;
+  color: #1be7ff;
   font-weight: 700;
 }
 
@@ -986,7 +986,7 @@ a.shadow-formation-chip {
 }
 
 .shadow-slot-picker-item:hover {
-  border-color: rgba(94, 234, 212, 0.35);
+  border-color: rgba(27, 231, 255, 0.35);
   background: rgba(15, 23, 42, 0.55);
 }
 
@@ -1010,7 +1010,7 @@ a.shadow-formation-chip {
 .shadow-slot-picker-rating {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--accent, #5eead4);
+  color: var(--accent, #1be7ff);
 }
 
 .shadow-roster-tabs {
@@ -1034,8 +1034,8 @@ a.shadow-formation-chip {
 
 .shadow-roster-tabs button.active {
   color: var(--text, #e2e8f0);
-  background: rgba(94, 234, 212, 0.1);
-  border-color: rgba(94, 234, 212, 0.25);
+  background: rgba(27, 231, 255, 0.1);
+  border-color: rgba(27, 231, 255, 0.25);
 }
 
 .shadow-roster-body {
@@ -1075,8 +1075,8 @@ a.shadow-formation-chip {
 }
 
 .shadow-player-row-link:hover {
-  border-color: rgba(94, 234, 212, 0.35);
-  background: rgba(94, 234, 212, 0.06);
+  border-color: rgba(27, 231, 255, 0.35);
+  background: rgba(27, 231, 255, 0.06);
 }
 
 .shadow-player-row-photo {
@@ -1176,12 +1176,12 @@ a.shadow-formation-chip {
 
 .shadow-add-dropdown button:hover,
 .shadow-add-dropdown button.is-active {
-  background: rgba(94, 234, 212, 0.1);
+  background: rgba(27, 231, 255, 0.1);
 }
 
 .shadow-add-dropdown button i {
   margin-top: 0.15rem;
-  color: var(--accent, #5eead4);
+  color: var(--accent, #1be7ff);
   width: 1rem;
   text-align: center;
 }
@@ -1203,8 +1203,8 @@ a.shadow-formation-chip {
 }
 
 .shadow-add-trigger.active {
-  border-color: rgba(94, 234, 212, 0.5);
-  color: #5eead4;
+  border-color: rgba(27, 231, 255, 0.5);
+  color: #1be7ff;
 }
 
 @media (max-width: 1024px) {

@@ -269,7 +269,7 @@ function drawAttackHint(ctx: CanvasRenderingContext2D, r: Rect) {
   const y = r.y + r.h + Math.max(12, r.h * 0.07);
   ctx.save();
   ctx.fillStyle = "rgba(226, 232, 240, 0.72)";
-  ctx.font = `600 ${Math.max(9, r.h * 0.045)}px "DM Sans", system-ui, sans-serif`;
+  ctx.font = `600 ${Math.max(9, r.h * 0.045)}px "TASA Orbiter Variable", system-ui, sans-serif`;
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
   ctx.fillText("Ataque  →", r.x + r.w, y);

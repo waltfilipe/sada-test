@@ -5,20 +5,20 @@
 .scout-shell {
   display: block;
   min-height: 100vh;
-  background: #080b11;
+  background: #0d1b2a;
 }
 
 .scout-root {
-  --bg: #080b11;
-  --surface: #0f141d;
-  --surface-2: #141b26;
-  --surface-3: #1a2331;
-  --line: #1d2634;
-  --line-2: #2a3547;
-  --text: #eaf0f8;
-  --text-2: #9aabc2;
-  --text-3: #6b7c93;
-  --accent: #5eead4;
+  --bg: #0d1b2a;
+  --surface: #12233a;
+  --surface-2: #16304a;
+  --surface-3: #1c3a56;
+  --line: rgba(27, 231, 255, 0.16);
+  --line-2: rgba(27, 231, 255, 0.32);
+  --text: #e5eefb;
+  --text-2: #8fa1bb;
+  --text-3: #6d829c;
+  --accent: #1be7ff;
 
   --radius-lg: 16px;
   --radius: 12px;
@@ -31,62 +31,62 @@
 
   min-height: 100vh;
   color: var(--text);
-  font-family: "DM Sans", system-ui, sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   background:
-    radial-gradient(1100px 520px at 8% -8%, rgba(56, 189, 248, 0.055), transparent 62%),
-    radial-gradient(900px 460px at 98% -4%, rgba(94, 234, 212, 0.045), transparent 58%),
+    radial-gradient(1100px 520px at 8% -8%, rgba(27, 231, 255, 0.08), transparent 62%),
+    radial-gradient(900px 460px at 98% -4%, rgba(137, 128, 245, 0.08), transparent 58%),
     var(--bg);
 }
 
 .scout-root h1,
 .scout-root h2,
 .scout-root h3 {
-  font-family: "Sora", "DM Sans", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-weight: 600;
   letter-spacing: -0.02em;
   margin: 0;
 }
 
 .scout-root ::selection {
-  background: rgba(94, 234, 212, 0.24);
+  background: rgba(27, 231, 255, 0.24);
 }
 
 /* ── Profile accent tones ────────────────────────────────────────────────── */
 
 .tone-combativo,
-.profile-combativo { --tone: #f87171; }
+.profile-combativo { --tone: #fe4a49; }
 .tone-construtor,
-.profile-construtor { --tone: #34d399; }
+.profile-construtor { --tone: #31e981; }
 .tone-posicional,
-.profile-posicional { --tone: #60a5fa; }
+.profile-posicional { --tone: #1be7ff; }
 .tone-defensivo,
-.profile-defensivo { --tone: #38bdf8; }
+.profile-defensivo { --tone: #1be7ff; }
 .tone-vertical,
-.profile-vertical { --tone: #a78bfa; }
+.profile-vertical { --tone: #8980f5; }
 .tone-ofensivo,
-.profile-ofensivo { --tone: #fb7185; }
+.profile-ofensivo { --tone: #fe4a49; }
 .tone-contencao,
-.profile-contencao { --tone: #22d3ee; }
+.profile-contencao { --tone: #1be7ff; }
 .tone-boxtobox,
-.profile-boxtobox { --tone: #facc15; }
+.profile-boxtobox { --tone: #fed766; }
 .tone-criador,
-.profile-criador { --tone: #c084fc; }
+.profile-criador { --tone: #8980f5; }
 .tone-meia-ponta,
-.profile-meia-ponta { --tone: #f0abfc; }
+.profile-meia-ponta { --tone: #8980f5; }
 .tone-armador,
-.profile-armador { --tone: #4ade80; }
+.profile-armador { --tone: #31e981; }
 .tone-finalizador,
-.profile-finalizador { --tone: #fb923c; }
+.profile-finalizador { --tone: #fe4a49; }
 .tone-alvo,
-.profile-alvo { --tone: #fbbf24; }
+.profile-alvo { --tone: #fed766; }
 .tone-movel,
-.profile-movel { --tone: #2dd4bf; }
+.profile-movel { --tone: #1be7ff; }
 .tone-hibrido,
 .profile-hibrido { --tone: #94a3b8; }
 .tone-hibrido-construtor,
-.profile-hibrido-construtor { --tone: #6ee7b7; }
+.profile-hibrido-construtor { --tone: #31e981; }
 .tone-hibrido-defensivo,
-.profile-hibrido-defensivo { --tone: #7dd3fc; }
+.profile-hibrido-defensivo { --tone: #1be7ff; }
 
 /* ── Top bar ─────────────────────────────────────────────────────────────── */
 
@@ -100,10 +100,13 @@
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  height: 60px;
-  padding: 0 1.5rem;
+  height: auto;
+  min-height: 124px;
+  flex-wrap: wrap;
+  row-gap: 0.45rem;
+  padding: 0.45rem 1.5rem;
   border-bottom: 1px solid var(--line);
-  background: rgba(8, 11, 17, 0.88);
+  background: rgba(13, 27, 42, 0.92);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -113,7 +116,7 @@
   justify-content: center;
   padding: 0.45rem 1.25rem 0.55rem;
   border-bottom: 1px solid var(--line);
-  background: rgba(8, 11, 17, 0.94);
+  background: rgba(13, 27, 42, 0.96);
   overflow-x: auto;
 }
 
@@ -130,13 +133,13 @@
   width: 32px;
   height: 32px;
   border-radius: 9px;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #06231f;
-  background: linear-gradient(140deg, #7df1de, #34d399);
-  box-shadow: 0 4px 14px rgba(52, 211, 153, 0.24);
+  color: #0d1b2a;
+  background: #1be7ff;
+  box-shadow: 0 4px 14px rgba(49, 233, 129, 0.24);
 }
 
 .sc-brand-copy {
@@ -145,7 +148,7 @@
 }
 
 .sc-brand-copy strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.86rem;
   font-weight: 600;
   color: var(--text);
@@ -187,9 +190,9 @@
 }
 
 .position-tabs a.active {
-  color: #05201d;
+  color: #0d1b2a;
   font-weight: 600;
-  background: linear-gradient(140deg, #7df1de, #34d399);
+  background: #1be7ff;
 }
 
 .position-tabs .tab-short {
@@ -227,9 +230,9 @@
 }
 
 .topbar-links a.active {
-  color: #05201d;
+  color: #0d1b2a;
   font-weight: 650;
-  background: linear-gradient(140deg, #7df1de, #34d399);
+  background: #1be7ff;
 }
 
 .topbar-links a:focus-visible,
@@ -238,7 +241,7 @@
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 2px solid rgba(125, 241, 222, 0.9);
+  outline: 2px solid rgba(27, 231, 255, 0.9);
   outline-offset: 2px;
 }
 
@@ -265,11 +268,11 @@ select:focus-visible {
 
 .roster-inner {
   position: sticky;
-  top: 60px;
+  top: 124px;
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 124px);
   padding: 1rem 0.85rem 0.5rem;
 }
 
@@ -305,8 +308,8 @@ select:focus-visible {
 }
 
 .roster-search input:focus {
-  border-color: rgba(94, 234, 212, 0.45);
-  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.1);
+  border-color: rgba(27, 231, 255, 0.45);
+  box-shadow: 0 0 0 3px rgba(27, 231, 255, 0.1);
 }
 
 .roster-search button {
@@ -516,7 +519,7 @@ select:focus-visible {
 .roster-rating {
   padding: 0.18rem 0.46rem;
   border-radius: 6px;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.8rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -599,7 +602,7 @@ select:focus-visible {
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
   background:
-    radial-gradient(620px 220px at 0% 0%, rgba(94, 234, 212, 0.05), transparent 70%),
+    radial-gradient(620px 220px at 0% 0%, rgba(27, 231, 255, 0.05), transparent 70%),
     linear-gradient(180deg, #151d29 0%, #0e131b 100%);
 }
 
@@ -624,7 +627,7 @@ select:focus-visible {
 }
 
 .portrait-fallback {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1.7rem;
   font-weight: 500;
   color: var(--text-3);
@@ -674,15 +677,15 @@ select:focus-visible {
   opacity: 0.92;
 }
 
-.cluster-defensor { --tone: #38bdf8; }
-.cluster-defensivo { --tone: #38bdf8; }
-.cluster-defensor-area { --tone: #38bdf8; }
-.cluster-construtor { --tone: #34d399; }
-.cluster-ofensivo { --tone: #fb923c; }
-.cluster-combativo { --tone: #fbbf24; }
-.cluster-rebatedor { --tone: #38bdf8; }
-.cluster-agressivo { --tone: #fbbf24; }
-.cluster-hibrido { --tone: #c084fc; }
+.cluster-defensor { --tone: #1be7ff; }
+.cluster-defensivo { --tone: #1be7ff; }
+.cluster-defensor-area { --tone: #1be7ff; }
+.cluster-construtor { --tone: #31e981; }
+.cluster-ofensivo { --tone: #fe4a49; }
+.cluster-combativo { --tone: #fed766; }
+.cluster-rebatedor { --tone: #1be7ff; }
+.cluster-agressivo { --tone: #fed766; }
+.cluster-hibrido { --tone: #8980f5; }
 
 .cluster-tag {
   display: inline-flex;
@@ -706,20 +709,20 @@ select:focus-visible {
 
 .cluster-tag-badge {
   border-left: 1px solid color-mix(in srgb, var(--tone) 28%, transparent);
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-weight: 600;
 }
 
 .cluster-tag-hybrid {
   border-left: 1px solid color-mix(in srgb, var(--tone) 28%, transparent);
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-weight: 600;
-  --tone: #c084fc;
+  --tone: #8980f5;
 }
 
 .cluster-tag-micro {
   border-left: 1px solid color-mix(in srgb, var(--tone) 28%, transparent);
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-weight: 600;
 }
 
@@ -746,7 +749,7 @@ select:focus-visible {
 
 .cluster-path-macro,
 .cluster-path-micro {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.82rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -768,27 +771,27 @@ select:focus-visible {
 }
 
 .cluster-badge-hierarchical {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.68rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 0.15rem 0.45rem;
   border-radius: 999px;
-  color: #6ee7b7;
-  background: color-mix(in srgb, #34d399 18%, transparent);
-  border: 1px solid color-mix(in srgb, #34d399 35%, transparent);
+  color: #31e981;
+  background: color-mix(in srgb, #31e981 18%, transparent);
+  border: 1px solid color-mix(in srgb, #31e981 35%, transparent);
 }
 
 .cluster-hybrid-badge {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.68rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 0.15rem 0.45rem;
   border-radius: 999px;
   color: #e9d5ff;
-  background: color-mix(in srgb, #c084fc 18%, transparent);
-  border: 1px solid color-mix(in srgb, #c084fc 35%, transparent);
+  background: color-mix(in srgb, #8980f5 18%, transparent);
+  border: 1px solid color-mix(in srgb, #8980f5 35%, transparent);
 }
 
 .cluster-share-caption {
@@ -944,7 +947,7 @@ select:focus-visible {
 }
 
 .cluster-map-code {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -977,7 +980,7 @@ select:focus-visible {
   min-width: 2.1rem;
   justify-content: center;
   padding-inline: 0.45rem;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-weight: 600;
   letter-spacing: 0.06em;
 }
@@ -1018,7 +1021,7 @@ select:focus-visible {
 
 .dossier-facts dd {
   margin: 0;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.92rem;
   font-weight: 500;
   color: var(--text);
@@ -1069,7 +1072,7 @@ select:focus-visible {
 }
 
 .dossier-rating-hero .dossier-rating-value {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 2.35rem;
   font-weight: 600;
   line-height: 1;
@@ -1139,7 +1142,7 @@ select:focus-visible {
 }
 
 .dossier-rating-axis-value {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1.55rem;
   font-weight: 600;
   line-height: 1;
@@ -1183,7 +1186,7 @@ select:focus-visible {
 
 .dial-center strong {
   display: block;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 2.3rem;
   font-weight: 600;
   line-height: 1;
@@ -1208,7 +1211,7 @@ select:focus-visible {
 }
 
 .dial-rank {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text);
@@ -1301,7 +1304,7 @@ select:focus-visible {
 }
 
 .dossier-rating-hero-modern .dossier-rating-value {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1.55rem;
   font-weight: 600;
   line-height: 1;
@@ -1322,7 +1325,7 @@ select:focus-visible {
 }
 
 .dossier-rating-rank {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-weight: 600;
   color: #eef4fb;
 }
@@ -1351,7 +1354,7 @@ select:focus-visible {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, rgba(94, 234, 212, 0.45), var(--accent));
+  background: linear-gradient(90deg, rgba(27, 231, 255, 0.45), var(--accent));
 }
 
 .bar-minutes-pct {
@@ -1372,7 +1375,7 @@ select:focus-visible {
 }
 
 .dossier-minutes-head strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--accent);
@@ -1389,7 +1392,7 @@ select:focus-visible {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, rgba(94, 234, 212, 0.45), var(--accent));
+  background: linear-gradient(90deg, rgba(27, 231, 255, 0.45), var(--accent));
 }
 
 .dossier-profile-row {
@@ -1416,7 +1419,7 @@ select:focus-visible {
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
   background:
-    radial-gradient(360px 180px at 50% 0%, rgba(56, 189, 248, 0.05), transparent 72%),
+    radial-gradient(360px 180px at 50% 0%, rgba(27, 231, 255, 0.05), transparent 72%),
     linear-gradient(180deg, #10161f 0%, #0b1017 100%);
 }
 
@@ -1438,10 +1441,10 @@ select:focus-visible {
 }
 
 .archetype-radar-fill {
-  fill: rgba(94, 234, 212, 0.16);
-  stroke: rgba(94, 234, 212, 0.72);
+  fill: rgba(27, 231, 255, 0.16);
+  stroke: rgba(27, 231, 255, 0.72);
   stroke-width: 1.6;
-  filter: drop-shadow(0 0 10px rgba(94, 234, 212, 0.18));
+  filter: drop-shadow(0 0 10px rgba(27, 231, 255, 0.18));
 }
 
 .archetype-radar-dot {
@@ -1455,7 +1458,7 @@ select:focus-visible {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   fill: var(--tone);
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
 }
 
 .archetype-radar-legend {
@@ -1480,12 +1483,12 @@ select:focus-visible {
 }
 
 .archetype-radar-legend li.active {
-  border-color: rgba(94, 234, 212, 0.28);
-  background: rgba(94, 234, 212, 0.06);
+  border-color: rgba(27, 231, 255, 0.28);
+  background: rgba(27, 231, 255, 0.06);
 }
 
 .archetype-radar-legend strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.82rem;
   color: #eef4fb;
 }
@@ -1501,7 +1504,7 @@ select:focus-visible {
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
   background:
-    radial-gradient(420px 160px at 0% 0%, rgba(56, 189, 248, 0.06), transparent 70%),
+    radial-gradient(420px 160px at 0% 0%, rgba(27, 231, 255, 0.06), transparent 70%),
     linear-gradient(180deg, #121821 0%, #0d1118 100%);
   height: 100%;
   min-height: 0;
@@ -1516,7 +1519,7 @@ select:focus-visible {
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
   background:
-    radial-gradient(420px 160px at 100% 0%, rgba(56, 189, 248, 0.04), transparent 70%),
+    radial-gradient(420px 160px at 100% 0%, rgba(27, 231, 255, 0.04), transparent 70%),
     linear-gradient(180deg, #121821 0%, #0d1118 100%);
 }
 
@@ -1555,7 +1558,7 @@ select:focus-visible {
 }
 
 .archetype-mix-primary {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.82rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1622,7 +1625,7 @@ select:focus-visible {
 }
 
 .archetype-mix-share {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.82rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -1638,7 +1641,7 @@ select:focus-visible {
 
 .archetype-mix-rating strong {
   margin-left: 0.2rem;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--tier-color);
@@ -1678,7 +1681,7 @@ select:focus-visible {
 .archetype-tip-title {
   display: block;
   margin-bottom: 0.45rem;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1720,7 +1723,7 @@ select:focus-visible {
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
   background:
-    radial-gradient(520px 180px at 0% 0%, rgba(52, 211, 153, 0.05), transparent 70%),
+    radial-gradient(520px 180px at 0% 0%, rgba(49, 233, 129, 0.05), transparent 70%),
     linear-gradient(180deg, #121821 0%, #0d1118 100%);
 }
 
@@ -1764,7 +1767,7 @@ select:focus-visible {
 }
 
 .bar-item strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.98rem;
   font-weight: 600;
   color: var(--text);
@@ -1791,7 +1794,7 @@ select:focus-visible {
 }
 
 .minutes-value {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-weight: 700;
   color: #eef6ff;
   font-variant-numeric: tabular-nums;
@@ -1810,7 +1813,7 @@ select:focus-visible {
 }
 
 .minutes-pct b {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-weight: 600;
   color: var(--accent);
 }
@@ -1827,14 +1830,14 @@ select:focus-visible {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, rgba(94, 234, 212, 0.55), var(--accent));
+  background: linear-gradient(90deg, rgba(27, 231, 255, 0.55), var(--accent));
 }
 
 .minutes-stat.is-prominent {
   padding: 0.55rem 0.85rem;
   border-radius: 10px;
-  border: 1px solid rgba(94, 234, 212, 0.22);
-  background: rgba(94, 234, 212, 0.06);
+  border: 1px solid rgba(27, 231, 255, 0.22);
+  background: rgba(27, 231, 255, 0.06);
 }
 
 .minutes-stat.is-prominent .minutes-value {
@@ -1853,7 +1856,7 @@ select:focus-visible {
 }
 
 .minutes-stat.is-inline strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-weight: 600;
   color: var(--text);
 }
@@ -1881,8 +1884,8 @@ select:focus-visible {
   gap: 0.35rem;
   padding: 0.36rem 0.7rem;
   border-radius: 7px;
-  border: 1px solid rgba(94, 234, 212, 0.35);
-  background: rgba(94, 234, 212, 0.08);
+  border: 1px solid rgba(27, 231, 255, 0.35);
+  background: rgba(27, 231, 255, 0.08);
   color: var(--accent);
   font-size: 0.76rem;
   font-weight: 500;
@@ -1895,8 +1898,8 @@ select:focus-visible {
 }
 
 .bar-compare:hover {
-  background: rgba(94, 234, 212, 0.16);
-  border-color: rgba(94, 234, 212, 0.55);
+  background: rgba(27, 231, 255, 0.16);
+  border-color: rgba(27, 231, 255, 0.55);
 }
 
 .bar-source {
@@ -1918,7 +1921,7 @@ select:focus-visible {
 
 .bar-source:hover {
   color: var(--accent);
-  border-color: rgba(94, 234, 212, 0.4);
+  border-color: rgba(27, 231, 255, 0.4);
 }
 
 /* ── Profile rating cards ────────────────────────────────────────────────── */
@@ -2012,7 +2015,7 @@ select:focus-visible {
 }
 
 .rating-card-value {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 2rem;
   font-weight: 600;
   line-height: 1;
@@ -2128,7 +2131,7 @@ select:focus-visible {
 }
 
 .dna-legend strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.86rem;
   font-weight: 600;
   color: var(--text);
@@ -2146,7 +2149,7 @@ select:focus-visible {
 }
 
 .dna-summary strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text);
@@ -2251,7 +2254,7 @@ select:focus-visible {
 }
 
 .skill-score strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--tier-color);
@@ -2415,7 +2418,7 @@ select:focus-visible {
 }
 
 .aspect-bar-value {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.84rem;
   font-weight: 700;
   color: var(--tier-color);
@@ -2477,7 +2480,7 @@ select:focus-visible {
 .aspect-metric-pct,
 .aspect-metric-value {
   min-width: 1.55rem;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.86rem;
   font-weight: 700;
   color: var(--tier-color);
@@ -2505,7 +2508,7 @@ select:focus-visible {
 
 .aspect-metric-eff-value,
 .aspect-metric-secondary-value {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
   color: var(--tier-color);
@@ -2626,7 +2629,7 @@ select:focus-visible {
 }
 
 .constr-share-value {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.86rem;
   font-weight: 700;
   color: var(--tier-color);
@@ -2805,7 +2808,7 @@ select:focus-visible {
 }
 
 .constr-gradient-tip strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.76rem;
   font-weight: 600;
   color: #f3f7fb;
@@ -2833,7 +2836,7 @@ select:focus-visible {
 }
 
 .constr-metric-value {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.92rem;
   font-weight: 700;
   color: #eef4fb;
@@ -2963,7 +2966,7 @@ select:focus-visible {
 
 .aspect-grade {
   min-width: 1.6rem;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -2996,7 +2999,7 @@ select:focus-visible {
 }
 
 .aspect-stat-pct {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.76rem;
   font-weight: 600;
   color: var(--tier-color);
@@ -3049,7 +3052,7 @@ select:focus-visible {
 
 .aspect-pass-pct {
   min-width: 1.4rem;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--tier-color);
@@ -3065,7 +3068,7 @@ select:focus-visible {
   min-width: 32px;
   padding: 0.12rem 0.4rem;
   border-radius: 5px;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.76rem;
   font-weight: 600;
   text-align: center;

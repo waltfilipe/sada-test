@@ -177,9 +177,9 @@ export function profileAccent(label: string): string {
     Driblador: "#fed766",
     "Meia Ponta": "#8980f5",
     Ruptura: "#31e981",
-    Finalizador: "#f97316",
-    Alvo: "#60a5fa",
-    Móvel: "#a78bfa",
+    Finalizador: "#fe4a49",
+    Alvo: "#fed766",
+    Móvel: "#8980f5",
   };
   return map[label] ?? "#1be7ff";
 }

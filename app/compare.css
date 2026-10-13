@@ -4,9 +4,9 @@
    ========================================================================== */
 
 .compare-root {
-  --side-a: #34d399;
-  --side-b: #a78bfa;
-  --side-c: #f59e0b;
+  --side-a: #31e981;
+  --side-b: #8980f5;
+  --side-c: #fed766;
 }
 
 .compare-canvas {
@@ -28,8 +28,8 @@
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
   background:
-    radial-gradient(560px 200px at 18% 0%, rgba(52, 211, 153, 0.06), transparent 70%),
-    radial-gradient(560px 200px at 82% 0%, rgba(167, 139, 250, 0.06), transparent 70%),
+    radial-gradient(560px 200px at 18% 0%, rgba(49, 233, 129, 0.06), transparent 70%),
+    radial-gradient(560px 200px at 82% 0%, rgba(137, 128, 245, 0.06), transparent 70%),
     linear-gradient(180deg, #131a26 0%, #0e131b 100%);
   overflow: hidden;
 }
@@ -115,7 +115,7 @@
 
 .duel-swap:hover {
   color: var(--accent);
-  border-color: rgba(94, 234, 212, 0.45);
+  border-color: rgba(27, 231, 255, 0.45);
   transform: rotate(180deg);
 }
 
@@ -172,7 +172,7 @@
 }
 
 .duel-photo-fallback {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1.2rem;
   font-weight: 500;
   color: var(--text-3);
@@ -239,7 +239,7 @@
 }
 
 .duel-rating-value {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1.9rem;
   font-weight: 700;
   line-height: 1;
@@ -302,7 +302,7 @@
 }
 
 .duel-chip-copy strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--text);
@@ -316,21 +316,21 @@
 }
 
 .duel-chip-warn {
-  border-color: rgba(251, 191, 36, 0.35);
+  border-color: rgba(254, 215, 102, 0.35);
 }
 
 .duel-chip-warn > i,
 .duel-chip-warn .duel-chip-copy strong {
-  color: #fbbf24;
+  color: #fed766;
 }
 
 .duel-chip-danger {
-  border-color: rgba(248, 113, 113, 0.4);
+  border-color: rgba(254, 74, 73, 0.4);
 }
 
 .duel-chip-danger > i,
 .duel-chip-danger .duel-chip-copy strong {
-  color: #f87171;
+  color: #fe4a49;
 }
 
 .duel-facts {
@@ -355,7 +355,7 @@
 
 .duel-facts dd {
   margin: 0;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--text);
@@ -398,7 +398,7 @@
 }
 
 .duel-vs {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.24em;
@@ -410,7 +410,7 @@
   align-items: baseline;
   gap: 0.3rem;
   margin: 0;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1.7rem;
   font-weight: 700;
 }
@@ -470,7 +470,7 @@
 .compare-overview-player.side-b .compare-overview-name { color: color-mix(in srgb, var(--side-b) 70%, var(--text-3)); }
 
 .compare-overview-rating {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1.35rem;
   font-weight: 700;
   color: var(--text);
@@ -488,7 +488,7 @@
   align-items: baseline;
   gap: 0.35rem;
   margin: 0;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1.45rem;
   font-weight: 700;
 }
@@ -660,7 +660,7 @@
 }
 
 .compare-tendency-score {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
   color: var(--tier-color, var(--text-2));
@@ -825,7 +825,7 @@
 }
 
 .archetype-duel-values strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--text-3);
@@ -1148,31 +1148,31 @@
 }
 
 .compare-section-accordion.tone-defensivos {
-  border-color: color-mix(in srgb, #60a5fa 18%, var(--line));
+  border-color: color-mix(in srgb, #1be7ff 18%, var(--line));
 }
 
 .compare-section-accordion.tone-passes {
-  border-color: color-mix(in srgb, #34d399 18%, var(--line));
+  border-color: color-mix(in srgb, #31e981 18%, var(--line));
 }
 
 .compare-section-accordion.tone-dribles {
-  border-color: color-mix(in srgb, #fbbf24 18%, var(--line));
+  border-color: color-mix(in srgb, #fed766 18%, var(--line));
 }
 
 .compare-section-accordion.tone-finais {
-  border-color: color-mix(in srgb, #c084fc 18%, var(--line));
+  border-color: color-mix(in srgb, #8980f5 18%, var(--line));
 }
 
 .compare-section-accordion.tone-aereo {
-  border-color: color-mix(in srgb, #22d3ee 18%, var(--line));
+  border-color: color-mix(in srgb, #1be7ff 18%, var(--line));
 }
 
 .compare-section-accordion.tone-ofensividade {
-  border-color: color-mix(in srgb, #fb923c 18%, var(--line));
+  border-color: color-mix(in srgb, #fe4a49 18%, var(--line));
 }
 
 .compare-section-accordion.tone-finalizacao {
-  border-color: color-mix(in srgb, #fb7185 18%, var(--line));
+  border-color: color-mix(in srgb, #fe4a49 18%, var(--line));
 }
 
 .compare-stat-group {
@@ -1185,8 +1185,8 @@
 }
 
 .compare-stat-group.has-stat-badge {
-  border-color: rgba(251, 191, 36, 0.45);
-  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.08);
+  border-color: rgba(254, 215, 102, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(254, 215, 102, 0.08);
 }
 
 .compare-stat-group-head {
@@ -1200,7 +1200,7 @@
 }
 
 .compare-stat-group.has-stat-badge .compare-stat-group-head {
-  border-bottom-color: rgba(251, 191, 36, 0.2);
+  border-bottom-color: rgba(254, 215, 102, 0.2);
 }
 
 .compare-stat-group-title {
@@ -1299,7 +1299,7 @@
 }
 
 .compare-stat-value {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-2);
@@ -1370,7 +1370,7 @@
 .profile-bar-versus-side.side-a { text-align: right; }
 
 .profile-bar-versus-value {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-2);
@@ -1457,7 +1457,7 @@
 
 .compare-links a:hover {
   color: var(--accent);
-  border-color: rgba(94, 234, 212, 0.45);
+  border-color: rgba(27, 231, 255, 0.45);
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
@@ -1823,7 +1823,7 @@
   font-style: normal;
   font-size: 0.62rem;
   font-weight: 600;
-  color: #7df1de;
+  color: #1be7ff;
 }
 
 .compare-col-picker {
@@ -1913,7 +1913,7 @@
 
 .compare-col-results button:hover,
 .compare-col-results button.is-current {
-  background: rgba(125, 241, 222, 0.1);
+  background: rgba(27, 231, 255, 0.1);
 }
 
 .compare-col-results-empty {
@@ -1993,7 +1993,7 @@
 }
 
 .compare-col-photo-fallback {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1rem;
   font-weight: 500;
   color: var(--text-3);
@@ -2048,7 +2048,7 @@
 }
 
 .compare-col-rating-letter {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1.45rem;
   font-weight: 700;
   line-height: 1;
@@ -2206,7 +2206,7 @@
 .compare-col-tendency-score {
   grid-column: 2;
   grid-row: 1;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--tier-color, var(--text));

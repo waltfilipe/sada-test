@@ -4,8 +4,8 @@
    ========================================================================== */
 
 .scatter-root {
-  --side-a: #34d399;
-  --side-b: #a78bfa;
+  --side-a: #31e981;
+  --side-b: #8980f5;
 }
 
 .scatter-canvas {
@@ -46,12 +46,12 @@
 
 .slot.side-a {
   --slot-accent: var(--side-a);
-  --slot-glow: rgba(52, 211, 153, 0.07);
+  --slot-glow: rgba(49, 233, 129, 0.07);
 }
 
 .slot.side-b {
   --slot-accent: var(--side-b);
-  --slot-glow: rgba(167, 139, 250, 0.07);
+  --slot-glow: rgba(137, 128, 245, 0.07);
 }
 
 .slot::before {
@@ -132,7 +132,7 @@
 }
 
 .slot-photo span {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 1.4rem;
   font-weight: 500;
   color: var(--text-3);
@@ -177,7 +177,7 @@
 }
 
 .slot-rating strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 2rem;
   font-weight: 600;
   line-height: 1;
@@ -219,7 +219,7 @@
 
 .slot-facts dd {
   margin: 0;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.88rem;
   font-weight: 500;
   color: var(--text);
@@ -257,7 +257,7 @@
 }
 
 .slot-market strong {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.92rem;
   font-weight: 600;
   color: #d9f7ee;
@@ -278,7 +278,7 @@
 }
 
 .pivot-mark {
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.22em;
@@ -299,7 +299,7 @@
 
 .pivot-swap:hover {
   color: var(--accent);
-  border-color: rgba(94, 234, 212, 0.45);
+  border-color: rgba(27, 231, 255, 0.45);
 }
 
 @media (max-width: 900px) {
@@ -439,14 +439,14 @@
 }
 
 .axis-options button.active {
-  border-color: rgba(94, 234, 212, 0.35);
-  background: rgba(94, 234, 212, 0.08);
+  border-color: rgba(27, 231, 255, 0.35);
+  background: rgba(27, 231, 255, 0.08);
   color: #d9fff7;
 }
 
 .axis-y .axis-options button.active {
-  border-color: rgba(167, 139, 250, 0.35);
-  background: rgba(167, 139, 250, 0.08);
+  border-color: rgba(137, 128, 245, 0.35);
+  background: rgba(137, 128, 245, 0.08);
   color: #ede9fe;
 }
 
@@ -530,14 +530,14 @@
 .scatter-tick {
   fill: var(--text-3);
   font-size: 10px;
-  font-family: "DM Sans", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
 }
 
 .scatter-axis-label {
   fill: var(--text-2);
   font-size: 11px;
   font-weight: 600;
-  font-family: "Sora", "DM Sans", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   letter-spacing: 0.02em;
 }
 
@@ -546,13 +546,13 @@
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-family: "DM Sans", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
 }
 
 .scatter-tag {
   font-size: 10px;
   font-weight: 600;
-  font-family: "Sora", "DM Sans", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
 }
 
 .scatter-tag.tag-a {
@@ -617,7 +617,7 @@
 .scatter-stat-name {
   display: block;
   margin-top: 0.2rem;
-  font-family: "Sora", sans-serif;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.92rem;
   color: #f6f9fd;
   font-weight: 600;
@@ -656,7 +656,7 @@
 
 .scatter-links a:hover {
   color: var(--accent);
-  border-bottom-color: rgba(94, 234, 212, 0.35);
+  border-bottom-color: rgba(27, 231, 255, 0.35);
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */

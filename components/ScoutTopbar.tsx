@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { SiteLogo } from "@/components/SiteLogo";
 import { LEAGUES, isLeagueId } from "@/lib/leagues";
 import { useLeague } from "@/components/LeagueProvider";
 
@@ -22,7 +23,7 @@ type Props = {
 };
 
 export function ScoutTopbar({ active, subnav }: Props) {
-  const { leagueId, href, name, season, brand } = useLeague();
+  const { leagueId, href, name, season } = useLeague();
   const pathname = usePathname() || "/";
 
   function leagueHref(nextId: string) {
@@ -38,7 +39,7 @@ export function ScoutTopbar({ active, subnav }: Props) {
     <div className="scout-topbar-wrap">
       <header className="scout-topbar">
         <Link href={href("/")} className="scout-brand">
-          <span className="sc-brand-mark">{brand}</span>
+          <SiteLogo height={108} />
           <span className="sc-brand-copy">
             <strong>{name} Scout</strong>
             <em>Temporada {season}</em>
