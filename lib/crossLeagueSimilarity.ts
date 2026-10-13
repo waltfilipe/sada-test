@@ -1,12 +1,6 @@
-import type { PlayerProfile, PositionFamily, Tendencies } from "@/lib/types";
-
-const TENDENCY_KEYS: (keyof Tendencies)[] = [
-  "construcao",
-  "ofensividade",
-  "def1v1",
-  "contencao",
-  "duelo_aereo",
-];
+import { findAspect, flattenAspects } from "@/lib/aspectLookup";
+import { statSectionsForFamily } from "@/lib/aspectStatSections";
+import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
 
 export type SimilarPlayerHit = {
   player_id: string;
@@ -17,57 +11,108 @@ export type SimilarPlayerHit = {
   similarity: number;
 };
 
-/** Percentile of `value` within a pool (0–100). */
+type MetricSlot =
+  | { id: string; label: string; kind: "volume" }
+  | { id: string; label: string; kind: "efficiency" }
+  | { id: string; label: string; kind: "sub"; subLabel: string };
+
+const NEUTRAL_PERCENTILE = 50;
+
+/** Percentile rank of `value` within `pool` (0–100). */
 function percentileInPool(value: number, pool: number[]): number {
-  if (!pool.length) return 50;
+  if (!pool.length) return NEUTRAL_PERCENTILE;
   const sorted = [...pool].sort((a, b) => a - b);
   const idx = sorted.findIndex((v) => v >= value);
   if (idx === -1) return 100;
   return ((idx + 0.5) / sorted.length) * 100;
 }
 
-function scatterPercentilesForPlayer(
-  player: PlayerProfile,
-  pool: PlayerProfile[],
-  scatterKeys: string[],
-): Record<string, number> {
-  const out: Record<string, number> = {};
-  for (const key of scatterKeys) {
-    const values = pool.map((p) => p.scatter[key] ?? 0);
-    out[key] = percentileInPool(player.scatter[key] ?? 0, values);
-  }
-  return out;
+function parseDisplayNumber(raw?: string | null): number | null {
+  if (!raw) return null;
+  const cleaned = raw.trim().replace(/\s/g, "");
+  const normalized =
+    cleaned.includes(",") && cleaned.includes(".")
+      ? cleaned.replace(/\./g, "").replace(",", ".")
+      : cleaned.replace(",", ".");
+  const n = Number(normalized);
+  return Number.isFinite(n) ? n : null;
 }
 
-/** Fixed-order feature vector in [0, 1] for cosine / distance comparison. */
-function featureVector(
+function aspectItem(player: PlayerProfile, label: string): AspectItem | undefined {
+  return findAspect(flattenAspects(player), label);
+}
+
+function storedPercentile(item: AspectItem | undefined, slot: MetricSlot): number | null {
+  if (!item) return null;
+  if (slot.kind === "sub") {
+    return item.sub_metrics?.find((sub) => sub.label === slot.subLabel)?.percentile ?? null;
+  }
+  if (slot.kind === "efficiency") return item.efficiency_pct ?? null;
+  return item.percentile ?? null;
+}
+
+/** Prefer per90 / display for cross-pool ranking; fall back to stored percentile. */
+function rawForSlot(player: PlayerProfile, slot: MetricSlot): number | null {
+  const item = aspectItem(player, slot.label);
+  if (!item) return null;
+  if (slot.kind === "sub") {
+    const sub = item.sub_metrics?.find((s) => s.label === slot.subLabel);
+    return parseDisplayNumber(sub?.display_value) ?? sub?.percentile ?? null;
+  }
+  if (slot.kind === "efficiency") return item.efficiency_pct ?? null;
+  if (item.certos_per90 != null) return item.certos_per90;
+  return parseDisplayNumber(item.display_value) ?? item.percentile ?? null;
+}
+
+function percentileForSlot(player: PlayerProfile, pool: PlayerProfile[], slot: MetricSlot): number {
+  const values = pool
+    .map((p) => rawForSlot(p, slot))
+    .filter((value): value is number => value != null);
+  const raw = rawForSlot(player, slot);
+  if (raw != null && values.length >= 3) {
+    return percentileInPool(raw, values);
+  }
+
+  const stored = pool
+    .map((p) => storedPercentile(aspectItem(p, slot.label), slot))
+    .filter((value): value is number => value != null);
+  const mine = storedPercentile(aspectItem(player, slot.label), slot);
+  if (mine != null && stored.length >= 3) {
+    return percentileInPool(mine, stored);
+  }
+  return mine ?? NEUTRAL_PERCENTILE;
+}
+
+function metricSlotsForFamily(pool: PlayerProfile[], family: PositionFamily): MetricSlot[] {
+  const sectionLabels = statSectionsForFamily(family).flatMap((section) => section.labels);
+  const slots: MetricSlot[] = [];
+
+  for (const label of sectionLabels) {
+    slots.push({ id: `${label}::vol`, label, kind: "volume" });
+    slots.push({ id: `${label}::eff`, label, kind: "efficiency" });
+
+    const subLabels = new Set<string>();
+    for (const player of pool) {
+      const item = aspectItem(player, label);
+      item?.sub_metrics?.forEach((sub) => subLabels.add(sub.label));
+    }
+    for (const subLabel of [...subLabels].sort()) {
+      slots.push({ id: `${label}::sub::${subLabel}`, label, kind: "sub", subLabel });
+    }
+  }
+
+  return slots;
+}
+
+function featureVectorFromAspectPercentiles(
   player: PlayerProfile,
-  profileKeys: string[],
-  scatterKeys: string[],
-  scatterPct: Record<string, number>,
+  pool: PlayerProfile[],
+  slots: MetricSlot[],
 ): number[] {
-  const parts: number[] = [];
-
-  for (const key of TENDENCY_KEYS) {
-    parts.push(Math.max(0, Math.min(1, (player.tendencies[key] ?? 0) / 100)));
-  }
-
-  for (const key of profileKeys) {
-    parts.push(Math.max(0, Math.min(1, (player.profile_shares[key] ?? 0) / 100)));
-  }
-
-  for (const key of profileKeys) {
-    const rating = player.ratings[key] ?? player.ratings.geral ?? player.rating;
-    parts.push(Math.max(0, Math.min(1, rating / 10)));
-  }
-
-  parts.push(Math.max(0, Math.min(1, player.ratings.geral / 10)));
-
-  for (const key of scatterKeys) {
-    parts.push(Math.max(0, Math.min(1, (scatterPct[key] ?? 50) / 100)));
-  }
-
-  return parts;
+  return slots.map((slot) => {
+    const pct = percentileForSlot(player, pool, slot);
+    return Math.max(0, Math.min(1, pct / 100));
+  });
 }
 
 function cosineSimilarity(a: number[], b: number[]): number {
@@ -83,33 +128,16 @@ function cosineSimilarity(a: number[], b: number[]): number {
   return dot / (Math.sqrt(na) * Math.sqrt(nb));
 }
 
-function profileKeysForFamily(pool: PlayerProfile[]): string[] {
-  const keys = new Set<string>();
-  for (const player of pool) {
-    for (const key of player.profiles_available ?? []) keys.add(key);
-  }
-  return [...keys].sort();
-}
-
-function scatterKeysForFamily(pool: PlayerProfile[]): string[] {
-  const keys = new Set<string>();
-  for (const player of pool) {
-    for (const key of Object.keys(player.scatter ?? {})) keys.add(key);
-  }
-  return [...keys].sort();
-}
-
 /**
- * Top cross-league matches for one source player against a destination pool.
+ * Top cross-league matches using **stat percentiles** from the dossier (aspect cards),
+ * not tendency axes.
  *
- * Similarity blends:
- * - Tendências de jogo (5 eixos 0–100)
- * - Shares de perfil tático (%)
- * - Notas por perfil + geral (escala 0–10, comparável entre divisões)
- * - Métricas scatter expressas como percentil **dentro da divisão de destino**
- *   (o atleta fonte é posicionado no ranking da outra liga em cada métrica)
+ * For each metric in the position stat sections (volume, efficiency, sub-metrics),
+ * we express every player — including the source from another league — as a
+ * **percentile within the destination pool** (raw per90 / display when available).
  *
- * Pequeno bônus se o rótulo de perfil principal for igual.
+ * Similarity = cosine similarity between those percentile vectors (0–100%).
+ * +3 pp when the main tactical profile label matches.
  */
 export function rankCrossLeagueSimilarity(
   source: PlayerProfile,
@@ -118,25 +146,24 @@ export function rankCrossLeagueSimilarity(
 ): SimilarPlayerHit[] {
   const limit = options.limit ?? 5;
   const minMinutes = options.minMinutes ?? 300;
+  const family = source.position_family;
 
   const sameFamily = targetPool.filter(
-    (p) => p.position_family === source.position_family && p.minutes >= minMinutes,
+    (p) => p.position_family === family && p.minutes >= minMinutes,
   );
   if (!sameFamily.length) return [];
 
-  const profileKeys = profileKeysForFamily(sameFamily);
-  const scatterKeys = scatterKeysForFamily(sameFamily);
+  const slots = metricSlotsForFamily(sameFamily, family);
+  if (!slots.length) return [];
 
-  const sourceScatterPct = scatterPercentilesForPlayer(source, sameFamily, scatterKeys);
-  const sourceVec = featureVector(source, profileKeys, scatterKeys, sourceScatterPct);
+  const sourceVec = featureVectorFromAspectPercentiles(source, sameFamily, slots);
 
   const scored: SimilarPlayerHit[] = [];
 
   for (const candidate of sameFamily) {
     if (candidate.player_id === source.player_id) continue;
 
-    const candScatterPct = scatterPercentilesForPlayer(candidate, sameFamily, scatterKeys);
-    const candVec = featureVector(candidate, profileKeys, scatterKeys, candScatterPct);
+    const candVec = featureVectorFromAspectPercentiles(candidate, sameFamily, slots);
     let sim = cosineSimilarity(sourceVec, candVec) * 100;
 
     if (candidate.profile === source.profile) {
