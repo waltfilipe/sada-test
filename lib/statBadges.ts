@@ -20,7 +20,7 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
   },
   "Ações Defensivas": {
     label: "Ações Defensivas",
-    icon: "fa-shield-halved",
+    icon: "fa-shield",
     title: "Ações defensivas — rebatidas, interceptações e bloqueios acima de P50",
   },
   "Eficiência Defensiva": {
@@ -45,7 +45,7 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
   },
   "Passes para Terço Final": {
     label: "Passes para Terço Final",
-    icon: "fa-bullseye",
+    icon: "fa-arrow-right-to-bracket",
     title: "Passes para terço final — volume e eficiência acima de P50",
   },
   "Passes Longos": {
