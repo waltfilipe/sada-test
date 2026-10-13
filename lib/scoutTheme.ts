@@ -216,6 +216,28 @@ export function ratingToLetterGrade(rating: number, max = 10): string {
   return "D";
 }
 
+/** Scouting grades A+ → D, cut on the peer pool percentile. D carries no sign. */
+const PROFILE_GRADE_CUTS: { min: number; grade: string }[] = [
+  { min: 98, grade: "A+" },
+  { min: 93, grade: "A" },
+  { min: 86, grade: "A-" },
+  { min: 76, grade: "B+" },
+  { min: 64, grade: "B" },
+  { min: 52, grade: "B-" },
+  { min: 40, grade: "C+" },
+  { min: 28, grade: "C" },
+  { min: 16, grade: "C-" },
+];
+
+export function profileGradeFromRank(rank: number, poolSize: number): string | null {
+  if (!poolSize || rank < 1) return null;
+  const pct = rankPercentile(rank, poolSize);
+  for (const cut of PROFILE_GRADE_CUTS) {
+    if (pct >= cut.min) return cut.grade;
+  }
+  return "D";
+}
+
 export function formatRating(value: number): string {
   return value.toFixed(1).replace(".", ",");
 }
@@ -233,7 +255,7 @@ export function playerInitials(name: string): string {
 export const MEDAL_META = {
   gold: { label: "Top 10%", short: "Top 10", tone: "Ouro" },
   silver: { label: "Top 25%", short: "Top 25", tone: "Prata" },
-  bronze: { label: "Top 40%", short: "Top 40", tone: "Bronze" },
+  bronze: { label: "Acima de P50", short: "P50+", tone: "Bronze" },
 } as const;
 
 export type MedalKind = keyof typeof MEDAL_META;

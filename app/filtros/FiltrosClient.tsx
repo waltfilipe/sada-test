@@ -1,19 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { BadgeFilterBox } from "@/components/filters/BadgeFilterBox";
 import { PlayerResultRow } from "@/components/filters/PlayerResultRow";
 import { RangeSlider } from "@/components/filters/RangeSlider";
+import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { saveFilters, takeFiltersReturn } from "@/lib/filterSession";
 import { POSITION_FAMILIES } from "@/lib/positions";
-import { TENDENCY_META, formatRating } from "@/lib/scoutTheme";
-import { profileTone } from "@/lib/scoutUi";
-import type { PlayerSearchRow, PositionFamily, SiteMeta, Tendencies } from "@/lib/types";
+import { badgeCatalogForFamily } from "@/lib/statBadges";
+import { positionRating, profileTone } from "@/lib/scoutUi";
+import type { PlayerSearchRow, PositionFamily, SiteMeta } from "@/lib/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const FEET = ["all", "Destro", "Canhoto", "Ambidestro"] as const;
 
 const SORTS = [
-  { key: "rating", label: "Melhor rating" },
+  { key: "destaque", label: "Destaque" },
   { key: "minutes", label: "Mais minutos" },
   { key: "age", label: "Mais jovem" },
   { key: "name", label: "Nome (A–Z)" },
@@ -21,19 +24,7 @@ const SORTS = [
 
 type SortKey = (typeof SORTS)[number]["key"];
 type Range = [number, number];
-type TendencyRanges = Record<keyof Tendencies, Range>;
-
-const FULL_RANGE: Range = [0, 100];
-
-function makeTendencyRanges(): TendencyRanges {
-  return {
-    construcao: [...FULL_RANGE] as Range,
-    ofensividade: [...FULL_RANGE] as Range,
-    def1v1: [...FULL_RANGE] as Range,
-    contencao: [...FULL_RANGE] as Range,
-    duelo_aereo: [...FULL_RANGE] as Range,
-  };
-}
+type Origin = "all" | "br" | "out";
 
 function sameRange(a: Range, b: Range) {
   return a[0] === b[0] && a[1] === b[1];
@@ -45,23 +36,15 @@ type Props = {
 };
 
 export function FiltrosClient({ meta, players }: Props) {
-  /**
-   * Derived from the rows rather than meta.filters: the published bounds include
-   * players with a missing height, which pins the slider minimum at zero.
-   */
+  const { leagueId } = useLeague();
   const bounds = useMemo(() => {
     const heights = players.map((p) => p.height).filter((value): value is number => !!value);
     const years = players.map((p) => p.birth_year).filter((value): value is number => !!value);
-    const ratings = players.map((p) => p.rating);
     const minutes = players.map((p) => p.minutes);
 
     return {
       height: [Math.min(...heights), Math.max(...heights)] as Range,
       age: [CURRENT_YEAR - Math.max(...years), CURRENT_YEAR - Math.min(...years)] as Range,
-      rating: [
-        Math.floor(Math.min(...ratings) * 10) / 10,
-        Math.ceil(Math.max(...ratings) * 10) / 10,
-      ] as Range,
       minutes: [0, Math.max(...minutes)] as Range,
     };
   }, [players]);
@@ -71,30 +54,72 @@ export function FiltrosClient({ meta, players }: Props) {
   const [family, setFamily] = useState<PositionFamily>("zagueiros");
   const [query, setQuery] = useState("");
   const [club, setClub] = useState("all");
-  const [nationality, setNationality] = useState("all");
+  const [origin, setOrigin] = useState<Origin>("all");
   const [foot, setFoot] = useState<string>("all");
   const [profiles, setProfiles] = useState<string[]>([]);
-  const [sort, setSort] = useState<SortKey>("rating");
-
-  const [rating, setRating] = useState<Range>(bounds.rating);
+  const [badges, setBadges] = useState<string[]>([]);
+  const [sort, setSort] = useState<SortKey>("destaque");
   const [age, setAge] = useState<Range>(ageBounds);
   const [height, setHeight] = useState<Range>(bounds.height);
   const [minutes, setMinutes] = useState<Range>(bounds.minutes);
-  const [tendencies, setTendencies] = useState<TendencyRanges>(makeTendencyRanges);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const saved = takeFiltersReturn(leagueId);
+    if (saved && POSITION_FAMILIES.some((item) => item.key === saved.family)) {
+      setFamily(saved.family as PositionFamily);
+      setQuery(saved.query ?? "");
+      setClub(saved.club ?? "all");
+      setOrigin(saved.origin ?? "all");
+      setFoot(saved.foot ?? "all");
+      setProfiles(saved.profiles ?? []);
+      setBadges(saved.badges ?? []);
+      setSort(saved.sort ?? "destaque");
+      if (saved.age) setAge(saved.age);
+      if (saved.height) setHeight(saved.height);
+      if (saved.minutes) setMinutes(saved.minutes);
+    }
+    setReady(true);
+  }, [leagueId]);
+
+  useEffect(() => {
+    if (!ready) return;
+    saveFilters(leagueId, {
+      family,
+      query,
+      club,
+      origin,
+      foot,
+      profiles,
+      badges,
+      sort,
+      age,
+      height,
+      minutes,
+    });
+  }, [ready, leagueId, family, query, club, origin, foot, profiles, badges, sort, age, height, minutes]);
 
   const familyMeta = meta.families.find((item) => item.key === family)!;
+  const badgeOptions = useMemo(() => badgeCatalogForFamily(family), [family]);
+
+  const clubs = useMemo(() => {
+    const set = new Set<string>();
+    for (const player of players) {
+      if (player.position_family === family) set.add(player.club);
+    }
+    return [...set].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [players, family]);
 
   const resetAll = () => {
     setQuery("");
     setClub("all");
-    setNationality("all");
+    setOrigin("all");
     setFoot("all");
     setProfiles([]);
-    setRating(bounds.rating);
+    setBadges([]);
     setAge(ageBounds);
     setHeight(bounds.height);
     setMinutes(bounds.minutes);
-    setTendencies(makeTendencyRanges());
   };
 
   const toggleProfile = (profile: string) => {
@@ -103,35 +128,32 @@ export function FiltrosClient({ meta, players }: Props) {
     );
   };
 
+  const toggleBadge = (key: string) => {
+    setBadges((current) => (current.includes(key) ? current.filter((item) => item !== key) : [...current, key]));
+  };
+
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
 
     const rows = players.filter((player) => {
       if (player.position_family !== family) return false;
       if (club !== "all" && player.club !== club) return false;
-      if (nationality !== "all" && player.nationality !== nationality) return false;
+      if (origin === "br" && player.nationality !== "Brazil") return false;
+      if (origin === "out" && player.nationality === "Brazil") return false;
       if (foot !== "all" && player.foot !== foot) return false;
       if (profiles.length && !profiles.includes(player.profile)) return false;
+      if (badges.length && !badges.every((key) => player.badges.includes(key))) return false;
 
       if (q && !player.name.toLowerCase().includes(q) && !player.club.toLowerCase().includes(q)) {
         return false;
       }
 
-      if (player.rating < rating[0] || player.rating > rating[1]) return false;
       if (player.minutes < minutes[0] || player.minutes > minutes[1]) return false;
-
-      // Height 0 means "not recorded", so those athletes are never excluded by the range.
       if (player.height && (player.height < height[0] || player.height > height[1])) return false;
 
       if (player.birth_year != null) {
         const playerAge = CURRENT_YEAR - player.birth_year;
         if (playerAge < age[0] || playerAge > age[1]) return false;
-      }
-
-      for (const item of TENDENCY_META) {
-        const [low, high] = tendencies[item.key];
-        const value = player.tendencies[item.key];
-        if (value < low || value > high) return false;
       }
 
       return true;
@@ -141,31 +163,32 @@ export function FiltrosClient({ meta, players }: Props) {
       if (sort === "name") return a.name.localeCompare(b.name, "pt-BR");
       if (sort === "minutes") return b.minutes - a.minutes;
       if (sort === "age") return (b.birth_year ?? 0) - (a.birth_year ?? 0);
-      return b.rating - a.rating;
+      return positionRating(b) - positionRating(a);
     });
-  }, [players, family, club, nationality, foot, profiles, query, rating, minutes, height, age, tendencies, sort]);
+  }, [players, family, club, origin, foot, profiles, badges, query, minutes, height, age, sort]);
 
   const chips = useMemo(() => {
     const list: { key: string; label: string; clear: () => void }[] = [];
 
     if (query.trim()) list.push({ key: "q", label: `"${query.trim()}"`, clear: () => setQuery("") });
     if (club !== "all") list.push({ key: "club", label: club, clear: () => setClub("all") });
-    if (nationality !== "all") {
-      list.push({ key: "nat", label: nationality, clear: () => setNationality("all") });
+    if (origin !== "all") {
+      list.push({
+        key: "origin",
+        label: origin === "br" ? "Brasileiros" : "Estrangeiros",
+        clear: () => setOrigin("all"),
+      });
     }
     if (foot !== "all") list.push({ key: "foot", label: `Pé ${foot.toLowerCase()}`, clear: () => setFoot("all") });
 
     profiles.forEach((profile) => {
       list.push({ key: `p-${profile}`, label: profile, clear: () => toggleProfile(profile) });
     });
+    badges.forEach((key) => {
+      const label = badgeOptions.find((item) => item.key === key)?.label ?? key;
+      list.push({ key: `b-${key}`, label, clear: () => toggleBadge(key) });
+    });
 
-    if (!sameRange(rating, bounds.rating)) {
-      list.push({
-        key: "rating",
-        label: `Rating ${formatRating(rating[0])}–${formatRating(rating[1])}`,
-        clear: () => setRating(bounds.rating),
-      });
-    }
     if (!sameRange(age, ageBounds)) {
       list.push({ key: "age", label: `${age[0]}–${age[1]} anos`, clear: () => setAge(ageBounds) });
     }
@@ -184,20 +207,8 @@ export function FiltrosClient({ meta, players }: Props) {
       });
     }
 
-    TENDENCY_META.forEach((item) => {
-      if (!sameRange(tendencies[item.key], FULL_RANGE)) {
-        const [low, high] = tendencies[item.key];
-        list.push({
-          key: `t-${item.key}`,
-          label: `${item.label} ${low}–${high}`,
-          clear: () =>
-            setTendencies((current) => ({ ...current, [item.key]: [...FULL_RANGE] as Range })),
-        });
-      }
-    });
-
     return list;
-  }, [query, club, nationality, foot, profiles, rating, age, height, minutes, tendencies, bounds, ageBounds]);
+  }, [query, club, origin, foot, profiles, badges, age, height, minutes, bounds, ageBounds, badgeOptions]);
 
   return (
     <div className="scout-root filters-root">
@@ -208,7 +219,7 @@ export function FiltrosClient({ meta, players }: Props) {
           <div className="filters-rail-inner">
             <header className="filters-rail-head">
               <div>
-                <p className="sc-eyebrow">Busca avançada</p>
+                <p className="sc-eyebrow">Busca</p>
                 <h1>Filtros</h1>
               </div>
               <button type="button" onClick={resetAll} disabled={chips.length === 0}>
@@ -227,6 +238,8 @@ export function FiltrosClient({ meta, players }: Props) {
                     onClick={() => {
                       setFamily(item.key);
                       setProfiles([]);
+                      setBadges([]);
+                      setClub("all");
                     }}
                   >
                     {item.label}
@@ -252,13 +265,37 @@ export function FiltrosClient({ meta, players }: Props) {
             </section>
 
             <section className="filter-block">
+              <h2>Perfil</h2>
+              <div className="chip-row">
+                {familyMeta.profiles.map((profile) => (
+                  <button
+                    key={profile}
+                    type="button"
+                    className={`filter-chip profile-${profileTone(profile)} ${
+                      profiles.includes(profile) ? "active" : ""
+                    }`}
+                    onClick={() => toggleProfile(profile)}
+                    aria-pressed={profiles.includes(profile)}
+                  >
+                    {profile}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="filter-block">
+              <BadgeFilterBox options={badgeOptions} selected={badges} onToggle={toggleBadge} />
+              <p className="filter-block-note">Mostra quem conquistou todos os badges marcados.</p>
+            </section>
+
+            <section className="filter-block">
               <h2>Contexto</h2>
 
               <label className="filter-field">
                 <span>Clube</span>
                 <select value={club} onChange={(event) => setClub(event.target.value)}>
                   <option value="all">Todos os clubes</option>
-                  {meta.clubs.map((item) => (
+                  {clubs.map((item) => (
                     <option key={item} value={item}>
                       {item}
                     </option>
@@ -266,17 +303,27 @@ export function FiltrosClient({ meta, players }: Props) {
                 </select>
               </label>
 
-              <label className="filter-field">
-                <span>Nacionalidade</span>
-                <select value={nationality} onChange={(event) => setNationality(event.target.value)}>
-                  <option value="all">Todas</option>
-                  {meta.nationalities.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
+              <div className="filter-field">
+                <span>Origem</span>
+                <div className="segmented" role="group" aria-label="Origem">
+                  {(
+                    [
+                      ["all", "Todos"],
+                      ["br", "Brasil"],
+                      ["out", "Fora"],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      className={origin === value ? "active" : ""}
+                      onClick={() => setOrigin(value)}
+                    >
+                      {label}
+                    </button>
                   ))}
-                </select>
-              </label>
+                </div>
+              </div>
 
               <div className="filter-field">
                 <span>Pé dominante</span>
@@ -296,35 +343,7 @@ export function FiltrosClient({ meta, players }: Props) {
             </section>
 
             <section className="filter-block">
-              <h2>Perfil tático</h2>
-              <div className="chip-row">
-                {familyMeta.profiles.map((profile) => (
-                  <button
-                    key={profile}
-                    type="button"
-                    className={`filter-chip profile-${profileTone(profile)} ${
-                      profiles.includes(profile) ? "active" : ""
-                    }`}
-                    onClick={() => toggleProfile(profile)}
-                    aria-pressed={profiles.includes(profile)}
-                  >
-                    {profile}
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            <section className="filter-block">
-              <h2>Contexto físico</h2>
-              <RangeSlider
-                label="Rating"
-                min={bounds.rating[0]}
-                max={bounds.rating[1]}
-                step={0.1}
-                value={rating}
-                onChange={setRating}
-                format={formatRating}
-              />
+              <h2>Físico e minutagem</h2>
               <RangeSlider label="Idade" min={ageBounds[0]} max={ageBounds[1]} value={age} onChange={setAge} suffix="anos" />
               <RangeSlider
                 label="Altura"
@@ -342,21 +361,6 @@ export function FiltrosClient({ meta, players }: Props) {
                 value={minutes}
                 onChange={setMinutes}
               />
-            </section>
-
-            <section className="filter-block">
-              <h2>Índices normalizados</h2>
-              <p className="filter-block-note">Percentil dentro do pool da posição</p>
-              {TENDENCY_META.map((item) => (
-                <RangeSlider
-                  key={item.key}
-                  label={item.label}
-                  min={0}
-                  max={100}
-                  value={tendencies[item.key]}
-                  onChange={(next) => setTendencies((current) => ({ ...current, [item.key]: next }))}
-                />
-              ))}
             </section>
           </div>
         </aside>
@@ -397,7 +401,7 @@ export function FiltrosClient({ meta, players }: Props) {
           {results.length > 0 ? (
             <div className="results-list">
               {results.map((player) => (
-                <PlayerResultRow key={player.player_id} player={player} />
+                <PlayerResultRow key={player.player_id} player={player} catalog={badgeOptions} />
               ))}
             </div>
           ) : (

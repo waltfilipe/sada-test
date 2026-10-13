@@ -2,71 +2,97 @@ import "server-only";
 
 import fs from "fs";
 import path from "path";
-import type { PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
+import { DEFAULT_LEAGUE, isLeagueId, type LeagueId } from "./leagues";
+import { playerStatBadges } from "./statBadges";
+import type { PlayerHeatmapData, PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
-function readJson<T>(file: string): T {
-  return JSON.parse(fs.readFileSync(path.join(DATA_DIR, file), "utf-8")) as T;
+function leagueDir(league: LeagueId): string {
+  return path.join(DATA_DIR, league);
 }
 
-let metaCache: SiteMeta | null = null;
-let playersCache: { players: PlayerSummary[]; total: number } | null = null;
+function readJson<T>(filePath: string): T {
+  return JSON.parse(fs.readFileSync(filePath, "utf-8")) as T;
+}
+
+const metaCache = new Map<LeagueId, SiteMeta>();
+const playersCache = new Map<LeagueId, { players: PlayerSummary[]; total: number }>();
 const profileCache = new Map<string, PlayerProfile>();
+const searchRowsCache = new Map<LeagueId, PlayerSearchRow[]>();
 
-export function getMeta(): SiteMeta {
-  if (!metaCache) metaCache = readJson("meta.json");
-  return metaCache!;
+function resolveLeague(league?: string): LeagueId {
+  if (league && isLeagueId(league)) return league;
+  return DEFAULT_LEAGUE;
 }
 
-export function getPlayers(): PlayerSummary[] {
-  if (!playersCache) playersCache = readJson("players.json");
-  return playersCache!.players;
-}
-
-let searchRowsCache: PlayerSearchRow[] | null = null;
-
-/**
- * Summaries joined with the per-player tendency indices so the advanced search
- * can filter the whole pool without shipping the full profile payload.
- */
-export function getSearchRows(): PlayerSearchRow[] {
-  if (searchRowsCache) return searchRowsCache;
-
-  searchRowsCache = getPlayers().map((player) => {
-    const profile = getPlayerProfile(player.player_id);
-    return {
-      ...player,
-      // players.json predates the Transfermarkt enrichment, so take it from the profile.
-      transfermarkt: player.transfermarkt ?? profile?.transfermarkt ?? null,
-      goals: profile?.goals ?? 0,
-      assists: profile?.assists ?? 0,
-      tendencies: profile?.tendencies ?? {
-        construcao: 0,
-        ofensividade: 0,
-        def1v1: 0,
-        contencao: 0,
-        duelo_aereo: 0,
-      },
-    };
-  });
-
-  return searchRowsCache;
-}
-
-export function getPlayerProfile(playerId: string): PlayerProfile | null {
-  if (!profileCache.has(playerId)) {
-    const filePath = path.join(DATA_DIR, "profiles", `${playerId}.json`);
-    if (!fs.existsSync(filePath)) return null;
-    profileCache.set(playerId, readJson(`profiles/${playerId}.json`));
+export function getMeta(league?: string): SiteMeta {
+  const id = resolveLeague(league);
+  if (!metaCache.has(id)) {
+    const file = path.join(leagueDir(id), "meta.json");
+    if (!fs.existsSync(file)) {
+      throw new Error(`Missing meta for league ${id}. Run scripts/build_site_data.py`);
+    }
+    metaCache.set(id, readJson(file));
   }
-  return profileCache.get(playerId) ?? null;
+  return metaCache.get(id)!;
 }
 
-export function getFamilyPlayers(family: PositionFamily): PlayerProfile[] {
-  const filePath = path.join(DATA_DIR, `family-${family}.json`);
+export function getPlayers(league?: string): PlayerSummary[] {
+  const id = resolveLeague(league);
+  if (!playersCache.has(id)) {
+    const file = path.join(leagueDir(id), "players.json");
+    playersCache.set(id, readJson(file));
+  }
+  return playersCache.get(id)!.players;
+}
+
+export function getSearchRows(league?: string): PlayerSearchRow[] {
+  const id = resolveLeague(league);
+  if (!searchRowsCache.has(id)) {
+    const meta = getMeta(id);
+    searchRowsCache.set(
+      id,
+      getPlayers(id).map((player) => {
+        const profile = getPlayerProfile(player.player_id, id);
+        const heatmap = meta.heatmaps_enabled ? profile?.heatmap : undefined;
+        return {
+          ...player,
+          transfermarkt: player.transfermarkt ?? profile?.transfermarkt ?? null,
+          goals: profile?.goals ?? 0,
+          assists: profile?.assists ?? 0,
+          tendencies: profile?.tendencies ?? {
+            construcao: 0,
+            ofensividade: 0,
+            def1v1: 0,
+            contencao: 0,
+            duelo_aereo: 0,
+          },
+          badges: profile ? playerStatBadges(profile).map((badge) => badge.key) : [],
+          heatmap,
+        };
+      }),
+    );
+  }
+  return searchRowsCache.get(id)!;
+}
+
+export function getPlayerProfile(playerId: string, league?: string): PlayerProfile | null {
+  const id = resolveLeague(league);
+  const cacheKey = `${id}:${playerId}`;
+  if (!profileCache.has(cacheKey)) {
+    const filePath = path.join(leagueDir(id), "profiles", `${playerId}.json`);
+    if (!fs.existsSync(filePath)) return null;
+    profileCache.set(cacheKey, readJson(filePath));
+  }
+  return profileCache.get(cacheKey) ?? null;
+}
+
+export function getFamilyPlayers(family: PositionFamily, league?: string): PlayerProfile[] {
+  const id = resolveLeague(league);
+  const filePath = path.join(leagueDir(id), `family-${family}.json`);
   if (!fs.existsSync(filePath)) return [];
-  const payload = readJson<{ players: PlayerProfile[] }>(`family-${family}.json`);
+  const payload = readJson<{ players: PlayerProfile[] }>(filePath);
   return payload.players;
 }
 
@@ -85,6 +111,7 @@ export function filterPlayers(
     tendencies?: Partial<Record<keyof PlayerProfile["tendencies"], [number, number]>>;
     search?: string;
   },
+  league?: string,
 ): PlayerSummary[] {
   return players.filter((player) => {
     if (filters.family && player.position_family !== filters.family) return false;
@@ -104,18 +131,21 @@ export function filterPlayers(
     if (filters.rating) {
       if (player.rating < filters.rating[0] || player.rating > filters.rating[1]) return false;
     }
-    if (filters.search) {
-      const q = filters.search.toLowerCase();
-      if (!player.label.toLowerCase().includes(q) && !player.club.toLowerCase().includes(q)) return false;
-    }
     if (filters.tendencies) {
-      const profile = getPlayerProfile(player.player_id);
+      const profile = getPlayerProfile(player.player_id, league);
       if (!profile) return false;
-      for (const [key, range] of Object.entries(filters.tendencies)) {
-        if (!range) continue;
-        const value = profile.tendencies[key as keyof PlayerProfile["tendencies"]];
+      for (const [key, range] of Object.entries(filters.tendencies) as [
+        keyof PlayerProfile["tendencies"],
+        [number, number],
+      ][]) {
+        const value = profile.tendencies[key];
         if (value < range[0] || value > range[1]) return false;
       }
+    }
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      const hay = `${player.name} ${player.club} ${player.position}`.toLowerCase();
+      if (!hay.includes(q)) return false;
     }
     return true;
   });

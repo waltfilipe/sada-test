@@ -56,10 +56,19 @@ export function sortPlayers(players: PlayerProfile[], sort: "rating" | "name" | 
   return copy.sort((a, b) => positionRating(b) - positionRating(a));
 }
 
+/** Highest position-scoped rating in the pool (same order as the athlete strip). */
+export function topRatedPlayerId(players: PlayerProfile[]): string {
+  if (!players.length) return "";
+  return sortPlayers(players, "rating")[0]!.player_id;
+}
+
 /** Rating do perfil classificado do atleta (não usa rating geral). */
-export function positionRating(player: PlayerProfile): number {
+export function positionRating(
+  player: Pick<PlayerProfile, "profile" | "position_family" | "rating"> &
+    Partial<Pick<PlayerProfile, "ratings" | "hybrid_lean" | "cluster">>,
+): number {
   const key = dominantRatingKey(player.profile, player.position_family, player.hybrid_lean);
-  if (key && player.ratings[key] != null) return player.ratings[key];
+  if (key && player.ratings?.[key] != null) return player.ratings[key];
 
   if (player.cluster?.ratings) {
     const slug = archetypeClusterSlug(player.cluster.archetype);
@@ -69,9 +78,11 @@ export function positionRating(player: PlayerProfile): number {
     }
   }
 
-  const profileRatings = Object.entries(player.ratings)
-    .filter(([ratingKey]) => ratingKey !== "geral")
-    .map(([, value]) => value);
+  const profileRatings = player.ratings
+    ? Object.entries(player.ratings)
+        .filter(([ratingKey]) => ratingKey !== "geral")
+        .map(([, value]) => value)
+    : [];
   if (profileRatings.length) return Math.max(...profileRatings);
   return player.rating;
 }

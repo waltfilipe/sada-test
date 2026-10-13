@@ -1,22 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
-import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
+import { PlayerHeatmap } from "@/components/position/profile/PlayerHeatmap";
 import { ProfileCard } from "@/components/position/profile/ProfileCard";
 import { ScoutStatsSections } from "@/components/position/profile/ScoutStatsSections";
-import { GradeBadge } from "@/components/ui/GradeBadge";
-import { Tooltip } from "@/components/ui/Tooltip";
-import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import { sectionShortLabel } from "@/lib/sectionLabels";
-import { allSectionGrades, buildSectionGradeLookup } from "@/lib/sectionGrades";
-import { dominantRatingKey } from "@/lib/profileMeta";
-import { playerInitials, ratingTier, formatRating, tierVars } from "@/lib/scoutTheme";
-import { positionRating } from "@/lib/scoutUi";
+import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
+import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
-import { ComparePlayerTendencies } from "./ComparePlayerTendencies";
 
 export type CompareSide = "a" | "b" | "c";
 
@@ -29,6 +22,9 @@ type Props = {
   pool: PlayerProfile[];
   excludeIds: Set<string>;
   onChange: (id: string) => void;
+  activeSection: string | null;
+  onSectionChange: (title: string | null) => void;
+  peers: PlayerProfile[];
 };
 
 function monthsRemaining(iso?: string | null): string {
@@ -52,123 +48,114 @@ export function ComparePlayerColumn({
   pool,
   excludeIds,
   onChange,
-}: Props) {
+  activeSection,
+  onSectionChange,
+  peers,
+  heatmapsEnabled = true,
+}: Props & { heatmapsEnabled?: boolean }) {
+  const { href } = useLeague();
   const tm = player.transfermarkt;
-  const profileRating = positionRating(player);
-  const profileRank =
-    player.ranks[dominantRatingKey(player.profile, family, player.hybrid_lean) ?? "geral"] ??
-    player.ranks.geral;
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
-  const clusterProps = clusterTagProps(player);
-
-  const gradeLookup = useMemo(() => buildSectionGradeLookup(pool, family), [pool, family]);
-  const sectionGrades = useMemo(
-    () => allSectionGrades(gradeLookup, player.player_id, family),
-    [gradeLookup, player.player_id, family],
-  );
-
-  const gradeEntries = useMemo(
-    () =>
-      statSectionsForFamily(family)
-        .map((section) => {
-          const triple = sectionGrades[section.title];
-          if (!triple?.geral) return null;
-          return { title: section.title, short: sectionShortLabel(section.title), letter: triple.geral };
-        })
-        .filter((entry): entry is { title: string; short: string; letter: string } => Boolean(entry)),
-    [family, sectionGrades],
-  );
 
   return (
     <article className={`compare-player-column side-${side}`} aria-label={`Coluna ${label}: ${player.name}`}>
-      <label className="compare-col-picker">
-        <span>{label}</span>
-        <select
-          value={player.player_id}
-          onChange={(event) => {
-            const next = event.target.value;
-            if (!excludeIds.has(next)) onChange(next);
-          }}
-        >
-          {players.map((option) => (
-            <option
-              key={option.player_id}
-              value={option.player_id}
-              disabled={excludeIds.has(option.player_id) && option.player_id !== player.player_id}
-            >
-              {option.name} — {option.club}
-            </option>
-          ))}
-        </select>
-      </label>
+      <header className={`compare-identity-card player-card side-${side}`}>
+        <label className="compare-col-picker">
+          <span>{label}</span>
+          <select
+            value={player.player_id}
+            onChange={(event) => {
+              const next = event.target.value;
+              if (!excludeIds.has(next)) onChange(next);
+            }}
+          >
+            {players.map((option) => (
+              <option
+                key={option.player_id}
+                value={option.player_id}
+                disabled={excludeIds.has(option.player_id) && option.player_id !== player.player_id}
+              >
+                {option.name} — {option.club}
+              </option>
+            ))}
+          </select>
+        </label>
 
-      <header className="compare-col-hero">
-        <div className="compare-col-photo">
-          {tm?.photo ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={tm.photo} alt={player.name} />
-          ) : (
-            <span className="compare-col-photo-fallback">{playerInitials(player.name)}</span>
-          )}
-        </div>
-
-        <div className="compare-col-identity">
-          <h2 className="compare-col-name">{player.name}</h2>
-          <p className="compare-col-club">
-            <ClubLogo club={player.club} size={16} />
-            <span>{player.club}</span>
-            <span aria-hidden="true">·</span>
-            <span className="compare-col-position">{player.position}</span>
-          </p>
-          <div className="compare-col-tag-row">
-            {clusterProps ? <ClusterTag {...clusterProps} /> : <ProfileTag {...profileTagProps(player)} />}
+        <div className="compare-head-top">
+          <div className="compare-col-photo">
+            {tm?.photo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={tm.photo} alt={player.name} />
+            ) : (
+              <span className="compare-col-photo-fallback">{playerInitials(player.name)}</span>
+            )}
           </div>
-        </div>
 
-        {profileRating != null ? (
-          <Tooltip content={`${player.profile} · #${profileRank}`}>
-            <div className="compare-col-rating" style={tierVars(ratingTier(profileRating))}>
-              <span className="compare-col-rating-letter">{formatRating(profileRating)}</span>
-              <span className="compare-col-rating-rank">#{profileRank}</span>
+          <div className="compare-col-side">
+            <div className="compare-col-identity">
+              <h2 className="compare-col-name">{player.name}</h2>
+              <p className="compare-col-club">
+                <ClubLogo club={player.club} size={16} />
+                <span>{player.club}</span>
+                <span aria-hidden="true">·</span>
+                <span className="compare-col-position">{player.position}</span>
+              </p>
+              <div className="compare-col-tag-row">
+                <ProfileTag {...profileTagProps(player)} />
+              </div>
             </div>
-          </Tooltip>
-        ) : null}
-      </header>
 
-      <dl className="compare-col-facts">
-        <div>
-          <dt>Valor</dt>
-          <dd>{tm?.market_value ?? "—"}</dd>
-        </div>
-        <div>
-          <dt>Contrato</dt>
-          <dd>{monthsRemaining(tm?.contract_until)}</dd>
-        </div>
-        <div>
-          <dt>Minutos</dt>
-          <dd className="tabular">
-            {player.minutes.toLocaleString("pt-BR")}
-            {player.minutes_pct != null ? ` · ${Math.round(player.minutes_pct)}%` : ""}
-          </dd>
-        </div>
-        {age != null ? (
-          <div>
-            <dt>Idade</dt>
-            <dd>{age}</dd>
+            <div className="compare-col-actions">
+              <Link className="btn btn-ghost btn-sm" href={href(`/posicao/${family}?atleta=${player.player_id}`)}>
+                <i className="fa-solid fa-user" aria-hidden="true" /> Ver perfil
+              </Link>
+              {tm?.profile_url ? (
+                <a className="btn btn-ghost btn-sm" href={tm.profile_url} target="_blank" rel="noreferrer">
+                  <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
+                </a>
+              ) : null}
+              <AddToShadowMenu playerId={player.player_id} family={family} />
+            </div>
           </div>
-        ) : null}
-      </dl>
-
-      {gradeEntries.length > 0 ? (
-        <div className="compare-col-grades">
-          {gradeEntries.map((entry) => (
-            <span key={entry.title} className="compare-col-grade-chip" title={entry.title}>
-              <GradeBadge letter={entry.letter} size="sm" />
-              <em>{entry.short}</em>
-            </span>
-          ))}
         </div>
-      ) : null}
+
+        <div className={`compare-head-bottom${heatmapsEnabled ? "" : " compare-head-bottom-no-heatmap"}`}>
+          {heatmapsEnabled ? (
+            <div className="compare-col-pitch">
+              <PlayerHeatmap compact heatmap={player.heatmap} playerName={player.name} />
+            </div>
+          ) : null}
+          <dl className="compare-fact-grid">
+            <div>
+              <dt>Valor</dt>
+              <dd>{tm?.market_value ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Contrato</dt>
+              <dd>{monthsRemaining(tm?.contract_until)}</dd>
+            </div>
+            <div>
+              <dt>Minutos</dt>
+              <dd className="tabular">
+                {player.minutes.toLocaleString("pt-BR")}
+                {player.minutes_pct != null ? <em>{Math.round(player.minutes_pct)}%</em> : null}
+              </dd>
+            </div>
+            <div>
+              <dt>Idade</dt>
+              <dd>{age ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Gols</dt>
+              <dd className="tabular">{player.goals}</dd>
+            </div>
+            <div>
+              <dt>Assistências</dt>
+              <dd className="tabular">{player.assists}</dd>
+            </div>
+          </dl>
+        </div>
+      </header>
 
       <div className="compare-col-stack">
         <div className="compare-col-profile">
@@ -176,24 +163,15 @@ export function ComparePlayerColumn({
         </div>
 
         <div className="player-card compare-col-stats">
-          <ScoutStatsSections player={player} family={family} />
-        </div>
-
-        <div className="player-card compare-col-tendencies-wrap">
-          <ComparePlayerTendencies player={player} />
+          <ScoutStatsSections
+            player={player}
+            family={family}
+            active={activeSection}
+            onActiveChange={onSectionChange}
+            peers={peers}
+          />
         </div>
       </div>
-
-      <footer className="compare-col-foot">
-        <Link className="compare-col-link" href={`/posicao/${family}?atleta=${player.player_id}`}>
-          <i className="fa-solid fa-user" aria-hidden="true" /> Ver perfil
-        </Link>
-        {tm?.profile_url ? (
-          <a className="compare-col-link" href={tm.profile_url} target="_blank" rel="noreferrer">
-            <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
-          </a>
-        ) : null}
-      </footer>
     </article>
   );
 }

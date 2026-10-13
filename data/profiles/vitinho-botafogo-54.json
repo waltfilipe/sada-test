@@ -16,13 +16,13 @@
   "rating": 6.5,
   "ratings": {
     "geral": 6.5,
-    "defensivo": 5.6,
+    "defensivo": 5.4,
     "construtor": 5.4,
     "ofensivo": 5.6
   },
   "ranks": {
-    "geral": 51,
-    "defensivo": 59,
+    "geral": 49,
+    "defensivo": 62,
     "construtor": 65,
     "ofensivo": 59
   },
@@ -62,19 +62,15 @@
         "efficiency_value": "43%"
       },
       {
-        "label": "Eficiência Defensiva",
-        "kind": "def_efficiency_group",
-        "grade": "C+",
-        "percentile": 50.0,
-        "pair_badge": [
-          7.6,
-          50.0
-        ],
+        "label": "Ações Defensivas",
+        "kind": "metric_group",
+        "grade": "D",
+        "percentile": 2.1,
         "sub_metrics": [
           {
-            "label": "Ações bem-sucedidas",
-            "percentile": 7.6,
-            "display_value": "5,1"
+            "label": "Rebatidas",
+            "percentile": 6.2,
+            "display_value": "1,0"
           },
           {
             "label": "Interceptações",
@@ -82,14 +78,32 @@
             "display_value": "0,3"
           },
           {
-            "label": "Rebatidas",
-            "percentile": 6.2,
+            "label": "Chutes Bloqueados",
+            "percentile": 0.0,
             "display_value": "1,0"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Eficiência Defensiva",
+        "kind": "def_efficiency_group",
+        "grade": "D",
+        "percentile": 12.1,
+        "pair_badge": [
+          100.0,
+          12.1
+        ],
+        "sub_metrics": [
+          {
+            "label": "Erros Totais",
+            "percentile": 100.0,
+            "display_value": "0"
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 50.0,
-            "display_value": "0,57"
+            "percentile": 12.1,
+            "display_value": "-1,0"
           }
         ],
         "stats": []
@@ -197,8 +211,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "C+",
-        "percentile": 50.0,
+        "grade": "D",
+        "percentile": 12.1,
         "display_value": "55%",
         "share_pct": 54.7,
         "pool_avg_pct": 1.1,
@@ -221,14 +235,6 @@
         "efficiency_value": "54%"
       },
       {
-        "label": "Conduções Progressivas",
-        "kind": "metric",
-        "grade": "C",
-        "percentile": 42.9,
-        "stats": [],
-        "display_value": "1,1"
-      },
-      {
         "label": "1v1 - Ofensivo",
         "kind": "metric",
         "grade": "B-",
@@ -237,6 +243,25 @@
         "display_value": "1,4",
         "efficiency_pct": 47.5,
         "efficiency_value": "58%"
+      },
+      {
+        "label": "Progressão",
+        "kind": "metric_group",
+        "grade": "C",
+        "percentile": 42.9,
+        "sub_metrics": [
+          {
+            "label": "Conduções Progressivas",
+            "percentile": 42.9,
+            "display_value": "1,1"
+          },
+          {
+            "label": "Acelerações",
+            "percentile": 15.2,
+            "display_value": "0,1"
+          }
+        ],
+        "stats": []
       }
     ],
     "passes_finais": [
@@ -357,7 +382,7 @@
       "ofensivo": 65.8
     },
     "ratings": {
-      "defensivo": 5.6,
+      "defensivo": 5.4,
       "construtor": 5.4,
       "ofensivo": 5.7
     }
@@ -2060,6 +2085,7 @@
         "y": 35.9
       }
     ],
-    "point_count": 420
+    "point_count": 420,
+    "image_url": null
   }
 }

@@ -99,6 +99,10 @@ export type PlayerSearchRow = PlayerSummary & {
   goals: number;
   assists: number;
   tendencies: Tendencies;
+  /** Stat badges earned on the position page. */
+  badges: string[];
+  /** Downsampled touch map for the filter-card preview. */
+  heatmap?: PlayerHeatmapData;
 };
 
 export type PlayerHeatmapData = {
@@ -108,6 +112,7 @@ export type PlayerHeatmapData = {
   competition?: string | null;
   point_count?: number;
   points: { x: number; y: number }[];
+  image_url?: string | null;
 };
 
 export type PlayerProfile = PlayerSummary & {
@@ -142,9 +147,11 @@ export type PlayerProfile = PlayerSummary & {
 };
 
 export type SiteMeta = {
+  league_id?: string;
   league: string;
   season: string;
   source: string;
+  heatmaps_enabled?: boolean;
   player_count: number;
   families: {
     key: PositionFamily;

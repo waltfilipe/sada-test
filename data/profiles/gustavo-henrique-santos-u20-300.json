@@ -13,16 +13,16 @@
   "minutes_pct": 30.5,
   "goals": 0,
   "assists": 0,
-  "rating": 7.2,
+  "rating": 7.1,
   "ratings": {
-    "geral": 7.2,
+    "geral": 7.1,
     "contencao": 7.2,
     "construtor": 6.0,
     "boxtobox": 6.3
   },
   "ranks": {
-    "geral": 8,
-    "contencao": 11,
+    "geral": 12,
+    "contencao": 10,
     "construtor": 58,
     "boxtobox": 48
   },
@@ -62,19 +62,15 @@
         "efficiency_value": "45%"
       },
       {
-        "label": "Eficiência Defensiva",
-        "kind": "def_efficiency_group",
+        "label": "Ações Defensivas",
+        "kind": "metric_group",
         "grade": "B+",
-        "percentile": 76.5,
-        "pair_badge": [
-          100.0,
-          76.5
-        ],
+        "percentile": 75.8,
         "sub_metrics": [
           {
-            "label": "Ações bem-sucedidas",
+            "label": "Rebatidas",
             "percentile": 100.0,
-            "display_value": "12,4"
+            "display_value": "5,5"
           },
           {
             "label": "Interceptações",
@@ -82,14 +78,32 @@
             "display_value": "0,9"
           },
           {
-            "label": "Rebatidas",
+            "label": "Chutes Bloqueados",
+            "percentile": 95.9,
+            "display_value": "0,8"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Eficiência Defensiva",
+        "kind": "def_efficiency_group",
+        "grade": "A",
+        "percentile": 95.1,
+        "pair_badge": [
+          100.0,
+          95.1
+        ],
+        "sub_metrics": [
+          {
+            "label": "Erros Totais",
             "percentile": 100.0,
-            "display_value": "5,5"
+            "display_value": "0"
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 76.5,
-            "display_value": "0,28"
+            "percentile": 95.1,
+            "display_value": "+1,8"
           }
         ],
         "stats": []
@@ -197,8 +211,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "B+",
-        "percentile": 76.5,
+        "grade": "A",
+        "percentile": 95.1,
         "display_value": "42%",
         "share_pct": 42.0,
         "pool_avg_pct": 1.5,
@@ -240,27 +254,6 @@
       }
     ],
     "passes_finais": [
-      {
-        "label": "Finalizações",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 5.0,
-        "sub_metrics": [
-          {
-            "label": "Finalizações",
-            "percentile": 5.0,
-            "display_value": "0,3"
-          },
-          {
-            "label": "xG",
-            "percentile": 5.9,
-            "display_value": "0,01"
-          }
-        ],
-        "stats": [],
-        "efficiency_pct": 5.9,
-        "efficiency_value": "0,01"
-      },
       {
         "label": "Passes Chave e Área",
         "kind": "metric_group",
@@ -311,6 +304,27 @@
       }
     ],
     "ofensividade": [
+      {
+        "label": "Finalizações",
+        "kind": "metric_group",
+        "grade": "D",
+        "percentile": 5.0,
+        "sub_metrics": [
+          {
+            "label": "Finalizações",
+            "percentile": 5.0,
+            "display_value": "0,3"
+          },
+          {
+            "label": "xG",
+            "percentile": 5.9,
+            "display_value": "0,01"
+          }
+        ],
+        "stats": [],
+        "efficiency_pct": 5.9,
+        "efficiency_value": "0,01"
+      },
       {
         "label": "Ofensividade",
         "kind": "metric_group",
@@ -2050,6 +2064,7 @@
         "y": 46.5
       }
     ],
-    "point_count": 420
+    "point_count": 420,
+    "image_url": null
   }
 }

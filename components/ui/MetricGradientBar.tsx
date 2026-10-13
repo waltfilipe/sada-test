@@ -1,5 +1,6 @@
 "use client";
 
+import { Tooltip } from "@/components/ui/Tooltip";
 import {
   barPosition,
   letterGradePillColor,
@@ -25,7 +26,10 @@ export function MetricGradientBar({ score, letter, displayScore, scale = "grade"
         : passGradeGradientColor(passGradePct(score))
       : sectionColor;
 
-  return (
+  const percentileTip =
+    scale === "percent" && score != null ? `p${Math.round(score)}` : score != null ? score.toFixed(1) : "";
+
+  const bar = (
     <div className={`metric-gradient-bar${score == null ? " metric-gradient-bar-empty" : ""}`}>
       <div className="metric-gradient-bar-track">
         <div className="metric-gradient-bar-spectrum" aria-hidden="true" />
@@ -44,5 +48,13 @@ export function MetricGradientBar({ score, letter, displayScore, scale = "grade"
         )}
       </div>
     </div>
+  );
+
+  if (!percentileTip) return bar;
+
+  return (
+    <Tooltip content={percentileTip} block>
+      {bar}
+    </Tooltip>
   );
 }

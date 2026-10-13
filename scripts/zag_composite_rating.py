@@ -161,8 +161,9 @@ def enrich_pool(pool: pd.DataFrame) -> pd.DataFrame:
 
     beta = 0.45
     faltas = _pool_col(out, "Faltas/90", "Faltas")
+    err_def = _pool_col(out, "ss_def_error_p90", "error_lead_to_a_shot_p90")
     dd_perd = dd * (1 - pct_w)
-    num = dd_perd + np.maximum(0, faltas - beta * dd_perd)
+    num = dd_perd + np.maximum(0, faltas - beta * dd_perd) + err_def
     den = out["acoes_def"].replace(0, np.nan)
     out["custo_def"] = (num / den).fillna(num)
     out["inter_clear_p90"] = inter + clear
@@ -215,7 +216,12 @@ def _residualize_series(y: pd.Series, x: pd.Series) -> pd.Series:
 
 
 def score_eficiencia_def_v2_pool(enriched: pd.DataFrame) -> pd.Series:
-    """Defensive efficiency without interceptions/clearances (for DA composite)."""
+    """Pool percentile of defensive efficiency z (ações/custo vs family benchmark)."""
+    if "_asp_custo_def_eff" in enriched.columns:
+        return pd.to_numeric(enriched["_asp_custo_def_eff"], errors="coerce").fillna(50.0)
+    if "_def_eff_z" in enriched.columns:
+        z = pd.to_numeric(enriched["_def_eff_z"], errors="coerce").fillna(0.0)
+        return z.apply(lambda v: pct_rank(v, z))
     dd = enriched["duelos_def_vol"]
     pct_w = enriched["duelos_def_eff"] / 100.0
     block = _pool_col(enriched, "outfielder_block_p90")

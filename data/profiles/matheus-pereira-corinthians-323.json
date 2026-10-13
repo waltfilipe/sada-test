@@ -16,15 +16,15 @@
   "rating": 7.0,
   "ratings": {
     "geral": 7.0,
-    "contencao": 6.0,
+    "contencao": 5.8,
     "construtor": 7.0,
     "boxtobox": 6.4
   },
   "ranks": {
-    "geral": 21,
-    "contencao": 57,
+    "geral": 20,
+    "contencao": 66,
     "construtor": 20,
-    "boxtobox": 46
+    "boxtobox": 45
   },
   "profile": "Construtor",
   "profile_shares": {
@@ -62,19 +62,15 @@
         "efficiency_value": "56%"
       },
       {
-        "label": "Eficiência Defensiva",
-        "kind": "def_efficiency_group",
-        "grade": "C+",
-        "percentile": 50.0,
-        "pair_badge": [
-          4.9,
-          50.0
-        ],
+        "label": "Ações Defensivas",
+        "kind": "metric_group",
+        "grade": "D",
+        "percentile": 3.0,
         "sub_metrics": [
           {
-            "label": "Ações bem-sucedidas",
-            "percentile": 4.9,
-            "display_value": "3,6"
+            "label": "Rebatidas",
+            "percentile": 1.2,
+            "display_value": "0,2"
           },
           {
             "label": "Interceptações",
@@ -82,14 +78,32 @@
             "display_value": "0,4"
           },
           {
-            "label": "Rebatidas",
-            "percentile": 1.2,
-            "display_value": "0,2"
+            "label": "Chutes Bloqueados",
+            "percentile": 1.4,
+            "display_value": "0,1"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Eficiência Defensiva",
+        "kind": "def_efficiency_group",
+        "grade": "D",
+        "percentile": 4.9,
+        "pair_badge": [
+          50.0,
+          4.9
+        ],
+        "sub_metrics": [
+          {
+            "label": "Erros Totais",
+            "percentile": 50.0,
+            "display_value": "2"
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 50.0,
-            "display_value": "0,77"
+            "percentile": 4.9,
+            "display_value": "-1,0"
           }
         ],
         "stats": []
@@ -197,8 +211,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "C+",
-        "percentile": 50.0,
+        "grade": "D",
+        "percentile": 4.9,
         "display_value": "75%",
         "share_pct": 75.4,
         "pool_avg_pct": 1.5,
@@ -240,27 +254,6 @@
       }
     ],
     "passes_finais": [
-      {
-        "label": "Finalizações",
-        "kind": "metric_group",
-        "grade": "B",
-        "percentile": 73.3,
-        "sub_metrics": [
-          {
-            "label": "Finalizações",
-            "percentile": 73.3,
-            "display_value": "1,1"
-          },
-          {
-            "label": "xG",
-            "percentile": 5.9,
-            "display_value": "0,01"
-          }
-        ],
-        "stats": [],
-        "efficiency_pct": 5.9,
-        "efficiency_value": "0,01"
-      },
       {
         "label": "Passes Chave e Área",
         "kind": "metric_group",
@@ -312,6 +305,27 @@
     ],
     "ofensividade": [
       {
+        "label": "Finalizações",
+        "kind": "metric_group",
+        "grade": "B",
+        "percentile": 73.3,
+        "sub_metrics": [
+          {
+            "label": "Finalizações",
+            "percentile": 73.3,
+            "display_value": "1,1"
+          },
+          {
+            "label": "xG",
+            "percentile": 5.9,
+            "display_value": "0,01"
+          }
+        ],
+        "stats": [],
+        "efficiency_pct": 5.9,
+        "efficiency_value": "0,01"
+      },
+      {
         "label": "Ofensividade",
         "kind": "metric_group",
         "grade": "B+",
@@ -357,7 +371,7 @@
       "boxtobox": 6.7
     },
     "ratings": {
-      "contencao": 6.0,
+      "contencao": 5.8,
       "construtor": 7.0,
       "boxtobox": 6.4
     }
@@ -2060,6 +2074,7 @@
         "y": 38.9
       }
     ],
-    "point_count": 420
+    "point_count": 420,
+    "image_url": null
   }
 }

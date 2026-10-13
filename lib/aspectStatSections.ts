@@ -1,6 +1,13 @@
 import type { PositionFamily } from "@/lib/types";
 
-export type StatSectionTone = "defensivos" | "passes" | "dribles" | "final";
+export type StatSectionTone =
+  | "defensivos"
+  | "aereo"
+  | "passes"
+  | "dribles"
+  | "finais"
+  | "ofensividade"
+  | "finalizacao";
 
 export type StatSectionSpec = {
   title: string;
@@ -12,11 +19,11 @@ const ZAG_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Defensivos",
     tone: "defensivos",
-    labels: ["Duelos Defensivos", "Eficiência Defensiva"],
+    labels: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva"],
   },
   {
     title: "Aéreo",
-    tone: "defensivos",
+    tone: "aereo",
     labels: ["Aéreo"],
   },
   {
@@ -35,7 +42,7 @@ const LAT_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Defensivos",
     tone: "defensivos",
-    labels: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
+    labels: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
   },
   {
     title: "Passes",
@@ -45,16 +52,16 @@ const LAT_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Dribles e Condução",
     tone: "dribles",
-    labels: ["Disputas com Bola", "1v1 - Ofensivo", "Conduções Progressivas"],
+    labels: ["Disputas com Bola", "1v1 - Ofensivo", "Progressão"],
   },
   {
     title: "Passes Finais",
-    tone: "final",
+    tone: "finais",
     labels: ["Cruzamentos", "Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
   },
   {
     title: "Ofensividade",
-    tone: "final",
+    tone: "ofensividade",
     labels: ["Ofensividade"],
   },
 ];
@@ -63,7 +70,7 @@ const MC_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Defensivos",
     tone: "defensivos",
-    labels: ["Duelos Defensivos", "Eficiência Defensiva", "Duelos Aéreos"],
+    labels: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
   },
   {
     title: "Passes",
@@ -77,30 +84,25 @@ const MC_STAT_SECTIONS: StatSectionSpec[] = [
   },
   {
     title: "Passes Finais",
-    tone: "final",
-    labels: ["Finalizações", "Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
+    tone: "finais",
+    labels: ["Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
   },
   {
     title: "Ofensividade",
-    tone: "final",
-    labels: ["Ofensividade"],
+    tone: "ofensividade",
+    labels: ["Finalizações", "Ofensividade"],
   },
 ];
 
 const EX_STAT_SECTIONS: StatSectionSpec[] = [
   {
-    title: "Defensivos",
-    tone: "defensivos",
-    labels: ["Duelos Vencidos", "Ações Defensivas"],
-  },
-  {
     title: "Passes",
     tone: "passes",
     labels: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
   },
   {
     title: "Passes Finais",
-    tone: "final",
+    tone: "finais",
     labels: ["Passes Chave e Área", "Cruzamentos", "Pré Assistências e xA", "Passes Criativos"],
   },
   {
@@ -110,46 +112,41 @@ const EX_STAT_SECTIONS: StatSectionSpec[] = [
   },
   {
     title: "Finalização",
-    tone: "final",
+    tone: "finalizacao",
     labels: ["Gols e xG", "Finalizações"],
   },
   {
     title: "Ofensividade",
-    tone: "final",
+    tone: "ofensividade",
     labels: ["Ações Terminais", "Verticalidade"],
+  },
+  {
+    title: "Defensivos",
+    tone: "defensivos",
+    labels: ["Duelos Vencidos", "Ações Defensivas"],
   },
 ];
 
 const AT_STAT_SECTIONS: StatSectionSpec[] = [
   {
+    title: "Finalização",
+    tone: "finalizacao",
+    labels: ["Gols e xG", "Finalizações", "Efetividade"],
+  },
+  {
     title: "Duelos Aéreos",
-    tone: "defensivos",
+    tone: "aereo",
     labels: ["Duelos Aéreos"],
   },
   {
-    title: "Passes",
-    tone: "passes",
-    labels: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
-  },
-  {
     title: "Passes Finais",
-    tone: "final",
+    tone: "finais",
     labels: ["Passes Chave e Área", "Cruzamentos", "Pré Assistências e xA", "Passes Criativos"],
   },
   {
     title: "Condução e Drible",
     tone: "dribles",
     labels: ["Disputas com Bola", "1v1 - Ofensivo", "Progressão"],
-  },
-  {
-    title: "Finalização",
-    tone: "final",
-    labels: ["Gols e xG", "Finalizações"],
-  },
-  {
-    title: "Ofensividade",
-    tone: "final",
-    labels: ["Ações Terminais", "Verticalidade"],
   },
 ];
 

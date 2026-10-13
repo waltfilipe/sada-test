@@ -17,7 +17,9 @@ const EX_GROUPS = [
   { key: "construcao", title: "Passes" },
   { key: "passes_finais", title: "Passes Finais" },
   { key: "conducao_drible", title: "Condução e Drible" },
+  { key: "finalizacao", title: "Finalização" },
   { key: "ofensividade", title: "Ofensividade" },
+  { key: "defensivos", title: "Defensivos" },
 ] as const;
 
 export function AspectMatrix({ player, family }: { player: PlayerProfile; family?: PositionFamily }) {

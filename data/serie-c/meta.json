@@ -1,0 +1,287 @@
+{
+  "league_id": "serie-c",
+  "league": "Série C",
+  "season": "2026 · 1ª fase",
+  "source": "xlsx",
+  "player_count": 348,
+  "families": [
+    {
+      "key": "zagueiros",
+      "label": "Zagueiros",
+      "positions": [
+        "Zagueiro"
+      ],
+      "profiles": [
+        "Construtor",
+        "Defensivo",
+        "Híbrido"
+      ],
+      "count": 75
+    },
+    {
+      "key": "laterais",
+      "label": "Laterais",
+      "positions": [
+        "Lateral Direito",
+        "Lateral Esquerdo"
+      ],
+      "profiles": [
+        "Defensivo",
+        "Construtor",
+        "Ofensivo",
+        "Híbrido"
+      ],
+      "count": 68
+    },
+    {
+      "key": "meio-campistas",
+      "label": "Meio-campistas",
+      "positions": [
+        "Meio-campista"
+      ],
+      "profiles": [
+        "Contenção",
+        "Construtor",
+        "Box-to-box",
+        "Híbrido"
+      ],
+      "count": 70
+    },
+    {
+      "key": "extremos",
+      "label": "Meias Ofensivos",
+      "positions": [
+        "Extremo Direito",
+        "Extremo Esquerdo",
+        "Meia Ofensivo"
+      ],
+      "profiles": [
+        "Driblador",
+        "Meia Ponta",
+        "Ruptura",
+        "Híbrido"
+      ],
+      "count": 81
+    },
+    {
+      "key": "atacantes",
+      "label": "Atacantes",
+      "positions": [
+        "Atacante"
+      ],
+      "profiles": [
+        "Finalizador",
+        "Alvo",
+        "Móvel",
+        "Híbrido"
+      ],
+      "count": 54
+    }
+  ],
+  "clubs": [
+    "Amazonas",
+    "América Mineiro",
+    "Anápolis",
+    "Avaí",
+    "Barra",
+    "Botafogo PB",
+    "Brasiliense",
+    "Brusque",
+    "CRB",
+    "Caxias",
+    "Confiança",
+    "Ferroviária",
+    "Figueirense",
+    "Floresta EC",
+    "Guarani",
+    "Inter de Limeira",
+    "Itabaiana",
+    "Ituano",
+    "Jeonnam Dragons",
+    "Maranhão",
+    "Maringá",
+    "Náutico",
+    "Oeste",
+    "Paysandu",
+    "Santa Cruz",
+    "Universitario de Vinto",
+    "Volta Redonda",
+    "Ypiranga Erechim"
+  ],
+  "nationalities": [
+    "Argentina",
+    "Brazil",
+    "Colombia",
+    "Italy",
+    "Nigeria",
+    "Paraguay",
+    "United States",
+    "Uruguay"
+  ],
+  "filters": {
+    "height": [
+      155,
+      197
+    ],
+    "minutes": [
+      0,
+      1885
+    ],
+    "birth_year": [
+      1981,
+      2008
+    ],
+    "rating": [
+      6.0,
+      7.5
+    ]
+  },
+  "scatter_metrics": {
+    "zagueiros": [
+      {
+        "key": "intervencoes",
+        "label": "Intervenções",
+        "field": "interception_won_p90"
+      },
+      {
+        "key": "confrontos_of",
+        "label": "Confrontos Ofensivos",
+        "field": "DuelosOf"
+      },
+      {
+        "key": "construcao",
+        "label": "Construção",
+        "field": "n_construcao"
+      },
+      {
+        "key": "duelo_ar",
+        "label": "Duelo Aéreo",
+        "field": "n_duelo_ar"
+      },
+      {
+        "key": "contencao",
+        "label": "Contenção",
+        "field": "n_contencao"
+      },
+      {
+        "key": "ofensividade",
+        "label": "Ofensividade",
+        "field": "n_conducao"
+      },
+      {
+        "key": "passes_prog",
+        "label": "Passes Progressivos",
+        "field": "PassesProg"
+      },
+      {
+        "key": "duelos_def",
+        "label": "Duelos Defensivos",
+        "field": "DuelosDef"
+      }
+    ],
+    "laterais": [
+      {
+        "key": "cruzamentos",
+        "label": "Cruzamentos",
+        "field": "Cruz."
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "construcao",
+        "label": "Construção",
+        "field": "n_construcao"
+      },
+      {
+        "key": "duelos_def",
+        "label": "Duelos Defensivos",
+        "field": "DuelosDef"
+      }
+    ],
+    "meio-campistas": [
+      {
+        "key": "finalizacao",
+        "label": "Finalizações",
+        "field": "Finalizações"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "construcao",
+        "label": "Construção",
+        "field": "n_construcao"
+      },
+      {
+        "key": "duelos_def",
+        "label": "Duelos Defensivos",
+        "field": "DuelosDef"
+      }
+    ],
+    "extremos": [
+      {
+        "key": "dribles",
+        "label": "Dribles",
+        "field": "Dribles"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      },
+      {
+        "key": "cruzamentos",
+        "label": "Cruzamentos",
+        "field": "Cruz."
+      },
+      {
+        "key": "toques_area",
+        "label": "Toques na Área",
+        "field": "ToquesArea"
+      }
+    ],
+    "atacantes": [
+      {
+        "key": "gols",
+        "label": "Gols",
+        "field": "Gols"
+      },
+      {
+        "key": "finalizacao",
+        "label": "Finalizações",
+        "field": "Finalizações"
+      },
+      {
+        "key": "toques_area",
+        "label": "Toques na Área",
+        "field": "ToquesArea"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      }
+    ]
+  },
+  "heatmaps_enabled": false
+}

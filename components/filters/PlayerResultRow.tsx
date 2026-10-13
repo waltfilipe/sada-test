@@ -1,114 +1,113 @@
 "use client";
 
 import Link from "next/link";
-import {
-  TENDENCY_META,
-  clampPercent,
-  formatRating,
-  percentileTier,
-  playerInitials,
-  ratingTier,
-  tierVars,
-} from "@/lib/scoutTheme";
+import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
-import { MinutesStat } from "@/components/position/MinutesStat";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
+import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
+import { PlayerHeatmap } from "@/components/position/profile/PlayerHeatmap";
+import { Tooltip } from "@/components/ui/Tooltip";
+import { playerInitials } from "@/lib/scoutTheme";
+import type { FamilyBadgeOption } from "@/lib/statBadges";
 import type { PlayerSearchRow } from "@/lib/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-export function PlayerResultRow({ player }: { player: PlayerSearchRow }) {
-  const token = ratingTier(player.rating);
+export function PlayerResultRow({
+  player,
+  catalog,
+}: {
+  player: PlayerSearchRow;
+  catalog: FamilyBadgeOption[];
+}) {
+  const { href, heatmaps } = useLeague();
   const age = player.birth_year ? CURRENT_YEAR - player.birth_year : null;
   const tm = player.transfermarkt;
+  const earned = catalog.filter((badge) => player.badges.includes(badge.key));
 
   const facts = [
     { label: "Idade", value: age ? `${age}` : "—", unit: age ? "anos" : undefined },
     { label: "Altura", value: player.height ? `${player.height}` : "—", unit: player.height ? "cm" : undefined },
     { label: "Pé", value: player.foot ?? "—" },
-    { label: "G/A", value: `${player.goals}/${player.assists}` },
+    { label: "Minutos", value: player.minutes.toLocaleString("pt-BR") },
+    { label: "Valor", value: tm?.market_value ?? "—" },
+    { label: "Contrato", value: tm?.contract_remaining ?? "—" },
   ];
 
+  const profileHref = href(
+    `/posicao/${player.position_family}?atleta=${player.player_id}&origem=filtros`,
+  );
+
   return (
-    <Link
-      href={`/posicao/${player.position_family}?atleta=${player.player_id}`}
-      className="result-row"
-      style={tierVars(token)}
-    >
-      <div className="row-photo">
+    <article className="result-row">
+      <Link href={profileHref} className="row-photo" aria-label={player.name}>
         {tm?.photo ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={tm.photo} alt="" loading="lazy" />
         ) : (
           <span>{playerInitials(player.name)}</span>
         )}
-      </div>
+      </Link>
 
       <div className="row-identity">
-        <div className="row-name">
-          <h3>{player.name}</h3>
-          <ProfileTag {...profileTagProps(player)} />
-        </div>
-        <p className="row-club">
-          <ClubLogo club={player.club} size={16} />
-          {player.club}
-          <i aria-hidden>·</i>
-          <span>{player.position}</span>
-        </p>
+        <Link href={profileHref} className="row-identity-link">
+          <div className="row-name">
+            <h3>{player.name}</h3>
+            <ProfileTag {...profileTagProps(player)} />
+          </div>
+          <p className="row-club">
+            <ClubLogo club={player.club} size={16} />
+            {player.club}
+            <i aria-hidden>·</i>
+            <span>{player.position}</span>
+          </p>
 
-        <dl className="row-facts">
+        </Link>
+
+        {earned.length ? (
+          <ul className="row-badges" aria-label="Badges">
+            {earned.map((badge) => (
+              <li key={badge.key}>
+                <Tooltip content={`${badge.label}. ${badge.title}`}>
+                  <span className={`row-badge-icon tone-${badge.tone}`} aria-label={badge.label}>
+                    <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
+                  </span>
+                </Tooltip>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="row-badges-empty">Sem badges nesta posição</p>
+        )}
+
+        <div className="row-stat-strip">
           {facts.map((fact) => (
-            <div key={fact.label}>
-              <dt>{fact.label}</dt>
-              <dd>
+            <div key={fact.label} className="row-stat-chip">
+              <span>{fact.label}</span>
+              <strong>
                 {fact.value}
-                {fact.unit && <em>{fact.unit}</em>}
-              </dd>
+                {fact.unit ? <em>{fact.unit}</em> : null}
+              </strong>
             </div>
           ))}
-        </dl>
-      </div>
-
-      <div className="row-indices">
-        {TENDENCY_META.map((item) => {
-          const value = clampPercent(player.tendencies[item.key]);
-          const indexToken = percentileTier(value);
-          return (
-            <div key={item.key} className="row-index" style={tierVars(indexToken)} title={item.hint}>
-              <span className="row-index-label">{item.compact}</span>
-              <strong>{Math.round(value)}</strong>
-              <span className="row-index-track">
-                <i style={{ width: `${Math.max(3, value)}%` }} />
-              </span>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="row-aside">
-        <MinutesStat
-          minutes={player.minutes}
-          minutesPct={player.minutes_pct}
-          variant="compact"
-          className="row-minutes"
-        />
-
-        <div className="row-rating">
-          <strong>{formatRating(player.rating)}</strong>
-          <span>Rating</span>
-        </div>
-
-        <div className="row-market">
-          <div>
-            <span>Valor</span>
-            <strong>{tm?.market_value ?? "—"}</strong>
-          </div>
-          <div>
-            <span>Contrato</span>
-            <strong>{tm?.contract_remaining ?? "—"}</strong>
-          </div>
         </div>
       </div>
-    </Link>
+
+      {heatmaps ? (
+        <div className="row-mini-heatmap">
+          <PlayerHeatmap compact heatmap={player.heatmap} playerName={player.name} />
+        </div>
+      ) : null}
+
+      <div className="row-actions">
+          {tm?.profile_url ? (
+            <a className="btn btn-ghost btn-sm row-action" href={tm.profile_url} target="_blank" rel="noreferrer">
+              <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
+              Transfermarkt
+            </a>
+          ) : null}
+          <AddToShadowMenu playerId={player.player_id} family={player.position_family} />
+      </div>
+    </article>
   );
 }

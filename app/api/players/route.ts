@@ -4,8 +4,9 @@ import type { PositionFamily } from "@/lib/types";
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
+  const league = params.get("league") ?? undefined;
   const family = params.get("family") as PositionFamily | null;
-  const players = filterPlayers(getPlayers(), {
+  const players = filterPlayers(getPlayers(league), {
     family: family ?? undefined,
     club: params.get("club") ?? undefined,
     nationality: params.get("nationality") ?? undefined,
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
     minutes: readRange(params, "minutes"),
     birthYear: readRange(params, "birth"),
     rating: readRange(params, "rating"),
-  });
+  }, league);
   return NextResponse.json({ players, total: players.length });
 }
 

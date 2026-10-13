@@ -16,17 +16,17 @@ function averageDefined(values: (number | undefined)[]): number | undefined {
 /** Volume-only percentile for an aspect subcard. */
 export function aspectQuantityPercentile(item: AspectItem): number | undefined {
   if (item.kind === "def_efficiency_group") {
-    const subs = item.sub_metrics ?? [];
-    const inter = subs.find((row) => row.label === "Interceptações");
-    const cortes = subs.find((row) => row.label === "Rebatidas");
-    const qty = averageDefined([num(inter?.percentile), num(cortes?.percentile)]);
-    if (qty != null) return qty;
-    const acoes = subs.find((row) => row.label === "Ações bem-sucedidas");
-    return num(acoes?.percentile);
+    return num(item.sub_metrics?.find((row) => row.label === "Erros Totais")?.percentile);
   }
 
   if (item.kind === "metric_group") {
     const subs = item.sub_metrics ?? [];
+    if (item.label === "Ações Defensivas") {
+      const cortes = subs.find((row) => row.label === "Rebatidas");
+      const inter = subs.find((row) => row.label === "Interceptações");
+      const blocks = subs.find((row) => row.label === "Chutes Bloqueados");
+      return averageDefined([num(cortes?.percentile), num(inter?.percentile), num(blocks?.percentile)]);
+    }
     if (item.label === "Cruzamentos" || item.label === "Finalizações") {
       return num(subs.find((row) => row.label === item.label)?.percentile);
     }

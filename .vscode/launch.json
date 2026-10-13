@@ -20,6 +20,52 @@
         "5.0",
         "--png"
       ]
+    },
+    {
+      "name": "Photo & Mercado — Série C (CDP)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/photo&mercado.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--csv",
+        "BRC26_defensive.csv",
+        "--output",
+        "./BRC26_photos",
+        "--transport",
+        "cdp",
+        "--cdp-url",
+        "http://127.0.0.1:9222",
+        "--warmup-url",
+        "https://www.sofascore.com/football/tournament/brazil/brasileirao-serie-c/1281#id:90642",
+        "--resume",
+        "--rate-limit",
+        "0.3"
+      ]
+    },
+    {
+      "name": "Photo & Mercado — Série A (CDP)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/photo&mercado.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--csv",
+        "BR26_defensive.csv",
+        "--output",
+        "./BR26_photos",
+        "--transport",
+        "cdp",
+        "--cdp-url",
+        "http://127.0.0.1:9222",
+        "--warmup-url",
+        "https://www.sofascore.com/football/tournament/brazil/brasileirao-serie-a/325#id:87678",
+        "--resume",
+        "--rate-limit",
+        "0.3"
+      ]
     }
   ]
 }

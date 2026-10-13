@@ -90,19 +90,31 @@
 
 /* ── Top bar ─────────────────────────────────────────────────────────────── */
 
-.scout-topbar {
+.scout-topbar-wrap {
   position: sticky;
   top: 0;
   z-index: 20;
+}
+
+.scout-topbar {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   height: 60px;
   padding: 0 1.5rem;
   border-bottom: 1px solid var(--line);
-  background: rgba(8, 11, 17, 0.82);
+  background: rgba(8, 11, 17, 0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+}
+
+.scout-subnav {
+  display: flex;
+  justify-content: center;
+  padding: 0.45rem 1.25rem 0.55rem;
+  border-bottom: 1px solid var(--line);
+  background: rgba(8, 11, 17, 0.94);
+  overflow-x: auto;
 }
 
 .scout-brand {
@@ -186,18 +198,48 @@
 
 .topbar-links {
   display: flex;
-  gap: 1.1rem;
+  gap: 2px;
   margin-left: auto;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.topbar-links::-webkit-scrollbar {
+  display: none;
 }
 
 .topbar-links a {
-  font-size: 0.82rem;
-  color: var(--text-3);
-  transition: color 0.16s ease;
+  flex-shrink: 0;
+  padding: 0.38rem 0.72rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: var(--text-2);
+  transition: background 0.16s ease, color 0.16s ease;
 }
 
 .topbar-links a:hover {
   color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.topbar-links a.active {
+  color: #05201d;
+  font-weight: 650;
+  background: linear-gradient(140deg, #7df1de, #34d399);
+}
+
+.topbar-links a:focus-visible,
+.position-tabs a:focus-visible,
+.scout-brand:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid rgba(125, 241, 222, 0.9);
+  outline-offset: 2px;
 }
 
 /* ── Page frame ──────────────────────────────────────────────────────────── */
@@ -3141,8 +3183,22 @@
     width: 100%;
   }
 
+  .scout-topbar {
+    height: auto;
+    flex-wrap: wrap;
+    row-gap: 0.55rem;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+  }
+
   .topbar-links {
-    display: none;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .topbar-links a {
+    font-size: 0.74rem;
+    padding: 0.32rem 0.58rem;
   }
 }
 

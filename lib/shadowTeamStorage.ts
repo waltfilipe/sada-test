@@ -6,9 +6,21 @@ import {
   suggestSlotId,
   type Formation,
 } from "@/lib/formations";
+import type { LeagueId } from "@/lib/leagues";
 import type { PositionFamily } from "@/lib/types";
 
+export function storageKey(league: LeagueId) {
+  return `${league}-scout:shadow-team-v1`;
+}
+
+export function shadowChangeEvent(league: LeagueId) {
+  return `${league}-scout:shadow-change`;
+}
+
+/** @deprecated use storageKey(league) */
 export const STORAGE_KEY = "serie-a-scout:shadow-team-v1";
+/** @deprecated use shadowChangeEvent(league) */
+export const SHADOW_CHANGE_EVENT = "serie-a-scout:shadow-change";
 
 export type ShadowTeamState = {
   formationId: string;
@@ -31,10 +43,10 @@ function emptyAssignments(formation: Formation): Record<string, string | null> {
   return Object.fromEntries(fieldSlots(formation).map((s) => [s.id, null]));
 }
 
-export function loadShadowTeamState(): ShadowTeamState {
+export function loadShadowTeamState(league: LeagueId = "serie-a"): ShadowTeamState {
   if (typeof window === "undefined") return { ...EMPTY_STATE };
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey(league));
     if (!raw) return { ...EMPTY_STATE, assignments: emptyAssignments(formationById(DEFAULT_FORMATION_ID)) };
     const parsed = JSON.parse(raw) as Partial<ShadowTeamState>;
     const formationId = parsed.formationId ?? DEFAULT_FORMATION_ID;
@@ -51,9 +63,10 @@ export function loadShadowTeamState(): ShadowTeamState {
   }
 }
 
-export function saveShadowTeamState(state: ShadowTeamState): void {
+export function saveShadowTeamState(state: ShadowTeamState, league: LeagueId = "serie-a"): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(storageKey(league), JSON.stringify(state));
+  window.dispatchEvent(new Event(shadowChangeEvent(league)));
 }
 
 function takenSlots(assignments: Record<string, string | null>): Set<string> {

@@ -7,8 +7,10 @@ from typing import Any
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[2]
-XLSX_PATH = ROOT / "Serie A 26.xlsx"
 PBIX_PATH = ROOT / "Dashboard - Série A 25-26.pbix"
+
+from engine.leagues import LEAGUES, LeagueConfig
+from engine.wyscout_i18n import rename_english_wyscout_columns
 
 WYSCOUT_TO_POSITION: dict[str, str] = {
     "GK": "Goleiro",
@@ -107,11 +109,11 @@ def _normalize_foot(value: Any) -> str:
     return FOOT_MAP.get(text, str(value).strip().title())
 
 
-def _load_from_xlsx() -> pd.DataFrame | None:
-    if not XLSX_PATH.exists():
+def _load_from_xlsx(xlsx_path: Path) -> pd.DataFrame | None:
+    if not xlsx_path.exists():
         return None
 
-    xl = pd.ExcelFile(XLSX_PATH)
+    xl = pd.ExcelFile(xlsx_path)
     if "Tb_SerieC25" in xl.sheet_names:
         df = pd.read_excel(XLSX_PATH, sheet_name="Tb_SerieC25")
         if "Equipe" not in df.columns and "Equipa" in df.columns:
@@ -121,12 +123,16 @@ def _load_from_xlsx() -> pd.DataFrame | None:
     if "Search results (500)" not in xl.sheet_names:
         return None
 
-    raw = pd.read_excel(XLSX_PATH, sheet_name="Search results (500)")
+    raw = pd.read_excel(xlsx_path, sheet_name="Search results (500)")
+    raw = rename_english_wyscout_columns(raw)
     rename = {
         "Equipa": "Equipe",
+        "Jogador": "Jogador",
         "País de nacionalidade": "Naturalidade",
     }
-    df = raw.rename(columns=rename)
+    df = raw.rename(columns={k: v for k, v in rename.items() if k in raw.columns})
+    if "Jogador" not in df.columns and "Player" in df.columns:
+        df = df.rename(columns={"Player": "Jogador"})
     if "Equipe" not in df.columns and "Equipa dentro de um período de tempo seleccionado" in df.columns:
         df = df.rename(columns={"Equipa dentro de um período de tempo seleccionado": "Equipe"})
     # Drop duplicate Equipe columns from Wyscout export
@@ -154,14 +160,18 @@ def _load_from_pbix() -> pd.DataFrame:
     return pbix.get_table("Tb_SerieC25")
 
 
-def load_players_dataframe() -> pd.DataFrame:
-    df = _load_from_xlsx()
+def load_players_dataframe(league_id: str = "serie-a") -> pd.DataFrame:
+    league = LEAGUES.get(league_id)
+    if not league:
+        raise ValueError(f"Liga desconhecida: {league_id}")
+
+    df = _load_from_xlsx(league["xlsx"])
     source = "xlsx"
-    if df is None and PBIX_PATH.exists():
+    if df is None and league_id == "serie-a" and PBIX_PATH.exists():
         df = _load_from_pbix()
         source = "pbix"
     if df is None:
-        raise FileNotFoundError("Nenhuma fonte de dados válida encontrada.")
+        raise FileNotFoundError(f"Nenhuma fonte válida para {league['label']}: {league['xlsx']}")
 
     df = df.copy()
     df = _dedupe_columns(df)
@@ -182,8 +192,12 @@ def load_players_dataframe() -> pd.DataFrame:
         f"{name} ({club})" if club and str(club) != "nan" else str(name)
         for name, club in zip(df["Jogador"], df["Equipe"])
     ]
+    def _player_id(name: str, club: str, index: int) -> str:
+        slug = _slugify(name, club, index)
+        return slug if league_id == "serie-a" else f"{league_id}-{slug}"
+
     df["player_id"] = [
-        _slugify(str(row["Jogador"]), str(row.get("Equipe", "")), i)
+        _player_id(str(row["Jogador"]), str(row.get("Equipe", "")), i)
         for i, row in df.reset_index(drop=True).iterrows()
     ]
     for name, position in PLAYER_POSITION_OVERRIDES.items():
@@ -196,4 +210,7 @@ def load_players_dataframe() -> pd.DataFrame:
         df["Nascimento"] = None
 
     df.attrs["source"] = source
+    df.attrs["league_id"] = league_id
+    df.attrs["league_label"] = league["label"]
+    df.attrs["season"] = league["season"]
     return df.reset_index(drop=True)

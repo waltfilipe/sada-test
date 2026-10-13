@@ -21,10 +21,10 @@
     "perfil": 6.2
   },
   "ranks": {
-    "geral": 40,
+    "geral": 44,
     "construcao": 26,
     "defesa": 54,
-    "perfil": 63
+    "perfil": 64
   },
   "profile": "Combativo",
   "profile_shares": {
@@ -51,19 +51,15 @@
         "efficiency_value": "46%"
       },
       {
-        "label": "Eficiência Defensiva",
-        "kind": "def_efficiency_group",
-        "grade": "C+",
-        "percentile": 50.0,
-        "pair_badge": [
-          1.4,
-          50.0
-        ],
+        "label": "Ações Defensivas",
+        "kind": "metric_group",
+        "grade": "C-",
+        "percentile": 25.0,
         "sub_metrics": [
           {
-            "label": "Ações bem-sucedidas",
-            "percentile": 1.4,
-            "display_value": "5,0"
+            "label": "Rebatidas",
+            "percentile": 0.0,
+            "display_value": "1,1"
           },
           {
             "label": "Interceptações",
@@ -71,14 +67,32 @@
             "display_value": "1,2"
           },
           {
-            "label": "Rebatidas",
-            "percentile": 0.0,
-            "display_value": "1,1"
+            "label": "Chutes Bloqueados",
+            "percentile": 17.9,
+            "display_value": "0,5"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Eficiência Defensiva",
+        "kind": "def_efficiency_group",
+        "grade": "D",
+        "percentile": 1.4,
+        "pair_badge": [
+          100.0,
+          1.4
+        ],
+        "sub_metrics": [
+          {
+            "label": "Erros Totais",
+            "percentile": 100.0,
+            "display_value": "0"
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 50.0,
-            "display_value": "0,52"
+            "percentile": 1.4,
+            "display_value": "-1,2"
           }
         ],
         "stats": []
@@ -167,8 +181,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "C+",
-        "percentile": 50.0,
+        "grade": "D",
+        "percentile": 1.4,
         "display_value": "46%",
         "share_pct": 45.6,
         "pool_avg_pct": 0.9,
@@ -1945,6 +1959,7 @@
         "y": 28.9
       }
     ],
-    "point_count": 420
+    "point_count": 420,
+    "image_url": null
   }
 }

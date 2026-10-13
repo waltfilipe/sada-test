@@ -2,45 +2,67 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { LEAGUES } from "@/lib/leagues";
+import { useLeague } from "@/components/LeagueProvider";
 
 const NAV = [
-  { key: "posicoes", href: "/posicao/zagueiros", label: "Posições" },
-  { key: "filtros", href: "/filtros", label: "Filtros" },
-  { key: "comparar", href: "/comparar", label: "Comparar" },
-  { key: "scatter", href: "/scatter", label: "Scatter" },
-  { key: "time-sombra", href: "/time-sombra", label: "Time Sombra" },
+  { key: "inicio", path: "/", label: "Início" },
+  { key: "posicoes", path: "/posicao/zagueiros", label: "Posições" },
+  { key: "filtros", path: "/filtros", label: "Filtros" },
+  { key: "comparar", path: "/comparar", label: "Comparar" },
+  { key: "scatter", path: "/scatter", label: "Scatter" },
+  { key: "time-sombra", path: "/time-sombra", label: "Time Sombra" },
 ] as const;
 
+export type ScoutSection = (typeof NAV)[number]["key"];
+
 type Props = {
-  active: (typeof NAV)[number]["key"];
-  center?: ReactNode;
+  active: ScoutSection;
+  subnav?: ReactNode;
 };
 
-export function ScoutTopbar({ active, center }: Props) {
+export function ScoutTopbar({ active, subnav }: Props) {
+  const { leagueId, href, name, season, brand } = useLeague();
+
   return (
-    <header className="scout-topbar">
-      <Link href="/" className="scout-brand">
-        <span className="sc-brand-mark">SA</span>
-        <span className="sc-brand-copy">
-          <strong>Série A Scout</strong>
-          <em>Temporada 2025/26</em>
-        </span>
-      </Link>
+    <div className="scout-topbar-wrap">
+      <header className="scout-topbar">
+        <Link href={href("/")} className="scout-brand">
+          <span className="sc-brand-mark">{brand}</span>
+          <span className="sc-brand-copy">
+            <strong>{name} Scout</strong>
+            <em>Temporada {season}</em>
+          </span>
+        </Link>
 
-      {center}
+        <div className="league-switcher" role="navigation" aria-label="Ligas">
+          {LEAGUES.map((league) => (
+            <Link
+              key={league.id}
+              href={`/${league.id}`}
+              className={league.id === leagueId ? "active" : ""}
+              aria-current={league.id === leagueId ? "true" : undefined}
+            >
+              {league.name}
+            </Link>
+          ))}
+        </div>
 
-      <nav className="topbar-links" aria-label="Seções">
-        {NAV.map((item) => (
-          <Link
-            key={item.key}
-            href={item.href}
-            className={item.key === active ? "active" : ""}
-            aria-current={item.key === active ? "page" : undefined}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-    </header>
+        <nav className="topbar-links" aria-label="Seções">
+          {NAV.map((item) => (
+            <Link
+              key={item.key}
+              href={href(item.path)}
+              className={item.key === active ? "active" : ""}
+              aria-current={item.key === active ? "page" : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </header>
+
+      {subnav ? <div className="scout-subnav">{subnav}</div> : null}
+    </div>
   );
 }

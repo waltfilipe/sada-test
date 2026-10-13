@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
+import { SimilarCrossLeagueModal } from "@/components/position/profile/SimilarCrossLeagueModal";
 
 type Props = {
   player: PlayerProfile;
@@ -61,6 +64,8 @@ function MarketCard({
 }
 
 export function PlayerHero({ player, family }: Props) {
+  const { href, leagueId } = useLeague();
+  const [similarOpen, setSimilarOpen] = useState(false);
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const tm = player.transfermarkt;
 
@@ -154,7 +159,7 @@ export function PlayerHero({ player, family }: Props) {
           <div className="player-hero-actions">
             <Link
               className="btn btn-ghost btn-sm"
-              href={`/comparar?posicao=${family}&a=${player.player_id}`}
+              href={href(`/comparar?posicao=${family}&a=${player.player_id}`)}
             >
               <i className="fa-solid fa-scale-balanced" aria-hidden="true" /> Comparar
             </Link>
@@ -163,10 +168,22 @@ export function PlayerHero({ player, family }: Props) {
                 <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
               </a>
             ) : null}
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSimilarOpen(true)}>
+              <i className="fa-solid fa-shuffle" aria-hidden="true" /> Similares
+            </button>
             <AddToShadowMenu playerId={player.player_id} family={family} />
           </div>
         </div>
       </div>
+
+      {similarOpen ? (
+        <SimilarCrossLeagueModal
+          player={player}
+          family={family}
+          currentLeagueId={leagueId}
+          onClose={() => setSimilarOpen(false)}
+        />
+      ) : null}
     </section>
   );
 }
