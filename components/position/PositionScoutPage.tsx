@@ -224,7 +224,6 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
         </header>
         <div className="zag-v2-shell">
           <aside className="zag-v2-rail">
-            <div className="zag-v2-filters">
             <label className="zag-v2-search">
               <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
               <input
@@ -358,9 +357,7 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
                 </select>
               </label>
             </section>
-            </div>
 
-            <div className="zag-v2-roster">
             <p className="zag-v2-count tabular">
               <strong>{visible.length}</strong> de {players.length}
             </p>
@@ -397,7 +394,6 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
               })}
             </ul>
             {!visible.length ? <p className="zag-v2-empty">Nenhum atleta com esses filtros.</p> : null}
-            </div>
           </aside>
 
           <main className="zag-v2-detail">

@@ -85,32 +85,12 @@
 .zag-v2-rail {
   position: sticky;
   top: 0;
-  height: calc(100vh - 168px);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  height: calc(100vh - 210px);
+  overflow: auto;
   padding: 0.85rem;
   border-right: 1px solid var(--line);
   background: rgba(10, 14, 20, 0.72);
   scrollbar-width: thin;
-}
-
-.zag-v2-filters {
-  flex: 0 1 auto;
-  max-height: 48%;
-  overflow: auto;
-  padding-right: 0.15rem;
-}
-
-.zag-v2-roster {
-  flex: 1 1 auto;
-  min-height: 240px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  margin-top: 0.35rem;
-  padding-top: 0.45rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.16);
 }
 
 .zag-v2-rail-head {
@@ -308,38 +288,33 @@
 .zag-v2-list {
   list-style: none;
   margin: 0;
-  padding: 0 0.1rem 0.2rem 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
+  gap: 0.2rem;
 }
 
 .zag-v2-list li {
   display: block;
   margin: 0;
   padding: 0;
-  flex-shrink: 0;
 }
 
 .zag-v2-list button {
   width: 100%;
   box-sizing: border-box;
-  position: relative;
-  isolation: isolate;
-  display: flex;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.5rem 0.5rem;
-  min-height: 3.15rem;
+  column-gap: 0.55rem;
+  padding: 0.35rem 0.4rem;
   border-radius: 12px;
   border: 1px solid transparent;
-  background: #0c121a;
+  background: transparent;
   color: inherit;
   text-align: left;
   cursor: pointer;
+  line-height: 1.2;
 }
 
 .zag-v2-list button:hover {
@@ -492,16 +467,6 @@
     overflow: visible;
     border-right: 0;
     border-bottom: 1px solid var(--line);
-  }
-
-  .zag-v2-filters {
-    max-height: none;
-    overflow: visible;
-  }
-
-  .zag-v2-roster {
-    min-height: 0;
-    overflow: visible;
   }
 
   .zag-v2 .profile-content-grid {
