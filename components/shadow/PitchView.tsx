@@ -104,7 +104,12 @@ export function PitchView({
 
   return (
     <div className="shadow-pitch-wrap">
-      <div className="shadow-pitch" aria-label="Campo tático">
+      <p className="shadow-pitch-axis">
+        <span>Ataque</span>
+        <span>Direita do time à direita · esquerda à esquerda</span>
+        <span>Defesa</span>
+      </p>
+      <div className="shadow-pitch" aria-label="Campo tático, ataque para cima">
         <div className="shadow-pitch-lines" aria-hidden="true">
           <span className="shadow-pitch-mid" />
           <span className="shadow-pitch-circle" />

@@ -109,48 +109,50 @@ export function TimeSombraClient({ players }: Props) {
 
       <div className="shadow-page-body">
         <header className="shadow-page-header">
-          <div>
+          <div className="shadow-page-heading">
             <h1 className="shadow-page-title">Time Sombra</h1>
             <p className="shadow-page-sub">
-              {BOARD_LABEL[board]} · {squadPlayers.length} escalados · {watchPlayers.length} em observação
+              {BOARD_LABEL[board]} · {starters.length} titulares · {benchIds.length} reservas
               {avgLetter != null ? ` · letra ${avgLetter}` : ""}
             </p>
           </div>
 
-          <div className="shadow-board-switch" role="tablist" aria-label="Seleção">
-            {(["proprio", "sombra"] as const).map((id) => (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={board === id}
-                className={`shadow-board-tab${board === id ? " active" : ""}`}
-                onClick={() => openBoard(id)}
-              >
-                {BOARD_LABEL[id]}
-              </button>
-            ))}
-          </div>
-
-          <div className="shadow-formation-picker" role="group" aria-label="Formação tática">
-            <span className="shadow-formation-label">Formação</span>
-            <div className="shadow-formation-chips">
-              {FORMATIONS.map((f) => (
+          <div className="shadow-page-controls">
+            <div className="shadow-board-switch" role="tablist" aria-label="Seleção">
+              {(["proprio", "sombra"] as const).map((id) => (
                 <button
-                  key={f.id}
+                  key={id}
                   type="button"
-                  className={`shadow-formation-chip${state.formationId === f.id ? " active" : ""}`}
-                  onClick={() => {
-                    changeFormation(f.id);
-                    setSelectedSlotId(null);
-                    setPlacementPlayerId(null);
-                    setPicker(null);
-                  }}
-                  aria-pressed={state.formationId === f.id}
+                  role="tab"
+                  aria-selected={board === id}
+                  className={`shadow-board-tab${board === id ? " active" : ""}`}
+                  onClick={() => openBoard(id)}
                 >
-                  {f.label}
+                  {BOARD_LABEL[id]}
                 </button>
               ))}
+            </div>
+
+            <div className="shadow-formation-picker" role="group" aria-label="Formação tática">
+              <span className="shadow-formation-label">Formação</span>
+              <div className="shadow-formation-chips">
+                {FORMATIONS.map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    className={`shadow-formation-chip${state.formationId === f.id ? " active" : ""}`}
+                    onClick={() => {
+                      changeFormation(f.id);
+                      setSelectedSlotId(null);
+                      setPlacementPlayerId(null);
+                      setPicker(null);
+                    }}
+                    aria-pressed={state.formationId === f.id}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </header>
@@ -159,13 +161,7 @@ export function TimeSombraClient({ players }: Props) {
 
         <div className="shadow-layout">
           <section className="shadow-main player-card" aria-label="Campo e reservas">
-            <div className="shadow-pitch-row">
-              <TeamProfileMap
-                formationId={state.formationId}
-                assignments={assignments}
-                playersById={playersById}
-              />
-              <PitchView
+            <PitchView
                 formationId={state.formationId}
                 assignments={assignments}
                 compareAssignments={board === "proprio" ? state.assignments : null}
@@ -205,7 +201,12 @@ export function TimeSombraClient({ players }: Props) {
                   setPicker({ slot, mode: "reserve" });
                 }}
               />
-            </div>
+
+            <TeamProfileMap
+              formationId={state.formationId}
+              assignments={assignments}
+              playersById={playersById}
+            />
 
             <div className="shadow-bench">
               <div className="shadow-bench-head">
@@ -246,6 +247,7 @@ export function TimeSombraClient({ players }: Props) {
                   value={slotQuery}
                   placeholder="Buscar atleta ou clube…"
                   aria-label="Buscar atleta para escalar"
+                  autoFocus
                   onChange={(event) => setSlotQuery(event.target.value)}
                 />
                 {slotCandidates.length ? (
@@ -296,6 +298,7 @@ export function TimeSombraClient({ players }: Props) {
                     src={selectedPlayer.transfermarkt?.photo}
                     alt=""
                   />
+                  <div className="shadow-slot-detail-copy">
                   <h4>{selectedPlayer.name}</h4>
                   <p className="shadow-slot-detail-meta">
                     {selectedPlayer.club} · {selectedPlayer.position}
@@ -322,6 +325,7 @@ export function TimeSombraClient({ players }: Props) {
                       family={selectedPlayer.position_family}
                       compact
                     />
+                  </div>
                   </div>
                 </div>
               </article>
@@ -365,9 +369,9 @@ export function TimeSombraClient({ players }: Props) {
                     </ul>
                   ) : (
                     <p className="shadow-roster-empty">
-                      Nenhum atleta no time. Abra uma{" "}
-                      <Link href={href("/posicao/zagueiros")}>posição</Link> e use o botão <strong>+</strong> no perfil,
-                      ou clique numa vaga vazia do campo.
+                      Nenhum atleta neste time. Clique numa vaga do campo ou abra{" "}
+                      <Link href={href("/posicao/zagueiros")}>Posições</Link> e{" "}
+                      <Link href={href("/filtros")}>Filtros</Link> para adicionar pelo perfil.
                     </p>
                   )
                 ) : watchPlayers.length ? (

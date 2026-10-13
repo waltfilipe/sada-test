@@ -20,25 +20,9 @@ export function TeamProfileMap({ formationId, assignments, playersById }: Props)
   return (
     <aside className="shadow-profile-map" aria-label="Mapa de perfis do time">
       <header className="shadow-profile-map-head">
-        <h3 className="section-label">Mapa do time</h3>
+        <h3 className="section-label">Perfis por linha</h3>
         <span className="shadow-profile-map-formation">{formation.label}</span>
       </header>
-
-      <div className="shadow-profile-map-mini-pitch" aria-hidden="true">
-        {lines.flatMap((line) =>
-          line.map((slot) => {
-            const playerId = assignments[slot.id];
-            const filled = Boolean(playerId);
-            return (
-              <span
-                key={slot.id}
-                className={`shadow-profile-map-dot${filled ? " filled" : ""}`}
-                style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
-              />
-            );
-          }),
-        )}
-      </div>
 
       <div className="shadow-profile-map-lines">
         {linesDefenseFirst.map((line, lineIdx) => {

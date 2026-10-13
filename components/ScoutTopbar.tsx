@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { LEAGUES } from "@/lib/leagues";
+import { LEAGUES, isLeagueId } from "@/lib/leagues";
 import { useLeague } from "@/components/LeagueProvider";
 
 const NAV = [
@@ -23,6 +24,16 @@ type Props = {
 
 export function ScoutTopbar({ active, subnav }: Props) {
   const { leagueId, href, name, season, brand } = useLeague();
+  const pathname = usePathname() || "/";
+
+  function leagueHref(nextId: string) {
+    const parts = pathname.split("/").filter(Boolean);
+    if (parts.length && isLeagueId(parts[0])) {
+      parts[0] = nextId;
+      return `/${parts.join("/")}`;
+    }
+    return `/${nextId}`;
+  }
 
   return (
     <div className="scout-topbar-wrap">
@@ -39,7 +50,7 @@ export function ScoutTopbar({ active, subnav }: Props) {
           {LEAGUES.map((league) => (
             <Link
               key={league.id}
-              href={`/${league.id}`}
+              href={leagueHref(league.id)}
               className={league.id === leagueId ? "active" : ""}
               aria-current={league.id === leagueId ? "true" : undefined}
             >
