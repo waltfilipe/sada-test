@@ -1,6 +1,13 @@
 import type { PositionFamily } from "@/lib/types";
 
-export type StatSectionTone = "defensivos" | "passes" | "dribles" | "final";
+export type StatSectionTone =
+  | "defensivos"
+  | "aereo"
+  | "passes"
+  | "dribles"
+  | "finais"
+  | "ofensividade"
+  | "finalizacao";
 
 export type StatSectionSpec = {
   title: string;
@@ -16,7 +23,7 @@ const ZAG_STAT_SECTIONS: StatSectionSpec[] = [
   },
   {
     title: "Aéreo",
-    tone: "defensivos",
+    tone: "aereo",
     labels: ["Aéreo"],
   },
   {
@@ -49,12 +56,12 @@ const LAT_STAT_SECTIONS: StatSectionSpec[] = [
   },
   {
     title: "Passes Finais",
-    tone: "final",
+    tone: "finais",
     labels: ["Cruzamentos", "Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
   },
   {
     title: "Ofensividade",
-    tone: "final",
+    tone: "ofensividade",
     labels: ["Ofensividade"],
   },
 ];
@@ -77,12 +84,12 @@ const MC_STAT_SECTIONS: StatSectionSpec[] = [
   },
   {
     title: "Passes Finais",
-    tone: "final",
+    tone: "finais",
     labels: ["Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
   },
   {
     title: "Ofensividade",
-    tone: "final",
+    tone: "ofensividade",
     labels: ["Finalizações", "Ofensividade"],
   },
 ];
@@ -95,7 +102,7 @@ const EX_STAT_SECTIONS: StatSectionSpec[] = [
   },
   {
     title: "Passes Finais",
-    tone: "final",
+    tone: "finais",
     labels: ["Passes Chave e Área", "Cruzamentos", "Pré Assistências e xA", "Passes Criativos"],
   },
   {
@@ -105,12 +112,12 @@ const EX_STAT_SECTIONS: StatSectionSpec[] = [
   },
   {
     title: "Finalização",
-    tone: "final",
+    tone: "finalizacao",
     labels: ["Gols e xG", "Finalizações"],
   },
   {
     title: "Ofensividade",
-    tone: "final",
+    tone: "ofensividade",
     labels: ["Ações Terminais", "Verticalidade"],
   },
   {
@@ -123,17 +130,17 @@ const EX_STAT_SECTIONS: StatSectionSpec[] = [
 const AT_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Finalização",
-    tone: "final",
+    tone: "finalizacao",
     labels: ["Gols e xG", "Finalizações", "Efetividade"],
   },
   {
     title: "Duelos Aéreos",
-    tone: "defensivos",
+    tone: "aereo",
     labels: ["Duelos Aéreos"],
   },
   {
     title: "Passes Finais",
-    tone: "final",
+    tone: "finais",
     labels: ["Passes Chave e Área", "Cruzamentos", "Pré Assistências e xA", "Passes Criativos"],
   },
   {

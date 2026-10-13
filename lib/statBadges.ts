@@ -108,6 +108,11 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
     icon: "fa-bullseye",
     title: "Finalizações — ambas métricas acima de P50",
   },
+  Efetividade: {
+    label: "Efetividade",
+    icon: "fa-percent",
+    title: "Efetividade — finalizações certas por passe recebido e gols por toque na área acima de P50",
+  },
   Ofensividade: {
     label: "Ofensividade",
     icon: "fa-fire",

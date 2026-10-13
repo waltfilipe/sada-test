@@ -3063,57 +3063,75 @@
   font-size: 0.72rem;
 }
 
-/* Badge tones by stat section group */
+/* Badge tones — one color per stat block */
 .player-badge-item.tone-defensivos,
-.stat-badge-chip.tone-defensivos {
-  border-color: rgba(96, 165, 250, 0.28);
-  background: rgba(59, 130, 246, 0.14);
+.stat-badge-chip.tone-defensivos,
+.row-badge-icon.tone-defensivos,
+.badge-filter-icon.tone-defensivos,
+.stat-badge-strip.tone-defensivos .stat-badge-chip {
+  border-color: rgba(96, 165, 250, 0.35);
+  background: rgba(59, 130, 246, 0.16);
   color: #93c5fd;
 }
 
+.player-badge-item.tone-aereo,
+.stat-badge-chip.tone-aereo,
+.row-badge-icon.tone-aereo,
+.badge-filter-icon.tone-aereo,
+.stat-badge-strip.tone-aereo .stat-badge-chip {
+  border-color: rgba(34, 211, 238, 0.35);
+  background: rgba(6, 182, 212, 0.16);
+  color: #67e8f9;
+}
+
 .player-badge-item.tone-passes,
-.stat-badge-chip.tone-passes {
-  border-color: rgba(52, 211, 153, 0.28);
-  background: rgba(16, 185, 129, 0.14);
+.stat-badge-chip.tone-passes,
+.row-badge-icon.tone-passes,
+.badge-filter-icon.tone-passes,
+.stat-badge-strip.tone-passes .stat-badge-chip {
+  border-color: rgba(52, 211, 153, 0.35);
+  background: rgba(16, 185, 129, 0.16);
   color: #6ee7b7;
 }
 
 .player-badge-item.tone-dribles,
-.stat-badge-chip.tone-dribles {
-  border-color: rgba(251, 191, 36, 0.28);
-  background: rgba(245, 158, 11, 0.14);
-  color: #fcd34d;
-}
-
-.player-badge-item.tone-final,
-.stat-badge-chip.tone-final {
-  border-color: rgba(192, 132, 252, 0.28);
-  background: rgba(168, 85, 247, 0.14);
-  color: #d8b4fe;
-}
-
-.stat-badge-strip.tone-defensivos .stat-badge-chip {
-  border-color: rgba(96, 165, 250, 0.28);
-  background: rgba(59, 130, 246, 0.14);
-  color: #93c5fd;
-}
-
-.stat-badge-strip.tone-passes .stat-badge-chip {
-  border-color: rgba(52, 211, 153, 0.28);
-  background: rgba(16, 185, 129, 0.14);
-  color: #6ee7b7;
-}
-
+.stat-badge-chip.tone-dribles,
+.row-badge-icon.tone-dribles,
+.badge-filter-icon.tone-dribles,
 .stat-badge-strip.tone-dribles .stat-badge-chip {
-  border-color: rgba(251, 191, 36, 0.28);
-  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(251, 191, 36, 0.35);
+  background: rgba(245, 158, 11, 0.16);
   color: #fcd34d;
 }
 
-.stat-badge-strip.tone-final .stat-badge-chip {
-  border-color: rgba(192, 132, 252, 0.28);
-  background: rgba(168, 85, 247, 0.14);
+.player-badge-item.tone-finais,
+.stat-badge-chip.tone-finais,
+.row-badge-icon.tone-finais,
+.badge-filter-icon.tone-finais,
+.stat-badge-strip.tone-finais .stat-badge-chip {
+  border-color: rgba(192, 132, 252, 0.35);
+  background: rgba(168, 85, 247, 0.16);
   color: #d8b4fe;
+}
+
+.player-badge-item.tone-ofensividade,
+.stat-badge-chip.tone-ofensividade,
+.row-badge-icon.tone-ofensividade,
+.badge-filter-icon.tone-ofensividade,
+.stat-badge-strip.tone-ofensividade .stat-badge-chip {
+  border-color: rgba(251, 146, 60, 0.35);
+  background: rgba(249, 115, 22, 0.16);
+  color: #fdba74;
+}
+
+.player-badge-item.tone-finalizacao,
+.stat-badge-chip.tone-finalizacao,
+.row-badge-icon.tone-finalizacao,
+.badge-filter-icon.tone-finalizacao,
+.stat-badge-strip.tone-finalizacao .stat-badge-chip {
+  border-color: rgba(251, 113, 133, 0.35);
+  background: rgba(244, 63, 94, 0.16);
+  color: #fda4af;
 }
 
 .stat-aspect-medal {
