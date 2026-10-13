@@ -1,11 +1,11 @@
 :root {
   /* Brand — blue-black base + ciano elétrico, secundárias digitais */
   --bg: #0d1b2a;
-  --bg-elevated: #12233a;
+  --bg-elevated: #0d1b2a;
   --panel: rgba(13, 27, 42, 0.88);
-  --panel-border: rgba(148, 163, 184, 0.14);
-  --text: #e5eefb;
-  --muted: #8fa1bb;
+  --panel-border: rgba(27, 231, 255, 0.14);
+  --text: #1be7ff;
+  --muted: #8980f5;
   --gold: #fed766;
   --accent: #1be7ff;
   --brand-red: #fe4a49;
@@ -29,7 +29,7 @@ body {
   background:
     radial-gradient(circle at top left, rgba(27, 231, 255, 0.06), transparent 28%),
     radial-gradient(circle at 80% 10%, rgba(137, 128, 245, 0.06), transparent 24%),
-    linear-gradient(180deg, #081525 0%, var(--bg) 100%);
+    linear-gradient(180deg, #0d1b2a 0%, var(--bg) 100%);
   color: var(--text);
   font-family: "TASA Orbiter Variable", system-ui, sans-serif;
 }
@@ -74,7 +74,7 @@ select {
   display: grid;
   place-items: center;
   background: linear-gradient(135deg, #fed766, #fed766);
-  color: #111827;
+  color: #0d1b2a;
   font-weight: 800;
 }
 
@@ -164,7 +164,7 @@ select {
 .compare-rating {
   padding: 0.8rem 1rem;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(13, 27, 42, 0.8);
   border: 1px solid var(--panel-border);
 }
 
@@ -398,7 +398,7 @@ input[type="range"] {
 .rating-box {
   padding: 0.85rem;
   border-radius: 16px;
-  background: rgba(15, 23, 42, 0.72);
+  background: rgba(13, 27, 42, 0.72);
 }
 
 .rating-box strong {
@@ -456,7 +456,7 @@ input[type="range"] {
   flex: 1;
   height: 8px;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.15);
+  background: rgba(27, 231, 255, 0.15);
   overflow: hidden;
 }
 
@@ -519,8 +519,8 @@ input[type="range"] {
   align-items: center;
   padding: 0.2rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(27, 231, 255, 0.06);
+  border: 1px solid rgba(27, 231, 255, 0.08);
 }
 
 .league-switcher a {
@@ -549,8 +549,8 @@ input[type="range"] {
   gap: 0.35rem;
   padding: 1.25rem;
   border-radius: var(--radius-lg, 16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(27, 231, 255, 0.08);
+  background: rgba(27, 231, 255, 0.03);
   text-decoration: none;
   color: inherit;
 }

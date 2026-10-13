@@ -10,24 +10,24 @@
 
 .scout-root {
   --bg: #0d1b2a;
-  --surface: #12233a;
-  --surface-2: #16304a;
-  --surface-3: #1c3a56;
+  --surface: #0d1b2a;
+  --surface-2: #0d1b2a;
+  --surface-3: #0d1b2a;
   --line: rgba(27, 231, 255, 0.16);
   --line-2: rgba(27, 231, 255, 0.32);
-  --text: #e5eefb;
-  --text-2: #8fa1bb;
-  --text-3: #6d829c;
+  --text: #1be7ff;
+  --text-2: #8980f5;
+  --text-3: #8980f5;
   --accent: #1be7ff;
 
   --radius-lg: 16px;
   --radius: 12px;
   --radius-sm: 8px;
 
-  --tier-color: #94a3b8;
-  --tier-soft: rgba(148, 163, 184, 0.12);
-  --tier-border: rgba(148, 163, 184, 0.3);
-  --tier-glow: rgba(148, 163, 184, 0.16);
+  --tier-color: #8980f5;
+  --tier-soft: rgba(27, 231, 255, 0.12);
+  --tier-border: rgba(27, 231, 255, 0.3);
+  --tier-glow: rgba(27, 231, 255, 0.16);
 
   min-height: 100vh;
   color: var(--text);
@@ -82,7 +82,7 @@
 .tone-movel,
 .profile-movel { --tone: #1be7ff; }
 .tone-hibrido,
-.profile-hibrido { --tone: #94a3b8; }
+.profile-hibrido { --tone: #8980f5; }
 .tone-hibrido-construtor,
 .profile-hibrido-construtor { --tone: #31e981; }
 .tone-hibrido-defensivo,
@@ -165,7 +165,7 @@
   gap: 2px;
   padding: 3px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(27, 231, 255, 0.035);
   border: 1px solid var(--line);
   overflow-x: auto;
   scrollbar-width: none;
@@ -186,7 +186,7 @@
 
 .position-tabs a:hover {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(27, 231, 255, 0.05);
 }
 
 .position-tabs a.active {
@@ -205,7 +205,7 @@
   margin-left: auto;
   padding: 3px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(27, 231, 255, 0.035);
   border: 1px solid var(--line);
   overflow-x: auto;
   scrollbar-width: none;
@@ -226,7 +226,7 @@
 
 .topbar-links a:hover {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(27, 231, 255, 0.05);
 }
 
 .topbar-links a.active {
@@ -263,7 +263,7 @@ select:focus-visible {
 
 .roster {
   border-right: 1px solid var(--line);
-  background: rgba(10, 14, 20, 0.6);
+  background: rgba(13, 27, 42, 0.6);
 }
 
 .roster-inner {
@@ -330,7 +330,7 @@ select:focus-visible {
 
 .roster-search button:hover {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(27, 231, 255, 0.06);
 }
 
 .roster-sort {
@@ -339,7 +339,7 @@ select:focus-visible {
   gap: 2px;
   padding: 3px;
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(27, 231, 255, 0.035);
   border: 1px solid var(--line);
 }
 
@@ -413,7 +413,7 @@ select:focus-visible {
   margin: 0 -0.3rem;
   padding: 0 0.3rem 1rem;
   scrollbar-width: thin;
-  scrollbar-color: #26303f transparent;
+  scrollbar-color: #0d1b2a transparent;
 }
 
 .roster-list::-webkit-scrollbar {
@@ -421,7 +421,7 @@ select:focus-visible {
 }
 
 .roster-list::-webkit-scrollbar-thumb {
-  background: #26303f;
+  background: #0d1b2a;
   border-radius: 99px;
 }
 
@@ -442,7 +442,7 @@ select:focus-visible {
 }
 
 .roster-item:hover {
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(27, 231, 255, 0.035);
 }
 
 .roster-item.active {
@@ -603,7 +603,7 @@ select:focus-visible {
   border: 1px solid var(--line);
   background:
     radial-gradient(620px 220px at 0% 0%, rgba(27, 231, 255, 0.05), transparent 70%),
-    linear-gradient(180deg, #151d29 0%, #0e131b 100%);
+    linear-gradient(180deg, #0d1b2a 0%, #0d1b2a 100%);
 }
 
 .dossier-portrait {
@@ -614,7 +614,7 @@ select:focus-visible {
   height: 146px;
   border-radius: var(--radius);
   overflow: hidden;
-  background: linear-gradient(180deg, #212c3d, #151c27);
+  background: linear-gradient(180deg, #0d1b2a, #0d1b2a);
   border: 1px solid var(--line-2);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
 }
@@ -732,7 +732,7 @@ select:focus-visible {
   padding: 0.95rem 1rem;
   border-radius: var(--radius);
   border: 1px solid var(--line);
-  background: rgba(8, 12, 18, 0.55);
+  background: rgba(13, 27, 42, 0.55);
 }
 
 .cluster-hierarchy-head {
@@ -757,7 +757,7 @@ select:focus-visible {
 }
 
 .cluster-path-micro {
-  color: #eef4fb;
+  color: #1be7ff;
 }
 
 .cluster-path-chevron {
@@ -789,7 +789,7 @@ select:focus-visible {
   text-transform: uppercase;
   padding: 0.15rem 0.45rem;
   border-radius: 999px;
-  color: #e9d5ff;
+  color: #8980f5;
   background: color-mix(in srgb, #8980f5 18%, transparent);
   border: 1px solid color-mix(in srgb, #8980f5 35%, transparent);
 }
@@ -822,7 +822,7 @@ select:focus-visible {
 .cluster-share-track {
   height: 0.45rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(27, 231, 255, 0.06);
   overflow: hidden;
 }
 
@@ -842,7 +842,7 @@ select:focus-visible {
 
 .cluster-share-row.active .cluster-share-label,
 .cluster-share-row.active .cluster-share-value {
-  color: #f3f7fb;
+  color: #1be7ff;
 }
 
 .cluster-map-archetypes {
@@ -870,7 +870,7 @@ select:focus-visible {
 .cluster-map-archetype strong {
   font-size: 1.15rem;
   font-weight: 600;
-  color: #f3f7fb;
+  color: #1be7ff;
 }
 
 .cluster-map-archetype em {
@@ -929,7 +929,7 @@ select:focus-visible {
   padding: 0.45rem 0.55rem;
   border-radius: 8px;
   border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(27, 231, 255, 0.02);
   color: var(--text-2);
   transition: border-color 0.15s ease, background 0.15s ease;
 }
@@ -961,7 +961,7 @@ select:focus-visible {
 }
 
 .cluster-map-leaf.active strong {
-  color: #f3f7fb;
+  color: #1be7ff;
 }
 
 .cluster-filter-groups {
@@ -988,7 +988,7 @@ select:focus-visible {
 .dossier-identity h1 {
   font-size: clamp(1.7rem, 2.6vw, 2.3rem);
   line-height: 1.08;
-  color: #f6f9fd;
+  color: #1be7ff;
 }
 
 .dossier-club {
@@ -1066,9 +1066,9 @@ select:focus-visible {
   border-radius: var(--radius);
   border: 1px solid var(--line-2);
   background:
-    radial-gradient(120px 80px at 100% 0%, rgba(255, 255, 255, 0.04), transparent 70%),
+    radial-gradient(120px 80px at 100% 0%, rgba(27, 231, 255, 0.04), transparent 70%),
     var(--surface-2);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(27, 231, 255, 0.04);
 }
 
 .dossier-rating-hero .dossier-rating-value {
@@ -1108,9 +1108,9 @@ select:focus-visible {
   border-radius: calc(var(--radius) + 2px);
   border: 1px solid var(--line);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, transparent 100%),
-    rgba(10, 14, 20, 0.35);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    linear-gradient(180deg, rgba(27, 231, 255, 0.025) 0%, transparent 100%),
+    rgba(13, 27, 42, 0.35);
+  box-shadow: inset 0 1px 0 rgba(27, 231, 255, 0.03);
 }
 
 .dossier-rating-axis {
@@ -1165,7 +1165,7 @@ select:focus-visible {
 
 .dial-track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.1);
+  stroke: rgba(27, 231, 255, 0.1);
 }
 
 .dial-reference {
@@ -1263,8 +1263,8 @@ select:focus-visible {
   border: 1px solid color-mix(in srgb, var(--rating-accent, var(--tier-color)) 28%, var(--line));
   background:
     radial-gradient(120px 90px at 100% 0%, color-mix(in srgb, var(--rating-accent, var(--tier-color)) 14%, transparent), transparent 70%),
-    rgba(10, 14, 20, 0.55);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    rgba(13, 27, 42, 0.55);
+  box-shadow: inset 0 1px 0 rgba(27, 231, 255, 0.04);
 }
 
 .dossier-rating-ring {
@@ -1282,7 +1282,7 @@ select:focus-visible {
 
 .dossier-rating-ring-track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.08);
+  stroke: rgba(27, 231, 255, 0.08);
   stroke-width: 7;
 }
 
@@ -1327,7 +1327,7 @@ select:focus-visible {
 .dossier-rating-rank {
   font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-weight: 600;
-  color: #eef4fb;
+  color: #1be7ff;
 }
 
 .dossier-rating-gradient .dossier-rating-ring-fill {
@@ -1346,7 +1346,7 @@ select:focus-visible {
   height: 4px;
   margin-top: 0.35rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(27, 231, 255, 0.08);
   overflow: hidden;
 }
 
@@ -1384,7 +1384,7 @@ select:focus-visible {
 .dossier-minutes-track {
   height: 3px;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.14);
+  background: rgba(27, 231, 255, 0.14);
   overflow: hidden;
 }
 
@@ -1420,7 +1420,7 @@ select:focus-visible {
   border: 1px solid var(--line);
   background:
     radial-gradient(360px 180px at 50% 0%, rgba(27, 231, 255, 0.05), transparent 72%),
-    linear-gradient(180deg, #10161f 0%, #0b1017 100%);
+    linear-gradient(180deg, #0d1b2a 0%, #0d1b2a 100%);
 }
 
 .archetype-radar-svg {
@@ -1431,12 +1431,12 @@ select:focus-visible {
 }
 
 .archetype-radar-grid {
-  stroke: rgba(255, 255, 255, 0.08);
+  stroke: rgba(27, 231, 255, 0.08);
   stroke-width: 1;
 }
 
 .archetype-radar-spoke {
-  stroke: rgba(255, 255, 255, 0.1);
+  stroke: rgba(27, 231, 255, 0.1);
   stroke-width: 1;
 }
 
@@ -1449,7 +1449,7 @@ select:focus-visible {
 
 .archetype-radar-dot {
   fill: var(--tone);
-  stroke: rgba(255, 255, 255, 0.92);
+  stroke: rgba(27, 231, 255, 0.92);
   stroke-width: 1.2;
 }
 
@@ -1476,8 +1476,8 @@ select:focus-visible {
   gap: 0.08rem;
   padding: 0.35rem 0.45rem;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(27, 231, 255, 0.05);
+  background: rgba(27, 231, 255, 0.02);
   font-size: 0.62rem;
   color: var(--text-3);
 }
@@ -1490,7 +1490,7 @@ select:focus-visible {
 .archetype-radar-legend strong {
   font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.82rem;
-  color: #eef4fb;
+  color: #1be7ff;
 }
 
 .aspect-group-def {
@@ -1505,7 +1505,7 @@ select:focus-visible {
   border: 1px solid var(--line);
   background:
     radial-gradient(420px 160px at 0% 0%, rgba(27, 231, 255, 0.06), transparent 70%),
-    linear-gradient(180deg, #121821 0%, #0d1118 100%);
+    linear-gradient(180deg, #0d1b2a 0%, #0d1b2a 100%);
   height: 100%;
   min-height: 0;
 }
@@ -1520,7 +1520,7 @@ select:focus-visible {
   border: 1px solid var(--line);
   background:
     radial-gradient(420px 160px at 100% 0%, rgba(27, 231, 255, 0.04), transparent 70%),
-    linear-gradient(180deg, #121821 0%, #0d1118 100%);
+    linear-gradient(180deg, #0d1b2a 0%, #0d1b2a 100%);
 }
 
 .dossier-profile-card-panel > header {
@@ -1608,7 +1608,7 @@ select:focus-visible {
   padding: 0.45rem 0.55rem;
   border-radius: 8px;
   border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(27, 231, 255, 0.02);
   cursor: default;
 }
 
@@ -1663,7 +1663,7 @@ select:focus-visible {
   border-radius: 10px;
   border: 1px solid color-mix(in srgb, var(--tone) 35%, var(--line));
   background:
-    linear-gradient(180deg, rgba(18, 24, 33, 0.98) 0%, rgba(10, 14, 20, 0.98) 100%);
+    linear-gradient(180deg, rgba(13, 27, 42, 0.98) 0%, rgba(13, 27, 42, 0.98) 100%);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
   opacity: 0;
   visibility: hidden;
@@ -1705,11 +1705,11 @@ select:focus-visible {
 }
 
 .archetype-tip-trait.is-up {
-  color: #86efac;
+  color: #31e981;
 }
 
 .archetype-tip-trait.is-down {
-  color: #fca5a5;
+  color: #fe4a49;
 }
 
 .archetype-tip-arrow {
@@ -1724,7 +1724,7 @@ select:focus-visible {
   border: 1px solid var(--line);
   background:
     radial-gradient(520px 180px at 0% 0%, rgba(49, 233, 129, 0.05), transparent 70%),
-    linear-gradient(180deg, #121821 0%, #0d1118 100%);
+    linear-gradient(180deg, #0d1b2a 0%, #0d1b2a 100%);
 }
 
 .dossier-profile-card .cluster-hierarchy {
@@ -1775,7 +1775,7 @@ select:focus-visible {
 }
 
 .bar-market .bar-item strong {
-  color: #d9f7ee;
+  color: #31e981;
 }
 
 /* Minutes played — shared across dossier, compare and filters */
@@ -1796,7 +1796,7 @@ select:focus-visible {
 .minutes-value {
   font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-weight: 700;
-  color: #eef6ff;
+  color: #1be7ff;
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
@@ -1822,7 +1822,7 @@ select:focus-visible {
   width: min(100%, 9.5rem);
   height: 4px;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.16);
+  background: rgba(27, 231, 255, 0.16);
   overflow: hidden;
 }
 
@@ -2058,7 +2058,7 @@ select:focus-visible {
 .meter {
   height: 5px;
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(27, 231, 255, 0.07);
   overflow: hidden;
 }
 
@@ -2111,7 +2111,7 @@ select:focus-visible {
   align-items: center;
   gap: 0.6rem;
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(27, 231, 255, 0.04);
 }
 
 .dna-legend li:last-child {
@@ -2189,7 +2189,7 @@ select:focus-visible {
 }
 
 .skill-row:hover {
-  background: rgba(255, 255, 255, 0.025);
+  background: rgba(27, 231, 255, 0.025);
 }
 
 .skill-label {
@@ -2219,7 +2219,7 @@ select:focus-visible {
 .skill-track {
   height: 7px;
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(27, 231, 255, 0.07);
   overflow: hidden;
 }
 
@@ -2338,18 +2338,18 @@ select:focus-visible {
 
 .aspect-row-expand {
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, rgba(255, 255, 255, 0.008) 100%);
+  border: 1px solid rgba(27, 231, 255, 0.04);
+  background: linear-gradient(180deg, rgba(27, 231, 255, 0.025) 0%, rgba(27, 231, 255, 0.008) 100%);
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .aspect-row-expand:hover {
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(27, 231, 255, 0.08);
 }
 
 .aspect-row-expand.is-open {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(27, 231, 255, 0.1);
+  background: rgba(27, 231, 255, 0.03);
 }
 
 .aspect-row-expand.has-medal-gold {
@@ -2392,7 +2392,7 @@ select:focus-visible {
   display: grid;
   gap: 0.55rem;
   padding-top: 0.15rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(27, 231, 255, 0.05);
 }
 
 .aspect-bar-row {
@@ -2428,15 +2428,15 @@ select:focus-visible {
 .aspect-row-metric {
   padding: 0.55rem 0.62rem 0.62rem;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(27, 231, 255, 0.04);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, rgba(255, 255, 255, 0.008) 100%);
+    linear-gradient(180deg, rgba(27, 231, 255, 0.025) 0%, rgba(27, 231, 255, 0.008) 100%);
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .aspect-row-metric:hover {
-  border-color: rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(27, 231, 255, 0.08);
+  background: rgba(27, 231, 255, 0.03);
 }
 
 .aspect-metric-head {
@@ -2469,7 +2469,7 @@ select:focus-visible {
 .aspect-metric-bar {
   height: 6px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(27, 231, 255, 0.06);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.22);
 }
 
@@ -2496,7 +2496,7 @@ select:focus-visible {
   gap: 0.5rem;
   margin-top: 0.35rem;
   padding-top: 0.32rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(27, 231, 255, 0.05);
 }
 
 .aspect-metric-eff-label,
@@ -2569,7 +2569,7 @@ select:focus-visible {
   bottom: 0;
   width: 1px;
   transform: translateX(-50%);
-  background: rgba(148, 163, 184, 0.35);
+  background: rgba(27, 231, 255, 0.35);
   z-index: 1;
   pointer-events: none;
 }
@@ -2585,7 +2585,7 @@ select:focus-visible {
   width: 1px;
   height: 0.28rem;
   transform: translateX(-50%);
-  background: rgba(148, 163, 184, 0.55);
+  background: rgba(27, 231, 255, 0.55);
   border-radius: 1px;
 }
 
@@ -2596,13 +2596,13 @@ select:focus-visible {
   font-size: 0.56rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(27, 231, 255, 0.42);
 }
 
 .spectrum-fill-foot span.is-active {
-  color: #fff;
+  color: #1be7ff;
   font-weight: 700;
-  text-shadow: 0 0 14px rgba(255, 255, 255, 0.18);
+  text-shadow: 0 0 14px rgba(27, 231, 255, 0.18);
 }
 
 .constr-share-bar {
@@ -2620,7 +2620,7 @@ select:focus-visible {
 .constr-share-label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #dbe5f1;
+  color: #1be7ff;
   letter-spacing: 0.01em;
 }
 
@@ -2650,8 +2650,8 @@ select:focus-visible {
   height: 0.38rem;
   width: 100%;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(27, 231, 255, 0.07);
+  border: 1px solid rgba(27, 231, 255, 0.05);
 }
 
 .constr-share-rail::after {
@@ -2661,7 +2661,7 @@ select:focus-visible {
   top: 0;
   bottom: 0;
   width: 1px;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(27, 231, 255, 0.18);
   transform: translateX(-50%);
 }
 
@@ -2672,7 +2672,7 @@ select:focus-visible {
   height: 0.95rem;
   transform: translate(-50%, -50%);
   border-radius: 1px;
-  background: rgba(255, 255, 255, 0.42);
+  background: rgba(27, 231, 255, 0.42);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
   z-index: 1;
 }
@@ -2684,7 +2684,7 @@ select:focus-visible {
   bottom: calc(100% + 2px);
   transform: translateX(-50%);
   border: 3px solid transparent;
-  border-top-color: rgba(255, 255, 255, 0.35);
+  border-top-color: rgba(27, 231, 255, 0.35);
 }
 
 .constr-share-dot {
@@ -2695,7 +2695,7 @@ select:focus-visible {
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: var(--tier-color);
-  border: 2px solid rgba(255, 255, 255, 0.92);
+  border: 2px solid rgba(27, 231, 255, 0.92);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 0 10px var(--tier-glow);
   z-index: 2;
 }
@@ -2748,7 +2748,7 @@ select:focus-visible {
   top: 0;
   bottom: 0;
   width: 1px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(27, 231, 255, 0.2);
   transform: translateX(-50%);
   z-index: 1;
   pointer-events: none;
@@ -2761,9 +2761,9 @@ select:focus-visible {
   height: 0.62rem;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: #fff;
-  border: 2px solid rgba(15, 23, 42, 0.85);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 12px rgba(255, 255, 255, 0.25);
+  background: #1be7ff;
+  border: 2px solid rgba(13, 27, 42, 0.85);
+  box-shadow: 0 0 0 1px rgba(27, 231, 255, 0.35), 0 0 12px rgba(27, 231, 255, 0.25);
   z-index: 2;
 }
 
@@ -2787,8 +2787,8 @@ select:focus-visible {
   min-width: 168px;
   padding: 0.55rem 0.65rem;
   border-radius: 9px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: linear-gradient(180deg, rgba(18, 24, 33, 0.98) 0%, rgba(10, 14, 20, 0.98) 100%);
+  border: 1px solid rgba(27, 231, 255, 0.22);
+  background: linear-gradient(180deg, rgba(13, 27, 42, 0.98) 0%, rgba(13, 27, 42, 0.98) 100%);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.42);
   opacity: 0;
   visibility: hidden;
@@ -2803,15 +2803,15 @@ select:focus-visible {
   left: 50%;
   transform: translateX(-50%);
   border: 6px solid transparent;
-  border-top-color: rgba(10, 14, 20, 0.98);
-  filter: drop-shadow(0 1px 0 rgba(148, 163, 184, 0.12));
+  border-top-color: rgba(13, 27, 42, 0.98);
+  filter: drop-shadow(0 1px 0 rgba(27, 231, 255, 0.12));
 }
 
 .constr-gradient-tip strong {
   font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.76rem;
   font-weight: 600;
-  color: #f3f7fb;
+  color: #1be7ff;
 }
 
 .constr-gradient-tip em {
@@ -2839,7 +2839,7 @@ select:focus-visible {
   font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.92rem;
   font-weight: 700;
-  color: #eef4fb;
+  color: #1be7ff;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -2853,7 +2853,7 @@ select:focus-visible {
   flex-shrink: 0;
   border-radius: 4px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(27, 231, 255, 0.06);
 }
 
 .club-logo img {
@@ -2872,7 +2872,7 @@ select:focus-visible {
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--text-2);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(27, 231, 255, 0.05);
 }
 
 .accuracy-badge {
@@ -2933,11 +2933,11 @@ select:focus-visible {
 }
 
 .aspect-row-trigger:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(27, 231, 255, 0.03);
 }
 
 .aspect-row.is-open .aspect-row-trigger {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(27, 231, 255, 0.04);
 }
 
 .aspect-name {
@@ -3009,7 +3009,7 @@ select:focus-visible {
 .aspect-stat-bar {
   height: 6px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(27, 231, 255, 0.06);
   overflow: hidden;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
 }
@@ -3026,7 +3026,7 @@ select:focus-visible {
 }
 
 .aspect-metric-bar i {
-  box-shadow: 0 0 8px color-mix(in srgb, #8ecf9a 28%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, #31e981 28%, transparent);
 }
 
 /* Pass aspects — certos/90 bar + accuracy badge */

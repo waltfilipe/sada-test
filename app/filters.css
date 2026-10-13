@@ -13,7 +13,7 @@
 
 .filters-rail {
   border-right: 1px solid var(--line);
-  background: rgba(10, 14, 20, 0.6);
+  background: rgba(13, 27, 42, 0.6);
 }
 
 .filters-rail-inner {
@@ -26,7 +26,7 @@
   overflow-y: auto;
   padding: 1.1rem 1.15rem 2.5rem;
   scrollbar-width: thin;
-  scrollbar-color: #26303f transparent;
+  scrollbar-color: #0d1b2a transparent;
 }
 
 .filters-rail-inner::-webkit-scrollbar {
@@ -34,7 +34,7 @@
 }
 
 .filters-rail-inner::-webkit-scrollbar-thumb {
-  background: #26303f;
+  background: #0d1b2a;
   border-radius: 99px;
 }
 
@@ -206,7 +206,7 @@
 
 .filter-field select option,
 .results-sort select option {
-  background: #131a24;
+  background: #0d1b2a;
   color: var(--text);
 }
 
@@ -218,7 +218,7 @@
   gap: 2px;
   padding: 3px;
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(27, 231, 255, 0.035);
   border: 1px solid var(--line);
 }
 
@@ -306,7 +306,7 @@
 .range-rail {
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(27, 231, 255, 0.08);
 }
 
 .range-fill {
@@ -341,15 +341,15 @@
   height: 14px;
   margin-top: 4px;
   border-radius: 50%;
-  background: #f1f5f9;
-  border: 2px solid #0b1018;
+  background: #1be7ff;
+  border: 2px solid #0d1b2a;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.55);
   cursor: grab;
   transition: transform 0.12s ease, background 0.12s ease;
 }
 
 .range-slider-rail input[type="range"]::-webkit-slider-thumb:hover {
-  background: #ffffff;
+  background: #1be7ff;
   transform: scale(1.12);
 }
 
@@ -368,8 +368,8 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #f1f5f9;
-  border: 2px solid #0b1018;
+  background: #1be7ff;
+  border: 2px solid #0d1b2a;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.55);
   cursor: grab;
 }
@@ -524,7 +524,7 @@
   align-self: stretch;
   border-radius: 10px;
   overflow: hidden;
-  background: linear-gradient(180deg, #212c3d, #151c27);
+  background: linear-gradient(180deg, #0d1b2a, #0d1b2a);
   border: 1px solid var(--line-2);
   text-decoration: none;
   color: inherit;
@@ -668,7 +668,7 @@
   padding: 0.32rem 0.5rem;
   border-radius: 10px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(27, 231, 255, 0.03);
 }
 
 .row-stat-chip span {
@@ -714,7 +714,7 @@
 
 .result-row .heatmap-compact-empty {
   border-radius: 8px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  border: 1px solid rgba(27, 231, 255, 0.16);
   background: linear-gradient(180deg, #1c7a45, #145c34);
 }
 
@@ -878,7 +878,7 @@
   height: 4px;
   margin-top: 0.15rem;
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(27, 231, 255, 0.07);
   overflow: hidden;
 }
 
@@ -959,7 +959,7 @@
   font-family: "TASA Orbiter Variable", system-ui, sans-serif;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #d9f7ee;
+  color: #31e981;
 }
 
 /* Empty state */
