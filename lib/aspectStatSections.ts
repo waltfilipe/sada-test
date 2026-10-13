@@ -124,7 +124,7 @@ const AT_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Finalização",
     tone: "final",
-    labels: ["Gols e xG", "Finalizações"],
+    labels: ["Gols e xG", "Finalizações", "Efetividade"],
   },
   {
     title: "Duelos Aéreos",

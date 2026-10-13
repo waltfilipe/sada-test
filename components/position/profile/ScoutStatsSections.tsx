@@ -18,12 +18,11 @@ function rowLabel(label: string): string {
     label === "Eficiência" ||
     label === "Eficiência Defensiva" ||
     label === "Erros Totais" ||
-    label === "Eficiência de finalização" ||
-    label === "Efetividade"
+    label === "Eficiência de finalização"
   ) {
     return label;
   }
-  if (label.includes("/90") || label.includes("/ 90")) return label;
+  if (label.includes(" / ") || label.includes("/90") || label.includes("/ 90")) return label;
   return `${label}/90`;
 }
 

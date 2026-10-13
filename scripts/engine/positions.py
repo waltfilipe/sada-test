@@ -1081,11 +1081,12 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         eff_fin = eff_fin.fillna(0)
     shots_on_target = fin_vol_raw * eff_fin
     goals_p90 = _feat_col(out, "Golos/90", "Gols").astype(float)
-    efetividade = (shots_on_target / rec.replace(0, np.nan)).fillna(0) + (
-        goals_p90 / toques.replace(0, np.nan)
-    ).fillna(0)
-    out["_fin_efetividade_raw"] = efetividade.astype(float)
-    mappings["fin_efetividade"] = percentile_rank(efetividade, ascending=True)
+    certas_por_passe = (shots_on_target / rec.replace(0, np.nan)).fillna(0)
+    gols_por_toque = (goals_p90 / toques.replace(0, np.nan)).fillna(0)
+    out["_fin_certas_por_passe"] = certas_por_passe.astype(float)
+    out["_gols_por_toque_area"] = gols_por_toque.astype(float)
+    mappings["fin_certas_por_passe"] = percentile_rank(certas_por_passe, ascending=True)
+    mappings["gols_por_toque_area"] = percentile_rank(gols_por_toque, ascending=True)
     touch_share = (toques / rec.replace(0, np.nan)).fillna(0.0)
     out["_touch_area_share"] = touch_share
     mappings["touch_area_share"] = percentile_rank(touch_share, ascending=True)
@@ -1584,18 +1585,27 @@ def _build_at_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
             eff_display=_raw_eff_display(row, "Duelos aéreos ganhos, %", "%DuelosAr"),
         ),
     ]
-    for item in aspects.get("finalizacao", []):
-        if item.get("label") != "Finalizações":
-            continue
-        subs = list(item.get("sub_metrics") or [])
-        subs.append(
-            _sub_metric(
-                "Efetividade",
-                percentile=row.get("_asp_fin_efetividade", 0),
-                display_value=_fmt_num(float(row.get("_fin_efetividade_raw") or 0), decimals=2),
-            )
+    aspects.setdefault("finalizacao", []).append(
+        _metric_group_aspect(
+            "Efetividade",
+            percentile=max(
+                float(row.get("_asp_fin_certas_por_passe") or 0),
+                float(row.get("_asp_gols_por_toque_area") or 0),
+            ),
+            sub_metrics=[
+                _sub_metric(
+                    "Finalizações certas / passe recebido",
+                    percentile=row.get("_asp_fin_certas_por_passe", 0),
+                    display_value=_fmt_num(float(row.get("_fin_certas_por_passe") or 0), decimals=2),
+                ),
+                _sub_metric(
+                    "Gols / toques na área",
+                    percentile=row.get("_asp_gols_por_toque_area", 0),
+                    display_value=_fmt_num(float(row.get("_gols_por_toque_area") or 0), decimals=2),
+                ),
+            ],
         )
-        item["sub_metrics"] = subs
+    )
     return aspects
 
 

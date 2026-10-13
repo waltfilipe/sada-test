@@ -205,16 +205,30 @@
             "label": "Finalizações certas",
             "percentile": 25.8,
             "display_value": "34%"
-          },
-          {
-            "label": "Efetividade",
-            "percentile": 76.2,
-            "display_value": "0,21"
           }
         ],
         "stats": [],
         "efficiency_pct": 25.8,
         "efficiency_value": "34%"
+      },
+      {
+        "label": "Efetividade",
+        "kind": "metric_group",
+        "grade": "B+",
+        "percentile": 76.2,
+        "sub_metrics": [
+          {
+            "label": "Finalizações certas / passe recebido",
+            "percentile": 76.2,
+            "display_value": "0,09"
+          },
+          {
+            "label": "Gols / toques na área",
+            "percentile": 65.8,
+            "display_value": "0,11"
+          }
+        ],
+        "stats": []
       }
     ],
     "conducao_drible": [
