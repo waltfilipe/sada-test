@@ -1073,6 +1073,19 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     }
     toques = _feat_col(out, "Toques na área/90", "ToquesArea").astype(float)
     rec = _feat_col(out, "Passes recebidos/90", "RecPasse").astype(float)
+    fin_vol_raw = _feat_col(out, "Remates/90", "Finalizações").astype(float)
+    eff_fin = pd.to_numeric(out.get("%EffFin"), errors="coerce")
+    if eff_fin.isna().all() or float(eff_fin.fillna(0).max() or 0) > 1.5:
+        eff_fin = pd.to_numeric(out.get("Remates à baliza, %"), errors="coerce").fillna(0) / 100.0
+    else:
+        eff_fin = eff_fin.fillna(0)
+    shots_on_target = fin_vol_raw * eff_fin
+    goals_p90 = _feat_col(out, "Golos/90", "Gols").astype(float)
+    efetividade = (shots_on_target / rec.replace(0, np.nan)).fillna(0) + (
+        goals_p90 / toques.replace(0, np.nan)
+    ).fillna(0)
+    out["_fin_efetividade_raw"] = efetividade.astype(float)
+    mappings["fin_efetividade"] = percentile_rank(efetividade, ascending=True)
     touch_share = (toques / rec.replace(0, np.nan)).fillna(0.0)
     out["_touch_area_share"] = touch_share
     mappings["touch_area_share"] = percentile_rank(touch_share, ascending=True)
@@ -1571,6 +1584,18 @@ def _build_at_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
             eff_display=_raw_eff_display(row, "Duelos aéreos ganhos, %", "%DuelosAr"),
         ),
     ]
+    for item in aspects.get("finalizacao", []):
+        if item.get("label") != "Finalizações":
+            continue
+        subs = list(item.get("sub_metrics") or [])
+        subs.append(
+            _sub_metric(
+                "Efetividade",
+                percentile=row.get("_asp_fin_efetividade", 0),
+                display_value=_fmt_num(float(row.get("_fin_efetividade_raw") or 0), decimals=2),
+            )
+        )
+        item["sub_metrics"] = subs
     return aspects
 
 

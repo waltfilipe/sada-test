@@ -122,14 +122,14 @@ const EX_STAT_SECTIONS: StatSectionSpec[] = [
 
 const AT_STAT_SECTIONS: StatSectionSpec[] = [
   {
+    title: "Finalização",
+    tone: "final",
+    labels: ["Gols e xG", "Finalizações"],
+  },
+  {
     title: "Duelos Aéreos",
     tone: "defensivos",
     labels: ["Duelos Aéreos"],
-  },
-  {
-    title: "Passes",
-    tone: "passes",
-    labels: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
   },
   {
     title: "Passes Finais",
@@ -140,16 +140,6 @@ const AT_STAT_SECTIONS: StatSectionSpec[] = [
     title: "Condução e Drible",
     tone: "dribles",
     labels: ["Disputas com Bola", "1v1 - Ofensivo", "Progressão"],
-  },
-  {
-    title: "Finalização",
-    tone: "final",
-    labels: ["Gols e xG", "Finalizações"],
-  },
-  {
-    title: "Ofensividade",
-    tone: "final",
-    labels: ["Ações Terminais", "Verticalidade"],
   },
 ];
 

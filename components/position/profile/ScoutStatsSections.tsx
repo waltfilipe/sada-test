@@ -18,7 +18,8 @@ function rowLabel(label: string): string {
     label === "Eficiência" ||
     label === "Eficiência Defensiva" ||
     label === "Erros Totais" ||
-    label === "Eficiência de finalização"
+    label === "Eficiência de finalização" ||
+    label === "Efetividade"
   ) {
     return label;
   }
