@@ -10,5 +10,5 @@ import runpy
 from pathlib import Path
 
 if __name__ == "__main__":
-    script = Path(__file__).resolve().parent / "scripts" / "fetch_sofascore_photos.py"
+    script = Path(__file__).resolve().parent / "allmatch" / "photo&mercado.py"
     runpy.run_path(str(script), run_name="__main__")

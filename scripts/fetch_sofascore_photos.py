@@ -231,6 +231,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--warmup-wait", type=int, default=8000)
     parser.add_argument("--load-storage", type=Path, default=None)
     parser.add_argument("--user-data-dir", type=Path, default=None)
+    parser.add_argument(
+        "--apply-site",
+        action="store_true",
+        help="Após baixar, preenche foto/valor faltando em data/<league>/ (Transfermarkt block)",
+    )
+    parser.add_argument("--league", default="serie-c", help="Liga alvo com --apply-site (default: serie-c)")
+    parser.add_argument("--dry-run-apply", action="store_true", help="Só simula o --apply-site")
     return parser.parse_args()
 
 
@@ -274,12 +281,14 @@ def main() -> None:
             elif args.resume and (cached_photo := existing_photo(args.output, player_id)):
                 photos_skip += 1
                 entry["file"] = cached_photo.name
+                entry["photo_url"] = IMAGE_URL.format(player_id=player_id)
                 entry["photo_status"] = "cached"
             else:
                 try:
                     saved = download_photo(photo_session, player_id, args.output / player_id, args.timeout)
                     photos_ok += 1
                     entry["file"] = saved.name
+                    entry["photo_url"] = IMAGE_URL.format(player_id=player_id)
                     entry["photo_status"] = "ok"
                 except FileNotFoundError:
                     photos_missing += 1
@@ -341,6 +350,17 @@ def main() -> None:
         parts.append(f"mercado ok={market_ok} vazio={market_empty} cache={market_skip} err={market_failed}")
     log("Pronto. " + " | ".join(parts))
     log(f"Pasta: {args.output.resolve()}")
+
+    if args.apply_site:
+        from apply_sofascore_to_site import apply_manifest
+
+        log(f"\nAplicando no site ({args.league})…")
+        apply_manifest(
+            args.league,
+            args.csv,
+            manifest_path,
+            dry_run=args.dry_run_apply,
+        )
 
 
 if __name__ == "__main__":
