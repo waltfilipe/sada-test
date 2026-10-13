@@ -27,7 +27,7 @@ export const LEAGUES: LeagueInfo[] = [
     season: "2026 · 1ª fase",
     brand: "SC",
     tagline: "Primeira fase",
-    heatmaps: false,
+    heatmaps: true,
   },
 ];
 

@@ -206,15 +206,16 @@ def import_heatmaps_from_br26(
     source_dir: Path | None = None,
     out_dir: Path | None = None,
     public_dir: Path | None = None,
+    csv_path: Path | None = None,
 ) -> int:
-    """Copy HeatmapsBR26 JSONs into data/heatmaps and PNGs into public/heatmaps."""
+    """Copy downloaded heatmap JSONs into data/heatmaps and PNGs into public/heatmaps."""
     source = source_dir or HEATMAPS_BR26_DIR
     target = out_dir or HEATMAP_DIR
     public_target = public_dir or PUBLIC_HEATMAP_DIR
     if not source.exists():
         return 0
 
-    mapping = build_sofascore_player_map(df)
+    mapping = build_sofascore_player_map(df, csv_path)
     ss_to_site: dict[str, str] = {}
     for site_id, meta in mapping.items():
         ss_id = str(meta["sofascore_player_id"])

@@ -58,8 +58,12 @@ def build_league(league_id: str) -> None:
     all_players = enrich_players_with_transfermarkt(all_players)
 
     if league["heatmaps"]:
-        imported = import_heatmaps_from_br26(raw_df)
-        print(f"  Heatmaps importados de HeatmapsBR26: {imported}")
+        imported = import_heatmaps_from_br26(
+            raw_df,
+            source_dir=league["heatmaps_dir"],
+            csv_path=league["defensive_csv"],
+        )
+        print(f"  Heatmaps importados de {league['heatmaps_dir'].name if league['heatmaps_dir'] else 'HeatmapsBR26'}: {imported}")
         attached = attach_heatmaps_to_players(all_players)
         print(f"  Heatmaps anexados: {attached}/{len(all_players)}")
     else:
