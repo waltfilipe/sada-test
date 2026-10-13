@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLeague } from "@/components/LeagueProvider";
 import {
+  addReserve,
   addToSquad,
   addToWatchlist,
   assignPlayer,
@@ -16,6 +17,7 @@ import {
   dropPlayerOnSlot,
   swapSlots,
   type ShadowTeamState,
+  type TeamBoard,
 } from "@/lib/shadowTeamStorage";
 import type { PositionFamily } from "@/lib/types";
 
@@ -74,25 +76,33 @@ export function useShadowTeam() {
   );
 
   const assign = useCallback(
-    (slotId: string, playerId: string | null) => {
+    (slotId: string, playerId: string | null, board: TeamBoard = "sombra") => {
       if (!state) return;
-      persist(assignPlayer(state, slotId, playerId));
+      persist(assignPlayer(state, slotId, playerId, board));
     },
     [state, persist],
   );
 
   const swap = useCallback(
-    (slotA: string, slotB: string) => {
+    (slotA: string, slotB: string, board: TeamBoard = "sombra") => {
       if (!state) return;
-      persist(swapSlots(state, slotA, slotB));
+      persist(swapSlots(state, slotA, slotB, board));
     },
     [state, persist],
   );
 
   const dropOnSlot = useCallback(
-    (sourceSlotId: string | null, targetSlotId: string, playerId: string) => {
+    (sourceSlotId: string | null, targetSlotId: string, playerId: string, board: TeamBoard = "sombra") => {
       if (!state) return;
-      persist(dropPlayerOnSlot(state, sourceSlotId, targetSlotId, playerId));
+      persist(dropPlayerOnSlot(state, sourceSlotId, targetSlotId, playerId, board));
+    },
+    [state, persist],
+  );
+
+  const reserve = useCallback(
+    (playerId: string, board: TeamBoard) => {
+      if (!state) return;
+      persist(addReserve(state, playerId, board));
     },
     [state, persist],
   );
@@ -123,10 +133,12 @@ export function useShadowTeam() {
     assign,
     swap,
     dropOnSlot,
+    reserve,
     changeFormation,
     isWatchlisted,
     isInSquad,
-    removeFromSquad: (playerId: string) => state && persist(removeFromSquad(state, playerId)),
+    removeFromSquad: (playerId: string, board: TeamBoard = "sombra") =>
+      state && persist(removeFromSquad(state, playerId, board)),
     removeFromWatchlist: (playerId: string) => state && persist(removeFromWatchlist(state, playerId)),
   };
 }

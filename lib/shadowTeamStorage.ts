@@ -22,14 +22,19 @@ export const STORAGE_KEY = "serie-a-scout:shadow-team-v1";
 /** @deprecated use shadowChangeEvent(league) */
 export const SHADOW_CHANGE_EVENT = "serie-a-scout:shadow-change";
 
+export type TeamBoard = "sombra" | "proprio";
+
 export type ShadowTeamState = {
   formationId: string;
   /** Players in the shadow squad (may be on pitch or bench). */
   squadIds: string[];
   /** Observation list — independent from the shadow squad. */
   watchlistIds: string[];
-  /** slotId → playerId */
+  /** slotId → playerId (time sombra) */
   assignments: Record<string, string | null>;
+  /** Time próprio — mesma formação, elenco separado. */
+  ownSquadIds: string[];
+  ownAssignments: Record<string, string | null>;
 };
 
 export const EMPTY_STATE: ShadowTeamState = {
@@ -37,6 +42,8 @@ export const EMPTY_STATE: ShadowTeamState = {
   squadIds: [],
   watchlistIds: [],
   assignments: {},
+  ownSquadIds: [],
+  ownAssignments: {},
 };
 
 function emptyAssignments(formation: Formation): Record<string, string | null> {
@@ -47,7 +54,10 @@ export function loadShadowTeamState(league: LeagueId = "serie-a"): ShadowTeamSta
   if (typeof window === "undefined") return { ...EMPTY_STATE };
   try {
     const raw = localStorage.getItem(storageKey(league));
-    if (!raw) return { ...EMPTY_STATE, assignments: emptyAssignments(formationById(DEFAULT_FORMATION_ID)) };
+    if (!raw) {
+      const base = emptyAssignments(formationById(DEFAULT_FORMATION_ID));
+      return { ...EMPTY_STATE, assignments: base, ownAssignments: { ...base } };
+    }
     const parsed = JSON.parse(raw) as Partial<ShadowTeamState>;
     const formationId = parsed.formationId ?? DEFAULT_FORMATION_ID;
     const formation = formationById(formationId);
@@ -57,9 +67,12 @@ export function loadShadowTeamState(league: LeagueId = "serie-a"): ShadowTeamSta
       squadIds: parsed.squadIds ?? [],
       watchlistIds: parsed.watchlistIds ?? [],
       assignments: { ...base, ...(parsed.assignments ?? {}) },
+      ownSquadIds: parsed.ownSquadIds ?? [],
+      ownAssignments: { ...base, ...(parsed.ownAssignments ?? {}) },
     };
   } catch {
-    return { ...EMPTY_STATE, assignments: emptyAssignments(formationById(DEFAULT_FORMATION_ID)) };
+    const base = emptyAssignments(formationById(DEFAULT_FORMATION_ID));
+    return { ...EMPTY_STATE, assignments: base, ownAssignments: { ...base } };
   }
 }
 
@@ -71,6 +84,24 @@ export function saveShadowTeamState(state: ShadowTeamState, league: LeagueId = "
 
 function takenSlots(assignments: Record<string, string | null>): Set<string> {
   return new Set(Object.entries(assignments).filter(([, v]) => v).map(([k]) => k));
+}
+
+export function boardSquad(state: ShadowTeamState, board: TeamBoard): string[] {
+  return board === "proprio" ? state.ownSquadIds : state.squadIds;
+}
+
+export function boardAssignments(state: ShadowTeamState, board: TeamBoard): Record<string, string | null> {
+  return board === "proprio" ? state.ownAssignments : state.assignments;
+}
+
+function writeBoard(
+  state: ShadowTeamState,
+  board: TeamBoard,
+  squadIds: string[],
+  assignments: Record<string, string | null>,
+): ShadowTeamState {
+  if (board === "proprio") return { ...state, ownSquadIds: squadIds, ownAssignments: assignments };
+  return { ...state, squadIds, assignments };
 }
 
 export function addToWatchlist(state: ShadowTeamState, playerId: string): ShadowTeamState {
@@ -86,14 +117,15 @@ export function addToSquad(
   state: ShadowTeamState,
   playerId: string,
   family: PositionFamily,
+  board: TeamBoard = "sombra",
 ): ShadowTeamState {
   const formation = formationById(state.formationId);
-  let squadIds = state.squadIds;
+  let squadIds = boardSquad(state, board);
   if (!squadIds.includes(playerId)) {
     squadIds = [...squadIds, playerId];
   }
 
-  const assignments = { ...state.assignments };
+  const assignments = { ...boardAssignments(state, board) };
   const alreadyOnPitch = Object.values(assignments).includes(playerId);
   if (!alreadyOnPitch) {
     const taken = takenSlots(assignments);
@@ -101,43 +133,65 @@ export function addToSquad(
     if (slotId) assignments[slotId] = playerId;
   }
 
-  return { ...state, squadIds, assignments };
+  return writeBoard(state, board, squadIds, assignments);
 }
 
-export function removeFromSquad(state: ShadowTeamState, playerId: string): ShadowTeamState {
-  const assignments = { ...state.assignments };
+/** Entra no elenco sem ocupar vaga — fica no banco. */
+export function addReserve(state: ShadowTeamState, playerId: string, board: TeamBoard): ShadowTeamState {
+  const squadIds = boardSquad(state, board);
+  if (squadIds.includes(playerId)) return state;
+  return writeBoard(state, board, [...squadIds, playerId], boardAssignments(state, board));
+}
+
+export function removeFromSquad(
+  state: ShadowTeamState,
+  playerId: string,
+  board: TeamBoard = "sombra",
+): ShadowTeamState {
+  const assignments = { ...boardAssignments(state, board) };
   for (const key of Object.keys(assignments)) {
     if (assignments[key] === playerId) assignments[key] = null;
   }
-  return {
-    ...state,
-    squadIds: state.squadIds.filter((id) => id !== playerId),
+  return writeBoard(
+    state,
+    board,
+    boardSquad(state, board).filter((id) => id !== playerId),
     assignments,
-  };
+  );
 }
 
-export function assignPlayer(state: ShadowTeamState, slotId: string, playerId: string | null): ShadowTeamState {
-  const assignments = { ...state.assignments };
+export function assignPlayer(
+  state: ShadowTeamState,
+  slotId: string,
+  playerId: string | null,
+  board: TeamBoard = "sombra",
+): ShadowTeamState {
+  const assignments = { ...boardAssignments(state, board) };
   if (playerId) {
     for (const key of Object.keys(assignments)) {
       if (assignments[key] === playerId) assignments[key] = null;
     }
-    let squadIds = state.squadIds;
+    let squadIds = boardSquad(state, board);
     if (!squadIds.includes(playerId)) squadIds = [...squadIds, playerId];
     assignments[slotId] = playerId;
-    return { ...state, squadIds, assignments };
+    return writeBoard(state, board, squadIds, assignments);
   }
   assignments[slotId] = null;
-  return { ...state, assignments };
+  return writeBoard(state, board, boardSquad(state, board), assignments);
 }
 
-export function swapSlots(state: ShadowTeamState, slotA: string, slotB: string): ShadowTeamState {
-  const assignments = { ...state.assignments };
+export function swapSlots(
+  state: ShadowTeamState,
+  slotA: string,
+  slotB: string,
+  board: TeamBoard = "sombra",
+): ShadowTeamState {
+  const assignments = { ...boardAssignments(state, board) };
   const a = assignments[slotA] ?? null;
   const b = assignments[slotB] ?? null;
   assignments[slotA] = b;
   assignments[slotB] = a;
-  return { ...state, assignments };
+  return writeBoard(state, board, boardSquad(state, board), assignments);
 }
 
 /** Drag-and-drop: move or swap between slots; bench source has null sourceSlotId. */
@@ -146,11 +200,12 @@ export function dropPlayerOnSlot(
   sourceSlotId: string | null,
   targetSlotId: string,
   playerId: string,
+  board: TeamBoard = "sombra",
 ): ShadowTeamState {
-  const assignments = { ...state.assignments };
+  const assignments = { ...boardAssignments(state, board) };
   const occupant = assignments[targetSlotId] ?? null;
 
-  let squadIds = state.squadIds;
+  let squadIds = boardSquad(state, board);
   if (!squadIds.includes(playerId)) squadIds = [...squadIds, playerId];
 
   if (sourceSlotId) {
@@ -175,18 +230,23 @@ export function dropPlayerOnSlot(
     }
   }
 
-  return { ...state, squadIds, assignments };
+  return writeBoard(state, board, squadIds, assignments);
 }
 
 export function setFormation(state: ShadowTeamState, formationId: string): ShadowTeamState {
   const from = formationById(state.formationId);
   const to = formationById(formationId);
   if (from.id === to.id) return state;
-  const assignments = remapAssignments(from, to, state.assignments);
-  return { ...state, formationId, assignments };
+  return {
+    ...state,
+    formationId,
+    assignments: remapAssignments(from, to, state.assignments),
+    ownAssignments: remapAssignments(from, to, state.ownAssignments),
+  };
 }
 
-export function benchPlayerIds(state: ShadowTeamState): string[] {
-  const onPitch = new Set(Object.values(state.assignments).filter(Boolean) as string[]);
-  return state.squadIds.filter((id) => !onPitch.has(id));
+export function benchPlayerIds(state: ShadowTeamState, board: TeamBoard = "sombra"): string[] {
+  const assignments = boardAssignments(state, board);
+  const onPitch = new Set(Object.values(assignments).filter(Boolean) as string[]);
+  return boardSquad(state, board).filter((id) => !onPitch.has(id));
 }

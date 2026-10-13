@@ -6,15 +6,22 @@ import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { BenchStrip, PitchView } from "@/components/shadow/PitchView";
+import { formatDominantFoot } from "@/components/shadow/ShadowPlayerMiniReport";
 import { ClubLogo } from "@/components/ClubLogo";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { ShadowPlayerRow } from "@/components/shadow/ShadowPlayerChip";
 import { TeamProfileMap } from "@/components/shadow/TeamProfileMap";
 import { TeamStatsBar } from "@/components/shadow/TeamStatsBar";
 import { useShadowTeam } from "@/hooks/useShadowTeam";
-import { FORMATIONS, formationById } from "@/lib/formations";
-import { benchPlayerIds } from "@/lib/shadowTeamStorage";
-import { formatRating, ratingTier, tierVars } from "@/lib/scoutTheme";
+import { FORMATIONS, formationById, type FormationSlot } from "@/lib/formations";
+import { benchPlayerIds, boardAssignments, boardSquad, type TeamBoard } from "@/lib/shadowTeamStorage";
+import { gradeTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
+
+const BOARD_LABEL: Record<TeamBoard, string> = {
+  proprio: "Time próprio",
+  sombra: "Time sombra",
+};
 
 type Props = {
   players: PlayerSearchRow[];
@@ -22,34 +29,38 @@ type Props = {
 
 export function TimeSombraClient({ players }: Props) {
   const { href } = useLeague();
-  const { state, ready, changeFormation, assign, dropOnSlot, removeFromSquad, removeFromWatchlist } =
+  const { state, ready, changeFormation, assign, dropOnSlot, reserve, removeFromSquad, removeFromWatchlist } =
     useShadowTeam();
+  const [board, setBoard] = useState<TeamBoard>("sombra");
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [placementPlayerId, setPlacementPlayerId] = useState<string | null>(null);
   const [panelTab, setPanelTab] = useState<"squad" | "watch">("squad");
   const [slotQuery, setSlotQuery] = useState("");
+  const [picker, setPicker] = useState<{ slot: FormationSlot; mode: "starter" | "reserve" } | null>(null);
 
   const playersById = useMemo(() => new Map(players.map((p) => [p.player_id, p])), [players]);
 
   const slotCandidates = useMemo(() => {
-    if (!state || !selectedSlotId) return [];
-    const formation = formationById(state.formationId);
-    const selectedSlot = formation.slots.find((slot) => slot.id === selectedSlotId);
-    const occupantId = state.assignments[selectedSlotId];
-    if (!selectedSlot || occupantId) return [];
+    if (!state || !picker) return [];
+    const assignments = boardAssignments(state, board);
+    const squadIds = new Set(boardSquad(state, board));
+    const occupantId = assignments[picker.slot.id];
+    if (picker.mode === "starter" && occupantId) return [];
     const query = slotQuery.trim().toLowerCase();
-    const assignedIds = new Set(
-      Object.values(state.assignments).filter((id): id is string => Boolean(id)),
+    const taken = new Set(
+      picker.mode === "starter"
+        ? (Object.values(assignments).filter((id): id is string => Boolean(id)))
+        : squadIds,
     );
     return players
       .filter((player) => {
-        if (!selectedSlot.families.includes(player.position_family)) return false;
-        if (assignedIds.has(player.player_id)) return false;
+        if (!picker.slot.families.includes(player.position_family)) return false;
+        if (taken.has(player.player_id)) return false;
         if (!query) return true;
         return player.name.toLowerCase().includes(query) || player.club.toLowerCase().includes(query);
       })
       .sort((a, b) => b.rating - a.rating);
-  }, [players, state, selectedSlotId, slotQuery]);
+  }, [players, state, picker, slotQuery, board]);
 
   if (!ready || !state) {
     return (
@@ -61,27 +72,36 @@ export function TimeSombraClient({ players }: Props) {
   }
 
   const formation = formationById(state.formationId);
-  const benchIds = benchPlayerIds(state);
-  const selectedSlot = selectedSlotId ? formation.slots.find((slot) => slot.id === selectedSlotId) : null;
-  const selectedPlayerId = selectedSlotId ? state.assignments[selectedSlotId] : null;
+  const assignments = boardAssignments(state, board);
+  const benchIds = benchPlayerIds(state, board);
+  const selectedPlayerId = selectedSlotId ? assignments[selectedSlotId] : null;
   const selectedPlayer = selectedPlayerId ? playersById.get(selectedPlayerId) : null;
+  const activeSquadIds = boardSquad(state, board);
 
-  const squadPlayers = state.squadIds
+  const squadPlayers = activeSquadIds
     .map((id) => playersById.get(id))
     .filter((p): p is PlayerSearchRow => Boolean(p));
   const watchPlayers = state.watchlistIds
     .map((id) => playersById.get(id))
     .filter((p): p is PlayerSearchRow => Boolean(p));
 
-  const starters = Object.values(state.assignments)
+  const starters = Object.values(assignments)
     .filter((id): id is string => Boolean(id))
     .map((id) => playersById.get(id))
     .filter((p): p is PlayerSearchRow => Boolean(p));
 
-  const avgRating =
-    squadPlayers.length > 0
-      ? squadPlayers.reduce((sum, p) => sum + p.rating, 0) / squadPlayers.length
+  const avgLetter =
+    starters.length > 0
+      ? ratingToLetterGrade(starters.reduce((sum, p) => sum + p.rating, 0) / starters.length)
       : null;
+
+  function openBoard(next: TeamBoard) {
+    setBoard(next);
+    setSelectedSlotId(null);
+    setPlacementPlayerId(null);
+    setPicker(null);
+    setSlotQuery("");
+  }
 
   return (
     <div className="scout-root profile-page shadow-page">
@@ -92,9 +112,24 @@ export function TimeSombraClient({ players }: Props) {
           <div>
             <h1 className="shadow-page-title">Time Sombra</h1>
             <p className="shadow-page-sub">
-              {squadPlayers.length} escalados · {watchPlayers.length} em observação
-              {avgRating != null ? ` · média ${formatRating(avgRating)}` : ""}
+              {BOARD_LABEL[board]} · {squadPlayers.length} escalados · {watchPlayers.length} em observação
+              {avgLetter != null ? ` · letra ${avgLetter}` : ""}
             </p>
+          </div>
+
+          <div className="shadow-board-switch" role="tablist" aria-label="Seleção">
+            {(["proprio", "sombra"] as const).map((id) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={board === id}
+                className={`shadow-board-tab${board === id ? " active" : ""}`}
+                onClick={() => openBoard(id)}
+              >
+                {BOARD_LABEL[id]}
+              </button>
+            ))}
           </div>
 
           <div className="shadow-formation-picker" role="group" aria-label="Formação tática">
@@ -109,6 +144,7 @@ export function TimeSombraClient({ players }: Props) {
                     changeFormation(f.id);
                     setSelectedSlotId(null);
                     setPlacementPlayerId(null);
+                    setPicker(null);
                   }}
                   aria-pressed={state.formationId === f.id}
                 >
@@ -126,29 +162,47 @@ export function TimeSombraClient({ players }: Props) {
             <div className="shadow-pitch-row">
               <TeamProfileMap
                 formationId={state.formationId}
-                assignments={state.assignments}
+                assignments={assignments}
                 playersById={playersById}
               />
               <PitchView
                 formationId={state.formationId}
-                assignments={state.assignments}
+                assignments={assignments}
+                compareAssignments={board === "proprio" ? state.assignments : null}
                 playersById={playersById}
                 selectedSlotId={selectedSlotId}
                 placementPlayerId={placementPlayerId}
                 onSelectSlot={(id) => {
-                  setSelectedSlotId(id);
                   setPlacementPlayerId(null);
                   setSlotQuery("");
+                  if (!id) {
+                    setSelectedSlotId(null);
+                    setPicker(null);
+                    return;
+                  }
+                  const slot = formation.slots.find((item) => item.id === id);
+                  const occupied = Boolean(assignments[id]);
+                  setSelectedSlotId(id);
+                  if (slot && !occupied) setPicker({ slot, mode: "starter" });
+                  else setPicker(null);
                 }}
                 onAssign={(slotId, playerId) => {
-                  assign(slotId, playerId);
+                  assign(slotId, playerId, board);
                   setPlacementPlayerId(null);
+                  setPicker(null);
                   setSelectedSlotId(playerId ? slotId : null);
                 }}
                 onDrop={(sourceSlotId, targetSlotId, playerId) => {
-                  dropOnSlot(sourceSlotId, targetSlotId, playerId);
+                  dropOnSlot(sourceSlotId, targetSlotId, playerId, board);
                   setPlacementPlayerId(null);
+                  setPicker(null);
                   setSelectedSlotId(targetSlotId);
+                }}
+                onAddReserve={(slot) => {
+                  setSelectedSlotId(slot.id);
+                  setPlacementPlayerId(null);
+                  setSlotQuery("");
+                  setPicker({ slot, mode: "reserve" });
                 }}
               />
             </div>
@@ -163,17 +217,26 @@ export function TimeSombraClient({ players }: Props) {
                 playersById={playersById}
                 placementPlayerId={placementPlayerId}
                 onPlace={setPlacementPlayerId}
-                onRemove={removeFromSquad}
+                onRemove={(playerId) => removeFromSquad(playerId, board)}
               />
             </div>
           </section>
 
           <aside className="shadow-side">
-            {selectedSlot && !selectedPlayer ? (
+            {picker ? (
               <article className="player-card shadow-slot-picker">
                 <div className="profile-card-head">
-                  <h3 className="section-label">Escalar em {selectedSlot.label}</h3>
-                  <button type="button" className="shadow-link-btn" onClick={() => setSelectedSlotId(null)}>
+                  <h3 className="section-label">
+                    {picker.mode === "reserve" ? "Reserva" : "Titular"} · {picker.slot.label}
+                  </h3>
+                  <button
+                    type="button"
+                    className="shadow-link-btn"
+                    onClick={() => {
+                      setPicker(null);
+                      setSelectedSlotId(null);
+                    }}
+                  >
                     Fechar
                   </button>
                 </div>
@@ -193,8 +256,10 @@ export function TimeSombraClient({ players }: Props) {
                           type="button"
                           className="shadow-slot-picker-item"
                           onClick={() => {
-                            assign(selectedSlot.id, player.player_id);
-                            setSelectedSlotId(selectedSlot.id);
+                            if (picker.mode === "reserve") reserve(player.player_id, board);
+                            else assign(picker.slot.id, player.player_id, board);
+                            setPicker(null);
+                            setSelectedSlotId(picker.slot.id);
                           }}
                         >
                           <ClubLogo club={player.club} size={16} />
@@ -204,7 +269,9 @@ export function TimeSombraClient({ players }: Props) {
                               {player.club} · {player.position} · {player.profile}
                             </em>
                           </span>
-                          <span className="shadow-slot-picker-rating tabular">{formatRating(player.rating)}</span>
+                          <span className="shadow-slot-picker-rating tabular">
+                            {ratingToLetterGrade(player.rating)}
+                          </span>
                         </button>
                       </li>
                     ))}
@@ -224,24 +291,22 @@ export function TimeSombraClient({ players }: Props) {
                   </button>
                 </div>
                 <div className="shadow-slot-detail-body">
-                  {selectedPlayer.transfermarkt?.photo ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      className="shadow-slot-detail-photo"
-                      src={selectedPlayer.transfermarkt.photo}
-                      alt=""
-                    />
-                  ) : null}
+                  <PlayerPhoto
+                    className="shadow-slot-detail-photo"
+                    src={selectedPlayer.transfermarkt?.photo}
+                    alt=""
+                  />
                   <h4>{selectedPlayer.name}</h4>
                   <p className="shadow-slot-detail-meta">
                     {selectedPlayer.club} · {selectedPlayer.position}
                   </p>
                   <p className="shadow-slot-detail-profile">{selectedPlayer.profile}</p>
+                  <p className="shadow-slot-detail-meta">Pé {formatDominantFoot(selectedPlayer.foot)}</p>
                   <span
                     className="shadow-slot-detail-rating tabular"
-                    style={tierVars(ratingTier(selectedPlayer.rating))}
+                    style={tierVars(gradeTier(ratingToLetterGrade(selectedPlayer.rating)))}
                   >
-                    Rating {formatRating(selectedPlayer.rating)}
+                    {ratingToLetterGrade(selectedPlayer.rating)}
                   </span>
                   <div className="shadow-slot-detail-actions">
                     <Link
@@ -271,7 +336,7 @@ export function TimeSombraClient({ players }: Props) {
                   className={panelTab === "squad" ? "active" : ""}
                   onClick={() => setPanelTab("squad")}
                 >
-                  Time ({squadPlayers.length})
+                  {BOARD_LABEL[board]} ({squadPlayers.length})
                 </button>
                 <button
                   type="button"
@@ -293,7 +358,7 @@ export function TimeSombraClient({ players }: Props) {
                           <ShadowPlayerRow
                             player={player}
                             profileLabel={player.profile}
-                            onRemove={() => removeFromSquad(player.player_id)}
+                            onRemove={() => removeFromSquad(player.player_id, board)}
                           />
                         </li>
                       ))}

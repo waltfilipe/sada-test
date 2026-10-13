@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { ShadowPlayerChip } from "@/components/shadow/ShadowPlayerChip";
 import { ShadowPlayerTooltip } from "@/components/shadow/ShadowPlayerMiniReport";
 import { fieldSlots, formationById, type FormationSlot } from "@/lib/formations";
+import { gradeTier, playerInitials, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
 
 const DRAG_MIME = "application/x-shadow-player";
@@ -20,15 +22,40 @@ function parseDrag(data: DataTransfer): DragPayload | null {
   }
 }
 
+function PitchToken({ player }: { player: PlayerSearchRow }) {
+  const letter = ratingToLetterGrade(player.rating);
+  const photo = player.transfermarkt?.photo;
+  return (
+    <div className="shadow-pitch-token">
+      <span className="shadow-pitch-token-photo">
+        {photo ? (
+          <PlayerPhoto src={photo} alt="" />
+        ) : (
+          <span>{playerInitials(player.name)}</span>
+        )}
+      </span>
+      <span className="shadow-pitch-token-name" title={player.name}>
+        {player.name}
+      </span>
+      <span className="shadow-pitch-token-letter tabular" style={tierVars(gradeTier(letter))}>
+        {letter}
+      </span>
+    </div>
+  );
+}
+
 type Props = {
   formationId: string;
   assignments: Record<string, string | null>;
+  /** Titulares do time sombra, para mini comparação no time próprio. */
+  compareAssignments?: Record<string, string | null> | null;
   playersById: Map<string, PlayerSearchRow>;
   selectedSlotId: string | null;
   placementPlayerId: string | null;
   onSelectSlot: (slotId: string | null) => void;
   onAssign: (slotId: string, playerId: string | null) => void;
   onDrop: (sourceSlotId: string | null, targetSlotId: string, playerId: string) => void;
+  onAddReserve: (slot: FormationSlot) => void;
 };
 
 export function PitchView({
@@ -40,6 +67,8 @@ export function PitchView({
   onSelectSlot,
   onAssign,
   onDrop,
+  compareAssignments,
+  onAddReserve,
 }: Props) {
   const formation = useMemo(() => formationById(formationId), [formationId]);
   const slots = useMemo(() => fieldSlots(formation), [formation]);
@@ -89,12 +118,18 @@ export function PitchView({
           const isSelected = selectedSlotId === slot.id;
           const isDragOver = dragOverSlotId === slot.id;
           const isPlacementTarget = Boolean(placementPlayerId);
+          const compareId = compareAssignments?.[slot.id];
+          const comparePlayer = compareId ? playersById.get(compareId) ?? null : compareAssignments ? null : undefined;
 
           return (
             <div
               key={slot.id}
               className={`shadow-pitch-slot${isSelected ? " selected" : ""}${isDragOver ? " drag-over" : ""}${isPlacementTarget ? " placement-mode" : ""}${player ? " filled" : " empty"}`}
-              style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
+              style={{
+                left: `${slot.x}%`,
+                top: `${slot.y}%`,
+                zIndex: isSelected || isDragOver ? 40 : Math.round(slot.y),
+              }}
               onDragOver={(e) => handleDragOver(e, slot.id)}
               onDragLeave={() => setDragOverSlotId((id) => (id === slot.id ? null : id))}
               onDrop={(e) => handleDrop(e, slot)}
@@ -107,17 +142,31 @@ export function PitchView({
                   onDragStart={(e) => handleDragStart(e, player.player_id, slot.id)}
                   onClick={() => handleSlotClick(slot)}
                 >
-                  <ShadowPlayerTooltip player={player} block>
-                    <ShadowPlayerChip player={player} size="sm" />
+                  <ShadowPlayerTooltip player={player} compareWith={comparePlayer} block>
+                    <PitchToken player={player} />
                   </ShadowPlayerTooltip>
                 </div>
               ) : (
-                <button type="button" className="shadow-slot-hit" onClick={() => handleSlotClick(slot)}>
-                  <span className="shadow-slot-empty">
-                    <i className="fa-solid fa-plus" aria-hidden="true" />
-                  </span>
+                <button
+                  type="button"
+                  className="shadow-slot-hit"
+                  aria-label={`Escalar titular em ${slot.label}`}
+                  onClick={() => handleSlotClick(slot)}
+                >
+                  <span className="shadow-slot-empty" />
                 </button>
               )}
+              <button
+                type="button"
+                className="shadow-slot-plus"
+                aria-label={`Adicionar reserva em ${slot.label}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onAddReserve(slot);
+                }}
+              >
+                <i className="fa-solid fa-plus" aria-hidden="true" />
+              </button>
               {player && isSelected ? (
                 <button
                   type="button"
@@ -139,7 +188,7 @@ export function PitchView({
         </p>
       ) : (
         <p className="shadow-pitch-hint">
-          Arraste jogadores entre posições · clique para detalhes · use o banco para escalar reservas
+          Arraste entre posições · + adiciona reserva · vaga vazia escala titular
         </p>
       )}
     </div>

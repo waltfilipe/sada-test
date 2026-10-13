@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { formatRating } from "@/lib/scoutTheme";
+import { ratingToLetterGrade } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
 
 function formatEur(value: number): string {
@@ -61,9 +61,9 @@ export function TeamStatsBar({ starters, squad }: Props) {
         </strong>
       </div>
       <div className="shadow-stat">
-        <span className="shadow-stat-label">Rating médio</span>
+        <span className="shadow-stat-label">Letra média</span>
         <strong className="shadow-stat-value tabular">
-          {stats.avgRating != null ? formatRating(stats.avgRating) : "—"}
+          {stats.avgRating != null ? ratingToLetterGrade(stats.avgRating) : "—"}
         </strong>
       </div>
       <div className="shadow-stat">

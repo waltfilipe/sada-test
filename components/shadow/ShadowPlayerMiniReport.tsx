@@ -11,8 +11,8 @@ import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { getPlayerSectionGrade } from "@/lib/sectionGrades";
 import { sectionShortLabel } from "@/lib/sectionLabels";
 import {
-  formatRating,
-  ratingTier,
+  gradeTier,
+  ratingToLetterGrade,
   tierVars,
 } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
@@ -30,13 +30,59 @@ function monthsRemaining(iso?: string | null): string {
   return `${months} ${months === 1 ? "mês" : "meses"}`;
 }
 
-export function ShadowPlayerMiniReport({ player }: { player: PlayerSearchRow }) {
+export function formatDominantFoot(foot: string | null | undefined): string {
+  if (!foot) return "—";
+  const value = foot.trim().toLowerCase();
+  if (value.startsWith("r") || value.includes("direit")) return "Direito";
+  if (value.startsWith("l") || value.includes("esquer")) return "Esquerdo";
+  if (value.startsWith("b") || value.includes("amb")) return "Ambos";
+  return foot;
+}
+
+function CompareColumn({
+  title,
+  player,
+}: {
+  title: string;
+  player: PlayerSearchRow | null;
+}) {
+  const letter = player ? ratingToLetterGrade(player.rating) : null;
+  return (
+    <div className="shadow-mini-compare-col">
+      <span className="shadow-mini-report-section-label">{title}</span>
+      {player ? (
+        <>
+          <strong className="shadow-mini-compare-name">{player.name}</strong>
+          <span className="shadow-mini-compare-meta">
+            <span className="shadow-mini-letter" style={tierVars(gradeTier(letter ?? "C"))}>
+              {letter}
+            </span>
+            {player.profile}
+          </span>
+          <span className="shadow-mini-compare-foot">Pé {formatDominantFoot(player.foot)}</span>
+        </>
+      ) : (
+        <span className="shadow-mini-compare-empty">Sem titular nesta vaga</span>
+      )}
+    </div>
+  );
+}
+
+export function ShadowPlayerMiniReport({
+  player,
+  compareWith,
+  compareLabel = "Time sombra",
+}: {
+  player: PlayerSearchRow;
+  /** Titular do outro time na mesma vaga (usado no time próprio). */
+  compareWith?: PlayerSearchRow | null;
+  compareLabel?: string;
+}) {
   const { profile, loading } = usePlayerProfile(player.player_id, true);
   const { lookup: gradeLookup } = useFamilyGradeLookup(player.position_family, true);
 
   const tm = player.transfermarkt ?? profile?.transfermarkt;
   const profileRating = profile ? positionRating(profile) : player.rating;
-  const profileToken = ratingTier(profileRating);
 
   const dominant = useMemo(() => {
     if (profile) {
@@ -72,8 +118,8 @@ export function ShadowPlayerMiniReport({ player }: { player: PlayerSearchRow }) 
 
       <div className="shadow-mini-report-hero">
         <div className="shadow-mini-report-dominant shadow-mini-report-dominant-only">
-          <span className="shadow-mini-report-dominant-rating tabular" style={tierVars(profileToken)}>
-            {formatRating(profileRating)}
+          <span className="shadow-mini-report-dominant-rating tabular" style={tierVars(gradeTier(ratingToLetterGrade(profileRating)))}>
+            {ratingToLetterGrade(profileRating)}
           </span>
           <span className="shadow-mini-report-profile">{dominant.label}</span>
         </div>
@@ -95,6 +141,10 @@ export function ShadowPlayerMiniReport({ player }: { player: PlayerSearchRow }) 
 
       <div className="shadow-mini-report-market">
         <div>
+          <span className="shadow-mini-report-section-label">Pé</span>
+          <strong>{formatDominantFoot(player.foot)}</strong>
+        </div>
+        <div>
           <span className="shadow-mini-report-section-label">Valor</span>
           <strong>{tm?.market_value ?? "—"}</strong>
         </div>
@@ -103,6 +153,13 @@ export function ShadowPlayerMiniReport({ player }: { player: PlayerSearchRow }) 
           <strong>{monthsRemaining(tm?.contract_until)}</strong>
         </div>
       </div>
+
+      {compareWith !== undefined ? (
+        <div className="shadow-mini-compare">
+          <CompareColumn title="Time próprio" player={player} />
+          <CompareColumn title={compareLabel} player={compareWith} />
+        </div>
+      ) : null}
 
       {loading ? <p className="shadow-mini-report-loading">Carregando perfil…</p> : null}
     </div>
@@ -113,13 +170,18 @@ export function ShadowPlayerTooltip({
   player,
   children,
   block,
+  compareWith,
 }: {
   player: PlayerSearchRow;
   children: React.ReactNode;
   block?: boolean;
+  compareWith?: PlayerSearchRow | null;
 }) {
   return (
-    <Tooltip content={<ShadowPlayerMiniReport player={player} />} block={block}>
+    <Tooltip
+      content={<ShadowPlayerMiniReport player={player} compareWith={compareWith} />}
+      block={block}
+    >
       {children}
     </Tooltip>
   );

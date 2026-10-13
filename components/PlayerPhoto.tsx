@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-type Props = React.ImgHTMLAttributes<HTMLImageElement> & {
+type Props = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> & {
+  src?: string | null;
   /** Shown when src is missing or the image fails to load (e.g. SofaScore hotlink block). */
   fallback?: React.ReactNode;
 };

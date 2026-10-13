@@ -5,7 +5,7 @@ import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { ShadowPlayerTooltip } from "@/components/shadow/ShadowPlayerMiniReport";
-import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
+import { gradeTier, playerInitials, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
 
 type Props = {
@@ -17,7 +17,8 @@ type Props = {
 };
 
 export function ShadowPlayerChip({ player, size = "md", onRemove, onClick, selected }: Props) {
-  const token = ratingTier(player.rating);
+  const letter = ratingToLetterGrade(player.rating);
+  const token = gradeTier(letter);
   const photo = player.transfermarkt?.photo;
 
   const inner = (
@@ -30,14 +31,14 @@ export function ShadowPlayerChip({ player, size = "md", onRemove, onClick, selec
         )}
       </span>
       <span className="shadow-chip-copy">
-        <strong>{player.name.split(" ").slice(-1)[0]}</strong>
+        <strong title={player.name}>{player.name}</strong>
         <em>
           <ClubLogo club={player.club} size={12} />
           {player.position}
         </em>
       </span>
-      <span className="shadow-chip-rating tabular" style={tierVars(token)}>
-        {formatRating(player.rating)}
+      <span className="shadow-chip-rating shadow-chip-letter tabular" style={tierVars(token)}>
+        {letter}
       </span>
       {onRemove ? (
         <button
@@ -78,7 +79,8 @@ export function ShadowPlayerRow({
   onRemove?: () => void;
 }) {
   const { href } = useLeague();
-  const token = ratingTier(player.rating);
+  const letter = ratingToLetterGrade(player.rating);
+  const token = gradeTier(letter);
   const photo = player.transfermarkt?.photo;
 
   return (
@@ -103,8 +105,8 @@ export function ShadowPlayerRow({
               {profileLabel ? ` · ${profileLabel}` : ""}
             </em>
           </span>
-          <span className="shadow-player-row-rating tabular" style={tierVars(token)}>
-            {formatRating(player.rating)}
+          <span className="shadow-player-row-rating shadow-chip-letter tabular" style={tierVars(token)}>
+            {letter}
           </span>
         </Link>
       </ShadowPlayerTooltip>
