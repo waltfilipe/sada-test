@@ -18,7 +18,7 @@ HEATMAP_DIR = ROOT / "data" / "heatmaps"
 PUBLIC_HEATMAP_DIR = ROOT / "public" / "heatmaps"
 HEATMAPS_BR26_DIR = ROOT / "HeatmapsBR26"
 DEFAULT_TOURNAMENT_ID = 325
-API_BASE = "https://api.sofascore.com/api/v1"
+API_BASE = "https://www.sofascore.com/api/v1"
 
 
 def _headers() -> dict[str, str]:

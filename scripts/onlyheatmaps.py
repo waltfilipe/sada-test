@@ -27,7 +27,7 @@ import pandas as pd
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-API_BASE = "https://api.sofascore.com/api/v1"
+API_BASE = "https://www.sofascore.com/api/v1"
 DEFAULT_TOURNAMENT_ID = 325
 STATE_FILE = ".onlyheatmaps_state.json"
 DEFAULT_URL = "https://www.sofascore.com/football/tournament/brazil/brasileirao-serie-a/325#id:87678"

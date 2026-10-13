@@ -235,6 +235,17 @@ class CdpSofascoreHttp:
             log(f"CDP: warm-up liga → {warmup_url}")
             self._page.goto(warmup_url, wait_until="domcontentloaded", timeout=90_000)
             self._page.wait_for_timeout(4000)
+        self._warmup_api_session()
+
+    def _warmup_api_session(self) -> None:
+        probe = f"{API_ROOT}/config/default-unique-tournaments/BR/top"
+        for attempt in range(1, 4):
+            status, _ = self._fetch_once(probe)
+            if status == 200:
+                log("CDP: sessão API OK (cookies Akamai).")
+                return
+            log(f"CDP: API ainda bloqueada ({status}, tentativa {attempt}/3) — aguarde/interaja no site …")
+            self._page.wait_for_timeout(3000)
 
     def _fetch_once(self, url: str) -> tuple[int, str]:
         try:
@@ -242,7 +253,11 @@ class CdpSofascoreHttp:
                 """async (url) => {
                     const res = await fetch(url, {
                         credentials: "include",
-                        headers: { accept: "application/json, text/plain, */*" },
+                        headers: {
+                            accept: "application/json, text/plain, */*",
+                            "x-requested-with": "XMLHttpRequest",
+                            referer: window.location.href,
+                        },
                     });
                     return { status: res.status, text: await res.text() };
                 }""",
@@ -287,7 +302,9 @@ class CdpSofascoreHttp:
 
         raise RuntimeError(
             f"HTTP {last_status} em {url}: {str(last_text)[:300]}\n"
-            "No Chrome da porta 9222, abra a Série C e teste a URL da API na barra de endereço."
+            "403 na barra (api.sofascore.com) é normal. No Chrome 9222, abra www.sofascore.com → F12 → Console:\n"
+            f"  fetch('{url}', {{credentials:'include',headers:{{accept:'application/json','x-requested-with':'XMLHttpRequest'}}}}).then(r=>r.status)\n"
+            "Deve retornar 200. Se continuar 403, resolva captcha no site ou navegue um jogador antes de rodar o script."
         )
 
     def close(self) -> None:
