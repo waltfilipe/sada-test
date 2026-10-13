@@ -47,21 +47,6 @@ export function getPlayers(league?: string): PlayerSummary[] {
   return playersCache.get(id)!.players;
 }
 
-const HEATMAP_SAMPLE = 72;
-
-function compactHeatmap(heatmap: PlayerHeatmapData | undefined): PlayerHeatmapData | undefined {
-  const points = heatmap?.points;
-  if (!points?.length) return undefined;
-  const step = Math.max(1, Math.ceil(points.length / HEATMAP_SAMPLE));
-  const sampled = step === 1 ? points : points.filter((_, index) => index % step === 0);
-  return {
-    points: sampled.map((point) => ({
-      x: Math.round(point.x),
-      y: Math.round(point.y),
-    })),
-  };
-}
-
 export function getSearchRows(league?: string): PlayerSearchRow[] {
   const id = resolveLeague(league);
   if (!searchRowsCache.has(id)) {
@@ -70,7 +55,7 @@ export function getSearchRows(league?: string): PlayerSearchRow[] {
       id,
       getPlayers(id).map((player) => {
         const profile = getPlayerProfile(player.player_id, id);
-        const heatmap = meta.heatmaps_enabled ? compactHeatmap(profile?.heatmap) : undefined;
+        const heatmap = meta.heatmaps_enabled ? profile?.heatmap : undefined;
         return {
           ...player,
           transfermarkt: player.transfermarkt ?? profile?.transfermarkt ?? null,

@@ -1640,6 +1640,37 @@
   color: var(--text-3);
 }
 
+.compare-player-search {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1 1 220px;
+  max-width: 320px;
+  min-width: 180px;
+  padding: 0.38rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.compare-player-search i {
+  font-size: 0.72rem;
+  color: var(--text-3);
+}
+
+.compare-player-search input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.compare-player-search input:focus {
+  outline: none;
+}
+
 .compare-toolbar-actions {
   display: flex;
   align-items: center;

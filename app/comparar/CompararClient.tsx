@@ -59,11 +59,26 @@ export function CompararClient({
     const first = pickPlayer(initialA, players, new Set(), 0);
     return pickPlayer(initialB, players, new Set([first]), 1);
   });
+  const [pickerQuery, setPickerQuery] = useState("");
   const [idC, setIdC] = useState(() => {
     const first = pickPlayer(initialA, players, new Set(), 0);
     const second = pickPlayer(initialB, players, new Set([first]), 1);
     return pickPlayer(initialC, players, new Set([first, second]), 2);
   });
+
+  const pickerPlayers = useMemo(() => {
+    const q = pickerQuery.trim().toLowerCase();
+    if (!q) return players;
+    return players.filter(
+      (p) => p.name.toLowerCase().includes(q) || p.club.toLowerCase().includes(q),
+    );
+  }, [players, pickerQuery]);
+
+  const playersForPickers = useMemo(() => {
+    const ids = new Set([idA, idB, idC].filter(Boolean));
+    const extra = players.filter((p) => ids.has(p.player_id) && !pickerPlayers.some((x) => x.player_id === p.player_id));
+    return [...extra, ...pickerPlayers];
+  }, [players, pickerPlayers, idA, idB, idC]);
 
   const playerA = players.find((p) => p.player_id === idA) ?? players[0];
   const playerB = players.find((p) => p.player_id === idB) ?? players[1] ?? players[0];
@@ -119,6 +134,17 @@ export function CompararClient({
             <p className="compare-toolbar-sub">{familyMeta.label} · lado a lado</p>
           </div>
 
+          <label className="compare-player-search">
+            <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+            <input
+              type="search"
+              value={pickerQuery}
+              onChange={(event) => setPickerQuery(event.target.value)}
+              placeholder="Buscar atleta ou clube"
+              aria-label="Buscar atleta para comparar"
+            />
+          </label>
+
           <div className="compare-toolbar-actions">
             {players.length >= 3 ? (
               <button
@@ -143,7 +169,7 @@ export function CompararClient({
             side="a"
             label="Atleta 1"
             player={playerA}
-            players={players}
+            players={playersForPickers}
             family={family}
             pool={players}
             excludeIds={excludeForA}
@@ -158,7 +184,7 @@ export function CompararClient({
             side="b"
             label="Atleta 2"
             player={playerB}
-            players={players}
+            players={playersForPickers}
             family={family}
             pool={players}
             excludeIds={excludeForB}
@@ -174,7 +200,7 @@ export function CompararClient({
               side="c"
               label="Atleta 3"
               player={playerC}
-              players={players}
+              players={playersForPickers}
               family={family}
               pool={players}
               excludeIds={excludeForC}

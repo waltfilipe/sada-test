@@ -19,6 +19,11 @@ import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
 import { badgeCatalogForFamily, playerStatBadges } from "@/lib/statBadges";
+import {
+  playerMatchesFlankSide,
+  supportsFlankSideFilter,
+  type FlankSide,
+} from "@/lib/playerSideFilter";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -80,6 +85,8 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
   const [foot, setFoot] = useState<string | null>(null);
   const [origin, setOrigin] = useState<"br" | "out" | null>(null);
   const [club, setClub] = useState<string | null>(null);
+  const [flankSide, setFlankSide] = useState<FlankSide | null>(null);
+  const showFlankFilter = supportsFlankSideFilter(family);
   const [selectedId, setSelectedId] = useState(
     () => (requestedId && players.some((player) => player.player_id === requestedId) ? requestedId : ""),
   );
@@ -112,6 +119,7 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
         }
         if (club && player.club !== club) return false;
         if (foot && player.foot !== foot) return false;
+        if (flankSide && !playerMatchesFlankSide(player, flankSide)) return false;
         if (origin === "br" && player.nationality !== "Brazil") return false;
         if (origin === "out" && player.nationality === "Brazil") return false;
         if (age) {
@@ -123,9 +131,9 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
         return player.name.toLowerCase().includes(q) || player.club.toLowerCase().includes(q);
       })
       .sort((a, b) => positionRating(b) - positionRating(a));
-  }, [players, profile, badges, badgesById, club, foot, origin, ageBand, minutesBand, query]);
+  }, [players, profile, badges, badgesById, club, foot, flankSide, origin, ageBand, minutesBand, query]);
 
-  const filterKey = `${profile ?? ""}|${badges.join(",")}|${club ?? ""}|${foot ?? ""}|${origin ?? ""}|${ageBand ?? ""}|${minutesBand ?? ""}`;
+  const filterKey = `${profile ?? ""}|${badges.join(",")}|${club ?? ""}|${foot ?? ""}|${flankSide ?? ""}|${origin ?? ""}|${ageBand ?? ""}|${minutesBand ?? ""}`;
   const initialFilter = useRef(true);
 
   useEffect(() => {
@@ -166,7 +174,12 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
     setFoot(null);
     setOrigin(null);
     setClub(null);
+    setFlankSide(null);
   }
+
+  useEffect(() => {
+    if (!showFlankFilter) setFlankSide(null);
+  }, [showFlankFilter, family]);
 
   const activeCount =
     (profile ? 1 : 0) +
@@ -176,6 +189,7 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
     (foot ? 1 : 0) +
     (origin ? 1 : 0) +
     (club ? 1 : 0) +
+    (flankSide ? 1 : 0) +
     (query.trim() ? 1 : 0);
 
   return (
@@ -278,6 +292,35 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
                 </div>
               </section>
             </div>
+
+            {showFlankFilter ? (
+              <section className="zag-v2-block">
+                <h2>Lado</h2>
+                <div className="zag-v2-chips">
+                  <button
+                    type="button"
+                    className={!flankSide ? "active" : ""}
+                    onClick={() => setFlankSide(null)}
+                  >
+                    Ambos
+                  </button>
+                  <button
+                    type="button"
+                    className={flankSide === "esquerdo" ? "active" : ""}
+                    onClick={() => setFlankSide(flankSide === "esquerdo" ? null : "esquerdo")}
+                  >
+                    Esquerdo
+                  </button>
+                  <button
+                    type="button"
+                    className={flankSide === "direito" ? "active" : ""}
+                    onClick={() => setFlankSide(flankSide === "direito" ? null : "direito")}
+                  >
+                    Direito
+                  </button>
+                </div>
+              </section>
+            ) : null}
 
             <section className="zag-v2-selects zag-v2-block">
               <label>

@@ -157,13 +157,6 @@ export function PlayerHero({ player, family }: Props) {
           </dl>
 
           <div className="player-hero-actions">
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={() => setSimilarOpen(true)}
-            >
-              <i className="fa-solid fa-shuffle" aria-hidden="true" /> Similares
-            </button>
             <Link
               className="btn btn-ghost btn-sm"
               href={href(`/comparar?posicao=${family}&a=${player.player_id}`)}
@@ -175,6 +168,9 @@ export function PlayerHero({ player, family }: Props) {
                 <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
               </a>
             ) : null}
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSimilarOpen(true)}>
+              <i className="fa-solid fa-shuffle" aria-hidden="true" /> Similares
+            </button>
             <AddToShadowMenu playerId={player.player_id} family={family} />
           </div>
         </div>

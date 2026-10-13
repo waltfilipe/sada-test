@@ -35,7 +35,7 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
   },
   Aéreo: {
     label: "Aéreo",
-    icon: "fa-cloud",
+    icon: "fa-feather-pointed",
     title: "Duelo aéreo — volume e eficiência acima de P50",
   },
   "Passes Progressivos": {
@@ -74,9 +74,9 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
     title: "Conduções progressivas — volume acima de P50",
   },
   Progressão: {
-    label: "Conduções Progressivas",
-    icon: "fa-road",
-    title: "Conduções progressivas — volume acima de P50",
+    label: "Progressão",
+    icon: "fa-arrow-trend-up",
+    title: "Progressão com bola — volume acima de P50",
   },
   Cruzamentos: {
     label: "Cruzamentos",
@@ -115,7 +115,7 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
   },
   "Ações Terminais": {
     label: "Ações Terminais",
-    icon: "fa-fire",
+    icon: "fa-burst",
     title: "Ações terminais — ambas métricas acima de P50",
   },
   Verticalidade: {
@@ -125,7 +125,7 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
   },
   "Duelos Vencidos": {
     label: "Duelos Vencidos",
-    icon: "fa-shield-halved",
+    icon: "fa-hand-fist",
     title: "Duelos vencidos — volume e eficiência acima de P50",
   },
 };
@@ -172,13 +172,15 @@ export function statBadgeForMetric(item: AspectItem, displayLabel?: string): Sta
 
 export function earnedStatBadges(items: AspectItem[], groupTitleByItem?: Map<string, string>): StatMetricBadge[] {
   const badges: StatMetricBadge[] = [];
-  const seen = new Set<string>();
+  const seenKeys = new Set<string>();
+  const seenIcons = new Set<string>();
 
   for (const item of items) {
     const displayLabel = groupTitleByItem?.get(item.label) ?? item.label;
     const badge = statBadgeForMetric(item, displayLabel);
-    if (!badge || seen.has(badge.key)) continue;
-    seen.add(badge.key);
+    if (!badge || seenKeys.has(badge.key) || seenIcons.has(badge.icon)) continue;
+    seenKeys.add(badge.key);
+    seenIcons.add(badge.icon);
     badges.push(badge);
   }
 
@@ -190,12 +192,14 @@ export type FamilyBadgeOption = StatMetricBadge & { tone: StatSectionTone };
 /** Badges that can appear for a position, in the same order as the profile stats. */
 export function badgeCatalogForFamily(family: PositionFamily): FamilyBadgeOption[] {
   const options: FamilyBadgeOption[] = [];
-  const seen = new Set<string>();
+  const seenLabels = new Set<string>();
+  const seenIcons = new Set<string>();
   for (const section of statSectionsForFamily(family)) {
     for (const label of section.labels) {
       const meta = METRIC_BADGE_CATALOG[label];
-      if (!meta || seen.has(label)) continue;
-      seen.add(label);
+      if (!meta || seenLabels.has(label) || seenIcons.has(meta.icon)) continue;
+      seenLabels.add(label);
+      seenIcons.add(meta.icon);
       options.push({ key: label, tone: section.tone, ...meta });
     }
   }
@@ -206,14 +210,16 @@ export function badgeCatalogForFamily(family: PositionFamily): FamilyBadgeOption
 export function playerStatBadges(player: PlayerProfile): StatMetricBadge[] {
   const all = flattenAspects(player);
   const badges: StatMetricBadge[] = [];
-  const seen = new Set<string>();
+  const seenLabels = new Set<string>();
+  const seenIcons = new Set<string>();
   for (const section of statSectionsForFamily(player.position_family)) {
     for (const label of section.labels) {
       const item = findAspect(all, label);
-      if (!item || seen.has(label)) continue;
+      if (!item || seenLabels.has(label)) continue;
       const badge = statBadgeForMetric(item, label);
-      if (!badge) continue;
-      seen.add(label);
+      if (!badge || seenIcons.has(badge.icon)) continue;
+      seenLabels.add(label);
+      seenIcons.add(badge.icon);
       badges.push(badge);
     }
   }
