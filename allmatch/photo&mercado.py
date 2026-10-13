@@ -4,8 +4,8 @@
 Exemplo Série C (Chrome CDP na 9222, uma linha):
   python -u "allmatch/photo&mercado.py" --csv ./allmatch/BRC26_Defensive/BRC26_defensive.csv --output ./allmatch/BRC26_Defensive/photos --transport cdp --cdp-url http://127.0.0.1:9222 --warmup-url "https://www.sofascore.com/football/tournament/brazil/brasileirao-serie-c/1281#id:90642" --resume --rate-limit 0.35 --apply-site --league serie-c
 
-Só aplicar manifest já baixado:
-  python -u "allmatch/photo&mercado.py" --apply-only --csv ./allmatch/BRC26_Defensive/BRC26_defensive.csv --manifest ./allmatch/BRC26_Defensive/photos/manifest.json --league serie-c
+Só aplicar manifest já baixado (fotos locais em ./photos → /photos/… no site):
+  python -u "allmatch/photo&mercado.py" --apply-only --csv ./BRC26_defensive.csv --manifest ./photos/manifest.json --league serie-c
 """
 
 from __future__ import annotations
@@ -67,9 +67,19 @@ def main() -> None:
         parser.add_argument("--league", default="serie-c")
         parser.add_argument("--csv", type=Path, required=True)
         parser.add_argument("--manifest", type=Path, required=True)
+        parser.add_argument("--photos-dir", type=Path, default=None)
         parser.add_argument("--dry-run", action="store_true")
         args = parser.parse_args(argv)
-        apply_manifest(args.league, args.csv, args.manifest, dry_run=args.dry_run)
+        photos_dir = args.photos_dir or args.manifest.parent
+        if not any(photos_dir.glob("*.jpg")) and (ROOT / "photos").is_dir():
+            photos_dir = ROOT / "photos"
+        apply_manifest(
+            args.league,
+            args.csv,
+            args.manifest,
+            photos_dir=photos_dir,
+            dry_run=args.dry_run,
+        )
         return
 
     argv, apply_site = _pop_flag(argv, "--apply-site")
@@ -90,8 +100,15 @@ def main() -> None:
         if not csv_for_apply:
             raise SystemExit("--apply-site exige --csv")
         manifest = output_for_apply / "manifest.json"
+        photos_dir = output_for_apply if any(output_for_apply.glob("*.jpg")) else ROOT / "photos"
         print(f"\nAplicando no site ({league})…", flush=True)
-        apply_manifest(league or "serie-c", csv_for_apply, manifest, dry_run=dry_run_apply)
+        apply_manifest(
+            league or "serie-c",
+            csv_for_apply,
+            manifest,
+            photos_dir=photos_dir,
+            dry_run=dry_run_apply,
+        )
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@ from engine.measures import attach_base_measures
 from engine.sofascore_heatmap import build_sofascore_player_map
 
 IMAGE_URL = "https://img.sofascore.com/api/v1/player/{player_id}/image"
+PHOTO_EXTENSIONS = (".jpg", ".jpeg", ".png", ".webp")
 
 
 def log(msg: str) -> None:
@@ -32,6 +33,58 @@ def needs_photo(tm: dict[str, Any] | None) -> bool:
         return True
     photo = tm.get("photo")
     return not photo or not str(photo).strip()
+
+
+def is_sofascore_cdn_photo(photo: Any) -> bool:
+    text = str(photo or "").strip()
+    return "img.sofascore.com" in text
+
+
+def resolve_local_photo_file(entry: dict[str, Any], ss_id: str, photos_dir: Path) -> str | None:
+    """Return filename under photos/ if the file exists on disk."""
+    if not photos_dir.is_dir():
+        return None
+    fname = entry.get("file")
+    if isinstance(fname, str) and fname.strip():
+        path = photos_dir / fname.strip()
+        if path.is_file() and path.stat().st_size > 0:
+            return path.name
+    for ext in PHOTO_EXTENSIONS:
+        candidate = photos_dir / f"{ss_id}{ext}"
+        if candidate.is_file() and candidate.stat().st_size > 0:
+            return candidate.name
+    return None
+
+
+def resolve_photo_url(
+    entry: dict[str, Any],
+    ss_id: str,
+    *,
+    photos_dir: Path | None,
+    prefer_local: bool,
+) -> str | None:
+    local_name = resolve_local_photo_file(entry, ss_id, photos_dir) if photos_dir else None
+    if prefer_local and local_name:
+        return f"/photos/{local_name}"
+    if entry.get("photo_status") in {"missing", None} and not entry.get("file"):
+        return None
+    if local_name and not prefer_local:
+        return f"/photos/{local_name}"
+    return entry.get("photo_url") or IMAGE_URL.format(player_id=ss_id)
+
+
+def should_set_photo(existing: dict[str, Any] | None, new_url: str | None, *, refresh_local: bool) -> bool:
+    if not new_url or not str(new_url).startswith("/photos/"):
+        return False
+    current = str((existing or {}).get("photo") or "").strip()
+    if not current:
+        return True
+    if current == new_url:
+        return False
+    if not refresh_local:
+        return needs_photo(existing)
+    # Pasta photos/ no repo: preferir arquivo local sobre CDN SofaScore ou TM genérico
+    return True
 
 
 def needs_market(tm: dict[str, Any] | None) -> bool:
@@ -53,7 +106,7 @@ def merge_transfermarkt(
     ss_player_id: str,
 ) -> dict[str, Any]:
     tm: dict[str, Any] = dict(existing) if existing else {}
-    if photo_url and needs_photo(existing):
+    if photo_url:
         tm["photo"] = photo_url
     if market_label and needs_market(existing):
         tm["market_value"] = market_label
@@ -103,6 +156,9 @@ def apply_manifest(
     csv_path: Path,
     manifest_path: Path,
     *,
+    photos_dir: Path | None = None,
+    prefer_local: bool = True,
+    refresh_local: bool = True,
     dry_run: bool = False,
 ) -> tuple[int, int]:
     data_dir = ROOT / "data" / league_id
@@ -114,6 +170,9 @@ def apply_manifest(
         raise SystemExit(f"CSV defensivo não encontrado: {csv_path}")
 
     manifest: dict[str, dict[str, Any]] = json.loads(manifest_path.read_text(encoding="utf-8"))
+    local_dir = photos_dir or manifest_path.parent
+    if not local_dir.is_dir():
+        local_dir = ROOT / "photos"
     raw_df = load_players_dataframe(league_id)
     df = attach_base_measures(raw_df)
     ss_map = build_sofascore_player_map(df, csv_path)
@@ -133,9 +192,12 @@ def apply_manifest(
         profile = json.loads(profile_path.read_text(encoding="utf-8"))
         existing = profile.get("transfermarkt")
 
-        photo_url = entry.get("photo_url") or IMAGE_URL.format(player_id=ss_id)
-        if entry.get("photo_status") in {"missing", None} and not entry.get("file"):
-            photo_url = None
+        photo_url = resolve_photo_url(
+            entry,
+            ss_id,
+            photos_dir=local_dir,
+            prefer_local=prefer_local,
+        )
 
         market_label = entry.get("market_value_label")
         market_eur = entry.get("market_value_eur")
@@ -143,21 +205,25 @@ def apply_manifest(
             market_label = None
             market_eur = None
 
-        if not needs_photo(existing) and not needs_market(existing):
+        wants_photo = should_set_photo(existing, photo_url, refresh_local=refresh_local)
+        wants_market = needs_market(existing)
+        if not wants_photo and not wants_market:
             continue
 
-        before_photo = needs_photo(existing)
+        before_photo = needs_photo(existing) or is_sofascore_cdn_photo((existing or {}).get("photo"))
         before_market = needs_market(existing)
 
         tm = merge_transfermarkt(
             existing,
-            photo_url=photo_url,
-            market_label=market_label if isinstance(market_label, str) else None,
-            market_eur=market_eur if isinstance(market_eur, int) else None,
+            photo_url=photo_url if wants_photo else None,
+            market_label=market_label if isinstance(market_label, str) and wants_market else None,
+            market_eur=market_eur if isinstance(market_eur, int) and wants_market else None,
             ss_player_id=ss_id,
         )
 
-        if before_photo and not needs_photo(tm):
+        if wants_photo and photo_url and tm.get("photo") == photo_url:
+            filled_photo += 1
+        elif before_photo and not needs_photo(tm):
             filled_photo += 1
         if before_market and not needs_market(tm):
             filled_market += 1
@@ -180,13 +246,37 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--league", default="serie-c", help="serie-a ou serie-c")
     parser.add_argument("--csv", type=Path, required=True, help="CSV defensivo (BRC26_defensive.csv)")
     parser.add_argument("--manifest", type=Path, required=True, help="manifest.json da pasta de fotos")
+    parser.add_argument(
+        "--photos-dir",
+        type=Path,
+        default=None,
+        help="Pasta com arquivos de foto (default: pasta do manifest ou ./photos)",
+    )
+    parser.add_argument(
+        "--no-prefer-local",
+        action="store_true",
+        help="Usar URL SofaScore em vez de /photos/arquivo local",
+    )
+    parser.add_argument(
+        "--no-refresh-local",
+        action="store_true",
+        help="Não substituir fotos CDN já gravadas por /photos/…",
+    )
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    apply_manifest(args.league, args.csv, args.manifest, dry_run=args.dry_run)
+    apply_manifest(
+        args.league,
+        args.csv,
+        args.manifest,
+        photos_dir=args.photos_dir,
+        prefer_local=not args.no_prefer_local,
+        refresh_local=not args.no_refresh_local,
+        dry_run=args.dry_run,
+    )
 
 
 if __name__ == "__main__":
