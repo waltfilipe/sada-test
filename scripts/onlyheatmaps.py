@@ -62,7 +62,10 @@ def _proxy_cfg() -> dict[str, str] | None:
 
 def fetch_api_json(path: str) -> dict[str, Any]:
     if _SOFA_API is not None:
-        return _SOFA_API.get(path.lstrip("/"))
+        try:
+            return _SOFA_API.get(path.lstrip("/"))
+        except Exception as exc:
+            raise RuntimeError(f"SofaScore API error for {path}: {exc}") from exc
 
     url = f"{API_BASE}/{path.lstrip('/')}"
     proxy_cfg = _proxy_cfg()
@@ -451,8 +454,12 @@ def build_targets(args: argparse.Namespace, csv_path: Path) -> list[dict[str, An
 def main() -> None:
     global _SOFA_API
     args = parse_args()
-    api = open_sofascore_api(args)
-    _SOFA_API = api
+    injected_api = _SOFA_API
+    owned_api = None
+    if injected_api is None:
+        owned_api = open_sofascore_api(args)
+        _SOFA_API = owned_api
+
     csv_path = args.csv or (PROJECT_ROOT / "BR26_defensive.csv")
     if not csv_path.is_absolute():
         for candidate in [Path.cwd() / csv_path, PROJECT_ROOT / csv_path, SCRIPT_DIR / csv_path]:
@@ -553,12 +560,12 @@ def main() -> None:
 
     print(f"Done: {ok} saved, {skipped} skipped, {fail} failed")
 
-    if api is not None:
+    if owned_api is not None:
         try:
-            api.close()
+            owned_api.close()
         except Exception:
             pass
-    _SOFA_API = None
+        _SOFA_API = None
 
 
 if __name__ == "__main__":
