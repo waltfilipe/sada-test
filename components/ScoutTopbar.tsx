@@ -39,7 +39,7 @@ export function ScoutTopbar({ active, subnav }: Props) {
     <div className="scout-topbar-wrap">
       <header className="scout-topbar">
         <Link href={href("/")} className="scout-brand">
-          <SiteLogo height={108} />
+          <SiteLogo height={52} />
           <span className="sc-brand-copy">
             <strong>{name} Scout</strong>
             <em>Temporada {season}</em>
