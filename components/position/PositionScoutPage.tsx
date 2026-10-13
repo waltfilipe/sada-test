@@ -182,7 +182,7 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
     if (!showFlankFilter) setFlankSide(null);
   }, [showFlankFilter, family]);
 
-  const activeCount =
+  const panelCount =
     (profile ? 1 : 0) +
     badges.length +
     (ageBand ? 1 : 0) +
@@ -190,8 +190,8 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
     (foot ? 1 : 0) +
     (origin ? 1 : 0) +
     (club ? 1 : 0) +
-    (flankSide ? 1 : 0) +
-    (query.trim() ? 1 : 0);
+    (flankSide ? 1 : 0);
+  const activeCount = panelCount + (query.trim() ? 1 : 0);
 
   return (
     <div className={`scout-root zag-v2${leagueId === "serie-c" ? " league-serie-c" : ""}`}>
@@ -236,128 +236,137 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
               />
             </label>
 
-            <section className="zag-v2-block">
-              <h2>Perfil</h2>
-              <div className="zag-v2-chips">
-                <button type="button" className={!profile ? "active" : ""} onClick={() => setProfile(null)}>
-                  Todos
-                </button>
-                {archetypes.map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    className={profile === item ? "active" : ""}
-                    onClick={() => setProfile(profile === item ? null : item)}
-                  >
-                    {item}
-                  </button>
-                ))}
+            <details className="zag-v2-filters">
+              <summary>
+                <span>
+                  <i className="fa-solid fa-sliders" aria-hidden="true" />
+                  Filtros
+                  {panelCount ? <em className="zag-v2-filters-count">{panelCount}</em> : null}
+                </span>
+                <i className="fa-solid fa-chevron-down zag-v2-filters-chevron" aria-hidden="true" />
+              </summary>
+              <div className="zag-v2-filters-body">
+                <section>
+                  <h2>Perfil</h2>
+                  <div className="zag-v2-chips">
+                    <button type="button" className={!profile ? "active" : ""} onClick={() => setProfile(null)}>
+                      Todos
+                    </button>
+                    {archetypes.map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        className={profile === item ? "active" : ""}
+                        onClick={() => setProfile(profile === item ? null : item)}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                <section>
+                  <h2>Badges</h2>
+                  <BadgeFilterBox inline options={badgeOptions} selected={badges} onToggle={toggleBadge} />
+                  <p className="zag-v2-note">Quem tem todos os badges marcados.</p>
+                </section>
+
+                <div className="zag-v2-pairs">
+                  <section>
+                    <h2>Idade</h2>
+                    <div className="zag-v2-chips">
+                      {AGE_BANDS.map((band) => (
+                        <button
+                          key={band.value}
+                          type="button"
+                          className={ageBand === band.value ? "active" : ""}
+                          onClick={() => setAgeBand(ageBand === band.value ? null : band.value)}
+                        >
+                          {band.label}
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+
+                  <section>
+                    <h2>Minutagem</h2>
+                    <div className="zag-v2-chips">
+                      {MINUTES_BANDS.map((band) => (
+                        <button
+                          key={band.value}
+                          type="button"
+                          className={minutesBand === band.value ? "active" : ""}
+                          onClick={() => setMinutesBand(minutesBand === band.value ? null : band.value)}
+                        >
+                          {band.label}
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                </div>
+
+                {showFlankFilter ? (
+                  <section>
+                    <h2>Lado</h2>
+                    <div className="zag-v2-chips">
+                      <button type="button" className={!flankSide ? "active" : ""} onClick={() => setFlankSide(null)}>
+                        Ambos
+                      </button>
+                      <button
+                        type="button"
+                        className={flankSide === "esquerdo" ? "active" : ""}
+                        onClick={() => setFlankSide(flankSide === "esquerdo" ? null : "esquerdo")}
+                      >
+                        Esquerdo
+                      </button>
+                      <button
+                        type="button"
+                        className={flankSide === "direito" ? "active" : ""}
+                        onClick={() => setFlankSide(flankSide === "direito" ? null : "direito")}
+                      >
+                        Direito
+                      </button>
+                    </div>
+                  </section>
+                ) : null}
+
+                <section className="zag-v2-selects">
+                  <label>
+                    Pé
+                    <select value={foot ?? ""} onChange={(event) => setFoot(event.target.value || null)}>
+                      <option value="">Todos</option>
+                      {feet.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Origem
+                    <select
+                      value={origin ?? ""}
+                      onChange={(event) => setOrigin((event.target.value || null) as "br" | "out" | null)}
+                    >
+                      <option value="">Todas</option>
+                      <option value="br">Brasileiros</option>
+                      <option value="out">Estrangeiros</option>
+                    </select>
+                  </label>
+                  <label>
+                    Clube
+                    <select value={club ?? ""} onChange={(event) => setClub(event.target.value || null)}>
+                      <option value="">Todos</option>
+                      {clubs.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </section>
               </div>
-            </section>
-
-            <section>
-              <BadgeFilterBox options={badgeOptions} selected={badges} onToggle={toggleBadge} />
-              <p className="zag-v2-note">Quem tem todos os badges marcados.</p>
-            </section>
-
-            <div className="zag-v2-pairs">
-              <section className="zag-v2-block">
-                <h2>Idade</h2>
-                <div className="zag-v2-chips">
-                  {AGE_BANDS.map((band) => (
-                    <button
-                      key={band.value}
-                      type="button"
-                      className={ageBand === band.value ? "active" : ""}
-                      onClick={() => setAgeBand(ageBand === band.value ? null : band.value)}
-                    >
-                      {band.label}
-                    </button>
-                  ))}
-                </div>
-              </section>
-
-              <section className="zag-v2-block">
-                <h2>Minutagem</h2>
-                <div className="zag-v2-chips">
-                  {MINUTES_BANDS.map((band) => (
-                    <button
-                      key={band.value}
-                      type="button"
-                      className={minutesBand === band.value ? "active" : ""}
-                      onClick={() => setMinutesBand(minutesBand === band.value ? null : band.value)}
-                    >
-                      {band.label}
-                    </button>
-                  ))}
-                </div>
-              </section>
-            </div>
-
-            {showFlankFilter ? (
-              <section className="zag-v2-block">
-                <h2>Lado</h2>
-                <div className="zag-v2-chips">
-                  <button
-                    type="button"
-                    className={!flankSide ? "active" : ""}
-                    onClick={() => setFlankSide(null)}
-                  >
-                    Ambos
-                  </button>
-                  <button
-                    type="button"
-                    className={flankSide === "esquerdo" ? "active" : ""}
-                    onClick={() => setFlankSide(flankSide === "esquerdo" ? null : "esquerdo")}
-                  >
-                    Esquerdo
-                  </button>
-                  <button
-                    type="button"
-                    className={flankSide === "direito" ? "active" : ""}
-                    onClick={() => setFlankSide(flankSide === "direito" ? null : "direito")}
-                  >
-                    Direito
-                  </button>
-                </div>
-              </section>
-            ) : null}
-
-            <section className="zag-v2-selects zag-v2-block">
-              <label>
-                Pé
-                <select value={foot ?? ""} onChange={(event) => setFoot(event.target.value || null)}>
-                  <option value="">Todos</option>
-                  {feet.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Origem
-                <select
-                  value={origin ?? ""}
-                  onChange={(event) => setOrigin((event.target.value || null) as "br" | "out" | null)}
-                >
-                  <option value="">Todas</option>
-                  <option value="br">Brasileiros</option>
-                  <option value="out">Estrangeiros</option>
-                </select>
-              </label>
-              <label>
-                Clube
-                <select value={club ?? ""} onChange={(event) => setClub(event.target.value || null)}>
-                  <option value="">Todos</option>
-                  {clubs.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </section>
+            </details>
 
             <p className="zag-v2-count tabular">
               <strong>{visible.length}</strong> de {players.length}

@@ -167,6 +167,86 @@
   outline: none;
 }
 
+.zag-v2-filters {
+  margin-bottom: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(186, 204, 224, 0.04);
+}
+
+.zag-v2-filters summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.72rem 0.8rem;
+  cursor: pointer;
+  list-style: none;
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.zag-v2-filters summary::-webkit-details-marker {
+  display: none;
+}
+
+.zag-v2-filters summary > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.zag-v2-filters summary .fa-sliders {
+  color: #1be7ff;
+  font-size: 0.72rem;
+}
+
+.zag-v2-filters-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.28rem;
+  border-radius: 999px;
+  background: #1be7ff;
+  color: #0d1b2a;
+  font-style: normal;
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.zag-v2-filters-chevron {
+  font-size: 0.62rem;
+  color: var(--text-3);
+  transition: transform 0.16s ease;
+}
+
+.zag-v2-filters[open] .zag-v2-filters-chevron {
+  transform: rotate(180deg);
+}
+
+.zag-v2-filters-body {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0 0.8rem 0.85rem;
+}
+
+.zag-v2-filters-body > * + * {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(186, 204, 224, 0.12);
+}
+
+.zag-v2-filters-body section,
+.zag-v2-filters-body .zag-v2-pairs {
+  margin-bottom: 0;
+}
+
+.zag-v2-filters .badge-filter-icons.is-inline {
+  padding: 0;
+}
+
 .zag-v2-rail section {
   margin-bottom: 0.85rem;
 }
