@@ -119,8 +119,6 @@ export type PlayerProfile = PlayerSummary & {
   goals: number;
   assists: number;
   heatmap?: PlayerHeatmapData;
-  /** Wyscout role codes, most-used first. Present for Série A players with a heatmap. */
-  wyscout_positions?: string[];
   ratings: {
     geral: number;
     [profileKey: string]: number;

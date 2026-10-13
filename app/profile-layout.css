@@ -1871,46 +1871,6 @@
   text-align: center;
 }
 
-.heatmap-meta strong {
-  color: #7df1de;
-  font-weight: 750;
-}
-
-.heatmap-mode-switch {
-  display: flex;
-  gap: 0.15rem;
-  padding: 0.12rem;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: rgba(8, 12, 18, 0.45);
-}
-
-.heatmap-mode-switch button {
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  border-radius: 999px;
-  padding: 0.22rem 0.55rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.heatmap-mode-switch button.active {
-  background: rgba(125, 241, 222, 0.16);
-  color: #7df1de;
-}
-
-.role-pitch-body {
-  min-height: 0;
-}
-
-.role-pitch {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
 .heatmap-empty {
   flex: 1;
   min-height: 0;
