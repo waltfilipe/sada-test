@@ -517,8 +517,8 @@
 }
 
 .zag-v2 .profile-content-grid {
-  grid-template-columns: minmax(0, 0.765fr) minmax(0, 1.235fr);
-  align-items: start;
+  grid-template-columns: minmax(188px, 228px) minmax(0, 1.12fr) minmax(0, 1.05fr);
+  align-items: stretch;
 }
 
 .zag-v2 .player-hero {
@@ -574,23 +574,19 @@
 }
 
 .zag-v2 .profile-col-heatmap,
-.zag-v2 .profile-col-middle {
-  height: auto;
-}
-
+.zag-v2 .profile-col-middle,
 .zag-v2 .profile-col-stats {
-  grid-column: 1 / -1;
+  height: auto;
+  grid-column: auto;
+  order: 0;
 }
 
 .zag-v2 .profile-col-heatmap .heatmap-card,
-.zag-v2 .profile-col-middle .profile-perfil-card {
-  min-height: 0;
-  height: auto;
-  flex: 0 0 auto;
-}
-
+.zag-v2 .profile-col-middle .profile-perfil-card,
 .zag-v2 .profile-col-stats .pass-scores-shell {
   min-height: 0;
+  height: 100%;
+  flex: 1 1 auto;
 }
 
 .zag-v2 .heatmap-body,
@@ -600,11 +596,11 @@
 }
 
 .zag-v2 .heatmap-pitch-wrap {
-  aspect-ratio: 1.7;
+  aspect-ratio: 68 / 105;
   width: 100%;
   height: auto;
   min-height: 0;
-  max-height: 196px;
+  max-height: none;
   flex: none;
 }
 
@@ -643,7 +639,9 @@
   }
 
   .zag-v2 .heatmap-pitch-wrap {
-    aspect-ratio: 1.55;
+    aspect-ratio: 68 / 105;
+    max-width: 240px;
+    margin-inline: auto;
     flex: none;
   }
 

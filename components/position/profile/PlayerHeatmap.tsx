@@ -7,6 +7,8 @@ type Props = {
   heatmap?: PlayerHeatmapData | null;
   playerName: string;
   compact?: boolean;
+  /** Goal-to-goal axis runs upward, so the pitch card is tall. */
+  upright?: boolean;
 };
 
 type Point = { x: number; y: number };
@@ -85,10 +87,10 @@ function buildDensity(points: Point[]): Float32Array {
 
 type Rect = { x: number; y: number; w: number; h: number };
 
-function pitchRect(w: number, h: number, compact = false): Rect {
-  const padX = compact ? Math.max(2, w * 0.025) : Math.max(8, w * 0.04);
-  const padTop = compact ? Math.max(2, h * 0.04) : Math.max(6, h * 0.03);
-  const padBottom = compact ? Math.max(2, h * 0.04) : Math.max(18, h * 0.09);
+function pitchRect(w: number, h: number, compact = false, evenPad = false): Rect {
+  const padX = evenPad ? Math.max(6, w * 0.035) : compact ? Math.max(2, w * 0.025) : Math.max(8, w * 0.04);
+  const padTop = evenPad ? Math.max(6, h * 0.04) : compact ? Math.max(2, h * 0.04) : Math.max(6, h * 0.03);
+  const padBottom = evenPad ? padTop : compact ? Math.max(2, h * 0.04) : Math.max(18, h * 0.09);
   const availW = Math.max(0, w - padX * 2);
   const availH = Math.max(0, h - padTop - padBottom);
   let pw = availW;
@@ -276,7 +278,61 @@ function drawAttackHint(ctx: CanvasRenderingContext2D, r: Rect) {
   ctx.restore();
 }
 
-function render(canvas: HTMLCanvasElement, points: Point[], compact = false) {
+function paintPitch(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  points: Point[],
+  compact: boolean,
+  evenPad: boolean,
+) {
+  const rect = pitchRect(width, height, compact, evenPad);
+  if (rect.w <= 0 || rect.h <= 0) return null;
+  const radius = Math.max(2, Math.min(6, rect.h * 0.02));
+  drawGrass(ctx, rect, radius);
+  if (points.length) drawHeat(ctx, rect, radius, points, compact);
+  drawLines(ctx, rect, radius, compact);
+  return rect;
+}
+
+/** Landscape render, rotated so the attacking goal sits at the top. */
+function renderUpright(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  points: Point[],
+  dpr: number,
+) {
+  const labelH = 16;
+  const boxW = width;
+  const boxH = Math.max(1, height - labelH);
+  const bw = boxH;
+  const bh = boxW;
+
+  const off = document.createElement("canvas");
+  off.width = Math.max(1, Math.floor(bw * dpr));
+  off.height = Math.max(1, Math.floor(bh * dpr));
+  const offCtx = off.getContext("2d");
+  if (!offCtx) return;
+  offCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  paintPitch(offCtx, bw, bh, points, false, true);
+
+  ctx.save();
+  ctx.translate(boxW / 2, labelH + boxH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.drawImage(off, -bw / 2, -bh / 2, bw, bh);
+  ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle = "rgba(226, 232, 240, 0.72)";
+  ctx.font = `600 11px "TASA Orbiter Variable", system-ui, sans-serif`;
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  ctx.fillText("Ataque  ↑", width - 2, labelH / 2);
+  ctx.restore();
+}
+
+function render(canvas: HTMLCanvasElement, points: Point[], compact = false, upright = false) {
   const wrap = canvas.parentElement;
   if (!wrap) return;
 
@@ -285,6 +341,8 @@ function render(canvas: HTMLCanvasElement, points: Point[], compact = false) {
   // The observer also fires while the card is collapsed, where no pitch fits.
   if (compact) {
     if (width < 48 || height < 32) return;
+  } else if (upright) {
+    if (width < 72 || height < 120) return;
   } else if (width < 80 || height < 60) return;
 
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -299,17 +357,16 @@ function render(canvas: HTMLCanvasElement, points: Point[], compact = false) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
 
-  const rect = pitchRect(width, height, compact);
-  if (rect.w <= 0 || rect.h <= 0) return;
-  const radius = Math.max(2, Math.min(6, rect.h * 0.02));
+  if (upright) {
+    renderUpright(ctx, width, height, points, dpr);
+    return;
+  }
 
-  drawGrass(ctx, rect, radius);
-  if (points.length) drawHeat(ctx, rect, radius, points, compact);
-  drawLines(ctx, rect, radius, compact);
-  if (!compact) drawAttackHint(ctx, rect);
+  const rect = paintPitch(ctx, width, height, points, compact, false);
+  if (rect && !compact) drawAttackHint(ctx, rect);
 }
 
-export function PlayerHeatmap({ heatmap, playerName, compact = false }: Props) {
+export function PlayerHeatmap({ heatmap, playerName, compact = false, upright = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -323,12 +380,12 @@ export function PlayerHeatmap({ heatmap, playerName, compact = false }: Props) {
 
     let seen = false;
     const paint = () => {
-      if (seen) render(canvas, points, compact);
+      if (seen) render(canvas, points, compact, upright);
     };
     const onScreen = new IntersectionObserver((entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return;
       seen = true;
-      render(canvas, points, compact);
+      render(canvas, points, compact, upright);
     }, { rootMargin: "240px" });
     onScreen.observe(wrap);
 
@@ -339,7 +396,7 @@ export function PlayerHeatmap({ heatmap, playerName, compact = false }: Props) {
       observer.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [heatmap, hasPoints, compact]);
+  }, [heatmap, hasPoints, compact, upright]);
 
   if (!hasPoints && !heatmap?.image_url) {
     if (compact) return <div className="heatmap-compact-empty" aria-hidden="true" />;
@@ -364,7 +421,7 @@ export function PlayerHeatmap({ heatmap, playerName, compact = false }: Props) {
   const ariaLabel = `Heatmap de ${playerName}${meta ? ` — ${meta}` : ""}`;
 
   return (
-    <div className={`heatmap-body heatmap-body-live${compact ? " heatmap-compact" : ""}`}>
+    <div className={`heatmap-body heatmap-body-live${compact ? " heatmap-compact" : ""}${upright ? " heatmap-upright" : ""}`}>
       {hasPoints ? (
         <div ref={wrapRef} className="heatmap-pitch-wrap">
           <canvas ref={canvasRef} className="heatmap-pitch-canvas" role="img" aria-label={ariaLabel} />

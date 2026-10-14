@@ -158,7 +158,7 @@ export function PlayerHero({ player, family }: Props) {
         </div>
 
         <div className="player-hero-bottom-row">
-          <div className="hero-identity-card">
+          <div className="hero-bio-block">
             <dl className="player-hero-facts">
               {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
               {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
