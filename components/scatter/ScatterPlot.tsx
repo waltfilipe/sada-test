@@ -19,8 +19,8 @@ type Props = {
   yLabel: string;
 };
 
-const WIDTH = 860;
-const HEIGHT = 560;
+const WIDTH = 760;
+const HEIGHT = 440;
 const PAD = { top: 28, right: 28, bottom: 52, left: 56 };
 
 function formatAxis(value: number): string {
@@ -33,7 +33,11 @@ function bounds(values: number[], anchor: number) {
   const min = Math.min(...values, anchor);
   const max = Math.max(...values, anchor);
   const span = max - min || 1;
-  return { min: min - span * 0.08, max: max + span * 0.08 };
+  const pad = span * 0.18;
+  let lo = min - pad;
+  const hi = max + pad;
+  if (min >= 0) lo = Math.max(0, lo);
+  return { min: lo, max: hi };
 }
 
 export function ScatterPlot({

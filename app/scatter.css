@@ -25,8 +25,8 @@
 }
 
 .slot-compact {
-  gap: 0.5rem;
-  padding: 0.65rem 0.8rem 0.7rem;
+  gap: 0.55rem;
+  padding: 0.75rem 0.9rem 0.8rem;
 }
 
 .slot-compact-row {
@@ -37,9 +37,9 @@
 }
 
 .slot-compact .slot-photo {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
   box-shadow: none;
 }
 
@@ -52,25 +52,29 @@
 }
 
 .slot-compact .slot-identity h2 {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .slot-compact .slot-club {
-  margin: 0.08rem 0 0;
-  font-size: 0.74rem;
+  margin: 0.12rem 0 0;
+  font-size: 0.78rem;
 }
 
-.slot-compact-rating {
-  margin-left: auto;
-  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
-  font-size: 1.2rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--tier-color);
-  font-variant-numeric: tabular-nums;
+.slot-compact-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.16rem 0 0;
+  font-size: 0.72rem;
+  color: var(--text-3);
+}
+
+.slot-compact-meta i {
+  font-style: normal;
+  opacity: 0.7;
 }
 
 .scatter-stage .compare-pivot {
@@ -563,8 +567,8 @@
 /* ── Chart ───────────────────────────────────────────────────────────────── */
 
 .scatter-plot-wrap {
-  width: 100%;
-  margin-top: 0.35rem;
+  width: min(100%, 760px);
+  margin: 0.35rem auto 0;
 }
 
 .scatter-plot {

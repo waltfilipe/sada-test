@@ -53,9 +53,15 @@ export function AthleteSlot({ side, player, players, onChange, compact = false }
             <p className="slot-club">
               <ClubLogo club={player.club} size={16} />
               {player.club}
+              <i aria-hidden>·</i>
+              <span>{player.position}</span>
+            </p>
+            <p className="slot-compact-meta">
+              {age != null ? `${age} anos` : "Idade —"}
+              <i aria-hidden>·</i>
+              {player.minutes.toLocaleString("pt-BR")} min
             </p>
           </div>
-          <strong className="slot-compact-rating">{rating}</strong>
         </div>
       </section>
     );

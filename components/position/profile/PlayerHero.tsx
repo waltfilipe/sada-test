@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
@@ -25,6 +26,12 @@ function monthsRemaining(iso?: string | null): number | null {
   let months = (end.getFullYear() - now.getFullYear()) * 12 + (end.getMonth() - now.getMonth());
   if (end.getDate() < now.getDate()) months -= 1;
   return Math.max(0, months);
+}
+
+function metricDisplay(player: PlayerProfile, group: string, sub: string): string {
+  const item = findAspect(flattenAspects(player), group);
+  const value = item?.sub_metrics?.find((row) => row.label === sub)?.display_value?.trim();
+  return value || "—";
 }
 
 function HeroFact({ label, children }: { label: string; children: React.ReactNode }) {
@@ -145,6 +152,25 @@ export function PlayerHero({ player, family }: Props) {
                 ) : null}
               </span>
             </MarketCard>
+          </div>
+        </div>
+
+        <div className="hero-output" aria-label="Produção ofensiva">
+          <div>
+            <span>Gols</span>
+            <strong className="tabular">{player.goals.toLocaleString("pt-BR")}</strong>
+          </div>
+          <div>
+            <span>xG</span>
+            <strong className="tabular">{metricDisplay(player, "Gols e xG", "xG")}</strong>
+          </div>
+          <div>
+            <span>Assistências</span>
+            <strong className="tabular">{player.assists.toLocaleString("pt-BR")}</strong>
+          </div>
+          <div>
+            <span>xA</span>
+            <strong className="tabular">{metricDisplay(player, "Pré Assistências e xA", "xA")}</strong>
           </div>
         </div>
 

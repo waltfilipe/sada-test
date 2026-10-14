@@ -1593,6 +1593,40 @@
   font-weight: 600;
 }
 
+.hero-output {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.hero-output div {
+  min-width: 4.4rem;
+  padding: 0.38rem 0.7rem 0.42rem;
+  border-radius: 10px;
+  border: 1px solid rgba(186, 204, 224, 0.14);
+  background: rgba(186, 204, 224, 0.05);
+}
+
+.hero-output span {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.hero-output strong {
+  display: block;
+  margin-top: 0.12rem;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--text);
+}
+
 .player-hero-actions {
   display: flex;
   align-items: center;
