@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { findAspect, flattenAspects } from "@/lib/aspectLookup";
+import { flattenAspects } from "@/lib/aspectLookup";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
@@ -28,10 +28,12 @@ function monthsRemaining(iso?: string | null): number | null {
   return Math.max(0, months);
 }
 
-function metricDisplay(player: PlayerProfile, group: string, sub: string): string {
-  const item = findAspect(flattenAspects(player), group);
-  const value = item?.sub_metrics?.find((row) => row.label === sub)?.display_value?.trim();
-  return value || "—";
+function metricDisplay(player: PlayerProfile, label: string): string {
+  for (const item of flattenAspects(player)) {
+    const value = item.sub_metrics?.find((row) => row.label === label)?.display_value?.trim();
+    if (value) return value;
+  }
+  return "—";
 }
 
 function HeroFact({ label, children }: { label: string; children: React.ReactNode }) {
@@ -155,32 +157,33 @@ export function PlayerHero({ player, family }: Props) {
           </div>
         </div>
 
-        <div className="hero-output" aria-label="Produção ofensiva">
-          <div>
-            <span>Gols</span>
-            <strong className="tabular">{player.goals.toLocaleString("pt-BR")}</strong>
-          </div>
-          <div>
-            <span>xG</span>
-            <strong className="tabular">{metricDisplay(player, "Gols e xG", "xG")}</strong>
-          </div>
-          <div>
-            <span>Assistências</span>
-            <strong className="tabular">{player.assists.toLocaleString("pt-BR")}</strong>
-          </div>
-          <div>
-            <span>xA</span>
-            <strong className="tabular">{metricDisplay(player, "Pré Assistências e xA", "xA")}</strong>
-          </div>
-        </div>
-
         <div className="player-hero-bottom-row">
-          <dl className="player-hero-facts">
-            {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
-            {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
-            {player.foot ? <HeroFact label="Pé">{player.foot}</HeroFact> : null}
-            {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
-          </dl>
+          <div className="hero-identity-card">
+            <dl className="player-hero-facts">
+              {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
+              {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
+              {player.foot ? <HeroFact label="Pé">{player.foot}</HeroFact> : null}
+              {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
+            </dl>
+            <div className="hero-output" aria-label="Produção ofensiva">
+              <div>
+                <span>Gols</span>
+                <strong className="tabular">{player.goals.toLocaleString("pt-BR")}</strong>
+              </div>
+              <div>
+                <span>xG</span>
+                <strong className="tabular">{metricDisplay(player, "xG")}</strong>
+              </div>
+              <div>
+                <span>Assistências</span>
+                <strong className="tabular">{player.assists.toLocaleString("pt-BR")}</strong>
+              </div>
+              <div>
+                <span>xA</span>
+                <strong className="tabular">{metricDisplay(player, "xA")}</strong>
+              </div>
+            </div>
+          </div>
 
           <div className="player-hero-actions">
             <Link

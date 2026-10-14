@@ -408,6 +408,7 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
           <main className="zag-v2-detail">
             {selected ? (
               <PositionProfileView
+                key={selected.player_id}
                 player={selected}
                 family={family}
                 players={players}
