@@ -27,7 +27,7 @@ export const LEAGUES: LeagueInfo[] = [
     season: "2026",
     brand: "SB",
     tagline: "Brasileirão",
-    heatmaps: false,
+    heatmaps: true,
   },
   {
     id: "serie-c",

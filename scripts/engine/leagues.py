@@ -33,8 +33,8 @@ LEAGUES: dict[str, LeagueConfig] = {
         "season": "2026",
         "xlsx": [WYSCOUT_2026 / "serie-b-pt1.xlsx", WYSCOUT_2026 / "serie-b-pt2.xlsx"],
         "defensive_csv": ROOT / "BRB26_defensive.csv",
-        "heatmaps": False,
-        "heatmaps_dir": None,
+        "heatmaps": True,
+        "heatmaps_dir": ROOT / "HeatmapsBRB26",
     },
     "serie-c": {
         "id": "serie-c",
