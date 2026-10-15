@@ -599,6 +599,15 @@
   flex: 1 1 auto;
 }
 
+.zag-v2 .profile-col-heatmap:has(.projection-card) .heatmap-card {
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.zag-v2 .profile-content-grid:has(.projection-card):not(:has(.heatmap-card)) {
+  grid-template-columns: minmax(240px, 300px) minmax(0, 1.12fr) minmax(0, 1.05fr);
+}
+
 .zag-v2 .heatmap-body,
 .zag-v2 .heatmap-body-live {
   flex: 1 1 auto;

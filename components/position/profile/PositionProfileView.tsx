@@ -1,6 +1,8 @@
 "use client";
 
+import { isProjectionEligible } from "@/lib/minuteProjection";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
+import { MinuteProjection } from "./MinuteProjection";
 import { PlayerHero } from "./PlayerHero";
 import { PlayerHeatmap } from "./PlayerHeatmap";
 import { ProfileCard } from "./ProfileCard";
@@ -14,19 +16,25 @@ type Props = {
 };
 
 export function PositionProfileView({ player, family, players, heatmapsEnabled = true }: Props) {
+  const showProjection = isProjectionEligible(player);
+  const showHeatColumn = heatmapsEnabled || showProjection;
+
   return (
     <div className="profile-view-shell">
       <PlayerHero player={player} family={family} />
 
-      <div className={`profile-content-grid${heatmapsEnabled ? "" : " profile-content-grid-no-heatmap"}`}>
-        {heatmapsEnabled ? (
+      <div className={`profile-content-grid${showHeatColumn ? "" : " profile-content-grid-no-heatmap"}`}>
+        {showHeatColumn ? (
           <div className="profile-content-col profile-col-heatmap">
-            <div className="player-card heatmap-card profile-perfil-card-score">
-              <div className="profile-card-head">
-                <h3 className="section-label">Heatmap</h3>
+            {heatmapsEnabled ? (
+              <div className="player-card heatmap-card profile-perfil-card-score">
+                <div className="profile-card-head">
+                  <h3 className="section-label">Heatmap</h3>
+                </div>
+                <PlayerHeatmap upright heatmap={player.heatmap} playerName={player.name} />
               </div>
-              <PlayerHeatmap upright heatmap={player.heatmap} playerName={player.name} />
-            </div>
+            ) : null}
+            {showProjection ? <MinuteProjection player={player} family={family} players={players} /> : null}
           </div>
         ) : null}
 
