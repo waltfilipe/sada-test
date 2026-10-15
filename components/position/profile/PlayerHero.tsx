@@ -120,7 +120,7 @@ export function PlayerHero({ player, family, players }: Props) {
         <div className="player-hero-title-wrap">
           <h2 className="player-hero-name">{player.name}</h2>
           <p className="player-hero-club">
-            <ClubLogo club={player.club} size={17} />
+            <ClubLogo club={player.club} size={22} />
             <span className="player-hero-club-name">{player.club}</span>
             <span className="player-hero-club-sep" aria-hidden="true">·</span>
             <span className="player-hero-position">{player.position}</span>
@@ -134,23 +134,30 @@ export function PlayerHero({ player, family, players }: Props) {
             {formatFoot(player.foot) ? <HeroFact label="Pé">{formatFoot(player.foot)}</HeroFact> : null}
             {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
           </dl>
-          <div className="hero-output" aria-label="Produção ofensiva">
-            <div>
-              <span>Gols</span>
-              <strong className="tabular">{player.goals.toLocaleString("pt-BR")}</strong>
+          <div className="hero-output-row">
+            <div className="hero-output" aria-label="Produção ofensiva">
+              <div>
+                <span>Gols</span>
+                <strong className="tabular">{player.goals.toLocaleString("pt-BR")}</strong>
+              </div>
+              <div>
+                <span>xG</span>
+                <strong className="tabular">{metricDisplay(player, "xG")}</strong>
+              </div>
+              <div>
+                <span>Assistências</span>
+                <strong className="tabular">{player.assists.toLocaleString("pt-BR")}</strong>
+              </div>
+              <div>
+                <span>xA</span>
+                <strong className="tabular">{metricDisplay(player, "xA")}</strong>
+              </div>
             </div>
-            <div>
-              <span>xG</span>
-              <strong className="tabular">{metricDisplay(player, "xG")}</strong>
-            </div>
-            <div>
-              <span>Assistências</span>
-              <strong className="tabular">{player.assists.toLocaleString("pt-BR")}</strong>
-            </div>
-            <div>
-              <span>xA</span>
-              <strong className="tabular">{metricDisplay(player, "xA")}</strong>
-            </div>
+            {showProjection ? (
+              <div className="hero-output-projection">
+                <MinuteProjection player={player} family={family} players={players} />
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -205,11 +212,6 @@ export function PlayerHero({ player, family, players }: Props) {
         </div>
 
         <div className="hero-action-grid">
-          {showProjection ? (
-            <div className="hero-action-cell">
-              <MinuteProjection player={player} family={family} players={players} />
-            </div>
-          ) : null}
           <div className="hero-action-cell">
             <PassTendencies player={player} players={players} />
           </div>
