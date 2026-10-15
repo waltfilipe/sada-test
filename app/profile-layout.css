@@ -1515,9 +1515,11 @@
 
 .player-hero-photo {
   position: relative;
-  width: 142px;
-  min-height: 220px;
-  align-self: stretch;
+  width: 112px;
+  height: 148px;
+  min-height: 148px;
+  max-height: 148px;
+  align-self: center;
   flex-shrink: 0;
   border-radius: 14px;
   overflow: hidden;
@@ -1531,7 +1533,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 15%;
+  object-position: center 18%;
+  transform: none;
   display: block;
 }
 
@@ -1666,8 +1669,9 @@
   justify-content: space-between;
   gap: 0.55rem 0.85rem;
   box-sizing: border-box;
-  width: 0;
-  min-width: 100%;
+  width: 340px;
+  min-width: 340px;
+  max-width: 340px;
   padding: 0.7rem 0.9rem;
   border-radius: 14px;
   border: 1px solid rgba(186, 204, 224, 0.18);
@@ -3839,8 +3843,10 @@
   .zag-v2.league-serie-b .player-hero-photo,
   .zag-v2.league-serie-c .player-hero-photo,
   .zag-v2.league-serie-d .player-hero-photo {
-    width: 118px;
-    min-height: 156px;
+    width: 96px;
+    height: 128px;
+    min-height: 128px;
+    max-height: 128px;
   }
   .player-hero-name,
   .zag-v2 .player-hero-name { font-size: 1.45rem; }

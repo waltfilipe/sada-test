@@ -227,6 +227,22 @@ def save_club_cache(cache: dict[str, Any]) -> None:
 # players and each row carries a birth date and height to break ties.
 
 
+def _format_foot_pt(raw: str | None) -> str | None:
+    """Store the dominant foot as Destro, Canhoto or Ambidestro."""
+    if not raw:
+        return None
+    value = raw.strip().lower()
+    if not value or value in {"nan", "unknown", "none", "n/a", "-", "—"}:
+        return None
+    if "amb" in value or value in {"both", "either", "ambos"}:
+        return "Ambidestro"
+    if "canh" in value or "esquer" in value or value in {"left", "l"}:
+        return "Canhoto"
+    if "destr" in value or "direit" in value or value in {"right", "r"}:
+        return "Destro"
+    return None
+
+
 def _parse_squad_height(raw: str | None) -> int | None:
     if not raw:
         return None
@@ -664,6 +680,7 @@ def _scrape_profile(path: str) -> dict[str, Any]:
     contract_raw = None
     current_club = None
     on_loan_from = None
+    foot_raw = None
     spans = soup.select("span.info-table__content")
     for index, span in enumerate(spans):
         label = span.get_text(strip=True).lower()
@@ -676,7 +693,11 @@ def _scrape_profile(path: str) -> dict[str, Any]:
             current_club = value
         if label.startswith("emprestado de"):
             on_loan_from = value
+        if label.startswith("pé"):
+            foot_raw = value
 
+    height_el = soup.select_one("[itemprop='height']")
+    height = _parse_squad_height(height_el.get_text(" ", strip=True) if height_el else None)
     contract_until = _parse_contract_date(contract_raw)
     return {
         "id": re.search(r"/spieler/(\d+)", path).group(1) if re.search(r"/spieler/(\d+)", path) else None,
@@ -688,6 +709,8 @@ def _scrape_profile(path: str) -> dict[str, Any]:
         "on_loan_from": on_loan_from,
         "club": current_club,
         "profile_url": f"{BASE_URL}{path}",
+        "foot": _format_foot_pt(foot_raw),
+        "height": height,
     }
 
 

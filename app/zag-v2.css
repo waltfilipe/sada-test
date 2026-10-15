@@ -542,13 +542,14 @@
 .zag-v2.league-serie-b .player-hero-photo,
 .zag-v2.league-serie-c .player-hero-photo,
 .zag-v2.league-serie-d .player-hero-photo {
-  align-self: stretch;
-  width: 142px;
-  height: auto;
-  min-height: 0;
-  max-height: none;
+  align-self: center;
+  width: 112px;
+  height: 148px;
+  min-height: 148px;
+  max-height: 148px;
 }
 
+.zag-v2 .player-hero-photo img,
 .zag-v2.league-serie-b .player-hero-photo img,
 .zag-v2.league-serie-c .player-hero-photo img,
 .zag-v2.league-serie-d .player-hero-photo img {
@@ -557,8 +558,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 16%;
-  transform: scale(1.2);
+  object-position: center 18%;
+  transform: none;
 }
 
 .zag-v2 .player-hero-copy {
@@ -674,9 +675,19 @@
   .zag-v2.league-serie-b .player-hero-photo,
   .zag-v2.league-serie-c .player-hero-photo,
   .zag-v2.league-serie-d .player-hero-photo {
-    width: 118px;
-    min-height: 156px;
-    max-height: 230px;
+    width: 96px;
+    height: 128px;
+    min-height: 128px;
+    max-height: 128px;
+  }
+
+  .zag-v2 .hero-output {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem 0.75rem;
   }
 
   .zag-v2 .player-hero-name {

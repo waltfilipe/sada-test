@@ -206,7 +206,8 @@ export function PlayerHero({ player, family, players }: Props) {
               {months != null ? `${months} ${months === 1 ? "mês" : "meses"}` : "—"}
               {onLoanFrom ? (
                 <span className="hero-loan-pill">
-                  <i className="fa-solid fa-right-left" aria-hidden="true" /> {onLoanFrom}
+                  <ClubLogo club={onLoanFrom} size={14} />
+                  {onLoanFrom}
                 </span>
               ) : null}
             </span>
