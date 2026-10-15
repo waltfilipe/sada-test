@@ -128,29 +128,31 @@ export function PlayerHero({ player, family, players }: Props) {
         </div>
 
         <div className="hero-bio-block">
-          <dl className="player-hero-facts">
-            {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
-            {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
-            {formatFoot(player.foot) ? <HeroFact label="Pé">{formatFoot(player.foot)}</HeroFact> : null}
-            {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
-          </dl>
           <div className="hero-output-row">
-            <div className="hero-output" aria-label="Produção ofensiva">
-              <div>
-                <span>Gols</span>
-                <strong className="tabular">{player.goals.toLocaleString("pt-BR")}</strong>
-              </div>
-              <div>
-                <span>xG</span>
-                <strong className="tabular">{metricDisplay(player, "xG")}</strong>
-              </div>
-              <div>
-                <span>Assistências</span>
-                <strong className="tabular">{player.assists.toLocaleString("pt-BR")}</strong>
-              </div>
-              <div>
-                <span>xA</span>
-                <strong className="tabular">{metricDisplay(player, "xA")}</strong>
+            <div className="hero-identity-stack">
+              <dl className="player-hero-facts">
+                {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
+                {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
+                {formatFoot(player.foot) ? <HeroFact label="Pé">{formatFoot(player.foot)}</HeroFact> : null}
+                {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
+              </dl>
+              <div className="hero-output" aria-label="Produção ofensiva">
+                <div>
+                  <span>Gols</span>
+                  <strong className="tabular">{player.goals.toLocaleString("pt-BR")}</strong>
+                </div>
+                <div>
+                  <span>xG</span>
+                  <strong className="tabular">{metricDisplay(player, "xG")}</strong>
+                </div>
+                <div>
+                  <span>Assistências</span>
+                  <strong className="tabular">{player.assists.toLocaleString("pt-BR")}</strong>
+                </div>
+                <div>
+                  <span>xA</span>
+                  <strong className="tabular">{metricDisplay(player, "xA")}</strong>
+                </div>
               </div>
             </div>
             {showProjection ? (

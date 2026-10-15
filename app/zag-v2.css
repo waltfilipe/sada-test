@@ -543,7 +543,7 @@
 .zag-v2.league-serie-c .player-hero-photo,
 .zag-v2.league-serie-d .player-hero-photo {
   align-self: stretch;
-  width: 158px;
+  width: 142px;
   height: auto;
   min-height: 0;
   max-height: none;
@@ -684,12 +684,29 @@
   }
 
   .zag-v2 .hero-output-row {
-    flex-wrap: wrap;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .zag-v2 .hero-identity-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    width: 100%;
   }
 
   .zag-v2 .hero-output {
-    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
     flex-wrap: wrap;
+  }
+
+  .zag-v2 .hero-output-projection {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
   }
 
   .zag-v2 .hero-output-projection,
