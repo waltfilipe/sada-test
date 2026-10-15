@@ -1609,6 +1609,25 @@ def _build_at_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
     return aspects
 
 
+def _gols_xg_group(row: pd.Series) -> dict[str, Any]:
+    """Season totals. Defenders and full-backs had no xG block, so the profile showed a dash."""
+    gols_total = _row_vol(row, "Gols", "Golos")
+    xg_total = _row_vol(row, "xGTotal", "Golos esperados")
+    return _metric_group_aspect(
+        "Gols e xG",
+        percentile=max(float(row.get("_asp_gols_total_vol", 0) or 0), float(row.get("_asp_xg_total_vol", 0) or 0)),
+        sub_metrics=[
+            _sub_metric("Gols", percentile=row.get("_asp_gols_total_vol", 0), display_value=_fmt_num(gols_total, decimals=0)),
+            _sub_metric("xG", percentile=row.get("_asp_xg_total_vol", 0), display_value=_fmt_num(xg_total, decimals=2)),
+            _sub_metric(
+                "Eficiência de finalização",
+                percentile=row.get("_asp_gol_xg_diff", 0),
+                display_value=_fmt_z_score(gols_total - xg_total),
+            ),
+        ],
+    )
+
+
 def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, list[dict[str, Any]]]:
     if family_key == "atacantes":
         return _build_at_aspects(row)
@@ -1910,6 +1929,9 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 ],
             ),
         ]
+
+    if family_key in ("zagueiros", "laterais"):
+        aspects.setdefault("ofensivos", []).append(_gols_xg_group(row))
 
     return aspects
 

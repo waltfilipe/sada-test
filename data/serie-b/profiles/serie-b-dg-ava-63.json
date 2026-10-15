@@ -262,6 +262,30 @@
           }
         ],
         "stats": []
+      },
+      {
+        "label": "Gols e xG",
+        "kind": "metric_group",
+        "grade": "B+",
+        "percentile": 80.0,
+        "sub_metrics": [
+          {
+            "label": "Gols",
+            "percentile": 16.7,
+            "display_value": "1"
+          },
+          {
+            "label": "xG",
+            "percentile": 80.0,
+            "display_value": "1,72"
+          },
+          {
+            "label": "Eficiência de finalização",
+            "percentile": 21.1,
+            "display_value": "-0,7"
+          }
+        ],
+        "stats": []
       }
     ],
     "passes_finais": [

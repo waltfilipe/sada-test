@@ -211,6 +211,30 @@
         "percentile": 25.0,
         "stats": [],
         "display_value": "0,3"
+      },
+      {
+        "label": "Gols e xG",
+        "kind": "metric_group",
+        "grade": "B+",
+        "percentile": 75.0,
+        "sub_metrics": [
+          {
+            "label": "Gols",
+            "percentile": 75.0,
+            "display_value": "3"
+          },
+          {
+            "label": "xG",
+            "percentile": 72.9,
+            "display_value": "1,37"
+          },
+          {
+            "label": "Eficiência de finalização",
+            "percentile": 100.0,
+            "display_value": "+1,6"
+          }
+        ],
+        "stats": []
       }
     ],
     "aereo": [

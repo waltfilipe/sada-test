@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { ClubLogo } from "@/components/ClubLogo";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { useLeague } from "@/components/LeagueProvider";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
@@ -27,6 +28,7 @@ type ReportBlock = {
 
 type ReportSection = {
   title: string;
+  tone: string;
   blocks: ReportBlock[];
 };
 
@@ -103,7 +105,7 @@ function reportSections(player: PlayerProfile): ReportSection[] {
       const title = label === "Conduções Progressivas" ? "Progressão" : label;
       blocks.push(...blocksFor(item, title));
     }
-    if (blocks.length) sections.push({ title: section.title, blocks });
+    if (blocks.length) sections.push({ title: section.title, tone: section.tone, blocks });
   }
   return sections;
 }
@@ -170,17 +172,16 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
 
   const sheet = (
     <article className="player-report">
-      <header className="player-report-top">
-        <div>
-          <p className="player-report-brand">Brasil Scout</p>
-          <p className="player-report-kicker">Relatório do atleta</p>
-        </div>
+      <header className="player-report-banner">
+        <img src="/brand/logo.png" alt="SADA" className="player-report-logo" />
+        <p className="player-report-kicker">Relatório do atleta</p>
         <p className="player-report-league">
           {league.name} · {league.season}
           <span>{familyLabel}</span>
         </p>
       </header>
 
+      <div className="player-report-body">
       <section className="player-report-identity">
         <PlayerPhoto
           src={tm?.photo}
@@ -190,10 +191,11 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
         />
         <div className="player-report-who">
           <h1>{player.name}</h1>
-          <p>
-            {player.club}
-            <span> · </span>
-            {player.position}
+          <p className="player-report-club">
+            <ClubLogo club={player.club} size={15} />
+            <span>{player.club}</span>
+            <span className="player-report-dot">·</span>
+            <span>{player.position}</span>
           </p>
           {bio.length ? <p className="player-report-bio">{bio.join(" · ")}</p> : null}
         </div>
@@ -212,32 +214,32 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
       ) : null}
 
       <dl className="player-report-facts">
-        <div>
+        <div className="is-minutes">
           <dt>Minutos</dt>
           <dd>
             {player.minutes.toLocaleString("pt-BR")}
             {player.minutes_pct != null ? <small>{Math.round(player.minutes_pct)}% da competição</small> : null}
           </dd>
         </div>
-        <div>
+        <div className="is-market">
           <dt>Valor de mercado</dt>
           <dd>{tm?.market_value ?? "—"}</dd>
         </div>
-        <div>
+        <div className="is-contract">
           <dt>Contrato</dt>
           <dd>
             {tm?.contract_remaining ?? "—"}
             {contractDate ? <small>até {contractDate}</small> : null}
           </dd>
         </div>
-        <div>
+        <div className="is-goals">
           <dt>Gols · xG</dt>
           <dd>
             {player.goals.toLocaleString("pt-BR")}
             <small>xG {xg}</small>
           </dd>
         </div>
-        <div>
+        <div className="is-assists">
           <dt>Assistências · xA</dt>
           <dd>
             {player.assists.toLocaleString("pt-BR")}
@@ -267,7 +269,7 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
         <h2>Estatísticas</h2>
         <div className="player-report-stats">
           {sections.map((section) => (
-            <section key={section.title} className="player-report-section">
+            <section key={section.title} className={`player-report-section tone-${section.tone}`}>
               <h3>{section.title}</h3>
               {section.blocks.map((block, index) => (
                 <div key={`${section.title}-${block.title ?? index}`} className="player-report-block">
@@ -308,6 +310,7 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
           Gerado em {generated}.
         </p>
       </footer>
+      </div>
     </article>
   );
 
