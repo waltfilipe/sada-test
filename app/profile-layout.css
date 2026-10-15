@@ -2417,9 +2417,61 @@
   align-items: stretch;
 }
 
+.pass-insights-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
 .pass-tendencies-btn {
   justify-content: center;
-  gap: 0.45rem;
+  gap: 0.35rem;
+  width: 100%;
+  min-width: 0;
+  padding-inline: 0.45rem;
+  font-size: 0.74rem;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.pass-tendencies-btn.open {
+  border-color: rgba(27, 231, 255, 0.5);
+  color: var(--accent);
+}
+
+.short-prog-split {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.short-prog-split li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  padding: 0.4rem 0.45rem;
+  border-radius: 8px;
+  background: rgba(13, 27, 42, 0.45);
+  border: 1px solid rgba(27, 231, 255, 0.1);
+}
+
+.short-prog-split span {
+  color: var(--muted);
+  font-size: 0.62rem;
+  line-height: 1.25;
+}
+
+.short-prog-split strong {
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.short-prog-split li:last-child strong {
+  color: var(--accent);
 }
 
 .pass-tendencies-panel {
