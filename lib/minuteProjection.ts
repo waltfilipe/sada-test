@@ -331,7 +331,7 @@ function formatProjected(metric: ProjectedMetric): string {
   if (metric.kind === "percent") return `${Math.round(metric.value)}%`;
   if (metric.adverse) {
     const count = metric.value * (metric.refExposure || 1);
-    return count.toFixed(1).replace(".", ",");
+    return String(Math.round(count));
   }
   const fraction = metric.sample.split(",")[1];
   const decimals = fraction ? Math.min(2, Math.max(1, fraction.length)) : 1;

@@ -13,6 +13,18 @@ function metricValue(value?: string | null): string {
   return value ?? "—";
 }
 
+function oneDecimal(value?: string | null): string {
+  if (!value) return "—";
+  const parsed = Number(value.replace(/\s/g, "").replace(",", "."));
+  if (!Number.isFinite(parsed)) return value;
+  return parsed.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+}
+
+function shownValue(label: string, value?: string | null): string {
+  if (label === "xG" || label === "xA") return oneDecimal(value);
+  return metricValue(value);
+}
+
 function rowLabel(label: string): string {
   if (
     label === "Eficiência" ||
@@ -104,7 +116,7 @@ function StatAspectBlock({
             <StatMetricRow
               key={sub.label}
               label={rowLabel(sub.label)}
-              value={sub.display_value}
+              value={shownValue(sub.label, sub.display_value)}
               percentile={sub.percentile}
               edge={subEdges?.[sub.label]}
             />
@@ -113,7 +125,10 @@ function StatAspectBlock({
           <>
             <StatMetricRow
               label={volumeRowLabel(item)}
-              value={item.display_value ?? (item.certos_per90 != null ? item.certos_per90.toFixed(1).replace(".", ",") : undefined)}
+              value={shownValue(
+                item.label,
+                item.display_value ?? (item.certos_per90 != null ? item.certos_per90.toFixed(1).replace(".", ",") : undefined),
+              )}
               percentile={item.percentile}
               edge={volumeEdge}
             />

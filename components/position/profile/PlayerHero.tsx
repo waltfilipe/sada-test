@@ -34,10 +34,17 @@ function monthsRemaining(iso?: string | null): number | null {
   return Math.max(0, months);
 }
 
+function oneDecimal(value: string): string {
+  const parsed = Number(value.replace(/\s/g, "").replace(",", "."));
+  if (!Number.isFinite(parsed)) return value;
+  return parsed.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+}
+
 function metricDisplay(player: PlayerProfile, label: string): string {
   for (const item of flattenAspects(player)) {
     const value = item.sub_metrics?.find((row) => row.label === label)?.display_value?.trim();
-    if (value) return value;
+    if (!value) continue;
+    return label === "xG" || label === "xA" ? oneDecimal(value) : value;
   }
   return "—";
 }
@@ -55,17 +62,19 @@ function MarketCard({
   icon,
   label,
   tone,
+  wide,
   tooltip,
   children,
 }: {
   icon: string;
   label: string;
   tone?: "warn" | "danger";
+  wide?: boolean;
   tooltip?: string;
   children: React.ReactNode;
 }) {
   const card = (
-    <div className={`hero-market-card${tone ? ` hero-market-card-${tone}` : ""}`}>
+    <div className={`hero-market-card${tone ? ` hero-market-card-${tone}` : ""}${wide ? " hero-market-card-wide" : ""}`}>
       <span className="hero-market-icon" aria-hidden="true">
         <i className={`fa-solid ${icon}`} />
       </span>
@@ -108,129 +117,141 @@ export function PlayerHero({ player, family, players }: Props) {
       </div>
 
       <div className="player-hero-copy">
-        <div className="player-hero-title-row">
-          <div className="player-hero-title-wrap">
-            <h2 className="player-hero-name">{player.name}</h2>
-            <p className="player-hero-club">
-              <ClubLogo club={player.club} size={17} />
-              <span className="player-hero-club-name">{player.club}</span>
-              <span className="player-hero-club-sep" aria-hidden="true">·</span>
-              <span className="player-hero-position">{player.position}</span>
-            </p>
-          </div>
-
-          <div className="hero-market-strip">
-            <MarketCard icon="fa-coins" label="Valor de mercado" tooltip="Estimativa de valor no Transfermarkt.">
-              {tm?.market_value ?? "—"}
-            </MarketCard>
-            <MarketCard
-              icon={onLoanFrom ? "fa-right-left" : "fa-file-signature"}
-              label={onLoanFrom ? "Contrato · Empréstimo" : "Contrato"}
-              tone={contractTone}
-              tooltip={onLoanFrom ? `Emprestado por ${onLoanFrom}. ${contractTooltip}` : contractTooltip}
-            >
-              <span className="hero-contract-value">
-                {months != null ? `${months} ${months === 1 ? "mês" : "meses"}` : "—"}
-                {onLoanFrom ? (
-                  <span className="hero-loan-pill">
-                    <i className="fa-solid fa-right-left" aria-hidden="true" /> {onLoanFrom}
-                  </span>
-                ) : null}
-              </span>
-            </MarketCard>
-            <MarketCard
-              icon="fa-clock"
-              label="Minutos"
-              tooltip={
-                player.minutes_pct != null
-                  ? `${player.minutes.toLocaleString("pt-BR")} minutos, ${Math.round(player.minutes_pct)}% do líder da temporada.`
-                  : "Minutos jogados na temporada."
-              }
-            >
-              <span className="hero-market-minutes tabular">
-                {player.minutes.toLocaleString("pt-BR")}
-                {player.minutes_pct != null ? (
-                  <span
-                    className="identity-minutes-track identity-minutes-track-inline"
-                    role="img"
-                    aria-label={`${Math.round(player.minutes_pct)}% dos minutos do líder`}
-                  >
-                    <span
-                      className="identity-minutes-cover"
-                      style={{ left: `${Math.max(0, Math.min(100, player.minutes_pct))}%` }}
-                    />
-                  </span>
-                ) : null}
-              </span>
-            </MarketCard>
-          </div>
+        <div className="player-hero-title-wrap">
+          <h2 className="player-hero-name">{player.name}</h2>
+          <p className="player-hero-club">
+            <ClubLogo club={player.club} size={17} />
+            <span className="player-hero-club-name">{player.club}</span>
+            <span className="player-hero-club-sep" aria-hidden="true">·</span>
+            <span className="player-hero-position">{player.position}</span>
+          </p>
         </div>
 
-        <div className="player-hero-bottom-row">
-          <div className="hero-bio-block">
-            <dl className="player-hero-facts">
-              {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
-              {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
-              {formatFoot(player.foot) ? <HeroFact label="Pé">{formatFoot(player.foot)}</HeroFact> : null}
-              {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
-            </dl>
-            <div className="hero-output" aria-label="Produção ofensiva">
-              <div>
-                <span>Gols</span>
-                <strong className="tabular">{player.goals.toLocaleString("pt-BR")}</strong>
-              </div>
-              <div>
-                <span>xG</span>
-                <strong className="tabular">{metricDisplay(player, "xG")}</strong>
-              </div>
-              <div>
-                <span>Assistências</span>
-                <strong className="tabular">{player.assists.toLocaleString("pt-BR")}</strong>
-              </div>
-              <div>
-                <span>xA</span>
-                <strong className="tabular">{metricDisplay(player, "xA")}</strong>
-              </div>
+        <div className="hero-bio-block">
+          <dl className="player-hero-facts">
+            {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
+            {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
+            {formatFoot(player.foot) ? <HeroFact label="Pé">{formatFoot(player.foot)}</HeroFact> : null}
+            {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
+          </dl>
+          <div className="hero-output" aria-label="Produção ofensiva">
+            <div>
+              <span>Gols</span>
+              <strong className="tabular">{player.goals.toLocaleString("pt-BR")}</strong>
+            </div>
+            <div>
+              <span>xG</span>
+              <strong className="tabular">{metricDisplay(player, "xG")}</strong>
+            </div>
+            <div>
+              <span>Assistências</span>
+              <strong className="tabular">{player.assists.toLocaleString("pt-BR")}</strong>
+            </div>
+            <div>
+              <span>xA</span>
+              <strong className="tabular">{metricDisplay(player, "xA")}</strong>
             </div>
           </div>
-        </div>
-
-        <div className="player-hero-actions">
-            <div className="hero-action-group">
-              {showProjection ? <MinuteProjection player={player} family={family} players={players} /> : null}
-              <PassTendencies player={player} players={players} />
-            </div>
-            <div className="hero-action-group">
-              <Tooltip content="Abre o comparador já com este atleta.">
-                <Link className="btn btn-ghost btn-sm" href={href(`/comparar?posicao=${family}&a=${player.player_id}`)}>
-                  <i className="fa-solid fa-scale-balanced" aria-hidden="true" /> Comparar
-                </Link>
-              </Tooltip>
-              <Tooltip content="Procura atletas parecidos nas outras séries.">
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSimilarOpen(true)}>
-                  <i className="fa-solid fa-shuffle" aria-hidden="true" /> Similares
-                </button>
-              </Tooltip>
-              <Tooltip content="Gera um relatório em PDF deste atleta.">
-                <span className="hero-action-slot">
-                  <PlayerReportButton player={player} family={family} />
-                </span>
-              </Tooltip>
-              {tm?.profile_url ? (
-                <Tooltip content="Abre o perfil no Transfermarkt.">
-                  <a className="btn btn-ghost btn-sm" href={tm.profile_url} target="_blank" rel="noreferrer">
-                    <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
-                  </a>
-                </Tooltip>
-              ) : null}
-              <Tooltip content="Adiciona ao elenco ou à lista de observação.">
-                <span className="hero-action-slot">
-                  <AddToShadowMenu playerId={player.player_id} family={family} />
-                </span>
-              </Tooltip>
-            </div>
         </div>
       </div>
+
+      <aside className="hero-side" aria-label="Minutos, contrato e ações">
+        <MarketCard
+          icon="fa-clock"
+          label="Minutos"
+          wide
+          tooltip={
+            player.minutes_pct != null
+              ? `${player.minutes.toLocaleString("pt-BR")} minutos, ${Math.round(player.minutes_pct)}% do líder da temporada.`
+              : "Minutos jogados na temporada."
+          }
+        >
+          <span className="hero-market-minutes hero-market-minutes-wide tabular">
+            <span>{player.minutes.toLocaleString("pt-BR")}</span>
+            {player.minutes_pct != null ? (
+              <span
+                className="identity-minutes-track identity-minutes-track-wide"
+                role="img"
+                aria-label={`${Math.round(player.minutes_pct)}% dos minutos do líder`}
+              >
+                <span
+                  className="identity-minutes-cover"
+                  style={{ left: `${Math.max(0, Math.min(100, player.minutes_pct))}%` }}
+                />
+              </span>
+            ) : null}
+          </span>
+        </MarketCard>
+
+        <div className="hero-market-pair">
+          <MarketCard icon="fa-coins" label="Valor de mercado" tooltip="Estimativa de valor no Transfermarkt.">
+            {tm?.market_value ?? "—"}
+          </MarketCard>
+          <MarketCard
+            icon={onLoanFrom ? "fa-right-left" : "fa-file-signature"}
+            label={onLoanFrom ? "Contrato · Empréstimo" : "Contrato"}
+            tone={contractTone}
+            tooltip={onLoanFrom ? `Emprestado por ${onLoanFrom}. ${contractTooltip}` : contractTooltip}
+          >
+            <span className="hero-contract-value">
+              {months != null ? `${months} ${months === 1 ? "mês" : "meses"}` : "—"}
+              {onLoanFrom ? (
+                <span className="hero-loan-pill">
+                  <i className="fa-solid fa-right-left" aria-hidden="true" /> {onLoanFrom}
+                </span>
+              ) : null}
+            </span>
+          </MarketCard>
+        </div>
+
+        <div className="hero-action-grid">
+          {showProjection ? (
+            <div className="hero-action-cell">
+              <MinuteProjection player={player} family={family} players={players} />
+            </div>
+          ) : null}
+          <div className="hero-action-cell">
+            <PassTendencies player={player} players={players} />
+          </div>
+          <div className="hero-action-cell">
+            <Tooltip content="Abre o comparador já com este atleta.">
+              <Link className="btn btn-ghost btn-sm" href={href(`/comparar?posicao=${family}&a=${player.player_id}`)}>
+                <i className="fa-solid fa-scale-balanced" aria-hidden="true" /> Comparar
+              </Link>
+            </Tooltip>
+          </div>
+          <div className="hero-action-cell">
+            <Tooltip content="Procura atletas parecidos nas outras séries.">
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSimilarOpen(true)}>
+                <i className="fa-solid fa-shuffle" aria-hidden="true" /> Similares
+              </button>
+            </Tooltip>
+          </div>
+          <div className="hero-action-cell">
+            <Tooltip content="Gera um relatório em PDF deste atleta.">
+              <span className="hero-action-slot">
+                <PlayerReportButton player={player} family={family} />
+              </span>
+            </Tooltip>
+          </div>
+          {tm?.profile_url ? (
+            <div className="hero-action-cell">
+              <Tooltip content="Abre o perfil no Transfermarkt.">
+                <a className="btn btn-ghost btn-sm" href={tm.profile_url} target="_blank" rel="noreferrer">
+                  <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
+                </a>
+              </Tooltip>
+            </div>
+          ) : null}
+          <div className="hero-action-cell">
+            <Tooltip content="Adiciona ao elenco ou à lista de observação.">
+              <span className="hero-action-slot">
+                <AddToShadowMenu playerId={player.player_id} family={family} />
+              </span>
+            </Tooltip>
+          </div>
+        </div>
+      </aside>
 
       {similarOpen ? (
         <SimilarCrossLeagueModal
