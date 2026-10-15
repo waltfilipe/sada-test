@@ -284,6 +284,37 @@ function edgeAgainst(mine: number | null | undefined, others: Array<number | nul
   return null;
 }
 
+export function StatSectionsBoard({ player, family }: { player: PlayerProfile; family: PositionFamily }) {
+  const entries = useMemo(() => sectionEntries(player, family), [player, family]);
+  const allBadges = useMemo<TonedStatBadge[]>(
+    () => entries.flatMap((entry) => entry.badges.map((badge) => ({ ...badge, tone: entry.tone }))),
+    [entries],
+  );
+
+  return (
+    <div className="projection-board">
+      <PlayerBadgesSection badges={allBadges} />
+      <div className="projection-groups">
+        {entries.map((entry) => (
+          <section key={entry.title} className="projection-group" aria-label={entry.title}>
+            <h4 className="projection-group-title">{entry.title}</h4>
+            <div className="stat-cards-stack">
+              {entry.metrics.map(({ item, groupTitle }) => (
+                <StatAspectBlock
+                  key={`${entry.title}-${item.label}`}
+                  item={item}
+                  groupTitle={groupTitle}
+                  tone={entry.tone}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ScoutStatsSections({
   player,
   family,

@@ -36,10 +36,11 @@ const AGE_BANDS = [
   { value: "30+", label: "30+", min: 30, max: 200 },
 ];
 
-const MINUTES_BANDS = [
-  { value: "600", label: "600+", min: 600 },
-  { value: "900", label: "900+", min: 900 },
-  { value: "1200", label: "1.200+", min: 1200 },
+const MINUTES_BANDS: { value: string; label: string; min?: number; max?: number }[] = [
+  { value: "30", label: "Até 30%", max: 30 },
+  { value: "50", label: "Até 50%", max: 50 },
+  { value: "75", label: "Até 75%", max: 75 },
+  { value: "75+", label: "75% ou mais", min: 75 },
 ];
 
 function ageOf(player: PlayerProfile): number | null {
@@ -127,7 +128,12 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
           const years = ageOf(player);
           if (years == null || years < age.min || years > age.max) return false;
         }
-        if (minutes && player.minutes < minutes.min) return false;
+        if (minutes) {
+          const share = player.minutes_pct;
+          if (share == null) return false;
+          if (minutes.max != null && share > minutes.max) return false;
+          if (minutes.min != null && share < minutes.min) return false;
+        }
         if (!q) return true;
         return player.name.toLowerCase().includes(q) || player.club.toLowerCase().includes(q);
       })
