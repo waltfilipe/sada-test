@@ -13,20 +13,20 @@
   "minutes_pct": 91.9,
   "goals": 1,
   "assists": 2,
-  "rating": 7.1,
+  "rating": 7.0,
   "ratings": {
-    "geral": 7.1,
+    "geral": 7.0,
     "construcao": 8.7,
-    "defesa": 8.3,
-    "perfil": 7.6
+    "defesa": 7.7,
+    "perfil": 7.8
   },
   "ranks": {
-    "geral": 5,
+    "geral": 10,
     "construcao": 1,
-    "defesa": 3,
-    "perfil": 5
+    "defesa": 10,
+    "perfil": 4
   },
-  "profile": "Defensor de Área",
+  "profile": "Construtor",
   "profile_shares": {
     "construcao": 58.0,
     "defesa": 42.0
@@ -35,7 +35,7 @@
     "construcao": 85.0,
     "ofensividade": 88.0,
     "def1v1": 38.0,
-    "contencao": 100.0,
+    "contencao": 0.0,
     "duelo_aereo": 98.0
   },
   "aspects": {
@@ -53,22 +53,22 @@
       {
         "label": "Ações Defensivas",
         "kind": "metric_group",
-        "grade": "A",
-        "percentile": 100.0,
+        "grade": "D",
+        "percentile": 2.8,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 100.0,
-            "display_value": "0,5"
+            "percentile": 8.3,
+            "display_value": "1,4"
           },
           {
             "label": "Interceptações",
-            "percentile": 100.0,
-            "display_value": "3,9"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Chutes Bloqueados",
-            "percentile": 100.0,
+            "percentile": 0.0,
             "display_value": "0,5"
           }
         ],
@@ -77,11 +77,11 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "C+",
-        "percentile": 49.2,
+        "grade": "D",
+        "percentile": 18.0,
         "pair_badge": [
           100.0,
-          49.2
+          18.0
         ],
         "sub_metrics": [
           {
@@ -91,8 +91,8 @@
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 49.2,
-            "display_value": "+0,0"
+            "percentile": 18.0,
+            "display_value": "-0,5"
           }
         ],
         "stats": []
@@ -168,10 +168,10 @@
         "label": "Estilo de defesa",
         "kind": "construction_share",
         "grade": "D",
-        "percentile": 6.9,
-        "display_value": "0,56",
-        "share_pct": 6.9,
-        "pool_avg_pct": 1.2,
+        "percentile": 8.2,
+        "display_value": "0,46",
+        "share_pct": 8.2,
+        "pool_avg_pct": 0.9,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -181,8 +181,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "C+",
-        "percentile": 49.2,
+        "grade": "D",
+        "percentile": 18.0,
         "display_value": "57%",
         "share_pct": 57.1,
         "pool_avg_pct": 1.0,
@@ -236,7 +236,7 @@
     "confrontos_of": 2.23,
     "construcao": 85.24590163934425,
     "duelo_ar": 98.30508474576271,
-    "contencao": 100.0,
+    "contencao": 0.0,
     "ofensividade": 88.33333333333333,
     "passes_prog": 9.46,
     "duelos_def": 3.66
@@ -244,19 +244,19 @@
   "hybrid_lean": null,
   "cluster": {
     "family": "zagueiros",
-    "archetype": "Defensor de Área",
-    "archetype_label": "Defensor de Área",
-    "construtor_badge": null,
-    "construtor_badge_short": null,
+    "archetype": "Construtor",
+    "archetype_label": "Construtor",
+    "construtor_badge": "Construtor Nato",
+    "construtor_badge_short": "Nato",
     "shares": {
-      "defensor_area": 67.2,
-      "construtor": 23.1,
-      "combativo": 9.7
+      "defensor_area": 16.3,
+      "construtor": 75.6,
+      "combativo": 8.2
     },
     "ratings": {
-      "defensor_area": 7.6,
+      "defensor_area": 6.0,
       "construtor": 7.8,
-      "combativo": 7.0
+      "combativo": 5.9
     }
   },
   "transfermarkt": null
