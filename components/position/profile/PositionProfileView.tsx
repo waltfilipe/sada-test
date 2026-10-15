@@ -1,12 +1,9 @@
 "use client";
 
-import { isProjectionEligible } from "@/lib/minuteProjection";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
-import { MinuteProjection } from "./MinuteProjection";
 import { PlayerHero } from "./PlayerHero";
 import { PlayerHeatmap } from "./PlayerHeatmap";
 import { ProfileCard } from "./ProfileCard";
-import { PassTendencies } from "./PassTendencies";
 import { ScoutStatsSections } from "./ScoutStatsSections";
 
 type Props = {
@@ -17,25 +14,19 @@ type Props = {
 };
 
 export function PositionProfileView({ player, family, players, heatmapsEnabled = true }: Props) {
-  const showProjection = isProjectionEligible(player);
-  const showHeatColumn = heatmapsEnabled || showProjection;
-
   return (
     <div className="profile-view-shell">
-      <PlayerHero player={player} family={family} />
+      <PlayerHero player={player} family={family} players={players} />
 
-      <div className={`profile-content-grid${showHeatColumn ? "" : " profile-content-grid-no-heatmap"}`}>
-        {showHeatColumn ? (
+      <div className={`profile-content-grid${heatmapsEnabled ? "" : " profile-content-grid-no-heatmap"}`}>
+        {heatmapsEnabled ? (
           <div className="profile-content-col profile-col-heatmap">
-            {heatmapsEnabled ? (
-              <div className="player-card heatmap-card profile-perfil-card-score">
-                <div className="profile-card-head">
-                  <h3 className="section-label">Heatmap</h3>
-                </div>
-                <PlayerHeatmap upright heatmap={player.heatmap} playerName={player.name} />
+            <div className="player-card heatmap-card profile-perfil-card-score">
+              <div className="profile-card-head">
+                <h3 className="section-label">Heatmap</h3>
               </div>
-            ) : null}
-            {showProjection ? <MinuteProjection player={player} family={family} players={players} /> : null}
+              <PlayerHeatmap upright heatmap={player.heatmap} playerName={player.name} />
+            </div>
           </div>
         ) : null}
 
@@ -47,7 +38,6 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
           <div className="player-card pass-scores-shell">
             <ScoutStatsSections player={player} family={family} />
           </div>
-          <PassTendencies player={player} players={players} />
         </div>
       </div>
     </div>

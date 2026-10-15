@@ -30,6 +30,8 @@ type Prior = {
   tau2: number;
   n0: number;
   refRates: number[];
+  /** Mean nineties of the regulars. Used to write a predicted season count. */
+  refExposure: number;
 };
 
 type MetricKind = "rate" | "percent";
@@ -43,6 +45,7 @@ type MetricFit = {
   kind: MetricKind;
   rank: boolean;
   sample: string;
+  adverse?: boolean;
 };
 
 type BuiltModel = {
@@ -57,6 +60,8 @@ type Sample = {
   kind: MetricKind;
   rank: boolean;
   sample: string;
+  /** Lower is the generous reading. A short sample below the mean is pulled up. */
+  adverse?: boolean;
 };
 
 const modelCache = new WeakMap<PlayerProfile[], Map<string, BuiltModel | null>>();
@@ -127,14 +132,17 @@ function placementFrom(model: BuiltModel, scenario: ProjectionScenario): Project
 function projectedMetrics(model: BuiltModel, scenario: ProjectionScenario): Map<string, ProjectedMetric> {
   const projected = new Map<string, ProjectedMetric>();
   for (const metric of model.metrics) {
-    const next = projectRate(metric.y, model.exposure, metric.prior, scenario);
+    const next = projectRate(metric.y, model.exposure, metric.prior, scenario, metric.adverse);
     const value = metric.kind === "percent" ? clamp(next.value, 0, 100) : next.value;
+    const standing = midrankPercentile(value, metric.referenceRates);
     projected.set(metric.key, {
       value,
       weight: next.weight,
-      percentile: midrankPercentile(value, metric.referenceRates),
+      percentile: metric.adverse ? 100 - standing : standing,
       kind: metric.kind,
       sample: metric.sample,
+      adverse: metric.adverse,
+      refExposure: metric.prior.refExposure,
     });
   }
   return projected;
@@ -184,6 +192,7 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
       kind: sample.kind,
       rank: sample.rank,
       sample: sample.sample,
+      adverse: sample.adverse,
     });
   }
   if (metrics.filter((metric) => metric.rank).length < MIN_METRICS) return null;
@@ -223,6 +232,15 @@ function samplesOf(player: PlayerProfile): Sample[] {
 }
 
 function samplesFromAspect(item: AspectItem, exposure: number): Sample[] {
+  if (item.kind === "def_efficiency_group") {
+    const errors: Sample[] = [];
+    for (const sub of item.sub_metrics ?? []) {
+      if (!/erro/i.test(sub.label)) continue;
+      const sample = sampleFrom(item.label, sub.label, sub.display_value, exposure);
+      if (sample) errors.push(sample);
+    }
+    return errors;
+  }
   if (SKIP_KINDS.has(item.kind ?? "")) return [];
   const samples: Sample[] = [];
   const subs = item.sub_metrics ?? [];
@@ -252,7 +270,8 @@ function sampleFrom(
   if (!raw) return null;
   const key = parent ? `${parent}::${label}` : label;
   const normalized = label.trim().toLowerCase();
-  if (/erro/.test(normalized) || /^[+\-−]/.test(raw)) return null;
+  if (/^[+\-−]/.test(raw)) return null;
+  const adverse = /erro/.test(normalized);
   // Defender xA is a season total shown on the hero. It is not a ranked per-90 rate.
   if (normalized === "xa" && parent === "Gols e xG") return null;
 
@@ -264,9 +283,9 @@ function sampleFrom(
 
   const parsed = parseRate(raw);
   if (parsed == null) return null;
-  if (SEASON_TOTALS.has(normalized)) {
+  if (SEASON_TOTALS.has(normalized) || adverse) {
     if (exposure <= 0) return null;
-    return { key, value: parsed / exposure, kind: "rate", rank: false, sample: raw };
+    return { key, value: parsed / exposure, kind: "rate", rank: false, sample: raw, adverse };
   }
   if (!isVolumeLabel(label)) return null;
   return { key, value: parsed, kind: "rate", rank: true, sample: raw };
@@ -278,6 +297,8 @@ type ProjectedMetric = {
   percentile: number;
   kind: MetricKind;
   sample: string;
+  adverse?: boolean;
+  refExposure?: number;
 };
 
 function applyProjectedMetrics(player: PlayerProfile, projected: Map<string, ProjectedMetric>): PlayerProfile {
@@ -308,6 +329,10 @@ function applyProjectedMetrics(player: PlayerProfile, projected: Map<string, Pro
 
 function formatProjected(metric: ProjectedMetric): string {
   if (metric.kind === "percent") return `${Math.round(metric.value)}%`;
+  if (metric.adverse) {
+    const count = metric.value * (metric.refExposure || 1);
+    return count.toFixed(1).replace(".", ",");
+  }
   const fraction = metric.sample.split(",")[1];
   const decimals = fraction ? Math.min(2, Math.max(1, fraction.length)) : 1;
   return metric.value.toFixed(decimals).replace(".", ",");
@@ -319,6 +344,7 @@ function fitPrior(points: { e: number; value: number; low: boolean }[]): Prior |
 
   const refRates = ref.map((point) => point.value);
   const mu = mean(refRates);
+  const refExposure = mean(ref.map((point) => point.e));
   const msdRef = meanSquare(refRates);
   const invRef = mean(ref.map((point) => 1 / point.e));
   let tau2 = 0;
@@ -346,7 +372,7 @@ function fitPrior(points: { e: number; value: number; low: boolean }[]): Prior |
   }
   if (!(tau2 > 0) || !Number.isFinite(mu)) return null;
 
-  return { mu, tau2, n0: clamp(Math.max(n0, N0_FLOOR), N0_FLOOR, N0_MAX), refRates };
+  return { mu, tau2, n0: clamp(Math.max(n0, N0_FLOOR), N0_FLOOR, N0_MAX), refRates, refExposure };
 }
 
 function projectRate(
@@ -354,6 +380,7 @@ function projectRate(
   exposure: number,
   prior: Prior,
   scenario: ProjectionScenario,
+  adverse = false,
 ): { value: number; weight: number } {
   const weight = exposure / (exposure + prior.n0);
   const realistic = weight * y + (1 - weight) * prior.mu;
@@ -361,8 +388,9 @@ function projectRate(
   let value = realistic;
   if (scenario === "negativa") value = realistic - Z90 * sd;
   else if (scenario === "positiva") value = realistic + Z90 * sd;
-  else if (y < prior.mu) {
-    // A short sample that is already below the regulars' mean is not revised upward.
+  else if (adverse ? y >= prior.mu : y < prior.mu) {
+    // Volume already below the regulars stays there. Errors already above the regulars stay there.
+    // A short sample of zero errors is the generous reading, so it moves toward the regulars' rate.
     value = y;
   }
   return { value: metricFloor(value), weight };

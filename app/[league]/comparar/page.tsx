@@ -1,5 +1,5 @@
 import { CompararClient } from "@/app/comparar/CompararClient";
-import { getFamilyPlayers, getMeta } from "@/lib/data.server";
+import { compactHeatmap, getFamilyPlayers, getMeta } from "@/lib/data.server";
 import { isLeagueId } from "@/lib/leagues";
 import { familyBySlug } from "@/lib/positions";
 import { notFound } from "next/navigation";
@@ -15,7 +15,10 @@ export default async function CompararPage({ params, searchParams }: Props) {
   if (!isLeagueId(league)) notFound();
   const { posicao, a, b, c, triple } = await searchParams;
   const family = familyBySlug(posicao ?? "zagueiros");
-  const players = getFamilyPlayers(family.key as PositionFamily, league);
+  const players = getFamilyPlayers(family.key as PositionFamily, league).map((player) => {
+    const heatmap = compactHeatmap(player.heatmap);
+    return heatmap === player.heatmap ? player : { ...player, heatmap };
+  });
   const meta = getMeta(league);
   const scatterMetrics = meta.scatter_metrics[family.key] ?? [];
 

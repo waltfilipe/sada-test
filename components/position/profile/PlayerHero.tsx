@@ -13,10 +13,14 @@ import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { PlayerReportButton } from "@/components/position/profile/PlayerReport";
 import { SimilarCrossLeagueModal } from "@/components/position/profile/SimilarCrossLeagueModal";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
+import { isProjectionEligible } from "@/lib/minuteProjection";
+import { MinuteProjection } from "./MinuteProjection";
+import { PassTendencies } from "./PassTendencies";
 
 type Props = {
   player: PlayerProfile;
   family: PositionFamily;
+  players: PlayerProfile[];
 };
 
 function monthsRemaining(iso?: string | null): number | null {
@@ -75,7 +79,7 @@ function MarketCard({
   return <Tooltip content={tooltip}>{card}</Tooltip>;
 }
 
-export function PlayerHero({ player, family }: Props) {
+export function PlayerHero({ player, family, players }: Props) {
   const { href, leagueId } = useLeague();
   const [similarOpen, setSimilarOpen] = useState(false);
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
@@ -90,7 +94,8 @@ export function PlayerHero({ player, family }: Props) {
       ? "Contrato termina em menos de 6 meses."
       : months != null && months < 12
         ? "Contrato termina em menos de 1 ano."
-        : undefined;
+        : "Tempo restante de contrato.";
+  const showProjection = isProjectionEligible(player);
 
   return (
     <section className="player-hero player-card" aria-label={`Perfil de ${player.name}`}>
@@ -115,18 +120,14 @@ export function PlayerHero({ player, family }: Props) {
           </div>
 
           <div className="hero-market-strip">
-            <MarketCard icon="fa-coins" label="Valor de mercado">
+            <MarketCard icon="fa-coins" label="Valor de mercado" tooltip="Estimativa de valor no Transfermarkt.">
               {tm?.market_value ?? "—"}
             </MarketCard>
             <MarketCard
               icon={onLoanFrom ? "fa-right-left" : "fa-file-signature"}
               label={onLoanFrom ? "Contrato · Empréstimo" : "Contrato"}
               tone={contractTone}
-              tooltip={
-                onLoanFrom
-                  ? `Emprestado por ${onLoanFrom}.${contractTooltip ? ` ${contractTooltip}` : ""}`
-                  : contractTooltip
-              }
+              tooltip={onLoanFrom ? `Emprestado por ${onLoanFrom}. ${contractTooltip}` : contractTooltip}
             >
               <span className="hero-contract-value">
                 {months != null ? `${months} ${months === 1 ? "mês" : "meses"}` : "—"}
@@ -137,22 +138,28 @@ export function PlayerHero({ player, family }: Props) {
                 ) : null}
               </span>
             </MarketCard>
-            <MarketCard icon="fa-clock" label="Minutos">
+            <MarketCard
+              icon="fa-clock"
+              label="Minutos"
+              tooltip={
+                player.minutes_pct != null
+                  ? `${player.minutes.toLocaleString("pt-BR")} minutos, ${Math.round(player.minutes_pct)}% do líder da temporada.`
+                  : "Minutos jogados na temporada."
+              }
+            >
               <span className="hero-market-minutes tabular">
                 {player.minutes.toLocaleString("pt-BR")}
                 {player.minutes_pct != null ? (
-                  <Tooltip content={`${Math.round(player.minutes_pct)}% dos minutos possíveis na competição`}>
+                  <span
+                    className="identity-minutes-track identity-minutes-track-inline"
+                    role="img"
+                    aria-label={`${Math.round(player.minutes_pct)}% dos minutos do líder`}
+                  >
                     <span
-                      className="identity-minutes-track identity-minutes-track-inline"
-                      role="img"
-                      aria-label={`${Math.round(player.minutes_pct)}% dos minutos possíveis`}
-                    >
-                      <span
-                        className="identity-minutes-cover"
-                        style={{ left: `${Math.max(0, Math.min(100, player.minutes_pct))}%` }}
-                      />
-                    </span>
-                  </Tooltip>
+                      className="identity-minutes-cover"
+                      style={{ left: `${Math.max(0, Math.min(100, player.minutes_pct))}%` }}
+                    />
+                  </span>
                 ) : null}
               </span>
             </MarketCard>
@@ -186,25 +193,42 @@ export function PlayerHero({ player, family }: Props) {
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="player-hero-actions">
-            <Link
-              className="btn btn-ghost btn-sm"
-              href={href(`/comparar?posicao=${family}&a=${player.player_id}`)}
-            >
-              <i className="fa-solid fa-scale-balanced" aria-hidden="true" /> Comparar
-            </Link>
-            {tm?.profile_url ? (
-              <a className="btn btn-ghost btn-sm" href={tm.profile_url} target="_blank" rel="noreferrer">
-                <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
-              </a>
-            ) : null}
-            <PlayerReportButton player={player} family={family} />
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSimilarOpen(true)}>
-              <i className="fa-solid fa-shuffle" aria-hidden="true" /> Similares
-            </button>
-            <AddToShadowMenu playerId={player.player_id} family={family} />
-          </div>
+        <div className="player-hero-actions">
+            <div className="hero-action-group">
+              {showProjection ? <MinuteProjection player={player} family={family} players={players} /> : null}
+              <PassTendencies player={player} players={players} />
+            </div>
+            <div className="hero-action-group">
+              <Tooltip content="Abre o comparador já com este atleta.">
+                <Link className="btn btn-ghost btn-sm" href={href(`/comparar?posicao=${family}&a=${player.player_id}`)}>
+                  <i className="fa-solid fa-scale-balanced" aria-hidden="true" /> Comparar
+                </Link>
+              </Tooltip>
+              <Tooltip content="Procura atletas parecidos nas outras séries.">
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSimilarOpen(true)}>
+                  <i className="fa-solid fa-shuffle" aria-hidden="true" /> Similares
+                </button>
+              </Tooltip>
+              <Tooltip content="Gera um relatório em PDF deste atleta.">
+                <span className="hero-action-slot">
+                  <PlayerReportButton player={player} family={family} />
+                </span>
+              </Tooltip>
+              {tm?.profile_url ? (
+                <Tooltip content="Abre o perfil no Transfermarkt.">
+                  <a className="btn btn-ghost btn-sm" href={tm.profile_url} target="_blank" rel="noreferrer">
+                    <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
+                  </a>
+                </Tooltip>
+              ) : null}
+              <Tooltip content="Adiciona ao elenco ou à lista de observação.">
+                <span className="hero-action-slot">
+                  <AddToShadowMenu playerId={player.player_id} family={family} />
+                </span>
+              </Tooltip>
+            </div>
         </div>
       </div>
 

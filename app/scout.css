@@ -259,6 +259,21 @@ select:focus-visible {
   color: var(--text-2);
 }
 
+.route-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 40vh;
+  color: var(--text-2);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.route-loading i {
+  color: var(--accent);
+}
+
 /* ── Roster rail ─────────────────────────────────────────────────────────── */
 
 .roster {

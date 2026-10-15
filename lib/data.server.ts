@@ -21,6 +21,20 @@ const metaCache = new Map<LeagueId, SiteMeta>();
 const playersCache = new Map<LeagueId, { players: PlayerSummary[]; total: number }>();
 const profileCache = new Map<string, PlayerProfile>();
 const searchRowsCache = new Map<LeagueId, PlayerSearchRow[]>();
+const familyCache = new Map<string, PlayerProfile[]>();
+
+/** Coarser touch cloud for list and compare cards. The full map stays on the profile. */
+export function compactHeatmap(heatmap: PlayerProfile["heatmap"]): PlayerProfile["heatmap"] {
+  const points = heatmap?.points;
+  if (!points?.length || points.length <= 90) return heatmap;
+  const bins = new Map<string, { x: number; y: number }>();
+  for (const point of points) {
+    const x = Math.round(point.x / 8) * 8;
+    const y = Math.round(point.y / 8) * 8;
+    bins.set(`${x}:${y}`, { x, y });
+  }
+  return { ...heatmap, points: [...bins.values()] };
+}
 
 function resolveLeague(league?: string): LeagueId {
   if (league && isLeagueId(league)) return league;
@@ -70,7 +84,7 @@ export function getSearchRows(league?: string): PlayerSearchRow[] {
             duelo_aereo: 0,
           },
           badges: profile ? playerStatBadges(profile).map((badge) => badge.key) : [],
-          heatmap,
+          heatmap: compactHeatmap(heatmap),
         };
       }),
     );
@@ -91,9 +105,13 @@ export function getPlayerProfile(playerId: string, league?: string): PlayerProfi
 
 export function getFamilyPlayers(family: PositionFamily, league?: string): PlayerProfile[] {
   const id = resolveLeague(league);
+  const cacheKey = `${id}:${family}`;
+  const cached = familyCache.get(cacheKey);
+  if (cached) return cached;
   const filePath = path.join(leagueDir(id), `family-${family}.json`);
   if (!fs.existsSync(filePath)) return [];
   const payload = readJson<{ players: PlayerProfile[] }>(filePath);
+  familyCache.set(cacheKey, payload.players);
   return payload.players;
 }
 

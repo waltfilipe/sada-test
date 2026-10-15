@@ -15,7 +15,12 @@ export default async function ScatterPage({ params, searchParams }: Props) {
   if (!isLeagueId(league)) notFound();
   const { posicao, a, b } = await searchParams;
   const family = familyBySlug(posicao ?? "zagueiros");
-  const players = getFamilyPlayers(family.key as PositionFamily, league);
+  const players = getFamilyPlayers(family.key as PositionFamily, league).map((player) => {
+    if (!player.heatmap) return player;
+    const next = { ...player };
+    delete next.heatmap;
+    return next;
+  });
   const meta = getMeta(league);
 
   return (

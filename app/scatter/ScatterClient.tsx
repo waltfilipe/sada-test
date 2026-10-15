@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { AthleteSlot } from "@/components/compare/AthleteSlot";
 import { MetricAxisPicker } from "@/components/scatter/MetricAxisPicker";
@@ -69,7 +68,6 @@ export function ScatterClient({
   initialY,
 }: Props) {
   const { href } = useLeague();
-  const router = useRouter();
   const familyMeta = familyBySlug(family);
   const axisMetrics = useMemo(() => {
     const fromPosition = positionMetrics(family);
@@ -151,8 +149,10 @@ export function ScatterClient({
     if (idB) params.set("b", idB);
     params.set("x", xKey);
     params.set("y", yKey);
-    router.replace(href(`/scatter?${params.toString()}`), { scroll: false });
-  }, [family, idA, idB, xKey, yKey, router, href]);
+    const next = href(`/scatter?${params.toString()}`);
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (current !== next) window.history.replaceState(window.history.state, "", next);
+  }, [family, idA, idB, xKey, yKey, href]);
 
   const positionTabs = (
     <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/scatter?posicao=${slug}`)} />

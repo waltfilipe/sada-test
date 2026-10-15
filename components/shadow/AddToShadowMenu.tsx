@@ -44,7 +44,6 @@ export function AddToShadowMenu({ playerId, family, compact = false }: Props) {
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((v) => !v)}
-        title="Adicionar ao Time Sombra ou observação"
       >
         <i className="fa-solid fa-plus" aria-hidden="true" />
         {!compact ? <span>Adicionar</span> : null}

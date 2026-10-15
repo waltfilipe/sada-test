@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useLeague } from "@/components/LeagueProvider";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { realisticProjection } from "@/lib/minuteProjection";
 import { familyBySlug } from "@/lib/positions";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -25,15 +26,17 @@ export function MinuteProjection({ player, family, players }: Props) {
   const projection = useMemo(() => realisticProjection(player, players), [player, players]);
 
   return (
-    <div className="projection-slot">
-      <button
-        type="button"
-        className={`projection-launch${open ? " is-open" : ""}`}
-        aria-expanded={open}
-        onClick={() => setOpen(true)}
-      >
-        Projeção
-      </button>
+    <>
+      <Tooltip content="Estima os números por 90 com a minutagem de um titular. Volume acima da média dos regulares é puxado para ela. Erros zerados numa amostra curta sobem em direção à média.">
+        <button
+          type="button"
+          className={`btn btn-ghost btn-sm${open ? " is-open" : ""}`}
+          aria-expanded={open}
+          onClick={() => setOpen(true)}
+        >
+          <i className="fa-solid fa-forward" aria-hidden="true" /> Projeção
+        </button>
+      </Tooltip>
 
       {open ? (
         <StatWindow title="Projeção realista" onClose={() => setOpen(false)}>
@@ -52,6 +55,6 @@ export function MinuteProjection({ player, family, players }: Props) {
           )}
         </StatWindow>
       ) : null}
-    </div>
+    </>
   );
 }

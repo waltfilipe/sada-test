@@ -19,8 +19,8 @@ type Props = {
   yLabel: string;
 };
 
-const WIDTH = 760;
-const HEIGHT = 440;
+const WIDTH = 960;
+const HEIGHT = 560;
 const PAD = { top: 28, right: 28, bottom: 52, left: 56 };
 
 function formatAxis(value: number): string {

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ComparePlayerColumn } from "@/components/compare/ComparePlayerColumn";
 import { StatSectionPanel, StatWindow } from "@/components/position/profile/ScoutStatsSections";
@@ -49,7 +48,6 @@ export function CompararClient({
   heatmapsEnabled = true,
 }: Props) {
   const { href } = useLeague();
-  const router = useRouter();
   const familyMeta = familyBySlug(family);
 
   const [triple, setTriple] = useState(() => Boolean(initialTriple || initialC));
@@ -78,8 +76,10 @@ export function CompararClient({
       params.set("c", idC);
       params.set("triple", "1");
     }
-    router.replace(href(`/comparar?${params.toString()}`), { scroll: false });
-  }, [family, idA, idB, idC, triple, router, href]);
+    const next = href(`/comparar?${params.toString()}`);
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (current !== next) window.history.replaceState(window.history.state, "", next);
+  }, [family, idA, idB, idC, triple, href]);
 
   const excludeForA = useMemo(() => new Set(triple ? [idB, idC] : [idB]), [idB, idC, triple]);
   const excludeForB = useMemo(() => new Set(triple ? [idA, idC] : [idA]), [idA, idC, triple]);
