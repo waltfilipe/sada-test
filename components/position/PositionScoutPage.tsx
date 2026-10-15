@@ -7,13 +7,7 @@ import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { BadgeFilterBox } from "@/components/filters/BadgeFilterBox";
 import { PositionProfileView } from "@/components/position/profile/PositionProfileView";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
-import {
-  AT_ARCHETYPE_META,
-  EX_ARCHETYPE_META,
-  LAT_ARCHETYPE_META,
-  MC_ARCHETYPE_META,
-  ZAG_ARCHETYPE_META,
-} from "@/lib/clusterMeta";
+import { archetypesForFamily } from "@/lib/clusterMeta";
 import { useLeague } from "@/components/LeagueProvider";
 import { markFiltersReturn } from "@/lib/filterSession";
 import { formatFoot } from "@/lib/feet";
@@ -48,14 +42,6 @@ function ageOf(player: PlayerProfile): number | null {
   return player.birth_year ? CURRENT_YEAR - player.birth_year : null;
 }
 
-function archetypesFor(family: PositionFamily): string[] {
-  if (family === "laterais") return LAT_ARCHETYPE_META.map((item) => item.archetype);
-  if (family === "meio-campistas") return MC_ARCHETYPE_META.map((item) => item.archetype);
-  if (family === "extremos") return EX_ARCHETYPE_META.map((item) => item.archetype);
-  if (family === "atacantes") return AT_ARCHETYPE_META.map((item) => item.archetype);
-  return ZAG_ARCHETYPE_META.map((item) => item.archetype);
-}
-
 type Props = {
   family: PositionFamily;
   players: PlayerProfile[];
@@ -69,7 +55,7 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
   const requestedId = searchParams.get("atleta");
   const fromFilters = searchParams.get("origem") === "filtros";
   const familyMeta = familyBySlug(family);
-  const archetypes = useMemo(() => archetypesFor(family), [family]);
+  const archetypes = useMemo(() => archetypesForFamily(family), [family]);
 
   const badgeOptions = useMemo(() => badgeCatalogForFamily(family), [family]);
   const badgesById = useMemo(() => {

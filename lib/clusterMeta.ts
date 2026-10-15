@@ -685,6 +685,14 @@ export function atArchetypeMetaFor(archetype: AtArchetype) {
   return AT_ARCHETYPE_META.find((item) => item.archetype === archetype);
 }
 
+export function archetypesForFamily(family: "zagueiros" | "laterais" | "meio-campistas" | "extremos" | "atacantes"): string[] {
+  if (family === "laterais") return LAT_ARCHETYPE_META.map((item) => item.archetype);
+  if (family === "meio-campistas") return MC_ARCHETYPE_META.map((item) => item.archetype);
+  if (family === "extremos") return EX_ARCHETYPE_META.map((item) => item.archetype);
+  if (family === "atacantes") return AT_ARCHETYPE_META.map((item) => item.archetype);
+  return ZAG_ARCHETYPE_META.map((item) => item.archetype);
+}
+
 /** @deprecated use archetypeCounts */
 export function clusterCounts(players: { cluster?: ZagCluster | null }[]) {
   const { counts } = archetypeCounts(players);

@@ -13,7 +13,7 @@ type Props = {
   fixed?: { width: number; height: number };
 };
 
-type Point = { x: number; y: number };
+type Point = { x: number; y: number; w?: number };
 
 /** Real pitch proportions in metres — data is normalised 0–100 on both axes. */
 const PITCH_L = 105;
@@ -60,6 +60,7 @@ function buildDensity(points: Point[]): Float32Array {
 
   for (const pt of points) {
     // x runs goal to goal (attack to the right), y is the width of the pitch.
+    const weight = pt.w ?? 1;
     const cx = Math.round((pt.x / 100) * (GRID_W - 1));
     const cy = Math.round(((100 - pt.y) / 100) * (GRID_H - 1));
 
@@ -69,7 +70,7 @@ function buildDensity(points: Point[]): Float32Array {
       for (let dx = -radius; dx <= radius; dx += 1) {
         const gx = cx + dx;
         if (gx < 0 || gx >= GRID_W) continue;
-        grid[gy * GRID_W + gx] += Math.exp(-(dx * dx + dy * dy) / denom);
+        grid[gy * GRID_W + gx] += weight * Math.exp(-(dx * dx + dy * dy) / denom);
       }
     }
   }

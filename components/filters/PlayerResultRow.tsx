@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useLeague } from "@/components/LeagueProvider";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { ClubLogo } from "@/components/ClubLogo";
+import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { PlayerHeatmap } from "@/components/position/profile/PlayerHeatmap";
@@ -54,7 +55,11 @@ export function PlayerResultRow({
         <Link href={profileHref} className="row-identity-link">
           <div className="row-name">
             <h3>{player.name}</h3>
-            <ProfileTag {...profileTagProps(player)} />
+            {clusterTagProps(player) ? (
+              <ClusterTag {...clusterTagProps(player)!} />
+            ) : (
+              <ProfileTag {...profileTagProps(player)} />
+            )}
           </div>
           <p className="row-club">
             <ClubLogo club={player.club} size={16} />

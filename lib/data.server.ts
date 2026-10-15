@@ -23,15 +23,19 @@ const profileCache = new Map<string, PlayerProfile>();
 const searchRowsCache = new Map<LeagueId, PlayerSearchRow[]>();
 const familyCache = new Map<string, PlayerProfile[]>();
 
-/** Coarser touch cloud for list and compare cards. The full map stays on the profile. */
+/** Coarser touch cloud for list and compare cards. Counts stay, so hotspots do not flatten. */
 export function compactHeatmap(heatmap: PlayerProfile["heatmap"]): PlayerProfile["heatmap"] {
   const points = heatmap?.points;
   if (!points?.length || points.length <= 90) return heatmap;
-  const bins = new Map<string, { x: number; y: number }>();
+  const bins = new Map<string, { x: number; y: number; w: number }>();
   for (const point of points) {
     const x = Math.round(point.x / 8) * 8;
     const y = Math.round(point.y / 8) * 8;
-    bins.set(`${x}:${y}`, { x, y });
+    const key = `${x}:${y}`;
+    const weight = point.w ?? 1;
+    const prev = bins.get(key);
+    if (prev) prev.w += weight;
+    else bins.set(key, { x, y, w: weight });
   }
   return { ...heatmap, points: [...bins.values()] };
 }

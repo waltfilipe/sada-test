@@ -111,7 +111,7 @@ export type PlayerHeatmapData = {
   scope?: string;
   competition?: string | null;
   point_count?: number;
-  points: { x: number; y: number }[];
+  points: { x: number; y: number; w?: number }[];
   image_url?: string | null;
 };
 

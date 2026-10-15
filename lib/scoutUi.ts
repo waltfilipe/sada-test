@@ -7,6 +7,8 @@ export function profileTone(profile: string): string {
   switch (profile) {
     case "Combativo":
       return "combativo";
+    case "Defensor de Área":
+      return "defensor-area";
     case "Construtor":
       return "construtor";
     case "Posicional":

@@ -8,6 +8,7 @@ import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { formatFoot } from "@/lib/feet";
 import { saveFilters, takeFiltersReturn } from "@/lib/filterSession";
+import { archetypesForFamily } from "@/lib/clusterMeta";
 import { POSITION_FAMILIES } from "@/lib/positions";
 import { badgeCatalogForFamily } from "@/lib/statBadges";
 import { positionRating, profileTone } from "@/lib/scoutUi";
@@ -101,6 +102,7 @@ export function FiltrosClient({ meta, players }: Props) {
   }, [ready, leagueId, family, query, club, origin, foot, profiles, badges, sort, age, height, minutes]);
 
   const familyMeta = meta.families.find((item) => item.key === family)!;
+  const profileOptions = useMemo(() => archetypesForFamily(family), [family]);
   const badgeOptions = useMemo(() => badgeCatalogForFamily(family), [family]);
 
   const clubs = useMemo(() => {
@@ -142,7 +144,8 @@ export function FiltrosClient({ meta, players }: Props) {
       if (origin === "br" && player.nationality !== "Brazil") return false;
       if (origin === "out" && player.nationality === "Brazil") return false;
       if (foot !== "all" && formatFoot(player.foot) !== foot) return false;
-      if (profiles.length && !profiles.includes(player.profile)) return false;
+      const selectedProfiles = profiles.filter((item) => profileOptions.includes(item));
+      if (selectedProfiles.length && !selectedProfiles.includes(player.profile)) return false;
       if (badges.length && !badges.every((key) => player.badges.includes(key))) return false;
 
       if (q && !player.name.toLowerCase().includes(q) && !player.club.toLowerCase().includes(q)) {
@@ -166,7 +169,7 @@ export function FiltrosClient({ meta, players }: Props) {
       if (sort === "age") return (b.birth_year ?? 0) - (a.birth_year ?? 0);
       return positionRating(b) - positionRating(a);
     });
-  }, [players, family, club, origin, foot, profiles, badges, query, minutes, height, age, sort]);
+  }, [players, family, club, origin, foot, profiles, profileOptions, badges, query, minutes, height, age, sort]);
 
   const chips = useMemo(() => {
     const list: { key: string; label: string; clear: () => void }[] = [];
@@ -268,7 +271,7 @@ export function FiltrosClient({ meta, players }: Props) {
             <section className="filter-block">
               <h2>Perfil</h2>
               <div className="chip-row">
-                {familyMeta.profiles.map((profile) => (
+                {profileOptions.map((profile) => (
                   <button
                     key={profile}
                     type="button"
