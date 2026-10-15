@@ -6,6 +6,7 @@ import { PlayerResultRow } from "@/components/filters/PlayerResultRow";
 import { RangeSlider } from "@/components/filters/RangeSlider";
 import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { formatFoot } from "@/lib/feet";
 import { saveFilters, takeFiltersReturn } from "@/lib/filterSession";
 import { POSITION_FAMILIES } from "@/lib/positions";
 import { badgeCatalogForFamily } from "@/lib/statBadges";
@@ -140,7 +141,7 @@ export function FiltrosClient({ meta, players }: Props) {
       if (club !== "all" && player.club !== club) return false;
       if (origin === "br" && player.nationality !== "Brazil") return false;
       if (origin === "out" && player.nationality === "Brazil") return false;
-      if (foot !== "all" && player.foot !== foot) return false;
+      if (foot !== "all" && formatFoot(player.foot) !== foot) return false;
       if (profiles.length && !profiles.includes(player.profile)) return false;
       if (badges.length && !badges.every((key) => player.badges.includes(key))) return false;
 
@@ -335,7 +336,7 @@ export function FiltrosClient({ meta, players }: Props) {
                       className={foot === item ? "active" : ""}
                       onClick={() => setFoot(item)}
                     >
-                      {item === "all" ? "Todos" : item === "Ambidestro" ? "Ambos" : item}
+                      {item === "all" ? "Todos" : item}
                     </button>
                   ))}
                 </div>

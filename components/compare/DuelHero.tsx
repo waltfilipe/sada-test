@@ -6,6 +6,7 @@ import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
+import { formatFoot } from "@/lib/feet";
 import { playerInitials, ratingTier, formatRating, tierVars } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
 import { dominantRatingKey } from "@/lib/profileMeta";
@@ -166,10 +167,10 @@ function DuelSide({
               <dd>{player.height}</dd>
             </div>
           ) : null}
-          {player.foot ? (
+          {formatFoot(player.foot) ? (
             <div>
               <dt>Pé</dt>
-              <dd>{player.foot}</dd>
+              <dd>{formatFoot(player.foot)}</dd>
             </div>
           ) : null}
           {player.nationality ? (

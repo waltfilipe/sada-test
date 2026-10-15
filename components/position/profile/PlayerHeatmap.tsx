@@ -9,6 +9,8 @@ type Props = {
   compact?: boolean;
   /** Goal-to-goal axis runs upward, so the pitch card is tall. */
   upright?: boolean;
+  /** Paint immediately at this size. Used by the print report, which is hidden on screen. */
+  fixed?: { width: number; height: number };
 };
 
 type Point = { x: number; y: number };
@@ -366,7 +368,7 @@ function render(canvas: HTMLCanvasElement, points: Point[], compact = false, upr
   if (rect && !compact) drawAttackHint(ctx, rect);
 }
 
-export function PlayerHeatmap({ heatmap, playerName, compact = false, upright = false }: Props) {
+export function PlayerHeatmap({ heatmap, playerName, compact = false, upright = false, fixed }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -374,6 +376,26 @@ export function PlayerHeatmap({ heatmap, playerName, compact = false, upright = 
   const hasPoints = points.length > 0;
 
   useEffect(() => {
+    if (!fixed) return;
+    const canvas = canvasRef.current;
+    if (!canvas || !hasPoints) return;
+    const { width, height } = fixed;
+    const dpr = 2;
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    paintPitch(ctx, width, height, points, true, true);
+    // The point list lives on the heatmap object. A fresh empty array must not retrigger the paint.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fixed?.width, fixed?.height, hasPoints, heatmap]);
+
+  useEffect(() => {
+    if (fixed) return;
     const canvas = canvasRef.current;
     const wrap = wrapRef.current;
     if (!canvas || !wrap || !hasPoints) return;
@@ -419,6 +441,14 @@ export function PlayerHeatmap({ heatmap, playerName, compact = false, upright = 
     .join(" · ");
 
   const ariaLabel = `Heatmap de ${playerName}${meta ? ` — ${meta}` : ""}`;
+
+  if (fixed && hasPoints) {
+    return (
+      <div className="heatmap-body heatmap-fixed" style={{ width: fixed.width, height: fixed.height }}>
+        <canvas ref={canvasRef} className="heatmap-pitch-canvas" role="img" aria-label={ariaLabel} />
+      </div>
+    );
+  }
 
   return (
     <div className={`heatmap-body heatmap-body-live${compact ? " heatmap-compact" : ""}${upright ? " heatmap-upright" : ""}`}>

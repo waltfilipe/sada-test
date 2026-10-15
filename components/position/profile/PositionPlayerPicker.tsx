@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { AT_ARCHETYPE_META, EX_ARCHETYPE_META, LAT_ARCHETYPE_META, MC_ARCHETYPE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
+import { formatFoot } from "@/lib/feet";
 import { playerInitials, profileGradeFromRank } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
 import { archetypeRank, sortedProfileShareRows } from "@/lib/profileShares";
@@ -41,12 +42,6 @@ const ORIGIN_OPTIONS: FilterOption[] = [
 
 function playerAge(player: PlayerProfile): number | null {
   return player.birth_year ? CURRENT_YEAR - player.birth_year : null;
-}
-
-function hasKnownFoot(foot: string | null | undefined): foot is string {
-  if (!foot) return false;
-  const normalized = foot.trim().toLowerCase();
-  return normalized !== "unknown" && normalized !== "nan" && normalized !== "";
 }
 
 type Props = {
@@ -118,8 +113,9 @@ export function PositionPlayerPicker({
   const footOptions = useMemo<FilterOption[]>(() => {
     const counts = new Map<string, number>();
     for (const player of players) {
-      if (!hasKnownFoot(player.foot)) continue;
-      counts.set(player.foot, (counts.get(player.foot) ?? 0) + 1);
+      const foot = formatFoot(player.foot);
+      if (!foot) continue;
+      counts.set(foot, (counts.get(foot) ?? 0) + 1);
     }
     if (counts.size < 2) return [];
     return [...counts.entries()]
@@ -172,7 +168,7 @@ export function PositionPlayerPicker({
       }
       if (clubFilter.length && !clubFilter.includes(player.club)) return false;
       if (positionFilter.length && !positionFilter.includes(player.position)) return false;
-      if (footFilter.length && !(hasKnownFoot(player.foot) && footFilter.includes(player.foot))) {
+      if (footFilter.length && !footFilter.includes(formatFoot(player.foot) ?? "")) {
         return false;
       }
       if (ageFilter.length) {

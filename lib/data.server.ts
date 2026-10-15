@@ -2,6 +2,7 @@ import "server-only";
 
 import fs from "fs";
 import path from "path";
+import { formatFoot } from "./feet";
 import { DEFAULT_LEAGUE, isLeagueId, type LeagueId } from "./leagues";
 import { playerStatBadges } from "./statBadges";
 import type { PlayerHeatmapData, PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
@@ -117,7 +118,7 @@ export function filterPlayers(
     if (filters.family && player.position_family !== filters.family) return false;
     if (filters.club && filters.club !== "all" && player.club !== filters.club) return false;
     if (filters.nationality && filters.nationality !== "all" && player.nationality !== filters.nationality) return false;
-    if (filters.foot && filters.foot !== "all" && player.foot !== filters.foot) return false;
+    if (filters.foot && filters.foot !== "all" && formatFoot(player.foot) !== filters.foot) return false;
     if (filters.profiles?.length && !filters.profiles.includes(player.profile)) return false;
     if (filters.height && player.height != null) {
       if (player.height < filters.height[0] || player.height > filters.height[1]) return false;

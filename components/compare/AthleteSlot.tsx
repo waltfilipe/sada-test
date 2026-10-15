@@ -5,6 +5,7 @@ import { ClusterTag, clusterTagProps } from "@/components/position/ClusterTag";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { MinutesStat } from "@/components/position/MinutesStat";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
+import { formatFoot } from "@/lib/feet";
 import { dominantRatingKey } from "@/lib/profileMeta";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
@@ -70,7 +71,7 @@ export function AthleteSlot({ side, player, players, onChange, compact = false }
   const facts = [
     { label: "Idade", value: age ? `${age}` : "—", unit: age ? "anos" : undefined },
     { label: "Altura", value: player.height ? `${player.height}` : "—", unit: player.height ? "cm" : undefined },
-    { label: "Pé", value: player.foot ?? "—" },
+    { label: "Pé", value: formatFoot(player.foot) ?? "—" },
     {
       label: "G / A",
       value: `${player.goals} / ${player.assists}`,

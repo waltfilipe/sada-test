@@ -39,10 +39,17 @@ WYSCOUT_TO_POSITION: dict[str, str] = {
 
 FOOT_MAP = {
     "direito": "Destro",
-    "esquerdo": "Canhoto",
-    "both": "Ambidestro",
+    "right": "Destro",
+    "r": "Destro",
     "destro": "Destro",
+    "esquerdo": "Canhoto",
+    "left": "Canhoto",
+    "l": "Canhoto",
     "canhoto": "Canhoto",
+    "both": "Ambidestro",
+    "either": "Ambidestro",
+    "ambos": "Ambidestro",
+    "ambidestro": "Ambidestro",
 }
 
 # Manual corrections when Wyscout primary position is stale vs current role.
@@ -123,11 +130,13 @@ def _dedupe_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _normalize_foot(value: Any) -> str:
-    if value is None:
-        return "—"
+def _normalize_foot(value: Any) -> str | None:
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
     text = str(value).strip().lower()
-    return FOOT_MAP.get(text, str(value).strip().title())
+    if text in {"", "nan", "none", "unknown", "n/a", "—", "-"}:
+        return None
+    return FOOT_MAP.get(text)
 
 
 def _xlsx_sources(xlsx: Path | list[Path]) -> list[Path]:

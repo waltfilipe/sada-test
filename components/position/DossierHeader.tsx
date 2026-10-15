@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ClubLogo } from "@/components/ClubLogo";
+import { formatFoot } from "@/lib/feet";
 import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
@@ -28,7 +29,7 @@ export function DossierHeader({ player, poolSize, family }: Props) {
   const facts = [
     { label: "Idade", value: age ? `${age}` : "—", unit: age ? "anos" : undefined },
     { label: "Altura", value: player.height ? `${player.height}` : "—", unit: player.height ? "cm" : undefined },
-    { label: "Pé", value: player.foot ?? "—" },
+    { label: "Pé", value: formatFoot(player.foot) ?? "—" },
     { label: "País", value: player.nationality ?? "—" },
   ];
 

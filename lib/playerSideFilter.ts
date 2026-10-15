@@ -1,3 +1,4 @@
+import { formatFoot } from "@/lib/feet";
 import type { PlayerProfile } from "@/lib/types";
 
 export type FlankSide = "esquerdo" | "direito";
@@ -9,11 +10,9 @@ export function playerMatchesFlankSide(player: PlayerProfile, side: FlankSide): 
   if (position.includes("Direito")) return side === "direito";
 
   if (position === "Meia Ofensivo") {
-    const foot = (player.foot ?? "").toLowerCase();
-    if (side === "esquerdo") {
-      return foot.includes("canh") || foot.includes("esquer");
-    }
-    return foot.includes("dest") || foot.includes("dire");
+    const foot = formatFoot(player.foot);
+    if (side === "esquerdo") return foot === "Canhoto";
+    return foot === "Destro";
   }
 
   return false;

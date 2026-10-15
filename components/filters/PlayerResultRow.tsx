@@ -8,6 +8,7 @@ import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { PlayerHeatmap } from "@/components/position/profile/PlayerHeatmap";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { formatFoot } from "@/lib/feet";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { FamilyBadgeOption } from "@/lib/statBadges";
 import type { PlayerSearchRow } from "@/lib/types";
@@ -29,7 +30,7 @@ export function PlayerResultRow({
   const facts = [
     { label: "Idade", value: age ? `${age}` : "—", unit: age ? "anos" : undefined },
     { label: "Altura", value: player.height ? `${player.height}` : "—", unit: player.height ? "cm" : undefined },
-    { label: "Pé", value: player.foot ?? "—" },
+    { label: "Pé", value: formatFoot(player.foot) ?? "—" },
     { label: "Minutos", value: player.minutes.toLocaleString("pt-BR") },
     { label: "Valor", value: tm?.market_value ?? "—" },
     { label: "Contrato", value: tm?.contract_remaining ?? "—" },

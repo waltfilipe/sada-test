@@ -3890,16 +3890,16 @@
 
   .player-report-identity {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
   }
 
   .player-report-photo {
-    width: 54px;
-    height: 54px;
-    flex: 0 0 54px;
+    width: 112px;
+    height: 112px;
+    flex: 0 0 112px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 2px solid #1be7ff;
     background: #e7f7fb;
   }
@@ -3954,51 +3954,122 @@
     font-size: 10px;
   }
 
-  .player-report-score {
-    flex: 0 0 auto;
-    min-width: 78px;
-    padding: 6px 10px 7px;
-    border-radius: 10px;
-    background: linear-gradient(160deg, #10283a, #0e6d86);
-    text-align: right;
+  .player-report-profile {
+    margin-top: 6px;
   }
 
-  .player-report-score strong,
-  .player-report-score span,
-  .player-report-score em {
-    display: block;
-    font-style: normal;
+  .player-report-profile p {
+    margin: 0 0 3px;
+    color: #5c6d80;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
-  .player-report-score strong {
-    color: #1be7ff;
-    font-size: 24px;
-    font-weight: 750;
-    letter-spacing: -0.04em;
-    line-height: 1;
-  }
-
-  .player-report-score span {
-    color: #c5e7ef;
-    font-size: 9px;
-  }
-
-  .player-report-score em {
-    margin-top: 2px;
-    color: #fff;
+  .player-report-profile strong {
+    color: #102033;
     font-size: 11px;
-    font-weight: 750;
+    letter-spacing: 0;
+    text-transform: none;
   }
 
-  .player-report-mix {
-    margin-top: 7px;
-    color: #3d5166;
-    font-size: 10px;
+  .player-report-profile ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .player-report-profile li {
+    display: grid;
+    grid-template-columns: 78px 1fr 28px;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    color: #24384c;
+    font-size: 9px;
+    font-weight: 650;
+  }
+
+  .player-report-mix-track {
+    display: block;
+    height: 5px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: #e4ebf2;
+  }
+
+  .player-report-mix-track span {
+    display: block;
+    height: 100%;
+    border-radius: 99px;
+  }
+
+  .player-report-side {
+    flex: 0 0 176px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .player-report-heat,
+  .player-report-market {
+    padding: 5px 6px 6px;
+    border-radius: 10px;
+    background: #f3f7fb;
+  }
+
+  .player-report-heat p,
+  .player-report-market p {
+    margin: 0 0 3px;
+    color: #5c6d80;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .player-report-heat-empty {
+    margin: 8px 0;
+    color: #5c6d80;
+    font-size: 9px;
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 600;
+  }
+
+  .player-report-market {
+    background: #fff9e8;
+    border-top: 3px solid #fed766;
+  }
+
+  .player-report-market strong {
+    display: block;
+    color: #102033;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .player-report-market small {
+    display: block;
+    margin-top: 1px;
+    color: #6a5420;
+    font-size: 8.5px;
+    font-weight: 650;
+  }
+
+  .player-report .heatmap-fixed {
+    overflow: hidden;
+    border-radius: 8px;
+  }
+
+  .player-report .heatmap-pitch-canvas {
+    display: block;
   }
 
   .player-report-facts {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 6px;
     margin: 8px 0 2px;
   }
@@ -4058,13 +4129,43 @@
   }
 
   .player-report-badges li {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     border-radius: 999px;
-    padding: 2px 8px;
-    background: #10283a;
-    color: #d8fbff;
+    padding: 2px 8px 2px 3px;
+    background: #eef6ff;
+    color: #1e3a8a;
     font-size: 9px;
     font-weight: 700;
   }
+
+  .player-report-badges li i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 99px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 8px;
+  }
+
+  .player-report-badges li.tone-defensivos { background: #dbeafe; color: #1e3a8a; }
+  .player-report-badges li.tone-defensivos i { background: #2563eb; }
+  .player-report-badges li.tone-aereo { background: #cffafe; color: #155e75; }
+  .player-report-badges li.tone-aereo i { background: #0891b2; }
+  .player-report-badges li.tone-passes { background: #d1fae5; color: #065f46; }
+  .player-report-badges li.tone-passes i { background: #059669; }
+  .player-report-badges li.tone-dribles { background: #fef3c7; color: #92400e; }
+  .player-report-badges li.tone-dribles i { background: #d97706; }
+  .player-report-badges li.tone-finais { background: #ede9fe; color: #5b21b6; }
+  .player-report-badges li.tone-finais i { background: #7c3aed; }
+  .player-report-badges li.tone-ofensividade { background: #ffedd5; color: #9a3412; }
+  .player-report-badges li.tone-ofensividade i { background: #ea580c; }
+  .player-report-badges li.tone-finalizacao { background: #ffe4e6; color: #9f1239; }
+  .player-report-badges li.tone-finalizacao i { background: #e11d48; }
 
   .player-report-stats {
     columns: 2;

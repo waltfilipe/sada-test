@@ -16,6 +16,7 @@ import {
 } from "@/lib/clusterMeta";
 import { useLeague } from "@/components/LeagueProvider";
 import { markFiltersReturn } from "@/lib/filterSession";
+import { formatFoot } from "@/lib/feet";
 import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
@@ -101,8 +102,8 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
   const feet = useMemo(() => {
     const set = new Set<string>();
     for (const player of players) {
-      const value = player.foot?.trim();
-      if (value && value.toLowerCase() !== "unknown" && value.toLowerCase() !== "nan") set.add(value);
+      const value = formatFoot(player.foot);
+      if (value) set.add(value);
     }
     return [...set];
   }, [players]);
@@ -120,7 +121,7 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
           if (!badges.every((key) => earned.includes(key))) return false;
         }
         if (club && player.club !== club) return false;
-        if (foot && player.foot !== foot) return false;
+        if (foot && formatFoot(player.foot) !== foot) return false;
         if (flankSide && !playerMatchesFlankSide(player, flankSide)) return false;
         if (origin === "br" && player.nationality !== "Brazil") return false;
         if (origin === "out" && player.nationality === "Brazil") return false;

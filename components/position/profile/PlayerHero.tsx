@@ -6,6 +6,7 @@ import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { flattenAspects } from "@/lib/aspectLookup";
+import { formatFoot } from "@/lib/feet";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
@@ -163,7 +164,7 @@ export function PlayerHero({ player, family }: Props) {
             <dl className="player-hero-facts">
               {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
               {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
-              {player.foot ? <HeroFact label="Pé">{player.foot}</HeroFact> : null}
+              {formatFoot(player.foot) ? <HeroFact label="Pé">{formatFoot(player.foot)}</HeroFact> : null}
               {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
             </dl>
             <div className="hero-output" aria-label="Produção ofensiva">

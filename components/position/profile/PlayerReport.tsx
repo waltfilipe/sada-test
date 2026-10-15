@@ -7,11 +7,13 @@ import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { useLeague } from "@/components/LeagueProvider";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
+import { formatFoot } from "@/lib/feet";
 import { familyBySlug } from "@/lib/positions";
 import { profileMetaForFamily } from "@/lib/profileMeta";
-import { formatRating, playerInitials } from "@/lib/scoutTheme";
-import { positionRating } from "@/lib/scoutUi";
-import { playerStatBadges } from "@/lib/statBadges";
+import { profileAccent } from "@/lib/profileShares";
+import { playerInitials } from "@/lib/scoutTheme";
+import { badgeCatalogForFamily, playerStatBadges } from "@/lib/statBadges";
+import { PlayerHeatmap } from "./PlayerHeatmap";
 import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
 
 type ReportLine = {
@@ -136,11 +138,16 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
 
   const sections = useMemo(() => reportSections(player), [player]);
   const badges = useMemo(() => playerStatBadges(player), [player]);
+  const toneByBadge = useMemo(() => {
+    const tones = new Map<string, string>();
+    for (const option of badgeCatalogForFamily(family)) tones.set(option.key, option.tone);
+    return tones;
+  }, [family]);
   const familyLabel = familyBySlug(family).label;
   const tm = player.transfermarkt;
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const contractDate = formatIso(tm?.contract_until);
-  const rating = positionRating(player);
+  const foot = formatFoot(player.foot);
   const mix = profileMetaForFamily(family)
     .filter((item) => item.key !== "perfil" && item.key !== "geral")
     .map((item) => ({ label: item.label, share: player.profile_shares?.[item.key] ?? 0 }))
@@ -153,7 +160,7 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
   const bio = [
     age != null ? `${age} anos` : null,
     player.height ? `${player.height} cm` : null,
-    player.foot || null,
+    foot,
     player.nationality || null,
   ].filter(Boolean);
 
@@ -192,26 +199,45 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
         <div className="player-report-who">
           <h1>{player.name}</h1>
           <p className="player-report-club">
-            <ClubLogo club={player.club} size={15} />
+            <ClubLogo club={player.club} size={16} />
             <span>{player.club}</span>
             <span className="player-report-dot">·</span>
             <span>{player.position}</span>
           </p>
           {bio.length ? <p className="player-report-bio">{bio.join(" · ")}</p> : null}
+          <div className="player-report-profile">
+            <p>Perfil <strong>{player.profile}</strong></p>
+            {mix.length ? (
+              <ul>
+                {mix.map((item) => (
+                  <li key={item.label}>
+                    <span>{item.label}</span>
+                    <span className="player-report-mix-track">
+                      <span style={{ width: `${Math.max(4, Math.round(item.share))}%`, background: profileAccent(item.label) }} />
+                    </span>
+                    <strong>{Math.round(item.share)}%</strong>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
         </div>
-        <div className="player-report-score">
-          <strong>{formatRating(rating)}</strong>
-          <span>Nota</span>
-          <em>{player.ranks.geral}º geral</em>
-          <span>{player.profile}</span>
+        <div className="player-report-side">
+          <div className="player-report-heat">
+            <p>Heatmap</p>
+            {(player.heatmap?.points?.length ?? 0) > 0 ? (
+              <PlayerHeatmap playerName={player.name} heatmap={player.heatmap} fixed={{ width: 168, height: 108 }} />
+            ) : (
+              <p className="player-report-heat-empty">Mapa indisponível</p>
+            )}
+          </div>
+          <div className="player-report-market">
+            <p>Valor de mercado</p>
+            <strong>{tm?.market_value ?? "—"}</strong>
+            {tm?.on_loan_from ? <small>Empréstimo · {tm.on_loan_from}</small> : null}
+          </div>
         </div>
       </section>
-
-      {mix.length ? (
-        <p className="player-report-mix">
-          {mix.map((item) => `${item.label} ${Math.round(item.share)}%`).join("  ·  ")}
-        </p>
-      ) : null}
 
       <dl className="player-report-facts">
         <div className="is-minutes">
@@ -220,10 +246,6 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
             {player.minutes.toLocaleString("pt-BR")}
             {player.minutes_pct != null ? <small>{Math.round(player.minutes_pct)}% da competição</small> : null}
           </dd>
-        </div>
-        <div className="is-market">
-          <dt>Valor de mercado</dt>
-          <dd>{tm?.market_value ?? "—"}</dd>
         </div>
         <div className="is-contract">
           <dt>Contrato</dt>
@@ -246,12 +268,6 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
             <small>xA {xa}</small>
           </dd>
         </div>
-        {tm?.on_loan_from ? (
-          <div>
-            <dt>Empréstimo</dt>
-            <dd>{tm.on_loan_from}</dd>
-          </div>
-        ) : null}
       </dl>
 
       {badges.length ? (
@@ -259,7 +275,10 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
           <h2>Badges</h2>
           <ul>
             {badges.map((badge) => (
-              <li key={badge.key}>{badge.label}</li>
+              <li key={badge.key} className={`tone-${toneByBadge.get(badge.key) ?? "passes"}`}>
+                <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
+                <span>{badge.label}</span>
+              </li>
             ))}
           </ul>
         </section>

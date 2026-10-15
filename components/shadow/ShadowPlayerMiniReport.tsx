@@ -6,6 +6,7 @@ import { GradeBadge } from "@/components/ui/GradeBadge";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useFamilyGradeLookup } from "@/hooks/useFamilyGradeLookup";
 import { usePlayerProfile } from "@/hooks/usePlayerProfileCache";
+import { formatFoot } from "@/lib/feet";
 import { sortedProfileShareRows } from "@/lib/profileShares";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { getPlayerSectionGrade } from "@/lib/sectionGrades";
@@ -31,12 +32,7 @@ function monthsRemaining(iso?: string | null): string {
 }
 
 export function formatDominantFoot(foot: string | null | undefined): string {
-  if (!foot) return "—";
-  const value = foot.trim().toLowerCase();
-  if (value.startsWith("r") || value.includes("direit")) return "Direito";
-  if (value.startsWith("l") || value.includes("esquer")) return "Esquerdo";
-  if (value.startsWith("b") || value.includes("amb")) return "Ambos";
-  return foot;
+  return formatFoot(foot) ?? "—";
 }
 
 function CompareColumn({
