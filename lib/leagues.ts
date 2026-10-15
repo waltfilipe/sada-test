@@ -1,4 +1,4 @@
-export type LeagueId = "serie-a" | "serie-c";
+export type LeagueId = "serie-a" | "serie-b" | "serie-c" | "serie-d";
 
 export type LeagueInfo = {
   id: LeagueId;
@@ -15,19 +15,37 @@ export const LEAGUES: LeagueInfo[] = [
     id: "serie-a",
     slug: "serie-a",
     name: "Série A",
-    season: "2025/26",
+    season: "2026",
     brand: "SA",
     tagline: "Brasileirão",
     heatmaps: true,
   },
   {
+    id: "serie-b",
+    slug: "serie-b",
+    name: "Série B",
+    season: "2026",
+    brand: "SB",
+    tagline: "Brasileirão",
+    heatmaps: false,
+  },
+  {
     id: "serie-c",
     slug: "serie-c",
     name: "Série C",
-    season: "2026 · 1ª fase",
+    season: "2026",
     brand: "SC",
-    tagline: "Primeira fase",
+    tagline: "Brasileirão",
     heatmaps: true,
+  },
+  {
+    id: "serie-d",
+    slug: "serie-d",
+    name: "Série D",
+    season: "2026",
+    brand: "SD",
+    tagline: "Brasileirão",
+    heatmaps: false,
   },
 ];
 

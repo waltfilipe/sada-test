@@ -194,7 +194,7 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
   const activeCount = panelCount + (query.trim() ? 1 : 0);
 
   return (
-    <div className={`scout-root zag-v2${leagueId === "serie-c" ? " league-serie-c" : ""}`}>
+    <div className={leagueId === "serie-a" ? "scout-root zag-v2" : `scout-root zag-v2 league-${leagueId}`}>
       <ScoutTopbar
         active="posicoes"
         subnav={<PositionFamilyTabs active={family} hrefFor={(slug) => href(`/posicao/${slug}`)} />}

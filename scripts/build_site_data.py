@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 
@@ -11,7 +12,13 @@ from engine.leagues import LEAGUES
 from engine.load_data import load_players_dataframe
 from engine.measures import attach_base_measures
 from engine.sofascore import attach_sofascore_metrics
-from engine.sofascore_heatmap import attach_heatmaps_to_players, import_heatmaps_from_br26
+from engine.sofascore_heatmap import (
+    HEATMAP_DIR,
+    PUBLIC_HEATMAP_DIR,
+    attach_heatmaps_to_players,
+    import_heatmaps_from_br26,
+)
+from engine.transfermarkt import seed_cache_from_profiles
 from engine.positions import (
     POSITION_FAMILIES,
     SCATTER_METRICS,
@@ -154,17 +161,54 @@ def build_league(league_id: str) -> None:
     print(f"Wrote {len(all_players)} profiles → {out_dir}")
 
 
-def main() -> None:
-    for league_id in LEAGUES:
-        build_league(league_id)
-
-    # Legacy path: Série A at data/ root for older imports (symlink/copy meta+players index only)
+def _sync_serie_a_legacy() -> None:
+    """Older scripts still read Série A from data/ root."""
     serie_a = DATA_DIR / "serie-a"
-    legacy_files = ["meta.json", "players.json"]
-    for name in legacy_files:
+    for name in ("meta.json", "players.json"):
         src = serie_a / name
         if src.is_file():
             shutil.copy2(src, DATA_DIR / name)
+    for family in serie_a.glob("family-*.json"):
+        shutil.copy2(family, DATA_DIR / family.name)
+
+    legacy_profiles = DATA_DIR / "profiles"
+    legacy_profiles.mkdir(parents=True, exist_ok=True)
+    live = {path.name for path in (serie_a / "profiles").glob("*.json")}
+    for stale in legacy_profiles.glob("*.json"):
+        if stale.name not in live:
+            stale.unlink()
+    for profile in (serie_a / "profiles").glob("*.json"):
+        shutil.copy2(profile, legacy_profiles / profile.name)
+
+
+def _prune_orphan_heatmaps() -> None:
+    live_ids: set[str] = set()
+    for league_id in LEAGUES:
+        path = DATA_DIR / league_id / "players.json"
+        if not path.is_file():
+            continue
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        live_ids.update(player["player_id"] for player in payload.get("players", []))
+    for folder in (HEATMAP_DIR, PUBLIC_HEATMAP_DIR):
+        if not folder.exists():
+            continue
+        for path in folder.iterdir():
+            if path.name == "index.json":
+                continue
+            if path.stem not in live_ids:
+                path.unlink()
+
+
+def main() -> None:
+    seeded = seed_cache_from_profiles(DATA_DIR)
+    if seeded:
+        print(f"Transfermarkt cache seeded from profiles: {seeded}")
+
+    for league_id in LEAGUES:
+        build_league(league_id)
+
+    _sync_serie_a_legacy()
+    _prune_orphan_heatmaps()
 
     REFERENCE_DIR.mkdir(parents=True, exist_ok=True)
     dax_src = Path("/tmp/all_dax.json")

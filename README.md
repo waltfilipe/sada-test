@@ -1,6 +1,6 @@
 # Série A Scout
 
-Site de scouting da Série A inspirado no dashboard Power BI, com cálculos derivados das DAX do arquivo `Dashboard - Série A 25-26.pbix` e dados de `Serie A 26.xlsx`.
+Site de scouting das Séries A, B, C e D, com cálculos derivados das DAX do arquivo `Dashboard - Série A 25-26.pbix` e exportações Wyscout em `wyscout/2026/`.
 
 ## Stack
 
@@ -10,10 +10,11 @@ Site de scouting da Série A inspirado no dashboard Power BI, com cálculos deri
 
 ## Páginas
 
-- `/filtros` — filtros e lista de atletas
-- `/posicao/[slug]` — análise por posição
-- `/comparar` — comparação direta com radares
-- `/scatter` — comparação com gráficos de dispersão
+- `/` — escolha da competição (A, B, C, D)
+- `/{liga}/filtros` — filtros e lista de atletas
+- `/{liga}/posicao/[slug]` — análise por posição
+- `/{liga}/comparar` — comparação direta com radares
+- `/{liga}/scatter` — comparação com gráficos de dispersão
 
 ## Desenvolvimento
 
@@ -30,11 +31,11 @@ npm run dev
 npm run build
 ```
 
-O script de build lê `Serie A 26.xlsx` (aba `Tb_SerieC25` ou `Search results (500)` com mapeamento Wyscout). Se o Excel não estiver no formato esperado, o fallback usa os dados embutidos no `.pbix`.
+O script de build lê os pares `wyscout/2026/serie-*-pt1.xlsx` e `pt2.xlsx` (aba `Search results`), junta as partes e remove a sobreposição do limite de 500 linhas do Wyscout. A Série A ainda cai no `.pbix` se o Excel não estiver no formato esperado.
 
 ## Atualizar dados
 
-1. Substitua `Serie A 26.xlsx` mantendo as colunas do modelo (`Tb_SerieC25`)
+1. Substitua os arquivos em `wyscout/2026/` (`serie-a`, `serie-b`, `serie-c`, `serie-d`, partes `pt1` e `pt2`)
 2. Rode `npm run build:data`
 3. Faça deploy novamente na Vercel
 

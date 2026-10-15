@@ -14,7 +14,7 @@ import { TeamProfileMap } from "@/components/shadow/TeamProfileMap";
 import { TeamStatsBar } from "@/components/shadow/TeamStatsBar";
 import { useShadowTeam } from "@/hooks/useShadowTeam";
 import { FORMATIONS, formationById, type FormationSlot } from "@/lib/formations";
-import { LEAGUES, type LeagueId } from "@/lib/leagues";
+import { LEAGUES, isLeagueId, type LeagueId } from "@/lib/leagues";
 import { benchPlayerIds, boardAssignments, boardSquad, type ShadowScope, type TeamBoard } from "@/lib/shadowTeamStorage";
 import { gradeTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
@@ -38,8 +38,8 @@ function fold(value: string): string {
 
 function readSombraLeague(fallback: LeagueId): LeagueId {
   if (typeof window === "undefined") return fallback;
-  const value = sessionStorage.getItem(SOMBRA_LEAGUE_KEY);
-  return value === "serie-a" || value === "serie-c" ? value : fallback;
+  const value = sessionStorage.getItem(SOMBRA_LEAGUE_KEY) ?? "";
+  return isLeagueId(value) ? value : fallback;
 }
 
 type Props = {

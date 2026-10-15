@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 import unicodedata
@@ -52,8 +53,13 @@ CLUB_ALIASES: dict[str, list[str]] = {
 }
 
 
-def _normalize_text(value: str) -> str:
-    value = unicodedata.normalize("NFKD", value)
+def _normalize_text(value: Any) -> str:
+    if value is None:
+        return ""
+    text = str(value).strip()
+    if not text or text.lower() == "nan":
+        return ""
+    value = unicodedata.normalize("NFKD", text)
     value = "".join(ch for ch in value if not unicodedata.combining(ch))
     value = value.lower()
     value = re.sub(r"[^a-z0-9]+", " ", value)
@@ -159,6 +165,36 @@ def _contract_remaining(contract_until: str | None) -> str | None:
     if not parts:
         parts.append(f"{max((end - today).days, 1)} dia(s)")
     return " e ".join(parts)
+
+
+def _tm_offline() -> bool:
+    return os.environ.get("SCOUT_TM_OFFLINE", "").strip().lower() in {"1", "true", "yes"}
+
+
+def seed_cache_from_profiles(profiles_root: Path) -> int:
+    """Keep headshots already saved on profiles when the player returns in a new export."""
+    cache = _load_cache()
+    added = 0
+    for path in profiles_root.rglob("*.json"):
+        if path.parent.name != "profiles":
+            continue
+        try:
+            player = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        tm = player.get("transfermarkt")
+        name = player.get("name")
+        club = player.get("club")
+        if not tm or not name or not club:
+            continue
+        key = f"{_normalize_text(str(name))}::{_normalize_text(str(club))}"
+        if cache.get(key):
+            continue
+        cache[key] = tm
+        added += 1
+    if added:
+        _save_cache(cache)
+    return added
 
 
 def _load_cache() -> dict[str, Any]:
@@ -659,6 +695,8 @@ def fetch_player_transfermarkt(name: str, club: str, cache: dict[str, Any], dela
     cache_key = f"{_normalize_text(name)}::{_normalize_text(club)}"
     if cache_key in cache:
         return cache[cache_key]
+    if _tm_offline():
+        return None
 
     try:
         results = _search_players(name)
@@ -696,6 +734,8 @@ def resolve_club_squad(
     cached = club_cache.get(key)
     if cached is not None:
         return cached.get("squad", [])
+    if _tm_offline():
+        return []
 
     try:
         directory = build_club_directory(club_cache, season=season, delay=delay)
@@ -722,6 +762,8 @@ def fetch_player_via_squad(
     delay: float = 0.9,
 ) -> dict[str, Any] | None:
     """Fallback lookup that searches inside the player's club squad."""
+    if _tm_offline():
+        return None
     squad = resolve_club_squad(player["club"], club_cache, season=season, delay=delay)
     match = match_player_in_squad(player, squad)
     if not match:

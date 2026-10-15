@@ -443,16 +443,22 @@
   object-position: center 18%;
 }
 
-.zag-v2.league-serie-c .zag-v2-list button {
+.zag-v2.league-serie-b .zag-v2-list button,
+.zag-v2.league-serie-c .zag-v2-list button,
+.zag-v2.league-serie-d .zag-v2-list button {
   grid-template-columns: 66px minmax(0, 1fr);
 }
 
-.zag-v2.league-serie-c .zag-v2-photo {
+.zag-v2.league-serie-b .zag-v2-photo,
+.zag-v2.league-serie-c .zag-v2-photo,
+.zag-v2.league-serie-d .zag-v2-photo {
   width: 66px;
   height: 76px;
 }
 
-.zag-v2.league-serie-c .zag-v2-photo img {
+.zag-v2.league-serie-b .zag-v2-photo img,
+.zag-v2.league-serie-c .zag-v2-photo img,
+.zag-v2.league-serie-d .zag-v2-photo img {
   object-position: center 10%;
   transform: scale(1.22);
 }
@@ -540,13 +546,17 @@
   max-height: 168px;
 }
 
-.zag-v2.league-serie-c .player-hero-photo {
+.zag-v2.league-serie-b .player-hero-photo,
+.zag-v2.league-serie-c .player-hero-photo,
+.zag-v2.league-serie-d .player-hero-photo {
   width: 132px;
   height: 172px;
   min-height: 172px;
 }
 
-.zag-v2.league-serie-c .player-hero-photo img {
+.zag-v2.league-serie-b .player-hero-photo img,
+.zag-v2.league-serie-c .player-hero-photo img,
+.zag-v2.league-serie-d .player-hero-photo img {
   position: absolute;
   inset: 0;
   width: 100%;

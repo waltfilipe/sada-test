@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiteLogo } from "@/components/SiteLogo";
+import { LEAGUES } from "@/lib/leagues";
 import { POSITION_FAMILIES } from "@/lib/positions";
+
+const LEAGUE_ROUTE = new RegExp(`^/(${LEAGUES.map((league) => league.id).join("|")})(/|$)`);
 
 const NAV = [
   { href: "/filtros", label: "Filtros", icon: "⌕" },
@@ -16,7 +19,7 @@ const LEGACY_SCOUT_PREFIXES = ["/posicao/", "/filtros", "/comparar", "/scatter",
 
 function isScoutRoute(pathname: string): boolean {
   if (pathname === "/") return true;
-  if (/^\/(serie-a|serie-c)(\/|$)/.test(pathname)) return true;
+  if (LEAGUE_ROUTE.test(pathname)) return true;
   return LEGACY_SCOUT_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
