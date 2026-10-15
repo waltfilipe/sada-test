@@ -47,10 +47,10 @@ export function MinuteProjection({ player, family, players }: Props) {
                 {familyLabel} · {league.name}
               </p>
               <p className="projection-lead">
-                Cada número é a projeção realista por 90 minutos. A barra compara esse valor com os números reais da posição.
+                O ranking e as barras usam só quem já passou de 50% dos minutos. Números acima da média desses atletas são puxados para ela. Números que já estão abaixo permanecem.
               </p>
               <p className="projection-weight">
-                A amostra pesa {weightPct}%. O restante segue a média de quem já passou de 50% dos minutos.
+                A amostra pesa {weightPct}% de um número acima da média.
               </p>
               <StatSectionsBoard player={projection.profile} family={family} />
             </div>

@@ -18,7 +18,8 @@ const Z90 = 1.2815515655446004;
 const MIN_GROUP = 8;
 const MIN_METRICS = 3;
 const FALLBACK_N0 = 4;
-const N0_MIN = 0.5;
+/** Nineties before a per-90 rate is trusted. Below this, small samples stay too close to a hot streak. */
+const N0_FLOOR = 18;
 const N0_MAX = 40;
 
 const SKIP_KINDS = new Set(["construction_share", "def_efficiency_group"]);
@@ -37,7 +38,8 @@ type MetricFit = {
   key: string;
   y: number;
   prior: Prior;
-  competitionRates: number[];
+  /** Observed rates of players with at least half the minutes, sorted. */
+  referenceRates: number[];
   kind: MetricKind;
   rank: boolean;
   sample: string;
@@ -73,7 +75,7 @@ export function projectionPlacement(
   return placementFrom(model, scenario);
 }
 
-/** Realistic per-90 profile, with each bar ranked against the position's real numbers. */
+/** Realistic per-90 profile. Rates above the regulars' mean shrink toward it; rates already below stay put. Bars and rank use only players with at least half the minutes. */
 export function realisticProjection(player: PlayerProfile, players: PlayerProfile[]): RealisticProjection | null {
   const model = modelFor(player, players);
   if (!model) return null;
@@ -130,7 +132,7 @@ function projectedMetrics(model: BuiltModel, scenario: ProjectionScenario): Map<
     projected.set(metric.key, {
       value,
       weight: next.weight,
-      percentile: midrankPercentile(value, metric.competitionRates),
+      percentile: midrankPercentile(value, metric.referenceRates),
       kind: metric.kind,
       sample: metric.sample,
     });
@@ -178,7 +180,7 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
       key: sample.key,
       y: sample.value,
       prior,
-      competitionRates: points.map((point) => point.value).sort((a, b) => a - b),
+      referenceRates: [...prior.refRates].sort((a, b) => a - b),
       kind: sample.kind,
       rank: sample.rank,
       sample: sample.sample,
@@ -191,13 +193,13 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
   const peerIndexes: number[] = [];
   for (const candidate of players) {
     if (candidate.player_id === player.player_id) continue;
-    if ((candidate.minutes ?? 0) <= 0) continue;
+    if ((candidate.minutes ?? 0) <= 0 || candidate.minutes_pct == null || candidate.minutes_pct < 50) continue;
     const byKey = new Map(samplesOfId(candidate).map((sample) => [sample.key, sample.value]));
     const percentiles: number[] = [];
     for (const metric of ranked) {
       const value = byKey.get(metric.key);
       if (value == null) continue;
-      percentiles.push(midrankPercentile(value, metric.competitionRates));
+      percentiles.push(midrankPercentile(value, metric.referenceRates));
     }
     if (percentiles.length < minimumOverlap) continue;
     peerIndexes.push(mean(percentiles));
@@ -330,7 +332,7 @@ function fitPrior(points: { e: number; value: number; low: boolean }[]): Prior |
       const tau = msdRef - sigma2 * invRef;
       if (tau > 1e-8) {
         tau2 = tau;
-        n0 = clamp(sigma2 / tau2, N0_MIN, N0_MAX);
+        n0 = clamp(sigma2 / tau2, N0_FLOOR, N0_MAX);
       }
     }
   }
@@ -342,7 +344,7 @@ function fitPrior(points: { e: number; value: number; low: boolean }[]): Prior |
   }
   if (!(tau2 > 0) || !Number.isFinite(mu)) return null;
 
-  return { mu, tau2, n0, refRates };
+  return { mu, tau2, n0: clamp(Math.max(n0, N0_FLOOR), N0_FLOOR, N0_MAX), refRates };
 }
 
 function projectRate(
@@ -356,8 +358,16 @@ function projectRate(
   const sd = Math.sqrt(prior.tau2 * (1 - weight));
   let value = realistic;
   if (scenario === "negativa") value = realistic - Z90 * sd;
-  if (scenario === "positiva") value = realistic + Z90 * sd;
-  return { value: Math.max(0, value), weight };
+  else if (scenario === "positiva") value = realistic + Z90 * sd;
+  else if (y < prior.mu) {
+    // A short sample that is already below the regulars' mean is not revised upward.
+    value = y;
+  }
+  return { value: metricFloor(value), weight };
+}
+
+function metricFloor(value: number): number {
+  return value < 0 ? 0 : value;
 }
 
 function isVolumeLabel(label: string | undefined): boolean {

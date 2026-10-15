@@ -9,6 +9,7 @@ import { flattenAspects } from "@/lib/aspectLookup";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
+import { PlayerReportButton } from "@/components/position/profile/PlayerReport";
 import { SimilarCrossLeagueModal } from "@/components/position/profile/SimilarCrossLeagueModal";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 
@@ -197,6 +198,7 @@ export function PlayerHero({ player, family }: Props) {
                 <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
               </a>
             ) : null}
+            <PlayerReportButton player={player} family={family} />
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSimilarOpen(true)}>
               <i className="fa-solid fa-shuffle" aria-hidden="true" /> Similares
             </button>

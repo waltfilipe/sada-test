@@ -286,30 +286,57 @@ function edgeAgainst(mine: number | null | undefined, others: Array<number | nul
 
 export function StatSectionsBoard({ player, family }: { player: PlayerProfile; family: PositionFamily }) {
   const entries = useMemo(() => sectionEntries(player, family), [player, family]);
+  const [openTitles, setOpenTitles] = useState<Set<string>>(() => new Set());
   const allBadges = useMemo<TonedStatBadge[]>(
     () => entries.flatMap((entry) => entry.badges.map((badge) => ({ ...badge, tone: entry.tone }))),
     [entries],
   );
 
+  useEffect(() => {
+    setOpenTitles(new Set());
+  }, [player.player_id]);
+
+  const toggle = (title: string) => {
+    setOpenTitles((current) => {
+      const next = new Set(current);
+      if (next.has(title)) next.delete(title);
+      else next.add(title);
+      return next;
+    });
+  };
+
   return (
     <div className="projection-board">
       <PlayerBadgesSection badges={allBadges} />
       <div className="projection-groups">
-        {entries.map((entry) => (
-          <section key={entry.title} className="projection-group" aria-label={entry.title}>
-            <h4 className="projection-group-title">{entry.title}</h4>
-            <div className="stat-cards-stack">
-              {entry.metrics.map(({ item, groupTitle }) => (
-                <StatAspectBlock
-                  key={`${entry.title}-${item.label}`}
-                  item={item}
-                  groupTitle={groupTitle}
-                  tone={entry.tone}
-                />
-              ))}
-            </div>
-          </section>
-        ))}
+        {entries.map((entry) => {
+          const open = openTitles.has(entry.title);
+          return (
+            <section key={entry.title} className={`projection-group${open ? " is-open" : ""}`}>
+              <button
+                type="button"
+                className="projection-group-toggle"
+                aria-expanded={open}
+                onClick={() => toggle(entry.title)}
+              >
+                <span className="projection-group-title">{entry.title}</span>
+                <i className={`fa-solid fa-chevron-${open ? "up" : "down"}`} aria-hidden="true" />
+              </button>
+              {open ? (
+                <div className="stat-cards-stack">
+                  {entry.metrics.map(({ item, groupTitle }) => (
+                    <StatAspectBlock
+                      key={`${entry.title}-${item.label}`}
+                      item={item}
+                      groupTitle={groupTitle}
+                      tone={entry.tone}
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </section>
+          );
+        })}
       </div>
     </div>
   );

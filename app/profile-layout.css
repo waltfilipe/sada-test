@@ -3700,12 +3700,50 @@
 .projection-groups {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.85rem;
+  gap: 0.65rem;
   margin-top: 0.35rem;
 }
 
+.projection-group {
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.projection-group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.72rem 0.8rem;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.projection-group.is-open .projection-group-toggle {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px 12px 0 0;
+}
+
+.projection-group-toggle i {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.projection-group .stat-cards-stack {
+  padding: 0.55rem 0.65rem 0.7rem;
+}
+
 .projection-group-title {
-  margin: 0 0 0.45rem;
+  margin: 0;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -3749,5 +3787,357 @@
 @media (prefers-reduced-motion: reduce) {
   .projection-launch {
     animation: none;
+  }
+}
+
+/* Player PDF. Hidden on screen; the export button prints only this sheet. */
+.player-report {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 13mm 14mm 14mm;
+  }
+
+  html,
+  body.exporting-player-report {
+    background: #fff !important;
+    min-height: 0 !important;
+  }
+
+  body.exporting-player-report > *:not(.player-report) {
+    display: none !important;
+  }
+
+  body.exporting-player-report > .player-report {
+    display: block !important;
+    background: #fff;
+    color: #172033;
+    font-family: "TASA Orbiter Variable", system-ui, sans-serif;
+    font-size: 10.5px;
+    line-height: 1.35;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .player-report * {
+    box-shadow: none;
+    text-shadow: none;
+  }
+
+  .player-report-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #102033;
+  }
+
+  .player-report-brand,
+  .player-report-kicker,
+  .player-report-league,
+  .player-report-who h1,
+  .player-report-who p,
+  .player-report-mix,
+  .player-report-facts,
+  .player-report-badges h2,
+  .player-report-stats-wrap h2,
+  .player-report-section h3,
+  .player-report-block p,
+  .player-report-foot p {
+    margin: 0;
+  }
+
+  .player-report-brand {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #102033;
+  }
+
+  .player-report-kicker {
+    margin-top: 2px;
+    color: #5c6b7a;
+    font-size: 12px;
+  }
+
+  .player-report-league {
+    text-align: right;
+    font-size: 12px;
+    font-weight: 700;
+    color: #102033;
+  }
+
+  .player-report-league span {
+    display: block;
+    margin-top: 1px;
+    color: #5c6b7a;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .player-report-identity {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .player-report-photo {
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #eef2f6;
+  }
+
+  .player-report-photo-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #102033;
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .player-report-who {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .player-report-who h1 {
+    font-size: 22px;
+    font-weight: 750;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: #102033;
+  }
+
+  .player-report-who p {
+    margin-top: 3px;
+    color: #3d4c5e;
+    font-size: 11px;
+  }
+
+  .player-report-bio {
+    color: #5c6b7a;
+  }
+
+  .player-report-score {
+    flex: 0 0 auto;
+    text-align: right;
+  }
+
+  .player-report-score strong,
+  .player-report-score span,
+  .player-report-score em {
+    display: block;
+    font-style: normal;
+  }
+
+  .player-report-score strong {
+    font-size: 26px;
+    font-weight: 750;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: #102033;
+  }
+
+  .player-report-score span {
+    color: #5c6b7a;
+    font-size: 10px;
+  }
+
+  .player-report-score em {
+    margin-top: 3px;
+    color: #102033;
+    font-size: 11px;
+    font-weight: 750;
+  }
+
+  .player-report-mix {
+    margin-top: 8px;
+    color: #3d4c5e;
+    font-size: 10px;
+  }
+
+  .player-report-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: 8px 12px;
+    margin: 12px 0;
+    padding: 8px 0;
+    border-top: 1px solid #e4eaf0;
+    border-bottom: 1px solid #e4eaf0;
+  }
+
+  .player-report-facts dt {
+    color: #6b7c8d;
+    font-size: 8px;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .player-report-facts dd {
+    margin: 2px 0 0;
+    color: #172033;
+    font-size: 12px;
+    font-weight: 750;
+  }
+
+  .player-report-facts small {
+    display: block;
+    margin-top: 1px;
+    color: #5c6b7a;
+    font-size: 9.5px;
+    font-weight: 550;
+  }
+
+  .player-report-badges h2,
+  .player-report-stats-wrap h2 {
+    margin: 11px 0 6px;
+    color: #102033;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .player-report-badges ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .player-report-badges li {
+    border: 1px solid #d5dee8;
+    border-radius: 999px;
+    padding: 2px 8px;
+    color: #1d3348;
+    font-size: 9.5px;
+    font-weight: 650;
+  }
+
+  .player-report-stats {
+    columns: 2;
+    column-gap: 22px;
+  }
+
+  .player-report-section {
+    break-inside: avoid;
+    margin: 0 0 11px;
+  }
+
+  .player-report-section h3 {
+    margin-bottom: 3px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #d7e3ee;
+    color: #0c4a6e;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .player-report-block p {
+    margin: 5px 0 1px;
+    color: #243246;
+    font-size: 9.5px;
+    font-weight: 750;
+  }
+
+  .player-report table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .player-report th,
+  .player-report td {
+    padding: 1px 0;
+    font-size: 9.5px;
+    font-weight: 550;
+    line-height: 1.35;
+    white-space: nowrap;
+  }
+
+  .player-report td {
+    padding-left: 12px;
+  }
+
+  .player-report th {
+    color: #3d4c5e;
+    font-weight: 500;
+    text-align: left;
+  }
+
+  .player-report td {
+    color: #172033;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .player-report tr.is-sub th {
+    padding-left: 8px;
+    color: #6b7c8d;
+  }
+
+  .player-report-pct {
+    width: 26px;
+    padding-left: 8px !important;
+    color: #5c6b7a !important;
+    font-weight: 650 !important;
+  }
+
+  .player-report-pct.is-high {
+    color: #0e6b45 !important;
+  }
+
+  .player-report-pct.is-low {
+    color: #8a4b12 !important;
+  }
+
+  .player-report-foot {
+    break-inside: avoid;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #d7e0e8;
+  }
+
+  .player-report-foot p {
+    margin-bottom: 3px;
+    font-size: 9px;
+  }
+
+  .player-report-foot span {
+    display: inline-block;
+    width: 86px;
+    color: #6b7c8d;
+    font-size: 8px;
+    font-weight: 750;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .player-report-foot a {
+    color: #0c4a6e;
+    text-decoration: underline;
+    word-break: break-all;
+  }
+
+  .player-report-note {
+    margin-top: 6px;
+    color: #6b7c8d;
+    font-size: 8.5px;
+    line-height: 1.45;
   }
 }
