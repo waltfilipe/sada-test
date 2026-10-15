@@ -6,6 +6,7 @@ import { MinuteProjection } from "./MinuteProjection";
 import { PlayerHero } from "./PlayerHero";
 import { PlayerHeatmap } from "./PlayerHeatmap";
 import { ProfileCard } from "./ProfileCard";
+import { PassTendencies } from "./PassTendencies";
 import { ScoutStatsSections } from "./ScoutStatsSections";
 
 type Props = {
@@ -46,6 +47,7 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
           <div className="player-card pass-scores-shell">
             <ScoutStatsSections player={player} family={family} />
           </div>
+          <PassTendencies player={player} players={players} />
         </div>
       </div>
     </div>

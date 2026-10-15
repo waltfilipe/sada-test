@@ -1915,14 +1915,19 @@
   min-width: 0;
 }
 
-/* Heatmap and Perfil stay compact; stats column may grow when a group is open. */
+/* Heatmap and Perfil stay compact. Stats grows only with its mini cards. */
 .profile-col-heatmap .heatmap-card,
-.profile-col-middle .profile-perfil-card,
-.profile-col-stats .pass-scores-shell {
+.profile-col-middle .profile-perfil-card {
   min-height: 318px;
   display: flex;
   flex-direction: column;
   flex: 0 0 auto;
+  height: auto;
+}
+
+.profile-col-stats .pass-scores-shell {
+  display: flex;
+  flex-direction: column;
   height: auto;
 }
 
@@ -2404,6 +2409,31 @@
 .tendencies-pop-panel-right {
   left: auto;
   right: 0;
+}
+
+.pass-tendencies {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.pass-tendencies-btn {
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.pass-tendencies-panel {
+  position: static;
+  width: auto;
+  margin-top: 0.45rem;
+  box-shadow: none;
+}
+
+.pass-tendencies-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
 }
 
 /* ── Stats & Scores — panel-swap navigation ──────────────────────────────── */
@@ -3702,6 +3732,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
   margin-top: 0.35rem;
+  align-items: start;
 }
 
 .projection-group {
@@ -4039,8 +4070,14 @@
   }
 
   .player-report-market {
-    background: #fff9e8;
-    border-top: 3px solid #fed766;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    background: #f4f7fb;
+  }
+
+  .player-report-side {
+    flex-basis: 210px;
   }
 
   .player-report-market strong {
@@ -4053,7 +4090,7 @@
   .player-report-market small {
     display: block;
     margin-top: 1px;
-    color: #6a5420;
+    color: #4d6278;
     font-size: 8.5px;
     font-weight: 650;
   }
@@ -4069,7 +4106,7 @@
 
   .player-report-facts {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
     margin: 8px 0 2px;
   }
@@ -4077,14 +4114,8 @@
   .player-report-facts > div {
     padding: 5px 7px 6px;
     border-radius: 8px;
-    background: #f3f7fb;
-    border-top: 3px solid #1be7ff;
+    background: #eef2f6;
   }
-
-  .player-report-facts .is-market { border-top-color: #fed766; background: #fff9e8; }
-  .player-report-facts .is-contract { border-top-color: #8980f5; background: #f4f3ff; }
-  .player-report-facts .is-goals { border-top-color: #fe4a49; background: #fff1f0; }
-  .player-report-facts .is-assists { border-top-color: #31e981; background: #eefbf5; }
 
   .player-report-facts dt {
     color: #5d7084;
@@ -4237,8 +4268,9 @@
   }
 
   .player-report tr.is-sub th {
-    padding-left: 8px;
-    color: #5c7084;
+    padding-left: 0;
+    color: #1c3044;
+    font-weight: 500;
   }
 
   .player-report-pct {

@@ -36,9 +36,12 @@ export type ShadowTeamState = {
   watchlistIds: string[];
   /** slotId → playerId (time sombra) */
   assignments: Record<string, string | null>;
+  /** Reservas por posição, mostrados em miniatura no campo. */
+  reserves: Record<string, string[]>;
   /** Time próprio — mesma formação, elenco separado. */
   ownSquadIds: string[];
   ownAssignments: Record<string, string | null>;
+  ownReserves: Record<string, string[]>;
 };
 
 export const EMPTY_STATE: ShadowTeamState = {
@@ -46,8 +49,10 @@ export const EMPTY_STATE: ShadowTeamState = {
   squadIds: [],
   watchlistIds: [],
   assignments: {},
+  reserves: {},
   ownSquadIds: [],
   ownAssignments: {},
+  ownReserves: {},
 };
 
 function emptyAssignments(formation: Formation): Record<string, string | null> {
@@ -71,8 +76,10 @@ export function loadShadowTeamState(league: ShadowScope = "serie-a"): ShadowTeam
       squadIds: parsed.squadIds ?? [],
       watchlistIds: parsed.watchlistIds ?? [],
       assignments: { ...base, ...(parsed.assignments ?? {}) },
+      reserves: parsed.reserves ?? {},
       ownSquadIds: parsed.ownSquadIds ?? [],
       ownAssignments: { ...base, ...(parsed.ownAssignments ?? {}) },
+      ownReserves: parsed.ownReserves ?? {},
     };
   } catch {
     const base = emptyAssignments(formationById(DEFAULT_FORMATION_ID));
@@ -98,14 +105,31 @@ export function boardAssignments(state: ShadowTeamState, board: TeamBoard): Reco
   return board === "proprio" ? state.ownAssignments : state.assignments;
 }
 
+export function boardReserves(state: ShadowTeamState, board: TeamBoard): Record<string, string[]> {
+  return board === "proprio" ? state.ownReserves ?? {} : state.reserves ?? {};
+}
+
+function withoutReserve(reserves: Record<string, string[]>, playerId: string): Record<string, string[]> {
+  const next: Record<string, string[]> = {};
+  for (const [slotId, ids] of Object.entries(reserves)) {
+    const kept = ids.filter((id) => id !== playerId);
+    if (kept.length) next[slotId] = kept;
+  }
+  return next;
+}
+
 function writeBoard(
   state: ShadowTeamState,
   board: TeamBoard,
   squadIds: string[],
   assignments: Record<string, string | null>,
+  reserves?: Record<string, string[]>,
 ): ShadowTeamState {
-  if (board === "proprio") return { ...state, ownSquadIds: squadIds, ownAssignments: assignments };
-  return { ...state, squadIds, assignments };
+  const nextReserves = reserves ?? boardReserves(state, board);
+  if (board === "proprio") {
+    return { ...state, ownSquadIds: squadIds, ownAssignments: assignments, ownReserves: nextReserves };
+  }
+  return { ...state, squadIds, assignments, reserves: nextReserves };
 }
 
 export function addToWatchlist(state: ShadowTeamState, playerId: string): ShadowTeamState {
@@ -137,14 +161,30 @@ export function addToSquad(
     if (slotId) assignments[slotId] = playerId;
   }
 
-  return writeBoard(state, board, squadIds, assignments);
+  const onPitch = Object.values(assignments).includes(playerId);
+  return writeBoard(
+    state,
+    board,
+    squadIds,
+    assignments,
+    onPitch ? withoutReserve(boardReserves(state, board), playerId) : boardReserves(state, board),
+  );
 }
 
-/** Entra no elenco sem ocupar vaga — fica no banco. */
-export function addReserve(state: ShadowTeamState, playerId: string, board: TeamBoard): ShadowTeamState {
+/** Entra como reserva da posição e aparece em miniatura no campo. */
+export function addReserve(
+  state: ShadowTeamState,
+  playerId: string,
+  board: TeamBoard,
+  slotId: string,
+): ShadowTeamState {
+  const assignments = boardAssignments(state, board);
+  if (Object.values(assignments).includes(playerId)) return state;
   const squadIds = boardSquad(state, board);
-  if (squadIds.includes(playerId)) return state;
-  return writeBoard(state, board, [...squadIds, playerId], boardAssignments(state, board));
+  const nextSquad = squadIds.includes(playerId) ? squadIds : [...squadIds, playerId];
+  const reserves = withoutReserve(boardReserves(state, board), playerId);
+  reserves[slotId] = [...(reserves[slotId] ?? []), playerId];
+  return writeBoard(state, board, nextSquad, assignments, reserves);
 }
 
 export function removeFromSquad(
@@ -161,6 +201,7 @@ export function removeFromSquad(
     board,
     boardSquad(state, board).filter((id) => id !== playerId),
     assignments,
+    withoutReserve(boardReserves(state, board), playerId),
   );
 }
 
@@ -178,7 +219,13 @@ export function assignPlayer(
     let squadIds = boardSquad(state, board);
     if (!squadIds.includes(playerId)) squadIds = [...squadIds, playerId];
     assignments[slotId] = playerId;
-    return writeBoard(state, board, squadIds, assignments);
+    return writeBoard(
+      state,
+      board,
+      squadIds,
+      assignments,
+      withoutReserve(boardReserves(state, board), playerId),
+    );
   }
   assignments[slotId] = null;
   return writeBoard(state, board, boardSquad(state, board), assignments);
@@ -211,6 +258,7 @@ export function dropPlayerOnSlot(
 
   let squadIds = boardSquad(state, board);
   if (!squadIds.includes(playerId)) squadIds = [...squadIds, playerId];
+  const reserves = withoutReserve(boardReserves(state, board), playerId);
 
   if (sourceSlotId) {
     if (occupant && occupant !== playerId) {
@@ -234,7 +282,7 @@ export function dropPlayerOnSlot(
     }
   }
 
-  return writeBoard(state, board, squadIds, assignments);
+  return writeBoard(state, board, squadIds, assignments, reserves);
 }
 
 export function setFormation(state: ShadowTeamState, formationId: string): ShadowTeamState {
@@ -246,7 +294,25 @@ export function setFormation(state: ShadowTeamState, formationId: string): Shado
     formationId,
     assignments: remapAssignments(from, to, state.assignments),
     ownAssignments: remapAssignments(from, to, state.ownAssignments),
+    reserves: remapReserves(from, to, state.reserves ?? {}),
+    ownReserves: remapReserves(from, to, state.ownReserves ?? {}),
   };
+}
+
+function remapReserves(
+  from: Formation,
+  to: Formation,
+  reserves: Record<string, string[]>,
+): Record<string, string[]> {
+  const next: Record<string, string[]> = {};
+  for (const slot of fieldSlots(from)) {
+    const ids = reserves[slot.id];
+    if (!ids?.length) continue;
+    const dest = fieldSlots(to).find((item) => item.label === slot.label);
+    if (!dest) continue;
+    next[dest.id] = [...(next[dest.id] ?? []), ...ids];
+  }
+  return next;
 }
 
 export function benchPlayerIds(state: ShadowTeamState, board: TeamBoard = "sombra"): string[] {

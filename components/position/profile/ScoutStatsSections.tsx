@@ -297,12 +297,7 @@ export function StatSectionsBoard({ player, family }: { player: PlayerProfile; f
   }, [player.player_id]);
 
   const toggle = (title: string) => {
-    setOpenTitles((current) => {
-      const next = new Set(current);
-      if (next.has(title)) next.delete(title);
-      else next.add(title);
-      return next;
-    });
+    setOpenTitles((current) => (current.size === 1 && current.has(title) ? new Set() : new Set([title])));
   };
 
   return (

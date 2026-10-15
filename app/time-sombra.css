@@ -665,6 +665,53 @@ a.shadow-formation-chip {
   line-height: 1;
 }
 
+.shadow-slot-reserves {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+  max-width: 84px;
+}
+
+.shadow-reserve-mini {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(27, 231, 255, 0.55);
+  background: rgba(13, 27, 42, 0.95);
+  color: #e8eef6;
+  font-size: 0.48rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.shadow-reserve-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shadow-reserve-mini.is-placing {
+  outline: 2px solid #1be7ff;
+  outline-offset: 1px;
+}
+
+.shadow-pitch-loose {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  z-index: 5;
+}
+
 .shadow-slot-plus {
   position: absolute;
   top: 10px;

@@ -102,9 +102,9 @@ export function useShadowTeam(scope?: ShadowScope) {
   );
 
   const reserve = useCallback(
-    (playerId: string, board: TeamBoard) => {
+    (playerId: string, board: TeamBoard, slotId: string) => {
       if (!state) return;
-      persist(addReserve(state, playerId, board));
+      persist(addReserve(state, playerId, board, slotId));
     },
     [state, persist],
   );

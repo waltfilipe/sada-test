@@ -232,9 +232,16 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
             )}
           </div>
           <div className="player-report-market">
-            <p>Valor de mercado</p>
-            <strong>{tm?.market_value ?? "—"}</strong>
-            {tm?.on_loan_from ? <small>Empréstimo · {tm.on_loan_from}</small> : null}
+            <div>
+              <p>Valor de mercado</p>
+              <strong>{tm?.market_value ?? "—"}</strong>
+              {tm?.on_loan_from ? <small>Empréstimo · {tm.on_loan_from}</small> : null}
+            </div>
+            <div>
+              <p>Contrato</p>
+              <strong>{tm?.contract_remaining ?? "—"}</strong>
+              {contractDate ? <small>até {contractDate}</small> : null}
+            </div>
           </div>
         </div>
       </section>
@@ -245,13 +252,6 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
           <dd>
             {player.minutes.toLocaleString("pt-BR")}
             {player.minutes_pct != null ? <small>{Math.round(player.minutes_pct)}% da competição</small> : null}
-          </dd>
-        </div>
-        <div className="is-contract">
-          <dt>Contrato</dt>
-          <dd>
-            {tm?.contract_remaining ?? "—"}
-            {contractDate ? <small>até {contractDate}</small> : null}
           </dd>
         </div>
         <div className="is-goals">

@@ -253,6 +253,8 @@ function sampleFrom(
   const key = parent ? `${parent}::${label}` : label;
   const normalized = label.trim().toLowerCase();
   if (/erro/.test(normalized) || /^[+\-−]/.test(raw)) return null;
+  // Defender xA is a season total shown on the hero. It is not a ranked per-90 rate.
+  if (normalized === "xa" && parent === "Gols e xG") return null;
 
   if (raw.includes("%")) {
     const value = parsePercent(raw);

@@ -22,6 +22,35 @@ function parseDrag(data: DataTransfer): DragPayload | null {
   }
 }
 
+function ReserveMini({
+  player,
+  selected,
+  onDragStart,
+  onClick,
+}: {
+  player: PlayerSearchRow;
+  selected?: boolean;
+  onDragStart: (event: React.DragEvent) => void;
+  onClick: () => void;
+}) {
+  const photo = player.transfermarkt?.photo;
+  return (
+    <button
+      type="button"
+      className={`shadow-reserve-mini${selected ? " is-placing" : ""}`}
+      title={player.name}
+      draggable
+      onDragStart={onDragStart}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
+    >
+      {photo ? <PlayerPhoto src={photo} alt="" /> : <span>{playerInitials(player.name)}</span>}
+    </button>
+  );
+}
+
 function PitchToken({ player }: { player: PlayerSearchRow }) {
   const letter = ratingToLetterGrade(player.rating);
   const photo = player.transfermarkt?.photo;
@@ -49,6 +78,8 @@ type Props = {
   assignments: Record<string, string | null>;
   /** Titulares do time sombra, para mini comparação no time próprio. */
   compareAssignments?: Record<string, string | null> | null;
+  reservesBySlot?: Record<string, string[]>;
+  looseReserveIds?: string[];
   playersById: Map<string, PlayerSearchRow>;
   selectedSlotId: string | null;
   placementPlayerId: string | null;
@@ -56,6 +87,7 @@ type Props = {
   onAssign: (slotId: string, playerId: string | null) => void;
   onDrop: (sourceSlotId: string | null, targetSlotId: string, playerId: string) => void;
   onAddReserve: (slot: FormationSlot) => void;
+  onPlaceReserve?: (playerId: string) => void;
 };
 
 export function PitchView({
@@ -69,6 +101,9 @@ export function PitchView({
   onDrop,
   compareAssignments,
   onAddReserve,
+  reservesBySlot = {},
+  looseReserveIds = [],
+  onPlaceReserve,
 }: Props) {
   const formation = useMemo(() => formationById(formationId), [formationId]);
   const slots = useMemo(() => fieldSlots(formation), [formation]);
@@ -172,6 +207,23 @@ export function PitchView({
               >
                 <i className="fa-solid fa-plus" aria-hidden="true" />
               </button>
+              {(reservesBySlot[slot.id] ?? []).length ? (
+                <div className="shadow-slot-reserves">
+                  {(reservesBySlot[slot.id] ?? []).map((id) => {
+                    const reserve = playersById.get(id);
+                    if (!reserve) return null;
+                    return (
+                      <ReserveMini
+                        key={id}
+                        player={reserve}
+                        selected={placementPlayerId === id}
+                        onDragStart={(event) => handleDragStart(event, id, null)}
+                        onClick={() => onPlaceReserve?.(id)}
+                      />
+                    );
+                  })}
+                </div>
+              ) : null}
               {player && isSelected ? (
                 <button
                   type="button"
@@ -185,6 +237,23 @@ export function PitchView({
             </div>
           );
         })}
+        {looseReserveIds.length ? (
+          <div className="shadow-pitch-loose">
+            {looseReserveIds.map((id) => {
+              const reserve = playersById.get(id);
+              if (!reserve) return null;
+              return (
+                <ReserveMini
+                  key={id}
+                  player={reserve}
+                  selected={placementPlayerId === id}
+                  onDragStart={(event) => handleDragStart(event, id, null)}
+                  onClick={() => onPlaceReserve?.(id)}
+                />
+              );
+            })}
+          </div>
+        ) : null}
       </div>
 
       {placementPlayerId ? (
@@ -193,7 +262,7 @@ export function PitchView({
         </p>
       ) : (
         <p className="shadow-pitch-hint">
-          Arraste entre posições · + adiciona reserva · vaga vazia escala titular
+          Arraste entre posições · + adiciona reserva no campo · clique no mini para escalar
         </p>
       )}
     </div>

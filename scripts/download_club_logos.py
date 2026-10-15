@@ -65,6 +65,71 @@ WIKI_TITLES: dict[str, list[str]] = {
     "Júbilo Iwata": ["Júbilo Iwata"],
     "Qatar SC": ["Qatar SC"],
     "Shenzhen Peng City": ["Shenzhen FC"],
+    "ABC": ["ABC Futebol Clube", "ABC FC"],
+    "ASA": ["Agremiação Sportiva Arapiraquense", "ASA"],
+    "América": ["América Futebol Clube (Belo Horizonte)", "América-MG"],
+    "América RN": ["América Futebol Clube (Natal)", "América de Natal"],
+    "Athletic Club": ["Athletic Club (MG)", "Athletic Club (Minas Gerais)"],
+    "Atlético GO": ["Atlético Clube Goianiense", "Atlético Goianiense"],
+    "Botafogo SP": ["Botafogo Futebol Clube (Ribeirão Preto)", "Botafogo-SP"],
+    "CSA": ["Centro Sportivo Alagoano", "CSA"],
+    "Camboriú": ["Camboriú Futebol Clube"],
+    "Capital Brasilia": ["Capital CF", "Capital Clube de Futebol"],
+    "Cianorte": ["Cianorte Futebol Clube"],
+    "Criciúma": ["Criciúma Esporte Clube"],
+    "Cuiabá": ["Cuiabá Esporte Clube"],
+    "EC São José": ["Esporte Clube São José", "São José-RS"],
+    "Ferroviário": ["Ferroviário Atlético Clube", "Ferroviário AC"],
+    "Gama": ["Sociedade Esportiva do Gama"],
+    "Goiatuba EC": ["Goiatuba Esporte Clube"],
+    "Goiás": ["Goiás Esporte Clube"],
+    "Grêmio Novorizontino": ["Grêmio Novorizontino"],
+    "Iguatu": ["Associação Desportiva Iguatu"],
+    "Imperatriz": ["Sociedade Imperatriz de Desportos"],
+    "Juventude": ["Esporte Clube Juventude"],
+    "Luverdense": ["Luverdense Esporte Clube"],
+    "Maguary PE": ["Maguary"],
+    "Manauara": ["Manauara Esporte Clube"],
+    "Marcílio Dias": ["Clube Náutico Marcílio Dias"],
+    "Nacional": ["Nacional Futebol Clube", "Nacional-AM"],
+    "Nacional AM": ["Nacional Futebol Clube", "Nacional-AM"],
+    "Operário PR": ["Operário Ferroviário Esporte Clube"],
+    "Ponte Preta": ["Associação Atlética Ponte Preta"],
+    "Portuguesa": ["Associação Portuguesa de Desportos"],
+    "Primavera SP": ["Primavera"],
+    "São Bernardo FC": ["São Bernardo Futebol Clube"],
+    "São José EC": ["São José Esporte Clube"],
+    "São Luiz": ["Sport Club São Luiz"],
+    "Trem": ["Trem Desportivo Clube"],
+    "Treze": ["Treze Futebol Clube"],
+    "Uberlândia": ["Uberlândia Esporte Clube"],
+    "XV de Piracicaba": ["Esporte Clube XV de Novembro (Piracicaba)"],
+    "Águia de Marabá": ["Águia de Marabá Futebol Clube"],
+    "Al Ettifaq": ["Al-Ettifaq FC", "Ettifaq FC"],
+    "Al Jabalain": ["Al-Jabalain FC"],
+    "Alverca": ["F.C. Alverca"],
+    "Atlas": ["Atlas FC", "Club Atlas"],
+    "Birkirkara": ["Birkirkara F.C."],
+    "Buriram United": ["Buriram United F.C."],
+    "Cercle Brugge": ["Cercle Brugge K.S.V."],
+    "Columbus Crew": ["Columbus Crew"],
+    "FLC Thanh Hoa": ["Thanh Hoa FC", "Dong A Thanh Hoa"],
+    "Hapoel Ramat Gan": ["Hapoel Ramat Gan Givatayim F.C."],
+    "Hatta": ["Hatta Club"],
+    "Houston Dynamo II": ["Houston Dynamo FC"],
+    "Imigresen": ["Imigresen FC"],
+    "Jeonbuk Motors": ["Jeonbuk Hyundai Motors"],
+    "Los Angeles FC": ["Los Angeles FC"],
+    "Manchester City": ["Manchester City F.C."],
+    "Porto": ["FC Porto"],
+    "Racing Club": ["Racing Club de Avellaneda"],
+    "Rayong": ["Rayong F.C."],
+    "San Antonio Bulo Bulo": ["Club San Antonio Bulo Bulo"],
+    "Seoul E-Land": ["Seoul E-Land FC"],
+    "Sumqayıt": ["Sumgayit FK", "Sumqayıt FK"],
+    "Uthai Thani": ["Uthai Thani F.C."],
+    "Viettel": ["Viettel FC"],
+    "Zabbar St. Patrick": ["St. Patrick's F.C.", "Żabbar St. Patrick F.C."],
 }
 
 
@@ -130,9 +195,20 @@ def resolve_logo_url(club: str) -> str | None:
     return None
 
 
+def clubs_in_use() -> list[str]:
+    names = set(json.loads(META.read_text(encoding="utf-8")).get("clubs") or [])
+    for path in (ROOT / "data").glob("serie-*/players.json"):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        for player in payload.get("players") or []:
+            club = str(player.get("club") or "").strip()
+            if club:
+                names.add(club)
+    return sorted(names)
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    clubs = json.loads(META.read_text(encoding="utf-8"))["clubs"]
+    clubs = clubs_in_use()
     ok = 0
     for club in clubs:
         dest = OUT / f"{slug(club)}.png"
@@ -140,6 +216,13 @@ def main() -> None:
             print(f"SKIP {club} (exists)")
             ok += 1
             continue
+        if club.endswith(" U20"):
+            senior = OUT / f"{slug(club[:-4].strip())}.png"
+            if senior.exists() and senior.stat().st_size > 500:
+                dest.write_bytes(senior.read_bytes())
+                print(f"COPY {club} <- {senior.name}")
+                ok += 1
+                continue
         url = resolve_logo_url(club)
         if not url:
             print(f"MISS {club}")
