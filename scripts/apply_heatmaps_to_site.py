@@ -162,7 +162,7 @@ def apply_heatmaps(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Aplica heatmaps SofaScore nos JSON do site.")
-    parser.add_argument("--league", default="serie-c", help="serie-a ou serie-c")
+    parser.add_argument("--league", default="serie-c", help="serie-a, serie-b ou serie-c")
     parser.add_argument("--csv", type=Path, required=True, help="CSV defensivo (BRC26_defensive.csv)")
     parser.add_argument(
         "--source-dir",
