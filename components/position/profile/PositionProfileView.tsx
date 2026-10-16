@@ -36,7 +36,7 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
 
         <div className="profile-content-col profile-col-stats">
           <div className="player-card pass-scores-shell">
-            <ScoutStatsSections player={player} family={family} />
+            <ScoutStatsSections player={player} family={family} players={players} />
           </div>
         </div>
       </div>

@@ -1513,13 +1513,22 @@
   opacity: 0.85;
 }
 
+.player-hero-main {
+  display: flex;
+  align-items: stretch;
+  gap: 0.9rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-self: flex-start;
+}
+
 .player-hero-photo {
   position: relative;
   width: 112px;
-  height: 148px;
-  min-height: 148px;
-  max-height: 148px;
-  align-self: center;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  align-self: stretch;
   flex-shrink: 0;
   border-radius: 14px;
   overflow: hidden;
@@ -1555,8 +1564,8 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  justify-content: space-between;
+  gap: 0.45rem;
+  justify-content: flex-start;
   align-self: stretch;
 }
 
@@ -1582,7 +1591,7 @@
 }
 
 .player-hero-club {
-  margin: 0.35rem 0 0;
+  margin: 0.28rem 0 0;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -1605,12 +1614,11 @@
 .hero-bio-block {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: flex-start;
-  gap: 0.85rem;
-  flex: 1;
+  gap: 0.45rem;
+  flex: 0 0 auto;
   min-width: 0;
-  min-height: 0;
 }
 
 .hero-output-row {
@@ -1836,8 +1844,8 @@
 }
 
 .hero-side {
-  flex: 0 0 312px;
-  width: 312px;
+  flex: 0 0 420px;
+  width: 420px;
   max-width: 100%;
   display: flex;
   flex-direction: column;
@@ -1879,7 +1887,11 @@
   min-width: 0;
 }
 
-.hero-market-pair .hero-market-label,
+.hero-market-pair .hero-market-label {
+  white-space: nowrap;
+  letter-spacing: 0.06em;
+}
+
 .hero-market-pair .hero-market-value {
   white-space: normal;
 }
@@ -2178,6 +2190,55 @@
   gap: 0.5rem;
   padding-bottom: 0.55rem;
   border-bottom: 1px solid rgba(27, 231, 255, 0.12);
+}
+
+.stats-head-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.projection-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.14rem 0.48rem;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 168, 74, 0.5);
+  background: rgba(212, 168, 74, 0.08);
+  color: #e8c468;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.projection-mini i {
+  font-size: 0.55rem;
+}
+
+.projection-mini.is-on {
+  background: rgba(212, 168, 74, 0.24);
+  border-color: rgba(255, 220, 130, 0.9);
+  color: #ffe7a3;
+}
+
+.pass-scores-shell:has(.stats-swap-panel.is-projection) {
+  border-color: rgba(232, 196, 104, 0.75);
+  animation: projection-gold-ring 2.4s ease-in-out infinite;
+}
+
+@keyframes projection-gold-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px rgba(212, 168, 74, 0.35), 0 0 14px rgba(212, 168, 74, 0.16);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(255, 220, 120, 0.95), 0 0 26px rgba(232, 184, 74, 0.42);
+  }
 }
 
 .profile-card-head-hint {
@@ -3844,9 +3905,9 @@
   .zag-v2.league-serie-c .player-hero-photo,
   .zag-v2.league-serie-d .player-hero-photo {
     width: 96px;
-    height: 128px;
-    min-height: 128px;
-    max-height: 128px;
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
   .player-hero-name,
   .zag-v2 .player-hero-name { font-size: 1.45rem; }
@@ -4019,7 +4080,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .projection-launch {
+  .projection-launch,
+  .pass-scores-shell:has(.stats-swap-panel.is-projection) {
     animation: none;
   }
 }

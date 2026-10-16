@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
+import { isProjectionEligible, realisticProjection } from "@/lib/minuteProjection";
 import { earnedStatBadges, statBadgeForMetric } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 import { PlayerBadgesSection, StatBadgeChip, StatMedalCount, type TonedStatBadge } from "./StatBadgeStrip";
@@ -355,34 +356,66 @@ export function StatSectionsBoard({ player, family }: { player: PlayerProfile; f
 export function ScoutStatsSections({
   player,
   family,
+  players,
   active: activeProp,
   onActiveChange,
   peers = NO_PEERS,
 }: {
   player: PlayerProfile;
   family: PositionFamily;
+  players?: PlayerProfile[];
   active?: string | null;
   onActiveChange?: (title: string | null) => void;
   peers?: PlayerProfile[];
 }) {
   const [localActive, setLocalActive] = useState<string | null>(null);
+  const [projectionOn, setProjectionOn] = useState(false);
   const active = onActiveChange ? (activeProp ?? null) : localActive;
   const setActive = (title: string | null) => {
     if (onActiveChange) onActiveChange(title);
     else setLocalActive(title);
   };
-  const entries = useMemo(() => sectionEntries(player, family), [player, family]);
+  const projection = useMemo(
+    () => (players && isProjectionEligible(player) ? realisticProjection(player, players) : null),
+    [player, players],
+  );
+  const shown = projectionOn && projection ? projection.profile : player;
+  const entries = useMemo(() => sectionEntries(shown, family), [shown, family]);
   const allBadges = useMemo<TonedStatBadge[]>(
     () => entries.flatMap((entry) => entry.badges.map((badge) => ({ ...badge, tone: entry.tone }))),
     [entries],
   );
   const activeEntry = active ? entries.find((entry) => entry.title === active) ?? null : null;
 
+  useEffect(() => {
+    setProjectionOn(false);
+  }, [player.player_id]);
+
   return (
-    <div className="stats-swap-panel" key={`${player.player_id}-index`}>
+    <div className={`stats-swap-panel${projectionOn ? " is-projection" : ""}`} key={`${player.player_id}-index`}>
       <div className="profile-card-head">
-        <h3 className="section-label">Stats and Badges</h3>
-        <span className="profile-card-head-hint">Badge quando ambas métricas &gt; P60</span>
+        <div className="stats-head-title">
+          <h3 className="section-label">Stats and Badges</h3>
+          {projection ? (
+            <button
+              type="button"
+              className={`projection-mini${projectionOn ? " is-on" : ""}`}
+              aria-pressed={projectionOn}
+              onClick={() => {
+                setProjectionOn((current) => !current);
+                setActive(null);
+              }}
+            >
+              <i className="fa-solid fa-forward" aria-hidden="true" />
+              Projeção
+            </button>
+          ) : null}
+        </div>
+        <span className="profile-card-head-hint">
+          {projectionOn && projection
+            ? `${projection.rank}º de ${projection.poolSize} · minutagem de titular`
+            : "Badge quando ambas métricas > P60"}
+        </span>
       </div>
 
       <div className="stats-and-badges-body">
@@ -415,7 +448,7 @@ export function ScoutStatsSections({
 
       {!onActiveChange && activeEntry ? (
         <StatWindow title={activeEntry.title} onClose={() => setActive(null)}>
-          <StatSectionPanel player={player} family={family} title={activeEntry.title} peers={peers} />
+          <StatSectionPanel player={shown} family={family} title={activeEntry.title} peers={peers} />
         </StatWindow>
       ) : null}
     </div>

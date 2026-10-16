@@ -13,8 +13,6 @@ import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { PlayerReportButton } from "@/components/position/profile/PlayerReport";
 import { SimilarCrossLeagueModal } from "@/components/position/profile/SimilarCrossLeagueModal";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
-import { isProjectionEligible } from "@/lib/minuteProjection";
-import { MinuteProjection } from "./MinuteProjection";
 import { PassTendencies } from "./PassTendencies";
 
 type Props = {
@@ -104,62 +102,53 @@ export function PlayerHero({ player, family, players }: Props) {
       : months != null && months < 12
         ? "Contrato termina em menos de 1 ano."
         : "Tempo restante de contrato.";
-  const showProjection = isProjectionEligible(player);
-
   return (
     <section className="player-hero player-card" aria-label={`Perfil de ${player.name}`}>
-      <div className="player-hero-photo">
-        <PlayerPhoto
-          src={tm?.photo}
-          alt={player.name}
-          fallback={<span className="player-hero-photo-fallback">{playerInitials(player.name)}</span>}
-        />
-      </div>
-
-      <div className="player-hero-copy">
-        <div className="player-hero-title-wrap">
-          <h2 className="player-hero-name">{player.name}</h2>
-          <p className="player-hero-club">
-            <ClubLogo club={player.club} size={22} />
-            <span className="player-hero-club-name">{player.club}</span>
-            <span className="player-hero-club-sep" aria-hidden="true">·</span>
-            <span className="player-hero-position">{player.position}</span>
-          </p>
+      <div className="player-hero-main">
+        <div className="player-hero-photo">
+          <PlayerPhoto
+            src={tm?.photo}
+            alt={player.name}
+            fallback={<span className="player-hero-photo-fallback">{playerInitials(player.name)}</span>}
+          />
         </div>
 
-        <div className="hero-bio-block">
-          <div className="hero-output-row">
-            <div className="hero-identity-stack">
-              <dl className="player-hero-facts">
-                {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
-                {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
-                {formatFoot(player.foot) ? <HeroFact label="Pé">{formatFoot(player.foot)}</HeroFact> : null}
-                {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
-              </dl>
-              <div className="hero-output" aria-label="Produção ofensiva">
-                <div>
-                  <span>Gols</span>
-                  <strong className="tabular">{player.goals.toLocaleString("pt-BR")}</strong>
-                </div>
-                <div>
-                  <span>xG</span>
-                  <strong className="tabular">{metricDisplay(player, "xG")}</strong>
-                </div>
-                <div>
-                  <span>Assistências</span>
-                  <strong className="tabular">{player.assists.toLocaleString("pt-BR")}</strong>
-                </div>
-                <div>
-                  <span>xA</span>
-                  <strong className="tabular">{metricDisplay(player, "xA")}</strong>
-                </div>
+        <div className="player-hero-copy">
+          <div className="player-hero-title-wrap">
+            <h2 className="player-hero-name">{player.name}</h2>
+            <p className="player-hero-club">
+              <ClubLogo club={player.club} size={22} />
+              <span className="player-hero-club-name">{player.club}</span>
+              <span className="player-hero-club-sep" aria-hidden="true">·</span>
+              <span className="player-hero-position">{player.position}</span>
+            </p>
+          </div>
+
+          <div className="hero-bio-block">
+            <dl className="player-hero-facts">
+              {age != null ? <HeroFact label="Idade">{age}</HeroFact> : null}
+              {player.height ? <HeroFact label="Altura">{player.height} cm</HeroFact> : null}
+              {formatFoot(player.foot) ? <HeroFact label="Pé">{formatFoot(player.foot)}</HeroFact> : null}
+              {player.nationality ? <HeroFact label="País">{player.nationality}</HeroFact> : null}
+            </dl>
+            <div className="hero-output" aria-label="Produção ofensiva">
+              <div>
+                <span>Gols</span>
+                <strong className="tabular">{player.goals.toLocaleString("pt-BR")}</strong>
+              </div>
+              <div>
+                <span>xG</span>
+                <strong className="tabular">{metricDisplay(player, "xG")}</strong>
+              </div>
+              <div>
+                <span>Assistências</span>
+                <strong className="tabular">{player.assists.toLocaleString("pt-BR")}</strong>
+              </div>
+              <div>
+                <span>xA</span>
+                <strong className="tabular">{metricDisplay(player, "xA")}</strong>
               </div>
             </div>
-            {showProjection ? (
-              <div className="hero-output-projection">
-                <MinuteProjection player={player} family={family} players={players} />
-              </div>
-            ) : null}
           </div>
         </div>
       </div>
