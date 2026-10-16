@@ -12,6 +12,12 @@ const DRAG_MIME = "application/x-shadow-player";
 
 type DragPayload = { playerId: string; sourceSlotId: string | null };
 
+export function writeShadowDrag(data: DataTransfer, playerId: string, sourceSlotId: string | null) {
+  const payload: DragPayload = { playerId, sourceSlotId };
+  data.setData(DRAG_MIME, JSON.stringify(payload));
+  data.effectAllowed = "move";
+}
+
 function parseDrag(data: DataTransfer): DragPayload | null {
   const raw = data.getData(DRAG_MIME);
   if (!raw) return null;
@@ -20,35 +26,6 @@ function parseDrag(data: DataTransfer): DragPayload | null {
   } catch {
     return null;
   }
-}
-
-function ReserveMini({
-  player,
-  selected,
-  onDragStart,
-  onClick,
-}: {
-  player: PlayerSearchRow;
-  selected?: boolean;
-  onDragStart: (event: React.DragEvent) => void;
-  onClick: () => void;
-}) {
-  const photo = player.transfermarkt?.photo;
-  return (
-    <button
-      type="button"
-      className={`shadow-reserve-mini${selected ? " is-placing" : ""}`}
-      title={player.name}
-      draggable
-      onDragStart={onDragStart}
-      onClick={(event) => {
-        event.stopPropagation();
-        onClick();
-      }}
-    >
-      {photo ? <PlayerPhoto src={photo} alt="" /> : <span>{playerInitials(player.name)}</span>}
-    </button>
-  );
 }
 
 function PitchToken({ player }: { player: PlayerSearchRow }) {
@@ -78,16 +55,15 @@ type Props = {
   assignments: Record<string, string | null>;
   /** Titulares do time sombra, para mini comparação no time próprio. */
   compareAssignments?: Record<string, string | null> | null;
-  reservesBySlot?: Record<string, string[]>;
-  looseReserveIds?: string[];
   playersById: Map<string, PlayerSearchRow>;
   selectedSlotId: string | null;
   placementPlayerId: string | null;
+  /** Time sombra monta na mão. Elenco atual só consulta o time já escalado. */
+  editable?: boolean;
   onSelectSlot: (slotId: string | null) => void;
   onAssign: (slotId: string, playerId: string | null) => void;
   onDrop: (sourceSlotId: string | null, targetSlotId: string, playerId: string) => void;
   onAddReserve: (slot: FormationSlot) => void;
-  onPlaceReserve?: (playerId: string) => void;
 };
 
 export function PitchView({
@@ -101,16 +77,14 @@ export function PitchView({
   onDrop,
   compareAssignments,
   onAddReserve,
-  reservesBySlot = {},
-  looseReserveIds = [],
-  onPlaceReserve,
+  editable = true,
 }: Props) {
   const formation = useMemo(() => formationById(formationId), [formationId]);
   const slots = useMemo(() => fieldSlots(formation), [formation]);
   const [dragOverSlotId, setDragOverSlotId] = useState<string | null>(null);
 
   function handleSlotClick(slot: FormationSlot) {
-    if (placementPlayerId) {
+    if (editable && placementPlayerId) {
       onDrop(null, slot.id, placementPlayerId);
       return;
     }
@@ -118,9 +92,8 @@ export function PitchView({
   }
 
   function handleDragStart(e: React.DragEvent, playerId: string, sourceSlotId: string | null) {
-    const payload: DragPayload = { playerId, sourceSlotId };
-    e.dataTransfer.setData(DRAG_MIME, JSON.stringify(payload));
-    e.dataTransfer.effectAllowed = "move";
+    if (!editable) return;
+    writeShadowDrag(e.dataTransfer, playerId, sourceSlotId);
   }
 
   function handleDragOver(e: React.DragEvent, slotId: string) {
@@ -132,6 +105,7 @@ export function PitchView({
   function handleDrop(e: React.DragEvent, slot: FormationSlot) {
     e.preventDefault();
     setDragOverSlotId(null);
+    if (!editable) return;
     const payload = parseDrag(e.dataTransfer);
     if (!payload) return;
     onDrop(payload.sourceSlotId, slot.id, payload.playerId);
@@ -178,7 +152,7 @@ export function PitchView({
               {player ? (
                 <div
                   className="shadow-slot-draggable"
-                  draggable
+                  draggable={editable}
                   onDragStart={(e) => handleDragStart(e, player.player_id, slot.id)}
                   onClick={() => handleSlotClick(slot)}
                 >
@@ -190,41 +164,26 @@ export function PitchView({
                 <button
                   type="button"
                   className="shadow-slot-hit"
-                  aria-label={`Escalar titular em ${slot.label}`}
+                  aria-label={editable ? `Escalar titular em ${slot.label}` : slot.label}
                   onClick={() => handleSlotClick(slot)}
                 >
                   <span className="shadow-slot-empty" />
                 </button>
               )}
-              <button
-                type="button"
-                className="shadow-slot-plus"
-                aria-label={`Adicionar reserva em ${slot.label}`}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onAddReserve(slot);
-                }}
-              >
-                <i className="fa-solid fa-plus" aria-hidden="true" />
-              </button>
-              {(reservesBySlot[slot.id] ?? []).length ? (
-                <div className="shadow-slot-reserves">
-                  {(reservesBySlot[slot.id] ?? []).map((id) => {
-                    const reserve = playersById.get(id);
-                    if (!reserve) return null;
-                    return (
-                      <ReserveMini
-                        key={id}
-                        player={reserve}
-                        selected={placementPlayerId === id}
-                        onDragStart={(event) => handleDragStart(event, id, null)}
-                        onClick={() => onPlaceReserve?.(id)}
-                      />
-                    );
-                  })}
-                </div>
+              {editable ? (
+                <button
+                  type="button"
+                  className="shadow-slot-plus"
+                  aria-label={`Adicionar reserva em ${slot.label}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onAddReserve(slot);
+                  }}
+                >
+                  <i className="fa-solid fa-plus" aria-hidden="true" />
+                </button>
               ) : null}
-              {player && isSelected ? (
+              {editable && player && isSelected ? (
                 <button
                   type="button"
                   className="shadow-slot-clear"
@@ -237,32 +196,19 @@ export function PitchView({
             </div>
           );
         })}
-        {looseReserveIds.length ? (
-          <div className="shadow-pitch-loose">
-            {looseReserveIds.map((id) => {
-              const reserve = playersById.get(id);
-              if (!reserve) return null;
-              return (
-                <ReserveMini
-                  key={id}
-                  player={reserve}
-                  selected={placementPlayerId === id}
-                  onDragStart={(event) => handleDragStart(event, id, null)}
-                  onClick={() => onPlaceReserve?.(id)}
-                />
-              );
-            })}
-          </div>
-        ) : null}
       </div>
 
-      {placementPlayerId ? (
+      {editable && placementPlayerId ? (
         <p className="shadow-pitch-hint">
           <i className="fa-solid fa-location-dot" aria-hidden="true" /> Clique na posição para escalar o reserva
         </p>
+      ) : editable ? (
+        <p className="shadow-pitch-hint">
+          Arraste entre posições · + manda o reserva ao banquinho
+        </p>
       ) : (
         <p className="shadow-pitch-hint">
-          Arraste entre posições · + adiciona reserva no campo · clique no mini para escalar
+          Titulares pelos minutos em cada posição · reservas no banquinho
         </p>
       )}
     </div>
