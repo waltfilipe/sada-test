@@ -14,7 +14,10 @@ import "./zag-v2.css";
 export const metadata: Metadata = {
   title: "Brasil Scout",
   description: "Dashboard de scouting das Séries A, B, C e D com ratings, perfis e comparações.",
-  icons: { icon: "/favicon.png" },
+  icons: {
+    icon: [{ url: "/favicon.png", type: "image/png" }],
+    apple: [{ url: "/favicon.png", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

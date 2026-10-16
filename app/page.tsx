@@ -7,7 +7,7 @@ export default function HubPage() {
     <div className="scout-root home-page hub-page">
       <main className="home-main hub-main">
         <section className="home-hero hub-hero">
-          <SiteLogo className="hub-logo" width={560} />
+          <SiteLogo variant="stacked" className="hub-logo" />
           <p className="home-kicker">Brasil · Scouting</p>
           <h1>Escolha a competição</h1>
           <p className="home-lead">

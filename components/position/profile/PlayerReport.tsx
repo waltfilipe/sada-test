@@ -180,7 +180,7 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
   const sheet = (
     <article className="player-report">
       <header className="player-report-banner">
-        <img src="/brand/logo.png" alt="SADA" className="player-report-logo" />
+        <img src="/brand/sada-wordmark.png" alt="SADA — Sistema de Análise de Dados de Atletas" className="player-report-logo" />
         <p className="player-report-kicker">Relatório do atleta</p>
         <p className="player-report-league">
           {league.name} · {league.season}

@@ -574,14 +574,17 @@ input[type="range"] {
 .site-logo {
   display: block;
   width: auto;
+  height: auto;
   object-fit: contain;
+  object-position: left center;
 }
 
 .hub-logo {
   display: block;
+  width: min(188px, 58vw);
   max-width: 100%;
   height: auto;
-  margin: 0 0 1.4rem;
+  margin: 0 0 1.45rem;
 }
 
 .profile-content-grid-no-heatmap {

@@ -35,7 +35,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <SiteLogo height={42} />
+          <SiteLogo variant="mark" height={34} />
           <div>
             <strong>Série A Scout</strong>
             <small>2025/26</small>
