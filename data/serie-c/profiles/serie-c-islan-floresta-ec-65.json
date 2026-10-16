@@ -7,8 +7,8 @@
   "position_family": "zagueiros",
   "nationality": "Brazil",
   "birth_year": 1997,
-  "height": 180,
-  "foot": "Destro",
+  "height": 0,
+  "foot": null,
   "minutes": 1934,
   "minutes_pct": 77.9,
   "goals": 1,
@@ -41,14 +41,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "D",
         "percentile": 24.3,
-        "stats": [],
-        "display_value": "3,8",
-        "efficiency_pct": 51.6,
-        "efficiency_value": "68%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 24.3,
+            "display_value": "81"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 24.3,
+            "display_value": "3,8"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 51.6,
+            "display_value": "68%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "B+",
+        "percentile": 81.8,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 72.7,
+            "display_value": "8"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 71.7,
+            "display_value": "0,4"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 81.8,
+            "display_value": "75%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Ações Defensivas",
@@ -235,7 +273,7 @@
           },
           {
             "label": "xA",
-            "percentile": 42.4,
+            "percentile": 3.3,
             "display_value": "0,01"
           }
         ],

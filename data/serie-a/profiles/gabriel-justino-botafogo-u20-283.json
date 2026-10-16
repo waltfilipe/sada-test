@@ -8,7 +8,7 @@
   "nationality": "Brazil",
   "birth_year": 2006,
   "height": 0,
-  "foot": "Unknown",
+  "foot": null,
   "minutes": 1025,
   "minutes_pct": 33.1,
   "goals": 1,
@@ -41,14 +41,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "C+",
         "percentile": 54.4,
-        "stats": [],
-        "display_value": "4,2",
-        "efficiency_pct": 98.6,
-        "efficiency_value": "73%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 54.4,
+            "display_value": "48"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 54.4,
+            "display_value": "4,2"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 98.6,
+            "display_value": "73%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "A",
+        "percentile": 86.8,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 42.3,
+            "display_value": "14"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 86.8,
+            "display_value": "1,9"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 73.8,
+            "display_value": "71%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Ações Defensivas",
@@ -235,7 +273,7 @@
           },
           {
             "label": "xA",
-            "percentile": 67.5,
+            "percentile": 28.9,
             "display_value": "0,15"
           }
         ],
@@ -288,7 +326,19 @@
       "combativo": 6.5
     }
   },
-  "transfermarkt": null,
+  "transfermarkt": {
+    "id": "1127043",
+    "photo": "https://img.a.transfermarkt.technology/portrait/header/1127043-1779824068.jpg?lm=4711",
+    "market_value": "€ 1.50 mi.",
+    "market_value_eur": 1500000,
+    "contract_until": "2028-11-30",
+    "contract_remaining": "2 anos e 1 mes",
+    "on_loan_from": null,
+    "club": "Botafogo FR",
+    "profile_url": "https://www.transfermarkt.com.br/gabriel-justino/profil/spieler/1127043",
+    "foot": "Destro",
+    "height": 184
+  },
   "heatmap": {
     "tournament_id": 325,
     "season_id": 87678,

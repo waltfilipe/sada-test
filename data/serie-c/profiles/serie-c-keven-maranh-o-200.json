@@ -7,8 +7,8 @@
   "position_family": "zagueiros",
   "nationality": "Brazil",
   "birth_year": 1996,
-  "height": 191,
-  "foot": "Canhoto",
+  "height": 0,
+  "foot": null,
   "minutes": 857,
   "minutes_pct": 34.5,
   "goals": 0,
@@ -41,14 +41,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "C-",
         "percentile": 28.6,
-        "stats": [],
-        "display_value": "4,0",
-        "efficiency_pct": 80.6,
-        "efficiency_value": "74%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 28.6,
+            "display_value": "38"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 28.6,
+            "display_value": "4,0"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 80.6,
+            "display_value": "74%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "C",
+        "percentile": 41.5,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 18.2,
+            "display_value": "2"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 41.5,
+            "display_value": "0,2"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 0.0,
+            "display_value": "0%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Ações Defensivas",
@@ -235,7 +273,7 @@
           },
           {
             "label": "xA",
-            "percentile": 66.7,
+            "percentile": 30.0,
             "display_value": "0,09"
           }
         ],

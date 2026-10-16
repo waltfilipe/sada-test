@@ -8,7 +8,7 @@
   "nationality": "Guinea",
   "birth_year": 2007,
   "height": 0,
-  "foot": "Nan",
+  "foot": null,
   "minutes": 834,
   "minutes_pct": 27.0,
   "goals": 1,
@@ -42,14 +42,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "B+",
         "percentile": 82.4,
-        "stats": [],
-        "display_value": "7,2",
-        "efficiency_pct": 69.7,
-        "efficiency_value": "58%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 82.4,
+            "display_value": "67"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 82.4,
+            "display_value": "7,2"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 69.7,
+            "display_value": "58%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "D",
+        "percentile": 16.2,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 13.2,
+            "display_value": "5"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 16.2,
+            "display_value": "1,2"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 12.3,
+            "display_value": "40%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Duelos Aéreos",

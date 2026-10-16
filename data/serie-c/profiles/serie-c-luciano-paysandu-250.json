@@ -8,7 +8,7 @@
   "nationality": "Brazil",
   "birth_year": 1994,
   "height": 0,
-  "foot": "Nan",
+  "foot": null,
   "minutes": 796,
   "minutes_pct": 32.1,
   "goals": 1,
@@ -42,14 +42,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "B+",
         "percentile": 84.2,
-        "stats": [],
-        "display_value": "7,9",
-        "efficiency_pct": 79.7,
-        "efficiency_value": "66%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 84.2,
+            "display_value": "70"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 84.2,
+            "display_value": "7,9"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 79.7,
+            "display_value": "66%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "C+",
+        "percentile": 47.9,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 16.7,
+            "display_value": "2"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 47.9,
+            "display_value": "0,3"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 40.0,
+            "display_value": "50%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Duelos Aéreos",

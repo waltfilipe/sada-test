@@ -7,8 +7,8 @@
   "position_family": "meio-campistas",
   "nationality": "Brazil",
   "birth_year": 2002,
-  "height": 178,
-  "foot": "Destro",
+  "height": 0,
+  "foot": null,
   "minutes": 1652,
   "minutes_pct": 66.6,
   "goals": 1,
@@ -42,14 +42,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "C-",
         "percentile": 34.0,
-        "stats": [],
-        "display_value": "5,5",
-        "efficiency_pct": 58.9,
-        "efficiency_value": "61%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 34.0,
+            "display_value": "100"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 34.0,
+            "display_value": "5,5"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 58.9,
+            "display_value": "61%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "A",
+        "percentile": 90.6,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 87.5,
+            "display_value": "17"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 90.6,
+            "display_value": "1,1"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 33.3,
+            "display_value": "53%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Duelos Aéreos",

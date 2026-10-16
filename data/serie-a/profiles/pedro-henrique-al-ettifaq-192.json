@@ -41,14 +41,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "C-",
         "percentile": 33.8,
-        "stats": [],
-        "display_value": "3,7",
-        "efficiency_pct": 91.4,
-        "efficiency_value": "71%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 33.8,
+            "display_value": "59"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 33.8,
+            "display_value": "3,7"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 91.4,
+            "display_value": "71%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "B+",
+        "percentile": 83.3,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 23.1,
+            "display_value": "8"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 8.8,
+            "display_value": "0,7"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 83.3,
+            "display_value": "75%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Ações Defensivas",
@@ -235,7 +273,7 @@
           },
           {
             "label": "xA",
-            "percentile": 20.2,
+            "percentile": 0.0,
             "display_value": "0,00"
           }
         ],
@@ -288,7 +326,19 @@
       "combativo": 7.2
     }
   },
-  "transfermarkt": null,
+  "transfermarkt": {
+    "id": "329720",
+    "photo": "https://img.a.transfermarkt.technology/portrait/header/329720-1580198653.jpg?lm=4711",
+    "market_value": "€ 3.50 mi.",
+    "market_value_eur": 3500000,
+    "contract_until": "2028-06-30",
+    "contract_remaining": "1 ano e 8 meses",
+    "on_loan_from": null,
+    "club": "Al-Ettifaq FC",
+    "profile_url": "https://www.transfermarkt.com.br/pedro-henrique/profil/spieler/329720",
+    "foot": "Destro",
+    "height": 188
+  },
   "heatmap": {
     "tournament_id": 325,
     "season_id": 87678,

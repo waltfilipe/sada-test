@@ -41,14 +41,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "C-",
         "percentile": 27.9,
-        "stats": [],
-        "display_value": "3,4",
-        "efficiency_pct": 18.6,
-        "efficiency_value": "54%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 27.9,
+            "display_value": "56"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 27.9,
+            "display_value": "3,4"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 18.6,
+            "display_value": "54%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "B",
+        "percentile": 69.0,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 38.5,
+            "display_value": "13"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 23.5,
+            "display_value": "0,9"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 69.0,
+            "display_value": "69%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Ações Defensivas",
@@ -235,7 +273,7 @@
           },
           {
             "label": "xA",
-            "percentile": 61.4,
+            "percentile": 23.7,
             "display_value": "0,12"
           }
         ],
@@ -288,7 +326,19 @@
       "combativo": 6.3
     }
   },
-  "transfermarkt": null,
+  "transfermarkt": {
+    "id": "729587",
+    "photo": "https://img.a.transfermarkt.technology/portrait/header/729587-1682386276.jpg?lm=4711",
+    "market_value": "€ 400 mil",
+    "market_value_eur": 400000,
+    "contract_until": null,
+    "contract_remaining": null,
+    "on_loan_from": null,
+    "club": "Hatta Club",
+    "profile_url": "https://www.transfermarkt.com.br/bruno-leonardo/profil/spieler/729587",
+    "foot": "Destro",
+    "height": 187
+  },
   "heatmap": {
     "tournament_id": 325,
     "season_id": 87678,

@@ -8,7 +8,7 @@
   "nationality": "Brazil",
   "birth_year": 2002,
   "height": 0,
-  "foot": "Unknown",
+  "foot": null,
   "minutes": 889,
   "minutes_pct": 35.8,
   "goals": 0,
@@ -41,14 +41,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "D",
         "percentile": 5.7,
-        "stats": [],
-        "display_value": "2,9",
-        "efficiency_pct": 54.8,
-        "efficiency_value": "69%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 5.7,
+            "display_value": "29"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 5.7,
+            "display_value": "2,9"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 54.8,
+            "display_value": "69%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "C",
+        "percentile": 37.7,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 18.2,
+            "display_value": "2"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 37.7,
+            "display_value": "0,2"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 0.0,
+            "display_value": "0%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Ações Defensivas",
@@ -235,7 +273,7 @@
           },
           {
             "label": "xA",
-            "percentile": 20.0,
+            "percentile": 0.0,
             "display_value": "0,00"
           }
         ],

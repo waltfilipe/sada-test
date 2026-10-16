@@ -42,14 +42,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "B-",
         "percentile": 64.2,
-        "stats": [],
-        "display_value": "6,5",
-        "efficiency_pct": 65.7,
-        "efficiency_value": "60%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 64.2,
+            "display_value": "99"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 64.2,
+            "display_value": "6,5"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 65.7,
+            "display_value": "60%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "A",
+        "percentile": 90.0,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 53.1,
+            "display_value": "20"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 90.0,
+            "display_value": "2,6"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 76.7,
+            "display_value": "75%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Duelos Aéreos",
@@ -259,6 +297,30 @@
             "label": "Acelerações",
             "percentile": 19.4,
             "display_value": "0,1"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Gols e xG",
+        "kind": "metric_group",
+        "grade": "C+",
+        "percentile": 49.2,
+        "sub_metrics": [
+          {
+            "label": "Gols",
+            "percentile": 0.0,
+            "display_value": "0"
+          },
+          {
+            "label": "xG",
+            "percentile": 49.2,
+            "display_value": "0,71"
+          },
+          {
+            "label": "Eficiência de finalização",
+            "percentile": 14.5,
+            "display_value": "-0,7"
           }
         ],
         "stats": []

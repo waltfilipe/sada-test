@@ -7,8 +7,8 @@
   "position_family": "meio-campistas",
   "nationality": "Brazil",
   "birth_year": 2007,
-  "height": 187,
-  "foot": "Ambidestro",
+  "height": 0,
+  "foot": null,
   "minutes": 1997,
   "minutes_pct": 59.4,
   "goals": 0,
@@ -42,14 +42,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "B",
         "percentile": 65.3,
-        "stats": [],
-        "display_value": "6,2",
-        "efficiency_pct": 41.3,
-        "efficiency_value": "50%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 65.3,
+            "display_value": "137"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 65.3,
+            "display_value": "6,2"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 41.3,
+            "display_value": "50%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "B-",
+        "percentile": 61.7,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 66.7,
+            "display_value": "32"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 46.2,
+            "display_value": "1,6"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 61.7,
+            "display_value": "62%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Duelos Aéreos",

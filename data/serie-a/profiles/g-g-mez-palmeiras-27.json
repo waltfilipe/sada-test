@@ -41,14 +41,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "B",
         "percentile": 67.6,
-        "stats": [],
-        "display_value": "4,6",
-        "efficiency_pct": 80.0,
-        "efficiency_value": "67%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 67.6,
+            "display_value": "136"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 67.6,
+            "display_value": "4,6"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 80.0,
+            "display_value": "67%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "C+",
+        "percentile": 45.2,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 53.8,
+            "display_value": "18"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 26.5,
+            "display_value": "0,9"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 45.2,
+            "display_value": "61%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Ações Defensivas",
@@ -235,7 +273,7 @@
           },
           {
             "label": "xA",
-            "percentile": 91.7,
+            "percentile": 78.9,
             "display_value": "0,60"
           }
         ],

@@ -8,7 +8,7 @@
   "nationality": "Brazil",
   "birth_year": 1999,
   "height": 181,
-  "foot": "Ambidestro",
+  "foot": null,
   "minutes": 542,
   "minutes_pct": 21.8,
   "goals": 1,
@@ -42,14 +42,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "D",
         "percentile": 1.9,
-        "stats": [],
-        "display_value": "2,7",
-        "efficiency_pct": 1.8,
-        "efficiency_value": "44%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 1.9,
+            "display_value": "16"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 1.9,
+            "display_value": "2,7"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 1.8,
+            "display_value": "44%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "D",
+        "percentile": 0.0,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 0.0,
+            "display_value": "0"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 0.0,
+            "display_value": "0,0"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 0.0,
+            "display_value": "—"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Duelos Aéreos",

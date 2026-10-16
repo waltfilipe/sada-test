@@ -42,14 +42,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "D",
         "percentile": 1.4,
-        "stats": [],
-        "display_value": "3,2",
-        "efficiency_pct": 50.0,
-        "efficiency_value": "55%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 1.4,
+            "display_value": "40"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 1.4,
+            "display_value": "3,2"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 50.0,
+            "display_value": "55%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "C-",
+        "percentile": 26.3,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 18.4,
+            "display_value": "8"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 5.0,
+            "display_value": "0,9"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 26.3,
+            "display_value": "50%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Duelos Aéreos",
@@ -376,7 +414,19 @@
       "boxtobox": 5.6
     }
   },
-  "transfermarkt": null,
+  "transfermarkt": {
+    "id": "362842",
+    "photo": "https://img.a.transfermarkt.technology/portrait/header/362842-1692880101.jpg?lm=4711",
+    "market_value": "€ 3.50 mi.",
+    "market_value_eur": 3500000,
+    "contract_until": "2026-12-31",
+    "contract_remaining": "2 meses",
+    "on_loan_from": null,
+    "club": "Santos FC",
+    "profile_url": "https://www.transfermarkt.com.br/arthur-melo/profil/spieler/362842",
+    "foot": "Destro",
+    "height": 172
+  },
   "heatmap": {
     "tournament_id": 325,
     "season_id": 87678,

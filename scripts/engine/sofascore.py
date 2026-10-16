@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SS_PATH = ROOT / "BR26_defensive.csv"
 
 SS_STAT_COLS = ["interception_won", "total_clearance", "outfielder_block", "ball_recovery"]
+SS_TACKLE_COLS = ["total_tackle", "won_tackle"]
 SS_ERROR_COLS = ["error_lead_to_a_shot", "error_lead_to_a_goal"]
 
 SS_CLUB_ALIASES: dict[str, list[str]] = {
@@ -101,7 +102,7 @@ def aggregate_sofascore(path: Path | None = None) -> pd.DataFrame:
         "minutes_played": ("minutes_played", "sum"),
         "matches": ("event_id", "nunique"),
     }
-    for col in [*SS_STAT_COLS, *SS_ERROR_COLS]:
+    for col in [*SS_STAT_COLS, *SS_TACKLE_COLS, *SS_ERROR_COLS]:
         agg_dict[col] = (col, "sum")
     team_minutes = (
         raw.groupby(["player_id", "team"], as_index=False)["minutes_played"]
@@ -111,7 +112,7 @@ def aggregate_sofascore(path: Path | None = None) -> pd.DataFrame:
     primary_team = team_minutes.drop_duplicates("player_id").set_index("player_id")["team"]
     players = raw.groupby(["player_id", "player_name"], as_index=False).agg(**agg_dict)
     players["primary_team"] = players["player_id"].map(primary_team)
-    for col in SS_STAT_COLS:
+    for col in [*SS_STAT_COLS, *SS_TACKLE_COLS]:
         players[f"{col}_p90"] = players[col] / players["minutes_played"] * 90
     for col in SS_ERROR_COLS:
         players[f"{col}_p90"] = players[col] / players["minutes_played"] * 90
@@ -154,6 +155,11 @@ def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None) -> pd.D
     csv_path = path or SS_PATH
     for col in SS_STAT_COLS:
         out[f"{col}_p90"] = 0.0
+    out["total_tackle_total"] = 0
+    out["won_tackle_total"] = 0
+    out["total_tackle_p90"] = 0.0
+    out["won_tackle_p90"] = 0.0
+    out["ss_tackle_won_pct"] = 0.0
     out["error_lead_to_a_shot_total"] = 0
     out["error_lead_to_a_shot_p90"] = 0.0
     out["error_lead_to_a_goal_total"] = 0
@@ -176,6 +182,11 @@ def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None) -> pd.D
     err_goal_p90: list[float] = []
     err_combined_total: list[int] = []
     err_combined_p90: list[float] = []
+    tack_total_vals: list[int] = []
+    tack_won_total_vals: list[int] = []
+    tack_p90_vals: list[float] = []
+    tack_won_p90_vals: list[float] = []
+    tack_won_pct_vals: list[float] = []
 
     for _, row in out.iterrows():
         hit = match_ss_row(row, ss)
@@ -184,6 +195,11 @@ def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None) -> pd.D
             clearance_vals.append(0.0)
             block_vals.append(0.0)
             recovery_vals.append(0.0)
+            tack_total_vals.append(0)
+            tack_won_total_vals.append(0)
+            tack_p90_vals.append(0.0)
+            tack_won_p90_vals.append(0.0)
+            tack_won_pct_vals.append(0.0)
             err_shot_total.append(0)
             err_shot_p90.append(0.0)
             err_goal_total.append(0)
@@ -205,11 +221,23 @@ def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None) -> pd.D
         err_goal_p90.append(goal_p90)
         err_combined_total.append(shot_n + goal_n)
         err_combined_p90.append(shot_p90 + goal_p90)
+        t_total = int(hit.get("total_tackle", 0) or 0)
+        w_total = int(hit.get("won_tackle", 0) or 0)
+        tack_total_vals.append(t_total)
+        tack_won_total_vals.append(w_total)
+        tack_p90_vals.append(float(hit.get("total_tackle_p90", 0) or 0))
+        tack_won_p90_vals.append(float(hit.get("won_tackle_p90", 0) or 0))
+        tack_won_pct_vals.append((100.0 * w_total / t_total) if t_total > 0 else 0.0)
 
     out["interception_won_p90"] = inter_vals
     out["total_clearance_p90"] = clearance_vals
     out["outfielder_block_p90"] = block_vals
     out["ball_recovery_p90"] = recovery_vals
+    out["total_tackle_total"] = tack_total_vals
+    out["won_tackle_total"] = tack_won_total_vals
+    out["total_tackle_p90"] = tack_p90_vals
+    out["won_tackle_p90"] = tack_won_p90_vals
+    out["ss_tackle_won_pct"] = tack_won_pct_vals
     out["error_lead_to_a_shot_total"] = err_shot_total
     out["error_lead_to_a_shot_p90"] = err_shot_p90
     out["error_lead_to_a_goal_total"] = err_goal_total

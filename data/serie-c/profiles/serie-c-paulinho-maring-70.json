@@ -7,8 +7,8 @@
   "position_family": "meio-campistas",
   "nationality": "Brazil",
   "birth_year": 1998,
-  "height": 185,
-  "foot": "Canhoto",
+  "height": 0,
+  "foot": null,
   "minutes": 1834,
   "minutes_pct": 73.9,
   "goals": 1,
@@ -42,14 +42,52 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
+        "label": "Disputas sem bola",
+        "kind": "metric_group",
         "grade": "C",
         "percentile": 41.5,
-        "stats": [],
-        "display_value": "5,6",
-        "efficiency_pct": 21.4,
-        "efficiency_value": "52%"
+        "sub_metrics": [
+          {
+            "label": "Disputas sem bola",
+            "percentile": 41.5,
+            "display_value": "115"
+          },
+          {
+            "label": "Disputas sem bola/90",
+            "percentile": 41.5,
+            "display_value": "5,6"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 21.4,
+            "display_value": "52%"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Desarmes",
+        "kind": "metric_group",
+        "grade": "C-",
+        "percentile": 28.6,
+        "sub_metrics": [
+          {
+            "label": "Desarmes",
+            "percentile": 25.0,
+            "display_value": "4"
+          },
+          {
+            "label": "Desarmes/90",
+            "percentile": 18.9,
+            "display_value": "0,2"
+          },
+          {
+            "label": "Eficiência",
+            "percentile": 28.6,
+            "display_value": "50%"
+          }
+        ],
+        "stats": []
       },
       {
         "label": "Duelos Aéreos",
