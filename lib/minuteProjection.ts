@@ -22,7 +22,8 @@ const FALLBACK_N0 = 4;
 const N0_FLOOR = 18;
 const N0_MAX = 40;
 
-const SKIP_KINDS = new Set(["construction_share", "def_efficiency_group"]);
+/** Share bars (pass tendency) are pool percents, not per-90 rates — projection stays on volume/efficiency metrics. */
+const SKIP_KINDS = new Set(["construction_share"]);
 const SEASON_TOTALS = new Set(["gols", "xg", "pré assistências", "pre assistências", "erros totais"]);
 
 type Prior = {
@@ -52,6 +53,7 @@ type BuiltModel = {
   exposure: number;
   metrics: MetricFit[];
   peerIndexes: number[];
+  target: PlayerProfile;
 };
 
 type Sample = {
@@ -62,6 +64,20 @@ type Sample = {
   sample: string;
   /** Lower is the generous reading. A short sample below the mean is pulled up. */
   adverse?: boolean;
+};
+
+type PoolPoint = {
+  e: number;
+  value: number;
+  low: boolean;
+  minutesPct: number;
+  birthYear: number | null;
+};
+
+type TargetCovariates = {
+  minutesPct: number;
+  birthYear: number | null;
+  exposure: number;
 };
 
 const modelCache = new WeakMap<PlayerProfile[], Map<string, BuiltModel | null>>();
@@ -80,7 +96,7 @@ export function projectionPlacement(
   return placementFrom(model, scenario);
 }
 
-/** Realistic per-90 profile. Rates above the regulars' mean shrink toward it; rates already below stay put. Bars and rank use only players with at least half the minutes. */
+/** Realistic per-90 profile. Rates above the cohort mean shrink toward it; rates already below stay put. Bars and rank use only players with at least half the minutes. */
 export function realisticProjection(player: PlayerProfile, players: PlayerProfile[]): RealisticProjection | null {
   const model = modelFor(player, players);
   if (!model) return null;
@@ -131,8 +147,10 @@ function placementFrom(model: BuiltModel, scenario: ProjectionScenario): Project
 
 function projectedMetrics(model: BuiltModel, scenario: ProjectionScenario): Map<string, ProjectedMetric> {
   const projected = new Map<string, ProjectedMetric>();
+  const covariates = targetCovariates(model.target);
   for (const metric of model.metrics) {
-    const next = projectRate(metric.y, model.exposure, metric.prior, scenario, metric.adverse);
+    const n0 = effectiveN0(metric.prior.n0, covariates);
+    const next = projectRate(metric.y, model.exposure, { ...metric.prior, n0 }, scenario, metric.adverse);
     const value = metric.kind === "percent" ? clamp(next.value, 0, 100) : next.value;
     const standing = midrankPercentile(value, metric.referenceRates);
     projected.set(metric.key, {
@@ -163,7 +181,7 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
   const rankedTarget = target.filter((sample) => sample.rank);
   if (rankedTarget.length < MIN_METRICS) return null;
 
-  const observations = new Map<string, { e: number; value: number; low: boolean }[]>();
+  const observations = new Map<string, PoolPoint[]>();
   for (const sample of target) observations.set(sample.key, []);
 
   for (const candidate of players) {
@@ -175,14 +193,21 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
     for (const sample of target) {
       const found = byKey.get(sample.key);
       if (!found) continue;
-      observations.get(sample.key)!.push({ e: exposure, value: found.value, low });
+      observations.get(sample.key)!.push({
+        e: exposure,
+        value: found.value,
+        low,
+        minutesPct: candidate.minutes_pct,
+        birthYear: candidate.birth_year ?? null,
+      });
     }
   }
 
+  const covariates = targetCovariates(player);
   const metrics: MetricFit[] = [];
   for (const sample of target) {
     const points = observations.get(sample.key) ?? [];
-    const prior = fitPrior(points);
+    const prior = fitPrior(points, covariates);
     if (!prior) continue;
     metrics.push({
       key: sample.key,
@@ -218,7 +243,38 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
     exposure: player.minutes / 90,
     metrics,
     peerIndexes,
+    target: player,
   };
+}
+
+function targetCovariates(player: PlayerProfile): TargetCovariates {
+  return {
+    minutesPct: player.minutes_pct ?? 0,
+    birthYear: player.birth_year ?? null,
+    exposure: (player.minutes ?? 0) / 90,
+  };
+}
+
+/** Similar minutes and age get more weight when estimating the pool prior (empirical Bayes cohort). */
+function cohortWeight(point: PoolPoint, target: TargetCovariates): number {
+  const wMinutes = Math.exp(-0.5 * ((point.minutesPct - target.minutesPct) / 28) ** 2);
+  let wAge = 1;
+  if (target.birthYear != null && point.birthYear != null) {
+    wAge = Math.exp(-0.5 * ((point.birthYear - target.birthYear) / 4) ** 2);
+  }
+  return wMinutes * wAge;
+}
+
+/** Short minutes pull harder toward the cohort prior; veterans with more sample keep more of their rate. */
+function effectiveN0(baseN0: number, target: TargetCovariates): number {
+  const minuteFactor = 1 + clamp((50 - target.minutesPct) / 50, 0, 1);
+  let ageFactor = 1;
+  if (target.birthYear != null) {
+    const age = new Date().getFullYear() - target.birthYear;
+    if (age <= 22) ageFactor = 1.08;
+    else if (age >= 30) ageFactor = 0.92;
+  }
+  return clamp(baseN0 * minuteFactor * ageFactor, N0_FLOOR, N0_MAX);
 }
 
 function samplesOf(player: PlayerProfile): Sample[] {
@@ -233,13 +289,19 @@ function samplesOf(player: PlayerProfile): Sample[] {
 
 function samplesFromAspect(item: AspectItem, exposure: number): Sample[] {
   if (item.kind === "def_efficiency_group") {
-    const errors: Sample[] = [];
+    const out: Sample[] = [];
     for (const sub of item.sub_metrics ?? []) {
-      if (!/erro/i.test(sub.label)) continue;
-      const sample = sampleFrom(item.label, sub.label, sub.display_value, exposure);
-      if (sample) errors.push(sample);
+      if (/erro/i.test(sub.label)) {
+        const sample = sampleFrom(item.label, sub.label, sub.display_value, exposure);
+        if (sample) out.push(sample);
+        continue;
+      }
+      if (/efici[eê]ncia/i.test(sub.label)) {
+        const sample = sampleFrom(item.label, sub.label, sub.display_value, exposure, { zScore: true });
+        if (sample) out.push({ ...sample, rank: true });
+      }
     }
-    return errors;
+    return out;
   }
   if (SKIP_KINDS.has(item.kind ?? "")) return [];
   const samples: Sample[] = [];
@@ -255,7 +317,7 @@ function samplesFromAspect(item: AspectItem, exposure: number): Sample[] {
   }
   if (item.efficiency_value) {
     const sample = sampleFrom(item.label, "Eficiência", item.efficiency_value, exposure);
-    if (sample) samples.push({ ...sample, rank: false });
+    if (sample) samples.push({ ...sample, rank: true });
   }
   return samples;
 }
@@ -265,12 +327,13 @@ function sampleFrom(
   label: string,
   display: string | null | undefined,
   exposure: number,
+  options?: { zScore?: boolean },
 ): Sample | null {
   const raw = (display ?? "").trim();
   if (!raw) return null;
   const key = parent ? `${parent}::${label}` : label;
   const normalized = label.trim().toLowerCase();
-  if (/^[+\-−]/.test(raw)) return null;
+  if (!options?.zScore && raw.startsWith("+")) return null;
   const adverse = /erro/.test(normalized);
   // Defender xA is a season total shown on the hero. It is not a ranked per-90 rate.
   if (normalized === "xa" && parent === "Gols e xG") return null;
@@ -278,14 +341,17 @@ function sampleFrom(
   if (raw.includes("%")) {
     const value = parsePercent(raw);
     if (value == null) return null;
-    return { key, value, kind: "percent", rank: false, sample: raw };
+    return { key, value, kind: "percent", rank: true, sample: raw };
   }
 
-  const parsed = parseRate(raw);
+  const parsed = options?.zScore ? parseSignedRate(raw) : parseRate(raw);
   if (parsed == null) return null;
   if (SEASON_TOTALS.has(normalized) || adverse) {
     if (exposure <= 0) return null;
     return { key, value: parsed / exposure, kind: "rate", rank: false, sample: raw, adverse };
+  }
+  if (options?.zScore) {
+    return { key, value: parsed, kind: "rate", rank: true, sample: raw };
   }
   if (!isVolumeLabel(label)) return null;
   return { key, value: parsed, kind: "rate", rank: true, sample: raw };
@@ -335,25 +401,43 @@ function formatProjected(metric: ProjectedMetric): string {
   }
   const fraction = metric.sample.split(",")[1];
   const decimals = fraction ? Math.min(2, Math.max(1, fraction.length)) : 1;
-  return metric.value.toFixed(decimals).replace(".", ",");
+  const formatted = metric.value.toFixed(decimals).replace(".", ",");
+  if (metric.sample.trim().startsWith("-") || metric.sample.trim().startsWith("−")) {
+    return metric.value < 0 ? formatted : `-${formatted}`;
+  }
+  return formatted;
 }
 
-function fitPrior(points: { e: number; value: number; low: boolean }[]): Prior | null {
-  const ref = points.filter((point) => !point.low && point.e > 0);
-  if (ref.length < MIN_GROUP) return null;
+function fitPrior(points: PoolPoint[], target: TargetCovariates): Prior | null {
+  const pool = points.filter((point) => point.e > 0);
+  if (pool.length < MIN_GROUP) return null;
 
-  const refRates = ref.map((point) => point.value);
-  const mu = mean(refRates);
-  const refExposure = mean(ref.map((point) => point.e));
-  const msdRef = meanSquare(refRates);
-  const invRef = mean(ref.map((point) => 1 / point.e));
+  const ref = pool.filter((point) => !point.low);
+  const refRates = ref.length >= MIN_GROUP ? ref.map((point) => point.value) : pool.map((point) => point.value);
+  const refExposure = mean((ref.length >= MIN_GROUP ? ref : pool).map((point) => point.e));
+
+  const weights = pool.map((point) => cohortWeight(point, target) * point.e);
+  const mu = weightedMean(
+    pool.map((point) => point.value),
+    weights,
+  );
+
+  const msdRef = meanSquare(ref.length >= MIN_GROUP ? ref.map((point) => point.value) : pool.map((point) => point.value));
+  const invRef = weightedMean(
+    (ref.length >= MIN_GROUP ? ref : pool).map((point) => 1 / point.e),
+    (ref.length >= MIN_GROUP ? ref : pool).map((point) => cohortWeight(point, target)),
+  );
+
   let tau2 = 0;
   let n0 = FALLBACK_N0;
 
-  const low = points.filter((point) => point.low && point.e > 0);
+  const low = pool.filter((point) => point.low);
   if (low.length >= MIN_GROUP && msdRef > 0) {
     const msdLow = meanSquare(low.map((point) => point.value));
-    const invLow = mean(low.map((point) => 1 / point.e));
+    const invLow = weightedMean(
+      low.map((point) => 1 / point.e),
+      low.map((point) => cohortWeight(point, target)),
+    );
     const denom = invLow - invRef;
     const sigma2 = denom > 1e-6 ? (msdLow - msdRef) / denom : -1;
     if (sigma2 > 0) {
@@ -367,7 +451,10 @@ function fitPrior(points: { e: number; value: number; low: boolean }[]): Prior |
 
   if (!(tau2 > 0)) {
     n0 = FALLBACK_N0;
-    const factor = mean(ref.map((point) => (point.e + n0) / point.e));
+    const factor = weightedMean(
+      (ref.length >= MIN_GROUP ? ref : pool).map((point) => (point.e + n0) / point.e),
+      (ref.length >= MIN_GROUP ? ref : pool).map((point) => cohortWeight(point, target)),
+    );
     tau2 = msdRef > 0 && factor > 0 ? msdRef / factor : 0;
   }
   if (!(tau2 > 0) || !Number.isFinite(mu)) return null;
@@ -389,15 +476,14 @@ function projectRate(
   if (scenario === "negativa") value = realistic - Z90 * sd;
   else if (scenario === "positiva") value = realistic + Z90 * sd;
   else if (adverse ? y >= prior.mu : y < prior.mu) {
-    // Volume already below the regulars stays there. Errors already above the regulars stay there.
-    // A short sample of zero errors is the generous reading, so it moves toward the regulars' rate.
     value = y;
   }
-  return { value: metricFloor(value), weight };
+  return { value: metricFloor(value, adverse), weight };
 }
 
-function metricFloor(value: number): number {
-  return value < 0 ? 0 : value;
+function metricFloor(value: number, adverse: boolean): number {
+  if (adverse) return value < 0 ? 0 : value;
+  return value;
 }
 
 function isVolumeLabel(label: string | undefined): boolean {
@@ -410,6 +496,13 @@ function isVolumeLabel(label: string | undefined): boolean {
 function parseRate(display: string): number | null {
   const normalized = display.replace(/\s/g, "").replace(",", ".");
   if (!/^\d+(\.\d+)?$/.test(normalized)) return null;
+  const value = Number(normalized);
+  return Number.isFinite(value) ? value : null;
+}
+
+function parseSignedRate(display: string): number | null {
+  const normalized = display.replace(/\s/g, "").replace("−", "-").replace(",", ".");
+  if (!/^-?\d+(\.\d+)?$/.test(normalized)) return null;
   const value = Number(normalized);
   return Number.isFinite(value) ? value : null;
 }
@@ -442,6 +535,17 @@ function mean(values: number[]): number {
   let total = 0;
   for (const value of values) total += value;
   return total / values.length;
+}
+
+function weightedMean(values: number[], weights: number[]): number {
+  let total = 0;
+  let mass = 0;
+  for (let i = 0; i < values.length; i += 1) {
+    const w = weights[i] ?? 0;
+    total += values[i] * w;
+    mass += w;
+  }
+  return mass > 0 ? total / mass : mean(values);
 }
 
 function meanSquare(values: number[]): number {
