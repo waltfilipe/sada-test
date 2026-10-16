@@ -204,24 +204,24 @@ export function PlayerHero({ player, family, players }: Props) {
         </div>
 
         <div className="hero-action-grid">
-          <div className="hero-action-cell">
+          <div className="hero-action-cell hero-action-tendencies">
             <PassTendencies player={player} players={players} />
           </div>
-          <div className="hero-action-cell">
+          <div className="hero-action-cell hero-action-compare">
             <Tooltip content="Abre o comparador já com este atleta.">
               <Link className="btn btn-ghost btn-sm" href={href(`/comparar?posicao=${family}&a=${player.player_id}`)}>
                 <i className="fa-solid fa-scale-balanced" aria-hidden="true" /> Comparar
               </Link>
             </Tooltip>
           </div>
-          <div className="hero-action-cell">
+          <div className="hero-action-cell hero-action-similar">
             <Tooltip content="Procura atletas parecidos nas outras séries.">
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSimilarOpen(true)}>
                 <i className="fa-solid fa-shuffle" aria-hidden="true" /> Similares
               </button>
             </Tooltip>
           </div>
-          <div className="hero-action-cell">
+          <div className="hero-action-cell hero-action-pdf">
             <Tooltip content="Gera um relatório em PDF deste atleta.">
               <span className="hero-action-slot">
                 <PlayerReportButton player={player} family={family} />
@@ -229,7 +229,7 @@ export function PlayerHero({ player, family, players }: Props) {
             </Tooltip>
           </div>
           {tm?.profile_url ? (
-            <div className="hero-action-cell">
+            <div className="hero-action-cell hero-action-transfermarkt">
               <Tooltip content="Abre o perfil no Transfermarkt.">
                 <a className="btn btn-ghost btn-sm" href={tm.profile_url} target="_blank" rel="noreferrer">
                   <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
@@ -237,7 +237,7 @@ export function PlayerHero({ player, family, players }: Props) {
               </Tooltip>
             </div>
           ) : null}
-          <div className="hero-action-cell">
+          <div className="hero-action-cell hero-action-add">
             <Tooltip content="Adiciona ao elenco ou à lista de observação.">
               <span className="hero-action-slot">
                 <AddToShadowMenu playerId={player.player_id} family={family} />
