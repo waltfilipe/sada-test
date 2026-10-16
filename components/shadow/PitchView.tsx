@@ -1,11 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { ShadowPlayerChip } from "@/components/shadow/ShadowPlayerChip";
 import { ShadowPlayerTooltip } from "@/components/shadow/ShadowPlayerMiniReport";
 import { fieldSlots, formationById, type FormationSlot } from "@/lib/formations";
-import { gradeTier, playerInitials, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
 
 const DRAG_MIME = "application/x-shadow-player";
@@ -29,22 +27,10 @@ function parseDrag(data: DataTransfer): DragPayload | null {
 }
 
 function PitchToken({ player }: { player: PlayerSearchRow }) {
-  const letter = ratingToLetterGrade(player.rating);
-  const photo = player.transfermarkt?.photo;
   return (
-    <div className="shadow-pitch-token">
-      <span className="shadow-pitch-token-photo">
-        {photo ? (
-          <PlayerPhoto src={photo} alt="" />
-        ) : (
-          <span>{playerInitials(player.name)}</span>
-        )}
-      </span>
+    <div className="shadow-pitch-token shadow-pitch-token-name-only">
       <span className="shadow-pitch-token-name" title={player.name}>
         {player.name}
-      </span>
-      <span className="shadow-pitch-token-letter tabular" style={tierVars(gradeTier(letter))}>
-        {letter}
       </span>
     </div>
   );
@@ -156,7 +142,12 @@ export function PitchView({
                   onDragStart={(e) => handleDragStart(e, player.player_id, slot.id)}
                   onClick={() => handleSlotClick(slot)}
                 >
-                  <ShadowPlayerTooltip player={player} compareWith={comparePlayer} block>
+                  <ShadowPlayerTooltip
+                    player={player}
+                    compareWith={comparePlayer}
+                    profileLeague={player.sourceLeague}
+                    block
+                  >
                     <PitchToken player={player} />
                   </ShadowPlayerTooltip>
                 </div>
@@ -252,7 +243,7 @@ export function BenchStrip({
                 onDropStart?.(id);
               }}
             >
-              <ShadowPlayerTooltip player={player} block>
+              <ShadowPlayerTooltip player={player} profileLeague={player.sourceLeague} block>
                 <ShadowPlayerChip
                   player={player}
                   size="md"

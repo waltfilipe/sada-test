@@ -674,6 +674,54 @@ a.shadow-formation-chip {
   overflow: hidden;
 }
 
+.shadow-pitch-token-name-only {
+  width: 84px;
+  padding: 0.35rem 0.4rem;
+  gap: 0;
+}
+
+.shadow-pitch-token-name-only .shadow-pitch-token-name {
+  max-width: 80px;
+  font-size: 0.64rem;
+  -webkit-line-clamp: 3;
+}
+
+.shadow-slot-picker-remove {
+  margin: 0 0 0.65rem;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.shadow-slot-picker-remove-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.45rem 0.55rem;
+  border-radius: 10px;
+  border: 1px dashed rgba(248, 113, 113, 0.45);
+  background: rgba(127, 29, 29, 0.12);
+  color: var(--text);
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.shadow-slot-picker-remove-item strong {
+  font-weight: 700;
+}
+
+.shadow-slot-picker-remove-item em {
+  display: block;
+  font-style: normal;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
 .shadow-pitch-token-letter {
   font-size: 0.72rem;
   font-weight: 800;

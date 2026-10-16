@@ -13,14 +13,16 @@ export async function fetchPlayers(params?: URLSearchParams) {
   return res.json();
 }
 
-export async function fetchPlayer(playerId: string): Promise<PlayerProfile> {
-  const res = await fetch(`/api/players/${playerId}`, { cache: "no-store" });
+export async function fetchPlayer(playerId: string, league?: string): Promise<PlayerProfile> {
+  const query = league ? `?league=${encodeURIComponent(league)}` : "";
+  const res = await fetch(`/api/players/${playerId}${query}`, { cache: "no-store" });
   if (!res.ok) throw new Error("Jogador não encontrado");
   return res.json();
 }
 
-export async function fetchFamily(family: string) {
-  const res = await fetch(`/api/families/${family}`, { cache: "no-store" });
+export async function fetchFamily(family: string, league?: string) {
+  const query = league ? `?league=${encodeURIComponent(league)}` : "";
+  const res = await fetch(`/api/families/${family}${query}`, { cache: "no-store" });
   if (!res.ok) throw new Error("Falha ao carregar posição");
   return res.json();
 }

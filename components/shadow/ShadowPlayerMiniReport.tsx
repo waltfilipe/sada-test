@@ -17,6 +17,7 @@ import {
   tierVars,
 } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
+import type { LeagueId } from "@/lib/leagues";
 import type { PlayerSearchRow } from "@/lib/types";
 
 function monthsRemaining(iso?: string | null): string {
@@ -68,14 +69,17 @@ export function ShadowPlayerMiniReport({
   player,
   compareWith,
   compareLabel = "Time sombra",
+  profileLeague,
 }: {
   player: PlayerSearchRow;
   /** Titular do outro time na mesma vaga (usado no time próprio). */
   compareWith?: PlayerSearchRow | null;
   compareLabel?: string;
+  profileLeague?: LeagueId;
 }) {
-  const { profile, loading } = usePlayerProfile(player.player_id, true);
-  const { lookup: gradeLookup } = useFamilyGradeLookup(player.position_family, true);
+  const league = profileLeague ?? player.sourceLeague;
+  const { profile, loading } = usePlayerProfile(player.player_id, true, league);
+  const { lookup: gradeLookup } = useFamilyGradeLookup(player.position_family, true, league);
 
   const tm = player.transfermarkt ?? profile?.transfermarkt;
   const profileRating = profile ? positionRating(profile) : player.rating;
@@ -167,15 +171,19 @@ export function ShadowPlayerTooltip({
   children,
   block,
   compareWith,
+  profileLeague,
 }: {
   player: PlayerSearchRow;
   children: React.ReactNode;
   block?: boolean;
   compareWith?: PlayerSearchRow | null;
+  profileLeague?: LeagueId;
 }) {
   return (
     <Tooltip
-      content={<ShadowPlayerMiniReport player={player} compareWith={compareWith} />}
+      content={
+        <ShadowPlayerMiniReport player={player} compareWith={compareWith} profileLeague={profileLeague} />
+      }
       block={block}
     >
       {children}

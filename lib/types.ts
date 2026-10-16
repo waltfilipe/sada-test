@@ -1,3 +1,5 @@
+import type { LeagueId } from "./leagues";
+
 export type PositionFamily =
   | "zagueiros"
   | "laterais"
@@ -96,6 +98,8 @@ export type Tendencies = {
 
 /** Summary enriched with the fields the advanced search needs to filter on. */
 export type PlayerSearchRow = PlayerSummary & {
+  /** Set on cross-league views (ex.: elenco / time sombra). */
+  sourceLeague?: LeagueId;
   goals: number;
   assists: number;
   tendencies: Tendencies;

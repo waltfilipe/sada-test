@@ -71,6 +71,7 @@ export function TimeSombraClient({ playersByLeague }: Props) {
   const [placementPlayerId, setPlacementPlayerId] = useState<string | null>(null);
   const [panelTab, setPanelTab] = useState<"squad" | "watch">("squad");
   const [slotQuery, setSlotQuery] = useState("");
+  const [elencoHidden, setElencoHidden] = useState<Set<string>>(() => new Set());
   const [picker, setPicker] = useState<{ slot: FormationSlot; mode: "starter" | "reserve" } | null>(null);
 
   const taggedPlayers = useMemo(() => {
@@ -121,10 +122,19 @@ export function TimeSombraClient({ playersByLeague }: Props) {
     );
   }, [taggedPlayers, selectedClub]);
 
+  useEffect(() => {
+    setElencoHidden(new Set());
+  }, [clubKey]);
+
+  const visibleClubPlayers = useMemo(
+    () => clubPlayers.filter((player) => !elencoHidden.has(player.player_id)),
+    [clubPlayers, elencoHidden],
+  );
+
   const clubLineup = useMemo(() => {
     if (mode !== "elenco" || !selectedClub) return null;
-    return buildClubLineup(clubPlayers, formationById(state?.formationId ?? "4-3-3"));
-  }, [mode, selectedClub, clubPlayers, state?.formationId]);
+    return buildClubLineup(visibleClubPlayers, formationById(state?.formationId ?? "4-3-3"));
+  }, [mode, selectedClub, visibleClubPlayers, state?.formationId]);
 
   const slotCandidates = useMemo(() => {
     if (!state || !picker) return [];
@@ -200,6 +210,22 @@ export function TimeSombraClient({ playersByLeague }: Props) {
     .map((id) => playersById.get(id))
     .filter((p): p is SquadPlayer => Boolean(p));
   const editable = mode !== "elenco";
+
+  const excludeCandidates = (() => {
+    const query = slotQuery.trim();
+    if (!query || !picker) return [] as SquadPlayer[];
+    const q = fold(query);
+    const pool =
+      mode === "elenco" && selectedClub
+        ? squadPlayers.filter((player) => !elencoHidden.has(player.player_id))
+        : editable
+          ? squadPlayers
+          : [];
+    return pool.filter((player) => {
+      const leagueName = LEAGUES.find((league) => league.id === player.sourceLeague)?.name ?? "";
+      return fold(player.name).includes(q) || fold(player.club).includes(q) || fold(leagueName).includes(q);
+    });
+  })();
 
   const avgLetter =
     starters.length > 0
@@ -451,11 +477,43 @@ export function TimeSombraClient({ playersByLeague }: Props) {
                   className="shadow-slot-search"
                   type="search"
                   value={slotQuery}
-                  placeholder="Buscar atleta ou clube…"
-                  aria-label="Buscar atleta para escalar"
+                  placeholder="Buscar, escalar ou remover atleta…"
+                  aria-label="Buscar atleta para escalar ou remover"
                   autoFocus
                   onChange={(event) => setSlotQuery(event.target.value)}
                 />
+                {excludeCandidates.length ? (
+                  <ul className="shadow-slot-picker-remove">
+                    {excludeCandidates.map((player) => (
+                      <li key={`remove-${player.player_id}`}>
+                        <button
+                          type="button"
+                          className="shadow-slot-picker-remove-item"
+                          onClick={() => {
+                            if (mode === "elenco") {
+                              setElencoHidden((prev) => new Set(prev).add(player.player_id));
+                            } else {
+                              removeFromSquad(player.player_id, board);
+                            }
+                            setSlotQuery("");
+                            setPicker(null);
+                            setSelectedSlotId(null);
+                          }}
+                        >
+                          <span>
+                            <strong>Remover {player.name}</strong>
+                            <em>
+                              {mode === "elenco"
+                                ? "Oculta do elenco escalado desta sessão"
+                                : "Tira do time sombra"}
+                            </em>
+                          </span>
+                          <i className="fa-solid fa-user-minus" aria-hidden="true" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
                 {slotCandidates.length ? (
                   <ul className="shadow-slot-picker-list">
                     {slotCandidates.map((player) => (

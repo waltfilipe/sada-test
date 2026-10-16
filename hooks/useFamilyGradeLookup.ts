@@ -2,14 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { fetchFamily } from "@/lib/api";
+import type { LeagueId } from "@/lib/leagues";
 import { buildSectionGradeLookup, type SectionGradeLookup } from "@/lib/sectionGrades";
 import type { PositionFamily } from "@/lib/types";
 
-const cache = new Map<PositionFamily, SectionGradeLookup>();
+const cache = new Map<string, SectionGradeLookup>();
 
-export function useFamilyGradeLookup(family: PositionFamily | undefined, enabled: boolean) {
+function cacheKey(family: PositionFamily, league?: LeagueId) {
+  return `${league ?? "default"}:${family}`;
+}
+
+export function useFamilyGradeLookup(
+  family: PositionFamily | undefined,
+  enabled: boolean,
+  league?: LeagueId,
+) {
+  const key = family ? cacheKey(family, league) : "";
   const [lookup, setLookup] = useState<SectionGradeLookup | null>(
-    family && cache.has(family) ? cache.get(family)! : null,
+    key && cache.has(key) ? cache.get(key)! : null,
   );
   const [loading, setLoading] = useState(false);
 
@@ -18,17 +28,18 @@ export function useFamilyGradeLookup(family: PositionFamily | undefined, enabled
       setLookup(null);
       return;
     }
-    if (cache.has(family)) {
-      setLookup(cache.get(family)!);
+    const ck = cacheKey(family, league);
+    if (cache.has(ck)) {
+      setLookup(cache.get(ck)!);
       return;
     }
 
     let cancelled = false;
     setLoading(true);
-    fetchFamily(family)
+    fetchFamily(family, league)
       .then((data) => {
         const built = buildSectionGradeLookup(data.players ?? [], family);
-        cache.set(family, built);
+        cache.set(ck, built);
         if (!cancelled) setLookup(built);
       })
       .catch(() => {
@@ -41,7 +52,7 @@ export function useFamilyGradeLookup(family: PositionFamily | undefined, enabled
     return () => {
       cancelled = true;
     };
-  }, [family, enabled]);
+  }, [family, enabled, league]);
 
   return { lookup, loading };
 }

@@ -65,6 +65,12 @@ function metricGroupScore(item: AspectItem): number | undefined {
     return num(item.percentile) ?? averageDefined(subs.map((row) => num(row.percentile)));
   }
 
+  if (item.label === "Disputas sem bola" || item.label === "Desarmes") {
+    const vol = subs.find((row) => row.label.endsWith("/90"));
+    const eff = subs.find((row) => row.label === "Eficiência");
+    return blendVolEff(num(vol?.percentile), num(eff?.percentile));
+  }
+
   return averageDefined(subs.map((row) => num(row.percentile)));
 }
 

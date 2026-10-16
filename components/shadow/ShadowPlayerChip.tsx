@@ -85,9 +85,13 @@ export function ShadowPlayerRow({
 
   return (
     <div className="shadow-player-row">
-      <ShadowPlayerTooltip player={player} block>
+      <ShadowPlayerTooltip player={player} profileLeague={player.sourceLeague} block>
         <Link
-          href={href(`/posicao/${player.position_family}?atleta=${player.player_id}`)}
+          href={
+            player.sourceLeague
+              ? `/${player.sourceLeague}/posicao/${player.position_family}?atleta=${player.player_id}`
+              : href(`/posicao/${player.position_family}?atleta=${player.player_id}`)
+          }
           className="shadow-player-row-link"
         >
           <span className="shadow-player-row-photo">

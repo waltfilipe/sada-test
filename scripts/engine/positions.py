@@ -1306,10 +1306,20 @@ def _disputas_sem_bola_group(row: pd.Series) -> dict[str, Any]:
 def _desarmes_sofascore_group(row: pd.Series) -> dict[str, Any]:
     tack_total = int(row.get("total_tackle_total", 0) or 0)
     tack90 = float(row.get("total_tackle_p90", 0) or 0)
+    won_total = int(row.get("won_tackle_total", 0) or 0)
     won_pct = float(row.get("ss_tackle_won_pct", 0) or 0)
     vol_pct = float(row.get("_asp_ss_tackle_vol", 0) or 0)
     eff_pct = float(row.get("_asp_ss_tackle_eff", 0) or 0)
-    eff_disp = f"{won_pct:.0f}%" if tack_total > 0 else "—"
+    # Amostra fina (comum na Série D) distorce 0% — exige mínimo de tentativas.
+    min_tackles_for_eff = 5
+    if tack_total < min_tackles_for_eff:
+        eff_disp = "—"
+        eff_pct_show = 0
+    else:
+        eff_disp = f"{won_pct:.0f}%"
+        eff_pct_show = eff_pct
+    if tack_total > 0 and won_total == 0 and tack_total < min_tackles_for_eff:
+        eff_disp = "—"
     header = max(vol_pct, eff_pct) if tack_total > 0 else vol_pct
     return _metric_group_aspect(
         "Desarmes",
@@ -1318,7 +1328,7 @@ def _desarmes_sofascore_group(row: pd.Series) -> dict[str, Any]:
             _sub_metric("Desarmes/90", percentile=vol_pct, display_value=_fmt_per90(tack90)),
             _sub_metric(
                 "Eficiência",
-                percentile=eff_pct if tack_total > 0 else 0,
+                percentile=eff_pct_show if tack_total >= min_tackles_for_eff else 0,
                 display_value=eff_disp,
             ),
         ],

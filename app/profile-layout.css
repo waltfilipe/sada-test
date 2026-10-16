@@ -4216,10 +4216,22 @@
     background: #fff;
     color: #142033;
     font-family: "TASA Orbiter Variable", system-ui, sans-serif;
-    font-size: 10.5px;
-    line-height: 1.35;
+    font-size: 9.5px;
+    line-height: 1.28;
+    max-height: 287mm;
+    overflow: hidden;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  body.exporting-player-report > .player-report {
+    transform: scale(0.9);
+    transform-origin: top center;
+    width: 111%;
+    margin-left: -5.5%;
   }
 
   .player-report * {
@@ -4273,7 +4285,7 @@
   }
 
   .player-report-body {
-    padding: 5mm 12mm 10mm;
+    padding: 3mm 10mm 4mm;
   }
 
   .player-report-identity,
@@ -4701,8 +4713,8 @@
   .player-report-badges li.tone-finalizacao i { background: #e11d48; }
 
   .player-report-stats {
-    columns: 2;
-    column-gap: 16px;
+    columns: 3;
+    column-gap: 10px;
   }
 
   .player-report-section {
