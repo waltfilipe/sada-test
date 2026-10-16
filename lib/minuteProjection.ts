@@ -1,3 +1,4 @@
+import { isSeasonTotalLabel } from "@/lib/seasonTotals";
 import type { AspectItem, PlayerProfile } from "@/lib/types";
 
 export type ProjectionScenario = "negativa" | "realista" | "positiva";
@@ -24,7 +25,6 @@ const N0_MAX = 40;
 
 /** Share bars (pass tendency) are pool percents, not per-90 rates — projection stays on volume/efficiency metrics. */
 const SKIP_KINDS = new Set(["construction_share"]);
-const SEASON_TOTALS = new Set(["gols", "xg", "pré assistências", "pre assistências", "erros totais"]);
 
 type Prior = {
   mu: number;
@@ -47,6 +47,7 @@ type MetricFit = {
   rank: boolean;
   sample: string;
   adverse?: boolean;
+  seasonCount?: boolean;
 };
 
 type BuiltModel = {
@@ -64,6 +65,8 @@ type Sample = {
   sample: string;
   /** Lower is the generous reading. A short sample below the mean is pulled up. */
   adverse?: boolean;
+  /** Observed value is a season count. The fit uses a per-90 rate and the display writes an integer total. */
+  seasonCount?: boolean;
 };
 
 type PoolPoint = {
@@ -160,6 +163,7 @@ function projectedMetrics(model: BuiltModel, scenario: ProjectionScenario): Map<
       kind: metric.kind,
       sample: metric.sample,
       adverse: metric.adverse,
+      seasonCount: metric.seasonCount,
       refExposure: metric.prior.refExposure,
     });
   }
@@ -218,6 +222,7 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
       rank: sample.rank,
       sample: sample.sample,
       adverse: sample.adverse,
+      seasonCount: sample.seasonCount,
     });
   }
   if (metrics.filter((metric) => metric.rank).length < MIN_METRICS) return null;
@@ -335,8 +340,7 @@ function sampleFrom(
   const normalized = label.trim().toLowerCase();
   if (!options?.zScore && raw.startsWith("+")) return null;
   const adverse = /erro/.test(normalized);
-  // Defender xA is a season total shown on the hero. It is not a ranked per-90 rate.
-  if (normalized === "xa" && parent === "Gols e xG") return null;
+  const seasonCount = isSeasonTotalLabel(label);
 
   if (raw.includes("%")) {
     const value = parsePercent(raw);
@@ -346,9 +350,9 @@ function sampleFrom(
 
   const parsed = options?.zScore ? parseSignedRate(raw) : parseRate(raw);
   if (parsed == null) return null;
-  if (SEASON_TOTALS.has(normalized) || adverse) {
+  if (seasonCount || adverse) {
     if (exposure <= 0) return null;
-    return { key, value: parsed / exposure, kind: "rate", rank: false, sample: raw, adverse };
+    return { key, value: parsed / exposure, kind: "rate", rank: false, sample: raw, adverse, seasonCount };
   }
   if (options?.zScore) {
     return { key, value: parsed, kind: "rate", rank: true, sample: raw };
@@ -364,6 +368,7 @@ type ProjectedMetric = {
   kind: MetricKind;
   sample: string;
   adverse?: boolean;
+  seasonCount?: boolean;
   refExposure?: number;
 };
 
@@ -395,9 +400,10 @@ function applyProjectedMetrics(player: PlayerProfile, projected: Map<string, Pro
 
 function formatProjected(metric: ProjectedMetric): string {
   if (metric.kind === "percent") return `${Math.round(metric.value)}%`;
-  if (metric.adverse) {
+  if (metric.adverse || metric.seasonCount) {
     const count = metric.value * (metric.refExposure || 1);
-    return String(Math.round(count));
+    const rounded = Math.round(count);
+    return String(metric.adverse ? rounded : Math.max(0, rounded));
   }
   const fraction = metric.sample.split(",")[1];
   const decimals = fraction ? Math.min(2, Math.max(1, fraction.length)) : 1;
@@ -490,7 +496,7 @@ function isVolumeLabel(label: string | undefined): boolean {
   const normalized = (label ?? "").trim().toLowerCase();
   if (!normalized || normalized.includes("%") || normalized.includes("/")) return false;
   if (/erro|efici[eê]ncia/.test(normalized)) return false;
-  return !SEASON_TOTALS.has(normalized);
+  return !isSeasonTotalLabel(label ?? "");
 }
 
 function parseRate(display: string): number | null {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, type MouseEvent } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useLoading } from "@/components/LoadingProvider";
 
@@ -28,9 +28,7 @@ type Props = {
   yLabel: string;
 };
 
-const WIDTH = 760;
-const HEIGHT = 760;
-const PAD = { top: 28, right: 24, bottom: 104, left: 108 };
+const PAD = { top: 26, right: 20, bottom: 56, left: 88 };
 
 const TONE_FILL = {
   a: "var(--side-a)",
@@ -61,7 +59,25 @@ export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: 
   const router = useRouter();
   const { beginLoad } = useLoading();
   const wrapRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ width: 720, height: 640 });
   const [tip, setTip] = useState<{ name: string; club: string; x: number; y: number } | null>(null);
+  useLayoutEffect(() => {
+    const node = wrapRef.current;
+    if (!node) return;
+    const measure = () => {
+      const rect = node.getBoundingClientRect();
+      const width = Math.floor(rect.width);
+      const height = Math.floor(rect.height);
+      if (width < 80 || height < 80) return;
+      setSize((current) => (current.width === width && current.height === height ? current : { width, height }));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  const width = size.width;
+  const height = size.height;
   const toneById = useMemo(() => {
     const map = new Map<string, ScatterHighlight["tone"]>();
     for (const highlight of highlights) {
@@ -76,8 +92,8 @@ export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: 
     const xb = bounds(xs.length ? xs : [0], avgX);
     const yb = bounds(ys.length ? ys : [0], avgY);
 
-    const plotW = WIDTH - PAD.left - PAD.right;
-    const plotH = HEIGHT - PAD.top - PAD.bottom;
+    const plotW = Math.max(48, width - PAD.left - PAD.right);
+    const plotH = Math.max(48, height - PAD.top - PAD.bottom);
 
     const scaleX = (value: number) => PAD.left + ((value - xb.min) / (xb.max - xb.min || 1)) * plotW;
     const scaleY = (value: number) => PAD.top + plotH - ((value - yb.min) / (yb.max - yb.min || 1)) * plotH;
@@ -93,13 +109,13 @@ export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: 
     });
 
     return { scaleX, scaleY, xTicks, yTicks };
-  }, [points, avgX, avgY]);
+  }, [points, avgX, avgY, width, height]);
 
   const { scaleX, scaleY, xTicks, yTicks } = chart;
   const plotLeft = PAD.left;
   const plotTop = PAD.top;
-  const plotRight = WIDTH - PAD.right;
-  const plotBottom = HEIGHT - PAD.bottom;
+  const plotRight = width - PAD.right;
+  const plotBottom = height - PAD.bottom;
   const avgLineX = scaleX(avgX);
   const avgLineY = scaleY(avgY);
   const quietPool = toneById.size > 0;
@@ -178,7 +194,7 @@ export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: 
   return (
     <div className="scatter-plot-wrap" ref={wrapRef}>
       <svg
-        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        viewBox={`0 0 ${width} ${height}`}
         className="scatter-plot"
         role="img"
         aria-label={`Dispersão: ${xLabel} vs ${yLabel}`}
@@ -223,7 +239,7 @@ export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: 
           </text>
         ))}
 
-        <text x={(plotLeft + plotRight) / 2} y={HEIGHT - 22} textAnchor="middle" className="scatter-axis-label">
+        <text x={(plotLeft + plotRight) / 2} y={height - 16} textAnchor="middle" className="scatter-axis-label">
           {xLabel}
         </text>
         <text

@@ -27,7 +27,7 @@ export function MinuteProjection({ player, family, players }: Props) {
 
   return (
     <>
-      <Tooltip content="Estima os números por 90 com a minutagem de um titular. Volume acima da média dos regulares é puxado para ela. Erros zerados numa amostra curta sobem em direção à média.">
+      <Tooltip content="Estima a temporada com a minutagem de um titular. Taxas seguem por 90. Gols, assistências, xG e xA saem como totais inteiros. Erros também.">
         <button
           type="button"
           className={`btn btn-ghost btn-sm${open ? " is-open" : ""}`}

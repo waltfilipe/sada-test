@@ -8,25 +8,13 @@ import {
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
+import { statRowLabel } from "@/lib/seasonTotals";
 import { earnedStatBadges, statBadgeForMetric } from "@/lib/statBadges";
 import type { StatMetricBadge } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 
-function rowLabel(label: string): string {
-  if (
-    label === "Eficiência" ||
-    label === "Eficiência Defensiva" ||
-    label === "Erros Totais" ||
-    label === "Eficiência de finalização"
-  ) {
-    return label;
-  }
-  if (label.includes("/90") || label.includes("/ 90")) return label;
-  return `${label}/90`;
-}
-
 function volumeRowLabel(item: AspectItem): string {
-  return rowLabel(item.label);
+  return statRowLabel(item.label);
 }
 
 function metricValue(value?: string | null): string {
@@ -131,7 +119,7 @@ function CompareAspectBlock({
             return (
               <CompareMetricVersus
                 key={label}
-                label={rowLabel(label)}
+                label={statRowLabel(label)}
                 valueA={subA?.display_value}
                 valueB={subB?.display_value}
                 percentileA={subA?.percentile}

@@ -65,13 +65,19 @@ function formatPct(value: number): string {
   return `${Math.round(value)}%`;
 }
 
-function barEntry(spec: BarSpec, tip: string, options?: { per90?: boolean; scale?: number }): TendencyBarEntry {
+function barEntry(
+  spec: BarSpec,
+  tip: string,
+  options?: { per90?: boolean; scale?: number; lengthSpectrum?: boolean },
+): TendencyBarEntry {
   const per90 = options?.per90 === true;
   const scale = options?.scale ?? Math.max(40, spec.share, spec.average, 1);
   return {
     displayLabel: spec.label,
     infoTip: tip,
     valueScale: per90 ? "per90" : "percent",
+    centerAverage: true,
+    lengthSpectrum: options?.lengthSpectrum === true,
     item: {
       label: spec.label,
       grade: "",
@@ -134,7 +140,8 @@ export function PassTendencies({ player, players }: { player: PlayerProfile; pla
       rows.push(
         barEntry(
           { label: "Passe curto ↔ longo", share: long, average: longAverage },
-          "Parcela de passes longos no total. A marca central é a média da posição nesta série.",
+          "Parcela de passes longos no total. O meio da barra é a média da posição: à esquerda o passe é mais curto, à direita mais longo.",
+          { lengthSpectrum: true },
         ),
       );
       chips.push({

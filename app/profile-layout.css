@@ -4296,10 +4296,11 @@
   }
 
   .player-report-photo {
-    width: 129px;
-    height: 129px;
-    flex: 0 0 129px;
+    width: 118px;
+    height: 176px;
+    flex: 0 0 118px;
     object-fit: cover;
+    object-position: center 8%;
     border-radius: 12px;
     border: 2px solid #1be7ff;
     background: #e7f7fb;
@@ -4515,15 +4516,30 @@
 
   .player-report-facts {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 5px;
+    align-items: stretch;
     margin: 8px 0 2px;
   }
 
   .player-report-facts > div {
-    padding: 5px 7px 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 46px;
+    padding: 5px 6px 6px;
     border-radius: 8px;
     background: #eef2f6;
+    border: 1px solid transparent;
+  }
+
+  .player-report-facts > div.is-context {
+    background: #f7f4ee;
+    border-color: #e4d8c2;
+  }
+
+  .player-report-facts > div.is-context dt {
+    color: #7a6244;
   }
 
   .player-report-facts dt {
@@ -4608,6 +4624,14 @@
     height: 100%;
     border-radius: 99px;
     background: #0e7490;
+  }
+
+  .player-report-tendency.is-length .player-report-tendency-track {
+    background: linear-gradient(90deg, #d7e8f7 0%, #eef2f6 50%, #f6e7c4 100%);
+  }
+
+  .player-report-tendency.is-length .player-report-tendency-track span {
+    background: linear-gradient(90deg, #0284c7, #d97706);
   }
 
   .player-report-tendency-avg {

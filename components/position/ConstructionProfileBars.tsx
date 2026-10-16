@@ -1,6 +1,7 @@
 "use client";
 
 import { clampPercent } from "@/lib/scoutTheme";
+import { centeredTendencyPosition } from "@/lib/tendencyScale";
 import { Tooltip } from "@/components/ui/Tooltip";
 import type { AspectItem } from "@/lib/types";
 
@@ -10,6 +11,10 @@ export type TendencyBarEntry = {
   infoTip?: string;
   /** Pass shares are percents. Crossing volume is already per 90. */
   valueScale?: "percent" | "per90";
+  /** Pool average sits in the middle. The athlete marker moves to either side. */
+  centerAverage?: boolean;
+  /** Short-versus-long pass: ends read Curto and Longo. */
+  lengthSpectrum?: boolean;
 };
 
 function formatPct(value: number, decimals = 0): string {
@@ -34,6 +39,10 @@ function formatPer90(value: number): string {
   return value.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 }
 
+function markerInset(value: number): number {
+  return Math.min(97.5, Math.max(2.5, value));
+}
+
 function ShareBarClassic({ entry }: { entry: TendencyBarEntry }) {
   const { item, displayLabel, infoTip } = entry;
   const per90 = entry.valueScale === "per90";
@@ -41,11 +50,16 @@ function ShareBarClassic({ entry }: { entry: TendencyBarEntry }) {
   const share = item.share_pct ?? 0;
   const avg = item.pool_avg_pct ?? 0;
   const scale = Math.max(item.scale_max_pct ?? (per90 ? 1 : 40), share, avg, 1);
-  const avgPos = clampPercent((avg / scale) * 100);
-  const playerPos = clampPercent((share / scale) * 100);
+  const centered = entry.centerAverage === true;
+  const avgPos = centered ? 50 : clampPercent((avg / scale) * 100);
+  const playerPos = centered
+    ? markerInset(centeredTendencyPosition(share, avg, scale))
+    : clampPercent((share / scale) * 100);
+  const leftLabel = entry.lengthSpectrum ? "Curto" : per90 ? "0" : "0%";
+  const rightLabel = entry.lengthSpectrum ? "Longo" : format(scale);
 
   return (
-    <div className="constr-share-bar">
+    <div className={`constr-share-bar${entry.lengthSpectrum ? " is-length" : ""}`}>
       <div className="constr-share-head">
         <span className="constr-share-label">
           {displayLabel ?? item.label}
@@ -61,9 +75,9 @@ function ShareBarClassic({ entry }: { entry: TendencyBarEntry }) {
       </div>
 
       <div className="constr-share-foot">
-        <span>{per90 ? "0" : "0%"}</span>
+        <span>{leftLabel}</span>
         <span className="constr-share-avg">média {format(avg)}</span>
-        <span>{format(scale)}</span>
+        <span>{rightLabel}</span>
       </div>
     </div>
   );

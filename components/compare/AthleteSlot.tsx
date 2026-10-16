@@ -41,7 +41,12 @@ export function AthleteSlot({ side, player, players, onChange, compact = false, 
   if (!player) {
     return (
       <section className={`slot slot-compact slot-empty side-${side}`}>
-        {picker}
+        <div className="slot-compact-top">
+          <span className="slot-index" aria-hidden="true">
+            {slotNumber}
+          </span>
+          {picker}
+        </div>
         <p className="slot-empty-copy">Nenhum atleta selecionado</p>
       </section>
     );
@@ -56,7 +61,12 @@ export function AthleteSlot({ side, player, players, onChange, compact = false, 
   if (compact) {
     return (
       <section className={`slot slot-compact side-${side}`} style={tierVars(token)}>
-        {picker}
+        <div className="slot-compact-top">
+          <span className="slot-index" aria-hidden="true">
+            {slotNumber}
+          </span>
+          {picker}
+        </div>
         <div className="slot-compact-row">
           <div className="slot-photo">
             {tm?.photo ? <PlayerPhoto src={tm.photo} alt="" /> : <span>{playerInitials(player.name)}</span>}

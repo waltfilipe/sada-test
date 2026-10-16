@@ -7,6 +7,8 @@ import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { useLeague } from "@/components/LeagueProvider";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { crossingReading, formatPer90 } from "@/lib/crossingTendency";
+import { statRowLabel } from "@/lib/seasonTotals";
+import { centeredTendencyPosition } from "@/lib/tendencyScale";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { isZagCluster } from "@/lib/clusterMeta";
 import { formatFoot } from "@/lib/feet";
@@ -37,22 +39,6 @@ type ReportSection = {
   blocks: ReportBlock[];
 };
 
-const SEASON_TOTALS = new Set(["gols", "xg", "pré assistências", "pre assistências", "erros totais"]);
-
-function per90Label(label: string): string {
-  if (
-    label === "Eficiência" ||
-    label === "Eficiência Defensiva" ||
-    label === "Erros Totais" ||
-    label === "Eficiência de finalização"
-  ) {
-    return label;
-  }
-  if (SEASON_TOTALS.has(label.trim().toLowerCase())) return label;
-  if (label.includes("%") || label.includes(" / ") || label.includes("/90") || label.includes("/ 90")) return label;
-  return `${label}/90`;
-}
-
 function percentileOf(value: number | null | undefined): number | null {
   return value != null && Number.isFinite(value) ? Math.round(value) : null;
 }
@@ -62,7 +48,7 @@ function blocksFor(item: AspectItem, title: string): ReportBlock[] {
   if (subs.length) {
     const lines = subs
       .map((sub) => ({
-        label: per90Label(sub.label),
+        label: statRowLabel(sub.label),
         value: sub.display_value?.trim() || "—",
         percentile: percentileOf(sub.percentile),
       }))
@@ -86,7 +72,7 @@ function blocksFor(item: AspectItem, title: string): ReportBlock[] {
 
   if (!efficiency) {
     if (volumeValue === "—" && volumePercentile == null) return [];
-    return [{ title: null, lines: [{ label: per90Label(title), value: volumeValue, percentile: volumePercentile }] }];
+    return [{ title: null, lines: [{ label: statRowLabel(title), value: volumeValue, percentile: volumePercentile }] }];
   }
   return [
     {
@@ -222,8 +208,8 @@ function reportTendencies(player: PlayerProfile, players: PlayerProfile[]): Repo
       key: "curto",
       label: "Passe curto",
       detail: bits.join(" · "),
-      fill: clampPct((share / scale) * 100),
-      averageFill: average == null ? null : clampPct((average / scale) * 100),
+      fill: average == null ? clampPct((share / scale) * 100) : clampPct(centeredTendencyPosition(share, average, scale)),
+      averageFill: average == null ? null : 50,
       left: longo.axis_left || "Curto",
       right: longo.axis_right || "Longo",
     });
@@ -237,8 +223,8 @@ function reportTendencies(player: PlayerProfile, players: PlayerProfile[]): Repo
       key: "progressivo",
       label: "Passe progressivo",
       detail: average == null ? `${Math.round(share)}%` : `${Math.round(share)}% · média ${Math.round(average)}%`,
-      fill: clampPct((share / scale) * 100),
-      averageFill: average == null ? null : clampPct((average / scale) * 100),
+      fill: average == null ? clampPct((share / scale) * 100) : clampPct(centeredTendencyPosition(share, average, scale)),
+      averageFill: average == null ? null : 50,
       left: progressivo.axis_left || "Baixo",
       right: progressivo.axis_right || "Alto",
     });
@@ -250,8 +236,8 @@ function reportTendencies(player: PlayerProfile, players: PlayerProfile[]): Repo
       key: "cruzamentos",
       label: "Cruzamentos",
       detail: `${formatPer90(crossing.volume)}/90 · média ${formatPer90(crossing.average)}/90`,
-      fill: clampPct((crossing.volume / crossing.scale) * 100),
-      averageFill: clampPct((crossing.average / crossing.scale) * 100),
+      fill: clampPct(centeredTendencyPosition(crossing.volume, crossing.average, crossing.scale)),
+      averageFill: 50,
       left: "Baixo",
       right: "Alto",
     });
@@ -391,41 +377,43 @@ export function PlayerReportButton({
               <p className="player-report-heat-empty">Mapa indisponível</p>
             )}
           </div>
-          <div className="player-report-market">
-            <div>
-              <p>Valor de mercado</p>
-              <strong>{tm?.market_value ?? "—"}</strong>
-              {tm?.on_loan_from ? <small>Empréstimo · {tm.on_loan_from}</small> : null}
-            </div>
-            <div>
-              <p>Contrato</p>
-              <strong>{tm?.contract_remaining ?? "—"}</strong>
-              {contractDate ? <small>até {contractDate}</small> : null}
-            </div>
-          </div>
         </div>
       </section>
 
       <dl className="player-report-facts">
-        <div className="is-minutes">
+        <div className="is-output">
           <dt>Minutos</dt>
           <dd>
             {player.minutes.toLocaleString("pt-BR")}
             {player.minutes_pct != null ? <small>{Math.round(player.minutes_pct)}% da competição</small> : null}
           </dd>
         </div>
-        <div className="is-goals">
-          <dt>Gols · xG</dt>
+        <div className="is-output">
+          <dt>Gols</dt>
           <dd>
             {player.goals.toLocaleString("pt-BR")}
             <small>xG {xg}</small>
           </dd>
         </div>
-        <div className="is-assists">
-          <dt>Assistências · xA</dt>
+        <div className="is-output">
+          <dt>Assistências</dt>
           <dd>
             {player.assists.toLocaleString("pt-BR")}
             <small>xA {xa}</small>
+          </dd>
+        </div>
+        <div className="is-context">
+          <dt>Valor de mercado</dt>
+          <dd>
+            {tm?.market_value ?? "—"}
+            {tm?.on_loan_from ? <small>Empréstimo · {tm.on_loan_from}</small> : null}
+          </dd>
+        </div>
+        <div className="is-context">
+          <dt>Contrato</dt>
+          <dd>
+            {tm?.contract_remaining ?? "—"}
+            {contractDate ? <small>até {contractDate}</small> : null}
           </dd>
         </div>
       </dl>
@@ -435,7 +423,7 @@ export function PlayerReportButton({
           <h2>Tendências de passe</h2>
           <div className="player-report-tendency-grid">
             {tendencies.map((item) => (
-              <div key={item.key} className="player-report-tendency">
+              <div key={item.key} className={`player-report-tendency${item.key === "curto" ? " is-length" : ""}`}>
                 <p>{item.label}</p>
                 <strong>{item.detail}</strong>
                 <div className="player-report-tendency-bar">
@@ -520,7 +508,7 @@ export function PlayerReportButton({
           </p>
         ) : null}
         <p className="player-report-note">
-          “Por 90” e linhas com /90 são taxas por 90 minutos. O percentil (0–100) compara o atleta com a posição na {league.name} {league.season}. Verde a partir de 70, âmbar até 30.
+          Gols, assistências, xG e xA são totais da temporada. “Por 90” e linhas com /90 são taxas por 90 minutos. O percentil (0–100) compara o atleta com a posição na {league.name} {league.season}. Verde a partir de 70, âmbar até 30.
           Gerado em {generated}.
         </p>
       </footer>

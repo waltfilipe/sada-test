@@ -2841,6 +2841,34 @@ select:focus-visible {
   white-space: nowrap;
 }
 
+.constr-share-bar.is-length .constr-share-rail {
+  height: 0.55rem;
+  border-color: transparent;
+  background: linear-gradient(
+    90deg,
+    rgba(56, 189, 248, 0.72) 0%,
+    rgba(148, 163, 184, 0.28) 50%,
+    rgba(251, 191, 36, 0.78) 100%
+  );
+}
+
+.constr-share-bar.is-length .constr-share-foot span:first-child,
+.constr-share-bar.is-length .constr-share-foot span:last-child {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.constr-share-bar.is-length .constr-share-foot span:first-child {
+  color: #7dd3fc;
+}
+
+.constr-share-bar.is-length .constr-share-foot span:last-child {
+  color: #fbbf24;
+  text-align: right;
+}
+
 .constr-gradient-bar {
   display: grid;
   gap: 0.35rem;

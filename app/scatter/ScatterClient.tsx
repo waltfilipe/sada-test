@@ -180,7 +180,7 @@ export function ScatterClient({
       const canvas = root.querySelector(".scatter-canvas");
       const top = topbar?.getBoundingClientRect().height ?? 0;
       const pad = canvas ? parseFloat(getComputedStyle(canvas).paddingTop) || 0 : 0;
-      root.style.setProperty("--scatter-chrome", `${Math.ceil(top + pad + 10)}px`);
+      root.style.setProperty("--scatter-chrome", `${Math.ceil(top + pad + 6)}px`);
     };
     fit();
     const observer = new ResizeObserver(fit);

@@ -6,6 +6,7 @@ import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
 import { isProjectionEligible, realisticProjection } from "@/lib/minuteProjection";
+import { statRowLabel } from "@/lib/seasonTotals";
 import { earnedStatBadges, statBadgeForMetric } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 import { PlayerBadgesSection, StatBadgeChip, StatMedalCount, type TonedStatBadge } from "./StatBadgeStrip";
@@ -14,33 +15,8 @@ function metricValue(value?: string | null): string {
   return value ?? "—";
 }
 
-function oneDecimal(value?: string | null): string {
-  if (!value) return "—";
-  const parsed = Number(value.replace(/\s/g, "").replace(",", "."));
-  if (!Number.isFinite(parsed)) return value;
-  return parsed.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-}
-
-function shownValue(label: string, value?: string | null): string {
-  if (label === "xG" || label === "xA") return oneDecimal(value);
-  return metricValue(value);
-}
-
-function rowLabel(label: string): string {
-  if (
-    label === "Eficiência" ||
-    label === "Eficiência Defensiva" ||
-    label === "Erros Totais" ||
-    label === "Eficiência de finalização"
-  ) {
-    return label;
-  }
-  if (label.includes(" / ") || label.includes("/90") || label.includes("/ 90")) return label;
-  return `${label}/90`;
-}
-
 function volumeRowLabel(item: AspectItem): string {
-  return rowLabel(item.label);
+  return statRowLabel(item.label);
 }
 
 export type StatEdge = "up" | "down" | null;
@@ -116,8 +92,8 @@ function StatAspectBlock({
           item.sub_metrics!.map((sub: AspectSubMetric) => (
             <StatMetricRow
               key={sub.label}
-              label={rowLabel(sub.label)}
-              value={shownValue(sub.label, sub.display_value)}
+              label={statRowLabel(sub.label)}
+              value={metricValue(sub.display_value)}
               percentile={sub.percentile}
               edge={subEdges?.[sub.label]}
             />
@@ -126,8 +102,7 @@ function StatAspectBlock({
           <>
             <StatMetricRow
               label={volumeRowLabel(item)}
-              value={shownValue(
-                item.label,
+              value={metricValue(
                 item.display_value ?? (item.certos_per90 != null ? item.certos_per90.toFixed(1).replace(".", ",") : undefined),
               )}
               percentile={item.percentile}
