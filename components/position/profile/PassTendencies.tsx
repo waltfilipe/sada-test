@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ConstructionProfileBars, type TendencyBarEntry } from "@/components/position/ConstructionProfileBars";
+import { useLoading } from "@/components/LoadingProvider";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { flattenAspects } from "@/lib/aspectLookup";
 import { crossingReading, formatPer90 } from "@/lib/crossingTendency";
@@ -90,8 +91,24 @@ function passVerdict(share: number, average: number): string {
   return "Passe na média da posição, entre curto e longo.";
 }
 
+function deltaChip(value: number, average: number, unit: "pct" | "per90"): { label: string; tone: "up" | "down" | "neutral" } {
+  const gap = value - average;
+  const abs = Math.abs(gap);
+  if (unit === "pct") {
+    if (abs < 1.5) return { label: "Na média", tone: "neutral" };
+    return gap > 0
+      ? { label: `+${Math.round(abs)} p.p. vs pool`, tone: "up" }
+      : { label: `−${Math.round(abs)} p.p. vs pool`, tone: "down" };
+  }
+  if (abs < 0.15) return { label: "Na média", tone: "neutral" };
+  return gap > 0
+    ? { label: `+${formatPer90(abs)} vs pool`, tone: "up" }
+    : { label: `−${formatPer90(abs)} vs pool`, tone: "down" };
+}
+
 export function PassTendencies({ player, players }: { player: PlayerProfile; players: PlayerProfile[] }) {
   const [open, setOpen] = useState(false);
+  const { beginLoad, endLoad } = useLoading();
 
   useEffect(() => {
     setOpen(false);
@@ -111,48 +128,76 @@ export function PassTendencies({ player, players }: { player: PlayerProfile; pla
       mean(pool.map(progressiveShare).filter((value): value is number => value != null));
 
     const rows: TendencyBarEntry[] = [];
+    const chips: { key: string; title: string; player: string; pool: string; chip: ReturnType<typeof deltaChip> }[] = [];
+
     if (long != null && longAverage != null) {
       rows.push(
         barEntry(
-          { label: "Passe curto e longo", share: long, average: longAverage },
-          "Parcela de passes longos. A marca é a média da posição nesta série. Mais à esquerda, passe curto. Mais à direita, passe longo.",
+          { label: "Passe curto ↔ longo", share: long, average: longAverage },
+          "Parcela de passes longos no total. A marca central é a média da posição nesta série.",
         ),
       );
+      chips.push({
+        key: "long",
+        title: "Passe curto ↔ longo",
+        player: formatPct(long),
+        pool: formatPct(longAverage),
+        chip: deltaChip(long, longAverage, "pct"),
+      });
     }
     if (progressive != null && progressiveAverage != null) {
       rows.push(
         barEntry(
           { label: "Passes progressivos", share: progressive, average: progressiveAverage },
-          "Parcela de passes progressivos no total de passes, comparada à média da posição nesta série.",
+          "Parcela de passes progressivos no total de passes, comparada à média da posição.",
         ),
       );
+      chips.push({
+        key: "prog",
+        title: "Passes progressivos",
+        player: formatPct(progressive),
+        pool: formatPct(progressiveAverage),
+        chip: deltaChip(progressive, progressiveAverage, "pct"),
+      });
     }
     const crossing = crossingReading(player, pool);
     if (crossing) {
       rows.push(
         barEntry(
           { label: "Cruzamentos", share: crossing.volume, average: crossing.average },
-          "Volume de cruzamentos por 90 minutos. A marca é a média da posição nesta série.",
+          "Volume de cruzamentos por 90 minutos. A marca central é a média da posição nesta série.",
           { per90: true, scale: crossing.scale },
         ),
       );
+      chips.push({
+        key: "cross",
+        title: "Cruzamentos",
+        player: formatPer90(crossing.volume),
+        pool: formatPer90(crossing.average),
+        chip: deltaChip(crossing.volume, crossing.average, "per90"),
+      });
     }
     return {
       rows,
+      chips,
       verdict: long != null && longAverage != null ? passVerdict(long, longAverage) : null,
-      long,
-      longAverage,
     };
   }, [player, players]);
 
+  const openModal = () => {
+    beginLoad();
+    setOpen(true);
+    window.setTimeout(() => endLoad(), 120);
+  };
+
   return (
     <>
-      <Tooltip content="Mostra se o passe é mais curto ou mais longo que a média da posição nesta série.">
+      <Tooltip content="Passe curto/long, progressivos e cruzamentos comparados à média da posição.">
         <button
           type="button"
           className={`btn btn-ghost btn-sm${open ? " is-open" : ""}`}
           aria-expanded={open}
-          onClick={() => setOpen(true)}
+          onClick={openModal}
         >
           <i className="fa-solid fa-chart-line" aria-hidden="true" /> Tendências
         </button>
@@ -161,19 +206,32 @@ export function PassTendencies({ player, players }: { player: PlayerProfile; pla
         <StatWindow title="Tendências de passe" onClose={() => setOpen(false)}>
           <div className="tendency-modal">
             {reading.verdict ? <p className="tendency-verdict">{reading.verdict}</p> : null}
-            {reading.long != null && reading.longAverage != null ? (
-              <p className="pass-tendencies-note">
-                Longos {formatPct(reading.long)} · média da posição {formatPct(reading.longAverage)}. À esquerda da
-                barra, passe curto. À direita, passe longo.
-              </p>
-            ) : (
-              <p className="pass-tendencies-note">A marca da barra é a média da posição nesta série.</p>
-            )}
+
+            {reading.chips.length ? (
+              <ul className="tendency-chip-grid" aria-label="Comparação com a média da posição">
+                {reading.chips.map((entry) => (
+                  <li key={entry.key} className={`tendency-chip tone-${entry.chip.tone}`}>
+                    <span className="tendency-chip-title">{entry.title}</span>
+                    <span className="tendency-chip-values">
+                      <strong>{entry.player}</strong>
+                      <span className="tendency-chip-sep">·</span>
+                      <span>média {entry.pool}</span>
+                    </span>
+                    <span className="tendency-chip-delta">{entry.chip.label}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
             {reading.rows.length ? (
               <ConstructionProfileBars entries={reading.rows} embedded />
             ) : (
               <p className="pass-tendencies-note">Sem amostra de passes para esta posição.</p>
             )}
+
+            <p className="pass-tendencies-note tendency-footnote">
+              A marca central de cada barra é a média da posição nesta série. O ponto colorido é o atleta.
+            </p>
           </div>
         </StatWindow>
       ) : null}
