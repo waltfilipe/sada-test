@@ -8,8 +8,6 @@ const SEASON_TOTALS = new Set([
   "assistências",
   "assistencias",
   "erros totais",
-  "disputas sem bola",
-  "desarmes",
 ]);
 
 const PLAIN_LABELS = new Set([

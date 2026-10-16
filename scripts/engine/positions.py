@@ -1011,10 +1011,6 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
             pd.to_numeric(out.get("total_tackle_p90", 0), errors="coerce").fillna(0),
             ascending=True,
         ),
-        "ss_tackle_total_vol": percentile_rank(
-            pd.to_numeric(out.get("total_tackle_total", 0), errors="coerce").fillna(0),
-            ascending=True,
-        ),
         "ss_tackle_eff": percentile_rank(
             pd.to_numeric(out.get("ss_tackle_won_pct", 0), errors="coerce").fillna(0),
             ascending=True,
@@ -1288,14 +1284,8 @@ def _def_actions_group_aspect(
     }
 
 
-def _season_minutes(row: pd.Series) -> float:
-    return float(row.get("Minutos jogados:") or row.get("Minutos") or 0)
-
-
 def _disputas_sem_bola_group(row: pd.Series) -> dict[str, Any]:
     dd90 = _row_vol(row, "DuelosDef", "Duelos defensivos/90")
-    mins = _season_minutes(row)
-    dd_total = dd90 * mins / 90.0 if mins > 0 else 0.0
     vol_pct = float(row.get("_asp_duelos_def_vol", 0) or 0)
     eff_pct = row.get("_asp_duelos_def_eff", 0)
     eff_disp = _raw_eff_display(row, "Duelos defensivos ganhos, %", "%DuelosDefW")
@@ -1303,11 +1293,6 @@ def _disputas_sem_bola_group(row: pd.Series) -> dict[str, Any]:
         "Disputas sem bola",
         percentile=vol_pct,
         sub_metrics=[
-            _sub_metric(
-                "Disputas sem bola",
-                percentile=vol_pct,
-                display_value=_fmt_num(dd_total, decimals=0),
-            ),
             _sub_metric(
                 "Disputas sem bola/90",
                 percentile=vol_pct,
@@ -1323,7 +1308,6 @@ def _desarmes_sofascore_group(row: pd.Series) -> dict[str, Any]:
     tack90 = float(row.get("total_tackle_p90", 0) or 0)
     won_pct = float(row.get("ss_tackle_won_pct", 0) or 0)
     vol_pct = float(row.get("_asp_ss_tackle_vol", 0) or 0)
-    total_pct = float(row.get("_asp_ss_tackle_total_vol", vol_pct) or 0)
     eff_pct = float(row.get("_asp_ss_tackle_eff", 0) or 0)
     eff_disp = f"{won_pct:.0f}%" if tack_total > 0 else "—"
     header = max(vol_pct, eff_pct) if tack_total > 0 else vol_pct
@@ -1331,7 +1315,6 @@ def _desarmes_sofascore_group(row: pd.Series) -> dict[str, Any]:
         "Desarmes",
         percentile=header,
         sub_metrics=[
-            _sub_metric("Desarmes", percentile=total_pct, display_value=_fmt_num(tack_total, decimals=0)),
             _sub_metric("Desarmes/90", percentile=vol_pct, display_value=_fmt_per90(tack90)),
             _sub_metric(
                 "Eficiência",
