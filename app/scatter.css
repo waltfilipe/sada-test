@@ -444,14 +444,19 @@
   display: contents;
 }
 
-.scatter-slots {
+.scatter-axis-panel {
   grid-column: 1;
   grid-row: 1;
 }
 
-.scatter-rail-extra {
+.scatter-slots {
   grid-column: 1;
   grid-row: 2;
+}
+
+.scatter-rail-extra {
+  grid-column: 1;
+  grid-row: 3;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -540,44 +545,60 @@
   color: var(--accent);
 }
 
-.axis-options {
+.axis-select-wrap {
   display: grid;
   gap: 0.35rem;
 }
 
-.axis-options button {
+.axis-select {
   width: 100%;
-  padding: 0.5rem 0.7rem;
+  padding: 0.55rem 2rem 0.55rem 0.75rem;
   border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  background: rgba(13, 27, 42, 0.35);
-  color: var(--text-2);
-  font-size: 0.8rem;
-  text-align: left;
+  border: 1px solid var(--line-2);
+  background-color: rgba(13, 27, 42, 0.65);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b7c93' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 10px;
+  color: var(--text);
+  font-size: 0.84rem;
   cursor: pointer;
-  transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
-.axis-options button:hover:not(:disabled) {
-  border-color: var(--line-2);
+.axis-x .axis-select:focus {
+  border-color: rgba(49, 233, 129, 0.45);
+}
+
+.axis-y .axis-select:focus {
+  border-color: rgba(137, 128, 245, 0.45);
+}
+
+.axis-select option,
+.axis-select optgroup {
+  background: #0d1b2a;
   color: var(--text);
 }
 
-.axis-options button.active {
-  border-color: rgba(27, 231, 255, 0.35);
-  background: rgba(27, 231, 255, 0.08);
-  color: #31e981;
+.axis-select-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--text-3);
+  line-height: 1.35;
 }
 
-.axis-y .axis-options button.active {
-  border-color: rgba(137, 128, 245, 0.35);
-  background: rgba(137, 128, 245, 0.08);
-  color: #8980f5;
+.axis-select-hint strong {
+  color: var(--text-2);
+  font-weight: 650;
 }
 
-.axis-options button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
+.axis-swap {
+  width: auto;
+  padding: 0 0.55rem;
+  font-size: 0.72rem;
+  gap: 0.25rem;
 }
 
 /* ── Legend ──────────────────────────────────────────────────────────────── */
@@ -728,6 +749,10 @@
   fill: var(--side-c);
 }
 
+.scatter-point.pt-pool {
+  transition: opacity 0.16s ease;
+}
+
 /* ── Stat cards below chart ───────────────────────────────────────────────── */
 
 .scatter-stats {
@@ -869,18 +894,22 @@
     display: contents;
   }
 
-  .scatter-slots {
+  .scatter-axis-panel {
     order: 1;
   }
 
+  .scatter-slots {
+    order: 2;
+  }
+
   .scatter-rail-extra {
-    order: 3;
+    order: 4;
     overflow: visible;
     padding-right: 0;
   }
 
   .scatter-map {
-    order: 2;
+    order: 3;
     width: 100%;
     height: auto;
     aspect-ratio: 1;

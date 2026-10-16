@@ -217,6 +217,37 @@ export function ScatterClient({
       <main className="scatter-canvas">
         <div className="scatter-workspace">
           <aside className="scatter-rail" aria-label="Atletas em destaque">
+            <section className="sc-panel scatter-panel scatter-axis-panel">
+              <header className="sc-panel-head">
+                <div>
+                  <p className="sc-eyebrow">Configuração</p>
+                  <h2>Eixos do gráfico</h2>
+                </div>
+                <p className="sc-note">{players.length} atletas</p>
+              </header>
+
+              <MetricAxisPicker
+                axis="x"
+                metrics={axisMetrics}
+                groups={statSectionsForFamily(family)}
+                value={xKey}
+                otherValue={yKey}
+                plottedLabel={xLabel}
+                onChange={setXKey}
+                onSwap={swapAxes}
+              />
+              <MetricAxisPicker
+                axis="y"
+                metrics={axisMetrics}
+                groups={statSectionsForFamily(family)}
+                value={yKey}
+                otherValue={xKey}
+                plottedLabel={yLabel}
+                onChange={setYKey}
+                onSwap={swapAxes}
+              />
+            </section>
+
             <div className="scatter-slots">
               <AthleteSlot
                 compact
@@ -245,35 +276,6 @@ export function ScatterClient({
             </div>
 
             <div className="scatter-rail-extra">
-              <section className="sc-panel scatter-panel">
-                <header className="sc-panel-head">
-                  <div>
-                    <p className="sc-eyebrow">Configuração</p>
-                    <h2>Eixos do gráfico</h2>
-                  </div>
-                  <p className="sc-note">{players.length} atletas</p>
-                </header>
-
-                <MetricAxisPicker
-                  axis="x"
-                  metrics={axisMetrics}
-                  value={xKey}
-                  otherValue={yKey}
-                  plottedLabel={xLabel}
-                  onChange={setXKey}
-                  onSwap={swapAxes}
-                />
-                <MetricAxisPicker
-                  axis="y"
-                  metrics={axisMetrics}
-                  value={yKey}
-                  otherValue={xKey}
-                  plottedLabel={yLabel}
-                  onChange={setYKey}
-                  onSwap={swapAxes}
-                />
-              </section>
-
               <section className="sc-panel scatter-panel scatter-legend">
                 <header className="sc-panel-head">
                   <div>

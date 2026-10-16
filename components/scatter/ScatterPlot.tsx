@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useLoading } from "@/components/LoadingProvider";
 
 export type ScatterPoint = {
   player_id: string;
@@ -58,6 +59,7 @@ function bounds(values: number[], anchor: number) {
 
 export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: Props) {
   const router = useRouter();
+  const { beginLoad } = useLoading();
   const wrapRef = useRef<HTMLDivElement>(null);
   const [tip, setTip] = useState<{ name: string; club: string; x: number; y: number } | null>(null);
   const toneById = useMemo(() => {
@@ -114,6 +116,7 @@ export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: 
   };
 
   const openPlayer = (point: ScatterPoint) => {
+    beginLoad();
     router.push(point.href);
   };
 
@@ -122,7 +125,7 @@ export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: 
     const cx = scaleX(point.x);
     const cy = scaleY(point.y);
     const highlighted = Boolean(tone);
-    const size = highlighted ? 7 : 4;
+    const size = highlighted ? 8 : 5;
     const fill = tone ? TONE_FILL[tone] : "rgba(148, 163, 184, 0.9)";
     const opacity = highlighted ? 1 : quietPool ? 0.38 : 0.78;
 
