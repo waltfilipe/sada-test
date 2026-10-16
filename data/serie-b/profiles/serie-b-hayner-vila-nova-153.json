@@ -42,42 +42,14 @@
   "aspects": {
     "defensivos": [
       {
-        "label": "Disputas sem bola",
-        "kind": "metric_group",
+        "label": "Duelos Defensivos",
+        "kind": "metric",
         "grade": "D",
         "percentile": 1.4,
-        "sub_metrics": [
-          {
-            "label": "Disputas sem bola/90",
-            "percentile": 1.4,
-            "display_value": "4,1"
-          },
-          {
-            "label": "Eficiência",
-            "percentile": 10.4,
-            "display_value": "48%"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Desarmes",
-        "kind": "metric_group",
-        "grade": "B-",
-        "percentile": 56.9,
-        "sub_metrics": [
-          {
-            "label": "Desarmes/90",
-            "percentile": 52.6,
-            "display_value": "1,7"
-          },
-          {
-            "label": "Eficiência",
-            "percentile": 56.9,
-            "display_value": "68%"
-          }
-        ],
-        "stats": []
+        "stats": [],
+        "display_value": "4,1",
+        "efficiency_pct": 10.4,
+        "efficiency_value": "48%"
       },
       {
         "label": "Duelos Aéreos",

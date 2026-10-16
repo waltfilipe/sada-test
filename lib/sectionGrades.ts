@@ -65,12 +65,6 @@ function metricGroupScore(item: AspectItem): number | undefined {
     return num(item.percentile) ?? averageDefined(subs.map((row) => num(row.percentile)));
   }
 
-  if (item.label === "Disputas sem bola" || item.label === "Desarmes") {
-    const vol = subs.find((row) => row.label.endsWith("/90"));
-    const eff = subs.find((row) => row.label === "Eficiência");
-    return blendVolEff(num(vol?.percentile), num(eff?.percentile));
-  }
-
   return averageDefined(subs.map((row) => num(row.percentile)));
 }
 
@@ -119,20 +113,20 @@ const SECTION_BLOCK_WEIGHTS: Partial<
 /** Block labels per section — used for composite section score. */
 const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string[]>>> = {
   zagueiros: {
-    Defensivos: ["Disputas sem bola", "Desarmes", "Ações Defensivas", "Eficiência Defensiva"],
+    Defensivos: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva"],
     Aéreo: ["Aéreo"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos"],
     "Dribles e Condução": ["Disputas com Bola", "Conduções Progressivas"],
   },
   laterais: {
-    Defensivos: ["Disputas sem bola", "Desarmes", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
+    Defensivos: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
     "Dribles e Condução": ["Disputas com Bola", "1v1 - Ofensivo", "Progressão"],
     "Passes Finais": ["Cruzamentos", "Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
     Ofensividade: ["Ofensividade"],
   },
   "meio-campistas": {
-    Defensivos: ["Disputas sem bola", "Desarmes", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
+    Defensivos: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
     "Dribles e Condução": ["Disputas com Bola", "1v1 - Ofensivo", "Conduções Progressivas"],
     "Passes Finais": ["Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],

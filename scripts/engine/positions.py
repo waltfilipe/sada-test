@@ -1007,14 +1007,6 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "duelos_def_vol": _pool_percentile(out, "Duelos defensivos/90", "DuelosDef"),
         "duelos_def_eff": _pct_eff(out, "Duelos defensivos ganhos, %", "%DuelosDefW"),
         "duelos_def_won_vol": percentile_rank(dd_won, ascending=True),
-        "ss_tackle_vol": percentile_rank(
-            pd.to_numeric(out.get("total_tackle_p90", 0), errors="coerce").fillna(0),
-            ascending=True,
-        ),
-        "ss_tackle_eff": percentile_rank(
-            pd.to_numeric(out.get("ss_tackle_won_pct", 0), errors="coerce").fillna(0),
-            ascending=True,
-        ),
         "duelos_ar_vol": _pool_percentile(out, "Duelos aérios/90", "DuelosAr"),
         "duelos_ar_eff": _pct_eff(out, "Duelos aéreos ganhos, %", "%DuelosAr"),
         "duelos_ar_won_vol": percentile_rank(da_won, ascending=True),
@@ -1282,57 +1274,6 @@ def _def_actions_group_aspect(
         ],
         "stats": [],
     }
-
-
-def _disputas_sem_bola_group(row: pd.Series) -> dict[str, Any]:
-    dd90 = _row_vol(row, "DuelosDef", "Duelos defensivos/90")
-    vol_pct = float(row.get("_asp_duelos_def_vol", 0) or 0)
-    eff_pct = row.get("_asp_duelos_def_eff", 0)
-    eff_disp = _raw_eff_display(row, "Duelos defensivos ganhos, %", "%DuelosDefW")
-    return _metric_group_aspect(
-        "Disputas sem bola",
-        percentile=vol_pct,
-        sub_metrics=[
-            _sub_metric(
-                "Disputas sem bola/90",
-                percentile=vol_pct,
-                display_value=_fmt_per90(dd90),
-            ),
-            _sub_metric("Eficiência", percentile=eff_pct, display_value=eff_disp),
-        ],
-    )
-
-
-def _desarmes_sofascore_group(row: pd.Series) -> dict[str, Any]:
-    tack_total = int(row.get("total_tackle_total", 0) or 0)
-    tack90 = float(row.get("total_tackle_p90", 0) or 0)
-    won_total = int(row.get("won_tackle_total", 0) or 0)
-    won_pct = float(row.get("ss_tackle_won_pct", 0) or 0)
-    vol_pct = float(row.get("_asp_ss_tackle_vol", 0) or 0)
-    eff_pct = float(row.get("_asp_ss_tackle_eff", 0) or 0)
-    # Amostra fina (comum na Série D) distorce 0% — exige mínimo de tentativas.
-    min_tackles_for_eff = 5
-    if tack_total < min_tackles_for_eff:
-        eff_disp = "—"
-        eff_pct_show = 0
-    else:
-        eff_disp = f"{won_pct:.0f}%"
-        eff_pct_show = eff_pct
-    if tack_total > 0 and won_total == 0 and tack_total < min_tackles_for_eff:
-        eff_disp = "—"
-    header = max(vol_pct, eff_pct) if tack_total > 0 else vol_pct
-    return _metric_group_aspect(
-        "Desarmes",
-        percentile=header,
-        sub_metrics=[
-            _sub_metric("Desarmes/90", percentile=vol_pct, display_value=_fmt_per90(tack90)),
-            _sub_metric(
-                "Eficiência",
-                percentile=eff_pct_show if tack_total >= min_tackles_for_eff else 0,
-                display_value=eff_disp,
-            ),
-        ],
-    )
 
 
 def _def_efficiency_group_aspect(row: pd.Series) -> dict[str, Any]:
@@ -1826,8 +1767,13 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
 
     aspects: dict[str, list[dict[str, Any]]] = {
         "defensivos": [
-            _disputas_sem_bola_group(row),
-            _desarmes_sofascore_group(row),
+            _metric_aspect(
+                "Duelos Defensivos",
+                percentile=row.get("_asp_duelos_def_vol", 0),
+                display_value=_fmt_per90(dd_vol),
+                eff_pct=row.get("_asp_duelos_def_eff", 0),
+                eff_display=_raw_eff_display(row, "Duelos defensivos ganhos, %", "%DuelosDefW"),
+            ),
             *(
                 [
                     _metric_aspect(

@@ -30,10 +30,6 @@ export function aspectQuantityPercentile(item: AspectItem): number | undefined {
     if (item.label === "Cruzamentos" || item.label === "Finalizações") {
       return num(subs.find((row) => row.label === item.label)?.percentile);
     }
-    if (item.label === "Disputas sem bola" || item.label === "Desarmes") {
-      const vol = subs.find((row) => row.label.endsWith("/90"));
-      return num(vol?.percentile);
-    }
     const eff = subs.find((row) => row.label === "Eficiência" || row.label === "Eficiência Defensiva");
     if (eff) {
       const vol = subs.find((row) => row !== eff);

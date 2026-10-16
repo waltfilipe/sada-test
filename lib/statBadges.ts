@@ -13,15 +13,10 @@ export type StatMetricBadge = {
 };
 
 export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> = {
-  "Disputas sem bola": {
-    label: "Disputas sem bola",
+  "Duelos Defensivos": {
+    label: "Duelos Defensivos",
     icon: "fa-shield-halved",
-    title: "Disputas sem bola (Wyscout) — volume e eficiência acima de P50",
-  },
-  Desarmes: {
-    label: "Desarmes",
-    icon: "fa-shoe-prints",
-    title: "Desarmes (SofaScore) — volume e eficiência acima de P50",
+    title: "Duelos defensivos — volume e eficiência acima de P50",
   },
   "Ações Defensivas": {
     label: "Ações Defensivas",
