@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ConstructionProfileBars, type TendencyBarEntry } from "@/components/position/ConstructionProfileBars";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { flattenAspects } from "@/lib/aspectLookup";
+import { crossingReading, formatPer90 } from "@/lib/crossingTendency";
 import type { AspectItem, PlayerProfile } from "@/lib/types";
 import { StatWindow } from "./ScoutStatsSections";
 
@@ -63,11 +64,13 @@ function formatPct(value: number): string {
   return `${Math.round(value)}%`;
 }
 
-function barEntry(spec: BarSpec, tip: string): TendencyBarEntry {
-  const scale = Math.max(40, spec.share, spec.average, 1);
+function barEntry(spec: BarSpec, tip: string, options?: { per90?: boolean; scale?: number }): TendencyBarEntry {
+  const per90 = options?.per90 === true;
+  const scale = options?.scale ?? Math.max(40, spec.share, spec.average, 1);
   return {
     displayLabel: spec.label,
     infoTip: tip,
+    valueScale: per90 ? "per90" : "percent",
     item: {
       label: spec.label,
       grade: "",
@@ -75,7 +78,7 @@ function barEntry(spec: BarSpec, tip: string): TendencyBarEntry {
       share_pct: spec.share,
       pool_avg_pct: spec.average,
       scale_max_pct: scale,
-      display_value: formatPct(spec.share),
+      display_value: per90 ? formatPer90(spec.share) : formatPct(spec.share),
     },
   };
 }
@@ -121,6 +124,16 @@ export function PassTendencies({ player, players }: { player: PlayerProfile; pla
         barEntry(
           { label: "Passes progressivos", share: progressive, average: progressiveAverage },
           "Parcela de passes progressivos no total de passes, comparada à média da posição nesta série.",
+        ),
+      );
+    }
+    const crossing = crossingReading(player, pool);
+    if (crossing) {
+      rows.push(
+        barEntry(
+          { label: "Cruzamentos", share: crossing.volume, average: crossing.average },
+          "Volume de cruzamentos por 90 minutos. A marca é a média da posição nesta série.",
+          { per90: true, scale: crossing.scale },
         ),
       );
     }

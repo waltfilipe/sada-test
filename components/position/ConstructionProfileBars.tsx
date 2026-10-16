@@ -8,6 +8,8 @@ export type TendencyBarEntry = {
   item: AspectItem;
   displayLabel?: string;
   infoTip?: string;
+  /** Pass shares are percents. Crossing volume is already per 90. */
+  valueScale?: "percent" | "per90";
 };
 
 function formatPct(value: number, decimals = 0): string {
@@ -28,11 +30,17 @@ function InfoTip({ tip }: { tip?: string }) {
   );
 }
 
+function formatPer90(value: number): string {
+  return value.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+}
+
 function ShareBarClassic({ entry }: { entry: TendencyBarEntry }) {
   const { item, displayLabel, infoTip } = entry;
+  const per90 = entry.valueScale === "per90";
+  const format = per90 ? formatPer90 : formatPct;
   const share = item.share_pct ?? 0;
   const avg = item.pool_avg_pct ?? 0;
-  const scale = Math.max(item.scale_max_pct ?? 40, share, avg, 1);
+  const scale = Math.max(item.scale_max_pct ?? (per90 ? 1 : 40), share, avg, 1);
   const avgPos = clampPercent((avg / scale) * 100);
   const playerPos = clampPercent((share / scale) * 100);
 
@@ -43,7 +51,7 @@ function ShareBarClassic({ entry }: { entry: TendencyBarEntry }) {
           {displayLabel ?? item.label}
           <InfoTip tip={infoTip} />
         </span>
-        <span className="constr-share-value">{item.display_value ?? formatPct(share)}</span>
+        <span className="constr-share-value">{item.display_value ?? format(share)}</span>
       </div>
 
       <div className="constr-share-track" aria-hidden>
@@ -53,9 +61,9 @@ function ShareBarClassic({ entry }: { entry: TendencyBarEntry }) {
       </div>
 
       <div className="constr-share-foot">
-        <span>0%</span>
-        <span className="constr-share-avg">média {formatPct(avg)}</span>
-        <span>{formatPct(scale)}</span>
+        <span>{per90 ? "0" : "0%"}</span>
+        <span className="constr-share-avg">média {format(avg)}</span>
+        <span>{format(scale)}</span>
       </div>
     </div>
   );

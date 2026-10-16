@@ -6,6 +6,7 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { useLeague } from "@/components/LeagueProvider";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
+import { crossingReading, formatPer90 } from "@/lib/crossingTendency";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { isZagCluster } from "@/lib/clusterMeta";
 import { formatFoot } from "@/lib/feet";
@@ -191,7 +192,7 @@ function reportMix(player: PlayerProfile, family: PositionFamily, players: Playe
     .sort((a, b) => b.share - a.share);
 }
 
-function reportTendencies(player: PlayerProfile): ReportTendency[] {
+function reportTendencies(player: PlayerProfile, players: PlayerProfile[]): ReportTendency[] {
   const items = player.aspects.perfil_construcao ?? [];
   const longo = items.find((item) => item.bar_key === "pass_tendency");
   const progressivo = items.find((item) => item.bar_key === "progressive_share");
@@ -233,6 +234,19 @@ function reportTendencies(player: PlayerProfile): ReportTendency[] {
     });
   }
 
+  const crossing = crossingReading(player, players);
+  if (crossing) {
+    rows.push({
+      key: "cruzamentos",
+      label: "Cruzamentos",
+      detail: `${formatPer90(crossing.volume)}/90 · média ${formatPer90(crossing.average)}/90`,
+      fill: clampPct((crossing.volume / crossing.scale) * 100),
+      averageFill: clampPct((crossing.average / crossing.scale) * 100),
+      left: "Baixo",
+      right: "Alto",
+    });
+  }
+
   return rows;
 }
 
@@ -268,7 +282,7 @@ export function PlayerReportButton({
   const foot = formatFoot(player.foot);
   const profileLabel = reportProfileName(player);
   const mix = reportMix(player, family, players);
-  const tendencies = reportTendencies(player);
+  const tendencies = reportTendencies(player, players);
   const generated = new Date().toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" });
   const xg = metricDisplay(player, "xG");
   const xa = metricDisplay(player, "xA");
