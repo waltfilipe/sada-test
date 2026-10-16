@@ -7,7 +7,7 @@ export function RouteLoading() {
         <SiteLogo variant="wordmark" className="route-loading-mark" alt="" />
         <span className="route-loading-status">
           <i className="fa-solid fa-circle-notch" aria-hidden="true" />
-          Carregando
+          Carregando…
         </span>
       </div>
     </div>

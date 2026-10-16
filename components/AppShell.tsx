@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { usePathname } from "next/navigation";
+import { LoadingProvider } from "@/components/LoadingProvider";
 import { SiteLogo } from "@/components/SiteLogo";
 import { LEAGUES } from "@/lib/leagues";
 import { POSITION_FAMILIES } from "@/lib/positions";
@@ -28,7 +30,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isScoutPage = isScoutRoute(pathname);
 
   if (isScoutPage) {
-    return <div className="app-shell scout-shell">{children}</div>;
+    return (
+      <div className="app-shell scout-shell">
+        <Suspense fallback={null}>
+          <LoadingProvider>{children}</LoadingProvider>
+        </Suspense>
+      </div>
+    );
   }
 
   return (

@@ -15,6 +15,7 @@ import { profileMetaForFamily } from "@/lib/profileMeta";
 import { activeProfileKeys, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
 import { playerInitials, profileGradeFromRank } from "@/lib/scoutTheme";
 import { badgeCatalogForFamily, playerStatBadges } from "@/lib/statBadges";
+import { useLoading } from "@/components/LoadingProvider";
 import { PlayerHeatmap } from "./PlayerHeatmap";
 import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -269,6 +270,7 @@ export function PlayerReportButton({
   players: PlayerProfile[];
 }) {
   const league = useLeague();
+  const { beginLoad, endLoad } = useLoading();
   const [mounted, setMounted] = useState(false);
   const [sheetUrl, setSheetUrl] = useState("");
 
@@ -305,15 +307,18 @@ export function PlayerReportButton({
   ].filter(Boolean);
 
   function exportPdf() {
+    beginLoad();
     const previousTitle = document.title;
     document.title = `${player.name} - SADA Scout`;
     document.body.classList.add("exporting-player-report");
     const cleanup = () => {
       document.body.classList.remove("exporting-player-report");
       document.title = previousTitle;
+      endLoad();
       window.removeEventListener("afterprint", cleanup);
     };
     window.addEventListener("afterprint", cleanup);
+    window.setTimeout(() => endLoad(), 400);
     window.print();
   }
 
