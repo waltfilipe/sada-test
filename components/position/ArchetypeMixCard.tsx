@@ -199,7 +199,6 @@ export function ArchetypeMixCard({ cluster }: Props) {
 const ZAG_ARCHETYPES = new Set<string>(["Defensor de Área", "Construtor", "Combativo"]);
 const LAT_ARCHETYPES = new Set<string>(["Defensivo", "Construtor", "Ofensivo", "Híbrido"]);
 const MC_ARCHETYPES = new Set<string>(["Contenção", "Construtor", "Box-to-box", "Híbrido"]);
-const CONSTRUTOR_BADGES = new Set<string>(["Construtor Âncora", "Construtor Nato"]);
 const LAT_HYBRID_BADGES = new Set<string>(["Lateral Base", "Lateral Moderno", "Lateral Projetivo", "Lateral Completo"]);
 const MC_HYBRID_BADGES = new Set<string>(["Volante Base", "MC Combativo", "MC Projetivo", "MC Completo"]);
 const EX_ARCHETYPES = new Set<string>(["Driblador", "Meia Ponta", "Ruptura", "Híbrido"]);
@@ -256,9 +255,6 @@ export function playerMatchesClusterFilter(
   }
 
   const archetypeFilters = filters.filter((key) => ZAG_ARCHETYPES.has(key));
-  const badgeFilters = filters.filter((key) => CONSTRUTOR_BADGES.has(key));
-
-  if (badgeFilters.length) return badgeFilters.includes(player.cluster.construtor_badge ?? "");
   if (archetypeFilters.length) return archetypeFilters.includes(player.cluster.archetype);
   return true;
 }

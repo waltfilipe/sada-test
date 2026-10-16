@@ -16,26 +16,29 @@
   background: rgba(13, 27, 42, 0.6);
 }
 
+.filters-root,
+.filters-body,
+.filters-rail {
+  height: auto;
+  overflow: visible;
+}
+
 .filters-rail-inner {
-  position: sticky;
-  top: 76px;
+  position: static;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  height: calc(100vh - 76px);
-  overflow-y: auto;
+  height: auto;
+  max-height: none;
+  overflow: visible;
   padding: 1.1rem 1.15rem 2.5rem;
-  scrollbar-width: thin;
-  scrollbar-color: #0d1b2a transparent;
 }
 
-.filters-rail-inner::-webkit-scrollbar {
-  width: 6px;
-}
-
-.filters-rail-inner::-webkit-scrollbar-thumb {
-  background: #0d1b2a;
-  border-radius: 99px;
+.filter-chip.choice.active {
+  color: #0d1b2a;
+  font-weight: 600;
+  border-color: transparent;
+  background: #1be7ff;
 }
 
 .filters-rail-head {

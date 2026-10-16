@@ -1,5 +1,8 @@
 import type { LeagueId } from "@/lib/leagues";
 
+export type ContractFilter = "all" | "lt6" | "lt12" | "gte12" | "none";
+export type MarketFilter = "all" | "lt500k" | "500k-2m" | "2m-6m" | "gte6m" | "none";
+
 export type SavedFilters = {
   family: string;
   query: string;
@@ -12,7 +15,20 @@ export type SavedFilters = {
   age: [number, number];
   height: [number, number];
   minutes: [number, number];
+  contract?: ContractFilter;
+  market?: MarketFilter;
 };
+
+const CONTRACT_FILTERS: ContractFilter[] = ["all", "lt6", "lt12", "gte12", "none"];
+const MARKET_FILTERS: MarketFilter[] = ["all", "lt500k", "500k-2m", "2m-6m", "gte6m", "none"];
+
+export function isContractFilter(value: unknown): value is ContractFilter {
+  return typeof value === "string" && CONTRACT_FILTERS.includes(value as ContractFilter);
+}
+
+export function isMarketFilter(value: unknown): value is MarketFilter {
+  return typeof value === "string" && MARKET_FILTERS.includes(value as MarketFilter);
+}
 
 function keys(league: LeagueId) {
   return {

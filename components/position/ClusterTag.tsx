@@ -26,14 +26,10 @@ function clusterTone(cluster: PositionCluster) {
 
 export function ClusterTag({ cluster, className = "" }: Props) {
   const tone = clusterTone(cluster);
-  const badgeShort =
-    isLatCluster(cluster) || isMcCluster(cluster) || isExCluster(cluster) || isAtCluster(cluster)
-      ? cluster.hybrid_badge_short
-      : cluster.construtor_badge_short;
-  const badgeTitle =
-    isLatCluster(cluster) || isMcCluster(cluster) || isExCluster(cluster) || isAtCluster(cluster)
-      ? cluster.hybrid_badge
-      : cluster.construtor_badge;
+  const hybridFamily =
+    isLatCluster(cluster) || isMcCluster(cluster) || isExCluster(cluster) || isAtCluster(cluster);
+  const badgeShort = hybridFamily ? cluster.hybrid_badge_short : null;
+  const badgeTitle = hybridFamily ? cluster.hybrid_badge : null;
 
   return (
     <span className={`cluster-tag ${className}`.trim()}>

@@ -7,7 +7,14 @@ import { RangeSlider } from "@/components/filters/RangeSlider";
 import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { formatFoot } from "@/lib/feet";
-import { saveFilters, takeFiltersReturn } from "@/lib/filterSession";
+import {
+  isContractFilter,
+  isMarketFilter,
+  saveFilters,
+  takeFiltersReturn,
+  type ContractFilter,
+  type MarketFilter,
+} from "@/lib/filterSession";
 import { archetypesForFamily } from "@/lib/clusterMeta";
 import { POSITION_FAMILIES } from "@/lib/positions";
 import { badgeCatalogForFamily } from "@/lib/statBadges";
@@ -23,6 +30,52 @@ const SORTS = [
   { key: "age", label: "Mais jovem" },
   { key: "name", label: "Nome (A–Z)" },
 ] as const;
+
+const CONTRACT_BANDS: { key: Exclude<ContractFilter, "all">; label: string }[] = [
+  { key: "lt6", label: "Menos de 6 meses" },
+  { key: "lt12", label: "Menos de 1 ano" },
+  { key: "gte12", label: "1 ano ou mais" },
+  { key: "none", label: "Sem data" },
+];
+
+const MARKET_BANDS: { key: Exclude<MarketFilter, "all">; label: string }[] = [
+  { key: "lt500k", label: "Até €500 mil" },
+  { key: "500k-2m", label: "€500 mil – €2 mi" },
+  { key: "2m-6m", label: "€2 mi – €6 mi" },
+  { key: "gte6m", label: "€6 mi ou mais" },
+  { key: "none", label: "Sem valor" },
+];
+
+function monthsRemaining(iso?: string | null): number | null {
+  if (!iso) return null;
+  const [year, month, day] = iso.split("-").map(Number);
+  if (!year || !month) return null;
+  const end = new Date(year, month - 1, day || 1);
+  const now = new Date();
+  let months = (end.getFullYear() - now.getFullYear()) * 12 + (end.getMonth() - now.getMonth());
+  if (end.getDate() < now.getDate()) months -= 1;
+  return Math.max(0, months);
+}
+
+function matchesContract(iso: string | null | undefined, band: ContractFilter) {
+  if (band === "all") return true;
+  const months = monthsRemaining(iso);
+  if (band === "none") return months == null;
+  if (months == null) return false;
+  if (band === "lt6") return months < 6;
+  if (band === "lt12") return months < 12;
+  return months >= 12;
+}
+
+function matchesMarket(eur: number | null | undefined, band: MarketFilter) {
+  if (band === "all") return true;
+  if (band === "none") return eur == null;
+  if (eur == null) return false;
+  if (band === "lt500k") return eur <= 500_000;
+  if (band === "500k-2m") return eur > 500_000 && eur <= 2_000_000;
+  if (band === "2m-6m") return eur > 2_000_000 && eur <= 6_000_000;
+  return eur > 6_000_000;
+}
 
 type SortKey = (typeof SORTS)[number]["key"];
 type Range = [number, number];
@@ -64,6 +117,8 @@ export function FiltrosClient({ meta, players }: Props) {
   const [age, setAge] = useState<Range>(ageBounds);
   const [height, setHeight] = useState<Range>(bounds.height);
   const [minutes, setMinutes] = useState<Range>(bounds.minutes);
+  const [contract, setContract] = useState<ContractFilter>("all");
+  const [market, setMarket] = useState<MarketFilter>("all");
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -80,6 +135,8 @@ export function FiltrosClient({ meta, players }: Props) {
       if (saved.age) setAge(saved.age);
       if (saved.height) setHeight(saved.height);
       if (saved.minutes) setMinutes(saved.minutes);
+      if (isContractFilter(saved.contract)) setContract(saved.contract);
+      if (isMarketFilter(saved.market)) setMarket(saved.market);
     }
     setReady(true);
   }, [leagueId]);
@@ -98,8 +155,10 @@ export function FiltrosClient({ meta, players }: Props) {
       age,
       height,
       minutes,
+      contract,
+      market,
     });
-  }, [ready, leagueId, family, query, club, origin, foot, profiles, badges, sort, age, height, minutes]);
+  }, [ready, leagueId, family, query, club, origin, foot, profiles, badges, sort, age, height, minutes, contract, market]);
 
   const familyMeta = meta.families.find((item) => item.key === family)!;
   const profileOptions = useMemo(() => archetypesForFamily(family), [family]);
@@ -123,6 +182,8 @@ export function FiltrosClient({ meta, players }: Props) {
     setAge(ageBounds);
     setHeight(bounds.height);
     setMinutes(bounds.minutes);
+    setContract("all");
+    setMarket("all");
   };
 
   const toggleProfile = (profile: string) => {
@@ -160,6 +221,9 @@ export function FiltrosClient({ meta, players }: Props) {
         if (playerAge < age[0] || playerAge > age[1]) return false;
       }
 
+      if (!matchesContract(player.transfermarkt?.contract_until, contract)) return false;
+      if (!matchesMarket(player.transfermarkt?.market_value_eur, market)) return false;
+
       return true;
     });
 
@@ -169,7 +233,7 @@ export function FiltrosClient({ meta, players }: Props) {
       if (sort === "age") return (b.birth_year ?? 0) - (a.birth_year ?? 0);
       return positionRating(b) - positionRating(a);
     });
-  }, [players, family, club, origin, foot, profiles, profileOptions, badges, query, minutes, height, age, sort]);
+  }, [players, family, club, origin, foot, profiles, profileOptions, badges, query, minutes, height, age, contract, market, sort]);
 
   const chips = useMemo(() => {
     const list: { key: string; label: string; clear: () => void }[] = [];
@@ -210,9 +274,17 @@ export function FiltrosClient({ meta, players }: Props) {
         clear: () => setMinutes(bounds.minutes),
       });
     }
+    if (contract !== "all") {
+      const label = CONTRACT_BANDS.find((item) => item.key === contract)?.label ?? contract;
+      list.push({ key: "contract", label, clear: () => setContract("all") });
+    }
+    if (market !== "all") {
+      const label = MARKET_BANDS.find((item) => item.key === market)?.label ?? market;
+      list.push({ key: "market", label, clear: () => setMarket("all") });
+    }
 
     return list;
-  }, [query, club, origin, foot, profiles, badges, age, height, minutes, bounds, ageBounds, badgeOptions]);
+  }, [query, club, origin, foot, profiles, badges, age, height, minutes, contract, market, bounds, ageBounds, badgeOptions]);
 
   return (
     <div className="scout-root filters-root">
@@ -365,6 +437,44 @@ export function FiltrosClient({ meta, players }: Props) {
                 value={minutes}
                 onChange={setMinutes}
               />
+            </section>
+
+            <section className="filter-block">
+              <h2>Contrato e valor</h2>
+
+              <div className="filter-field">
+                <span>Contrato restante</span>
+                <div className="chip-row" role="group" aria-label="Contrato restante">
+                  {CONTRACT_BANDS.map((item) => (
+                    <button
+                      key={item.key}
+                      type="button"
+                      className={`filter-chip choice ${contract === item.key ? "active" : ""}`}
+                      aria-pressed={contract === item.key}
+                      onClick={() => setContract(contract === item.key ? "all" : item.key)}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="filter-field">
+                <span>Valor de mercado</span>
+                <div className="chip-row" role="group" aria-label="Valor de mercado">
+                  {MARKET_BANDS.map((item) => (
+                    <button
+                      key={item.key}
+                      type="button"
+                      className={`filter-chip choice ${market === item.key ? "active" : ""}`}
+                      aria-pressed={market === item.key}
+                      onClick={() => setMarket(market === item.key ? "all" : item.key)}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </section>
           </div>
         </aside>
