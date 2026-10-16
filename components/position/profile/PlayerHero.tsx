@@ -224,7 +224,7 @@ export function PlayerHero({ player, family, players }: Props) {
           <div className="hero-action-cell hero-action-pdf">
             <Tooltip content="Gera um relatório em PDF deste atleta.">
               <span className="hero-action-slot">
-                <PlayerReportButton player={player} family={family} />
+                <PlayerReportButton player={player} family={family} players={players} />
               </span>
             </Tooltip>
           </div>

@@ -7,11 +7,12 @@ import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { useLeague } from "@/components/LeagueProvider";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
+import { isZagCluster } from "@/lib/clusterMeta";
 import { formatFoot } from "@/lib/feet";
 import { familyBySlug } from "@/lib/positions";
 import { profileMetaForFamily } from "@/lib/profileMeta";
-import { profileAccent } from "@/lib/profileShares";
-import { playerInitials } from "@/lib/scoutTheme";
+import { activeProfileKeys, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
+import { playerInitials, profileGradeFromRank } from "@/lib/scoutTheme";
 import { badgeCatalogForFamily, playerStatBadges } from "@/lib/statBadges";
 import { PlayerHeatmap } from "./PlayerHeatmap";
 import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
@@ -126,7 +127,124 @@ function percentileClass(value: number | null): string {
   return "player-report-pct";
 }
 
-export function PlayerReportButton({ player, family }: { player: PlayerProfile; family: PositionFamily }) {
+type ReportMix = {
+  key: string;
+  label: string;
+  share: number;
+  active: boolean;
+  grade: string | null;
+  rank: number | null;
+};
+
+type ReportTendency = {
+  key: string;
+  label: string;
+  detail: string;
+  fill: number;
+  averageFill: number | null;
+  left: string;
+  right: string;
+};
+
+function clampPct(value: number): number {
+  return Math.max(0, Math.min(100, value));
+}
+
+/** Profile name as the site classifies it, including the construtor or hybrid tone. */
+function reportProfileName(player: PlayerProfile): string {
+  const cluster = player.cluster;
+  if (!cluster) return player.profile;
+  if (isZagCluster(cluster)) return cluster.construtor_badge || cluster.archetype;
+  if (cluster.archetype === "Híbrido" && cluster.hybrid_badge) return cluster.hybrid_badge;
+  return cluster.archetype;
+}
+
+function reportMix(player: PlayerProfile, family: PositionFamily, players: PlayerProfile[]): ReportMix[] {
+  const shareRows = sortedProfileShareRows(player);
+  if (shareRows.length) {
+    const active = activeProfileKeys(player, shareRows);
+    const pool = players.length ? players : [player];
+    return shareRows.map((row) => {
+      const rank = archetypeRank(player, pool, row.label, family);
+      return {
+        key: row.key,
+        label: row.label,
+        share: row.share,
+        active: active.has(row.key),
+        rank,
+        grade: rank ? profileGradeFromRank(rank, pool.length) : null,
+      };
+    });
+  }
+
+  return profileMetaForFamily(family)
+    .filter((item) => item.key !== "perfil" && item.key !== "geral")
+    .map((item) => ({
+      key: item.key,
+      label: item.label,
+      share: player.profile_shares?.[item.key] ?? 0,
+      active: false,
+      grade: null,
+      rank: null,
+    }))
+    .filter((item) => item.share > 0)
+    .sort((a, b) => b.share - a.share);
+}
+
+function reportTendencies(player: PlayerProfile): ReportTendency[] {
+  const items = player.aspects.perfil_construcao ?? [];
+  const longo = items.find((item) => item.bar_key === "pass_tendency");
+  const progressivo = items.find((item) => item.bar_key === "progressive_share");
+  const rows: ReportTendency[] = [];
+
+  if (longo?.share_pct != null) {
+    const share = longo.share_pct;
+    const average = longo.pool_avg_pct ?? null;
+    const scale = Math.max(longo.scale_max_pct ?? 40, share, average ?? 0, 1);
+    const gap = average == null ? null : share - average;
+    const verdict =
+      gap == null ? null : gap >= 2 ? "Mais longo que a média" : gap <= -2 ? "Mais curto que a média" : "Na média da posição";
+    const bits = [verdict, `${Math.round(share)}% longos`, average == null ? null : `média ${Math.round(average)}%`].filter(
+      (bit): bit is string => Boolean(bit),
+    );
+    rows.push({
+      key: "curto",
+      label: "Passe curto",
+      detail: bits.join(" · "),
+      fill: clampPct((share / scale) * 100),
+      averageFill: average == null ? null : clampPct((average / scale) * 100),
+      left: longo.axis_left || "Curto",
+      right: longo.axis_right || "Longo",
+    });
+  }
+
+  if (progressivo?.share_pct != null) {
+    const share = progressivo.share_pct;
+    const average = progressivo.pool_avg_pct ?? null;
+    const scale = Math.max(progressivo.scale_max_pct ?? 40, share, average ?? 0, 1);
+    rows.push({
+      key: "progressivo",
+      label: "Passe progressivo",
+      detail: average == null ? `${Math.round(share)}%` : `${Math.round(share)}% · média ${Math.round(average)}%`,
+      fill: clampPct((share / scale) * 100),
+      averageFill: average == null ? null : clampPct((average / scale) * 100),
+      left: progressivo.axis_left || "Baixo",
+      right: progressivo.axis_right || "Alto",
+    });
+  }
+
+  return rows;
+}
+
+export function PlayerReportButton({
+  player,
+  family,
+  players,
+}: {
+  player: PlayerProfile;
+  family: PositionFamily;
+  players: PlayerProfile[];
+}) {
   const league = useLeague();
   const [mounted, setMounted] = useState(false);
   const [sheetUrl, setSheetUrl] = useState("");
@@ -148,11 +266,9 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const contractDate = formatIso(tm?.contract_until);
   const foot = formatFoot(player.foot);
-  const mix = profileMetaForFamily(family)
-    .filter((item) => item.key !== "perfil" && item.key !== "geral")
-    .map((item) => ({ label: item.label, share: player.profile_shares?.[item.key] ?? 0 }))
-    .filter((item) => item.share > 0)
-    .sort((a, b) => b.share - a.share);
+  const profileLabel = reportProfileName(player);
+  const mix = reportMix(player, family, players);
+  const tendencies = reportTendencies(player);
   const generated = new Date().toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" });
   const xg = metricDisplay(player, "xG");
   const xa = metricDisplay(player, "xA");
@@ -166,7 +282,7 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
 
   function exportPdf() {
     const previousTitle = document.title;
-    document.title = `${player.name} — Brasil Scout`;
+    document.title = `${player.name} - SADA Scout`;
     document.body.classList.add("exporting-player-report");
     const cleanup = () => {
       document.body.classList.remove("exporting-player-report");
@@ -206,12 +322,22 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
           </p>
           {bio.length ? <p className="player-report-bio">{bio.join(" · ")}</p> : null}
           <div className="player-report-profile">
-            <p>Perfil <strong>{player.profile}</strong></p>
+            <p>
+              Perfil <strong>{profileLabel}</strong>
+            </p>
             {mix.length ? (
               <ul>
                 {mix.map((item) => (
-                  <li key={item.label}>
-                    <span>{item.label}</span>
+                  <li key={item.key} className={item.active ? "is-active" : undefined}>
+                    <span className="player-report-mix-label">
+                      <i style={{ background: profileAccent(item.label) }} aria-hidden="true" />
+                      {item.label}
+                    </span>
+                    <span className="player-report-mix-meta">
+                      {item.grade}
+                      {item.grade && item.rank ? " · " : ""}
+                      {item.rank ? `${item.rank}º` : ""}
+                    </span>
                     <span className="player-report-mix-track">
                       <span style={{ width: `${Math.max(4, Math.round(item.share))}%`, background: profileAccent(item.label) }} />
                     </span>
@@ -270,6 +396,32 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
         </div>
       </dl>
 
+      {tendencies.length ? (
+        <section className="player-report-tendencies" aria-label="Tendências de passe">
+          <h2>Tendências de passe</h2>
+          <div className="player-report-tendency-grid">
+            {tendencies.map((item) => (
+              <div key={item.key} className="player-report-tendency">
+                <p>{item.label}</p>
+                <strong>{item.detail}</strong>
+                <div className="player-report-tendency-bar">
+                  <div className="player-report-tendency-track">
+                    <span style={{ width: `${item.fill}%` }} />
+                  </div>
+                  {item.averageFill != null ? (
+                    <i className="player-report-tendency-avg" style={{ left: `${item.averageFill}%` }} />
+                  ) : null}
+                </div>
+                <div className="player-report-axis">
+                  <span>{item.left}</span>
+                  <span>{item.right}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       {badges.length ? (
         <section className="player-report-badges" aria-label="Badges">
           <h2>Badges</h2>
@@ -294,11 +446,20 @@ export function PlayerReportButton({ player, family }: { player: PlayerProfile; 
                 <div key={`${section.title}-${block.title ?? index}`} className="player-report-block">
                   {block.title ? <p>{block.title}</p> : null}
                   <table>
+                    {index === 0 ? (
+                      <thead>
+                        <tr className="player-report-scale">
+                          <th scope="col" />
+                          <td>dado</td>
+                          <td>percentil</td>
+                        </tr>
+                      </thead>
+                    ) : null}
                     <tbody>
                       {block.lines.map((line, lineIndex) => (
                         <tr key={`${line.label}-${lineIndex}`} className={line.sub ? "is-sub" : undefined}>
                           <th scope="row">{line.label}</th>
-                          <td>{line.value}</td>
+                          <td className="player-report-value">{line.value}</td>
                           <td className={percentileClass(line.percentile)}>{line.percentile ?? "—"}</td>
                         </tr>
                       ))}
