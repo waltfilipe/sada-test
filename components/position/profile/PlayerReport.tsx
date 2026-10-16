@@ -121,6 +121,15 @@ function formatIso(iso?: string | null): string | null {
   return new Date(year, month - 1, day || 1).toLocaleDateString("pt-BR");
 }
 
+/** YouTube search for match clips. No API key — just an encoded public query. */
+function youtubeHighlightsHref(player: PlayerProfile): string {
+  const query = [player.name, player.club, player.position.toLocaleLowerCase("pt-BR"), "highlights"]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(" ");
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+}
+
 function percentileClass(value: number | null): string {
   if (value == null) return "player-report-pct";
   if (value >= 70) return "player-report-pct is-high";
@@ -284,6 +293,7 @@ export function PlayerReportButton({
   const mix = reportMix(player, family, players);
   const tendencies = reportTendencies(player, players);
   const generated = new Date().toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" });
+  const highlightsHref = youtubeHighlightsHref(player);
   const xg = metricDisplay(player, "xG");
   const xa = metricDisplay(player, "xA");
 
@@ -333,6 +343,11 @@ export function PlayerReportButton({
             <span>{player.club}</span>
             <span className="player-report-dot">·</span>
             <span>{player.position}</span>
+          </p>
+          <p className="player-report-highlights">
+            <a href={highlightsHref} target="_blank" rel="noopener noreferrer">
+              Highlights no YouTube
+            </a>
           </p>
           {bio.length ? <p className="player-report-bio">{bio.join(" · ")}</p> : null}
           <div className="player-report-profile">
