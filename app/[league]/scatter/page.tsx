@@ -7,13 +7,13 @@ import type { PositionFamily } from "@/lib/types";
 
 type Props = {
   params: Promise<{ league: string }>;
-  searchParams: Promise<{ posicao?: string; a?: string; b?: string }>;
+  searchParams: Promise<{ posicao?: string; a?: string; b?: string; c?: string; x?: string; y?: string }>;
 };
 
 export default async function ScatterPage({ params, searchParams }: Props) {
   const { league } = await params;
   if (!isLeagueId(league)) notFound();
-  const { posicao, a, b } = await searchParams;
+  const { posicao, a, b, c, x, y } = await searchParams;
   const family = familyBySlug(posicao ?? "zagueiros");
   const players = getFamilyPlayers(family.key as PositionFamily, league).map((player) => {
     if (!player.heatmap) return player;
@@ -31,6 +31,9 @@ export default async function ScatterPage({ params, searchParams }: Props) {
       metrics={meta.scatter_metrics[family.key] ?? []}
       initialA={a}
       initialB={b}
+      initialC={c}
+      initialX={x}
+      initialY={y}
     />
   );
 }

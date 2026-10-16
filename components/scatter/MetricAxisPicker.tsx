@@ -7,11 +7,12 @@ type Props = {
   metrics: Metric[];
   value: string;
   otherValue: string;
+  plottedLabel?: string;
   onChange: (key: string) => void;
   onSwap: () => void;
 };
 
-export function MetricAxisPicker({ axis, metrics, value, otherValue, onChange, onSwap }: Props) {
+export function MetricAxisPicker({ axis, metrics, value, otherValue, plottedLabel, onChange, onSwap }: Props) {
   return (
     <div className={`axis-picker axis-${axis}`}>
       <div className="axis-picker-head">
@@ -22,6 +23,7 @@ export function MetricAxisPicker({ axis, metrics, value, otherValue, onChange, o
           </button>
         )}
       </div>
+      {plottedLabel ? <p className="axis-plotted">{plottedLabel}</p> : null}
 
       <div className="axis-options" role="radiogroup" aria-label={axis === "x" ? "Métrica do eixo X" : "Métrica do eixo Y"}>
         {metrics.map((metric) => {

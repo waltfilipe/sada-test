@@ -14,24 +14,21 @@ import type { PlayerProfile } from "@/lib/types";
 const CURRENT_YEAR = new Date().getFullYear();
 
 type Props = {
-  side: "a" | "b";
-  player: PlayerProfile;
+  side: "a" | "b" | "c";
+  player: PlayerProfile | null;
   players: PlayerProfile[];
   onChange: (playerId: string) => void;
   compact?: boolean;
+  allowEmpty?: boolean;
 };
 
-export function AthleteSlot({ side, player, players, onChange, compact = false }: Props) {
-  const token = ratingTier(positionRating(player));
-  const age = player.birth_year ? CURRENT_YEAR - player.birth_year : null;
-  const tm = player.transfermarkt;
-  const clusterProps = clusterTagProps(player);
-  const rating = formatRating(positionRating(player));
-
+export function AthleteSlot({ side, player, players, onChange, compact = false, allowEmpty = false }: Props) {
+  const slotNumber = side === "a" ? "1" : side === "b" ? "2" : "3";
   const picker = (
     <label className="slot-picker">
-      <span>Atleta {side === "a" ? "1" : "2"}</span>
-      <select value={player.player_id} onChange={(event) => onChange(event.target.value)}>
+      <span>Atleta {slotNumber}</span>
+      <select value={player?.player_id ?? ""} onChange={(event) => onChange(event.target.value)}>
+        {allowEmpty ? <option value="">Nenhum</option> : null}
         {players.map((option) => (
           <option key={option.player_id} value={option.player_id}>
             {option.name} — {option.club}
@@ -40,6 +37,21 @@ export function AthleteSlot({ side, player, players, onChange, compact = false }
       </select>
     </label>
   );
+
+  if (!player) {
+    return (
+      <section className={`slot slot-compact slot-empty side-${side}`}>
+        {picker}
+        <p className="slot-empty-copy">Nenhum atleta selecionado</p>
+      </section>
+    );
+  }
+
+  const token = ratingTier(positionRating(player));
+  const age = player.birth_year ? CURRENT_YEAR - player.birth_year : null;
+  const tm = player.transfermarkt;
+  const clusterProps = clusterTagProps(player);
+  const rating = formatRating(positionRating(player));
 
   if (compact) {
     return (

@@ -6,6 +6,7 @@
 .scatter-root {
   --side-a: #31e981;
   --side-b: #8980f5;
+  --side-c: #38bdf8;
 }
 
 .scatter-canvas {
@@ -17,9 +18,9 @@
   padding: 0.9rem 1.25rem 2.5rem;
 }
 
-.scatter-stage {
+.scatter-stage.compare-stage {
   margin-bottom: 0;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.65rem;
   align-items: stretch;
 }
@@ -113,6 +114,17 @@
 .slot.side-b {
   --slot-accent: var(--side-b);
   --slot-glow: rgba(137, 128, 245, 0.07);
+}
+
+.slot.side-c {
+  --slot-accent: var(--side-c);
+  --slot-glow: rgba(56, 189, 248, 0.08);
+}
+
+.slot-empty-copy {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-3);
 }
 
 .slot::before {
@@ -364,7 +376,8 @@
 }
 
 @media (max-width: 900px) {
-  .compare-stage {
+  .compare-stage,
+  .scatter-stage.compare-stage {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -423,6 +436,11 @@
   min-height: 0;
 }
 
+.scatter-chart-panel .sc-panel-head h2 {
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
 .scatter-vs {
   color: var(--text-3);
   font-weight: 400;
@@ -447,6 +465,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+}
+
+.axis-plotted {
+  margin: -0.15rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--text-3);
 }
 
 .axis-badge {
@@ -551,6 +576,10 @@
   background: var(--side-b);
 }
 
+.legend-list .lg-c {
+  background: var(--side-c);
+}
+
 .legend-list .lg-pool {
   background: rgba(107, 124, 147, 0.55);
 }
@@ -567,8 +596,36 @@
 /* ── Chart ───────────────────────────────────────────────────────────────── */
 
 .scatter-plot-wrap {
+  position: relative;
   width: 100%;
   margin: 0.15rem 0 0;
+}
+
+.scatter-tooltip {
+  position: absolute;
+  z-index: 4;
+  display: grid;
+  gap: 0.12rem;
+  min-width: 8.5rem;
+  max-width: 16rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(8, 14, 22, 0.96);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  transform: translate(12px, -120%);
+}
+
+.scatter-tip-name {
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.scatter-tip-club {
+  font-size: 0.68rem;
+  color: var(--text-3);
 }
 
 .scatter-plot {
@@ -624,11 +681,15 @@
   fill: var(--side-b);
 }
 
+.scatter-tag.tag-c {
+  fill: var(--side-c);
+}
+
 /* ── Stat cards below chart ───────────────────────────────────────────────── */
 
 .scatter-stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.85rem;
   margin-top: 1rem;
   padding-top: 1rem;
@@ -660,6 +721,10 @@
 
 .scatter-stat.side-b {
   --stat-accent: var(--side-b);
+}
+
+.scatter-stat.side-c {
+  --stat-accent: var(--side-c);
 }
 
 .scatter-stat-line {

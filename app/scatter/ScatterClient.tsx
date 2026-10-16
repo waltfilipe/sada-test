@@ -4,16 +4,17 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AthleteSlot } from "@/components/compare/AthleteSlot";
 import { MetricAxisPicker } from "@/components/scatter/MetricAxisPicker";
-import { ScatterPlot } from "@/components/scatter/ScatterPlot";
+import { ScatterPlot, type ScatterHighlight } from "@/components/scatter/ScatterPlot";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
-import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { familyBySlug } from "@/lib/positions";
+import { scatterAxis, scatterAxisLabel } from "@/lib/scatterAxis";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Metric = { key: string; label: string };
+type Tone = ScatterHighlight["tone"];
 
 type Props = {
   family: PositionFamily;
@@ -21,25 +22,24 @@ type Props = {
   metrics: Metric[];
   initialA?: string;
   initialB?: string;
+  initialC?: string;
   initialX?: string;
   initialY?: string;
 };
+
+const TONES: Tone[] = ["a", "b", "c"];
 
 function positionMetrics(family: PositionFamily): Metric[] {
   const labels = statSectionsForFamily(family).flatMap((section) => section.labels);
   return [...new Set(labels)].map((label) => ({ key: label, label }));
 }
 
-function axisValue(player: PlayerProfile, key: string): number {
-  const item = findAspect(flattenAspects(player), key);
-  if (item?.percentile != null) return item.percentile;
-  return player.scatter[key] ?? 0;
-}
-
 function formatMetric(value: number): string {
-  if (Math.abs(value) >= 100) return value.toFixed(1);
-  if (Math.abs(value) >= 10) return value.toFixed(2);
-  return value.toFixed(2);
+  const digits = Math.abs(value) >= 10 ? 1 : Math.abs(value) >= 1 ? 1 : 2;
+  return value.toLocaleString("pt-BR", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  });
 }
 
 function quadrantLabel(
@@ -64,6 +64,7 @@ export function ScatterClient({
   metrics,
   initialA,
   initialB,
+  initialC,
   initialX,
   initialY,
 }: Props) {
@@ -74,9 +75,11 @@ export function ScatterClient({
     return fromPosition.length ? fromPosition : metrics;
   }, [family, metrics]);
 
-  const pick = (requested: string | undefined, fallbackIndex: number) => {
+  const pick = (requested: string | undefined, fallbackIndex: number | null) => {
+    if (requested === "") return "";
     if (requested && players.some((player) => player.player_id === requested)) return requested;
-    return players[fallbackIndex]?.player_id ?? players[0]?.player_id ?? "";
+    if (fallbackIndex == null) return "";
+    return players[fallbackIndex]?.player_id ?? "";
   };
 
   const defaultX = axisMetrics[0]?.key ?? "intervencoes";
@@ -84,11 +87,13 @@ export function ScatterClient({
 
   const [idA, setIdA] = useState(() => pick(initialA, 0));
   const [idB, setIdB] = useState(() => {
+    if (initialB === "") return "";
     const chosen = pick(initialB, 1);
     const first = pick(initialA, 0);
-    if (chosen !== first) return chosen;
-    return players.find((player) => player.player_id !== first)?.player_id ?? chosen;
+    if (!chosen || chosen !== first) return chosen;
+    return players.find((player) => player.player_id !== first)?.player_id ?? "";
   });
+  const [idC, setIdC] = useState(() => pick(initialC, null));
   const [xKey, setXKey] = useState(() => {
     if (initialX && axisMetrics.some((metric) => metric.key === initialX && metric.key !== initialY)) {
       return initialX;
@@ -99,22 +104,35 @@ export function ScatterClient({
     if (initialY && axisMetrics.some((metric) => metric.key === initialY && metric.key !== initialX)) {
       return initialY;
     }
-    const fallback = axisMetrics.find((metric) => metric.key !== defaultX)?.key ?? defaultY;
-    return fallback;
+    return axisMetrics.find((metric) => metric.key !== defaultX)?.key ?? defaultY;
   });
 
-  const a = players.find((player) => player.player_id === idA) ?? players[0];
-  const b = players.find((player) => player.player_id === idB) ?? players[1] ?? players[0];
+  const slotIds = [idA, idB, idC];
+  const selected = useMemo(() => {
+    const seen = new Set<string>();
+    const rows: { id: string; tone: Tone; player: PlayerProfile }[] = [];
+    [idA, idB, idC].forEach((id, index) => {
+      if (!id || seen.has(id)) return;
+      const player = players.find((item) => item.player_id === id);
+      if (!player) return;
+      seen.add(id);
+      rows.push({ id, tone: TONES[index], player });
+    });
+    return rows;
+  }, [idA, idB, idC, players]);
 
   const points = useMemo(
     () =>
       players.map((player) => ({
         player_id: player.player_id,
-        label: player.label,
-        x: axisValue(player, xKey),
-        y: axisValue(player, yKey),
+        label: player.name,
+        name: player.name,
+        club: player.club,
+        href: href(`/posicao/${family}?atleta=${player.player_id}`),
+        x: scatterAxis(player, xKey).value,
+        y: scatterAxis(player, yKey).value,
       })),
-    [players, xKey, yKey],
+    [players, xKey, yKey, href, family],
   );
 
   const avgX = useMemo(
@@ -126,39 +144,38 @@ export function ScatterClient({
     [points],
   );
 
-  const pointA = points.find((point) => point.player_id === idA);
-  const pointB = points.find((point) => point.player_id === idB);
-
-  const xLabel = axisMetrics.find((metric) => metric.key === xKey)?.label ?? xKey;
-  const yLabel = axisMetrics.find((metric) => metric.key === yKey)?.label ?? yKey;
-
-  const swapAthletes = () => {
-    setIdA(idB);
-    setIdB(idA);
-  };
+  const xLabel = scatterAxisLabel(players, xKey);
+  const yLabel = scatterAxisLabel(players, yKey);
+  const highlights = selected.map((slot) => ({ id: slot.id, tone: slot.tone }));
 
   const swapAxes = () => {
     setXKey(yKey);
     setYKey(xKey);
   };
 
+  const optionsFor = (current: string) => {
+    const taken = new Set(slotIds.filter((id) => id && id !== current));
+    return players.filter((player) => !taken.has(player.player_id));
+  };
+
   useEffect(() => {
     const params = new URLSearchParams();
     params.set("posicao", family);
-    if (idA) params.set("a", idA);
-    if (idB) params.set("b", idB);
+    params.set("a", idA);
+    params.set("b", idB);
+    params.set("c", idC);
     params.set("x", xKey);
     params.set("y", yKey);
     const next = href(`/scatter?${params.toString()}`);
     const current = `${window.location.pathname}${window.location.search}`;
     if (current !== next) window.history.replaceState(window.history.state, "", next);
-  }, [family, idA, idB, xKey, yKey, href]);
+  }, [family, idA, idB, idC, xKey, yKey, href]);
 
   const positionTabs = (
     <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/scatter?posicao=${slug}`)} />
   );
 
-  if (!a || !b) {
+  if (!players.length) {
     return (
       <div className="scout-root scatter-root">
         <ScoutTopbar active="scatter" subnav={positionTabs} />
@@ -167,21 +184,40 @@ export function ScatterClient({
     );
   }
 
+  const compareQuery = new URLSearchParams({ posicao: family });
+  if (selected[0]) compareQuery.set("a", selected[0].id);
+  if (selected[1]) compareQuery.set("b", selected[1].id);
+
   return (
     <div className="scout-root scatter-root">
-        <ScoutTopbar active="scatter" subnav={positionTabs} />
+      <ScoutTopbar active="scatter" subnav={positionTabs} />
 
       <main className="scatter-canvas">
         <div className="compare-stage scatter-stage">
-          <AthleteSlot compact side="a" player={a} players={players} onChange={setIdA} />
-
-          <div className="compare-pivot">
-            <button type="button" className="pivot-swap" onClick={swapAthletes}>
-              Inverter
-            </button>
-          </div>
-
-          <AthleteSlot compact side="b" player={b} players={players} onChange={setIdB} />
+          <AthleteSlot
+            compact
+            allowEmpty
+            side="a"
+            player={players.find((player) => player.player_id === idA) ?? null}
+            players={optionsFor(idA)}
+            onChange={setIdA}
+          />
+          <AthleteSlot
+            compact
+            allowEmpty
+            side="b"
+            player={players.find((player) => player.player_id === idB) ?? null}
+            players={optionsFor(idB)}
+            onChange={setIdB}
+          />
+          <AthleteSlot
+            compact
+            allowEmpty
+            side="c"
+            player={players.find((player) => player.player_id === idC) ?? null}
+            players={optionsFor(idC)}
+            onChange={setIdC}
+          />
         </div>
 
         <div className="scatter-workspace">
@@ -200,6 +236,7 @@ export function ScatterClient({
                 metrics={axisMetrics}
                 value={xKey}
                 otherValue={yKey}
+                plottedLabel={xLabel}
                 onChange={setXKey}
                 onSwap={swapAxes}
               />
@@ -208,6 +245,7 @@ export function ScatterClient({
                 metrics={axisMetrics}
                 value={yKey}
                 otherValue={xKey}
+                plottedLabel={yLabel}
                 onChange={setYKey}
                 onSwap={swapAxes}
               />
@@ -230,6 +268,10 @@ export function ScatterClient({
                   <span>Atleta 2</span>
                 </li>
                 <li>
+                  <i className="lg lg-c" aria-hidden />
+                  <span>Atleta 3</span>
+                </li>
+                <li>
                   <i className="lg lg-pool" aria-hidden />
                   <span>Pool da posição</span>
                 </li>
@@ -249,62 +291,66 @@ export function ScatterClient({
                   {xLabel} <span className="scatter-vs">×</span> {yLabel}
                 </h2>
               </div>
-              <p className="sc-note">Posição relativa no pool</p>
+              <p className="sc-note">Por 90 minutos</p>
             </header>
 
             <ScatterPlot
               points={points}
               avgX={avgX}
               avgY={avgY}
-              highlightA={idA}
-              highlightB={idB}
+              highlights={highlights}
               xLabel={xLabel}
               yLabel={yLabel}
             />
 
-            <div className="scatter-stats">
-              {[pointA, pointB].map((point, index) => {
-                if (!point) return null;
-                const player = index === 0 ? a : b;
-                const side = index === 0 ? "a" : "b";
-                return (
-                  <article key={point.player_id} className={`scatter-stat side-${side}`}>
-                    <p className="scatter-stat-line">
-                      <span>Atleta {index + 1}</span> {quadrantLabel(point.x, point.y, avgX, avgY, xLabel, yLabel)}
-                    </p>
-                    <strong className="scatter-stat-name">{player.name}</strong>
-                    <p className="scatter-stat-values">
-                      <span>
-                        {xLabel} <b>{formatMetric(point.x)}</b>
-                      </span>
-                      <span>
-                        {yLabel} <b>{formatMetric(point.y)}</b>
-                      </span>
-                    </p>
-                  </article>
-                );
-              })}
-            </div>
+            {selected.length > 0 && (
+              <div className="scatter-stats">
+                {selected.map((slot, index) => {
+                  const point = points.find((item) => item.player_id === slot.id);
+                  if (!point) return null;
+                  return (
+                    <article key={slot.tone} className={`scatter-stat side-${slot.tone}`}>
+                      <p className="scatter-stat-line">
+                        <span>Atleta {index + 1}</span>{" "}
+                        {quadrantLabel(point.x, point.y, avgX, avgY, xLabel, yLabel)}
+                      </p>
+                      <strong className="scatter-stat-name">{slot.player.name}</strong>
+                      <p className="scatter-stat-values">
+                        <span>
+                          {xLabel} <b>{formatMetric(point.x)}</b>
+                        </span>
+                        <span>
+                          {yLabel} <b>{formatMetric(point.y)}</b>
+                        </span>
+                      </p>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
           </section>
         </div>
 
         <section className="scatter-guide">
           <h2>Como ler este gráfico</h2>
           <p>
-            Cada ponto é um atleta da posição. A horizontal é o percentil no eixo X e a vertical, no eixo Y,
-            sempre em relação aos colegas do mesmo grupo. Mais à direita ou mais acima significa melhor
-            naquela métrica.
+            Cada ponto é um atleta da posição. Os eixos usam o número por 90 minutos. Se a métrica tem
+            aproveitamento, entra o que deu certo: duelos e disputas vencidos, dribles com sucesso, passes,
+            cruzamentos e finalizações certas. Sem eficiência, o eixo mostra o próprio dado, como condução
+            progressiva e pré-assistências.
           </p>
           <p>
-            As linhas tracejadas marcam a média do grupo. Escolha dois atletas, troque os eixos e leia o
-            quadrante para ver quem está alto em um eixo, nos dois, ou abaixo da média.
+            Passe o mouse em um ponto para ver o jogador e o clube. Clique para abrir o dossiê. Dá para
+            destacar um, dois ou três atletas ao mesmo tempo; o restante do grupo continua no gráfico, mais
+            discreto. As linhas tracejadas marcam a média.
           </p>
           <div className="scatter-links">
-            <Link href={href(`/comparar?posicao=${family}&a=${a.player_id}&b=${b.player_id}`)}>
-              Comparar atletas
-            </Link>
-            <Link href={href(`/posicao/${family}?atleta=${a.player_id}`)}>Dossiê de {a.name}</Link>
-            <Link href={href(`/posicao/${family}?atleta=${b.player_id}`)}>Dossiê de {b.name}</Link>
+            <Link href={href(`/comparar?${compareQuery.toString()}`)}>Comparar atletas</Link>
+            {selected.map((slot) => (
+              <Link key={slot.id} href={href(`/posicao/${family}?atleta=${slot.id}`)}>
+                Dossiê de {slot.player.name}
+              </Link>
+            ))}
           </div>
         </section>
       </main>
