@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AthleteSlot } from "@/components/compare/AthleteSlot";
 import { MetricAxisPicker } from "@/components/scatter/MetricAxisPicker";
 import { ScatterPlot, type ScatterHighlight } from "@/components/scatter/ScatterPlot";
@@ -69,6 +69,7 @@ export function ScatterClient({
   initialY,
 }: Props) {
   const { href } = useLeague();
+  const rootRef = useRef<HTMLDivElement>(null);
   const familyMeta = familyBySlug(family);
   const axisMetrics = useMemo(() => {
     const fromPosition = positionMetrics(family);
@@ -171,13 +172,34 @@ export function ScatterClient({
     if (current !== next) window.history.replaceState(window.history.state, "", next);
   }, [family, idA, idB, idC, xKey, yKey, href]);
 
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const fit = () => {
+      const topbar = root.querySelector(".scout-topbar-wrap");
+      const canvas = root.querySelector(".scatter-canvas");
+      const top = topbar?.getBoundingClientRect().height ?? 0;
+      const pad = canvas ? parseFloat(getComputedStyle(canvas).paddingTop) || 0 : 0;
+      root.style.setProperty("--scatter-chrome", `${Math.ceil(top + pad + 10)}px`);
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    const topbar = root.querySelector(".scout-topbar-wrap");
+    if (topbar) observer.observe(topbar);
+    window.addEventListener("resize", fit);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", fit);
+    };
+  }, []);
+
   const positionTabs = (
     <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/scatter?posicao=${slug}`)} />
   );
 
   if (!players.length) {
     return (
-      <div className="scout-root scatter-root">
+      <div className="scout-root scatter-root" ref={rootRef}>
         <ScoutTopbar active="scatter" subnav={positionTabs} />
         <div className="scout-empty">Nenhum atleta disponível para {familyMeta.label.toLowerCase()}.</div>
       </div>
@@ -189,111 +211,103 @@ export function ScatterClient({
   if (selected[1]) compareQuery.set("b", selected[1].id);
 
   return (
-    <div className="scout-root scatter-root">
+    <div className="scout-root scatter-root" ref={rootRef}>
       <ScoutTopbar active="scatter" subnav={positionTabs} />
 
       <main className="scatter-canvas">
-        <div className="compare-stage scatter-stage">
-          <AthleteSlot
-            compact
-            allowEmpty
-            side="a"
-            player={players.find((player) => player.player_id === idA) ?? null}
-            players={optionsFor(idA)}
-            onChange={setIdA}
-          />
-          <AthleteSlot
-            compact
-            allowEmpty
-            side="b"
-            player={players.find((player) => player.player_id === idB) ?? null}
-            players={optionsFor(idB)}
-            onChange={setIdB}
-          />
-          <AthleteSlot
-            compact
-            allowEmpty
-            side="c"
-            player={players.find((player) => player.player_id === idC) ?? null}
-            players={optionsFor(idC)}
-            onChange={setIdC}
-          />
-        </div>
-
         <div className="scatter-workspace">
-          <aside className="scatter-rail">
-            <section className="sc-panel scatter-panel">
-              <header className="sc-panel-head">
-                <div>
-                  <p className="sc-eyebrow">Configuração</p>
-                  <h2>Eixos do gráfico</h2>
-                </div>
-                <p className="sc-note">{players.length} atletas</p>
-              </header>
-
-              <MetricAxisPicker
-                axis="x"
-                metrics={axisMetrics}
-                value={xKey}
-                otherValue={yKey}
-                plottedLabel={xLabel}
-                onChange={setXKey}
-                onSwap={swapAxes}
+          <aside className="scatter-rail" aria-label="Atletas em destaque">
+            <div className="scatter-slots">
+              <AthleteSlot
+                compact
+                allowEmpty
+                side="a"
+                player={players.find((player) => player.player_id === idA) ?? null}
+                players={optionsFor(idA)}
+                onChange={setIdA}
               />
-              <MetricAxisPicker
-                axis="y"
-                metrics={axisMetrics}
-                value={yKey}
-                otherValue={xKey}
-                plottedLabel={yLabel}
-                onChange={setYKey}
-                onSwap={swapAxes}
+              <AthleteSlot
+                compact
+                allowEmpty
+                side="b"
+                player={players.find((player) => player.player_id === idB) ?? null}
+                players={optionsFor(idB)}
+                onChange={setIdB}
               />
-            </section>
+              <AthleteSlot
+                compact
+                allowEmpty
+                side="c"
+                player={players.find((player) => player.player_id === idC) ?? null}
+                players={optionsFor(idC)}
+                onChange={setIdC}
+              />
+            </div>
 
-            <section className="sc-panel scatter-panel scatter-legend">
-              <header className="sc-panel-head">
-                <div>
-                  <p className="sc-eyebrow">Leitura</p>
-                  <h2>Legenda</h2>
-                </div>
-              </header>
-              <ul className="legend-list">
-                <li>
-                  <i className="lg lg-a" aria-hidden />
-                  <span>Atleta 1</span>
-                </li>
-                <li>
-                  <i className="lg lg-b" aria-hidden />
-                  <span>Atleta 2</span>
-                </li>
-                <li>
-                  <i className="lg lg-c" aria-hidden />
-                  <span>Atleta 3</span>
-                </li>
-                <li>
-                  <i className="lg lg-pool" aria-hidden />
-                  <span>Pool da posição</span>
-                </li>
-                <li>
-                  <i className="lg lg-avg" aria-hidden />
-                  <span>Média do grupo</span>
-                </li>
-              </ul>
-            </section>
+            <div className="scatter-rail-extra">
+              <section className="sc-panel scatter-panel">
+                <header className="sc-panel-head">
+                  <div>
+                    <p className="sc-eyebrow">Configuração</p>
+                    <h2>Eixos do gráfico</h2>
+                  </div>
+                  <p className="sc-note">{players.length} atletas</p>
+                </header>
+
+                <MetricAxisPicker
+                  axis="x"
+                  metrics={axisMetrics}
+                  value={xKey}
+                  otherValue={yKey}
+                  plottedLabel={xLabel}
+                  onChange={setXKey}
+                  onSwap={swapAxes}
+                />
+                <MetricAxisPicker
+                  axis="y"
+                  metrics={axisMetrics}
+                  value={yKey}
+                  otherValue={xKey}
+                  plottedLabel={yLabel}
+                  onChange={setYKey}
+                  onSwap={swapAxes}
+                />
+              </section>
+
+              <section className="sc-panel scatter-panel scatter-legend">
+                <header className="sc-panel-head">
+                  <div>
+                    <p className="sc-eyebrow">Leitura</p>
+                    <h2>Legenda</h2>
+                  </div>
+                </header>
+                <ul className="legend-list">
+                  <li>
+                    <i className="lg lg-a" aria-hidden />
+                    <span>Atleta 1</span>
+                  </li>
+                  <li>
+                    <i className="lg lg-b" aria-hidden />
+                    <span>Atleta 2</span>
+                  </li>
+                  <li>
+                    <i className="lg lg-c" aria-hidden />
+                    <span>Atleta 3</span>
+                  </li>
+                  <li>
+                    <i className="lg lg-pool" aria-hidden />
+                    <span>Pool da posição</span>
+                  </li>
+                  <li>
+                    <i className="lg lg-avg" aria-hidden />
+                    <span>Média do grupo</span>
+                  </li>
+                </ul>
+              </section>
+            </div>
           </aside>
 
-          <section className="sc-panel scatter-panel scatter-chart-panel">
-            <header className="sc-panel-head">
-              <div>
-                <p className="sc-eyebrow">Mapa de dispersão</p>
-                <h2>
-                  {xLabel} <span className="scatter-vs">×</span> {yLabel}
-                </h2>
-              </div>
-              <p className="sc-note">Por 90 minutos</p>
-            </header>
-
+          <section className="scatter-map" aria-label="Mapa de dispersão">
             <ScatterPlot
               points={points}
               avgX={avgX}
@@ -302,34 +316,34 @@ export function ScatterClient({
               xLabel={xLabel}
               yLabel={yLabel}
             />
-
-            {selected.length > 0 && (
-              <div className="scatter-stats">
-                {selected.map((slot, index) => {
-                  const point = points.find((item) => item.player_id === slot.id);
-                  if (!point) return null;
-                  return (
-                    <article key={slot.tone} className={`scatter-stat side-${slot.tone}`}>
-                      <p className="scatter-stat-line">
-                        <span>Atleta {index + 1}</span>{" "}
-                        {quadrantLabel(point.x, point.y, avgX, avgY, xLabel, yLabel)}
-                      </p>
-                      <strong className="scatter-stat-name">{slot.player.name}</strong>
-                      <p className="scatter-stat-values">
-                        <span>
-                          {xLabel} <b>{formatMetric(point.x)}</b>
-                        </span>
-                        <span>
-                          {yLabel} <b>{formatMetric(point.y)}</b>
-                        </span>
-                      </p>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
           </section>
         </div>
+
+        {selected.length > 0 && (
+          <div className="scatter-stats">
+            {selected.map((slot, index) => {
+              const point = points.find((item) => item.player_id === slot.id);
+              if (!point) return null;
+              return (
+                <article key={slot.tone} className={`scatter-stat side-${slot.tone}`}>
+                  <p className="scatter-stat-line">
+                    <span>Atleta {index + 1}</span>{" "}
+                    {quadrantLabel(point.x, point.y, avgX, avgY, xLabel, yLabel)}
+                  </p>
+                  <strong className="scatter-stat-name">{slot.player.name}</strong>
+                  <p className="scatter-stat-values">
+                    <span>
+                      {xLabel} <b>{formatMetric(point.x)}</b>
+                    </span>
+                    <span>
+                      {yLabel} <b>{formatMetric(point.y)}</b>
+                    </span>
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+        )}
 
         <section className="scatter-guide">
           <h2>Como ler este gráfico</h2>

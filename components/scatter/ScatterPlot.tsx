@@ -27,9 +27,9 @@ type Props = {
   yLabel: string;
 };
 
-const WIDTH = 960;
-const HEIGHT = 560;
-const PAD = { top: 28, right: 28, bottom: 56, left: 64 };
+const WIDTH = 760;
+const HEIGHT = 760;
+const PAD = { top: 28, right: 24, bottom: 104, left: 108 };
 
 const TONE_FILL = {
   a: "var(--side-a)",
@@ -215,19 +215,19 @@ export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: 
           </text>
         ))}
         {yTicks.map((tick) => (
-          <text key={`ty-${tick.value}`} x={plotLeft - 10} y={tick.y + 4} textAnchor="end" className="scatter-tick">
+          <text key={`ty-${tick.value}`} x={plotLeft - 14} y={tick.y + 4} textAnchor="end" className="scatter-tick">
             {formatAxis(tick.value)}
           </text>
         ))}
 
-        <text x={(plotLeft + plotRight) / 2} y={HEIGHT - 12} textAnchor="middle" className="scatter-axis-label">
+        <text x={(plotLeft + plotRight) / 2} y={HEIGHT - 22} textAnchor="middle" className="scatter-axis-label">
           {xLabel}
         </text>
         <text
-          x={16}
+          x={18}
           y={(plotTop + plotBottom) / 2}
           textAnchor="middle"
-          transform={`rotate(-90 16 ${(plotTop + plotBottom) / 2})`}
+          transform={`rotate(-90 18 ${(plotTop + plotBottom) / 2})`}
           className="scatter-axis-label"
         >
           {yLabel}
