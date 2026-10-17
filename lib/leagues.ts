@@ -1,4 +1,4 @@
-export type LeagueId = "serie-a" | "serie-b" | "serie-c" | "serie-d";
+export type LeagueId = "serie-a" | "serie-b" | "serie-c" | "serie-d" | "mls-next-pro";
 
 export type LeagueInfo = {
   id: LeagueId;
@@ -45,6 +45,15 @@ export const LEAGUES: LeagueInfo[] = [
     season: "2026",
     brand: "SD",
     tagline: "Brasileirão",
+    heatmaps: false,
+  },
+  {
+    id: "mls-next-pro",
+    slug: "mls-next-pro",
+    name: "MLS Next Pro",
+    season: "2026",
+    brand: "NP",
+    tagline: "MLS",
     heatmaps: false,
   },
 ];

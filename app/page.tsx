@@ -8,7 +8,7 @@ export default function HubPage() {
       <main className="home-main hub-main">
         <section className="home-hero hub-hero">
           <SiteLogo variant="stacked" className="hub-logo" />
-          <p className="home-kicker">Brasil · Scouting</p>
+          <p className="home-kicker">Scouting</p>
           <h1>Escolha a competição</h1>
           <p className="home-lead">
             Mesmas ferramentas para cada liga: posições, filtros, comparar, scatter e elenco.

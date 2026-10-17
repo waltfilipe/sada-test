@@ -10,7 +10,7 @@ const SECTIONS = [
   { path: "/filtros", kicker: "Busca", title: "Filtros", text: "Cruze clube, idade, minutagem, pé e tendências para achar o perfil certo." },
   { path: "/comparar", kicker: "Duelo", title: "Comparar", text: "Coloque dois ou três atletas da mesma posição lado a lado." },
   { path: "/scatter", kicker: "Mapa", title: "Scatter", text: "Veja a posição inteira num gráfico e encontre quem se destaca." },
-  { path: "/time-sombra", kicker: "Elenco", title: "Elenco + Time Sombra", text: "Elenco da competição, time sombra de uma liga ou de todas, com atletas de qualquer série." },
+  { path: "/time-sombra", kicker: "Elenco", title: "Elenco + Time Sombra", text: "Elenco da competição, time sombra de uma liga ou de todas, com atletas de qualquer competição." },
 ] as const;
 
 export function LeagueHomeMain({ leagueId }: { leagueId: LeagueId }) {

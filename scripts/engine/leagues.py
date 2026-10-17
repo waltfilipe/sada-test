@@ -54,4 +54,13 @@ LEAGUES: dict[str, LeagueConfig] = {
         "heatmaps": True,
         "heatmaps_dir": ROOT / "HeatmapsBRD26",
     },
+    "mls-next-pro": {
+        "id": "mls-next-pro",
+        "label": "MLS Next Pro",
+        "season": "2026",
+        "xlsx": [WYSCOUT_2026 / "mls-next-pro-pt1.xlsx", WYSCOUT_2026 / "mls-next-pro-pt2.xlsx"],
+        "defensive_csv": ROOT / "MLS_NEXT_PRO_defensive.csv",
+        "heatmaps": False,
+        "heatmaps_dir": None,
+    },
 }
