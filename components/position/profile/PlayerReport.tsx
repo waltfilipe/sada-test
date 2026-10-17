@@ -129,8 +129,10 @@ function sectionWeight(section: ReportSection): number {
   );
 }
 
-/** Masonry into three columns, keeping reading order: each section goes to the shortest column. */
-function sectionColumns(sections: ReportSection[], count = 3): ReportSection[][] {
+/** Masonry keeping reading order: each section goes to the shortest column. Light positions get two wider columns. */
+function sectionColumns(sections: ReportSection[]): { columns: ReportSection[][]; density: string } {
+  const total = sections.reduce((sum, section) => sum + sectionWeight(section), 0);
+  const count = total < 42 ? 2 : 3;
   const columns: ReportSection[][] = Array.from({ length: count }, () => []);
   const heights = Array(count).fill(0);
   for (const section of sections) {
@@ -138,7 +140,10 @@ function sectionColumns(sections: ReportSection[], count = 3): ReportSection[][]
     columns[target].push(section);
     heights[target] += sectionWeight(section);
   }
-  return columns.filter((column) => column.length);
+  // Spare page height goes into row spacing; the thresholds are in table rows of the tallest column.
+  const tallest = Math.max(...heights);
+  const density = tallest <= 20 ? "is-roomy" : tallest <= 27 ? "is-comfy" : "";
+  return { columns: columns.filter((column) => column.length), density };
 }
 
 function formatIso(iso: string | null | undefined, lang: ReportLang): string | null {
@@ -290,14 +295,202 @@ function reportTendencies(player: PlayerProfile, players: PlayerProfile[], lang:
   return rows;
 }
 
+const TONE_COLORS: Record<string, string> = {
+  defensivos: "#0f766e",
+  aereo: "#0369a1",
+  passes: "#1d4ed8",
+  dribles: "#6d28d9",
+  finais: "#a21caf",
+  ofensividade: "#c2410c",
+  finalizacao: "#be123c",
+};
+
+type ReportMetric = {
+  name: string;
+  context: string;
+  value: string;
+  percentile: number;
+  tone: string;
+};
+
+type SectionScore = {
+  title: string;
+  tone: string;
+  score: number;
+};
+
+/** Volume and efficiency rows read as "Block · Per 90"; sub-metric rows keep their own label. */
+function reportMetrics(sections: ReportSection[], copy: ReportCopy): ReportMetric[] {
+  const metrics: ReportMetric[] = [];
+  for (const section of sections) {
+    for (const block of section.blocks) {
+      for (const line of block.lines) {
+        if (line.percentile == null) continue;
+        const generic = line.label === copy.per90 || line.label === copy.efficiency;
+        metrics.push({
+          name: generic && block.title ? block.title : line.label,
+          context: generic && block.title ? line.label : block.title ?? section.title,
+          value: line.value,
+          percentile: line.percentile,
+          tone: section.tone,
+        });
+      }
+    }
+  }
+  return metrics;
+}
+
+function sectionScores(sections: ReportSection[]): SectionScore[] {
+  return sections.flatMap((section) => {
+    const values = section.blocks.flatMap((block) =>
+      block.lines.map((line) => line.percentile).filter((value): value is number => value != null),
+    );
+    if (!values.length) return [];
+    const score = Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+    return [{ title: section.title, tone: section.tone, score }];
+  });
+}
+
+function gradeTone(grade: string | null): string {
+  const letter = grade?.[0];
+  if (letter === "A") return "is-a";
+  if (letter === "B") return "is-b";
+  if (letter === "C") return "is-c";
+  return "is-d";
+}
+
 function PercentileCell({ value }: { value: number | null }) {
   return (
-    <td className={`player-report-pct ${percentileTone(value)}`}>
+    <span className={`player-report-pct ${percentileTone(value)}`}>
       <span className="player-report-pct-track" aria-hidden="true">
         <span style={{ width: `${value ?? 0}%` }} />
       </span>
       <b>{value ?? "—"}</b>
-    </td>
+    </span>
+  );
+}
+
+function ReportBanner({ kicker, league, family }: { kicker: string; league: string; family: string }) {
+  return (
+    <header className="player-report-banner">
+      <img src="/brand/sada-wordmark.png" alt="SADA — Sistema de Análise de Dados de Atletas" className="player-report-logo" />
+      <p className="player-report-kicker">{kicker}</p>
+      <p className="player-report-league">
+        {league}
+        <span>{family}</span>
+      </p>
+    </header>
+  );
+}
+
+function ReportColophon({ generated, page }: { generated: string; page: string }) {
+  return (
+    <p className="player-report-colophon">
+      <span>SADA Scout</span>
+      <span>{generated}</span>
+      <span>{page}</span>
+    </p>
+  );
+}
+
+/** Section averages on a 0–100 radar. The dashed ring is the positional median. */
+function SectionRadar({ scores }: { scores: SectionScore[] }) {
+  const width = 340;
+  const height = 270;
+  const cx = width / 2;
+  const cy = height / 2;
+  const radius = 92;
+  const count = scores.length;
+  const angle = (index: number) => -Math.PI / 2 + (index / count) * Math.PI * 2;
+  const point = (index: number, value: number) => {
+    const r = (radius * value) / 100;
+    return [cx + r * Math.cos(angle(index)), cy + r * Math.sin(angle(index))] as const;
+  };
+  const ring = (value: number) =>
+    scores.map((_, index) => point(index, value).map((n) => n.toFixed(1)).join(",")).join(" ");
+  const shape = scores.map((item, index) => point(index, Math.max(4, item.score)).map((n) => n.toFixed(1)).join(",")).join(" ");
+
+  return (
+    <svg className="player-report-radar" viewBox={`0 0 ${width} ${height}`} role="img" aria-hidden="true">
+      {[25, 75, 100].map((value) => (
+        <polygon key={value} points={ring(value)} className="radar-ring" />
+      ))}
+      <polygon points={ring(50)} className="radar-ring is-median" />
+      {scores.map((item, index) => {
+        const [x, y] = point(index, 100);
+        return <line key={item.title} x1={cx} y1={cy} x2={x} y2={y} className="radar-axis" />;
+      })}
+      <polygon points={shape} className="radar-shape" />
+      {scores.map((item, index) => {
+        const [x, y] = point(index, Math.max(4, item.score));
+        return <circle key={item.title} cx={x} cy={y} r={3.4} fill={TONE_COLORS[item.tone] ?? "#0e7490"} className="radar-dot" />;
+      })}
+      {scores.map((item, index) => {
+        const a = angle(index);
+        const x = cx + (radius + 14) * Math.cos(a);
+        const y = cy + (radius + 14) * Math.sin(a);
+        const cos = Math.cos(a);
+        const anchor = Math.abs(cos) < 0.2 ? "middle" : cos > 0 ? "start" : "end";
+        const dy = Math.sin(a) < -0.5 ? -4 : Math.sin(a) > 0.5 ? 10 : 0;
+        return (
+          <text key={item.title} x={x} y={y + dy} textAnchor={anchor} className="radar-label">
+            <tspan>{item.title}</tspan>
+            <tspan x={x} dy={11} className="radar-score" fill={TONE_COLORS[item.tone] ?? "#0e7490"}>
+              {item.score}
+            </tspan>
+          </text>
+        );
+      })}
+    </svg>
+  );
+}
+
+function MetricList({
+  title,
+  hint,
+  metrics,
+  empty,
+  tone,
+}: {
+  title: string;
+  hint: string;
+  metrics: ReportMetric[];
+  empty: string;
+  tone: "is-strong" | "is-weak";
+}) {
+  return (
+    <section className={`player-report-card player-report-metrics ${tone}`}>
+      <header className="player-report-card-head">
+        <h2>
+          <i className={`fa-solid ${tone === "is-strong" ? "fa-arrow-trend-up" : "fa-arrow-trend-down"}`} aria-hidden="true" />
+          {title}
+        </h2>
+        <span>{hint}</span>
+      </header>
+      {metrics.length ? (
+        <ol>
+          {metrics.map((metric) => (
+            <li key={`${metric.name}-${metric.context}`}>
+              <span className="player-report-metric-name">
+                <i style={{ background: TONE_COLORS[metric.tone] }} aria-hidden="true" />
+                <span>
+                  <strong>{metric.name}</strong>
+                  <small>{metric.context}</small>
+                </span>
+              </span>
+              <span className="player-report-metric-value">{metric.value}</span>
+              <span className={`player-report-metric-bar ${percentileTone(metric.percentile)}`} aria-hidden="true">
+                <span style={{ width: `${Math.max(2, metric.percentile)}%` }} />
+                <i />
+              </span>
+              <b className={percentileTone(metric.percentile)}>{metric.percentile}</b>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p className="player-report-empty">{empty}</p>
+      )}
+    </section>
   );
 }
 
@@ -317,7 +510,10 @@ function ReportSheet({
   const league = useLeague();
   const copy: ReportCopy = REPORT_COPY[lang];
   const locale = reportLocale(lang);
-  const columns = useMemo(() => sectionColumns(reportSections(player, lang)), [player, lang]);
+  const sections = useMemo(() => reportSections(player, lang), [player, lang]);
+  const { columns, density } = useMemo(() => sectionColumns(sections), [sections]);
+  const scores = useMemo(() => sectionScores(sections), [sections]);
+  const metrics = useMemo(() => reportMetrics(sections, copy), [sections, copy]);
   const badges = useMemo(() => playerStatBadges(player), [player]);
   const toneByBadge = useMemo(() => {
     const tones = new Map<string, string>();
@@ -331,252 +527,399 @@ function ReportSheet({
   const foot = formatFoot(player.foot);
   const profileLabel = translateLabel(reportProfileName(player), lang);
   const mix = reportMix(player, family, players);
+  const poolSize = players.length || 1;
   const tendencies = reportTendencies(player, players, lang);
-  const generated = new Date().toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" });
+  const generated = copy.generated(
+    new Date().toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" }),
+  );
   const highlightsHref = youtubeHighlightsHref(player);
   const xg = localizeValue(metricDisplay(player, "xG"), lang);
   const xa = localizeValue(metricDisplay(player, "xA"), lang);
   const leagueLabel = `${league.name} ${league.season}`;
+  const leagueBanner = `${league.name} · ${league.season}`;
 
   const bio = [
     age != null ? copy.age(age) : null,
     player.height ? `${player.height} cm` : null,
     foot ? translateLabel(foot, lang) : null,
     translateNationality(player.nationality, lang),
-  ].filter(Boolean);
+  ].filter((item): item is string => Boolean(item));
+
+  const ranked = [...metrics].sort((a, b) => b.percentile - a.percentile);
+  const strengths = ranked.filter((metric) => metric.percentile >= 50).slice(0, 6);
+  const weaknesses = [...ranked]
+    .reverse()
+    .filter((metric) => metric.percentile < 50)
+    .slice(0, 6);
+  const distribution = {
+    above: metrics.filter((metric) => metric.percentile >= 70).length,
+    below: metrics.filter((metric) => metric.percentile <= 30).length,
+  };
+  const distMid = metrics.length - distribution.above - distribution.below;
+  const best = scores.length ? scores.reduce((a, b) => (b.score > a.score ? b : a)) : null;
+  const worst = scores.length ? scores.reduce((a, b) => (b.score < a.score ? b : a)) : null;
+  const aboveMedian = scores.filter((item) => item.score >= 50).length;
+  const share = (n: number) => (metrics.length ? (n / metrics.length) * 100 : 0);
+
+  const facts = [
+    {
+      key: "minutes",
+      icon: "fa-stopwatch",
+      label: copy.minutes,
+      value: player.minutes.toLocaleString(locale),
+      sub: player.minutes_pct != null ? copy.minutesShare(Math.round(player.minutes_pct)) : null,
+    },
+    { key: "goals", icon: "fa-futbol", label: copy.goals, value: player.goals.toLocaleString(locale), sub: `xG ${xg}` },
+    {
+      key: "assists",
+      icon: "fa-shoe-prints",
+      label: copy.assists,
+      value: player.assists.toLocaleString(locale),
+      sub: `xA ${xa}`,
+    },
+    {
+      key: "market",
+      icon: "fa-euro-sign",
+      label: copy.marketValue,
+      value: localizeMarketValue(tm?.market_value, lang),
+      sub: tm?.on_loan_from ? copy.onLoan(tm.on_loan_from) : null,
+    },
+    {
+      key: "contract",
+      icon: "fa-file-signature",
+      label: copy.contract,
+      value: localizeContract(tm?.contract_remaining, lang),
+      sub: contractDate ? copy.contractUntil(contractDate) : null,
+    },
+  ];
 
   return (
     <article className="player-report" lang={lang === "en" ? "en" : "pt-BR"}>
-      <header className="player-report-banner">
-        <img src="/brand/sada-wordmark.png" alt="SADA — Sistema de Análise de Dados de Atletas" className="player-report-logo" />
-        <p className="player-report-kicker">{copy.kicker}</p>
-        <p className="player-report-league">
-          {league.name} · {league.season}
-          <span>{familyLabel}</span>
-        </p>
-      </header>
+      <div className="player-report-page">
+        <ReportBanner kicker={copy.kicker} league={leagueBanner} family={familyLabel} />
 
-      <div className="player-report-body">
-        <section className="player-report-identity">
-          <PlayerPhoto
-            src={tm?.photo}
-            alt=""
-            className="player-report-photo"
-            fallback={<span className="player-report-photo player-report-photo-fallback">{playerInitials(player.name)}</span>}
-          />
-          <div className="player-report-who">
-            <h1>{player.name}</h1>
-            <p className="player-report-club">
-              <ClubLogo club={player.club} size={16} />
-              <span>{player.club}</span>
-              <span className="player-report-dot">·</span>
-              <span>{translateLabel(player.position, lang)}</span>
-            </p>
-            {bio.length ? <p className="player-report-bio">{bio.join(" · ")}</p> : null}
-            <p className="player-report-highlights">
-              <a href={highlightsHref} target="_blank" rel="noopener noreferrer">
-                <i className="fa-brands fa-youtube" aria-hidden="true" /> {copy.highlights}
-              </a>
-            </p>
-            <div className="player-report-profile">
-              <p>
-                {copy.profile} <strong>{profileLabel}</strong>
+        <div className="player-report-body">
+          <section className="player-report-identity">
+            <PlayerPhoto
+              src={tm?.photo}
+              alt=""
+              className="player-report-photo"
+              fallback={<span className="player-report-photo player-report-photo-fallback">{playerInitials(player.name)}</span>}
+            />
+            <div className="player-report-who">
+              <p className="player-report-eyebrow">{translateLabel(player.position, lang)}</p>
+              <h1>{player.name}</h1>
+              <p className="player-report-club">
+                <ClubLogo club={player.club} size={16} />
+                <span>{player.club}</span>
               </p>
-              {mix.length ? (
-                <ul>
-                  {mix.map((item) => (
-                    <li key={item.key} className={item.active ? "is-active" : undefined}>
-                      <span className="player-report-mix-label">
-                        <i style={{ background: profileAccent(item.label) }} aria-hidden="true" />
-                        {translateLabel(item.label, lang)}
-                      </span>
-                      <span className="player-report-mix-meta">
-                        {item.grade}
-                        {item.grade && item.rank ? " · " : ""}
-                        {item.rank ? ordinal(item.rank, lang) : ""}
-                      </span>
-                      <span className="player-report-mix-track">
-                        <span style={{ width: `${Math.max(4, Math.round(item.share))}%`, background: profileAccent(item.label) }} />
-                      </span>
-                      <strong>{Math.round(item.share)}%</strong>
-                    </li>
+              {bio.length ? (
+                <ul className="player-report-bio">
+                  {bio.map((item) => (
+                    <li key={item}>{item}</li>
                   ))}
                 </ul>
               ) : null}
+              <p className="player-report-highlights">
+                <a href={highlightsHref} target="_blank" rel="noopener noreferrer">
+                  <i className="fa-brands fa-youtube" aria-hidden="true" /> {copy.highlights}
+                </a>
+              </p>
             </div>
-          </div>
-          <div className="player-report-heat">
-            <p>{copy.heatmap}</p>
-            {(player.heatmap?.points?.length ?? 0) > 0 ? (
-              <PlayerHeatmap playerName={player.name} heatmap={player.heatmap} fixed={{ width: 196, height: 127 }} />
-            ) : (
-              <p className="player-report-heat-empty">{copy.heatmapEmpty}</p>
-            )}
-          </div>
-        </section>
+            <div className="player-report-heat">
+              <p className="player-report-label">{copy.heatmap}</p>
+              {(player.heatmap?.points?.length ?? 0) > 0 ? (
+                <PlayerHeatmap playerName={player.name} heatmap={player.heatmap} fixed={{ width: 196, height: 127 }} />
+              ) : (
+                <p className="player-report-heat-empty">{copy.heatmapEmpty}</p>
+              )}
+            </div>
+          </section>
 
-        <dl className="player-report-facts">
-          <div>
-            <dt>{copy.minutes}</dt>
-            <dd>
-              {player.minutes.toLocaleString(locale)}
-              {player.minutes_pct != null ? <small>{copy.minutesShare(Math.round(player.minutes_pct))}</small> : null}
-            </dd>
-          </div>
-          <div>
-            <dt>{copy.goals}</dt>
-            <dd>
-              {player.goals.toLocaleString(locale)}
-              <small>xG {xg}</small>
-            </dd>
-          </div>
-          <div>
-            <dt>{copy.assists}</dt>
-            <dd>
-              {player.assists.toLocaleString(locale)}
-              <small>xA {xa}</small>
-            </dd>
-          </div>
-          <div className="is-context">
-            <dt>{copy.marketValue}</dt>
-            <dd>
-              {localizeMarketValue(tm?.market_value, lang)}
-              {tm?.on_loan_from ? <small>{copy.onLoan(tm.on_loan_from)}</small> : null}
-            </dd>
-          </div>
-          <div className="is-context">
-            <dt>{copy.contract}</dt>
-            <dd>
-              {localizeContract(tm?.contract_remaining, lang)}
-              {contractDate ? <small>{copy.contractUntil(contractDate)}</small> : null}
-            </dd>
-          </div>
-        </dl>
+          <dl className="player-report-facts">
+            {facts.map((fact) => (
+              <div key={fact.key}>
+                <dt>
+                  <i className={`fa-solid ${fact.icon}`} aria-hidden="true" />
+                  {fact.label}
+                </dt>
+                <dd>
+                  {fact.value}
+                  {fact.sub ? <small>{fact.sub}</small> : null}
+                </dd>
+              </div>
+            ))}
+          </dl>
 
-        {tendencies.length ? (
-          <section className="player-report-tendencies" aria-label={copy.tendencies}>
-            <h2>{copy.tendencies}</h2>
-            <div className="player-report-tendency-grid">
-              {tendencies.map((item) => (
-                <div key={item.key} className={`player-report-tendency${item.key === "curto" ? " is-length" : ""}`}>
-                  <p>{item.label}</p>
-                  <strong>{item.detail}</strong>
-                  <div className="player-report-tendency-bar">
-                    <div className="player-report-tendency-track">
-                      <span style={{ width: `${item.fill}%` }} />
-                    </div>
-                    {item.averageFill != null ? (
-                      <i className="player-report-tendency-avg" style={{ left: `${item.averageFill}%` }} />
-                    ) : null}
-                  </div>
-                  <div className="player-report-axis">
-                    <span>{item.left}</span>
-                    <span>{item.right}</span>
-                  </div>
+          <section className="player-report-card player-report-profile" aria-label={copy.tacticalProfile}>
+            <div className="player-report-profile-main">
+              <p className="player-report-label">{copy.tacticalProfile}</p>
+              <strong>{profileLabel}</strong>
+              <span>
+                {familyLabel} · {leagueLabel}
+              </span>
+            </div>
+            {mix.length ? (
+              <ul className="player-report-archetypes" style={{ gridTemplateColumns: `repeat(${Math.min(mix.length, 4)}, minmax(0, 1fr))` }}>
+                {mix.slice(0, 4).map((item) => (
+                  <li key={item.key} className={item.active ? "is-active" : undefined}>
+                    <p className="player-report-archetype-name">
+                      <i style={{ background: profileAccent(item.label) }} aria-hidden="true" />
+                      <span>{translateLabel(item.label, lang)}</span>
+                      {item.grade ? <b className={`player-report-grade ${gradeTone(item.grade)}`}>{item.grade}</b> : null}
+                    </p>
+                    <p className="player-report-archetype-share">
+                      <strong>{Math.round(item.share)}%</strong>
+                      {item.rank ? <small>{copy.rankOf(item.rank, poolSize)}</small> : null}
+                    </p>
+                    <span className="player-report-archetype-track" aria-hidden="true">
+                      <span style={{ width: `${Math.max(3, Math.round(item.share))}%`, background: profileAccent(item.label) }} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
+
+          <section className="player-report-stats-wrap" aria-label={copy.stats}>
+            <h2 className="player-report-heading">{copy.stats}</h2>
+            <div
+              className={`player-report-stats ${columns.length === 2 ? "is-wide" : ""} ${density}`.trim()}
+              style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
+            >
+              {columns.map((column, columnIndex) => (
+                <div key={columnIndex} className="player-report-stats-col">
+                  {column.map((section) => (
+                    <section key={section.title} className={`player-report-section tone-${section.tone}`}>
+                      <h3>{section.title}</h3>
+                      <p className="player-report-row player-report-cols" aria-hidden="true">
+                        <span />
+                        <span>{copy.value}</span>
+                        <span>{copy.percentile}</span>
+                      </p>
+                      {section.blocks.map((block, index) => (
+                        <div key={`${section.title}-${block.title ?? index}`} className="player-report-block">
+                          {block.title ? <p className="player-report-block-title">{block.title}</p> : null}
+                          {block.lines.map((line, lineIndex) => (
+                            <div
+                              key={`${line.label}-${lineIndex}`}
+                              className={`player-report-row player-report-line${line.sub ? " is-sub" : ""}`}
+                            >
+                              <span className="player-report-line-label">{line.label}</span>
+                              <span className="player-report-value">{line.value}</span>
+                              <PercentileCell value={line.percentile} />
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </section>
+                  ))}
                 </div>
               ))}
             </div>
           </section>
-        ) : null}
 
-        {badges.length ? (
-          <section className="player-report-badges" aria-label={copy.badges}>
-            <h2>{copy.badges}</h2>
-            <ul>
-              {badges.map((badge) => (
-                <li key={badge.key} className={`tone-${toneByBadge.get(badge.key) ?? "passes"}`}>
-                  <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
-                  <span>{translateLabel(badge.label, lang)}</span>
+          <footer className="player-report-foot">
+            <div className="player-report-legend">
+              <p className="player-report-label">{copy.legendTitle}</p>
+              <ul>
+                <li>
+                  <span className="player-report-legend-key is-pct" aria-hidden="true" />
+                  {copy.legendPercentile(copy.pool(familyLabel, leagueLabel))}
                 </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
+                <li>
+                  <span className="player-report-legend-key is-rate" aria-hidden="true">
+                    90
+                  </span>
+                  {copy.legendRates}
+                </li>
+                <li>
+                  <span className="player-report-legend-key is-badge" aria-hidden="true">
+                    <i className="fa-solid fa-star" />
+                  </span>
+                  {copy.legendBadge}
+                </li>
+              </ul>
+            </div>
+            <ReportColophon generated={generated} page={copy.page(1, 2)} />
+          </footer>
+        </div>
+      </div>
 
-        <section className="player-report-stats-wrap" aria-label={copy.stats}>
-          <h2>{copy.stats}</h2>
-          <div className="player-report-stats">
-            {columns.map((column, columnIndex) => (
-              <div key={columnIndex} className="player-report-stats-col">
-                {column.map((section) => (
-                  <section key={section.title} className={`player-report-section tone-${section.tone}`}>
-                    <h3>{section.title}</h3>
-                    {section.blocks.map((block, index) => (
-                      <div
-                        key={`${section.title}-${block.title ?? index}`}
-                        className={`player-report-block${block.title ? "" : " is-untitled"}`}
-                      >
-                        {block.title ? <p>{block.title}</p> : null}
-                        <table>
-                          {index === 0 ? (
-                            <thead>
-                              <tr className="player-report-scale">
-                                <th scope="col" />
-                                <td>{copy.value}</td>
-                                <td>{copy.percentile}</td>
-                              </tr>
-                            </thead>
+      <div className="player-report-page">
+        <ReportBanner kicker={copy.summaryKicker} league={leagueBanner} family={familyLabel} />
+
+        <div className="player-report-body">
+          <section className="player-report-mini">
+            <PlayerPhoto
+              src={tm?.photo}
+              alt=""
+              className="player-report-mini-photo"
+              fallback={<span className="player-report-mini-photo player-report-photo-fallback">{playerInitials(player.name)}</span>}
+            />
+            <div>
+              <h1>{player.name}</h1>
+              <p>
+                <ClubLogo club={player.club} size={14} />
+                <span>{player.club}</span>
+                <span className="player-report-dot">·</span>
+                <span>{translateLabel(player.position, lang)}</span>
+                <span className="player-report-dot">·</span>
+                <span>{profileLabel}</span>
+              </p>
+            </div>
+          </section>
+
+          {best && worst ? (
+            <section className="player-report-card player-report-overview">
+              <div>
+                <p className="player-report-label">{copy.overview}</p>
+                <p className="player-report-overview-text">
+                  {copy.summaryLine(aboveMedian, scores.length, best.title, best.score, worst.title, worst.score)}
+                </p>
+              </div>
+              <div className="player-report-dist">
+                <div className="player-report-dist-bar" aria-hidden="true">
+                  <span className="is-high" style={{ width: `${share(distribution.above)}%` }} />
+                  <span className="is-mid" style={{ width: `${share(distMid)}%` }} />
+                  <span className="is-low" style={{ width: `${share(distribution.below)}%` }} />
+                </div>
+                <ul>
+                  <li className="is-high">{copy.distAbove(distribution.above)}</li>
+                  <li className="is-mid">{copy.distMid(distMid)}</li>
+                  <li className="is-low">{copy.distBelow(distribution.below)}</li>
+                </ul>
+              </div>
+            </section>
+          ) : null}
+
+          {scores.length ? (
+            <div className="player-report-charts">
+              <section className="player-report-card">
+                <header className="player-report-card-head">
+                  <h2>{copy.radar}</h2>
+                  <span>{copy.radarHint}</span>
+                </header>
+                <SectionRadar scores={scores} />
+                <p className="player-report-chart-key">
+                  <span className="is-player">{player.name}</span>
+                  <span className="is-median">{copy.medianKey}</span>
+                </p>
+              </section>
+              <section className="player-report-card">
+                <header className="player-report-card-head">
+                  <h2>{copy.blocks}</h2>
+                  <span>{copy.blocksHint}</span>
+                </header>
+                <ul className="player-report-diverging">
+                  {scores.map((item) => {
+                    const delta = item.score - 50;
+                    return (
+                      <li key={item.title}>
+                        <span className="player-report-diverging-name">
+                          <i style={{ background: TONE_COLORS[item.tone] }} aria-hidden="true" />
+                          {item.title}
+                        </span>
+                        <span className="player-report-diverging-track" aria-hidden="true">
+                          <span
+                            className={delta >= 0 ? "is-up" : "is-down"}
+                            style={delta >= 0 ? { left: "50%", width: `${delta}%` } : { right: "50%", width: `${-delta}%` }}
+                          />
+                          <i />
+                        </span>
+                        <b className={percentileTone(item.score)}>{item.score}</b>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <p className="player-report-diverging-axis" aria-hidden="true">
+                  <span>0</span>
+                  <span>50</span>
+                  <span>100</span>
+                </p>
+              </section>
+            </div>
+          ) : null}
+
+          <div className="player-report-split">
+            <MetricList
+              title={copy.strengths}
+              hint={copy.strengthsHint}
+              metrics={strengths}
+              empty={copy.noStrengths}
+              tone="is-strong"
+            />
+            <MetricList
+              title={copy.weaknesses}
+              hint={copy.weaknessesHint}
+              metrics={weaknesses}
+              empty={copy.noWeaknesses}
+              tone="is-weak"
+            />
+          </div>
+
+          {tendencies.length || badges.length ? (
+            <div className="player-report-extras">
+              {tendencies.length ? (
+                <section className="player-report-tendencies" aria-label={copy.tendencies}>
+                  <h2 className="player-report-heading">{copy.tendencies}</h2>
+                  <div className="player-report-tendency-grid">
+                    {tendencies.map((item) => (
+                      <div key={item.key} className={`player-report-tendency${item.key === "curto" ? " is-length" : ""}`}>
+                        <p className="player-report-label">{item.label}</p>
+                        <strong>{item.detail}</strong>
+                        <div className="player-report-tendency-bar">
+                          <div className="player-report-tendency-track">
+                            <span style={{ width: `${item.fill}%` }} />
+                          </div>
+                          {item.averageFill != null ? (
+                            <i className="player-report-tendency-avg" style={{ left: `${item.averageFill}%` }} />
                           ) : null}
-                          <tbody>
-                            {block.lines.map((line, lineIndex) => (
-                              <tr key={`${line.label}-${lineIndex}`} className={line.sub ? "is-sub" : undefined}>
-                                <th scope="row">{line.label}</th>
-                                <td className="player-report-value">{line.value}</td>
-                                <PercentileCell value={line.percentile} />
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                        </div>
+                        <div className="player-report-axis">
+                          <span>{item.left}</span>
+                          <span>{item.right}</span>
+                        </div>
                       </div>
                     ))}
-                  </section>
-                ))}
-              </div>
-            ))}
-          </div>
-        </section>
+                  </div>
+                </section>
+              ) : null}
 
-        <footer className="player-report-foot">
-          <div className="player-report-legend">
-            <p className="player-report-legend-title">{copy.legendTitle}</p>
-            <ul>
-              <li>
-                <span className="player-report-legend-key is-pct" aria-hidden="true" />
-                {copy.legendPercentile(copy.pool(familyLabel, leagueLabel))}
-              </li>
-              <li>
-                <span className="player-report-legend-key is-rate" aria-hidden="true">
-                  90
-                </span>
-                {copy.legendRates}
-              </li>
-              <li>
-                <span className="player-report-legend-key is-badge" aria-hidden="true">
-                  <i className="fa-solid fa-star" />
-                </span>
-                {copy.legendBadge}
-              </li>
-            </ul>
-          </div>
-          <div className="player-report-links">
-            {tm?.profile_url ? (
-              <p>
-                <span>{copy.transfermarkt}</span>
-                <a href={tm.profile_url}>{tm.profile_url.replace(/^https?:\/\/(www\.)?/, "")}</a>
-              </p>
-            ) : null}
-            {sheetUrl ? (
-              <p>
-                <span>{copy.sheet}</span>
-                <a href={sheetUrl}>{sheetUrl.replace(/^https?:\/\//, "")}</a>
-              </p>
-            ) : null}
-          </div>
-          <p className="player-report-colophon">
-            <span>SADA Scout</span>
-            <span>{copy.generated(generated)}</span>
-          </p>
-        </footer>
+              {badges.length ? (
+                <section className="player-report-badges" aria-label={copy.badges}>
+                  <h2 className="player-report-heading">{copy.badges}</h2>
+                  <ul>
+                    {badges.map((badge) => (
+                      <li key={badge.key} className={`tone-${toneByBadge.get(badge.key) ?? "passes"}`}>
+                        <i className={`fa-solid ${badge.icon}`} aria-hidden="true" />
+                        <span>{translateLabel(badge.label, lang)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+            </div>
+          ) : null}
+
+          <footer className="player-report-foot">
+            <div className="player-report-links">
+              {tm?.profile_url ? (
+                <p>
+                  <span className="player-report-label">{copy.transfermarkt}</span>
+                  <a href={tm.profile_url}>{tm.profile_url.replace(/^https?:\/\/(www\.)?/, "")}</a>
+                </p>
+              ) : null}
+              {sheetUrl ? (
+                <p>
+                  <span className="player-report-label">{copy.sheet}</span>
+                  <a href={sheetUrl}>{sheetUrl.replace(/^https?:\/\//, "")}</a>
+                </p>
+              ) : null}
+            </div>
+            <ReportColophon generated={generated} page={copy.page(2, 2)} />
+          </footer>
+        </div>
       </div>
     </article>
   );
