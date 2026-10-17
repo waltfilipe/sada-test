@@ -71,6 +71,7 @@ def apply_heatmaps(
     *,
     dry_run: bool = False,
     overwrite: bool = False,
+    competition: str | None = None,
 ) -> tuple[int, int]:
     data_dir = ROOT / "data" / league_id
     if not data_dir.is_dir():
@@ -118,9 +119,11 @@ def apply_heatmaps(
         payload["player_id"] = site_id
         payload["sofascore_player_id"] = int(ss_id)
         payload["source"] = payload.get("source") or "onlyheatmaps"
+        if competition:
+            payload["competition"] = competition
 
         hm_field = embed_heatmap_field(payload, site_id, public_dir)
-        log(f"  {profile.get('name')} ← SS {ss_id} | {hm_field['point_count']} pts")
+        log(f"  {profile.get('name')} <- SS {ss_id} | {hm_field['point_count']} pts")
 
         if dry_run:
             filled += 1
@@ -162,7 +165,7 @@ def apply_heatmaps(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Aplica heatmaps SofaScore nos JSON do site.")
-    parser.add_argument("--league", default="serie-c", help="serie-a, serie-b, serie-c ou serie-d")
+    parser.add_argument("--league", default="serie-c", help="serie-a, serie-b, serie-c, serie-d ou mls-next-pro")
     parser.add_argument("--csv", type=Path, required=True, help="CSV defensivo (BRC26_defensive.csv)")
     parser.add_argument(
         "--source-dir",
@@ -172,6 +175,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--overwrite", action="store_true", help="Substituir heatmap já presente no perfil")
+    parser.add_argument("--competition", default=None, help="Sobrescreve o nome da competição no heatmap")
     return parser.parse_args()
 
 
@@ -183,6 +187,7 @@ def main() -> None:
         args.source_dir,
         dry_run=args.dry_run,
         overwrite=args.overwrite,
+        competition=args.competition,
     )
 
 

@@ -54,7 +54,7 @@ export const LEAGUES: LeagueInfo[] = [
     season: "2026",
     brand: "NP",
     tagline: "MLS",
-    heatmaps: false,
+    heatmaps: true,
   },
 ];
 
