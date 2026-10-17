@@ -13,29 +13,29 @@
   "minutes_pct": 59.3,
   "goals": 1,
   "assists": 0,
-  "rating": 6.4,
+  "rating": 6.3,
   "ratings": {
-    "geral": 6.4,
+    "geral": 6.3,
     "construcao": 6.5,
-    "defesa": 6.4,
-    "perfil": 6.0
+    "defesa": 6.3,
+    "perfil": 6.3
   },
   "ranks": {
-    "geral": 84,
-    "construcao": 90,
+    "geral": 100,
+    "construcao": 88,
     "defesa": 92,
-    "perfil": 96
+    "perfil": 90
   },
   "profile": "Defensor de Área",
   "profile_shares": {
-    "construcao": 47.0,
-    "defesa": 53.0
+    "construcao": 38.0,
+    "defesa": 62.0
   },
   "tendencies": {
     "construcao": 16.0,
     "ofensividade": 7.0,
     "def1v1": 11.0,
-    "contencao": 100.0,
+    "contencao": 15.0,
     "duelo_aereo": 43.0
   },
   "aspects": {
@@ -53,23 +53,23 @@
       {
         "label": "Ações Defensivas",
         "kind": "metric_group",
-        "grade": "A",
-        "percentile": 100.0,
+        "grade": "C",
+        "percentile": 44.0,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 100.0,
-            "display_value": "0,3"
+            "percentile": 43.8,
+            "display_value": "4,0"
           },
           {
             "label": "Interceptações",
-            "percentile": 100.0,
-            "display_value": "5,2"
+            "percentile": 14.4,
+            "display_value": "0,8"
           },
           {
             "label": "Chutes Bloqueados",
-            "percentile": 100.0,
-            "display_value": "0,9"
+            "percentile": 73.9,
+            "display_value": "1,0"
           }
         ],
         "stats": []
@@ -77,22 +77,22 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "D",
-        "percentile": 23.2,
+        "grade": "C",
+        "percentile": 36.6,
         "pair_badge": [
-          100.0,
-          23.2
+          75.0,
+          36.6
         ],
         "sub_metrics": [
           {
             "label": "Erros Totais",
-            "percentile": 100.0,
-            "display_value": "0"
+            "percentile": 75.0,
+            "display_value": "1"
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 23.2,
-            "display_value": "-0,6"
+            "percentile": 36.6,
+            "display_value": "-0,2"
           }
         ],
         "stats": []
@@ -167,11 +167,11 @@
       {
         "label": "Estilo de defesa",
         "kind": "construction_share",
-        "grade": "C",
-        "percentile": 39.3,
-        "display_value": "1,65",
-        "share_pct": 39.3,
-        "pool_avg_pct": 2.2,
+        "grade": "C-",
+        "percentile": 27.7,
+        "display_value": "0,71",
+        "share_pct": 27.7,
+        "pool_avg_pct": 1.0,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -181,8 +181,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "D",
-        "percentile": 23.2,
+        "grade": "C",
+        "percentile": 36.6,
         "display_value": "9%",
         "share_pct": 8.8,
         "pool_avg_pct": 1.0,
@@ -261,16 +261,16 @@
     "Híbrido"
   ],
   "scatter": {
-    "intervencoes": 0.0,
+    "intervencoes": 0.7884097035040432,
     "confrontos_of": 1.06,
     "construcao": 16.071428571428573,
     "duelo_ar": 43.11926605504588,
-    "contencao": 100.0,
+    "contencao": 14.814814814814813,
     "ofensividade": 7.207207207207207,
     "passes_prog": 5.88,
     "duelos_def": 3.66
   },
-  "hybrid_lean": null,
+  "hybrid_lean": "+ Defensivo",
   "cluster": {
     "family": "zagueiros",
     "archetype": "Defensor de Área",
@@ -278,12 +278,12 @@
     "construtor_badge": null,
     "construtor_badge_short": null,
     "shares": {
-      "defensor_area": 69.9,
-      "construtor": 10.5,
-      "combativo": 19.6
+      "defensor_area": 77.0,
+      "construtor": 9.8,
+      "combativo": 13.2
     },
     "ratings": {
-      "defensor_area": 6.0,
+      "defensor_area": 6.3,
       "construtor": 6.3,
       "combativo": 5.3
     }
