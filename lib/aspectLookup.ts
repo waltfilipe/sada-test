@@ -19,7 +19,8 @@ export function findAspect(items: AspectItem[], label: string): AspectItem | und
   const aliases: Record<string, string[]> = {
     "Passes Chave e Área": ["Passes Chave e Área", "Passes Finas"],
     Progressão: ["Progressão", "Conduções Progressivas"],
-    "Passes Chave": ["Passes Chave", "Passes Finas"],
+    "Passes Chave": ["Passes Chave", "Assistências para remate", "Passes Finas"],
+    "Assistências para remate": ["Assistências para remate", "Passes Chave"],
     "Disputas com Bola": ["Disputas com Bola", "Duelos Ofensivos"],
     "1v1 - Ofensivo": ["1v1 - Ofensivo", "Dribles"],
     "Pré Assistências e xA": ["Pré Assistências e xA", "Assistências e xA"],

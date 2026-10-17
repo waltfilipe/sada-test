@@ -93,7 +93,7 @@ def compute_base_measures(row: pd.Series, max_minutes: float) -> dict[str, float
         "ToquesArea": _num(row.get("Toques na área/90")),
         "Cruz.": _num(row.get("Cruzamentos/90")),
         "%EffCruz.": _num(row.get("Cruzamentos certos, %")) / 100,
-        "PassesChave": _num(row.get("Passes chave/90")),
+        "PassesChave": _num(row.get("Assistências para remate/90")),
         "PassesProf": _num(row.get("Passes em profundidade/90")),
         "%EffPassesProf": _num(row.get("Passes em profundidade certos, %")) / 100,
         "PassesFrente": _num(row.get("Passes para a frente/90")),
@@ -101,7 +101,7 @@ def compute_base_measures(row: pd.Series, max_minutes: float) -> dict[str, float
         "PasseAreaW": _num(row.get("Passes para a área de penálti/90"))
         * (_num(row.get("Passes precisos para a área de penálti, %")) / 100),
         "PassesCriativos": _num(row.get("Passes inteligentes/90")),
-        "PassesPerigosos": _num(row.get("Passes chave/90")),
+        "PassesPerigosos": _num(row.get("Assistências para remate/90")),
         "%EffPasse": _num(row.get("Passes certos, %")) / 100,
         "%EffDribles": _num(row.get("Dribles com sucesso, %")) / 100,
         "AçõesAtW": _num(row.get("Toques na área/90")),

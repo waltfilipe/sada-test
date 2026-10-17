@@ -1081,7 +1081,7 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "cruz_eff": _pct_eff(out, "Cruzamentos certos, %", "%EffCruz."),
         "fin_vol": _pool_percentile(out, "Remates/90", "Finalizações"),
         "fin_xg": _pool_percentile(out, "Golos esperados/90", "npxG"),
-        "passes_chave_vol": _pool_percentile(out, "Passes chave/90", "PassesChave"),
+        "passes_chave_vol": _pool_percentile(out, "Assistências para remate/90", "PassesChave"),
         "passe_area_certos90": _pool_percentile(out, "PasseAreaW"),
         "acoes_at_vol": _pool_percentile(out, "Acções atacantes com sucesso/90", "AcoesAtW", "AçõesAtW"),
         "toques_area_vol": _pool_percentile(out, "Toques na área/90", "ToquesArea"),
@@ -1403,9 +1403,9 @@ def _passes_chave_area_group(row: pd.Series) -> dict[str, Any]:
         percentile=max(float(row.get("_asp_passes_chave_vol", 0) or 0), float(row.get("_asp_passe_area_certos90", 0) or 0)),
         sub_metrics=[
             _sub_metric(
-                "Passes Chave",
+                "Assistências para remate",
                 percentile=row.get("_asp_passes_chave_vol", 0),
-                display_value=_fmt_per90(_row_vol(row, "PassesChave", "Passes chave/90")),
+                display_value=_fmt_per90(_row_vol(row, "PassesChave", "Assistências para remate/90")),
             ),
             _sub_metric(
                 "Passes para Área",
