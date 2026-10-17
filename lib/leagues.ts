@@ -45,7 +45,7 @@ export const LEAGUES: LeagueInfo[] = [
     season: "2026",
     brand: "SD",
     tagline: "Brasileirão",
-    heatmaps: false,
+    heatmaps: true,
   },
   {
     id: "mls-next-pro",
