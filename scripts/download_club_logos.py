@@ -130,6 +130,63 @@ WIKI_TITLES: dict[str, list[str]] = {
     "Uthai Thani": ["Uthai Thani F.C."],
     "Viettel": ["Viettel FC"],
     "Zabbar St. Patrick": ["St. Patrick's F.C.", "Żabbar St. Patrick F.C."],
+    # MLS and MLS Next Pro. "Dallas" alone is the city page, not FC Dallas.
+    "Austin FC": ["Austin FC"],
+    "Charlotte FC": ["Charlotte FC"],
+    "Chicago Fire": ["Chicago Fire FC"],
+    "Cincinnati": ["FC Cincinnati"],
+    "Colorado Rapids": ["Colorado Rapids"],
+    "Dallas": ["FC Dallas"],
+    "Houston Dynamo": ["Houston Dynamo FC"],
+    "Minnesota United": ["Minnesota United FC"],
+    "Nashville SC": ["Nashville SC"],
+    "New York RB": ["New York Red Bulls"],
+    "Orlando City": ["Orlando City SC"],
+    "Philadelphia Union": ["Philadelphia Union"],
+    "Portland Timbers": ["Portland Timbers"],
+    "Real Salt Lake": ["Real Salt Lake"],
+    "Seattle Sounders": ["Seattle Sounders FC"],
+    "SJ Earthquakes": ["San Jose Earthquakes"],
+    "Sporting KC": ["Sporting Kansas City"],
+    "St. Louis City": ["St. Louis City SC"],
+    "Toronto": ["Toronto FC"],
+    "Vancouver Whitecaps": ["Vancouver Whitecaps FC"],
+}
+
+# Official MLS Next Pro crests (mlsnextpro.com), keyed by the club name in the dataset.
+# "Los Angeles II" is Los Angeles FC 2; Ventura County FC is a separate club.
+MLS_NEXT_PRO_CRESTS: dict[str, str] = {
+    "Atlanta United II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1671201297/assets/mnp/logos/clubs/ATL-Club_Logo-Full_Color_xgfecm.png",
+    "Austin FC II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1677080279/assets/mnp/logos/clubs/ATX_2-Club_Logo-Full_Color_pe1twv.svg",
+    "Carolina Core": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1707387107/assets/mnp/logos/clubs/CCFC_Logo480x480.png",
+    "Chattanooga": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1707387108/assets/mnp/logos/clubs/CHT-480x480.png",
+    "Chicago Fire II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628288/assets/mnp/logos/clubs/MLS_NextPro_Logo-CHI-480_xnhffw.png",
+    "Colorado Rapids II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628284/assets/mnp/logos/clubs/COL-Logo-480.png",
+    "Columbus Crew II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628289/assets/mnp/logos/clubs/CLB-Logo_Dark-480.png",
+    "Crown Legacy FC": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1677077684/assets/mnp/logos/clubs/CLT2-Club_Logo-Full_Color_msnssi.png",
+    "Connecticut FC": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1764624230/assets/mnp/club-logos/CT-United-Shield-Digital_fmufik.png",
+    "Cincinnati II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628285/assets/mnp/logos/clubs/FCC2-Logo-480_iq8qpq.png",
+    "Houston Dynamo II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628286/assets/mnp/logos/clubs/HOU-Logo-480.png",
+    "Huntsville City": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1667406760/assets/mnp/huntsville/logos/New_RGB_HuntsvilleCityFC_Crest_FullColor_2_ykcgln.svg",
+    "Inter Miami II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645639462/assets/mnp/logos/clubs/MLS_NextPro_Logo-MIA-480_mqgj5k.png",
+    "Los Angeles II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1677084715/assets/mnp/logos/clubs/LAFC-Club_Logo-Full_Color_updated_yegizu.svg",
+    "Minnesota United II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628286/assets/mnp/logos/clubs/MIN-Logo-480.png",
+    "New England II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628289/assets/mnp/logos/clubs/NE-Logo-480.png",
+    "North Texas": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628266/assets/mnp/logos/clubs/NTSC-Logo-480.png",
+    "New York City II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1742330029/assets/mnp/logos/clubs/NYCFC-II_badge_rgb_full-color_2025_jec9lr.png",
+    "Orlando City B": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628268/assets/mnp/logos/clubs/ORL-Logo-480.png",
+    "Philadelphia Union II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628269/assets/mnp/logos/clubs/PHI-Logo-480.png",
+    "Real Monarchs": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628271/assets/mnp/logos/clubs/RMN-Logo-480.png",
+    "New York RB II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1778277232/assets/RBII_crest_4C_STAR_480x480_t0vnbo.png",
+    "Quakes II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1745527199/assets/mnp/club-logos/San_Jose_Earthquakes_2014_jjndnq.png",
+    "Sporting KC II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628275/assets/mnp/logos/clubs/SKC-Logo-480.png",
+    "St. Louis City II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628276/assets/mnp/logos/clubs/STL-Logo-480.png",
+    "Tacoma Defiance": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628277/assets/mnp/logos/clubs/TAC-Logo-480.png",
+    "Toronto II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628277/assets/mnp/logos/clubs/TOR-Logo-480.png",
+    "Portland Timbers II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645628270/assets/mnp/logos/clubs/POR-Logo-480.png",
+    "Ventura County": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1710868641/assets/mnp/logos/clubs/Ventura_County_480x480_bmc1mn.png",
+    "Vancouver Whitecaps II": "https://images.mlssoccer.com/image/upload/f_png,w_320,c_limit/v1645740228/assets/mnp/logos/clubs/MLS_NextPro_Logo-VAN-480_1_jntzah.png",
+    "St. Louis City": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Logo_of_St._Louis_City_SC.svg/330px-Logo_of_St._Louis_City_SC.svg.png",
 }
 
 
@@ -184,6 +241,8 @@ def sportsdb_badge(club: str) -> str | None:
 
 
 def resolve_logo_url(club: str) -> str | None:
+    if club in MLS_NEXT_PRO_CRESTS:
+        return MLS_NEXT_PRO_CRESTS[club]
     for title in WIKI_TITLES.get(club, [club]):
         url = wiki_thumbnail(title)
         if url:
@@ -197,7 +256,7 @@ def resolve_logo_url(club: str) -> str | None:
 
 def clubs_in_use() -> list[str]:
     names = set(json.loads(META.read_text(encoding="utf-8")).get("clubs") or [])
-    for path in (ROOT / "data").glob("serie-*/players.json"):
+    for path in (ROOT / "data").glob("*/players.json"):
         payload = json.loads(path.read_text(encoding="utf-8"))
         for player in payload.get("players") or []:
             club = str(player.get("club") or "").strip()

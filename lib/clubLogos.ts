@@ -59,6 +59,15 @@ const LOGO_ALIASES: Record<string, string> = {
   "vila-nova-fc": "vila-nova",
   "volta-redonda-fc": "volta-redonda",
   "coritiba-fc": "coritiba",
+  // MLS Next Pro youth sides and the former Quakes II name share a crest we have.
+  "the-town": "quakes-ii",
+  "chicago-fire-u15": "chicago-fire",
+  "chicago-fire-u17": "chicago-fire",
+  "columbus-crew-u17": "columbus-crew",
+  "dallas-u17": "dallas",
+  "inter-miami-u18": "inter-miami",
+  "los-angeles-u17": "los-angeles-fc",
+  "new-york-city-u15": "new-york-city",
 };
 
 export function clubLogoSrc(club: string): string {
