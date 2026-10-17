@@ -928,18 +928,54 @@ def _custo_def_ajustado(pool: pd.DataFrame) -> pd.Series:
     return (num_adj / den).fillna(num_adj)
 
 
+def _num_col(pool: pd.DataFrame, name: str) -> pd.Series:
+    if name not in pool.columns:
+        return pd.Series(0.0, index=pool.index)
+    return pd.to_numeric(pool[name], errors="coerce").fillna(0.0).astype(float)
+
+
+def _pool_z(values: pd.Series) -> pd.Series:
+    """Z-score inside the position pool. A flat column (no SofaScore, for example) stays at 0."""
+    mu = float(values.mean())
+    sigma = float(values.std(ddof=0))
+    if sigma <= 1e-9 or np.isnan(sigma):
+        return pd.Series(0.0, index=values.index)
+    return (values - mu) / sigma
+
+
 def _def_efficiency_z_scores(pool: pd.DataFrame) -> tuple[pd.Series, float, float]:
-    """Z-score of ações/custo vs pool aggregate benchmark μ = Σações/Σcusto."""
-    acoes = pool["_acoes_def_comp"].astype(float)
-    cost = _def_cost_numerator_p90(pool)
-    ratio = acoes / cost.replace(0, np.nan)
-    cost_sum = float(cost.sum())
-    mu = float(acoes.sum() / cost_sum) if cost_sum > 0 else float(ratio.mean())
-    sigma = float(ratio.std(ddof=0))
-    if sigma <= 0 or np.isnan(sigma):
+    """Equal-weight component z-scores, then a pool z-score of actions minus cost.
+
+    Actions: duelos defensivos vencidos, interceptações, rebatidas, chutes bloqueados.
+    Cost: duelos defensivos perdidos, faltas, erro para chute, erro para gol.
+    """
+    dd = _num_col(pool, "DuelosDef")
+    pct_w = _num_col(pool, "%DuelosDefW")
+    action_z = pd.concat(
+        [
+            _pool_z(dd * pct_w),
+            _pool_z(_ss_inter_col(pool)),
+            _pool_z(_ss_clearance_col(pool)),
+            _pool_z(_num_col(pool, "outfielder_block_p90")),
+        ],
+        axis=1,
+    ).mean(axis=1)
+    cost_z = pd.concat(
+        [
+            _pool_z(dd * (1 - pct_w)),
+            _pool_z(_num_col(pool, "Faltas/90")),
+            _pool_z(_num_col(pool, "error_lead_to_a_shot_p90")),
+            _pool_z(_num_col(pool, "error_lead_to_a_goal_p90")),
+        ],
+        axis=1,
+    ).mean(axis=1)
+    raw = action_z - cost_z
+    mu = float(raw.mean())
+    sigma = float(raw.std(ddof=0))
+    if sigma <= 1e-9 or np.isnan(sigma):
         z = pd.Series(0.0, index=pool.index)
     else:
-        z = (ratio.fillna(mu) - mu) / sigma
+        z = (raw - mu) / sigma
     return z.astype(float), mu, sigma
 
 
