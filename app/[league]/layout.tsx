@@ -1,6 +1,13 @@
 import { notFound } from "next/navigation";
 import { LeagueProvider } from "@/components/LeagueProvider";
 import { isLeagueId } from "@/lib/leagues";
+import { leagueStaticParams } from "@/lib/staticParams";
+
+export function generateStaticParams() {
+  return leagueStaticParams();
+}
+
+export const dynamicParams = false;
 
 type Props = {
   children: React.ReactNode;

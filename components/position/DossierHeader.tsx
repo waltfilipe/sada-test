@@ -115,7 +115,7 @@ export function DossierHeader({ player, poolSize, family }: Props) {
         </div>
 
         <div className="bar-actions">
-          <Link className="bar-compare" href={`/comparar?posicao=${family}&a=${player.player_id}`}>
+          <Link className="bar-compare" href={`/comparar/${family}?a=${player.player_id}`}>
             <svg viewBox="0 0 14 14" aria-hidden>
               <path
                 d="M5.5 3.5 2.5 7l3 3.5M8.5 3.5 11.5 7l-3 3.5"

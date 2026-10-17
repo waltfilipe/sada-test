@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AthleteSlot } from "@/components/compare/AthleteSlot";
 import { MetricAxisPicker } from "@/components/scatter/MetricAxisPicker";
@@ -161,13 +162,12 @@ export function ScatterClient({
 
   useEffect(() => {
     const params = new URLSearchParams();
-    params.set("posicao", family);
     params.set("a", idA);
     params.set("b", idB);
     params.set("c", idC);
     params.set("x", xKey);
     params.set("y", yKey);
-    const next = href(`/scatter?${params.toString()}`);
+    const next = href(`/scatter/${family}?${params.toString()}`);
     const current = `${window.location.pathname}${window.location.search}`;
     if (current !== next) window.history.replaceState(window.history.state, "", next);
   }, [family, idA, idB, idC, xKey, yKey, href]);
@@ -194,7 +194,7 @@ export function ScatterClient({
   }, []);
 
   const positionTabs = (
-    <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/scatter?posicao=${slug}`)} />
+    <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/scatter/${slug}`)} />
   );
 
   if (!players.length) {
@@ -206,7 +206,7 @@ export function ScatterClient({
     );
   }
 
-  const compareQuery = new URLSearchParams({ posicao: family });
+  const compareQuery = new URLSearchParams();
   if (selected[0]) compareQuery.set("a", selected[0].id);
   if (selected[1]) compareQuery.set("b", selected[1].id);
 
@@ -361,7 +361,7 @@ export function ScatterClient({
             discreto. As linhas tracejadas marcam a média.
           </p>
           <div className="scatter-links">
-            <Link href={href(`/comparar?${compareQuery.toString()}`)}>Comparar atletas</Link>
+            <Link href={href(`/comparar/${family}?${compareQuery.toString()}`)}>Comparar atletas</Link>
             {selected.map((slot) => (
               <Link key={slot.id} href={href(`/posicao/${family}?atleta=${slot.id}`)}>
                 Dossiê de {slot.player.name}
@@ -371,5 +371,19 @@ export function ScatterClient({
         </section>
       </main>
     </div>
+  );
+}
+
+export function ScatterWithQuery(props: Omit<Props, "initialA" | "initialB" | "initialC" | "initialX" | "initialY">) {
+  const search = useSearchParams();
+  return (
+    <ScatterClient
+      {...props}
+      initialA={search.get("a") ?? undefined}
+      initialB={search.get("b") ?? undefined}
+      initialC={search.get("c") ?? undefined}
+      initialX={search.get("x") ?? undefined}
+      initialY={search.get("y") ?? undefined}
+    />
   );
 }

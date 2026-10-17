@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ComparePlayerColumn } from "@/components/compare/ComparePlayerColumn";
 import { StatSectionPanel, StatWindow } from "@/components/position/profile/ScoutStatsSections";
@@ -69,14 +70,13 @@ export function CompararClient({
 
   useEffect(() => {
     const params = new URLSearchParams();
-    params.set("posicao", family);
     if (idA) params.set("a", idA);
     if (idB) params.set("b", idB);
     if (triple && idC) {
       params.set("c", idC);
       params.set("triple", "1");
     }
-    const next = href(`/comparar?${params.toString()}`);
+    const next = href(`/comparar/${family}?${params.toString()}`);
     const current = `${window.location.pathname}${window.location.search}`;
     if (current !== next) window.history.replaceState(window.history.state, "", next);
   }, [family, idA, idB, idC, triple, href]);
@@ -86,7 +86,7 @@ export function CompararClient({
   const excludeForC = useMemo(() => new Set([idA, idB]), [idA, idB]);
 
   const positionTabs = (
-    <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/comparar?posicao=${slug}`)} />
+    <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/comparar/${slug}`)} />
   );
 
   if (!playerA || !playerB || players.length < 2) {
@@ -132,7 +132,7 @@ export function CompararClient({
               </button>
             ) : null}
 
-            <Link className="btn btn-ghost btn-sm" href={href(`/scatter?posicao=${family}&a=${idA}&b=${idB}`)}>
+            <Link className="btn btn-ghost btn-sm" href={href(`/scatter/${family}?a=${idA}&b=${idB}`)}>
               <i className="fa-solid fa-chart-scatter" aria-hidden="true" /> Scatter
             </Link>
           </div>
@@ -223,5 +223,19 @@ export function CompararClient({
         ) : null}
       </main>
     </div>
+  );
+}
+
+export function CompararWithQuery(props: Omit<Props, "initialA" | "initialB" | "initialC" | "initialTriple">) {
+  const search = useSearchParams();
+  const c = search.get("c") ?? undefined;
+  return (
+    <CompararClient
+      {...props}
+      initialA={search.get("a") ?? undefined}
+      initialB={search.get("b") ?? undefined}
+      initialC={c}
+      initialTriple={search.get("triple") === "1" || Boolean(c)}
+    />
   );
 }

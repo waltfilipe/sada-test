@@ -209,7 +209,7 @@ export function PlayerHero({ player, family, players }: Props) {
           </div>
           <div className="hero-action-cell hero-action-compare">
             <Tooltip content="Abre o comparador já com este atleta.">
-              <Link className="btn btn-ghost btn-sm" href={href(`/comparar?posicao=${family}&a=${player.player_id}`)}>
+              <Link className="btn btn-ghost btn-sm" href={href(`/comparar/${family}?a=${player.player_id}`)}>
                 <i className="fa-solid fa-scale-balanced" aria-hidden="true" /> Comparar
               </Link>
             </Tooltip>

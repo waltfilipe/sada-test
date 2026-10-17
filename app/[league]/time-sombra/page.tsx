@@ -1,8 +1,16 @@
 import { TimeSombraClient } from "@/app/time-sombra/TimeSombraClient";
 import { getSearchRows } from "@/lib/data.server";
 import { isLeagueId, LEAGUES, type LeagueId } from "@/lib/leagues";
+import { leagueStaticParams } from "@/lib/staticParams";
 import type { PlayerSearchRow } from "@/lib/types";
 import { notFound } from "next/navigation";
+
+export function generateStaticParams() {
+  return leagueStaticParams();
+}
+
+export const dynamic = "force-static";
+export const dynamicParams = false;
 
 type Props = { params: Promise<{ league: string }> };
 

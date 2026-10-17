@@ -8,8 +8,6 @@ type Props = {
   family: PositionFamily;
   players: PlayerProfile[];
   heatmapsEnabled?: boolean;
-  initialPlayerId?: string;
-  filterOrigin?: string;
 };
 
 export function PosicaoClient({ family, players, heatmapsEnabled = true }: Props) {
