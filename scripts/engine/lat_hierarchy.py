@@ -25,10 +25,9 @@ OFF_COLS = ["ToquesArea", "Cruz.", "CorridasProg", "Dribles", "DuelosOfRaw", "Ac
 
 
 def _zscore(series: pd.Series) -> pd.Series:
-    std = float(series.std())
-    if std == 0:
-        return pd.Series(0.0, index=series.index)
-    return (series - series.mean()) / std
+    from .pool_reference import zscore_against
+
+    return zscore_against(series)
 
 
 def _axis_z(feat_df: pd.DataFrame, cols: list[str]) -> pd.Series:

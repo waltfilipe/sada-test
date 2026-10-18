@@ -45,10 +45,9 @@ def _build_feature_row(wy_row: pd.Series, ss_row: pd.Series | None) -> dict[str,
 
 
 def _zscore(series: pd.Series) -> pd.Series:
-    std = float(series.std())
-    if std == 0:
-        return pd.Series(0.0, index=series.index)
-    return (series - series.mean()) / std
+    from .pool_reference import zscore_against
+
+    return zscore_against(series)
 
 
 def _axis_z(feat_df: pd.DataFrame, cols: list[str]) -> pd.Series:
@@ -124,7 +123,9 @@ def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
     z_com = _axis_z(feat, COM_COLS)
     z_dd = _zscore(feat["duelos_def"])
 
-    mean_share_long = float(feat["share_long"].mean())
+    from .pool_reference import distribution
+
+    mean_share_long = float(distribution(feat["share_long"]).mean())
 
     primaries: list[str] = []
     labels: list[str] = []

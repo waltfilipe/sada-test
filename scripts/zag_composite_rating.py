@@ -47,7 +47,12 @@ IMPACT_METRICS = ("duelos_def", "duelos_ar", "passes_prog", "passes_long")
 
 
 def pct_rank(value: float, series: pd.Series) -> float:
-    return float(stats.percentileofscore(series, value, kind="mean"))
+    from engine.pool_reference import distribution
+
+    sample = distribution(series)
+    if len(sample) == 0:
+        return 50.0
+    return float(stats.percentileofscore(sample, value, kind="mean"))
 
 
 def fit_impact_regression(pool: pd.DataFrame) -> dict[str, float]:
@@ -209,10 +214,21 @@ def build_axis_scores_for_pool(pool: pd.DataFrame) -> pd.DataFrame:
 
 
 def _residualize_series(y: pd.Series, x: pd.Series) -> pd.Series:
-    xv = x.to_numpy(dtype=float)
-    yv = y.to_numpy(dtype=float)
+    from engine.pool_reference import distribution
+
+    y_sample = distribution(y)
+    if y_sample.index.equals(y.index):
+        x_fit = x
+        y_fit = y
+    else:
+        x_fit = x.reindex(y_sample.index)
+        y_fit = y_sample
+    xv = x_fit.to_numpy(dtype=float)
+    yv = y_fit.to_numpy(dtype=float)
     coef, _, _, _ = np.linalg.lstsq(np.column_stack([np.ones(len(xv)), xv]), yv, rcond=None)
-    return pd.Series(yv - (coef[0] + coef[1] * xv), index=y.index)
+    x_all = x.to_numpy(dtype=float)
+    y_all = y.to_numpy(dtype=float)
+    return pd.Series(y_all - (coef[0] + coef[1] * x_all), index=y.index)
 
 
 def score_eficiencia_def_v2_pool(enriched: pd.DataFrame) -> pd.Series:

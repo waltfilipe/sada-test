@@ -15,6 +15,7 @@ from .normalize import (
     rank_players,
     zscore_linear_100,
 )
+from .pool_reference import distribution, reference_mask, reference_pool, zscore_against
 from .profiles import FAMILY_PROFILE_CONFIG, profile_ratings_from_row, profile_ranks_from_row, profile_shares_from_row
 from .at_tri_composite_config import AT_TRI_COMPOSITE_CONFIG, apply_at_tri_composite_ratings
 from .ex_hierarchy import apply_ex_hierarchical_clusters
@@ -135,8 +136,21 @@ class ZagueiroMetrics:
     rank_posicional: int
 
 
-def _eligible_pool(df: pd.DataFrame, positions: list[str], min_pct: float = 0.2) -> pd.DataFrame:
-    return df[(df["Posição"].isin(positions)) & (df["%Minutos"] > min_pct)].copy()
+# Qualified sample for percentiles and archetypes. The site still publishes
+# everyone below this line; their rates are read on this scale.
+QUALIFIED_MIN_PCT = 0.2
+MIN_REFERENCE_PLAYERS = 8
+
+
+def _eligible_pool(
+    df: pd.DataFrame,
+    positions: list[str],
+    min_pct: float | None = QUALIFIED_MIN_PCT,
+) -> pd.DataFrame:
+    mask = df["Posição"].isin(positions)
+    if min_pct is not None:
+        mask = mask & (df["%Minutos"] > min_pct)
+    return df[mask].copy()
 
 
 def _z_percentile(pool: pd.DataFrame, field: str, ascending: bool = True) -> pd.Series:
@@ -174,17 +188,40 @@ def _ss_clearance_col(pool: pd.DataFrame) -> pd.Series:
 def _score_axis(frame: pd.DataFrame) -> pd.Series:
     from sklearn.preprocessing import MinMaxScaler
 
-    scaled = pd.DataFrame(
-        MinMaxScaler().fit_transform(frame),
-        columns=frame.columns,
-        index=frame.index,
-    )
+    mask = reference_mask(frame.index)
+    fit_frame = frame.loc[mask] if bool(mask.all()) or int(mask.sum()) >= 2 else frame
+    if bool(mask.all()):
+        scaled_values = MinMaxScaler().fit_transform(frame)
+    else:
+        scaled_values = MinMaxScaler().fit(fit_frame).transform(frame)
+    scaled = pd.DataFrame(scaled_values, columns=frame.columns, index=frame.index)
     return scaled.mean(axis=1)
+
+
+def _average_pct_against(series: pd.Series, sample: pd.Series) -> pd.Series:
+    sample_np = pd.to_numeric(sample, errors="coerce").dropna().to_numpy(dtype=float)
+    n = len(sample_np)
+    if n == 0:
+        return series.rank(method="average", pct=True)
+
+    def pct(value: float) -> float:
+        if np.isnan(value):
+            return np.nan
+        less = float(np.sum(sample_np < value))
+        equal = float(np.sum(sample_np == value))
+        rank = less + 0.5 if equal == 0 else less + (equal + 1) / 2.0
+        return rank / n
+
+    return pd.to_numeric(series, errors="coerce").map(pct)
 
 
 def _rescale_rating_band(series: pd.Series, lo: float = 5.0, hi: float = 9.5) -> pd.Series:
     """Uniform rank mapping — platykurtic, not bell-shaped. Prefer _round_rating_raw for zagueiros."""
-    ranked = series.rank(method="average", pct=True)
+    sample = distribution(series)
+    if sample.index.equals(series.index):
+        ranked = series.rank(method="average", pct=True)
+    else:
+        ranked = _average_pct_against(series, sample)
     return lo + ranked * (hi - lo)
 
 
@@ -259,19 +296,23 @@ def _blend_eff_vol_percentiles(
 
 
 def _residualize_on(pool: pd.DataFrame, y: pd.Series, base: pd.Series) -> pd.Series:
-    x = base.to_numpy(dtype=float)
-    yv = y.to_numpy(dtype=float)
-    coef, _, _, _ = np.linalg.lstsq(np.column_stack([np.ones(len(pool)), x]), yv, rcond=None)
-    return pd.Series(yv - (coef[0] + coef[1] * x), index=pool.index)
+    y_sample = distribution(y)
+    x_sample = base.reindex(y_sample.index)
+    if y_sample.index.equals(y.index):
+        x = base.to_numpy(dtype=float)
+        yv = y.to_numpy(dtype=float)
+        coef, _, _, _ = np.linalg.lstsq(np.column_stack([np.ones(len(y)), x]), yv, rcond=None)
+    else:
+        x = x_sample.to_numpy(dtype=float)
+        yv = y_sample.to_numpy(dtype=float)
+        coef, _, _, _ = np.linalg.lstsq(np.column_stack([np.ones(len(y_sample)), x]), yv, rcond=None)
+        x = base.to_numpy(dtype=float)
+        yv = y.to_numpy(dtype=float)
+    return pd.Series(yv - (coef[0] + coef[1] * x), index=y.index)
 
 
 def _zscore_series(series: pd.Series, clip: float = 2.0) -> pd.Series:
-    values = series.astype(float)
-    std = float(values.std(ddof=1))
-    if not std:
-        return pd.Series(0.0, index=series.index)
-    med = float(values.median())
-    return ((values - med) / std).clip(-clip, clip)
+    return zscore_against(series, ddof=1, center="median", clip=clip)
 
 
 def _skill_index_from_series(raw: pd.Series) -> pd.Series:
@@ -454,8 +495,16 @@ def _apply_zag_k3_classification(out: pd.DataFrame) -> None:
     out["gap_con_def"] = (score_con - score_def).abs()
 
     coords = np.column_stack([score_con.to_numpy(), score_def.to_numpy()])
+    mask = reference_mask(score_con.index).to_numpy()
     scaler = StandardScaler()
-    km = KMeans(n_clusters=3, random_state=42, n_init=30).fit(scaler.fit_transform(coords))
+    if bool(mask.all()) or int(mask.sum()) < 3:
+        fitted = scaler.fit_transform(coords)
+        km = KMeans(n_clusters=3, random_state=42, n_init=30).fit(fitted)
+        labels = km.labels_
+    else:
+        fitted_ref = scaler.fit_transform(coords[mask])
+        km = KMeans(n_clusters=3, random_state=42, n_init=30).fit(fitted_ref)
+        labels = km.predict(scaler.transform(coords))
     centers = scaler.inverse_transform(km.cluster_centers_)
     center_df = pd.DataFrame(centers, columns=["score_con", "score_def"])
     gaps = (center_df["score_con"] - center_df["score_def"]).abs()
@@ -467,7 +516,7 @@ def _apply_zag_k3_classification(out: pd.DataFrame) -> None:
 
     profiles: list[str] = []
     leans: list[str | None] = []
-    for idx, cluster in enumerate(km.labels_):
+    for idx, cluster in enumerate(labels):
         base = cluster_to_base[int(cluster)]
         profiles.append(base)
         if base != "Híbrido":
@@ -849,22 +898,48 @@ def _compute_generic_ratings(pool: pd.DataFrame, prefix: str) -> pd.DataFrame:
     return out
 
 
-def compute_family_metrics(df: pd.DataFrame, family_key: str) -> pd.DataFrame:
+def compute_family_metrics(
+    df: pd.DataFrame,
+    family_key: str,
+    *,
+    publish_all: bool = False,
+) -> pd.DataFrame:
+    """Position metrics. The site publishes every outfield player.
+
+    Percentiles and archetypes stay fitted on the qualified sample (more than
+    20% of the league leader's minutes), so a short appearance does not move
+    the players who were already in that sample.
+    """
     family = POSITION_FAMILIES[family_key]
-    pool = _eligible_pool(df, family["positions"])
+    pool = _eligible_pool(df, family["positions"], min_pct=None if publish_all else QUALIFIED_MIN_PCT)
     if pool.empty:
         return pool
-    if family_key == "zagueiros":
-        return _compute_zag_indices(pool)
-    if family_key == "laterais":
-        return _compute_lat_indices(pool)
-    if family_key == "meio-campistas":
-        return _compute_mc_indices(pool)
-    if family_key == "extremos":
-        return _compute_ex_indices(pool)
-    if family_key == "atacantes":
-        return _compute_at_indices(pool)
-    return FAMILY_PROFILE_CONFIG[family_key].compute_indices(pool)
+    pool = pool.drop_duplicates("player_id", keep="first").set_index("player_id", drop=False)
+    # Keep player ids as index values so the reference sample can be selected,
+    # but drop the index name: pandas refuses merges when "player_id" is both.
+    pool.index.name = None
+    qualified = pool["%Minutos"] > QUALIFIED_MIN_PCT if publish_all else pd.Series(True, index=pool.index)
+    if int(qualified.sum()) < MIN_REFERENCE_PLAYERS:
+        qualified = pd.Series(True, index=pool.index)
+
+    def _dispatch() -> pd.DataFrame:
+        if family_key == "zagueiros":
+            return _compute_zag_indices(pool)
+        if family_key == "laterais":
+            return _compute_lat_indices(pool)
+        if family_key == "meio-campistas":
+            return _compute_mc_indices(pool)
+        if family_key == "extremos":
+            return _compute_ex_indices(pool)
+        if family_key == "atacantes":
+            return _compute_at_indices(pool)
+        return FAMILY_PROFILE_CONFIG[family_key].compute_indices(pool)
+
+    reference_index = pd.Index(pool.index[qualified.to_numpy()])
+    with reference_pool(reference_index):
+        result = _dispatch()
+    result.attrs["reference_index"] = reference_index
+    return result
 
 
 def medal_for_rank(rank: int, pool_size: int) -> str | None:
@@ -936,8 +1011,10 @@ def _num_col(pool: pd.DataFrame, name: str) -> pd.Series:
 
 def _pool_z(values: pd.Series) -> pd.Series:
     """Z-score inside the position pool. A flat column (no SofaScore, for example) stays at 0."""
-    mu = float(values.mean())
-    sigma = float(values.std(ddof=0))
+    values = pd.to_numeric(values, errors="coerce")
+    sample = distribution(values)
+    mu = float(sample.mean())
+    sigma = float(sample.std(ddof=0))
     if sigma <= 1e-9 or np.isnan(sigma):
         return pd.Series(0.0, index=values.index)
     return (values - mu) / sigma
@@ -970,8 +1047,9 @@ def _def_efficiency_z_scores(pool: pd.DataFrame) -> tuple[pd.Series, float, floa
         axis=1,
     ).mean(axis=1)
     raw = action_z - cost_z
-    mu = float(raw.mean())
-    sigma = float(raw.std(ddof=0))
+    sample = distribution(raw)
+    mu = float(sample.mean())
+    sigma = float(sample.std(ddof=0))
     if sigma <= 1e-9 or np.isnan(sigma):
         z = pd.Series(0.0, index=pool.index)
     else:
@@ -1014,10 +1092,12 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
 
     share_long_pct = (share_long.fillna(0) * 100).astype(float)
     share_prog_pct = (share_prog.fillna(0) * 100).astype(float)
-    avg_long = float(share_long_pct.mean())
-    avg_prog = float(share_prog_pct.mean())
-    scale_long = max(30.0, float(share_long_pct.quantile(0.95)) * 1.15, avg_long * 2)
-    scale_prog = max(30.0, float(share_prog_pct.quantile(0.95)) * 1.15, avg_prog * 2)
+    long_sample = distribution(share_long_pct)
+    prog_sample = distribution(share_prog_pct)
+    avg_long = float(long_sample.mean())
+    avg_prog = float(prog_sample.mean())
+    scale_long = max(30.0, float(long_sample.quantile(0.95)) * 1.15, avg_long * 2)
+    scale_prog = max(30.0, float(prog_sample.quantile(0.95)) * 1.15, avg_prog * 2)
     out["_share_long_pct"] = share_long_pct
     out["_share_prog_pct"] = share_prog_pct
     out["_pool_avg_share_long"] = avg_long
@@ -1034,10 +1114,10 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     m4_ratio = (contact_def / line_def.replace(0, np.nan)).fillna(0.0)
     faltas = pd.to_numeric(out.get("Faltas/90", 0), errors="coerce").fillna(0)
     out["_def_m4_ratio"] = m4_ratio.astype(float)
-    out["_pool_avg_def_m4"] = float(m4_ratio.mean())
+    out["_pool_avg_def_m4"] = float(distribution(m4_ratio).mean())
     out["_asp_def_style"] = percentile_rank(m4_ratio, ascending=True)
     out["_asp_faltas_vol"] = percentile_rank(faltas, ascending=True)
-    out["_pool_avg_faltas"] = float(faltas.mean())
+    out["_pool_avg_faltas"] = float(distribution(faltas).mean())
 
     mappings: dict[str, pd.Series] = {
         "duelos_def_vol": _pool_percentile(out, "Duelos defensivos/90", "DuelosDef"),
