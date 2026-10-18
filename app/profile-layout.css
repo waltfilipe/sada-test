@@ -4088,11 +4088,42 @@
 .projection-lead,
 .projection-empty,
 .projection-weight,
-.projection-rank-meta {
+.projection-rank-meta,
+.projection-reliability,
+.projection-rank-spread {
   margin: 0;
   color: var(--muted);
   font-size: 0.78rem;
   line-height: 1.4;
+}
+
+.projection-reliability span {
+  color: var(--text);
+}
+
+.projection-scenario-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+}
+
+.projection-scenario-tabs button {
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.projection-scenario-tabs button.is-active {
+  border-color: rgba(27, 231, 255, 0.45);
+  background: rgba(27, 231, 255, 0.12);
+  color: var(--text);
 }
 
 .projection-groups {

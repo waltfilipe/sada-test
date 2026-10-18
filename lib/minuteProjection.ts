@@ -1,3 +1,17 @@
+/**
+ * Minute projection for scouts (empirical Bayes).
+ *
+ * Question: "He has ~20% of minutes and strong rates — how much can I trust that,
+ * and what if he played starter minutes?"
+ *
+ * - Prior μ, τ², n₀: fitted from the position pool, weighting peers with similar
+ *   minutes % and age (cohort).
+ * - Posterior mean (cenário realista): w·y + (1−w)·μ with w = exposure / (exposure + n₀).
+ * - Pessimista / otimista: posterior ± z₉₀·σ_pred, where σ_pred combines uncertainty
+ *   about true talent (τ) and sampling noise (binomial for %, Poisson-like for rates).
+ * - hotStreakRegressionPct: average expected drop on metrics already above μ (answers
+ *   "would the good numbers sustain?").
+ */
 import { isSeasonTotalLabel } from "@/lib/seasonTotals";
 import type { AspectItem, PlayerProfile } from "@/lib/types";
 
@@ -15,7 +29,28 @@ export type RealisticProjection = ProjectionPlacement & {
   profile: PlayerProfile;
 };
 
+/** How much the observed per-90 / % rates are trusted vs the cohort prior. */
+export type ProjectionReliability = {
+  /** Mean share of the estimate from the player's own minutes (0–1). */
+  sampleWeight: number;
+  /** Human label for scouts. */
+  tier: "baixa" | "media" | "alta";
+  /** Average % drop on volume/efficiency lines already above the cohort mean (hot streak). */
+  hotStreakRegressionPct: number | null;
+  /** Colocação no pool de titulares: pessimista → realista → otimista. */
+  rankSpread: { negativa: number; realista: number; positiva: number; poolSize: number };
+};
+
+export type MinuteProjectionReport = {
+  negativa: RealisticProjection;
+  realista: RealisticProjection;
+  positiva: RealisticProjection;
+  reliability: ProjectionReliability;
+};
+
 const Z90 = 1.2815515655446004;
+/** Typical decision events per 90 used to widen % intervals when attempt counts are unknown. */
+const EFF_TRIALS_PER_90 = 6;
 const MIN_GROUP = 8;
 const MIN_METRICS = 3;
 const FALLBACK_N0 = 4;
@@ -99,14 +134,51 @@ export function projectionPlacement(
   return placementFrom(model, scenario);
 }
 
-/** Realistic per-90 profile. Rates above the cohort mean shrink toward it; rates already below stay put. Bars and rank use only players with at least half the minutes. */
+/** Realistic per-90 profile at starter exposure. Bars and rank use only players with at least half the minutes. */
 export function realisticProjection(player: PlayerProfile, players: PlayerProfile[]): RealisticProjection | null {
+  return scenarioProjection(player, players, "realista");
+}
+
+/** Full scout readout: expected line plus 80% bands (pessimista / otimista) and a confidence summary. */
+export function minuteProjectionReport(
+  player: PlayerProfile,
+  players: PlayerProfile[],
+): MinuteProjectionReport | null {
   const model = modelFor(player, players);
   if (!model) return null;
-  const placement = placementFrom(model, "realista");
+
+  const negativa = buildScenario(model, player, "negativa");
+  const realista = buildScenario(model, player, "realista");
+  const positiva = buildScenario(model, player, "positiva");
+
+  return {
+    negativa,
+    realista,
+    positiva,
+    reliability: reliabilityFrom(model, realista.weight, {
+      negativa: negativa.rank,
+      realista: realista.rank,
+      positiva: positiva.rank,
+      poolSize: realista.poolSize,
+    }),
+  };
+}
+
+function scenarioProjection(
+  player: PlayerProfile,
+  players: PlayerProfile[],
+  scenario: ProjectionScenario,
+): RealisticProjection | null {
+  const model = modelFor(player, players);
+  if (!model) return null;
+  return buildScenario(model, player, scenario);
+}
+
+function buildScenario(model: BuiltModel, player: PlayerProfile, scenario: ProjectionScenario): RealisticProjection {
+  const placement = placementFrom(model, scenario);
   return {
     ...placement,
-    profile: applyProjectedMetrics(player, projectedMetrics(model, "realista")),
+    profile: applyProjectedMetrics(player, projectedMetrics(model, scenario)),
   };
 }
 
@@ -153,7 +225,14 @@ function projectedMetrics(model: BuiltModel, scenario: ProjectionScenario): Map<
   const covariates = targetCovariates(model.target);
   for (const metric of model.metrics) {
     const n0 = effectiveN0(metric.prior.n0, covariates);
-    const next = projectRate(metric.y, model.exposure, { ...metric.prior, n0 }, scenario, metric.adverse);
+    const next = projectRate(
+      metric.y,
+      model.exposure,
+      { ...metric.prior, n0 },
+      scenario,
+      metric.adverse,
+      metric.kind,
+    );
     const value = metric.kind === "percent" ? clamp(next.value, 0, 100) : next.value;
     const standing = midrankPercentile(value, metric.referenceRates);
     projected.set(metric.key, {
@@ -474,17 +553,75 @@ function projectRate(
   prior: Prior,
   scenario: ProjectionScenario,
   adverse = false,
+  kind: MetricKind = "rate",
 ): { value: number; weight: number } {
   const weight = exposure / (exposure + prior.n0);
-  const realistic = weight * y + (1 - weight) * prior.mu;
-  const sd = Math.sqrt(prior.tau2 * (1 - weight));
-  let value = realistic;
-  if (scenario === "negativa") value = realistic - Z90 * sd;
-  else if (scenario === "positiva") value = realistic + Z90 * sd;
-  else if (adverse ? y >= prior.mu : y < prior.mu) {
-    value = y;
-  }
+  const posteriorMean = weight * y + (1 - weight) * prior.mu;
+  const sd = predictiveSd(y, exposure, prior, weight, kind, adverse);
+  let value = posteriorMean;
+  if (scenario === "negativa") value = posteriorMean - Z90 * sd;
+  else if (scenario === "positiva") value = posteriorMean + Z90 * sd;
   return { value: metricFloor(value, adverse), weight };
+}
+
+/** Epistemic (between-player) + sampling noise for small per-90 / % samples. */
+function predictiveSd(
+  y: number,
+  exposure: number,
+  prior: Prior,
+  weight: number,
+  kind: MetricKind,
+  adverse: boolean,
+): number {
+  const epistemic = Math.sqrt(Math.max(prior.tau2 * (1 - weight), 0));
+  let aleatory = 0;
+  if (kind === "percent") {
+    const p = clamp(y, 0.05, 99.95) / 100;
+    const trials = Math.max(exposure * EFF_TRIALS_PER_90, 8);
+    aleatory = Math.sqrt((p * (1 - p)) / trials);
+  } else if (!adverse) {
+    const rate = Math.max(Math.abs(y), 0.04);
+    aleatory = Math.sqrt(rate / Math.max(exposure, 0.35));
+  }
+  return Math.sqrt(epistemic * epistemic + aleatory * aleatory);
+}
+
+function reliabilityFrom(
+  model: BuiltModel,
+  sampleWeight: number,
+  ranks: ProjectionReliability["rankSpread"],
+): ProjectionReliability {
+  const covariates = targetCovariates(model.target);
+  let hotSum = 0;
+  let hotN = 0;
+  for (const metric of model.metrics) {
+    if (metric.adverse || metric.seasonCount || !metric.rank) continue;
+    if (metric.y <= metric.prior.mu + 1e-9) continue;
+    const n0 = effectiveN0(metric.prior.n0, covariates);
+    const w = model.exposure / (model.exposure + n0);
+    const projected = w * metric.y + (1 - w) * metric.prior.mu;
+    hotSum += (metric.y - projected) / metric.y;
+    hotN += 1;
+  }
+
+  return {
+    sampleWeight,
+    tier: confidenceTier(sampleWeight),
+    hotStreakRegressionPct: hotN ? (hotSum / hotN) * 100 : null,
+    rankSpread: ranks,
+  };
+}
+
+export function confidenceTier(sampleWeight: number): ProjectionReliability["tier"] {
+  if (sampleWeight >= 0.34) return "alta";
+  if (sampleWeight >= 0.22) return "media";
+  return "baixa";
+}
+
+export function confidenceTierLabel(tier: ProjectionReliability["tier"]): string {
+  if (tier === "alta") return "Confiança alta na amostra";
+  if (tier === "media") return "Confiança média — boa leitura, mas ainda regredindo à média";
+  return "Confiança baixa — poucos minutos; leitura puxada ao grupo parecido";
 }
 
 function metricFloor(value: number, adverse: boolean): number {
