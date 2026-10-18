@@ -494,18 +494,23 @@ function MetricList({
   );
 }
 
-function ReportSheet({
+export function ReportSheet({
   player,
   family,
   players,
   lang,
   sheetUrl,
+  pageOffset = 0,
+  totalPages = 2,
 }: {
   player: PlayerProfile;
   family: PositionFamily;
   players: PlayerProfile[];
   lang: ReportLang;
   sheetUrl: string;
+  /** First player-report page number in the full export (e.g. after scatter pages). */
+  pageOffset?: number;
+  totalPages?: number;
 }) {
   const league = useLeague();
   const copy: ReportCopy = REPORT_COPY[lang];
@@ -741,7 +746,7 @@ function ReportSheet({
                 </li>
               </ul>
             </div>
-            <ReportColophon generated={generated} page={copy.page(1, 2)} />
+            <ReportColophon generated={generated} page={copy.page(1 + pageOffset, totalPages)} />
           </footer>
         </div>
       </div>
@@ -917,7 +922,7 @@ function ReportSheet({
                 </p>
               ) : null}
             </div>
-            <ReportColophon generated={generated} page={copy.page(2, 2)} />
+            <ReportColophon generated={generated} page={copy.page(2 + pageOffset, totalPages)} />
           </footer>
         </div>
       </div>
