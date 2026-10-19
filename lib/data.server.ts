@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import { formatFoot } from "./feet";
 import { DEFAULT_LEAGUE, isLeagueId, type LeagueId } from "./leagues";
+import { POSITION_FAMILIES } from "./positions";
 import { playerStatBadges } from "./statBadges";
 import type { PlayerHeatmapData, PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
 
@@ -19,7 +20,7 @@ function readJson<T>(filePath: string): T {
 
 const metaCache = new Map<LeagueId, SiteMeta>();
 const playersCache = new Map<LeagueId, { players: PlayerSummary[]; total: number }>();
-const profileCache = new Map<string, PlayerProfile>();
+const profileIndexCache = new Map<LeagueId, Map<string, PlayerProfile>>();
 const searchRowsCache = new Map<LeagueId, PlayerSearchRow[]>();
 const familyCache = new Map<string, PlayerProfile[]>();
 
@@ -96,15 +97,26 @@ export function getSearchRows(league?: string): PlayerSearchRow[] {
   return searchRowsCache.get(id)!;
 }
 
-export function getPlayerProfile(playerId: string, league?: string): PlayerProfile | null {
-  const id = resolveLeague(league);
-  const cacheKey = `${id}:${playerId}`;
-  if (!profileCache.has(cacheKey)) {
-    const filePath = path.join(leagueDir(id), "profiles", `${playerId}.json`);
-    if (!fs.existsSync(filePath)) return null;
-    profileCache.set(cacheKey, readJson(filePath));
+/**
+ * Profiles live inside each `family-*.json`. Reading `profiles/*.json` as well
+ * traced a second copy (~110 MB) into every serverless function and pushed each
+ * route over Vercel's bundling budget, so Hobby created one function per route.
+ */
+function profileIndex(league: LeagueId): Map<string, PlayerProfile> {
+  const cached = profileIndexCache.get(league);
+  if (cached) return cached;
+  const index = new Map<string, PlayerProfile>();
+  for (const family of POSITION_FAMILIES) {
+    for (const player of getFamilyPlayers(family.key, league)) {
+      index.set(player.player_id, player);
+    }
   }
-  return profileCache.get(cacheKey) ?? null;
+  profileIndexCache.set(league, index);
+  return index;
+}
+
+export function getPlayerProfile(playerId: string, league?: string): PlayerProfile | null {
+  return profileIndex(resolveLeague(league)).get(playerId) ?? null;
 }
 
 export function getFamilyPlayers(family: PositionFamily, league?: string): PlayerProfile[] {
