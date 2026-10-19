@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AthleteSlot } from "@/components/compare/AthleteSlot";
 import { MetricAxisPicker } from "@/components/scatter/MetricAxisPicker";
+import { ScatterSavedChartsBar } from "@/components/scatter/ScatterSavedChartsBar";
 import { ScatterPlot, type ScatterHighlight } from "@/components/scatter/ScatterPlot";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { useLeague } from "@/components/LeagueProvider";
@@ -12,6 +13,12 @@ import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { familyBySlug } from "@/lib/positions";
 import { scatterAxis, scatterAxisLabel } from "@/lib/scatterAxis";
+import {
+  newSavedChartId,
+  readSavedScatterCharts,
+  writeSavedScatterCharts,
+  type SavedScatterChart,
+} from "@/lib/scatterSavedCharts";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Metric = { key: string; label: string };
@@ -69,7 +76,7 @@ export function ScatterClient({
   initialX,
   initialY,
 }: Props) {
-  const { href } = useLeague();
+  const { href, leagueId } = useLeague();
   const rootRef = useRef<HTMLDivElement>(null);
   const familyMeta = familyBySlug(family);
   const axisMetrics = useMemo(() => {
@@ -108,8 +115,14 @@ export function ScatterClient({
     }
     return axisMetrics.find((metric) => metric.key !== defaultX)?.key ?? defaultY;
   });
+  const [savedCharts, setSavedCharts] = useState<SavedScatterChart[]>([]);
+
+  useEffect(() => {
+    setSavedCharts(readSavedScatterCharts(leagueId, family));
+  }, [leagueId, family]);
 
   const slotIds = [idA, idB, idC];
+  const athleteIds = useMemo(() => [idA, idB, idC] as [string, string, string], [idA, idB, idC]);
   const selected = useMemo(() => {
     const seen = new Set<string>();
     const rows: { id: string; tone: Tone; player: PlayerProfile }[] = [];
@@ -153,6 +166,25 @@ export function ScatterClient({
   const swapAxes = () => {
     setXKey(yKey);
     setYKey(xKey);
+  };
+
+  const persistSaved = (next: SavedScatterChart[]) => {
+    setSavedCharts(writeSavedScatterCharts(leagueId, family, next));
+  };
+
+  const saveCurrentChart = () => {
+    const entry: SavedScatterChart = {
+      id: newSavedChartId(),
+      xKey,
+      yKey,
+      athleteIds,
+      savedAt: Date.now(),
+    };
+    persistSaved([...savedCharts, entry]);
+  };
+
+  const removeSavedChart = (id: string) => {
+    persistSaved(savedCharts.filter((chart) => chart.id !== id));
   };
 
   const optionsFor = (current: string) => {
@@ -215,6 +247,17 @@ export function ScatterClient({
       <ScoutTopbar active="scatter" subnav={positionTabs} />
 
       <main className="scatter-canvas">
+        <ScatterSavedChartsBar
+          family={family}
+          players={players}
+          savedCharts={savedCharts}
+          xKey={xKey}
+          yKey={yKey}
+          athleteIds={athleteIds}
+          onSave={saveCurrentChart}
+          onRemove={removeSavedChart}
+        />
+
         <div className="scatter-workspace">
           <aside className="scatter-rail" aria-label="Atletas em destaque">
             <section className="sc-panel scatter-panel scatter-axis-panel">

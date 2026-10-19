@@ -4222,7 +4222,8 @@
 }
 
 /* Player PDF. Hidden on screen; the export button prints only this sheet. */
-.player-report {
+.player-report,
+.scout-print-export {
   display: none;
 }
 
@@ -4233,7 +4234,8 @@
   }
 
   html,
-  body.exporting-player-report {
+  body.exporting-player-report,
+  body.exporting-scout-print {
     background: #fff !important;
     min-height: 0 !important;
   }
@@ -4242,7 +4244,8 @@
     display: none !important;
   }
 
-  body.exporting-player-report > .player-report {
+  body.exporting-player-report > .player-report,
+  body.exporting-scout-print > .scout-print-export {
     --r-ink: #0f1b2d;
     --r-text: #334155;
     --r-muted: #64748b;
@@ -4257,6 +4260,22 @@
     --r-mid: #94a3b8;
     --r-gap: 4mm;
     --r-radius: 2.5mm;
+    display: block !important;
+    width: 210mm;
+    background: #fff;
+    color: var(--r-text);
+    font-family: "TASA Orbiter Variable", system-ui, sans-serif;
+    font-size: 8.5px;
+    line-height: 1.3;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body.exporting-scout-print > *:not(.scout-print-export) {
+    display: none !important;
+  }
+
+  body.exporting-scout-print .scout-print-export .player-report {
     display: block !important;
     width: 210mm;
     background: #fff;

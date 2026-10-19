@@ -26,6 +26,12 @@ type Props = {
   highlights: ScatterHighlight[];
   xLabel: string;
   yLabel: string;
+  /** Fixed canvas size (print / thumbnails). Skips resize observer when set. */
+  fixedSize?: { width: number; height: number };
+  /** Unique id for SVG defs when multiple plots share one document. */
+  instanceId?: string;
+  /** When false, points are not clickable and tooltips are off. */
+  interactive?: boolean;
 };
 
 const PAD = { top: 26, right: 20, bottom: 56, left: 88 };
@@ -55,13 +61,27 @@ function bounds(values: number[], anchor: number) {
   return { min: lo, max: hi };
 }
 
-export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: Props) {
+export function ScatterPlot({
+  points,
+  avgX,
+  avgY,
+  highlights,
+  xLabel,
+  yLabel,
+  fixedSize,
+  instanceId = "main",
+  interactive = true,
+}: Props) {
   const router = useRouter();
   const { beginLoad } = useLoading();
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ width: 720, height: 640 });
+  const [size, setSize] = useState(() => fixedSize ?? { width: 720, height: 640 });
   const [tip, setTip] = useState<{ name: string; club: string; x: number; y: number } | null>(null);
   useLayoutEffect(() => {
+    if (fixedSize) {
+      setSize(fixedSize);
+      return;
+    }
     const node = wrapRef.current;
     if (!node) return;
     const measure = () => {
@@ -75,7 +95,7 @@ export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: 
     const observer = new ResizeObserver(measure);
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [fixedSize?.width, fixedSize?.height]);
   const width = size.width;
   const height = size.height;
   const toneById = useMemo(() => {
@@ -132,6 +152,7 @@ export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: 
   };
 
   const openPlayer = (point: ScatterPoint) => {
+    if (!interactive) return;
     beginLoad();
     router.push(point.href);
   };
@@ -153,19 +174,23 @@ export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: 
         data-player-id={point.player_id}
         data-player-name={point.name}
         cursor="pointer"
-        onMouseEnter={(event) => showTip(event, point)}
-        onMouseMove={(event) => showTip(event, point)}
-        onMouseLeave={() => setTip(null)}
+        onMouseEnter={interactive ? (event) => showTip(event, point) : undefined}
+        onMouseMove={interactive ? (event) => showTip(event, point) : undefined}
+        onMouseLeave={interactive ? () => setTip(null) : undefined}
         onClick={() => openPlayer(point)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            openPlayer(point);
-          }
-        }}
-        role="link"
-        tabIndex={0}
-        aria-label={`${point.name}, ${point.club}`}
+        onKeyDown={
+          interactive
+            ? (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  openPlayer(point);
+                }
+              }
+            : undefined
+        }
+        role={interactive ? "link" : undefined}
+        tabIndex={interactive ? 0 : undefined}
+        aria-label={interactive ? `${point.name}, ${point.club}` : undefined}
       >
         <circle cx={cx} cy={cy} r={14} fill="transparent" />
         {highlighted && <circle cx={cx} cy={cy} r={size + 7} fill={fill} opacity={0.16} />}
@@ -202,13 +227,20 @@ export function ScatterPlot({ points, avgX, avgY, highlights, xLabel, yLabel }: 
         data-y-label={yLabel}
       >
         <defs>
-          <linearGradient id="scatter-bg" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={`scatter-bg-${instanceId}`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="rgba(20, 27, 38, 0.95)" />
             <stop offset="100%" stopColor="rgba(12, 17, 25, 0.98)" />
           </linearGradient>
         </defs>
 
-        <rect x={plotLeft} y={plotTop} width={plotRight - plotLeft} height={plotBottom - plotTop} fill="url(#scatter-bg)" rx="14" />
+        <rect
+          x={plotLeft}
+          y={plotTop}
+          width={plotRight - plotLeft}
+          height={plotBottom - plotTop}
+          fill={`url(#scatter-bg-${instanceId})`}
+          rx="14"
+        />
 
         <rect x={avgLineX} y={plotTop} width={plotRight - avgLineX} height={avgLineY - plotTop} fill="rgba(52, 211, 153, 0.03)" />
         <rect x={plotLeft} y={plotTop} width={avgLineX - plotLeft} height={avgLineY - plotTop} fill="rgba(167, 139, 250, 0.025)" />
