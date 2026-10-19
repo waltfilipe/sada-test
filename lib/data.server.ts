@@ -89,6 +89,7 @@ export function getSearchRows(league?: string): PlayerSearchRow[] {
             duelo_aereo: 0,
           },
           badges: profile ? playerStatBadges(profile).map((badge) => badge.key) : [],
+          scatter: profile?.scatter,
           heatmap: compactHeatmap(heatmap),
         };
       }),

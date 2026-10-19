@@ -15,6 +15,7 @@ import { formatFoot } from "@/lib/feet";
 import { familyBySlug } from "@/lib/positions";
 import { profileMetaForFamily } from "@/lib/profileMeta";
 import { activeProfileKeys, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
+import { isProjectionEligible, realisticProjection } from "@/lib/minuteProjection";
 import { playerInitials, profileGradeFromRank } from "@/lib/scoutTheme";
 import { badgeCatalogForFamily, playerStatBadges } from "@/lib/statBadges";
 import {
@@ -40,6 +41,8 @@ type ReportLine = {
   value: string;
   percentile: number | null;
   sub?: boolean;
+  projectionValue?: string;
+  projectionPercentile?: number | null;
 };
 
 type ReportBlock = {
@@ -119,6 +122,36 @@ function reportSections(player: PlayerProfile, lang: ReportLang): ReportSection[
     if (blocks.length) sections.push({ title: translateSection(section.title, lang), tone: section.tone, blocks });
   }
   return sections;
+}
+
+function lineKey(section: string, block: string | null, label: string): string {
+  return `${section}::${block ?? ""}::${label}`;
+}
+
+/** Overlay starter-minute projection on the observed lines. Same label, lighter figure. */
+function applyProjection(base: ReportSection[], projected: ReportSection[]): ReportSection[] {
+  const lookup = new Map<string, ReportLine>();
+  for (const section of projected) {
+    for (const block of section.blocks) {
+      for (const line of block.lines) lookup.set(lineKey(section.title, block.title, line.label), line);
+    }
+  }
+  return base.map((section) => ({
+    ...section,
+    blocks: section.blocks.map((block) => ({
+      ...block,
+      lines: block.lines.map((line) => {
+        const hit = lookup.get(lineKey(section.title, block.title, line.label));
+        if (!hit) return line;
+        if (hit.value === line.value && hit.percentile === line.percentile) return line;
+        return {
+          ...line,
+          projectionValue: hit.value,
+          projectionPercentile: hit.percentile,
+        };
+      }),
+    })),
+  }));
 }
 
 /** Rough printed height of a section, in table rows. */
@@ -359,11 +392,14 @@ function gradeTone(grade: string | null): string {
   return "is-d";
 }
 
-function PercentileCell({ value }: { value: number | null }) {
+function PercentileCell({ value, ribbon }: { value: number | null; ribbon?: number | null }) {
   return (
     <span className={`player-report-pct ${percentileTone(value)}`}>
       <span className="player-report-pct-track" aria-hidden="true">
         <span style={{ width: `${value ?? 0}%` }} />
+        {ribbon != null ? (
+          <i className="player-report-pct-ribbon" style={{ left: `${Math.max(0, Math.min(100, ribbon))}%` }} />
+        ) : null}
       </span>
       <b>{value ?? "—"}</b>
     </span>
@@ -515,7 +551,13 @@ export function ReportSheet({
   const league = useLeague();
   const copy: ReportCopy = REPORT_COPY[lang];
   const locale = reportLocale(lang);
-  const sections = useMemo(() => reportSections(player, lang), [player, lang]);
+  const sections = useMemo(() => {
+    const observed = reportSections(player, lang);
+    if (!isProjectionEligible(player)) return observed;
+    const projection = realisticProjection(player, players);
+    if (!projection) return observed;
+    return applyProjection(observed, reportSections(projection.profile, lang));
+  }, [player, players, lang]);
   const { columns, density } = useMemo(() => sectionColumns(sections), [sections]);
   const scores = useMemo(() => sectionScores(sections), [sections]);
   const metrics = useMemo(() => reportMetrics(sections, copy), [sections, copy]);
@@ -711,8 +753,13 @@ export function ReportSheet({
                               className={`player-report-row player-report-line${line.sub ? " is-sub" : ""}`}
                             >
                               <span className="player-report-line-label">{line.label}</span>
-                              <span className="player-report-value">{line.value}</span>
-                              <PercentileCell value={line.percentile} />
+                              <span className="player-report-value">
+                                {line.value}
+                                {line.projectionValue ? (
+                                  <small className="player-report-projection">{line.projectionValue}</small>
+                                ) : null}
+                              </span>
+                              <PercentileCell value={line.percentile} ribbon={line.projectionPercentile} />
                             </div>
                           ))}
                         </div>
@@ -744,6 +791,12 @@ export function ReportSheet({
                   </span>
                   {copy.legendBadge}
                 </li>
+                {isProjectionEligible(player) ? (
+                  <li>
+                    <span className="player-report-legend-key is-projection" aria-hidden="true" />
+                    {copy.legendProjection}
+                  </li>
+                ) : null}
               </ul>
             </div>
             <ReportColophon generated={generated} page={copy.page(1 + pageOffset, totalPages)} />

@@ -4860,6 +4860,13 @@
     white-space: nowrap;
   }
 
+  .player-report-projection {
+    margin-left: 1.1mm;
+    color: #b0891e;
+    font-size: 6.6px;
+    font-weight: 650;
+  }
+
   .player-report-pct {
     display: flex;
     align-items: center;
@@ -4868,12 +4875,31 @@
   }
 
   .player-report-pct-track {
+    position: relative;
     display: block;
     flex: 1;
     height: 3px;
-    overflow: hidden;
+    overflow: visible;
     border-radius: 99px;
     background: var(--r-hair);
+  }
+
+  .player-report-pct-ribbon {
+    position: absolute;
+    top: -2.4px;
+    width: 1.7px;
+    height: 8px;
+    margin-left: -0.85px;
+    border-radius: 1px;
+    background: linear-gradient(#f8e7a2, #c9a227);
+    box-shadow: 0 0 0 0.45px #fff;
+  }
+
+  .player-report-legend-key.is-projection {
+    width: 7px;
+    height: 8px;
+    border-radius: 1px;
+    background: linear-gradient(#f8e7a2, #c9a227);
   }
 
   .player-report-pct-track span {

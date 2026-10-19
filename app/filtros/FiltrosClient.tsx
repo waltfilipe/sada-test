@@ -31,6 +31,52 @@ const SORTS = [
   { key: "name", label: "Nome (A–Z)" },
 ] as const;
 
+const BASE_STATS = [
+  { key: "rating", label: "Nota" },
+  { key: "goals", label: "Gols" },
+  { key: "assists", label: "Assistências" },
+] as const;
+
+/** Scatter axes already stored on each athlete, so the filter list can rank by a stat. */
+const FAMILY_STATS: Record<PositionFamily, { key: string; label: string }[]> = {
+  zagueiros: [
+    { key: "duelos_def", label: "Duelos defensivos" },
+    { key: "intervencoes", label: "Intervenções" },
+    { key: "duelo_ar", label: "Duelo aéreo" },
+    { key: "passes_prog", label: "Passes progressivos" },
+    { key: "contencao", label: "Contenção" },
+    { key: "construcao", label: "Construção" },
+    { key: "ofensividade", label: "Ofensividade" },
+    { key: "confrontos_of", label: "Confrontos ofensivos" },
+  ],
+  laterais: [
+    { key: "cruzamentos", label: "Cruzamentos" },
+    { key: "progressao", label: "Progressão" },
+    { key: "xa", label: "xA" },
+    { key: "duelos_def", label: "Duelos defensivos" },
+    { key: "construcao", label: "Construção" },
+  ],
+  "meio-campistas": [
+    { key: "finalizacao", label: "Finalizações" },
+    { key: "progressao", label: "Progressão" },
+    { key: "xa", label: "xA" },
+    { key: "duelos_def", label: "Duelos defensivos" },
+    { key: "construcao", label: "Construção" },
+  ],
+  extremos: [
+    { key: "dribles", label: "Dribles" },
+    { key: "xa", label: "xA" },
+    { key: "progressao", label: "Progressão" },
+    { key: "cruzamentos", label: "Cruzamentos" },
+    { key: "toques_area", label: "Toques na área" },
+  ],
+  atacantes: [
+    { key: "finalizacao", label: "Finalizações" },
+    { key: "toques_area", label: "Toques na área" },
+    { key: "progressao", label: "Progressão" },
+  ],
+};
+
 const CONTRACT_BANDS: { key: Exclude<ContractFilter, "all">; label: string }[] = [
   { key: "lt6", label: "Menos de 6 meses" },
   { key: "lt12", label: "Menos de 1 ano" },
@@ -77,7 +123,14 @@ function matchesMarket(eur: number | null | undefined, band: MarketFilter) {
   return eur > 6_000_000;
 }
 
-type SortKey = (typeof SORTS)[number]["key"];
+type SortKey = string;
+
+function statSortValue(player: PlayerSearchRow, key: string): number {
+  if (key === "rating") return player.rating;
+  if (key === "goals") return player.goals;
+  if (key === "assists") return player.assists;
+  return player.scatter?.[key] ?? Number.NEGATIVE_INFINITY;
+}
 type Range = [number, number];
 type Origin = "all" | "br" | "out";
 
@@ -140,6 +193,16 @@ export function FiltrosClient({ meta, players }: Props) {
     }
     setReady(true);
   }, [leagueId]);
+
+  useEffect(() => {
+    if (!sort.startsWith("stat:")) return;
+    const key = sort.slice(5);
+    const allowed = new Set<string>([
+      ...BASE_STATS.map((item) => item.key),
+      ...FAMILY_STATS[family].map((item) => item.key),
+    ]);
+    if (!allowed.has(key)) setSort("destaque");
+  }, [family, sort]);
 
   useEffect(() => {
     if (!ready) return;
@@ -231,6 +294,7 @@ export function FiltrosClient({ meta, players }: Props) {
       if (sort === "name") return a.name.localeCompare(b.name, "pt-BR");
       if (sort === "minutes") return b.minutes - a.minutes;
       if (sort === "age") return (b.birth_year ?? 0) - (a.birth_year ?? 0);
+      if (sort.startsWith("stat:")) return statSortValue(b, sort.slice(5)) - statSortValue(a, sort.slice(5));
       return positionRating(b) - positionRating(a);
     });
   }, [players, family, club, origin, foot, profiles, profileOptions, badges, query, minutes, height, age, contract, market, sort]);
@@ -488,12 +552,24 @@ export function FiltrosClient({ meta, players }: Props) {
 
             <label className="results-sort">
               <span>Ordenar</span>
-              <select value={sort} onChange={(event) => setSort(event.target.value as SortKey)}>
+              <select value={sort} onChange={(event) => setSort(event.target.value)}>
                 {SORTS.map((item) => (
                   <option key={item.key} value={item.key}>
                     {item.label}
                   </option>
                 ))}
+                <optgroup label="Estatística">
+                  {BASE_STATS.map((item) => (
+                    <option key={item.key} value={`stat:${item.key}`}>
+                      {item.label}
+                    </option>
+                  ))}
+                  {FAMILY_STATS[family].map((item) => (
+                    <option key={item.key} value={`stat:${item.key}`}>
+                      {item.label}
+                    </option>
+                  ))}
+                </optgroup>
               </select>
             </label>
           </div>

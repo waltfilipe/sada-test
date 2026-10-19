@@ -11,7 +11,7 @@ export type SavedFilters = {
   foot: string;
   profiles: string[];
   badges: string[];
-  sort: "destaque" | "minutes" | "age" | "name";
+  sort: string;
   age: [number, number];
   height: [number, number];
   minutes: [number, number];

@@ -105,6 +105,8 @@ export type PlayerSearchRow = PlayerSummary & {
   tendencies: Tendencies;
   /** Stat badges earned on the position page. */
   badges: string[];
+  /** Numeric axes already used by scatter, so filters can sort without the full profile. */
+  scatter?: Record<string, number>;
   /** Downsampled touch map for the filter-card preview. */
   heatmap?: PlayerHeatmapData;
 };

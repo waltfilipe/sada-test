@@ -33,6 +33,8 @@ export const REPORT_COPY = {
     legendRates: "“Por 90” e “/90” são taxas por 90 minutos. Gols, assistências, xG, xA e erros somam a temporada.",
     legendBadge:
       "Badge é o selo de destaque: o atleta supera o percentil 50 da posição em volume e em eficiência daquele bloco.",
+    legendProjection:
+      "O número menor ao lado do dado e a fita dourada no percentil são a projeção com minutagem de titular.",
     pool: (family: string, league: string) => `${family.toLocaleLowerCase("pt-BR")} da ${league}`,
     longer: "Mais longo que a média",
     shorter: "Mais curto que a média",
@@ -97,6 +99,8 @@ export const REPORT_COPY = {
     legendRates: "“Per 90” and “/90” are rates per 90 minutes. Goals, assists, xG, xA and errors are season totals.",
     legendBadge:
       "A badge marks a strength: the player is above the 50th percentile for the position in both volume and efficiency of that block.",
+    legendProjection:
+      "The smaller figure beside a rate, and the gold ribbon on the percentile, are the projection at starter minutes.",
     pool: (family: string, league: string) => `${family.toLocaleLowerCase("en-GB")} in ${league}`,
     longer: "Longer than average",
     shorter: "Shorter than average",
