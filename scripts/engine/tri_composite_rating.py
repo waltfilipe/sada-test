@@ -70,8 +70,11 @@ def _shrink(raw: float, pct_minutes: float, params: TriCompositeRatingParams) ->
 
 
 def _tanh_nota(series: pd.Series, params: TriCompositeRatingParams) -> pd.Series:
-    mu = float(series.mean())
-    sig = float(series.std())
+    from .pool_reference import distribution
+
+    sample = distribution(series)
+    mu = float(sample.mean())
+    sig = float(sample.std())
     if sig == 0:
         return pd.Series(params.nota_mu, index=series.index)
     z = (series - mu) / (sig * params.nota_tau)
@@ -143,6 +146,7 @@ def apply_tri_composite_ratings(
     prefix = config.blend_raw_prefix
 
     merged = pool.merge(build_metric_scores(pool), on="player_id", how="left")
+    merged.index = pool.index
 
     for spec in config.profiles:
         merged[spec.raw_col] = merged[list(spec.metric_cols)].mean(axis=1)

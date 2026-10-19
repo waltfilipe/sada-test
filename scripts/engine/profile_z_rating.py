@@ -34,12 +34,9 @@ METRIC_TO_COLUMNS: dict[str, tuple[str, ...]] = {
 
 
 def _zscore_series(series: pd.Series, clip: float = 2.5) -> pd.Series:
-    values = pd.to_numeric(series, errors="coerce").fillna(0.0)
-    mu = float(values.mean())
-    sigma = float(values.std())
-    if sigma == 0:
-        return pd.Series(0.0, index=series.index)
-    return ((values - mu) / sigma).clip(-clip, clip)
+    from .pool_reference import zscore_against
+
+    return zscore_against(series, clip=clip, fillna=0.0)
 
 
 def _metric_z(pool: pd.DataFrame, metric_key: str) -> pd.Series:

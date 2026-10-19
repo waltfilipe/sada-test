@@ -19,6 +19,7 @@ from engine.sofascore_heatmap import (
     import_heatmaps_from_br26,
 )
 from engine.transfermarkt import seed_cache_from_profiles
+from engine.pool_reference import reference_pool
 from engine.positions import (
     POSITION_FAMILIES,
     SCATTER_METRICS,
@@ -54,7 +55,13 @@ def build_league(league_id: str) -> None:
     nationalities = sorted({str(n) for n in df["Naturalidade"].dropna().unique()})
 
     for family_key, family in POSITION_FAMILIES.items():
-        computed = attach_aspect_percentiles(compute_family_metrics(df, family_key))
+        computed = compute_family_metrics(df, family_key, publish_all=True)
+        reference_index = computed.attrs.get("reference_index")
+        if reference_index is not None:
+            with reference_pool(reference_index):
+                computed = attach_aspect_percentiles(computed)
+        else:
+            computed = attach_aspect_percentiles(computed)
         pool_size = len(computed)
         players = [build_player_payload(row, family_key, pool_size) for _, row in computed.iterrows()]
         family_payloads[family_key] = players

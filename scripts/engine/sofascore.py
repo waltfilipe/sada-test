@@ -25,6 +25,8 @@ SS_CLUB_ALIASES: dict[str, list[str]] = {
     "coritiba": ["coritiba"],
     "sao paulo": ["sao paulo"],
     "fluminense": ["fluminense"],
+    "capital brasilia": ["capital cf", "capital clube de futebol"],
+    "capital cf": ["capital brasilia", "capital clube de futebol"],
 }
 
 
@@ -121,11 +123,15 @@ def aggregate_sofascore(path: Path | None = None) -> pd.DataFrame:
 def match_ss_row(wy_row: pd.Series, ss: pd.DataFrame) -> pd.Series | None:
     wy_name = str(wy_row["Jogador"])
     wy_club = str(wy_row["Equipe"])
+    wy_token_count = len(normalize_text(wy_name).split())
     best_score = -1.0
     best_row = None
     for _, cand in ss.iterrows():
         ns = name_similarity(wy_name, cand["player_name"])
         cs = club_match_score(wy_club, cand["primary_team"])
+        cand_token_count = len(normalize_text(cand["player_name"]).split())
+        if cs == 0 and cand_token_count > wy_token_count:
+            continue
         if cs < 50 and ns < 90:
             continue
         combined = ns if cs < 50 else 0.58 * ns + 0.42 * cs
