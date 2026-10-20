@@ -130,20 +130,12 @@
   min-width: 0;
 }
 
-.scout-brand-logos {
+.scout-header-logo {
   display: block;
-  flex: 0 0 auto;
-  line-height: 0;
-}
-
-.scout-logo-full,
-.scout-logo-compact {
   width: auto;
-  max-width: none;
-}
-
-.scout-logo-compact {
-  display: none;
+  max-width: min(220px, 42vw);
+  height: auto;
+  object-fit: contain;
 }
 
 .sc-brand-mark {
@@ -3287,12 +3279,8 @@ select:focus-visible {
 }
 
 @media (max-width: 900px) {
-  .scout-logo-full {
-    display: none;
-  }
-
-  .scout-logo-compact {
-    display: block;
+  .scout-header-logo {
+    max-width: min(180px, 48vw);
   }
 
   .scout-body {

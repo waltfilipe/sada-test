@@ -23,7 +23,7 @@ type Props = {
 };
 
 export function ScoutTopbar({ active, subnav }: Props) {
-  const { leagueId, href, name, season } = useLeague();
+  const { leagueId, href } = useLeague();
   const pathname = usePathname() || "/";
 
   function leagueHref(nextId: string) {
@@ -38,15 +38,8 @@ export function ScoutTopbar({ active, subnav }: Props) {
   return (
     <div className="scout-topbar-wrap">
       <header className="scout-topbar">
-        <Link href={href("/")} className="scout-brand">
-          <span className="scout-brand-logos">
-            <SiteLogo variant="horizontal" className="scout-logo-full" height={52} />
-            <SiteLogo variant="mark" className="scout-logo-compact" height={36} />
-          </span>
-          <span className="sc-brand-copy">
-            <strong>{name} Scout</strong>
-            <em>Temporada {season}</em>
-          </span>
+        <Link href={href("/")} className="scout-brand" aria-label="SADA | Scout — Início">
+          <SiteLogo variant="header" className="scout-header-logo" height={44} />
         </Link>
 
         <div className="league-switcher" role="navigation" aria-label="Ligas">

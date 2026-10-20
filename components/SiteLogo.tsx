@@ -1,8 +1,11 @@
+export const SITE_NAME = "SADA | Scout";
+
 const SOURCES = {
   wordmark: "/brand/sada-wordmark.png",
   horizontal: "/brand/sada-lockup-horizontal.png",
   stacked: "/brand/sada-lockup-stacked.png",
   mark: "/brand/sada-mark.png",
+  header: "/brand/sada-scout-header.png",
 } as const;
 
 type Variant = keyof typeof SOURCES;
@@ -20,7 +23,7 @@ export function SiteLogo({
   height,
   width,
   className = "",
-  alt = "SADA — Sistema de Análise de Dados de Atletas",
+  alt = SITE_NAME,
 }: Props) {
   return (
     <img

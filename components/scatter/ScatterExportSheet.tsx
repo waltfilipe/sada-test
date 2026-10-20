@@ -109,7 +109,7 @@ export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, 
             </ul>
             <footer className="player-report-foot">
               <p className="player-report-colophon">
-                <span>SADA Scout</span>
+                <span>SADA | Scout</span>
                 <span>{generated}</span>
                 <span>{copy.page(totalPages, totalPages)}</span>
               </p>

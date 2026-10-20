@@ -12,7 +12,7 @@ import "./home.css";
 import "./zag-v2.css";
 
 export const metadata: Metadata = {
-  title: "Brasil Scout",
+  title: "SADA | Scout",
   description: "Dashboard de scouting das Séries A, B, C e D com ratings, perfis e comparações.",
   icons: {
     icon: [{ url: "/favicon.png", type: "image/png" }],

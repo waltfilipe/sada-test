@@ -422,7 +422,7 @@ function ReportBanner({ kicker, league, family }: { kicker: string; league: stri
 function ReportColophon({ generated, page }: { generated: string; page: string }) {
   return (
     <p className="player-report-colophon">
-      <span>SADA Scout</span>
+      <span>SADA | Scout</span>
       <span>{generated}</span>
       <span>{page}</span>
     </p>
