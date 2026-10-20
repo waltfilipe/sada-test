@@ -441,7 +441,7 @@ export function PlayerHeatmap({ heatmap, playerName, compact = false, upright = 
     .filter(Boolean)
     .join(" · ");
 
-  const ariaLabel = `Heatmap de ${playerName}${meta ? ` — ${meta}` : ""}`;
+  const ariaLabel = `Mapa de calor de ${playerName}${meta ? ` — ${meta}` : ""}`;
 
   if (fixed && hasPoints) {
     return (

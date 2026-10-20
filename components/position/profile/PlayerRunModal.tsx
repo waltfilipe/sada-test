@@ -1,5 +1,6 @@
 "use client";
 
+import { Tooltip } from "@/components/ui/Tooltip";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
 import type { PlayerPhysicalRun, PlayerProfile } from "@/lib/types";
 import { StatWindow } from "./ScoutStatsSections";
@@ -54,11 +55,13 @@ function fmt(value: number, digits: number): string {
   return value.toLocaleString("pt-BR", { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
-function rankLine(run: PlayerPhysicalRun, key: MetricDef["key"]): string | null {
+function comparisonTooltip(run: PlayerPhysicalRun, key: MetricDef["key"], pct: number): string {
   const rank = run.ranks[key];
   const pool = run.position_pool_size;
-  if (!rank || !pool) return null;
-  return `${rank}º de ${pool} · ${run.position_pool}`;
+  const parts = [`Percentil ${Math.round(pct)}`];
+  if (rank && pool) parts.push(`${rank}º de ${pool}`);
+  if (run.position_pool) parts.push(run.position_pool);
+  return parts.join(" · ");
 }
 
 type Props = {
@@ -89,7 +92,7 @@ export function PlayerRunModal({ player, onClose }: Props) {
         <div className="run-metrics-grid">
           {METRICS.map((metric) => {
             const pct = run.percentiles[metric.key];
-            const rank = rankLine(run, metric.key);
+            const tip = pct != null ? comparisonTooltip(run, metric.key, pct) : null;
             return (
               <article key={metric.key} className="run-metric-card">
                 <div className="run-metric-head">
@@ -99,14 +102,12 @@ export function PlayerRunModal({ player, onClose }: Props) {
                     <span className="run-metric-unit">{metric.unit}</span>
                   </span>
                 </div>
-                {pct != null ? (
-                  <>
-                    <MetricGradientBar score={pct} scale="percent" />
-                    <p className="run-metric-foot tabular">
-                      Percentil {Math.round(pct)}
-                      {rank ? ` · ${rank}` : null}
-                    </p>
-                  </>
+                {pct != null && tip ? (
+                  <Tooltip content={tip} block>
+                    <div className="run-metric-bar-tip" aria-label={tip}>
+                      <MetricGradientBar score={pct} scale="percent" />
+                    </div>
+                  </Tooltip>
                 ) : (
                   <p className="run-metric-foot run-metric-foot-muted">
                     Amostra insuficiente na posição para percentil (mín. 270 min na coleta).

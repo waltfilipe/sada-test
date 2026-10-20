@@ -13,7 +13,7 @@ type Props = {
 
 export function BadgeFilterBox({ options, selected, onToggle, inline = false }: Props) {
   const icons = (
-    <div className={`badge-filter-icons${inline ? " is-inline" : ""}`} role="group" aria-label="Badges">
+    <div className={`badge-filter-icons${inline ? " is-inline" : ""}`} role="group" aria-label="Selos">
       {options.map((badge) => {
         const active = selected.includes(badge.key);
         return (
@@ -38,7 +38,7 @@ export function BadgeFilterBox({ options, selected, onToggle, inline = false }: 
   return (
     <details className="badge-filter-box">
       <summary>
-        <span>Badges</span>
+        <span>Selos</span>
         <em>{selected.length ? `${selected.length} selecionado${selected.length > 1 ? "s" : ""}` : "Filtrar"}</em>
       </summary>
       {icons}

@@ -23,7 +23,7 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
           <div className="profile-content-col profile-col-heatmap">
             <div className="player-card heatmap-card profile-perfil-card-score">
               <div className="profile-card-head">
-                <h3 className="section-label">Heatmap</h3>
+                <h3 className="section-label">Mapa de calor</h3>
               </div>
               <PlayerHeatmap upright heatmap={player.heatmap} playerName={player.name} />
             </div>

@@ -17,7 +17,7 @@ export const REPORT_COPY = {
     contract: "Contrato",
     contractUntil: (date: string) => `até ${date}`,
     tendencies: "Tendências de passe",
-    badges: "Badges",
+    badges: "Selos",
     stats: "Estatísticas",
     value: "dado",
     percentile: "percentil",

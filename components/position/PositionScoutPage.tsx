@@ -259,7 +259,7 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
                 </section>
 
                 <section>
-                  <h2>Badges</h2>
+                  <h2>Selos</h2>
                   <BadgeFilterBox inline options={badgeOptions} selected={badges} onToggle={toggleBadge} />
                   <p className="zag-v2-note">Quem tem todos os badges marcados.</p>
                 </section>

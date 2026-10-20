@@ -370,7 +370,7 @@ export function ScoutStatsSections({
     <div className={`stats-swap-panel${projectionOn ? " is-projection" : ""}`} key={`${player.player_id}-index`}>
       <div className="profile-card-head">
         <div className="stats-head-title">
-          <h3 className="section-label">Stats and Badges</h3>
+          <h3 className="section-label">Estatísticas e selos</h3>
           {projection ? (
             <button
               type="button"
@@ -397,7 +397,7 @@ export function ScoutStatsSections({
         <PlayerBadgesSection badges={allBadges} />
 
         <section className="stats-subsection" aria-label="Estatísticas por grupo">
-          <h4 className="stats-subsection-label">Stats</h4>
+          <h4 className="stats-subsection-label">Estatísticas</h4>
           <div className="stats-nav-grid">
             {entries.map((entry) => {
               const open = active === entry.title;

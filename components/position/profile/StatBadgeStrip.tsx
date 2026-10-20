@@ -21,7 +21,7 @@ export function StatBadgeStrip({ badges, tone, size = "sm" }: StripProps) {
     <div
       className={`stat-badge-strip tone-${tone}${size === "md" ? " stat-badge-strip-md" : ""}`}
       role="list"
-      aria-label="Badges conquistados"
+      aria-label="Selos conquistados"
     >
       {badges.map((badge) => (
         <StatBadgeChip key={badge.key} badge={badge} tone={tone} />
@@ -52,8 +52,8 @@ type CatalogProps = {
 
 export function PlayerBadgesSection({ badges, hideLabel = false }: CatalogProps) {
   return (
-    <section className="player-badges-section" aria-label="Badges do atleta">
-      {hideLabel ? null : <h4 className="stats-subsection-label">Badges</h4>}
+    <section className="player-badges-section" aria-label="Selos do atleta">
+      {hideLabel ? null : <h4 className="stats-subsection-label">Selos</h4>}
       {badges.length === 0 ? (
         <p className="player-badges-empty">Nenhum badge conquistado</p>
       ) : (

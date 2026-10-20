@@ -251,7 +251,7 @@ export function CompareStatsSections({ playerA, playerB, family }: Props) {
   return (
     <section className="player-card compare-stats-panel" aria-label="Estatísticas comparadas">
       <div className="profile-card-head compare-stats-panel-head">
-        <h3 className="section-label">Stats</h3>
+        <h3 className="section-label">Estatísticas</h3>
         <span className="profile-card-head-hint">Volume e eficiência por grupo</span>
       </div>
 

@@ -71,7 +71,7 @@ export function PlayerResultRow({
         </Link>
 
         {earned.length ? (
-          <ul className="row-badges" aria-label="Badges">
+          <ul className="row-badges" aria-label="Selos">
             {earned.map((badge) => (
               <li key={badge.key}>
                 <Tooltip content={`${badge.label}. ${badge.title}`}>
