@@ -12,6 +12,8 @@ class LeagueConfig(TypedDict):
     defensive_csv: Path
     heatmaps: bool
     heatmaps_dir: Path | None
+    physical_run: bool
+    run_csv: Path | None
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -26,6 +28,8 @@ LEAGUES: dict[str, LeagueConfig] = {
         "defensive_csv": ROOT / "BR26_defensive.csv",
         "heatmaps": True,
         "heatmaps_dir": ROOT / "HeatmapsBR26",
+        "physical_run": True,
+        "run_csv": ROOT / "BR26_run.csv",
     },
     "serie-b": {
         "id": "serie-b",
@@ -35,6 +39,8 @@ LEAGUES: dict[str, LeagueConfig] = {
         "defensive_csv": ROOT / "BRB26_defensive.csv",
         "heatmaps": True,
         "heatmaps_dir": ROOT / "HeatmapsBRB26",
+        "physical_run": False,
+        "run_csv": None,
     },
     "serie-c": {
         "id": "serie-c",
@@ -44,6 +50,8 @@ LEAGUES: dict[str, LeagueConfig] = {
         "defensive_csv": ROOT / "BRC26_defensive.csv",
         "heatmaps": True,
         "heatmaps_dir": ROOT / "HeatmapsBRC26",
+        "physical_run": False,
+        "run_csv": None,
     },
     "serie-d": {
         "id": "serie-d",
@@ -53,6 +61,8 @@ LEAGUES: dict[str, LeagueConfig] = {
         "defensive_csv": ROOT / "BRD26_defensive.csv",
         "heatmaps": True,
         "heatmaps_dir": ROOT / "HeatmapsBRD26",
+        "physical_run": False,
+        "run_csv": None,
     },
     "mls-next-pro": {
         "id": "mls-next-pro",
@@ -62,5 +72,7 @@ LEAGUES: dict[str, LeagueConfig] = {
         "defensive_csv": ROOT / "MLS_NEXT_PRO_defensive.csv",
         "heatmaps": True,
         "heatmaps_dir": ROOT / "HeatmapsMLSN",
+        "physical_run": False,
+        "run_csv": None,
     },
 }

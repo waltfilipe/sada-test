@@ -12,6 +12,7 @@ import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { PlayerReportButton } from "@/components/position/profile/PlayerReport";
 import { SimilarCrossLeagueModal } from "@/components/position/profile/SimilarCrossLeagueModal";
+import { PlayerRunModal } from "@/components/position/profile/PlayerRunModal";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { PassTendencies } from "./PassTendencies";
 
@@ -89,6 +90,8 @@ function MarketCard({
 export function PlayerHero({ player, family, players }: Props) {
   const { href, leagueId } = useLeague();
   const [similarOpen, setSimilarOpen] = useState(false);
+  const [runOpen, setRunOpen] = useState(false);
+  const showRun = Boolean(player.physical_run);
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const tm = player.transfermarkt;
 
@@ -203,7 +206,7 @@ export function PlayerHero({ player, family, players }: Props) {
           </MarketCard>
         </div>
 
-        <div className="hero-action-grid">
+        <div className={`hero-action-grid${showRun ? " hero-action-grid-has-run" : ""}`}>
           <div className="hero-action-cell hero-action-tendencies">
             <PassTendencies player={player} players={players} />
           </div>
@@ -221,6 +224,15 @@ export function PlayerHero({ player, family, players }: Props) {
               </button>
             </Tooltip>
           </div>
+          {showRun ? (
+            <div className="hero-action-cell hero-action-run">
+              <Tooltip content="Distância, velocidade e sprints vs. atletas na mesma posição.">
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setRunOpen(true)}>
+                  <i className="fa-solid fa-person-running" aria-hidden="true" /> GPS
+                </button>
+              </Tooltip>
+            </div>
+          ) : null}
           <div className="hero-action-cell hero-action-pdf">
             <Tooltip content="Gera um relatório em PDF deste atleta.">
               <span className="hero-action-slot">
@@ -254,6 +266,9 @@ export function PlayerHero({ player, family, players }: Props) {
           currentLeagueId={leagueId}
           onClose={() => setSimilarOpen(false)}
         />
+      ) : null}
+      {runOpen && player.physical_run ? (
+        <PlayerRunModal player={player} onClose={() => setRunOpen(false)} />
       ) : null}
     </section>
   );

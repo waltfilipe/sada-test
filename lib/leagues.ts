@@ -8,6 +8,7 @@ export type LeagueInfo = {
   brand: string;
   tagline: string;
   heatmaps: boolean;
+  physicalRun: boolean;
 };
 
 export const LEAGUES: LeagueInfo[] = [
@@ -19,6 +20,7 @@ export const LEAGUES: LeagueInfo[] = [
     brand: "SA",
     tagline: "Brasileirão",
     heatmaps: true,
+    physicalRun: true,
   },
   {
     id: "serie-b",
@@ -28,6 +30,7 @@ export const LEAGUES: LeagueInfo[] = [
     brand: "SB",
     tagline: "Brasileirão",
     heatmaps: true,
+    physicalRun: false,
   },
   {
     id: "serie-c",
@@ -37,6 +40,7 @@ export const LEAGUES: LeagueInfo[] = [
     brand: "SC",
     tagline: "Brasileirão",
     heatmaps: true,
+    physicalRun: false,
   },
   {
     id: "serie-d",
@@ -46,6 +50,7 @@ export const LEAGUES: LeagueInfo[] = [
     brand: "SD",
     tagline: "Brasileirão",
     heatmaps: true,
+    physicalRun: false,
   },
   {
     id: "mls-next-pro",
@@ -55,6 +60,7 @@ export const LEAGUES: LeagueInfo[] = [
     brand: "NP",
     tagline: "MLS",
     heatmaps: true,
+    physicalRun: false,
   },
 ];
 

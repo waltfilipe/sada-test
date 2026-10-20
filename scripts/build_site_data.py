@@ -18,6 +18,7 @@ from engine.sofascore_heatmap import (
     attach_heatmaps_to_players,
     import_heatmaps_from_br26,
 )
+from engine.sofascore_run import attach_physical_run_to_players
 from engine.transfermarkt import seed_cache_from_profiles
 from engine.pool_reference import reference_pool
 from engine.positions import (
@@ -82,6 +83,17 @@ def build_league(league_id: str) -> None:
         print(f"  Heatmaps anexados: {attached}/{len(all_players)}")
     else:
         print("  Heatmaps: omitido para esta liga")
+
+    if league.get("physical_run") and league.get("run_csv"):
+        run_attached = attach_physical_run_to_players(
+            all_players,
+            raw_df,
+            defensive_csv=league["defensive_csv"],
+            run_csv=league["run_csv"],
+        )
+        print(f"  GPS/Run anexado: {run_attached}/{len(all_players)}")
+    else:
+        print("  GPS/Run: omitido para esta liga")
 
     family_payloads = {}
     for family_key in POSITION_FAMILIES:
@@ -151,6 +163,7 @@ def build_league(league_id: str) -> None:
         },
         "scatter_metrics": SCATTER_METRICS,
         "heatmaps_enabled": league["heatmaps"],
+        "physical_run_enabled": league.get("physical_run", False),
     }
 
     (out_dir / "players.json").write_text(

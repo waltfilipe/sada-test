@@ -121,10 +121,48 @@ export type PlayerHeatmapData = {
   image_url?: string | null;
 };
 
+export type PlayerPhysicalRun = {
+  source?: string;
+  competition?: string;
+  position_pool: string;
+  position_pool_size: number;
+  matches: number;
+  minutes: number;
+  kilometers_p90: number;
+  top_speed: number;
+  sprints_p90: number;
+  running_km_p90: number;
+  high_speed_km_p90: number;
+  sprinting_km_p90: number;
+  percentiles: Partial<
+    Record<
+      | "kilometers_p90"
+      | "top_speed"
+      | "sprints_p90"
+      | "running_km_p90"
+      | "high_speed_km_p90"
+      | "sprinting_km_p90",
+      number
+    >
+  >;
+  ranks: Partial<
+    Record<
+      | "kilometers_p90"
+      | "top_speed"
+      | "sprints_p90"
+      | "running_km_p90"
+      | "high_speed_km_p90"
+      | "sprinting_km_p90",
+      number
+    >
+  >;
+};
+
 export type PlayerProfile = PlayerSummary & {
   goals: number;
   assists: number;
   heatmap?: PlayerHeatmapData;
+  physical_run?: PlayerPhysicalRun;
   ratings: {
     geral: number;
     [profileKey: string]: number;
@@ -158,6 +196,7 @@ export type SiteMeta = {
   season: string;
   source: string;
   heatmaps_enabled?: boolean;
+  physical_run_enabled?: boolean;
   player_count: number;
   families: {
     key: PositionFamily;
