@@ -20,12 +20,6 @@ type Props = {
   onClose: () => void;
 };
 
-function blockStrengthClass(similarity: number): string {
-  if (similarity >= 90) return "is-strong";
-  if (similarity >= 75) return "is-mid";
-  return "is-soft";
-}
-
 export function SimilarCrossLeagueModal({ player, family, currentLeagueId, onClose }: Props) {
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<Step>("pick-league");
@@ -189,23 +183,25 @@ export function SimilarCrossLeagueModal({ player, family, currentLeagueId, onClo
                       >
                         <div className="similar-result-top">
                           <span className="similar-result-rank">{index + 1}</span>
-                          <span className="similar-result-photo">
-                            <PlayerPhoto
-                              src={hit.photo}
-                              alt=""
-                              fallback={
-                                <span className="similar-result-photo similar-cross-photo-fallback">
-                                  {playerInitials(hit.name)}
-                                </span>
-                              }
-                            />
-                          </span>
-                          <div className="similar-result-headline">
-                            <span className="similar-result-name">{hit.name}</span>
-                            <span className="similar-result-meta">
-                              <ClubLogo club={hit.club} size={14} />
-                              {hit.club} · {hit.profile} · {hit.rating.toFixed(1)}
+                          <div className="similar-result-identity">
+                            <span className="similar-result-photo">
+                              <PlayerPhoto
+                                src={hit.photo}
+                                alt=""
+                                fallback={
+                                  <span className="similar-result-photo similar-cross-photo-fallback">
+                                    {playerInitials(hit.name)}
+                                  </span>
+                                }
+                              />
                             </span>
+                            <div className="similar-result-headline">
+                              <span className="similar-result-name">{hit.name}</span>
+                              <span className="similar-result-meta">
+                                <ClubLogo club={hit.club} size={14} />
+                                {hit.club} · {hit.profile} · {hit.rating.toFixed(1)}
+                              </span>
+                            </div>
                           </div>
                           <span className="similar-result-total tabular">
                             <span className="similar-result-total-label">Total</span>
@@ -215,10 +211,7 @@ export function SimilarCrossLeagueModal({ player, family, currentLeagueId, onClo
                         {hit.blocks.length ? (
                           <div className="similar-result-blocks">
                             {hit.blocks.map((block) => (
-                              <div
-                                key={block.title}
-                                className={`similar-result-block tone-${block.tone} ${blockStrengthClass(block.similarity)}`}
-                              >
+                              <div key={block.title} className={`similar-result-block tone-${block.tone}`}>
                                 <span className="similar-result-block-title">{block.title}</span>
                                 <span className="similar-result-block-pct tabular">{block.similarity}%</span>
                                 <span className="similar-result-block-bar" aria-hidden="true">
