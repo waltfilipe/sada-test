@@ -123,7 +123,10 @@ function similarPayload(url: URL) {
   const positionFamily = family ?? source.position_family;
   const targetPool = getFamilyPlayers(positionFamily, toLeague as LeagueId);
   const limit = limitRaw ? Math.min(20, Math.max(1, Number(limitRaw))) : 5;
-  const matches = rankCrossLeagueSimilarity(source, targetPool, { limit });
+  const matches = rankCrossLeagueSimilarity(source, targetPool, { limit }).map((hit) => ({
+    ...hit,
+    photo: getPlayerProfile(hit.player_id, toLeague)?.transfermarkt?.photo ?? null,
+  }));
 
   return NextResponse.json({
     from: fromLeague,

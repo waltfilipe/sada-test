@@ -1,9 +1,10 @@
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
-import { statSectionsForFamily } from "@/lib/aspectStatSections";
+import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
 import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
 
 export type SimilarBlockScore = {
   title: string;
+  tone: StatSectionTone;
   similarity: number;
 };
 
@@ -13,6 +14,7 @@ export type SimilarPlayerHit = {
   club: string;
   profile: string;
   rating: number;
+  photo?: string | null;
   /** Total similarity (0–100), same field as before for API consumers. */
   similarity: number;
   blocks: SimilarBlockScore[];
@@ -55,22 +57,30 @@ function certosFeaturesForLabel(
   const item = findAspect(flattenAspects(player), label);
   if (!item) return [];
 
-  if (label === "Ações Defensivas") {
-    const features: { key: string; value: number }[] = [];
-    for (const sub of item.sub_metrics ?? []) {
-      if (sub.label === "Erros Totais" || sub.label === "Eficiência Defensiva") continue;
-      const v = parseDisplayNumber(sub.display_value);
-      if (v != null) features.push({ key: sub.label, value: v });
-    }
-    return features;
-  }
+  const subSkip = new Set(["Erros Totais", "Eficiência Defensiva", "Eficiência", "Eficiência de finalização"]);
 
   if (item.kind === "pass_certos" && item.certos_per90 != null) {
     return [{ key: "certos/90", value: item.certos_per90 }];
   }
 
-  if (item.kind === "def_efficiency_group") {
+  if (item.kind === "def_efficiency_group" || item.kind === "construction_share") {
     return [];
+  }
+
+  if (item.kind === "metric_group") {
+    const features: { key: string; value: number }[] = [];
+    const groupEff = parseEffPct(item);
+    for (const sub of item.sub_metrics ?? []) {
+      if (subSkip.has(sub.label) || sub.label.startsWith("Eficiência")) continue;
+      const vol = parseDisplayNumber(sub.display_value);
+      if (vol == null) continue;
+      if (label === "Cruzamentos" && sub.label === "Cruzamentos" && groupEff != null) {
+        features.push({ key: "certos/90", value: (vol * groupEff) / 100 });
+      } else {
+        features.push({ key: sub.label, value: vol });
+      }
+    }
+    return features;
   }
 
   const duelLike = new Set([
@@ -95,7 +105,12 @@ function certosFeaturesForLabel(
   }
 
   const vol = parseDisplayNumber(item.display_value);
-  if (vol != null && (label.includes("Condu") || label === "Progressão")) {
+  const eff = parseEffPct(item);
+  if (vol != null && eff != null && label.includes("Criativ")) {
+    return [{ key: "certos/90", value: (vol * eff) / 100 }];
+  }
+
+  if (vol != null) {
     return [{ key: "volume/90", value: vol }];
   }
 
@@ -103,36 +118,38 @@ function certosFeaturesForLabel(
 }
 
 type BlockModel = {
-  blocks: { title: string; featureIds: string[] }[];
+  blocks: { title: string; tone: StatSectionTone; featureIds: string[] }[];
   featureIds: string[];
 };
 
 function buildCertosModel(family: PositionFamily, pool: PlayerProfile[]): BlockModel {
   const sections = statSectionsForFamily(family);
-  const blockMap = new Map<string, string[]>();
+  const blockMap = new Map<string, { tone: StatSectionTone; featureIds: string[] }>();
 
   for (const section of sections) {
+    const collected = new Set<string>();
     for (const label of section.labels) {
       if (label === "Eficiência Defensiva") continue;
-      const keys = new Set<string>();
       for (const player of pool) {
         for (const f of certosFeaturesForLabel(player, label)) {
-          keys.add(`${label} · ${f.key}`);
+          collected.add(`${label} · ${f.key}`);
         }
       }
-      if (!keys.size) continue;
-      const list = blockMap.get(section.title) ?? [];
-      list.push(...keys);
-      blockMap.set(section.title, list);
     }
+    if (!collected.size) continue;
+    blockMap.set(section.title, {
+      tone: section.tone,
+      featureIds: [...collected].sort(),
+    });
   }
 
   const blocks: BlockModel["blocks"] = [];
   const featureIds: string[] = [];
-  for (const [title, ids] of blockMap) {
-    const unique = [...new Set(ids)].sort();
-    blocks.push({ title, featureIds: unique });
-    featureIds.push(...unique);
+  for (const section of sections) {
+    const entry = blockMap.get(section.title);
+    if (!entry) continue;
+    blocks.push({ title: section.title, tone: entry.tone, featureIds: entry.featureIds });
+    featureIds.push(...entry.featureIds);
   }
   return { blocks, featureIds: [...new Set(featureIds)] };
 }
@@ -206,6 +223,7 @@ export function rankCrossLeagueSimilarity(
 
   const blockRanges = blocks.map((block) => ({
     title: block.title,
+    tone: block.tone,
     indices: block.featureIds
       .map((id) => featureIds.indexOf(id))
       .filter((index) => index >= 0),
@@ -223,11 +241,11 @@ export function rankCrossLeagueSimilarity(
       total = Math.min(100, total + PROFILE_MATCH_BONUS);
     }
 
-    const blockScores: SimilarBlockScore[] = blockRanges.map(({ title, indices }) => {
-      if (!indices.length) return { title, similarity: NEUTRAL_PERCENTILE };
+    const blockScores: SimilarBlockScore[] = blockRanges.map(({ title, tone, indices }) => {
+      if (!indices.length) return { title, tone, similarity: NEUTRAL_PERCENTILE };
       const a = indices.map((i) => sourceVec[i]);
       const b = indices.map((i) => candVec[i]);
-      return { title, similarity: round1(cosineSimilarity(a, b) * 100) };
+      return { title, tone, similarity: round1(cosineSimilarity(a, b) * 100) };
     });
 
     scored.push({

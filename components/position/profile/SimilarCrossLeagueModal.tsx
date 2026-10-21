@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LEAGUES, leaguePath, type LeagueId } from "@/lib/leagues";
+import { statSectionsForFamily } from "@/lib/aspectStatSections";
+import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import type { SimilarPlayerHit } from "@/lib/crossLeagueSimilarity";
 import { ClubLogo } from "@/components/ClubLogo";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 
 type Step = "pick-league" | "loading" | "results" | "error";
 
@@ -17,6 +20,12 @@ type Props = {
   onClose: () => void;
 };
 
+function blockStrengthClass(similarity: number): string {
+  if (similarity >= 90) return "is-strong";
+  if (similarity >= 75) return "is-mid";
+  return "is-soft";
+}
+
 export function SimilarCrossLeagueModal({ player, family, currentLeagueId, onClose }: Props) {
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<Step>("pick-league");
@@ -25,6 +34,9 @@ export function SimilarCrossLeagueModal({ player, family, currentLeagueId, onClo
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+
+  const referencePhoto = player.transfermarkt?.photo;
+  const positionSections = useMemo(() => statSectionsForFamily(family), [family]);
 
   const otherLeagues = LEAGUES.filter((league) => league.id !== currentLeagueId);
 
@@ -88,12 +100,28 @@ export function SimilarCrossLeagueModal({ player, family, currentLeagueId, onClo
         </header>
 
         <div className="stat-window-body">
-          <p className="similar-cross-intro">
-            Referência: <strong>{player.name}</strong> · {player.profile}
-            <span className="similar-cross-intro-note">
-              Comparação por ações certas por 90, com % total e por bloco do dossiê.
+          <div className="similar-cross-ref">
+            <span className="similar-cross-ref-photo">
+              <PlayerPhoto
+                src={referencePhoto}
+                alt=""
+                fallback={
+                  <span className="similar-cross-ref-photo similar-cross-photo-fallback">
+                    {playerInitials(player.name)}
+                  </span>
+                }
+              />
             </span>
-          </p>
+            <div className="similar-cross-ref-copy">
+              <p className="similar-cross-ref-name">{player.name}</p>
+              <p className="similar-cross-ref-meta">
+                {player.club} · {player.profile}
+              </p>
+              <p className="similar-cross-intro-note">
+                Ações certas por 90 · % total e por bloco ({positionSections.map((s) => s.title).join(" · ")})
+              </p>
+            </div>
+          </div>
 
           {step === "pick-league" ? (
             <div className="similar-league-pick">
@@ -156,30 +184,50 @@ export function SimilarCrossLeagueModal({ player, family, currentLeagueId, onClo
                           targetLeague!,
                           `/posicao/${family}?atleta=${encodeURIComponent(hit.player_id)}`,
                         )}
-                        className="similar-result-row"
+                        className="similar-result-card"
                         onClick={onClose}
                       >
-                        <span className="similar-result-rank">{index + 1}</span>
-                        <span className="similar-result-main">
-                          <span className="similar-result-name">{hit.name}</span>
-                          <span className="similar-result-meta">
-                            <ClubLogo club={hit.club} size={14} />
-                            {hit.club} · {hit.profile} · {hit.rating.toFixed(1)}
-                          </span>
-                          {hit.blocks.length ? (
-                            <span className="similar-result-blocks">
-                              <span className="similar-result-blocks-total tabular">
-                                Total {hit.similarity}%
-                              </span>
-                              {hit.blocks.map((block) => (
-                                <span key={block.title} className="similar-result-block-chip tabular">
-                                  {block.title} {block.similarity}%
+                        <div className="similar-result-top">
+                          <span className="similar-result-rank">{index + 1}</span>
+                          <span className="similar-result-photo">
+                            <PlayerPhoto
+                              src={hit.photo}
+                              alt=""
+                              fallback={
+                                <span className="similar-result-photo similar-cross-photo-fallback">
+                                  {playerInitials(hit.name)}
                                 </span>
-                              ))}
+                              }
+                            />
+                          </span>
+                          <div className="similar-result-headline">
+                            <span className="similar-result-name">{hit.name}</span>
+                            <span className="similar-result-meta">
+                              <ClubLogo club={hit.club} size={14} />
+                              {hit.club} · {hit.profile} · {hit.rating.toFixed(1)}
                             </span>
-                          ) : null}
-                        </span>
-                        <span className="similar-result-pct tabular">{hit.similarity}%</span>
+                          </div>
+                          <span className="similar-result-total tabular">
+                            <span className="similar-result-total-label">Total</span>
+                            {hit.similarity}%
+                          </span>
+                        </div>
+                        {hit.blocks.length ? (
+                          <div className="similar-result-blocks">
+                            {hit.blocks.map((block) => (
+                              <div
+                                key={block.title}
+                                className={`similar-result-block tone-${block.tone} ${blockStrengthClass(block.similarity)}`}
+                              >
+                                <span className="similar-result-block-title">{block.title}</span>
+                                <span className="similar-result-block-pct tabular">{block.similarity}%</span>
+                                <span className="similar-result-block-bar" aria-hidden="true">
+                                  <span style={{ width: `${Math.min(100, block.similarity)}%` }} />
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
                       </Link>
                     </li>
                   ))}
