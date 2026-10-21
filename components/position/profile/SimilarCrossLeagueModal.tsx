@@ -90,6 +90,9 @@ export function SimilarCrossLeagueModal({ player, family, currentLeagueId, onClo
         <div className="stat-window-body">
           <p className="similar-cross-intro">
             Referência: <strong>{player.name}</strong> · {player.profile}
+            <span className="similar-cross-intro-note">
+              Comparação por ações certas por 90, com % total e por bloco do dossiê.
+            </span>
           </p>
 
           {step === "pick-league" ? (
@@ -163,6 +166,18 @@ export function SimilarCrossLeagueModal({ player, family, currentLeagueId, onClo
                             <ClubLogo club={hit.club} size={14} />
                             {hit.club} · {hit.profile} · {hit.rating.toFixed(1)}
                           </span>
+                          {hit.blocks.length ? (
+                            <span className="similar-result-blocks">
+                              <span className="similar-result-blocks-total tabular">
+                                Total {hit.similarity}%
+                              </span>
+                              {hit.blocks.map((block) => (
+                                <span key={block.title} className="similar-result-block-chip tabular">
+                                  {block.title} {block.similarity}%
+                                </span>
+                              ))}
+                            </span>
+                          ) : null}
                         </span>
                         <span className="similar-result-pct tabular">{hit.similarity}%</span>
                       </Link>

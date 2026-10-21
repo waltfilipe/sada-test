@@ -2915,13 +2915,21 @@
 }
 
 .similar-cross-modal {
-  max-width: 28rem;
+  max-width: 34rem;
 }
 
 .similar-cross-intro {
   margin: 0 0 0.75rem;
   font-size: 0.88rem;
   color: var(--muted);
+}
+
+.similar-cross-intro-note {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  opacity: 0.9;
 }
 
 .similar-cross-hint {
@@ -2985,7 +2993,7 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 0.55rem;
-  align-items: center;
+  align-items: start;
   padding: 0.55rem 0.6rem;
   border-radius: 10px;
   border: 1px solid rgba(27, 231, 255, 0.15);
@@ -3020,6 +3028,28 @@
   align-items: center;
   gap: 0.25rem 0.35rem;
   font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.similar-result-blocks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.similar-result-blocks-total {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #31e981;
+}
+
+.similar-result-block-chip {
+  font-size: 0.68rem;
+  padding: 0.12rem 0.35rem;
+  border-radius: 6px;
+  background: rgba(13, 27, 42, 0.65);
+  border: 1px solid rgba(27, 231, 255, 0.12);
   color: var(--muted);
 }
 

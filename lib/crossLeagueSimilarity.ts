@@ -2,23 +2,25 @@ import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
 
+export type SimilarBlockScore = {
+  title: string;
+  similarity: number;
+};
+
 export type SimilarPlayerHit = {
   player_id: string;
   name: string;
   club: string;
   profile: string;
   rating: number;
+  /** Total similarity (0–100), same field as before for API consumers. */
   similarity: number;
+  blocks: SimilarBlockScore[];
 };
 
-type MetricSlot =
-  | { id: string; label: string; kind: "volume" }
-  | { id: string; label: string; kind: "efficiency" }
-  | { id: string; label: string; kind: "sub"; subLabel: string };
-
 const NEUTRAL_PERCENTILE = 50;
+const PROFILE_MATCH_BONUS = 3;
 
-/** Percentile rank of `value` within `pool` (0–100). */
 function percentileInPool(value: number, pool: number[]): number {
   if (!pool.length) return NEUTRAL_PERCENTILE;
   const sorted = [...pool].sort((a, b) => a - b);
@@ -38,80 +40,128 @@ function parseDisplayNumber(raw?: string | null): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-function aspectItem(player: PlayerProfile, label: string): AspectItem | undefined {
-  return findAspect(flattenAspects(player), label);
+function parseEffPct(item: AspectItem): number | null {
+  if (item.efficiency_pct != null) return item.efficiency_pct;
+  const raw = item.efficiency_value?.replace("%", "").trim();
+  if (!raw) return null;
+  return parseDisplayNumber(raw);
 }
 
-function storedPercentile(item: AspectItem | undefined, slot: MetricSlot): number | null {
-  if (!item) return null;
-  if (slot.kind === "sub") {
-    return item.sub_metrics?.find((sub) => sub.label === slot.subLabel)?.percentile ?? null;
-  }
-  if (slot.kind === "efficiency") return item.efficiency_pct ?? null;
-  return item.percentile ?? null;
-}
+/** Successful actions per 90 (certos / vencidos) from dossier cards. */
+function certosFeaturesForLabel(
+  player: PlayerProfile,
+  label: string,
+): { key: string; value: number }[] {
+  const item = findAspect(flattenAspects(player), label);
+  if (!item) return [];
 
-/** Prefer per90 / display for cross-pool ranking; fall back to stored percentile. */
-function rawForSlot(player: PlayerProfile, slot: MetricSlot): number | null {
-  const item = aspectItem(player, slot.label);
-  if (!item) return null;
-  if (slot.kind === "sub") {
-    const sub = item.sub_metrics?.find((s) => s.label === slot.subLabel);
-    return parseDisplayNumber(sub?.display_value) ?? sub?.percentile ?? null;
-  }
-  if (slot.kind === "efficiency") return item.efficiency_pct ?? null;
-  if (item.certos_per90 != null) return item.certos_per90;
-  return parseDisplayNumber(item.display_value) ?? item.percentile ?? null;
-}
-
-function percentileForSlot(player: PlayerProfile, pool: PlayerProfile[], slot: MetricSlot): number {
-  const values = pool
-    .map((p) => rawForSlot(p, slot))
-    .filter((value): value is number => value != null);
-  const raw = rawForSlot(player, slot);
-  if (raw != null && values.length >= 3) {
-    return percentileInPool(raw, values);
-  }
-
-  const stored = pool
-    .map((p) => storedPercentile(aspectItem(p, slot.label), slot))
-    .filter((value): value is number => value != null);
-  const mine = storedPercentile(aspectItem(player, slot.label), slot);
-  if (mine != null && stored.length >= 3) {
-    return percentileInPool(mine, stored);
-  }
-  return mine ?? NEUTRAL_PERCENTILE;
-}
-
-function metricSlotsForFamily(pool: PlayerProfile[], family: PositionFamily): MetricSlot[] {
-  const sectionLabels = statSectionsForFamily(family).flatMap((section) => section.labels);
-  const slots: MetricSlot[] = [];
-
-  for (const label of sectionLabels) {
-    slots.push({ id: `${label}::vol`, label, kind: "volume" });
-    slots.push({ id: `${label}::eff`, label, kind: "efficiency" });
-
-    const subLabels = new Set<string>();
-    for (const player of pool) {
-      const item = aspectItem(player, label);
-      item?.sub_metrics?.forEach((sub) => subLabels.add(sub.label));
+  if (label === "Ações Defensivas") {
+    const features: { key: string; value: number }[] = [];
+    for (const sub of item.sub_metrics ?? []) {
+      if (sub.label === "Erros Totais" || sub.label === "Eficiência Defensiva") continue;
+      const v = parseDisplayNumber(sub.display_value);
+      if (v != null) features.push({ key: sub.label, value: v });
     }
-    for (const subLabel of [...subLabels].sort()) {
-      slots.push({ id: `${label}::sub::${subLabel}`, label, kind: "sub", subLabel });
+    return features;
+  }
+
+  if (item.kind === "pass_certos" && item.certos_per90 != null) {
+    return [{ key: "certos/90", value: item.certos_per90 }];
+  }
+
+  if (item.kind === "def_efficiency_group") {
+    return [];
+  }
+
+  const duelLike = new Set([
+    "Duelos Defensivos",
+    "Duelos Aéreos",
+    "Disputas com Bola",
+    "Duelos Vencidos",
+    "Aéreo",
+    "1v1 - Ofensivo",
+  ]);
+  if (duelLike.has(label) || label.includes("Duelo")) {
+    const vol = parseDisplayNumber(item.display_value);
+    const eff = parseEffPct(item);
+    if (vol != null && eff != null) {
+      return [{ key: "vencidos/90", value: (vol * eff) / 100 }];
+    }
+    return [];
+  }
+
+  if (item.certos_per90 != null) {
+    return [{ key: "certos/90", value: item.certos_per90 }];
+  }
+
+  const vol = parseDisplayNumber(item.display_value);
+  if (vol != null && (label.includes("Condu") || label === "Progressão")) {
+    return [{ key: "volume/90", value: vol }];
+  }
+
+  return [];
+}
+
+type BlockModel = {
+  blocks: { title: string; featureIds: string[] }[];
+  featureIds: string[];
+};
+
+function buildCertosModel(family: PositionFamily, pool: PlayerProfile[]): BlockModel {
+  const sections = statSectionsForFamily(family);
+  const blockMap = new Map<string, string[]>();
+
+  for (const section of sections) {
+    for (const label of section.labels) {
+      if (label === "Eficiência Defensiva") continue;
+      const keys = new Set<string>();
+      for (const player of pool) {
+        for (const f of certosFeaturesForLabel(player, label)) {
+          keys.add(`${label} · ${f.key}`);
+        }
+      }
+      if (!keys.size) continue;
+      const list = blockMap.get(section.title) ?? [];
+      list.push(...keys);
+      blockMap.set(section.title, list);
     }
   }
 
-  return slots;
+  const blocks: BlockModel["blocks"] = [];
+  const featureIds: string[] = [];
+  for (const [title, ids] of blockMap) {
+    const unique = [...new Set(ids)].sort();
+    blocks.push({ title, featureIds: unique });
+    featureIds.push(...unique);
+  }
+  return { blocks, featureIds: [...new Set(featureIds)] };
 }
 
-function featureVectorFromAspectPercentiles(
+function rawCertos(player: PlayerProfile, featureId: string): number | null {
+  const sep = featureId.indexOf(" · ");
+  const label = featureId.slice(0, sep);
+  const subKey = featureId.slice(sep + 3);
+  for (const f of certosFeaturesForLabel(player, label)) {
+    if (`${label} · ${f.key}` === featureId) return f.value;
+  }
+  void subKey;
+  return null;
+}
+
+function featureVector(
   player: PlayerProfile,
   pool: PlayerProfile[],
-  slots: MetricSlot[],
+  featureIds: string[],
 ): number[] {
-  return slots.map((slot) => {
-    const pct = percentileForSlot(player, pool, slot);
-    return Math.max(0, Math.min(1, pct / 100));
+  return featureIds.map((fid) => {
+    const values = pool
+      .map((p) => rawCertos(p, fid))
+      .filter((value): value is number => value != null);
+    const raw = rawCertos(player, fid);
+    if (raw != null && values.length >= 3) {
+      return Math.max(0, Math.min(1, percentileInPool(raw, values) / 100));
+    }
+    return NEUTRAL_PERCENTILE / 100;
   });
 }
 
@@ -128,16 +178,14 @@ function cosineSimilarity(a: number[], b: number[]): number {
   return dot / (Math.sqrt(na) * Math.sqrt(nb));
 }
 
+function round1(n: number) {
+  return Math.round(n * 10) / 10;
+}
+
 /**
- * Top cross-league matches using **stat percentiles** from the dossier (aspect cards),
- * not tendency axes.
- *
- * For each metric in the position stat sections (volume, efficiency, sub-metrics),
- * we express every player — including the source from another league — as a
- * **percentile within the destination pool** (raw per90 / display when available).
- *
- * Similarity = cosine similarity between those percentile vectors (0–100%).
- * +3 pp when the main tactical profile label matches.
+ * Cross-league similarity from **successful actions per 90** (certos / vencidos),
+ * grouped by dossier stat blocks. Total = cosine over all certos features;
+ * each block score = cosine within that block's features only.
  */
 export function rankCrossLeagueSimilarity(
   source: PlayerProfile,
@@ -153,22 +201,34 @@ export function rankCrossLeagueSimilarity(
   );
   if (!sameFamily.length) return [];
 
-  const slots = metricSlotsForFamily(sameFamily, family);
-  if (!slots.length) return [];
+  const { blocks, featureIds } = buildCertosModel(family, sameFamily);
+  if (!featureIds.length) return [];
 
-  const sourceVec = featureVectorFromAspectPercentiles(source, sameFamily, slots);
+  const blockRanges = blocks.map((block) => ({
+    title: block.title,
+    indices: block.featureIds
+      .map((id) => featureIds.indexOf(id))
+      .filter((index) => index >= 0),
+  }));
 
+  const sourceVec = featureVector(source, sameFamily, featureIds);
   const scored: SimilarPlayerHit[] = [];
 
   for (const candidate of sameFamily) {
     if (candidate.player_id === source.player_id) continue;
 
-    const candVec = featureVectorFromAspectPercentiles(candidate, sameFamily, slots);
-    let sim = cosineSimilarity(sourceVec, candVec) * 100;
-
+    const candVec = featureVector(candidate, sameFamily, featureIds);
+    let total = cosineSimilarity(sourceVec, candVec) * 100;
     if (candidate.profile === source.profile) {
-      sim = Math.min(100, sim + 3);
+      total = Math.min(100, total + PROFILE_MATCH_BONUS);
     }
+
+    const blockScores: SimilarBlockScore[] = blockRanges.map(({ title, indices }) => {
+      if (!indices.length) return { title, similarity: NEUTRAL_PERCENTILE };
+      const a = indices.map((i) => sourceVec[i]);
+      const b = indices.map((i) => candVec[i]);
+      return { title, similarity: round1(cosineSimilarity(a, b) * 100) };
+    });
 
     scored.push({
       player_id: candidate.player_id,
@@ -176,7 +236,8 @@ export function rankCrossLeagueSimilarity(
       club: candidate.club,
       profile: candidate.profile,
       rating: candidate.rating,
-      similarity: Math.round(sim * 10) / 10,
+      similarity: round1(total),
+      blocks: blockScores,
     });
   }
 
