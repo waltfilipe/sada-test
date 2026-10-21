@@ -8,6 +8,7 @@ import "./filters.css";
 import "./compare.css";
 import "./scatter.css";
 import "./time-sombra.css";
+import "./athletes.css";
 import "./home.css";
 import "./zag-v2.css";
 

@@ -15,7 +15,7 @@ const NAV = [
   { key: "scatter", path: "/scatter", label: "Scatter" },
 ] as const;
 
-export type ScoutSection = (typeof NAV)[number]["key"] | "elenco";
+export type ScoutSection = (typeof NAV)[number]["key"] | "elenco" | "atletas";
 
 type Props = {
   active: ScoutSection;
@@ -59,6 +59,13 @@ export function ScoutTopbar({ active, subnav }: Props) {
             aria-current={active === "elenco" ? "page" : undefined}
           >
             Elenco + Time Sombra
+          </Link>
+          <Link
+            href={href("/atletas")}
+            className={active === "atletas" ? "active" : ""}
+            aria-current={active === "atletas" ? "page" : undefined}
+          >
+            Atletas
           </Link>
         </div>
 

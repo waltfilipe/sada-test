@@ -11,6 +11,7 @@ const SECTIONS = [
   { path: "/comparar", kicker: "Duelo", title: "Comparar", text: "Coloque dois ou três atletas da mesma posição lado a lado." },
   { path: "/scatter", kicker: "Mapa", title: "Scatter", text: "Veja a posição inteira num gráfico e encontre quem se destaca." },
   { path: "/time-sombra", kicker: "Elenco", title: "Elenco + Time Sombra", text: "Elenco da competição, time sombra de uma liga ou de todas, com atletas de qualquer competição." },
+  { path: "/atletas", kicker: "Atletas", title: "Atletas", text: "Ficha resumida por jogador, com temporadas 2026 (scout) e 2025 (Wyscout)." },
 ] as const;
 
 export function LeagueHomeMain({ leagueId }: { leagueId: LeagueId }) {
