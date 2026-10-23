@@ -113,6 +113,22 @@
   -webkit-backdrop-filter: blur(14px);
 }
 
+.scout-topbar-compact {
+  min-height: 64px;
+  flex-wrap: nowrap;
+}
+
+.scout-topbar-compact .topbar-links-primary {
+  margin-left: auto;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.topbar-link-muted {
+  opacity: 0.45;
+  pointer-events: auto;
+}
+
 .scout-subnav {
   display: flex;
   justify-content: center;

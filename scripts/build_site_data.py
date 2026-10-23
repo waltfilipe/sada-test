@@ -5,7 +5,12 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 from pathlib import Path
+
+SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
 from engine.json_util import dumps_json
 from engine.leagues import LEAGUES
@@ -224,8 +229,17 @@ def main() -> None:
     if seeded:
         print(f"Transfermarkt cache seeded from profiles: {seeded}")
 
+    skip_site = {"mls-next-pro"}
     for league_id in LEAGUES:
+        if league_id in skip_site:
+            print(f"\n=== skip {league_id} (dados só no repositório) ===")
+            continue
         build_league(league_id)
+
+    print("\n=== Split estaduais por campeonato ===")
+    from split_estaduais_data import main as split_estaduais
+
+    split_estaduais()
 
     _sync_serie_a_legacy()
     _prune_orphan_heatmaps()

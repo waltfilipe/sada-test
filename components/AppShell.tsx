@@ -17,7 +17,7 @@ const NAV = [
   { href: "/scatter", label: "Scatter", icon: "◈" },
 ];
 
-const LEGACY_SCOUT_PREFIXES = ["/posicao/", "/filtros", "/comparar", "/scatter", "/time-sombra", "/atletas", "/zagueiros-v2"];
+const LEGACY_SCOUT_PREFIXES = ["/posicao/", "/filtros", "/comparar", "/scatter", "/time-sombra", "/zagueiros-v2"];
 
 function isScoutRoute(pathname: string): boolean {
   if (pathname === "/") return true;

@@ -10,7 +10,7 @@ Site de scouting das Séries A, B, C e D, com cálculos derivados das DAX do arq
 
 ## Páginas
 
-- `/` — escolha da competição (A, B, C, D)
+- `/` — hub: Brasileirão (A–D) e estaduais por nível/campeonato
 - `/{liga}/filtros` — filtros e lista de atletas
 - `/{liga}/posicao/[slug]` — análise por posição
 - `/{liga}/comparar` — comparação direta com radares

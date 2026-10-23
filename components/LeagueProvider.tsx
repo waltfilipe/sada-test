@@ -37,3 +37,7 @@ export function useLeague(): LeagueContextValue {
   }
   return ctx;
 }
+
+export function useLeagueOptional(): LeagueContextValue | null {
+  return useContext(LeagueContext);
+}

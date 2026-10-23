@@ -8,13 +8,12 @@ import "./filters.css";
 import "./compare.css";
 import "./scatter.css";
 import "./time-sombra.css";
-import "./athletes.css";
 import "./home.css";
 import "./zag-v2.css";
 
 export const metadata: Metadata = {
   title: "SADA | Scout",
-  description: "Dashboard de scouting das Séries A, B, C e D com ratings, perfis e comparações.",
+  description: "Dashboard de scouting do Brasileirão e estaduais 2026 — ratings, perfis e comparações.",
   icons: {
     icon: [{ url: "/favicon.png", type: "image/png" }],
     apple: [{ url: "/favicon.png", type: "image/png" }],
