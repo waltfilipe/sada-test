@@ -218,7 +218,7 @@ export function PlayerHero({ player, family, players }: Props) {
             </Tooltip>
           </div>
           <div className="hero-action-cell hero-action-similar">
-            <Tooltip content="Procura atletas parecidos nas outras séries.">
+            <Tooltip content="Top 5 por estilo de jogo nesta divisão; dá para comparar também com outras séries.">
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSimilarOpen(true)}>
                 <i className="fa-solid fa-shuffle" aria-hidden="true" /> Similares
               </button>
@@ -264,6 +264,7 @@ export function PlayerHero({ player, family, players }: Props) {
           player={player}
           family={family}
           currentLeagueId={leagueId}
+          players={players}
           onClose={() => setSimilarOpen(false)}
         />
       ) : null}

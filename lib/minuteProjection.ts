@@ -1,9 +1,8 @@
 /**
  * Minute projection for scouts.
  *
- * For players below 50% team minutes: blend observed per-90 / % toward a mixed prior
- *   μ = 50% mean of regulars (≥50% min) in the division pool + 50% mean of same-profile peers
- *   in that division. Pull strength: (50 − minutes_pct) / 50 toward μ (0 pull at 50% min).
+ * For players below 50% team minutes: blend observed per-90 / % toward the mean of regulars
+ *   (≥50% min) in the division pool. Pull strength: minutes_pct / 50 on observed (0 pull at 50% min).
  * Pessimista / otimista: expected value ± z90 · σ_pred (spread from reference-pool variance + sampling noise).
  */
 import { isSeasonTotalLabel } from "@/lib/seasonTotals";
@@ -97,12 +96,6 @@ type PoolPoint = {
   e: number;
   value: number;
   low: boolean;
-  profile: string | null;
-};
-
-type TargetContext = {
-  minutesPct: number;
-  profile: string | null;
 };
 
 const modelCache = new WeakMap<PlayerProfile[], Map<string, BuiltModel | null>>();
@@ -252,16 +245,14 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
         e: exposure,
         value: found.value,
         low,
-        profile: candidate.profile ?? null,
       });
     }
   }
 
-  const context = targetContext(player);
   const metrics: MetricFit[] = [];
   for (const sample of target) {
     const points = observations.get(sample.key) ?? [];
-    const prior = fitPrior(points, context);
+    const prior = fitPrior(points);
     if (!prior) continue;
     metrics.push({
       key: sample.key,
@@ -284,23 +275,11 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
   };
 }
 
-function targetContext(player: PlayerProfile): TargetContext {
-  return {
-    minutesPct: player.minutes_pct ?? 0,
-    profile: player.profile ?? null,
-  };
-}
-
 /** Trust in observed rates ramps linearly until 50% of team minutes in the competition. */
 export function observationWeight(minutesPct: number): number {
   if (minutesPct >= STARTER_MINUTES_PCT) return 1;
   if (minutesPct <= 0) return 0;
   return clamp(minutesPct / STARTER_MINUTES_PCT, 0, 1);
-}
-
-function profilesSimilar(a: string | null, b: string | null): boolean {
-  if (!a || !b) return false;
-  return a.trim().toLowerCase() === b.trim().toLowerCase();
 }
 
 function samplesOf(player: PlayerProfile): Sample[] {
@@ -435,7 +414,7 @@ function formatProjected(metric: ProjectedMetric): string {
   return formatted;
 }
 
-function fitPrior(points: PoolPoint[], target: TargetContext): Prior | null {
+function fitPrior(points: PoolPoint[]): Prior | null {
   const pool = points.filter((point) => point.e > 0);
   if (pool.length < MIN_GROUP) return null;
 
@@ -444,21 +423,10 @@ function fitPrior(points: PoolPoint[], target: TargetContext): Prior | null {
   const refRates = refPool.map((point) => point.value);
   const refExposure = mean(refPool.map((point) => point.e));
 
-  const muMean = weightedMean(
+  const mu = weightedMean(
     refPool.map((point) => point.value),
     refPool.map((point) => point.e),
   );
-
-  let similarPool = pool.filter((point) => profilesSimilar(point.profile, target.profile));
-  if (similarPool.length < MIN_GROUP) {
-    similarPool = refPool;
-  }
-  const muSimilar = weightedMean(
-    similarPool.map((point) => point.value),
-    similarPool.map((point) => point.e),
-  );
-
-  const mu = 0.5 * muMean + 0.5 * muSimilar;
 
   const msdRef = meanSquare(refRates);
   const invRef = weightedMean(
@@ -569,7 +537,7 @@ export function confidenceTier(sampleWeight: number): ProjectionReliability["tie
 export function confidenceTierLabel(tier: ProjectionReliability["tier"]): string {
   if (tier === "alta") return "Confiança alta na amostra";
   if (tier === "media") return "Confiança média — boa leitura, mas ainda regredindo à média";
-  return "Confiança baixa — poucos minutos; leitura puxada à média da divisão e do perfil";
+  return "Confiança baixa — poucos minutos; leitura puxada à média dos titulares da divisão";
 }
 
 function metricFloor(value: number, adverse: boolean): number {

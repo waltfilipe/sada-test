@@ -27,7 +27,7 @@ const SCENARIO_TABS: { key: ProjectionScenario; label: string; hint: string }[] 
   {
     key: "realista",
     label: "Esperado",
-    hint: "Mistura a amostra dele com 50% média dos titulares + 50% média do mesmo perfil na divisão; força do ajuste até 50% dos minutos do time.",
+    hint: "Mistura a amostra dele com a média dos titulares na divisão; força do ajuste até 50% dos minutos do time.",
   },
   {
     key: "positiva",
@@ -53,7 +53,7 @@ export function MinuteProjection({ player, family, players }: Props) {
 
   return (
     <>
-      <Tooltip content="Ajusta estatísticas quando faltam minutos para 50% do time: mistura amostra, média da divisão e perfil. Faixas pessimista, esperada e otimista.">
+      <Tooltip content="Ajusta estatísticas quando faltam minutos para 50% do time: mistura amostra com média dos titulares na divisão. Faixas pessimista, esperada e otimista.">
         <button
           type="button"
           className={`btn btn-ghost btn-sm${open ? " is-open" : ""}`}
