@@ -75,4 +75,15 @@ LEAGUES: dict[str, LeagueConfig] = {
         "physical_run": False,
         "run_csv": None,
     },
+    "estaduais": {
+        "id": "estaduais",
+        "label": "Estaduais",
+        "season": "2026",
+        "xlsx": sorted(WYSCOUT_2026.glob("estaduais-pt*.xlsx")),
+        "defensive_csv": ROOT / "BRE26_defensive.csv",
+        "heatmaps": False,
+        "heatmaps_dir": None,
+        "physical_run": False,
+        "run_csv": None,
+    },
 }

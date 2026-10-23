@@ -1,4 +1,10 @@
-export type LeagueId = "serie-a" | "serie-b" | "serie-c" | "serie-d" | "mls-next-pro";
+export type LeagueId =
+  | "serie-a"
+  | "serie-b"
+  | "serie-c"
+  | "serie-d"
+  | "mls-next-pro"
+  | "estaduais";
 
 export type LeagueInfo = {
   id: LeagueId;
@@ -60,6 +66,16 @@ export const LEAGUES: LeagueInfo[] = [
     brand: "NP",
     tagline: "MLS",
     heatmaps: true,
+    physicalRun: false,
+  },
+  {
+    id: "estaduais",
+    slug: "estaduais",
+    name: "Estaduais",
+    season: "2026",
+    brand: "ES",
+    tagline: "Campeonatos estaduais",
+    heatmaps: false,
     physicalRun: false,
   },
 ];

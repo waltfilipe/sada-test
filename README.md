@@ -33,6 +33,8 @@ npm run build
 
 O script de build lê os pares `wyscout/2026/serie-*-pt1.xlsx` e `pt2.xlsx` (aba `Search results`), junta as partes e remove a sobreposição do limite de 500 linhas do Wyscout. A Série A ainda cai no `.pbix` se o Excel não estiver no formato esperado.
 
+**Estaduais 2026:** exporte os lotes do Wyscout, rode `npm run import:estaduais` (gera `Estaduais 26.xlsx` com abas `Search results` e `Tb_Estaduais26` + medidas DAX em Python) e depois `npm run build:data` para atualizar a liga `estaduais` no site.
+
 ## Atualizar dados
 
 1. Substitua os arquivos em `wyscout/2026/` (`serie-a`, `serie-b`, `serie-c`, `serie-d`, partes `pt1` e `pt2`)
