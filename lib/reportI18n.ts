@@ -34,7 +34,7 @@ export const REPORT_COPY = {
     legendBadge:
       "Badge é o selo de destaque: o atleta supera o percentil 50 da posição em volume e em eficiência daquele bloco.",
     legendProjection:
-      "O número menor ao lado do dado e a fita dourada no percentil são a projeção ajustada por minutos (média dos titulares na divisão).",
+      "O número menor ao lado do dado e a fita dourada no percentil são a projeção ajustada por minutos (50% média dos titulares + 50% mesmo perfil na divisão).",
     pool: (family: string, league: string) => `${family.toLocaleLowerCase("pt-BR")} da ${league}`,
     longer: "Mais longo que a média",
     shorter: "Mais curto que a média",
@@ -100,7 +100,7 @@ export const REPORT_COPY = {
     legendBadge:
       "A badge marks a strength: the player is above the 50th percentile for the position in both volume and efficiency of that block.",
     legendProjection:
-      "The smaller figure beside a rate, and the gold ribbon on the percentile, are the minutes-adjusted projection (division regulars mean).",
+      "The smaller figure beside a rate, and the gold ribbon on the percentile, are the minutes-adjusted projection (50% regulars mean + 50% same profile in the division).",
     pool: (family: string, league: string) => `${family.toLocaleLowerCase("en-GB")} in ${league}`,
     longer: "Longer than average",
     shorter: "Shorter than average",

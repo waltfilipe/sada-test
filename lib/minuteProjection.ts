@@ -1,8 +1,9 @@
 /**
  * Minute projection for scouts.
  *
- * For players below 50% team minutes: blend observed per-90 / % toward the mean of regulars
- *   (≥50% min) in the division pool. Pull strength: minutes_pct / 50 on observed (0 pull at 50% min).
+ * For players below 50% team minutes: blend observed per-90 / % toward a mixed prior
+ *   μ = 50% mean of regulars (≥50% min) + 50% mean of same-profile peers in the division pool.
+ * Pull strength toward μ: (50 − minutes_pct) / 50 (none at 50% team minutes; full pull at 0%).
  * Pessimista / otimista: expected value ± z90 · σ_pred (spread from reference-pool variance + sampling noise).
  */
 import { isSeasonTotalLabel } from "@/lib/seasonTotals";
@@ -11,7 +12,7 @@ import type { AspectItem, PlayerProfile } from "@/lib/types";
 export type ProjectionScenario = "negativa" | "realista" | "positiva";
 
 export type ProjectionPlacement = {
-  /** Share of the estimate from the player's own sample, 0–1 (minutes_pct / 50 below the cutoff). */
+  /** Share of the estimate from the player's own sample, 0–1 (1 − pull toward μ). */
   weight: number;
   scenario: ProjectionScenario;
 };
@@ -96,6 +97,7 @@ type PoolPoint = {
   e: number;
   value: number;
   low: boolean;
+  profile: string | null;
 };
 
 const modelCache = new WeakMap<PlayerProfile[], Map<string, BuiltModel | null>>();
@@ -245,6 +247,7 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
         e: exposure,
         value: found.value,
         low,
+        profile: candidate.profile ?? null,
       });
     }
   }
@@ -252,7 +255,7 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
   const metrics: MetricFit[] = [];
   for (const sample of target) {
     const points = observations.get(sample.key) ?? [];
-    const prior = fitPrior(points);
+    const prior = fitPrior(points, player.profile ?? null);
     if (!prior) continue;
     metrics.push({
       key: sample.key,
@@ -275,11 +278,21 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
   };
 }
 
-/** Trust in observed rates ramps linearly until 50% of team minutes in the competition. */
+/** Share kept from the player's sample; pull toward μ is 1 − this (linear in minutes to 50% of team total). */
 export function observationWeight(minutesPct: number): number {
   if (minutesPct >= STARTER_MINUTES_PCT) return 1;
   if (minutesPct <= 0) return 0;
   return clamp(minutesPct / STARTER_MINUTES_PCT, 0, 1);
+}
+
+/** Fraction of the gap (observed → μ) applied; equals minutes missing to 50%, divided by 50. */
+export function pullTowardPrior(minutesPct: number): number {
+  return 1 - observationWeight(minutesPct);
+}
+
+function profilesMatch(a: string | null, b: string | null): boolean {
+  if (!a || !b) return false;
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
 }
 
 function samplesOf(player: PlayerProfile): Sample[] {
@@ -414,7 +427,7 @@ function formatProjected(metric: ProjectedMetric): string {
   return formatted;
 }
 
-function fitPrior(points: PoolPoint[]): Prior | null {
+function fitPrior(points: PoolPoint[], targetProfile: string | null): Prior | null {
   const pool = points.filter((point) => point.e > 0);
   if (pool.length < MIN_GROUP) return null;
 
@@ -423,10 +436,21 @@ function fitPrior(points: PoolPoint[]): Prior | null {
   const refRates = refPool.map((point) => point.value);
   const refExposure = mean(refPool.map((point) => point.e));
 
-  const mu = weightedMean(
+  const muMean = weightedMean(
     refPool.map((point) => point.value),
     refPool.map((point) => point.e),
   );
+
+  let peerPool = pool.filter((point) => profilesMatch(point.profile, targetProfile));
+  if (peerPool.length < MIN_GROUP) {
+    peerPool = refPool;
+  }
+  const muPeer = weightedMean(
+    peerPool.map((point) => point.value),
+    peerPool.map((point) => point.e),
+  );
+
+  const mu = 0.5 * muMean + 0.5 * muPeer;
 
   const msdRef = meanSquare(refRates);
   const invRef = weightedMean(
@@ -537,7 +561,7 @@ export function confidenceTier(sampleWeight: number): ProjectionReliability["tie
 export function confidenceTierLabel(tier: ProjectionReliability["tier"]): string {
   if (tier === "alta") return "Confiança alta na amostra";
   if (tier === "media") return "Confiança média — boa leitura, mas ainda regredindo à média";
-  return "Confiança baixa — poucos minutos; leitura puxada à média dos titulares da divisão";
+  return "Confiança baixa — poucos minutos; leitura puxada à média + perfil na divisão";
 }
 
 function metricFloor(value: number, adverse: boolean): number {
