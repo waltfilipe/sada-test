@@ -5,22 +5,30 @@ import type { PlayerProfile } from "@/lib/types";
 
 type Axis = { title: string; score: number; color: string };
 
+const VB_W = 720;
+const VB_H = 560;
+const CX = 360;
+const CY = 278;
+const RADIUS = 132;
+
+function wrapTitle(title: string): string[] {
+  const words = title.split(" ");
+  if (words.length === 1 || title.length <= 14) return [title];
+  if (words.length === 2) return words;
+  return [words.slice(0, -1).join(" "), words[words.length - 1]];
+}
+
 function RadarChart({ title, hint, axes }: { title: string; hint: string; axes: Axis[] }) {
-  const width = 420;
-  const height = 340;
-  const cx = width / 2;
-  const cy = height / 2 + 6;
-  const radius = 112;
-  const count = Math.max(axes.length, 3);
-  const padded = axes.length >= 3 ? axes : [...axes, ...Array.from({ length: 3 - axes.length }, () => ({ title: "—", score: 0, color: "#64748b" }))];
+  const count = axes.length;
   const angle = (index: number) => -Math.PI / 2 + (index / count) * Math.PI * 2;
   const point = (index: number, value: number) => {
-    const r = (radius * Math.max(0, Math.min(100, value))) / 100;
-    return [cx + r * Math.cos(angle(index)), cy + r * Math.sin(angle(index))] as const;
+    const r = (RADIUS * Math.max(0, Math.min(100, value))) / 100;
+    return [CX + r * Math.cos(angle(index)), CY + r * Math.sin(angle(index))] as const;
   };
-  const ring = (value: number) =>
-    padded.map((_, index) => point(index, value).map((n) => n.toFixed(1)).join(",")).join(" ");
-  const shape = padded.map((item, index) => point(index, Math.max(4, item.score)).map((n) => n.toFixed(1)).join(",")).join(" ");
+  const ring = (value: number) => axes.map((_, index) => point(index, value).map((n) => n.toFixed(1)).join(",")).join(" ");
+  const shape = axes
+    .map((item, index) => point(index, Math.max(6, item.score)).map((n) => n.toFixed(1)).join(","))
+    .join(" ");
 
   return (
     <figure className="profile-radar-card">
@@ -28,31 +36,46 @@ function RadarChart({ title, hint, axes }: { title: string; hint: string; axes: 
         <strong>{title}</strong>
         <span>{hint}</span>
       </figcaption>
-      <svg className="player-report-radar profile-radar-svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={title}>
-        {[25, 75, 100].map((value) => (
-          <polygon key={value} points={ring(value)} className="radar-ring" />
+      <svg className="scout-radar" viewBox={`0 0 ${VB_W} ${VB_H}`} role="img" aria-label={title}>
+        {[25, 50, 75, 100].map((value) => (
+          <polygon key={value} points={ring(value)} className={value === 50 ? "scout-radar-ring is-median" : "scout-radar-ring"} />
         ))}
-        <polygon points={ring(50)} className="radar-ring is-median" />
-        {padded.map((item, index) => {
+        {axes.map((item, index) => {
           const [x, y] = point(index, 100);
-          return <line key={`${item.title}-axis`} x1={cx} y1={cy} x2={x} y2={y} className="radar-axis" />;
+          return <line key={`${item.title}-axis`} x1={CX} y1={CY} x2={x} y2={y} className="scout-radar-axis" />;
         })}
-        <polygon points={shape} className="radar-shape" />
-        {padded.map((item, index) => {
-          const [x, y] = point(index, Math.max(4, item.score));
-          return <circle key={`${item.title}-dot`} cx={x} cy={y} r={4} fill={item.color} className="radar-dot" />;
+        <polygon points={shape} className="scout-radar-shape" />
+        {axes.map((item, index) => {
+          const [x, y] = point(index, Math.max(6, item.score));
+          return <circle key={`${item.title}-dot`} cx={x} cy={y} r={5.5} fill={item.color} className="scout-radar-dot" />;
         })}
-        {padded.map((item, index) => {
-          const a = angle(index);
-          const x = cx + (radius + 18) * Math.cos(a);
-          const y = cy + (radius + 18) * Math.sin(a);
-          const cos = Math.cos(a);
-          const anchor = Math.abs(cos) < 0.25 ? "middle" : cos > 0 ? "start" : "end";
-          const dy = Math.sin(a) < -0.45 ? -6 : Math.sin(a) > 0.45 ? 12 : 0;
+        {[25, 50, 75].map((value) => {
+          const [x, y] = point(0, value);
           return (
-            <text key={`${item.title}-label`} x={x} y={y + dy} textAnchor={anchor} className="radar-label">
-              <tspan>{item.title}</tspan>
-              <tspan x={x} dy={13} className="radar-score" fill={item.color}>
+            <text key={`scale-${value}`} x={x + 8} y={y + 4} className="scout-radar-scale">
+              {value}
+            </text>
+          );
+        })}
+        {axes.map((item, index) => {
+          const a = angle(index);
+          const cos = Math.cos(a);
+          const sin = Math.sin(a);
+          const x = CX + (RADIUS + 36) * cos;
+          const y = CY + (RADIUS + 28) * sin;
+          const anchor = Math.abs(cos) < 0.35 ? "middle" : cos > 0 ? "start" : "end";
+          const lines = wrapTitle(item.title);
+          const lineH = 18;
+          const block = lines.length + 1;
+          const start = sin < -0.35 ? y - block * lineH + 10 : sin > 0.35 ? y + 8 : y - ((block - 1) * lineH) / 2;
+          return (
+            <text key={`${item.title}-label`} x={x} y={start} textAnchor={anchor} className="scout-radar-label">
+              {lines.map((line, lineIndex) => (
+                <tspan key={line} x={x} dy={lineIndex === 0 ? 0 : lineH}>
+                  {line}
+                </tspan>
+              ))}
+              <tspan x={x} dy={lineH + 2} className="scout-radar-score" fill={item.color}>
                 {Math.round(item.score)}
               </tspan>
             </text>
@@ -65,8 +88,8 @@ function RadarChart({ title, hint, axes }: { title: string; hint: string; axes: 
 
 export function ProfileRadars({ player }: { player: PlayerProfile }) {
   const rows = buildProfileShareRows(player).filter((row) => row.label !== "Híbrido");
-  if (!rows.length) {
-    return <p className="profile-radar-empty">Este atleta ainda não tem arquétipos para os radares.</p>;
+  if (rows.length < 3) {
+    return <p className="profile-radar-empty">Este atleta ainda não tem arquétipos suficientes para os radares.</p>;
   }
 
   const affinity: Axis[] = rows.map((row) => ({
@@ -82,8 +105,12 @@ export function ProfileRadars({ player }: { player: PlayerProfile }) {
 
   return (
     <div className="profile-radar-grid">
-      <RadarChart title="Afinidade" hint="Quanto o jogo se aproxima de cada arquétipo (0–100)." axes={affinity} />
-      <RadarChart title="Classificação" hint="Nota do arquétipo no nível, na escala 0–100. O tracejado é a mediana." axes={classification} />
+      <RadarChart title="Afinidade" hint="Quanto o jogo se aproxima de cada arquétipo. Escala de 0 a 100." axes={affinity} />
+      <RadarChart
+        title="Classificação"
+        hint="Nota do arquétipo neste nível, também de 0 a 100. O tracejado é a mediana."
+        axes={classification}
+      />
     </div>
   );
 }

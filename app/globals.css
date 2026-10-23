@@ -642,10 +642,62 @@ input[type="range"] {
 
 .profile-radar-card {
   margin: 0;
-  padding: 1rem 0.5rem 0.5rem;
+  padding: 1.1rem 0.75rem 0.4rem;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(8, 18, 32, 0.72);
+}
+
+.scout-radar {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.scout-radar-ring {
+  fill: none;
+  stroke: rgba(232, 238, 246, 0.2);
+  stroke-width: 1.4;
+}
+
+.scout-radar-ring.is-median {
+  stroke: rgba(27, 231, 255, 0.7);
+  stroke-dasharray: 5 5;
+}
+
+.scout-radar-axis {
+  stroke: rgba(232, 238, 246, 0.16);
+  stroke-width: 1.2;
+}
+
+.scout-radar-shape {
+  fill: rgba(27, 231, 255, 0.2);
+  stroke: #1be7ff;
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+}
+
+.scout-radar-dot {
+  stroke: #07111c;
+  stroke-width: 2;
+}
+
+.scout-radar-label {
+  fill: #e8eef6;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.scout-radar-score {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.scout-radar-scale {
+  fill: rgba(232, 238, 246, 0.45);
+  font-size: 11px;
+  font-weight: 650;
 }
 
 .profile-radar-card figcaption {
@@ -660,13 +712,8 @@ input[type="range"] {
   color: var(--muted, #9fb0c3);
 }
 
-.profile-radar-svg {
-  width: 100%;
-  height: auto;
-}
-
 .radares-main {
-  width: min(1100px, calc(100% - 2rem));
+  width: min(1180px, calc(100% - 2rem));
   margin: 1.25rem auto 3rem;
 }
 
