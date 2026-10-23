@@ -410,6 +410,79 @@ def _pattern_championship(norm_club: str) -> str | None:
     return None
 
 
+# One Wyscout export = one competition. Cups that share clubs with the estadual
+# are excluded so minutes stay on the state championship, not the regional cup.
+EXCLUDED_COMPETITIONS: Final[frozenset[str]] = frozenset({"copa-do-nordeste", "copa-paulista"})
+
+COMPETITION_LEVEL: Final[dict[str, str]] = {
+    "paulista-a1": "est-nv1",
+    "gaucho": "est-nv1",
+    "mineiro": "est-nv1",
+    "carioca": "est-nv1",
+    "paranaense": "est-nv2",
+    "catarinense": "est-nv2",
+    "paulista-a2": "est-nv2",
+    "baiano": "est-nv2",
+    "cearense": "est-nv3",
+    "pernambucano": "est-nv3",
+    "paulista-a3": "est-nv3",
+    "goiano": "est-nv3",
+    "paraense": "est-nv4",
+    "alagoano": "est-nv4",
+    "potiguar": "est-nv4",
+    "paulista-a4": "est-nv4",
+}
+
+# Period-club sets taken from the 2026 Wyscout exports (normalized).
+COMPETITION_CLUBS: Final[dict[str, frozenset[str]]] = {
+    "gaucho": frozenset(_norm(c) for c in ["Avenida", "Caxias", "EC São José", "Grêmio", "Guarany de Bagé", "Inter Santa Maria", "Internacional", "Juventude", "Monsoon FC", "Novo Hamburgo", "São Luiz", "Ypiranga Erechim"]),
+    "goiano": frozenset(_norm(c) for c in ["ABECAT Ouvidorense", "Anapolina", "Anápolis", "Aparecidense", "Atlético GO", "CRAC", "Centro Oeste", "Goiatuba EC", "Goiás", "Inhumas", "Jataiense", "Vila Nova"]),
+    "mineiro": frozenset(_norm(c) for c in ["América Mineiro", "Athletic Club", "Atlético Mineiro", "Betim", "Cruzeiro", "Democrata GV", "Itabirito", "North Esporte Clube", "Pouso Alegre", "Tombense", "URT", "Uberlândia"]),
+    "paraense": frozenset(_norm(c) for c in ["Amazônia PA", "Bragantino PA", "Cametá", "Capitão Poço", "Castanhal", "Paysandu", "Remo", "Santa Rosa", "São Francisco PA", "São Raimundo", "Tuna Luso", "Águia de Marabá"]),
+    "paranaense": frozenset(_norm(c) for c in ["Athletico Paranaense", "Azuriz", "Cascavel", "Cianorte", "Clube Andraus Brasil", "Coritiba", "Foz do Iguaçu", "Galo Maringá", "Independente FSJ", "Londrina", "Maringá", "Operário PR"]),
+    "paulista-a1": frozenset(_norm(c) for c in ["Botafogo SP", "Capivariano", "Corinthians", "Grêmio Novorizontino", "Guarani", "Mirassol", "Noroeste", "Palmeiras", "Ponte Preta", "Portuguesa", "Primavera SP", "Red Bull Bragantino", "Santos", "São Bernardo FC", "São Paulo", "Velo Clube"]),
+    "pernambucano": frozenset(_norm(c) for c in ["Acadêmica Vitória", "Decisão", "Jaguar", "Maguary PE", "Náutico", "Retrô", "Santa Cruz", "Sport Recife"]),
+    "baiano": frozenset(_norm(c) for c in ["Atlético Alagoinhas", "Bahia", "Bahia de Feira", "Barcelona BA", "Galícia", "Jacuipense", "Jequié", "Juazeirense", "Porto BA", "Vitória"]),
+    "carioca": frozenset(_norm(c) for c in ["Bangu", "Boavista", "Botafogo", "Flamengo", "Fluminense", "Madureira", "Maricá", "Nova Iguaçu", "Portuguesa RJ", "Sampaio Corrêa RJ", "Vasco da Gama", "Volta Redonda"]),
+    "catarinense": frozenset(_norm(c) for c in ["Avaí", "Barra", "Brusque", "Camboriú", "Carlos Renaux", "Chapecoense", "Concórdia", "Criciúma", "Figueirense", "Joinville", "Marcílio Dias", "Santa Catarina"]),
+    "cearense": frozenset(_norm(c) for c in ["Ceará", "Ferroviário", "Floresta EC", "Fortaleza", "Horizonte", "Iguatu", "Maracanã", "Maranguape", "Quixadá", "Tirol"]),
+    "alagoano": frozenset(_norm(c) for c in ["ASA", "Aliança AL", "CRB", "CSA", "CSE", "Coruripe", "Cruzeiro Arapiraca", "Murici"]),
+    "potiguar": frozenset(_norm(c) for c in ["ABC", "ASSU", "América RN", "Força e Luz", "Globo", "Potiguar Mossoró", "Potyguar", "Santa Cruz de Natal RN"]),
+    "paulista-a2": frozenset(_norm(c) for c in ["Ferroviária", "Grêmio Prudente", "Inter de Limeira", "Ituano", "Juventus", "Linense", "Monte Azul", "Oeste", "Santo André", "Sertãozinho", "São Bento", "São José EC", "Taubaté", "Votuporanguense", "XV de Piracicaba", "Água Santa"]),
+    "paulista-a3": frozenset(_norm(c) for c in ["Bandeirante SP", "Catanduva", "Desportivo Brasil", "Francana", "Itapirense", "Marília", "Paulista", "Portuguesa Santista", "Rio Branco SP", "Rio Claro", "Rio Preto", "São Bernardo", "USAC", "União Barbarense", "União São João", "XV de Jaú"]),
+    "paulista-a4": frozenset(_norm(c) for c in ["AEA", "Barretos", "Colorado Caieiras", "Comercial", "EC Lemense", "ECUS", "Grêmio Sãocarlense", "Inter de Bebedouro", "Jabaquara", "Jacareí", "Nacional SP", "Penapolense", "São Caetano", "Tanabi", "Taquaritinga", "VOCEM"]),
+    "copa-do-nordeste": frozenset(_norm(c) for c in ["ABC", "ASA", "América RN", "Botafogo PB", "CRB", "Ceará", "Confiança", "Ferroviário", "Fluminense PI", "Fortaleza", "Imperatriz", "Itabaiana", "Jacuipense", "Juazeirense", "Maranhão", "Piauí", "Retrô", "Sousa", "Sport Recife", "Vitória"]),
+    "copa-paulista": frozenset(_norm(c) for c in ["Bandeirante SP", "Comercial", "Grêmio Prudente", "Juventus", "Linense", "Marília", "Noroeste", "Oeste", "Paulista", "Primavera SP", "Santo André", "São Bernardo", "São Caetano", "São José EC", "União São João", "XV de Piracicaba"]),
+}
+
+
+def detect_estadual_competition(clubs: list[str]) -> str | None:
+    """Match a Wyscout export to one championship by its period-club list."""
+    present = {_norm(club) for club in clubs if _norm(club)}
+    if not present:
+        return None
+    best_id = None
+    best_score = 0.0
+    for competition, expected in COMPETITION_CLUBS.items():
+        overlap = len(present & expected)
+        score = overlap / max(len(expected), 1)
+        coverage = overlap / max(len(present), 1)
+        rank = min(score, coverage)
+        if rank > best_score:
+            best_score = rank
+            best_id = competition
+    if best_id and best_score >= 0.75:
+        return best_id
+    return None
+
+
+def competition_level(competition: str) -> str | None:
+    """Return the Nv pool for a state championship. Cups return None."""
+    if competition in EXCLUDED_COMPETITIONS:
+        return None
+    return COMPETITION_LEVEL.get(competition)
+
+
 def classify_estadual_level(club: str) -> str:
     """Nv1–Nv4 pool that should rate this club. Unknown clubs land in Nv4."""
     return CHAMPIONSHIP_LEVEL.get(classify_estadual_club(club), "est-nv4")

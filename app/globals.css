@@ -577,8 +577,9 @@ input[type="range"] {
 }
 
 .hub-serie-logo {
-  width: 64px;
-  height: 76px;
+  width: auto;
+  height: 72px;
+  max-width: 140px;
   object-fit: contain;
 }
 
@@ -616,10 +617,13 @@ input[type="range"] {
 }
 
 .hub-mini-logo {
-  width: 36px;
-  height: 44px;
+  width: auto;
+  height: 40px;
+  max-width: 78px;
   object-fit: contain;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
+  background: #fff;
+  border-radius: 8px;
+  padding: 3px;
 }
 
 .profile-radar-link {

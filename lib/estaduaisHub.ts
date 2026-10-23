@@ -21,8 +21,8 @@ export const ESTADUAIS_LEVELS: EstadualLevel[] = [
     hint: "Notas calculadas só entre Paulista, Gaúcho, Mineiro e Carioca.",
     logo: "/competitions/serie-a.svg",
     members: [
-      { id: "paulista", name: "Paulista", logo: "/competitions/paulista.svg" },
-      { id: "gaucho", name: "Gaúcho", logo: "/competitions/gaucho.svg" },
+      { id: "paulista", name: "Paulista", logo: "/competitions/paulista.png" },
+      { id: "gaucho", name: "Gaúcho", logo: "/competitions/gaucho.png" },
       { id: "mineiro", name: "Mineiro", logo: "/competitions/mineiro.svg" },
       { id: "carioca", name: "Carioca", logo: "/competitions/carioca.svg" },
     ],
@@ -33,9 +33,9 @@ export const ESTADUAIS_LEVELS: EstadualLevel[] = [
     hint: "Notas calculadas só entre Paranaense, Catarinense, Paulista A2 e Baiano.",
     logo: "/competitions/serie-b.svg",
     members: [
-      { id: "paranaense", name: "Paranaense", logo: "/competitions/paranaense.svg" },
-      { id: "catarinense", name: "Catarinense", logo: "/competitions/catarinense.svg" },
-      { id: "paulista-a2", name: "Paulista A2", logo: "/competitions/paulista-a2.svg" },
+      { id: "paranaense", name: "Paranaense", logo: "/competitions/paranaense.png" },
+      { id: "catarinense", name: "Catarinense", logo: "/competitions/catarinense.jpg" },
+      { id: "paulista-a2", name: "Paulista A2", logo: "/competitions/paulista-a2.png" },
       { id: "baiano", name: "Baiano", logo: "/competitions/baiano.svg" },
     ],
   },
@@ -47,7 +47,7 @@ export const ESTADUAIS_LEVELS: EstadualLevel[] = [
     members: [
       { id: "cearense", name: "Cearense", logo: "/competitions/cearense.svg" },
       { id: "pernambucano", name: "Pernambucano", logo: "/competitions/pernambucano.svg" },
-      { id: "paulista-a3", name: "Paulista A3", logo: "/competitions/paulista-a3.svg" },
+      { id: "paulista-a3", name: "Paulista A3", logo: "/competitions/paulista-a3.png" },
       { id: "goiano", name: "Goiano", logo: "/competitions/goiano.svg" },
     ],
   },

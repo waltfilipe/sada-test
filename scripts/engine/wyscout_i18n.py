@@ -22,7 +22,7 @@ def rename_english_wyscout_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Rename columns when the export uses English headers (same order as PT template)."""
     pt_cols = portuguese_column_template()
     en_cols = list(df.columns)
-    if en_cols == pt_cols:
+    if en_cols == pt_cols or (en_cols and en_cols[0] == "Jogador"):
         return df
     if len(en_cols) != len(pt_cols):
         raise ValueError(

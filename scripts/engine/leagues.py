@@ -18,7 +18,7 @@ class LeagueConfig(TypedDict):
 
 ROOT = Path(__file__).resolve().parents[2]
 WYSCOUT_2026 = ROOT / "wyscout" / "2026"
-_ESTADUAIS_XLSX = sorted(WYSCOUT_2026.glob("estaduais-pt*.xlsx"))
+_ESTADUAIS_XLSX = sorted((WYSCOUT_2026 / "estaduais").glob("*.xlsx"))
 
 
 def _estaduais_league(league_id: str, label: str) -> LeagueConfig:

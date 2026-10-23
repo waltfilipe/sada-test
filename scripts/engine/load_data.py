@@ -10,7 +10,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[2]
 PBIX_PATH = ROOT / "Dashboard - Série A 25-26.pbix"
 
-from engine.estaduais_championship import LEVEL_IDS, classify_estadual_level
+from engine.estaduais_championship import LEVEL_IDS, classify_estadual_level, competition_level
 from engine.leagues import LEAGUES, LeagueConfig
 from engine.wyscout_i18n import rename_english_wyscout_columns
 
@@ -207,7 +207,7 @@ def _dedupe_players(df: pd.DataFrame) -> pd.DataFrame:
     """Wyscout caps each export at 500 rows, so PT1/PT2 overlap around the cut."""
     keys = [
         column
-        for column in ("Jogador", "Equipe", "Equipa dentro de um período de tempo seleccionado")
+        for column in ("Jogador", "Equipe", "Campeonato", "Equipa dentro de um período de tempo seleccionado")
         if column in df.columns
     ]
     if "Jogador" not in keys:
@@ -283,7 +283,12 @@ def load_players_dataframe(league_id: str = "serie-a") -> pd.DataFrame:
                 break
 
     period_club = "Equipa dentro de um período de tempo seleccionado"
-    if period_club in df.columns:
+    estadual_pool = league_id in LEVEL_IDS or league_id == "estaduais"
+    if period_club in df.columns and estadual_pool:
+        period_values = df[period_club].map(lambda value: "" if pd.isna(value) else str(value).strip())
+        has_period = period_values.ne("")
+        df.loc[has_period, "Equipe"] = period_values.loc[has_period]
+    elif period_club in df.columns:
         def _blank_club(value: Any) -> bool:
             return pd.isna(value) or str(value).strip().lower() in {"", "nan", "none"}
 
@@ -291,7 +296,14 @@ def load_players_dataframe(league_id: str = "serie-a") -> pd.DataFrame:
         df.loc[missing_club, "Equipe"] = df.loc[missing_club, period_club]
     df["Equipe"] = df["Equipe"].map(lambda value: "" if pd.isna(value) else str(value).strip())
 
-    if league_id in LEVEL_IDS:
+    if league_id in LEVEL_IDS and "Campeonato" in df.columns:
+        levels = df["Campeonato"].map(lambda value: competition_level(str(value)) or "")
+        before = len(df)
+        df = df.loc[levels.eq(league_id)].copy()
+        print(f"  Filtro {league_id} por campeonato: {len(df)} de {before} linhas")
+        if df.empty:
+            raise FileNotFoundError(f"Nenhum campeonato classificado em {league['label']}")
+    elif league_id in LEVEL_IDS:
         levels = df["Equipe"].map(classify_estadual_level)
         before = len(df)
         df = df.loc[levels.eq(league_id)].copy()
