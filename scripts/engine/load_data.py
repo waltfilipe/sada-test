@@ -10,8 +10,12 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[2]
 PBIX_PATH = ROOT / "Dashboard - Série A 25-26.pbix"
 
+from engine.estaduais_championship import LEVEL_IDS, classify_estadual_level
 from engine.leagues import LEAGUES, LeagueConfig
 from engine.wyscout_i18n import rename_english_wyscout_columns
+
+# Wyscout parts are shared by the full estaduais pool and each level rebuild.
+_XLSX_FRAME_CACHE: dict[tuple[str, ...], pd.DataFrame] = {}
 
 WYSCOUT_TO_POSITION: dict[str, str] = {
     "GK": "Goleiro",
@@ -219,8 +223,14 @@ def _dedupe_players(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _load_from_xlsx(xlsx: Path | list[Path]) -> pd.DataFrame | None:
+    paths = _xlsx_sources(xlsx)
+    key = tuple(str(path.resolve()) for path in paths)
+    cached = _XLSX_FRAME_CACHE.get(key)
+    if cached is not None:
+        return cached.copy()
+
     frames = []
-    for path in _xlsx_sources(xlsx):
+    for path in paths:
         frame = _read_wyscout_frame(path)
         if frame is not None and len(frame):
             frames.append(frame)
@@ -234,6 +244,7 @@ def _load_from_xlsx(xlsx: Path | list[Path]) -> pd.DataFrame | None:
     df = df[df["Posição"].notna()].copy()
     if len(df) < 50:
         return None
+    _XLSX_FRAME_CACHE[key] = df.copy()
     return df
 
 
@@ -279,6 +290,14 @@ def load_players_dataframe(league_id: str = "serie-a") -> pd.DataFrame:
         missing_club = df["Equipe"].map(_blank_club)
         df.loc[missing_club, "Equipe"] = df.loc[missing_club, period_club]
     df["Equipe"] = df["Equipe"].map(lambda value: "" if pd.isna(value) else str(value).strip())
+
+    if league_id in LEVEL_IDS:
+        levels = df["Equipe"].map(classify_estadual_level)
+        before = len(df)
+        df = df.loc[levels.eq(league_id)].copy()
+        print(f"  Filtro {league_id}: {len(df)} de {before} linhas Wyscout")
+        if df.empty:
+            raise FileNotFoundError(f"Nenhum clube classificado em {league['label']}")
 
     df["Pé"] = df["Pé"].map(_normalize_foot)
     df["NomeExibicao"] = [

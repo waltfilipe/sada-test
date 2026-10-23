@@ -1,58 +1,65 @@
 import type { LeagueId } from "./leagues";
 
-export type EstadualTier = {
-  label: string;
-  items: { id: LeagueId; name: string; brand: string }[];
+export type ChampionshipMark = {
+  id: string;
+  name: string;
+  logo: string;
 };
 
-export const ESTADUAIS_HUB: EstadualTier[] = [
+export type EstadualLevel = {
+  id: LeagueId;
+  name: string;
+  hint: string;
+  logo: string;
+  members: ChampionshipMark[];
+};
+
+export const ESTADUAIS_LEVELS: EstadualLevel[] = [
   {
-    label: "Estaduais Nv1",
-    items: [
-      { id: "est-nv1-paulista", name: "Paulista", brand: "PA" },
-      { id: "est-nv1-gaucho", name: "Gaúcho", brand: "RS" },
-      { id: "est-nv1-mineiro", name: "Mineiro", brand: "MG" },
-      { id: "est-nv1-carioca", name: "Carioca", brand: "RJ" },
+    id: "est-nv1",
+    name: "Estaduais Nv1",
+    hint: "Notas calculadas só entre Paulista, Gaúcho, Mineiro e Carioca.",
+    logo: "/competitions/serie-a.svg",
+    members: [
+      { id: "paulista", name: "Paulista", logo: "/competitions/paulista.svg" },
+      { id: "gaucho", name: "Gaúcho", logo: "/competitions/gaucho.svg" },
+      { id: "mineiro", name: "Mineiro", logo: "/competitions/mineiro.svg" },
+      { id: "carioca", name: "Carioca", logo: "/competitions/carioca.svg" },
     ],
   },
   {
-    label: "Estaduais Nv2",
-    items: [
-      { id: "est-nv2-paranaense", name: "Paranaense", brand: "PR" },
-      { id: "est-nv2-catarinense", name: "Catarinense", brand: "SC" },
-      { id: "est-nv2-paulista-a2", name: "Paulista A2", brand: "A2" },
-      { id: "est-nv2-baiano", name: "Baiano", brand: "BA" },
+    id: "est-nv2",
+    name: "Estaduais Nv2",
+    hint: "Notas calculadas só entre Paranaense, Catarinense, Paulista A2 e Baiano.",
+    logo: "/competitions/serie-b.svg",
+    members: [
+      { id: "paranaense", name: "Paranaense", logo: "/competitions/paranaense.svg" },
+      { id: "catarinense", name: "Catarinense", logo: "/competitions/catarinense.svg" },
+      { id: "paulista-a2", name: "Paulista A2", logo: "/competitions/paulista-a2.svg" },
+      { id: "baiano", name: "Baiano", logo: "/competitions/baiano.svg" },
     ],
   },
   {
-    label: "Estaduais Nv3",
-    items: [
-      { id: "est-nv3-cearense", name: "Cearense", brand: "CE" },
-      { id: "est-nv3-pernambucano", name: "Pernambucano", brand: "PE" },
-      { id: "est-nv3-paulista-a3", name: "Paulista A3", brand: "A3" },
-      { id: "est-nv3-goiano", name: "Goiano", brand: "GO" },
+    id: "est-nv3",
+    name: "Estaduais Nv3",
+    hint: "Notas calculadas só entre Cearense, Pernambucano, Paulista A3 e Goiano.",
+    logo: "/competitions/serie-c.svg",
+    members: [
+      { id: "cearense", name: "Cearense", logo: "/competitions/cearense.svg" },
+      { id: "pernambucano", name: "Pernambucano", logo: "/competitions/pernambucano.svg" },
+      { id: "paulista-a3", name: "Paulista A3", logo: "/competitions/paulista-a3.svg" },
+      { id: "goiano", name: "Goiano", logo: "/competitions/goiano.svg" },
     ],
   },
   {
-    label: "Estaduais Nv4",
-    items: [{ id: "est-nv4-outros", name: "Outros", brand: "BR" }],
+    id: "est-nv4",
+    name: "Estaduais Nv4",
+    hint: "Demais estaduais, comparados apenas dentro deste nível.",
+    logo: "/competitions/outros.svg",
+    members: [{ id: "outros", name: "Outros", logo: "/competitions/outros.svg" }],
   },
 ];
 
-export const ESTADUAIS_LEAGUE_IDS = [
-  "est-nv1-paulista",
-  "est-nv1-gaucho",
-  "est-nv1-mineiro",
-  "est-nv1-carioca",
-  "est-nv2-paranaense",
-  "est-nv2-catarinense",
-  "est-nv2-paulista-a2",
-  "est-nv2-baiano",
-  "est-nv3-cearense",
-  "est-nv3-pernambucano",
-  "est-nv3-paulista-a3",
-  "est-nv3-goiano",
-  "est-nv4-outros",
-] as const satisfies readonly LeagueId[];
+export const ESTADUAIS_LEAGUE_IDS = ["est-nv1", "est-nv2", "est-nv3", "est-nv4"] as const;
 
 export type EstadualLeagueId = (typeof ESTADUAIS_LEAGUE_IDS)[number];

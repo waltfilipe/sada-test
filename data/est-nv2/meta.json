@@ -1,0 +1,336 @@
+{
+  "league_id": "est-nv2",
+  "league": "Estaduais Nv2",
+  "season": "2026",
+  "source": "xlsx",
+  "player_count": 1152,
+  "families": [
+    {
+      "key": "zagueiros",
+      "label": "Zagueiros",
+      "positions": [
+        "Zagueiro"
+      ],
+      "profiles": [
+        "Construtor",
+        "Defensivo",
+        "Híbrido"
+      ],
+      "count": 214
+    },
+    {
+      "key": "laterais",
+      "label": "Laterais",
+      "positions": [
+        "Lateral Direito",
+        "Lateral Esquerdo"
+      ],
+      "profiles": [
+        "Defensivo",
+        "Construtor",
+        "Ofensivo",
+        "Híbrido"
+      ],
+      "count": 228
+    },
+    {
+      "key": "meio-campistas",
+      "label": "Meio-campistas",
+      "positions": [
+        "Meio-campista"
+      ],
+      "profiles": [
+        "Contenção",
+        "Construtor",
+        "Box-to-box",
+        "Híbrido"
+      ],
+      "count": 254
+    },
+    {
+      "key": "extremos",
+      "label": "Meias Ofensivos",
+      "positions": [
+        "Extremo Direito",
+        "Extremo Esquerdo",
+        "Meia Ofensivo"
+      ],
+      "profiles": [
+        "Driblador",
+        "Meia Ponta",
+        "Ruptura",
+        "Híbrido"
+      ],
+      "count": 280
+    },
+    {
+      "key": "atacantes",
+      "label": "Atacantes",
+      "positions": [
+        "Atacante"
+      ],
+      "profiles": [
+        "Finalizador",
+        "Alvo",
+        "Móvel",
+        "Híbrido"
+      ],
+      "count": 176
+    }
+  ],
+  "clubs": [
+    "Athletico Paranaense",
+    "Athletico Paranaense U20",
+    "Atlético Alagoinhas",
+    "Atlético Alagoinhas U20",
+    "Atlético Tubarão",
+    "Avaí",
+    "Azuriz",
+    "Bahia",
+    "Bahia U20",
+    "Bahia de Feira",
+    "Barcelona BA",
+    "Barra SC U20",
+    "Botafogo PB",
+    "Brusque",
+    "Bylis Ballsh",
+    "Camboriú",
+    "Camboriú U20",
+    "Carlos Renaux",
+    "Cascavel",
+    "Catanduva",
+    "Chapecoense",
+    "Chapecoense U20",
+    "Cianorte",
+    "Concórdia",
+    "Coritiba",
+    "Coritiba U20",
+    "Criciúma",
+    "Dukla Banská Bystrica",
+    "EC São Bernardo U20",
+    "FC Cascavel U20",
+    "Figueirense",
+    "Foz do Iguaçu",
+    "Francana",
+    "Francana U20",
+    "Galícia",
+    "Guarany de Bagé",
+    "Inter de Bebedouro",
+    "Itapirense",
+    "Itapirense U20",
+    "Jacuipense",
+    "Jequié",
+    "Joinville",
+    "Juazeirense",
+    "Juazeirense U20",
+    "Londrina",
+    "Marcílio Dias",
+    "Maringá",
+    "Monterey Bay FC",
+    "Operário PR",
+    "Penapolense",
+    "Ponte da Barca",
+    "Portimonense",
+    "Porto BA",
+    "Rio Branco PR",
+    "Rio Preto",
+    "Santa Cruz",
+    "Santa Cruz U20",
+    "Sertãozinho",
+    "Sertãozinho U20",
+    "Taquaritinga",
+    "União Barbarense",
+    "União São João",
+    "Vitória",
+    "Vitória U20",
+    "Votuporanguense",
+    "XV de Jaú",
+    "XV de Jaú U20",
+    "XV de Piracicaba"
+  ],
+  "nationalities": [
+    "Argentina",
+    "Brazil",
+    "Cameroon",
+    "Chile",
+    "Colombia",
+    "Congo DR",
+    "Côte d'Ivoire",
+    "Dominican Republic",
+    "Ecuador",
+    "Ghana",
+    "Haiti",
+    "Italy",
+    "Nigeria",
+    "Portugal",
+    "United States",
+    "Uruguay"
+  ],
+  "filters": {
+    "height": [
+      162,
+      197
+    ],
+    "minutes": [
+      0,
+      1974
+    ],
+    "birth_year": [
+      1982,
+      2010
+    ],
+    "rating": [
+      5.9,
+      7.4
+    ]
+  },
+  "scatter_metrics": {
+    "zagueiros": [
+      {
+        "key": "intervencoes",
+        "label": "Intervenções",
+        "field": "interception_won_p90"
+      },
+      {
+        "key": "confrontos_of",
+        "label": "Confrontos Ofensivos",
+        "field": "DuelosOf"
+      },
+      {
+        "key": "construcao",
+        "label": "Construção",
+        "field": "n_construcao"
+      },
+      {
+        "key": "duelo_ar",
+        "label": "Duelo Aéreo",
+        "field": "n_duelo_ar"
+      },
+      {
+        "key": "contencao",
+        "label": "Contenção",
+        "field": "n_contencao"
+      },
+      {
+        "key": "ofensividade",
+        "label": "Ofensividade",
+        "field": "n_conducao"
+      },
+      {
+        "key": "passes_prog",
+        "label": "Passes Progressivos",
+        "field": "PassesProg"
+      },
+      {
+        "key": "duelos_def",
+        "label": "Duelos Defensivos",
+        "field": "DuelosDef"
+      }
+    ],
+    "laterais": [
+      {
+        "key": "cruzamentos",
+        "label": "Cruzamentos",
+        "field": "Cruz."
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "construcao",
+        "label": "Construção",
+        "field": "n_construcao"
+      },
+      {
+        "key": "duelos_def",
+        "label": "Duelos Defensivos",
+        "field": "DuelosDef"
+      }
+    ],
+    "meio-campistas": [
+      {
+        "key": "finalizacao",
+        "label": "Finalizações",
+        "field": "Finalizações"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "construcao",
+        "label": "Construção",
+        "field": "n_construcao"
+      },
+      {
+        "key": "duelos_def",
+        "label": "Duelos Defensivos",
+        "field": "DuelosDef"
+      }
+    ],
+    "extremos": [
+      {
+        "key": "dribles",
+        "label": "Dribles",
+        "field": "Dribles"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      },
+      {
+        "key": "cruzamentos",
+        "label": "Cruzamentos",
+        "field": "Cruz."
+      },
+      {
+        "key": "toques_area",
+        "label": "Toques na Área",
+        "field": "ToquesArea"
+      }
+    ],
+    "atacantes": [
+      {
+        "key": "gols",
+        "label": "Gols",
+        "field": "Gols"
+      },
+      {
+        "key": "finalizacao",
+        "label": "Finalizações",
+        "field": "Finalizações"
+      },
+      {
+        "key": "toques_area",
+        "label": "Toques na Área",
+        "field": "ToquesArea"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      }
+    ]
+  },
+  "heatmaps_enabled": false,
+  "physical_run_enabled": false
+}

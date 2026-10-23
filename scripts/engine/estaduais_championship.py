@@ -22,6 +22,25 @@ CHAMPIONSHIP_IDS: Final[tuple[str, ...]] = (
     "est-nv4-outros",
 )
 
+# Published site pools. Percentiles are fit inside the level, not per championship.
+LEVEL_IDS: Final[tuple[str, ...]] = ("est-nv1", "est-nv2", "est-nv3", "est-nv4")
+
+CHAMPIONSHIP_LEVEL: Final[dict[str, str]] = {
+    "est-nv1-paulista": "est-nv1",
+    "est-nv1-gaucho": "est-nv1",
+    "est-nv1-mineiro": "est-nv1",
+    "est-nv1-carioca": "est-nv1",
+    "est-nv2-paranaense": "est-nv2",
+    "est-nv2-catarinense": "est-nv2",
+    "est-nv2-paulista-a2": "est-nv2",
+    "est-nv2-baiano": "est-nv2",
+    "est-nv3-cearense": "est-nv3",
+    "est-nv3-pernambucano": "est-nv3",
+    "est-nv3-paulista-a3": "est-nv3",
+    "est-nv3-goiano": "est-nv3",
+    "est-nv4-outros": "est-nv4",
+}
+
 
 def _norm(value: str) -> str:
     text = unicodedata.normalize("NFKD", str(value or ""))
@@ -389,6 +408,11 @@ def _pattern_championship(norm_club: str) -> str | None:
         return "est-nv1-mineiro"
 
     return None
+
+
+def classify_estadual_level(club: str) -> str:
+    """Nv1–Nv4 pool that should rate this club. Unknown clubs land in Nv4."""
+    return CHAMPIONSHIP_LEVEL.get(classify_estadual_club(club), "est-nv4")
 
 
 def classify_estadual_club(club: str) -> str:

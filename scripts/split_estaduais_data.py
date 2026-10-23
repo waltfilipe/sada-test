@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Split data/estaduais into per-championship league folders for the site."""
+"""Legacy split of the global estaduais ratings into per-championship folders.
+
+The published site no longer uses these folders. Levels est-nv1..4 are rebuilt
+by scripts/build_estaduais_levels.py so percentiles stay inside the level.
+"""
 
 from __future__ import annotations
 

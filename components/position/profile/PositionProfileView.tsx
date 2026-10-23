@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useLeague } from "@/components/LeagueProvider";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { PlayerHero } from "./PlayerHero";
 import { PlayerHeatmap } from "./PlayerHeatmap";
@@ -14,6 +16,7 @@ type Props = {
 };
 
 export function PositionProfileView({ player, family, players, heatmapsEnabled = true }: Props) {
+  const { href } = useLeague();
   return (
     <div className="profile-view-shell">
       <PlayerHero player={player} family={family} players={players} />
@@ -32,6 +35,9 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
 
         <div className="profile-content-col profile-col-middle">
           <ProfileCard player={player} family={family} players={players} />
+          <Link className="profile-radar-link" href={`${href(`/posicao/${family}/radares`)}?jogador=${encodeURIComponent(player.player_id)}`}>
+            Ver afinidade e classificação em radares
+          </Link>
         </div>
 
         <div className="profile-content-col profile-col-stats">

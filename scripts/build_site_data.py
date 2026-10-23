@@ -236,10 +236,8 @@ def main() -> None:
             continue
         build_league(league_id)
 
-    print("\n=== Split estaduais por campeonato ===")
-    from split_estaduais_data import main as split_estaduais
-
-    split_estaduais()
+    # est-nv1..4 are first-class leagues: build_league refits percentiles inside
+    # each level. Do not republish the old per-championship split of the global pool.
 
     _sync_serie_a_legacy()
     _prune_orphan_heatmaps()

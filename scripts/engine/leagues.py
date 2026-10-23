@@ -18,6 +18,22 @@ class LeagueConfig(TypedDict):
 
 ROOT = Path(__file__).resolve().parents[2]
 WYSCOUT_2026 = ROOT / "wyscout" / "2026"
+_ESTADUAIS_XLSX = sorted(WYSCOUT_2026.glob("estaduais-pt*.xlsx"))
+
+
+def _estaduais_league(league_id: str, label: str) -> LeagueConfig:
+    """Same Wyscout exports. est-nv* rows are filtered to that level after load."""
+    return {
+        "id": league_id,
+        "label": label,
+        "season": "2026",
+        "xlsx": _ESTADUAIS_XLSX,
+        "defensive_csv": ROOT / "BRE26_defensive.csv",
+        "heatmaps": False,
+        "heatmaps_dir": None,
+        "physical_run": False,
+        "run_csv": None,
+    }
 
 LEAGUES: dict[str, LeagueConfig] = {
     "serie-a": {
@@ -75,15 +91,9 @@ LEAGUES: dict[str, LeagueConfig] = {
         "physical_run": False,
         "run_csv": None,
     },
-    "estaduais": {
-        "id": "estaduais",
-        "label": "Estaduais",
-        "season": "2026",
-        "xlsx": sorted(WYSCOUT_2026.glob("estaduais-pt*.xlsx")),
-        "defensive_csv": ROOT / "BRE26_defensive.csv",
-        "heatmaps": False,
-        "heatmaps_dir": None,
-        "physical_run": False,
-        "run_csv": None,
-    },
+    "estaduais": _estaduais_league("estaduais", "Estaduais"),
+    "est-nv1": _estaduais_league("est-nv1", "Estaduais Nv1"),
+    "est-nv2": _estaduais_league("est-nv2", "Estaduais Nv2"),
+    "est-nv3": _estaduais_league("est-nv3", "Estaduais Nv3"),
+    "est-nv4": _estaduais_league("est-nv4", "Estaduais Nv4"),
 }

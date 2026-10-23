@@ -1,23 +1,6 @@
-import { ESTADUAIS_LEAGUE_IDS, type EstadualLeagueId } from "./estaduaisHub";
+import { ESTADUAIS_LEAGUE_IDS, ESTADUAIS_LEVELS, type EstadualLeagueId } from "./estaduaisHub";
 
-export type LeagueId =
-  | "serie-a"
-  | "serie-b"
-  | "serie-c"
-  | "serie-d"
-  | "est-nv1-paulista"
-  | "est-nv1-gaucho"
-  | "est-nv1-mineiro"
-  | "est-nv1-carioca"
-  | "est-nv2-paranaense"
-  | "est-nv2-catarinense"
-  | "est-nv2-paulista-a2"
-  | "est-nv2-baiano"
-  | "est-nv3-cearense"
-  | "est-nv3-pernambucano"
-  | "est-nv3-paulista-a3"
-  | "est-nv3-goiano"
-  | "est-nv4-outros";
+export type LeagueId = "serie-a" | "serie-b" | "serie-c" | "serie-d" | EstadualLeagueId;
 
 export type LeagueInfo = {
   id: LeagueId;
@@ -28,6 +11,7 @@ export type LeagueInfo = {
   tagline: string;
   heatmaps: boolean;
   physicalRun: boolean;
+  logo: string;
 };
 
 const BRASILEIRAO: LeagueInfo[] = [
@@ -36,66 +20,60 @@ const BRASILEIRAO: LeagueInfo[] = [
     slug: "serie-a",
     name: "Série A",
     season: "2026",
-    brand: "SA",
+    brand: "A",
     tagline: "Brasileirão",
     heatmaps: true,
     physicalRun: true,
+    logo: "/competitions/serie-a.svg",
   },
   {
     id: "serie-b",
     slug: "serie-b",
     name: "Série B",
     season: "2026",
-    brand: "SB",
+    brand: "B",
     tagline: "Brasileirão",
     heatmaps: true,
     physicalRun: false,
+    logo: "/competitions/serie-b.svg",
   },
   {
     id: "serie-c",
     slug: "serie-c",
     name: "Série C",
     season: "2026",
-    brand: "SC",
+    brand: "C",
     tagline: "Brasileirão",
     heatmaps: true,
     physicalRun: false,
+    logo: "/competitions/serie-c.svg",
   },
   {
     id: "serie-d",
     slug: "serie-d",
     name: "Série D",
     season: "2026",
-    brand: "SD",
+    brand: "D",
     tagline: "Brasileirão",
     heatmaps: true,
     physicalRun: false,
+    logo: "/competitions/serie-d.svg",
   },
 ];
 
-const ESTADUAIS_META: Record<EstadualLeagueId, Omit<LeagueInfo, "id" | "slug">> = {
-  "est-nv1-paulista": { name: "Paulista", season: "2026", brand: "PA", tagline: "Estadual", heatmaps: false, physicalRun: false },
-  "est-nv1-gaucho": { name: "Gaúcho", season: "2026", brand: "RS", tagline: "Estadual", heatmaps: false, physicalRun: false },
-  "est-nv1-mineiro": { name: "Mineiro", season: "2026", brand: "MG", tagline: "Estadual", heatmaps: false, physicalRun: false },
-  "est-nv1-carioca": { name: "Carioca", season: "2026", brand: "RJ", tagline: "Estadual", heatmaps: false, physicalRun: false },
-  "est-nv2-paranaense": { name: "Paranaense", season: "2026", brand: "PR", tagline: "Estadual", heatmaps: false, physicalRun: false },
-  "est-nv2-catarinense": { name: "Catarinense", season: "2026", brand: "SC", tagline: "Estadual", heatmaps: false, physicalRun: false },
-  "est-nv2-paulista-a2": { name: "Paulista A2", season: "2026", brand: "A2", tagline: "Estadual", heatmaps: false, physicalRun: false },
-  "est-nv2-baiano": { name: "Baiano", season: "2026", brand: "BA", tagline: "Estadual", heatmaps: false, physicalRun: false },
-  "est-nv3-cearense": { name: "Cearense", season: "2026", brand: "CE", tagline: "Estadual", heatmaps: false, physicalRun: false },
-  "est-nv3-pernambucano": { name: "Pernambucano", season: "2026", brand: "PE", tagline: "Estadual", heatmaps: false, physicalRun: false },
-  "est-nv3-paulista-a3": { name: "Paulista A3", season: "2026", brand: "A3", tagline: "Estadual", heatmaps: false, physicalRun: false },
-  "est-nv3-goiano": { name: "Goiano", season: "2026", brand: "GO", tagline: "Estadual", heatmaps: false, physicalRun: false },
-  "est-nv4-outros": { name: "Outros estaduais", season: "2026", brand: "BR", tagline: "Estadual", heatmaps: false, physicalRun: false },
-};
-
-const ESTADUAIS: LeagueInfo[] = ESTADUAIS_LEAGUE_IDS.map((id) => ({
-  id,
-  slug: id,
-  ...ESTADUAIS_META[id],
+const ESTADUAIS: LeagueInfo[] = ESTADUAIS_LEVELS.map((level) => ({
+  id: level.id,
+  slug: level.id,
+  name: level.name,
+  season: "2026",
+  brand: level.id.replace("est-nv", "N"),
+  tagline: "Estaduais",
+  heatmaps: false,
+  physicalRun: false,
+  logo: level.members[0]?.logo ?? "/competitions/outros.svg",
 }));
 
-/** Ligas publicadas no site (sem MLS Next Pro). */
+/** Ligas publicadas no site. Estaduais entram por nível, não por campeonato. */
 export const LEAGUES: LeagueInfo[] = [...BRASILEIRAO, ...ESTADUAIS];
 
 export const BRASILEIRAO_LEAGUES = BRASILEIRAO;
@@ -103,7 +81,7 @@ export const BRASILEIRAO_LEAGUES = BRASILEIRAO;
 export const DEFAULT_LEAGUE: LeagueId = "serie-a";
 
 export function isLeagueId(value: string): value is LeagueId {
-  return LEAGUES.some((league) => league.id === value);
+  return (ESTADUAIS_LEAGUE_IDS as readonly string[]).includes(value) || BRASILEIRAO.some((league) => league.id === value);
 }
 
 export function getLeague(id: string): LeagueInfo | undefined {
