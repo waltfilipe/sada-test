@@ -27,7 +27,7 @@ const SCENARIO_TABS: { key: ProjectionScenario; label: string; hint: string }[] 
   {
     key: "realista",
     label: "Esperado",
-    hint: "Melhor palpite bayesiano: mistura da amostra com jogadores parecidos (minutos e idade).",
+    hint: "Mistura a amostra dele com 50% média dos titulares + 50% média do mesmo perfil na divisão; força do ajuste até 50% dos minutos do time.",
   },
   {
     key: "positiva",
@@ -53,7 +53,7 @@ export function MinuteProjection({ player, family, players }: Props) {
 
   return (
     <>
-      <Tooltip content="Projeta a temporada com minutagem de titular. Mostra confiança na amostra e faixas pessimista, esperada e otimista.">
+      <Tooltip content="Ajusta estatísticas quando faltam minutos para 50% do time: mistura amostra, média da divisão e perfil. Faixas pessimista, esperada e otimista.">
         <button
           type="button"
           className={`btn btn-ghost btn-sm${open ? " is-open" : ""}`}
@@ -65,7 +65,7 @@ export function MinuteProjection({ player, family, players }: Props) {
       </Tooltip>
 
       {open ? (
-        <StatWindow title="Projeção com minutagem de titular" onClose={() => setOpen(false)}>
+        <StatWindow title="Projeção ajustada por minutos" onClose={() => setOpen(false)}>
           {report && active && rel ? (
             <div className="projection-modal-copy">
               <p className="projection-reliability">
@@ -78,10 +78,6 @@ export function MinuteProjection({ player, family, players }: Props) {
                     grupo
                   </>
                 ) : null}
-              </p>
-              <p className="projection-rank-spread">
-                Colocação entre titulares: {rel.rankSpread.negativa}º (pessimista) · {rel.rankSpread.realista}º
-                (esperado) · {rel.rankSpread.positiva}º (otimista) de {rel.rankSpread.poolSize}
               </p>
               <div className="projection-scenario-tabs" role="tablist" aria-label="Cenário de projeção">
                 {SCENARIO_TABS.map((tab) => (
@@ -98,11 +94,9 @@ export function MinuteProjection({ player, family, players }: Props) {
                   </button>
                 ))}
               </div>
-              <p className="projection-rank">
-                {active.rank}º <span>de {active.poolSize}</span>
-              </p>
               <p className="projection-rank-meta">
-                {familyLabel} · {league.name} · cenário {SCENARIO_TABS.find((t) => t.key === scenario)?.label.toLowerCase()}
+                {familyLabel} · {league.name} · cenário{" "}
+                {SCENARIO_TABS.find((t) => t.key === scenario)?.label.toLowerCase()}
               </p>
               <StatSectionsBoard player={active.profile} family={family} />
             </div>

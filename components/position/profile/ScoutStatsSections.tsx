@@ -386,11 +386,6 @@ export function ScoutStatsSections({
             </button>
           ) : null}
         </div>
-        {projectionOn && projection ? (
-          <span className="profile-card-head-hint">
-            {`${projection.rank}º de ${projection.poolSize} · minutagem de titular`}
-          </span>
-        ) : null}
       </div>
 
       <div className="stats-and-badges-body">
