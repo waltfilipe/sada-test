@@ -11,7 +11,6 @@ import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { PlayerReportButton } from "@/components/position/profile/PlayerReport";
-import { ProjectionMethodsModal } from "@/components/position/profile/ProjectionMethodsModal";
 import { SimilarCrossLeagueModal } from "@/components/position/profile/SimilarCrossLeagueModal";
 import { PlayerRunModal } from "@/components/position/profile/PlayerRunModal";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
@@ -100,12 +99,10 @@ export function PlayerHero({
   isArchiveView = false,
   fichaSeason,
 }: Props) {
-  const { href, leagueId, isCurrentSeason } = useLeague();
+  const { href, leagueId } = useLeague();
   const scout = scoutPlayer ?? player;
   const [similarOpen, setSimilarOpen] = useState(false);
-  const [labOpen, setLabOpen] = useState(false);
   const [runOpen, setRunOpen] = useState(false);
-  const showProjectionLab = leagueId === "serie-a" && isCurrentSeason && !isArchiveView;
   const showRun = Boolean(scout.physical_run) && !isArchiveView;
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const tm = player.transfermarkt;
@@ -239,15 +236,6 @@ export function PlayerHero({
               </button>
             </Tooltip>
           </div>
-          {showProjectionLab ? (
-            <div className="hero-action-cell hero-action-lab">
-              <Tooltip content="Compara 8 métodos de shrinkage/projeção só na Série A (EB, Marcel, kNN, etc.).">
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setLabOpen(true)}>
-                  <i className="fa-solid fa-flask" aria-hidden="true" /> 8 métodos
-                </button>
-              </Tooltip>
-            </div>
-          ) : null}
           {showRun ? (
             <div className="hero-action-cell hero-action-run">
               <Tooltip content="Distância, velocidade e sprints vs. atletas na mesma posição.">
@@ -297,9 +285,6 @@ export function PlayerHero({
           players={players}
           onClose={() => setSimilarOpen(false)}
         />
-      ) : null}
-      {labOpen && showProjectionLab ? (
-        <ProjectionMethodsModal player={scout} family={family} onClose={() => setLabOpen(false)} />
       ) : null}
       {runOpen && scout.physical_run ? (
         <PlayerRunModal player={scout} onClose={() => setRunOpen(false)} />

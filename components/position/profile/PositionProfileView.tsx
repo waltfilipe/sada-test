@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useLeague } from "@/components/LeagueProvider";
 import { PlayerSeasonSlicer } from "@/components/PlayerSeasonSlicer";
 import { usePlayerArchiveProfile } from "@/hooks/usePlayerArchiveProfile";
@@ -19,7 +18,7 @@ type Props = {
 };
 
 export function PositionProfileView({ player, family, players, heatmapsEnabled = true }: Props) {
-  const { href, isCurrentSeason, season: hubSeason } = useLeague();
+  const { isCurrentSeason, season: hubSeason } = useLeague();
   const archive = usePlayerArchiveProfile(player, family);
   const { displayPlayer, isArchiveView, showSlicer, loading, setFichaSeason, fichaSeason, basePlayer } = archive;
 
@@ -78,9 +77,6 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
 
         <div className="profile-content-col profile-col-middle">
           <ProfileCard player={displayPlayer} family={family} players={players} />
-          <Link className="profile-radar-link" href={`${href(`/posicao/${family}/radares`)}?jogador=${encodeURIComponent(basePlayer.player_id)}`}>
-            Ver afinidade e classificação em radares
-          </Link>
         </div>
 
         <div className="profile-content-col profile-col-stats">

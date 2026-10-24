@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { filterPlayers, getFamilyPlayers, getMeta, getPlayerProfile, getPlayers } from "@/lib/data.server";
 import { findPlayerInSeason } from "@/lib/playerSeasonMatch.server";
 import { rankCrossLeagueSimilarity } from "@/lib/crossLeagueSimilarity";
-import { getProjectionLabReport } from "@/lib/projectionLab.server";
-import { PROJECTION_LAB_LEAGUE } from "@/lib/projectionMethodsLab";
 import { isLeagueId, type LeagueId } from "@/lib/leagues";
 import type { PositionFamily } from "@/lib/types";
 
@@ -49,10 +47,6 @@ export async function GET(request: Request, { params }: Params) {
 
   if (resource === "similar" && path.length === 1) {
     return similarPayload(url);
-  }
-
-  if (resource === "projection-lab" && path.length === 1) {
-    return projectionLabPayload(url);
   }
 
   if (resource === "player-season" && path.length === 1) {
@@ -161,25 +155,6 @@ function similarPayload(url: URL) {
     family: positionFamily,
     matches,
   });
-}
-
-function projectionLabPayload(url: URL) {
-  const playerId = url.searchParams.get("playerId");
-  const family = url.searchParams.get("family") as PositionFamily | null;
-  const league = url.searchParams.get("league") ?? PROJECTION_LAB_LEAGUE;
-
-  if (league !== PROJECTION_LAB_LEAGUE) {
-    return NextResponse.json({ error: "serie_a_only" }, { status: 400 });
-  }
-  if (!playerId || !family) {
-    return NextResponse.json({ error: "missing_params" }, { status: 400 });
-  }
-
-  const report = getProjectionLabReport(playerId, family);
-  if (!report) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
-  }
-  return NextResponse.json(report);
 }
 
 function readRange(params: URLSearchParams, prefix: string): [number, number] | undefined {
