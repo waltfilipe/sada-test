@@ -7,6 +7,7 @@ import { CURRENT_SEASON, parseSeasonParam } from "./seasons";
 import { DEFAULT_LEAGUE, isLeagueId, type LeagueId } from "./leagues";
 import { POSITION_FAMILIES } from "./positions";
 import { playerStatBadges } from "./statBadges";
+import { withResolvedPlayerPhoto, withResolvedPlayerPhotos } from "./playerPhotoLookup.server";
 import type { PlayerHeatmapData, PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -71,7 +72,12 @@ export function getPlayers(league?: string, season?: string): PlayerSummary[] {
   const key = cacheKey(id, season);
   if (!playersCache.has(key)) {
     const file = path.join(leagueDir(id, season), "players.json");
-    playersCache.set(key, readJson(file));
+    const payload = readJson<{ players: PlayerSummary[]; total: number }>(file);
+    const resolved =
+      parseSeasonParam(season) === CURRENT_SEASON
+        ? payload.players
+        : withResolvedPlayerPhotos(payload.players);
+    playersCache.set(key, { ...payload, players: resolved });
   }
   return playersCache.get(key)!.players;
 }
@@ -128,7 +134,9 @@ function profileIndex(league: LeagueId, season?: string): Map<string, PlayerProf
 }
 
 export function getPlayerProfile(playerId: string, league?: string, season?: string): PlayerProfile | null {
-  return profileIndex(resolveLeague(league), season).get(playerId) ?? null;
+  const player = profileIndex(resolveLeague(league), season).get(playerId) ?? null;
+  if (!player) return null;
+  return parseSeasonParam(season) === CURRENT_SEASON ? player : (withResolvedPlayerPhoto(player) as PlayerProfile);
 }
 
 export function getFamilyPlayers(family: PositionFamily, league?: string, season?: string): PlayerProfile[] {
@@ -139,8 +147,12 @@ export function getFamilyPlayers(family: PositionFamily, league?: string, season
   const filePath = path.join(leagueDir(id, season), `family-${family}.json`);
   if (!fs.existsSync(filePath)) return [];
   const payload = readJson<{ players: PlayerProfile[] }>(filePath);
-  familyCache.set(key, payload.players);
-  return payload.players;
+  const resolved =
+    parseSeasonParam(season) === CURRENT_SEASON
+      ? payload.players
+      : withResolvedPlayerPhotos(payload.players);
+  familyCache.set(key, resolved);
+  return resolved;
 }
 
 export function filterPlayers(
