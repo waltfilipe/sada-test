@@ -194,6 +194,140 @@
   color: #fff;
 }
 
+.hub-season-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.hub-season-picker-label,
+.player-season-slicer-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.hub-season-picker-tabs,
+.player-season-slicer-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.15rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.hub-season-picker-tabs button,
+.player-season-slicer-tabs button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.32rem 0.72rem;
+  font-size: 0.82rem;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.hub-season-picker-tabs button.is-active,
+.player-season-slicer-tabs button.is-active {
+  background: var(--accent, #3d8bfd);
+  color: #fff;
+}
+
+.hub-page-archive {
+  box-shadow: inset 0 4px 0 #f59e0b;
+}
+
+.hub-archive-hint {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: 0 0 0.85rem;
+  max-width: 52rem;
+}
+
+.profile-view-shell-archive-ficha {
+  border-left: 4px solid #f59e0b;
+  padding-left: 0.85rem;
+  margin-left: -0.85rem;
+}
+
+.profile-view-shell-archive-hub {
+  outline: 1px dashed rgba(245, 158, 11, 0.45);
+  outline-offset: 6px;
+  border-radius: 12px;
+  padding: 0.35rem;
+}
+
+.profile-archive-banner {
+  margin: 0 0 0.65rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  font-size: 0.84rem;
+  color: #fcd34d;
+}
+
+.player-season-slicer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.player-season-slicer-loading {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.zag-v2-hub-archive .zag-v2-frame {
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  box-shadow: inset 3px 0 0 #f59e0b;
+}
+
+.zag-v2-archive-notice {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  color: #fcd34d;
+}
+
+.player-report-archive-picks {
+  padding: 0.5rem 0.65rem 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.player-report-archive-picks-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.player-report-archive-pick {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.84rem;
+  padding: 0.25rem 0;
+  cursor: pointer;
+}
+
+.player-report-archive-tag {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.2);
+  color: #fcd34d;
+  font-size: 0.75rem;
+}
+
 .scout-brand {
   display: flex;
   align-items: center;

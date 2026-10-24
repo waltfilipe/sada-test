@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { filterPlayers, getFamilyPlayers, getMeta, getPlayerProfile, getPlayers } from "@/lib/data.server";
+import { findPlayerInSeason } from "@/lib/playerSeasonMatch.server";
 import { rankCrossLeagueSimilarity } from "@/lib/crossLeagueSimilarity";
 import { getProjectionLabReport } from "@/lib/projectionLab.server";
 import { PROJECTION_LAB_LEAGUE } from "@/lib/projectionMethodsLab";
@@ -52,6 +53,20 @@ export async function GET(request: Request, { params }: Params) {
 
   if (resource === "projection-lab" && path.length === 1) {
     return projectionLabPayload(url);
+  }
+
+  if (resource === "player-season" && path.length === 1) {
+    const league = url.searchParams.get("league");
+    const season = url.searchParams.get("season") ?? url.searchParams.get("temporada");
+    const name = url.searchParams.get("name");
+    const birthRaw = url.searchParams.get("birth_year");
+    if (!league || !season || !name || !isLeagueId(league)) {
+      return NextResponse.json({ error: "missing_params" }, { status: 400 });
+    }
+    const birth = birthRaw ? Number(birthRaw) : null;
+    const hit = findPlayerInSeason(league, season, name, Number.isFinite(birth) ? birth : null);
+    if (!hit) return NextResponse.json({ error: "not_found" }, { status: 404 });
+    return NextResponse.json(hit);
   }
 
   return NextResponse.json({ error: "not_found" }, { status: 404 });

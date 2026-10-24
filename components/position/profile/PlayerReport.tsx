@@ -406,7 +406,17 @@ function PercentileCell({ value, ribbon }: { value: number | null; ribbon?: numb
   );
 }
 
-function ReportBanner({ kicker, league, family }: { kicker: string; league: string; family: string }) {
+function ReportBanner({
+  kicker,
+  league,
+  family,
+  archiveSeason,
+}: {
+  kicker: string;
+  league: string;
+  family: string;
+  archiveSeason?: string;
+}) {
   return (
     <header className="player-report-banner">
       <img src="/brand/sada-wordmark.png" alt="SADA — Sistema de Análise de Dados de Atletas" className="player-report-logo" />
@@ -414,6 +424,7 @@ function ReportBanner({ kicker, league, family }: { kicker: string; league: stri
       <p className="player-report-league">
         {league}
         <span>{family}</span>
+        {archiveSeason ? <span className="player-report-archive-tag">Arquivo {archiveSeason}</span> : null}
       </p>
     </header>
   );
@@ -538,6 +549,8 @@ export function ReportSheet({
   sheetUrl,
   pageOffset = 0,
   totalPages = 2,
+  archiveSeasonLabel,
+  skipProjection = false,
 }: {
   player: PlayerProfile;
   family: PositionFamily;
@@ -547,17 +560,19 @@ export function ReportSheet({
   /** First player-report page number in the full export (e.g. after scatter pages). */
   pageOffset?: number;
   totalPages?: number;
+  archiveSeasonLabel?: string;
+  skipProjection?: boolean;
 }) {
   const league = useLeague();
   const copy: ReportCopy = REPORT_COPY[lang];
   const locale = reportLocale(lang);
   const sections = useMemo(() => {
     const observed = reportSections(player, lang);
-    if (!isProjectionEligible(player)) return observed;
+    if (skipProjection || !isProjectionEligible(player)) return observed;
     const projection = realisticProjection(player, players);
     if (!projection) return observed;
     return applyProjection(observed, reportSections(projection.profile, lang));
-  }, [player, players, lang]);
+  }, [player, players, lang, skipProjection]);
   const { columns, density } = useMemo(() => sectionColumns(sections), [sections]);
   const scores = useMemo(() => sectionScores(sections), [sections]);
   const metrics = useMemo(() => reportMetrics(sections, copy), [sections, copy]);
@@ -643,7 +658,12 @@ export function ReportSheet({
   return (
     <article className="player-report" lang={lang === "en" ? "en" : "pt-BR"}>
       <div className="player-report-page">
-        <ReportBanner kicker={copy.kicker} league={leagueBanner} family={familyLabel} />
+        <ReportBanner
+          kicker={copy.kicker}
+          league={leagueBanner}
+          family={familyLabel}
+          archiveSeason={archiveSeasonLabel}
+        />
 
         <div className="player-report-body">
           <section className="player-report-identity">
@@ -805,7 +825,12 @@ export function ReportSheet({
       </div>
 
       <div className="player-report-page">
-        <ReportBanner kicker={copy.summaryKicker} league={leagueBanner} family={familyLabel} />
+        <ReportBanner
+          kicker={copy.summaryKicker}
+          league={leagueBanner}
+          family={familyLabel}
+          archiveSeason={archiveSeasonLabel}
+        />
 
         <div className="player-report-body">
           <section className="player-report-mini">
@@ -983,22 +1008,42 @@ export function ReportSheet({
   );
 }
 
+type ReportSheetSpec = {
+  player: PlayerProfile;
+  archiveSeasonLabel?: string;
+  skipProjection?: boolean;
+};
+
 export function PlayerReportButton({
   player,
+  scoutPlayer,
   family,
   players,
+  primaryArchiveLabel,
 }: {
   player: PlayerProfile;
+  scoutPlayer?: PlayerProfile;
   family: PositionFamily;
   players: PlayerProfile[];
+  primaryArchiveLabel?: string;
 }) {
+  const { leagueId } = useLeague();
+  const scout = scoutPlayer ?? player;
   const { beginLoad, endLoad } = useLoading();
   const [mounted, setMounted] = useState(false);
   const [sheetUrl, setSheetUrl] = useState("");
   const [lang, setLang] = useState<ReportLang>("pt");
   const [menuOpen, setMenuOpen] = useState(false);
   const [printRequest, setPrintRequest] = useState(0);
+  const [reportSheets, setReportSheets] = useState<ReportSheetSpec[]>([{ player, skipProjection: false }]);
+  const [includeArchive, setIncludeArchive] = useState<Record<string, boolean>>({});
   const rootRef = useRef<HTMLDivElement>(null);
+
+  const archiveYears = useMemo(() => {
+    const rows = scout.cross_season?.seasons ?? [];
+    const years = [...new Set(rows.map((r) => r.year))].filter(Boolean).sort((a, b) => b.localeCompare(a));
+    return years;
+  }, [scout.cross_season]);
 
   useEffect(() => {
     setMounted(true);
@@ -1042,9 +1087,42 @@ export function PlayerReportButton({
     return () => window.cancelAnimationFrame(frame);
   }, [printRequest]);
 
-  function exportPdf(next: ReportLang) {
+  async function fetchArchiveProfile(year: string): Promise<PlayerProfile | null> {
+    const row = scout.cross_season?.seasons.find((s) => s.year === year);
+    const league = row?.league ?? leagueId;
+    const qs = new URLSearchParams({
+      league,
+      season: year,
+      name: scout.name,
+      birth_year: String(scout.birth_year ?? ""),
+    });
+    const res = await fetch(`/api/player-season?${qs}`);
+    if (!res.ok) return null;
+    return (await res.json()) as PlayerProfile;
+  }
+
+  async function exportPdf(next: ReportLang) {
     setMenuOpen(false);
     setLang(next);
+    beginLoad();
+    const sheets: ReportSheetSpec[] = [
+      {
+        player,
+        skipProjection: player.player_id !== scout.player_id,
+        archiveSeasonLabel: primaryArchiveLabel,
+      },
+    ];
+    const covered = new Set(primaryArchiveLabel ? [primaryArchiveLabel] : []);
+    for (const year of archiveYears) {
+      if (!includeArchive[year] || covered.has(year)) continue;
+      const profile = await fetchArchiveProfile(year);
+      if (profile) {
+        sheets.push({ player: profile, archiveSeasonLabel: year, skipProjection: true });
+        covered.add(year);
+      }
+    }
+    setReportSheets(sheets);
+    endLoad();
     setPrintRequest((value) => value + 1);
   }
 
@@ -1065,14 +1143,31 @@ export function PlayerReportButton({
         </button>
         {menuOpen ? (
           <div className="shadow-add-dropdown" role="menu">
-            <button type="button" role="menuitem" data-report-lang="pt" onClick={() => exportPdf("pt")}>
+            {archiveYears.length ? (
+              <div className="player-report-archive-picks" role="group" aria-label="Temporadas no PDF">
+                <p className="player-report-archive-picks-title">Incluir fichas de arquivo</p>
+                {archiveYears.map((year) => (
+                  <label key={year} className="player-report-archive-pick">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(includeArchive[year])}
+                      onChange={(event) =>
+                        setIncludeArchive((current) => ({ ...current, [year]: event.target.checked }))
+                      }
+                    />
+                    <span>Wyscout {year}</span>
+                  </label>
+                ))}
+              </div>
+            ) : null}
+            <button type="button" role="menuitem" data-report-lang="pt" onClick={() => void exportPdf("pt")}>
               <i className="fa-solid fa-file-pdf" aria-hidden="true" />
               <span>
                 <strong>{REPORT_COPY.pt.portuguese}</strong>
                 <em>Relatório em português</em>
               </span>
             </button>
-            <button type="button" role="menuitem" data-report-lang="en" onClick={() => exportPdf("en")}>
+            <button type="button" role="menuitem" data-report-lang="en" onClick={() => void exportPdf("en")}>
               <i className="fa-solid fa-file-pdf" aria-hidden="true" />
               <span>
                 <strong>{REPORT_COPY.en.english}</strong>
@@ -1084,7 +1179,22 @@ export function PlayerReportButton({
       </div>
       {mounted
         ? createPortal(
-            <ReportSheet player={player} family={family} players={players} lang={lang} sheetUrl={sheetUrl} />,
+            <>
+              {reportSheets.map((sheet, index) => (
+                <ReportSheet
+                  key={sheet.archiveSeasonLabel ?? `main-${sheet.player.player_id}`}
+                  player={sheet.player}
+                  family={family}
+                  players={players}
+                  lang={lang}
+                  sheetUrl={sheetUrl}
+                  archiveSeasonLabel={sheet.archiveSeasonLabel}
+                  skipProjection={sheet.skipProjection}
+                  pageOffset={index * 2}
+                  totalPages={reportSheets.length * 2}
+                />
+              ))}
+            </>,
             document.body,
           )
         : null}

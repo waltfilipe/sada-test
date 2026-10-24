@@ -332,6 +332,8 @@ export function ScoutStatsSections({
   player,
   family,
   players,
+  projectionSource,
+  disableProjection = false,
   active: activeProp,
   onActiveChange,
   peers = NO_PEERS,
@@ -339,6 +341,9 @@ export function ScoutStatsSections({
   player: PlayerProfile;
   family: PositionFamily;
   players?: PlayerProfile[];
+  /** When set, projection M7 uses this player (2026 scout) while stats show `player`. */
+  projectionSource?: PlayerProfile;
+  disableProjection?: boolean;
   active?: string | null;
   onActiveChange?: (title: string | null) => void;
   peers?: PlayerProfile[];
@@ -350,9 +355,13 @@ export function ScoutStatsSections({
     if (onActiveChange) onActiveChange(title);
     else setLocalActive(title);
   };
+  const projectionSubject = projectionSource ?? player;
   const projection = useMemo(
-    () => (players && isProjectionEligible(player) ? realisticProjection(player, players) : null),
-    [player, players],
+    () =>
+      !disableProjection && players && isProjectionEligible(projectionSubject)
+        ? realisticProjection(projectionSubject, players)
+        : null,
+    [disableProjection, projectionSubject, players],
   );
   const shown = projectionOn && projection ? projection.profile : player;
   const entries = useMemo(() => sectionEntries(shown, family), [shown, family]);

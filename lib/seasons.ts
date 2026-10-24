@@ -25,3 +25,15 @@ export function withSeasonQuery(path: string, season: string): string {
   const sep = path.includes("?") ? "&" : "?";
   return `${path}${sep}temporada=${season}`;
 }
+
+/** Per-player archive slice while hub season stays 2026. */
+export const FICHA_TEMPORADA_PARAM = "ficha_temporada";
+
+export function parseFichaSeasonParam(value: string | null | undefined): BrasileiraoSeason | null {
+  if (value && (BRASILEIRAO_SEASONS as readonly string[]).includes(value) && value !== CURRENT_SEASON) {
+    return value as BrasileiraoSeason;
+  }
+  return null;
+}
+
+export const HUB_SEASON_STORAGE_KEY = "sada-hub-season";

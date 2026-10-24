@@ -21,6 +21,10 @@ type Props = {
   player: PlayerProfile;
   family: PositionFamily;
   players: PlayerProfile[];
+  /** Scout 2026 identity when ficha shows another year. */
+  scoutPlayer?: PlayerProfile;
+  isArchiveView?: boolean;
+  fichaSeason?: string;
 };
 
 function monthsRemaining(iso?: string | null): number | null {
@@ -88,13 +92,21 @@ function MarketCard({
   return <Tooltip content={tooltip}>{card}</Tooltip>;
 }
 
-export function PlayerHero({ player, family, players }: Props) {
-  const { href, leagueId } = useLeague();
+export function PlayerHero({
+  player,
+  family,
+  players,
+  scoutPlayer,
+  isArchiveView = false,
+  fichaSeason,
+}: Props) {
+  const { href, leagueId, isCurrentSeason } = useLeague();
+  const scout = scoutPlayer ?? player;
   const [similarOpen, setSimilarOpen] = useState(false);
   const [labOpen, setLabOpen] = useState(false);
   const [runOpen, setRunOpen] = useState(false);
-  const showProjectionLab = leagueId === "serie-a";
-  const showRun = Boolean(player.physical_run);
+  const showProjectionLab = leagueId === "serie-a" && isCurrentSeason && !isArchiveView;
+  const showRun = Boolean(scout.physical_run) && !isArchiveView;
   const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const tm = player.transfermarkt;
 
@@ -248,7 +260,13 @@ export function PlayerHero({ player, family, players }: Props) {
           <div className="hero-action-cell hero-action-pdf">
             <Tooltip content="Gera um relatório em PDF deste atleta.">
               <span className="hero-action-slot">
-                <PlayerReportButton player={player} family={family} players={players} />
+                <PlayerReportButton
+                  player={player}
+                  scoutPlayer={scout}
+                  family={family}
+                  players={players}
+                  primaryArchiveLabel={fichaSeason}
+                />
               </span>
             </Tooltip>
           </div>
@@ -264,7 +282,7 @@ export function PlayerHero({ player, family, players }: Props) {
           <div className="hero-action-cell hero-action-add">
             <Tooltip content="Adiciona ao elenco ou à lista de observação.">
               <span className="hero-action-slot">
-                <AddToShadowMenu playerId={player.player_id} family={family} />
+                <AddToShadowMenu playerId={scout.player_id} family={family} />
               </span>
             </Tooltip>
           </div>
@@ -273,7 +291,7 @@ export function PlayerHero({ player, family, players }: Props) {
 
       {similarOpen ? (
         <SimilarCrossLeagueModal
-          player={player}
+          player={scout}
           family={family}
           currentLeagueId={leagueId}
           players={players}
@@ -281,10 +299,10 @@ export function PlayerHero({ player, family, players }: Props) {
         />
       ) : null}
       {labOpen && showProjectionLab ? (
-        <ProjectionMethodsModal player={player} family={family} onClose={() => setLabOpen(false)} />
+        <ProjectionMethodsModal player={scout} family={family} onClose={() => setLabOpen(false)} />
       ) : null}
-      {runOpen && player.physical_run ? (
-        <PlayerRunModal player={player} onClose={() => setRunOpen(false)} />
+      {runOpen && scout.physical_run ? (
+        <PlayerRunModal player={scout} onClose={() => setRunOpen(false)} />
       ) : null}
     </section>
   );

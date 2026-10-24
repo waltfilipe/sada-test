@@ -207,7 +207,6 @@ function placementFrom(model: BuiltModel, scenario: ProjectionScenario): Project
 
 function projectedMetrics(model: BuiltModel, scenario: ProjectionScenario): Map<string, ProjectedMetric> {
   const projected = new Map<string, ProjectedMetric>();
-  const minutesPct = model.target.minutes_pct ?? 0;
   for (const metric of model.metrics) {
     const next = projectRate(
       metric.y,

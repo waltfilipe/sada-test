@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
-import { SeasonSwitcher } from "@/components/SeasonSwitcher";
+import { FICHA_TEMPORADA_PARAM } from "@/lib/seasons";
 import { BadgeFilterBox } from "@/components/filters/BadgeFilterBox";
 import { PositionProfileView } from "@/components/position/profile/PositionProfileView";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
@@ -50,7 +50,7 @@ type Props = {
 };
 
 export function PositionScoutPage({ family, players: initialPlayers, heatmapsEnabled = true }: Props) {
-  const { leagueId, href, season, isCurrentSeason } = useLeague();
+  const { leagueId, href, season, isCurrentSeason, name: leagueName } = useLeague();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [players, setPlayers] = useState(initialPlayers);
@@ -217,25 +217,32 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
   const activeCount = panelCount + (query.trim() ? 1 : 0);
 
   return (
-    <div className={leagueId === "serie-a" ? "scout-root zag-v2" : `scout-root zag-v2 league-${leagueId}`}>
+    <div
+      className={[
+        leagueId === "serie-a" ? "scout-root zag-v2" : `scout-root zag-v2 league-${leagueId}`,
+        !isCurrentSeason ? "zag-v2-hub-archive" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <ScoutTopbar
         active="posicoes"
-        subnav={
-          <div className="scout-subnav-row">
-            <SeasonSwitcher />
-            <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/posicao/${slug}`)} />
-          </div>
-        }
+        subnav={<PositionFamilyTabs active={family} hrefFor={(slug) => href(`/posicao/${slug}`)} />}
       />
 
       <div className="zag-v2-frame">
         <header className="zag-v2-title-card">
           <div>
             <p className="zag-v2-kicker">
-              Scouting{!isCurrentSeason ? ` · arquivo ${season}` : ""}
+              Scouting{!isCurrentSeason ? ` · hub ${season}` : ""}
               {seasonLoading ? " · carregando…" : ""}
             </p>
             <h1>{familyMeta.label}</h1>
+            {!isCurrentSeason ? (
+              <p className="zag-v2-archive-notice">
+                Arquivo Wyscout {season} · {leagueName}. Volte ao hub para scout {season === "2026" ? "" : "2026"}.
+              </p>
+            ) : null}
           </div>
           <div className="zag-v2-title-actions">
             {fromFilters ? (
@@ -412,7 +419,15 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
                     <button
                       type="button"
                       className={active ? "active" : ""}
-                      onClick={() => setSelectedId(player.player_id)}
+                      onClick={() => {
+                        setSelectedId(player.player_id);
+                        const params = new URLSearchParams(searchParams.toString());
+                        params.delete(FICHA_TEMPORADA_PARAM);
+                        const qs = params.toString();
+                        router.replace(qs ? `${window.location.pathname}?${qs}` : window.location.pathname, {
+                          scroll: false,
+                        });
+                      }}
                     >
                       <span className="zag-v2-photo">
                         {photo ? (
