@@ -65,8 +65,8 @@ export const METHOD_COLUMNS: MethodColumn[] = [
   {
     id: "m7",
     short: "M7",
-    name: "k calibrado",
-    description: "EB com k otimizado no pool Série A (pseudo-holdout).",
+    name: "k calibrado + hist.",
+    description: "EB com k otimizado no pool; μ = cross-season quando existir (igual botão Projeção).",
   },
   {
     id: "m8",
@@ -441,14 +441,17 @@ export function buildProjectionLabReport(
     if (observed == null) continue;
     const mu = poolMeanRegulars(pool, def);
     const muH = hierarchicalMean(pool, def, source.profile ?? "");
-    const kCal = calibrateK(pool, def, mu);
+    const crossKey = def.subLabel ? `${def.aspectLabel}::${def.subLabel}` : def.aspectLabel;
+    const crossMu = source.cross_season?.metrics?.[crossKey]?.predicted;
+    const muM7 = crossMu != null && Number.isFinite(crossMu) ? crossMu : muH;
+    const kCal = calibrateK(pool, def, muM7);
     const wStab = minutes / (minutes + def.stabilizationMin);
 
     const m1 = ebShrink(observed, n90, mu, def.defaultK);
     const m2 = wStab * observed + (1 - wStab) * mu;
     const m3 = ebShrink(observed, n90, muH, 8);
     const m4 = monteCarloMedian(observed, n90, mu, def.defaultK);
-    const m7 = ebShrink(observed, n90, mu, kCal);
+    const m7 = ebShrink(observed, n90, muM7, kCal);
     const m8 = knnPrior(pool, source, def);
 
     let m5: LabCellValue;

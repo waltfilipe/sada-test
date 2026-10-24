@@ -27,7 +27,7 @@ const SCENARIO_TABS: { key: ProjectionScenario; label: string; hint: string }[] 
   {
     key: "realista",
     label: "Esperado",
-    hint: "Titulares + perfil na divisão, ancorado no histórico Wyscout quando existir; poucos minutos puxam para onde ele costuma jogar de verdade.",
+    hint: "M7: EB com k calibrado no pool; μ = previsão supervisionada Wyscout (2022–25) quando existir, senão titulares + perfil.",
   },
   {
     key: "positiva",
@@ -53,7 +53,7 @@ export function MinuteProjection({ player, family, players }: Props) {
 
   return (
     <>
-      <Tooltip content="Projeção de titularidade: mistura amostra atual, grupo da divisão e temporadas anteriores (quando houver). Não é ‘resto de 2026’ — é leitura de patamar quando joga de verdade.">
+      <Tooltip content="M7 + histórico Wyscout: regressão empírica Bayesiana (k calibrado) em direção ao patamar previsto entre temporadas. Não projeta ‘resto de 2026’.">
         <button
           type="button"
           className={`btn btn-ghost btn-sm${open ? " is-open" : ""}`}
@@ -65,12 +65,12 @@ export function MinuteProjection({ player, family, players }: Props) {
       </Tooltip>
 
       {open ? (
-        <StatWindow title="Projeção ajustada por minutos" onClose={() => setOpen(false)}>
+        <StatWindow title="Projeção M7 · histórico Wyscout" onClose={() => setOpen(false)}>
           {report && active && rel ? (
             <div className="projection-modal-copy">
               <p className="projection-reliability">
                 {confidenceTierLabel(rel.tier)} ·{" "}
-                <span>{Math.round(rel.sampleWeight * 100)}% da leitura vem dos minutos dele</span>
+                <span>{Math.round(rel.sampleWeight * 100)}% da leitura vem da amostra 2026 (peso EB n90/(n90+k))</span>
                 {rel.hotStreakRegressionPct != null && rel.hotStreakRegressionPct > 2 ? (
                   <>
                     {" "}

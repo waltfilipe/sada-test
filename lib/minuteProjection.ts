@@ -1,10 +1,12 @@
 /**
- * Minute projection for scouts.
+ * Minute projection for scouts (M7 + cross-season history).
  *
- * For players below 50% team minutes: blend observed per-90 / % toward a mixed prior
- *   μ = 50% mean of regulars (≥50% min) + 50% mean of same-profile peers in the division pool.
- * Pull strength toward μ: (50 − minutes_pct) / 50 (none at 50% team minutes; full pull at 0%).
- * Pessimista / otimista: expected value ± z90 · σ_pred (spread from reference-pool variance + sampling noise).
+ * Empirical Bayes with k calibrated on the division pool (pseudo-holdout, same idea as lab M7):
+ *   posterior = (y · n90 + μ · k) / (n90 + k)
+ * μ is the supervised cross-season prediction when available (Wyscout 2022–2025 build);
+ * otherwise μ = 50% titulares + 50% mesmo perfil na divisão.
+ * role_change_flag caps effective n90 so short noisy 2026 samples regress to μ.
+ * Pessimista / otimista: posterior ± z90 · σ_pred.
  */
 import { isSeasonTotalLabel } from "@/lib/seasonTotals";
 import type { AspectItem, PlayerProfile } from "@/lib/types";
@@ -50,6 +52,13 @@ const FALLBACK_N0 = 4;
 const N0_FLOOR = 18;
 const N0_MAX = 40;
 const STARTER_MINUTES_PCT = 50;
+/** Default EB prior strength (nineties) before pool calibration. */
+const DEFAULT_K_EB = 10;
+const K_EB_MIN = 4;
+const K_EB_MAX = 22;
+const K_EB_STEP = 2;
+const HELD_N90 = 10;
+const PSEUDO_SAMPLE_FRAC = 0.45;
 
 /** Share bars (pass tendency) are pool percents, not per-90 rates — projection stays on volume/efficiency metrics. */
 const SKIP_KINDS = new Set(["construction_share"]);
@@ -58,9 +67,13 @@ type Prior = {
   mu: number;
   tau2: number;
   n0: number;
+  /** Calibrated EB k (M7) for this metric. */
+  kEb: number;
   refRates: number[];
   /** Mean nineties of the regulars. Used to write a predicted season count. */
   refExposure: number;
+  /** Whether μ came from cross-season supervised model. */
+  muFromCrossSeason?: boolean;
 };
 
 type MetricKind = "rate" | "percent";
@@ -201,7 +214,6 @@ function projectedMetrics(model: BuiltModel, scenario: ProjectionScenario): Map<
       model.exposure,
       metric.prior,
       scenario,
-      minutesPct,
       metric.adverse,
       metric.kind,
       metric.roleChangeFlag,
@@ -263,18 +275,18 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
     const points = observations.get(sample.key) ?? [];
     const basePrior = fitPrior(points, player.profile ?? null);
     if (!basePrior) continue;
-    const prior = applyCrossSeasonPrior(basePrior, player, sample.key);
+    const resolved = resolveM7Prior(basePrior, player, sample.key, points);
     metrics.push({
       key: sample.key,
       y: sample.value,
-      prior: prior.prior,
-      referenceRates: [...prior.prior.refRates].sort((a, b) => a - b),
+      prior: resolved.prior,
+      referenceRates: [...resolved.prior.refRates].sort((a, b) => a - b),
       kind: sample.kind,
       rank: sample.rank,
       sample: sample.sample,
       adverse: sample.adverse,
       seasonCount: sample.seasonCount,
-      roleChangeFlag: prior.roleChangeFlag,
+      roleChangeFlag: resolved.roleChangeFlag,
     });
   }
   if (metrics.filter((metric) => metric.rank).length < MIN_METRICS) return null;
@@ -435,18 +447,53 @@ function formatProjected(metric: ProjectedMetric): string {
   return formatted;
 }
 
-function applyCrossSeasonPrior(
+function ebShrink(rate: number, n90: number, mu: number, k: number): number {
+  const denom = n90 + k;
+  if (denom <= 0) return mu;
+  return (rate * n90 + mu * k) / denom;
+}
+
+function calibrateKEb(points: PoolPoint[], mu: number): number {
+  const held = points.filter((point) => point.e > 0 && !point.low && point.e >= HELD_N90);
+  if (held.length < 12) return DEFAULT_K_EB;
+  let bestK = DEFAULT_K_EB;
+  let bestErr = Infinity;
+  for (let k = K_EB_MIN; k <= K_EB_MAX; k += K_EB_STEP) {
+    let err = 0;
+    let n = 0;
+    for (const point of held) {
+      const nPartial = point.e * PSEUDO_SAMPLE_FRAC;
+      const pseudo = ebShrink(point.value, nPartial, mu, k);
+      err += (pseudo - point.value) ** 2;
+      n += 1;
+    }
+    if (n && err / n < bestErr) {
+      bestErr = err / n;
+      bestK = k;
+    }
+  }
+  return bestK;
+}
+
+/** M7 prior: μ from cross-season ridge when present, else division hierarchical mean; k calibrated on pool. */
+function resolveM7Prior(
   base: Prior,
   player: PlayerProfile,
   sampleKey: string,
+  points: PoolPoint[],
 ): { prior: Prior; roleChangeFlag?: boolean } {
   const cross = player.cross_season?.metrics?.[sampleKey];
-  if (!cross) return { prior: base };
-  const historyWeight = cross.consistent ? 0.72 : 0.55;
-  const mu = (1 - historyWeight) * base.mu + historyWeight * cross.predicted;
+  let mu = base.mu;
+  let muFromCrossSeason = false;
+  let roleChangeFlag = cross?.role_change_flag;
+  if (cross && Number.isFinite(cross.predicted)) {
+    mu = cross.predicted;
+    muFromCrossSeason = true;
+  }
+  const kEb = calibrateKEb(points, mu);
   return {
-    prior: { ...base, mu },
-    roleChangeFlag: cross.role_change_flag,
+    prior: { ...base, mu, kEb, muFromCrossSeason },
+    roleChangeFlag,
   };
 }
 
@@ -512,7 +559,14 @@ function fitPrior(points: PoolPoint[], targetProfile: string | null): Prior | nu
   }
   if (!(tau2 > 0) || !Number.isFinite(mu)) return null;
 
-  return { mu, tau2, n0: clamp(Math.max(n0, N0_FLOOR), N0_FLOOR, N0_MAX), refRates, refExposure };
+  return {
+    mu,
+    tau2,
+    n0: clamp(Math.max(n0, N0_FLOOR), N0_FLOOR, N0_MAX),
+    kEb: DEFAULT_K_EB,
+    refRates,
+    refExposure,
+  };
 }
 
 function projectRate(
@@ -520,15 +574,16 @@ function projectRate(
   exposure: number,
   prior: Prior,
   scenario: ProjectionScenario,
-  minutesPct: number,
   adverse = false,
   kind: MetricKind = "rate",
   roleChangeFlag = false,
 ): { value: number; weight: number } {
-  let weight = observationWeight(minutesPct);
-  if (roleChangeFlag) weight = Math.min(weight, 0.3);
-  const posteriorMean = weight * y + (1 - weight) * prior.mu;
-  const sd = predictiveSd(y, exposure, prior, weight, kind, adverse);
+  const k = prior.kEb;
+  let n90 = Math.max(exposure, 0);
+  if (roleChangeFlag) n90 = Math.max(n90 * 0.22, 0.35);
+  const posteriorMean = ebShrink(y, n90, prior.mu, k);
+  const weight = n90 / (n90 + k);
+  const sd = predictiveSd(y, n90, prior, weight, kind, adverse);
   let value = posteriorMean;
   if (scenario === "negativa") value = posteriorMean - Z90 * sd;
   else if (scenario === "positiva") value = posteriorMean + Z90 * sd;
@@ -558,14 +613,14 @@ function predictiveSd(
 }
 
 function reliabilityFrom(model: BuiltModel, sampleWeight: number): ProjectionReliability {
-  const minutesPct = model.target.minutes_pct ?? 0;
-  const w = observationWeight(minutesPct);
   let hotSum = 0;
   let hotN = 0;
   for (const metric of model.metrics) {
     if (metric.adverse || metric.seasonCount || !metric.rank) continue;
     if (metric.y <= metric.prior.mu + 1e-9) continue;
-    const projected = w * metric.y + (1 - w) * metric.prior.mu;
+    const n90 = model.exposure;
+    const k = metric.prior.kEb;
+    const projected = ebShrink(metric.y, n90, metric.prior.mu, k);
     hotSum += (metric.y - projected) / metric.y;
     hotN += 1;
   }
@@ -590,8 +645,8 @@ export function confidenceTier(sampleWeight: number): ProjectionReliability["tie
 
 export function confidenceTierLabel(tier: ProjectionReliability["tier"]): string {
   if (tier === "alta") return "Confiança alta na amostra";
-  if (tier === "media") return "Confiança média — boa leitura, mas ainda regredindo à média";
-  return "Confiança baixa — poucos minutos; leitura puxada à média + perfil na divisão";
+  if (tier === "media") return "Confiança média — EB ainda puxa ao prior histórico/divisão";
+  return "Confiança baixa — poucos minutos; leitura domina o prior M7 (histórico Wyscout quando houver)";
 }
 
 function metricFloor(value: number, adverse: boolean): number {
