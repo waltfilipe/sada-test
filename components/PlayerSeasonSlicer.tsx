@@ -7,13 +7,25 @@ type Props = {
   archiveYears: BrasileiraoSeason[];
   loading?: boolean;
   onSelect: (year: BrasileiraoSeason | typeof CURRENT_SEASON) => void;
+  /** Ao lado do nome no hero (sem rótulo “Ficha”). */
+  inline?: boolean;
 };
 
-export function PlayerSeasonSlicer({ active, archiveYears, loading, onSelect }: Props) {
+export function PlayerSeasonSlicer({ active, archiveYears, loading, onSelect, inline = false }: Props) {
   if (!archiveYears.length) return null;
+  const viewingArchive = active !== CURRENT_SEASON;
   return (
-    <div className="player-season-slicer" aria-label="Temporada da ficha">
-      <span className="player-season-slicer-label">Ficha</span>
+    <div
+      className={[
+        "player-season-slicer",
+        inline ? "player-season-slicer-inline" : "",
+        viewingArchive ? "player-season-slicer-archive-active" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      aria-label="Temporada do atleta"
+    >
+      {inline ? null : <span className="player-season-slicer-label">Ficha</span>}
       <div className="player-season-slicer-tabs" role="tablist">
         <button
           type="button"

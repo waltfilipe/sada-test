@@ -1,7 +1,6 @@
 "use client";
 
 import { useLeague } from "@/components/LeagueProvider";
-import { PlayerSeasonSlicer } from "@/components/PlayerSeasonSlicer";
 import { usePlayerArchiveProfile } from "@/hooks/usePlayerArchiveProfile";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { CURRENT_SEASON } from "@/lib/seasons";
@@ -45,15 +44,6 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
         </p>
       ) : null}
 
-      {showSlicer ? (
-        <PlayerSeasonSlicer
-          active={fichaSeason}
-          archiveYears={archive.archiveYears}
-          loading={loading}
-          onSelect={setFichaSeason}
-        />
-      ) : null}
-
       <PlayerHero
         player={displayPlayer}
         family={family}
@@ -61,6 +51,16 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
         scoutPlayer={basePlayer}
         isArchiveView={isArchiveView}
         fichaSeason={isArchiveView ? fichaSeason : undefined}
+        seasonSlicer={
+          showSlicer
+            ? {
+                active: fichaSeason,
+                archiveYears: archive.archiveYears,
+                loading,
+                onSelect: setFichaSeason,
+              }
+            : undefined
+        }
       />
 
       <div className={`profile-content-grid${showHeatmap ? "" : " profile-content-grid-no-heatmap"}`}>

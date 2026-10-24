@@ -15,6 +15,9 @@ import { SimilarCrossLeagueModal } from "@/components/position/profile/SimilarCr
 import { PlayerRunModal } from "@/components/position/profile/PlayerRunModal";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { PassTendencies } from "./PassTendencies";
+import { PlayerSeasonSlicer } from "@/components/PlayerSeasonSlicer";
+import type { BrasileiraoSeason } from "@/lib/seasons";
+import { CURRENT_SEASON } from "@/lib/seasons";
 
 type Props = {
   player: PlayerProfile;
@@ -24,6 +27,12 @@ type Props = {
   scoutPlayer?: PlayerProfile;
   isArchiveView?: boolean;
   fichaSeason?: string;
+  seasonSlicer?: {
+    active: string;
+    archiveYears: BrasileiraoSeason[];
+    loading?: boolean;
+    onSelect: (year: BrasileiraoSeason | typeof CURRENT_SEASON) => void;
+  };
 };
 
 function monthsRemaining(iso?: string | null): number | null {
@@ -98,6 +107,7 @@ export function PlayerHero({
   scoutPlayer,
   isArchiveView = false,
   fichaSeason,
+  seasonSlicer,
 }: Props) {
   const { href, leagueId } = useLeague();
   const scout = scoutPlayer ?? player;
@@ -130,7 +140,18 @@ export function PlayerHero({
 
         <div className="player-hero-copy">
           <div className="player-hero-title-wrap">
-            <h2 className="player-hero-name">{player.name}</h2>
+            <div className="player-hero-name-row">
+              <h2 className="player-hero-name">{player.name}</h2>
+              {seasonSlicer ? (
+                <PlayerSeasonSlicer
+                  inline
+                  active={seasonSlicer.active}
+                  archiveYears={seasonSlicer.archiveYears}
+                  loading={seasonSlicer.loading}
+                  onSelect={seasonSlicer.onSelect}
+                />
+              ) : null}
+            </div>
             <p className="player-hero-club">
               <ClubLogo club={player.club} size={22} />
               <span className="player-hero-club-name">{player.club}</span>

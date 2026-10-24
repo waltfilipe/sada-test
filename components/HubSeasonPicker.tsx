@@ -120,7 +120,9 @@ export function HubSeasonPicker() {
                 <p>{level.hint}</p>
                 <span className="hub-level-marks">
                   {level.members.map((member) => (
-                    <img key={member.id} src={member.logo} alt={member.name} title={member.name} className="hub-mini-logo" />
+                    <span key={member.id} className="hub-mini-logo-frame" title={member.name}>
+                      <img src={member.logo} alt={member.name} className="hub-mini-logo" />
+                    </span>
                   ))}
                 </span>
               </Link>

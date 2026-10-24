@@ -285,6 +285,27 @@
   color: var(--muted);
 }
 
+.player-season-slicer-inline {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.player-season-slicer-inline .player-season-slicer-tabs button {
+  padding: 0.28rem 0.62rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.player-season-slicer-archive-active .player-season-slicer-tabs {
+  background: rgba(245, 158, 11, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.45);
+}
+
+.player-season-slicer-archive-active .player-season-slicer-tabs button.is-active {
+  background: #f59e0b;
+  color: #1a1205;
+}
+
 .zag-v2-hub-archive .zag-v2-frame {
   border: 1px solid rgba(245, 158, 11, 0.25);
   box-shadow: inset 3px 0 0 #f59e0b;
