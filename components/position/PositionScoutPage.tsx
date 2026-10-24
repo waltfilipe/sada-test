@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { SeasonSwitcher } from "@/components/SeasonSwitcher";
 import { BadgeFilterBox } from "@/components/filters/BadgeFilterBox";
 import { PositionProfileView } from "@/components/position/profile/PositionProfileView";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
@@ -48,10 +49,39 @@ type Props = {
   heatmapsEnabled?: boolean;
 };
 
-export function PositionScoutPage({ family, players, heatmapsEnabled = true }: Props) {
-  const { leagueId, href } = useLeague();
+export function PositionScoutPage({ family, players: initialPlayers, heatmapsEnabled = true }: Props) {
+  const { leagueId, href, season, isCurrentSeason } = useLeague();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [players, setPlayers] = useState(initialPlayers);
+  const [seasonLoading, setSeasonLoading] = useState(false);
+
+  useEffect(() => {
+    setPlayers(initialPlayers);
+  }, [initialPlayers]);
+
+  useEffect(() => {
+    if (isCurrentSeason) {
+      setPlayers(initialPlayers);
+      return;
+    }
+    let cancelled = false;
+    setSeasonLoading(true);
+    fetch(`/api/families/${family}?league=${leagueId}&season=${season}`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("season_fetch"))))
+      .then((payload: { players?: PlayerProfile[] }) => {
+        if (!cancelled) setPlayers(payload.players ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setPlayers([]);
+      })
+      .finally(() => {
+        if (!cancelled) setSeasonLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [family, leagueId, season, isCurrentSeason, initialPlayers]);
   const requestedId = searchParams.get("atleta");
   const fromFilters = searchParams.get("origem") === "filtros";
   const familyMeta = familyBySlug(family);
@@ -190,13 +220,21 @@ export function PositionScoutPage({ family, players, heatmapsEnabled = true }: P
     <div className={leagueId === "serie-a" ? "scout-root zag-v2" : `scout-root zag-v2 league-${leagueId}`}>
       <ScoutTopbar
         active="posicoes"
-        subnav={<PositionFamilyTabs active={family} hrefFor={(slug) => href(`/posicao/${slug}`)} />}
+        subnav={
+          <div className="scout-subnav-row">
+            <SeasonSwitcher />
+            <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/posicao/${slug}`)} />
+          </div>
+        }
       />
 
       <div className="zag-v2-frame">
         <header className="zag-v2-title-card">
           <div>
-            <p className="zag-v2-kicker">Scouting</p>
+            <p className="zag-v2-kicker">
+              Scouting{!isCurrentSeason ? ` · arquivo ${season}` : ""}
+              {seasonLoading ? " · carregando…" : ""}
+            </p>
             <h1>{familyMeta.label}</h1>
           </div>
           <div className="zag-v2-title-actions">

@@ -6,6 +6,12 @@ import pandas as pd
 from .pool_reference import distribution
 
 
+def numeric_col(pool: pd.DataFrame, col: str, default: float = 0.0) -> pd.Series:
+    if col not in pool.columns:
+        return pd.Series(default, index=pool.index, dtype=float)
+    return pd.to_numeric(pool[col], errors="coerce").fillna(default)
+
+
 def _percentile_rank_raw(values: pd.Series, ascending: bool) -> pd.Series:
     if ascending:
         ranks = values.rank(method="dense", ascending=True)

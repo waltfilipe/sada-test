@@ -376,5 +376,35 @@
       "boxtobox": 6.1
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2025",
+        "league": "serie-c",
+        "minutes": 1471,
+        "club": "CSA"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 8.4,
+        "history_mean": 8.4,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 6.5,
+        "history_mean": 6.5,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.5,
+        "history_mean": 1.5,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
+  }
 }

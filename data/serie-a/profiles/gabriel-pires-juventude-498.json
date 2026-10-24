@@ -1380,5 +1380,35 @@
     "sprinting_km_p90": 0.23,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 824,
+        "club": "Portuguesa"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 955,
+        "club": "Botafogo"
+      }
+    ],
+    "metrics": {
+      "1v1 - Ofensivo": {
+        "predicted": 2.4818,
+        "history_mean": 2.4074,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Pré Assistências e xA::Pré Assistências": {
+        "predicted": 1.523,
+        "history_mean": 0.5368,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

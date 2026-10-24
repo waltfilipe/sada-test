@@ -158,7 +158,20 @@ export type PlayerPhysicalRun = {
   >;
 };
 
+export type CrossSeasonMetricPrior = {
+  predicted: number;
+  history_mean: number;
+  consistent: boolean;
+  role_change_flag: boolean;
+};
+
+export type CrossSeasonProjection = {
+  seasons: { year: string; league: string; minutes: number; club?: string }[];
+  metrics: Record<string, CrossSeasonMetricPrior>;
+};
+
 export type PlayerProfile = PlayerSummary & {
+  cross_season?: CrossSeasonProjection;
   goals: number;
   assists: number;
   heatmap?: PlayerHeatmapData;

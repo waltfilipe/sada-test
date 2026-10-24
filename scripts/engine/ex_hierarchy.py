@@ -5,6 +5,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from .normalize import numeric_col
+
 ARCHETYPE_LABELS = ("Driblador", "Meia Ponta", "Ruptura", "Híbrido")
 
 HYBRID_Z_THRESHOLD = 0.30
@@ -102,7 +104,7 @@ def build_ex_feature_df(pool: pd.DataFrame) -> pd.DataFrame:
     if "Acelerações" not in out.columns:
         out["Acelerações"] = pd.to_numeric(out.get("Acelerações/90"), errors="coerce").fillna(0)
     for col in dict.fromkeys(DRIB_COLS + MEIA_COLS + RUPT_COLS):
-        out[col] = pd.to_numeric(out.get(col), errors="coerce").fillna(0.0)
+        out[col] = numeric_col(out, col)
     unique_cols = list(dict.fromkeys(DRIB_COLS + MEIA_COLS + RUPT_COLS))
     return out[unique_cols].copy()
 

@@ -5,6 +5,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from .normalize import numeric_col
+
 ARCHETYPE_LABELS = ("Contenção", "Construtor", "Box-to-box", "Híbrido")
 
 HYBRID_Z_THRESHOLD = 0.30
@@ -110,7 +112,7 @@ def build_mc_feature_df(pool: pd.DataFrame) -> pd.DataFrame:
     if "interception_won_p90" not in out.columns:
         out["interception_won_p90"] = pd.to_numeric(out.get("Interseções/90", out.get("Interseções")), errors="coerce").fillna(0)
     for col in dict.fromkeys(DEF_COLS + CON_COLS + B2B_COLS):
-        out[col] = pd.to_numeric(out.get(col), errors="coerce").fillna(0.0)
+        out[col] = numeric_col(out, col)
     unique_cols = list(dict.fromkeys(DEF_COLS + CON_COLS + B2B_COLS))
     return out[unique_cols].copy()
 

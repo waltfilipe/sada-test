@@ -40,19 +40,32 @@ DATA_DIR = ROOT / "data"
 REFERENCE_DIR = ROOT / "reference"
 
 
-def build_league(league_id: str) -> None:
+def build_league(
+    league_id: str,
+    *,
+    out_dir: Path | None = None,
+    xlsx_override: list[Path] | None = None,
+    season_label: str | None = None,
+    skip_heatmaps: bool = False,
+    skip_physical_run: bool = False,
+    skip_transfermarkt: bool = False,
+    skip_sofascore: bool = False,
+    skip_profiles_dir: bool = False,
+) -> None:
     league = LEAGUES[league_id]
-    out_dir = DATA_DIR / league_id
+    out_dir = out_dir or (DATA_DIR / league_id)
     profiles_dir = out_dir / "profiles"
+    season = season_label or league["season"]
 
-    print(f"\n=== {league['label']} ({league_id}) ===")
+    print(f"\n=== {league['label']} ({league_id}) season {season} ===")
     print("Loading player data…")
-    raw_df = load_players_dataframe(league_id)
+    raw_df = load_players_dataframe(league_id, xlsx_override=xlsx_override)
     source = raw_df.attrs.get("source", "unknown")
     print(f"Source: {source} ({len(raw_df)} players)")
 
     df = attach_base_measures(raw_df)
-    df = attach_sofascore_metrics(df, path=league["defensive_csv"])
+    if not skip_sofascore:
+        df = attach_sofascore_metrics(df, path=league["defensive_csv"])
     df = df[df["Posição"] != "Goleiro"].copy()
 
     all_players: list[dict] = []
@@ -74,10 +87,12 @@ def build_league(league_id: str) -> None:
         all_players.extend(players)
         print(f"  {family['label']}: {pool_size} jogadores")
 
-    print("Enriquecendo com Transfermarkt (foto, valor e contrato)…")
-    all_players = enrich_players_with_transfermarkt(all_players)
+    if not skip_transfermarkt:
+        print("Enriquecendo com Transfermarkt (foto, valor e contrato)…")
+        all_players = enrich_players_with_transfermarkt(all_players)
 
-    if league["heatmaps"]:
+    use_heatmaps = league["heatmaps"] and not skip_heatmaps
+    if use_heatmaps:
         imported = import_heatmaps_from_br26(
             raw_df,
             source_dir=league["heatmaps_dir"],
@@ -89,7 +104,7 @@ def build_league(league_id: str) -> None:
     else:
         print("  Heatmaps: omitido para esta liga")
 
-    if league.get("physical_run") and league.get("run_csv"):
+    if not skip_physical_run and league.get("physical_run") and league.get("run_csv"):
         run_attached = attach_physical_run_to_players(
             all_players,
             raw_df,
@@ -105,9 +120,10 @@ def build_league(league_id: str) -> None:
         family_payloads[family_key] = [p for p in all_players if p["position_family"] == family_key]
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    profiles_dir.mkdir(parents=True, exist_ok=True)
-    for stale in profiles_dir.glob("*.json"):
-        stale.unlink()
+    if not skip_profiles_dir:
+        profiles_dir.mkdir(parents=True, exist_ok=True)
+        for stale in profiles_dir.glob("*.json"):
+            stale.unlink()
 
     players_index = []
     for player in all_players:
@@ -132,17 +148,18 @@ def build_league(league_id: str) -> None:
                 "transfermarkt": player.get("transfermarkt"),
             }
         )
-        (profiles_dir / f"{player['player_id']}.json").write_text(
-            dumps_json(player),
-            encoding="utf-8",
-        )
+        if not skip_profiles_dir:
+            (profiles_dir / f"{player['player_id']}.json").write_text(
+                dumps_json(player),
+                encoding="utf-8",
+            )
 
     valid_heights = df["Altura"][df["Altura"] > 0]
 
     meta = {
         "league_id": league_id,
         "league": league["label"],
-        "season": league["season"],
+        "season": season,
         "source": source,
         "player_count": len(all_players),
         "families": [

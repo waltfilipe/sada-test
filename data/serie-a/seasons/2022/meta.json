@@ -1,0 +1,515 @@
+{
+  "league_id": "serie-a",
+  "league": "Série A",
+  "season": "2022",
+  "source": "xlsx",
+  "player_count": 689,
+  "families": [
+    {
+      "key": "zagueiros",
+      "label": "Zagueiros",
+      "positions": [
+        "Zagueiro"
+      ],
+      "profiles": [
+        "Construtor",
+        "Defensivo",
+        "Híbrido"
+      ],
+      "count": 116
+    },
+    {
+      "key": "laterais",
+      "label": "Laterais",
+      "positions": [
+        "Lateral Direito",
+        "Lateral Esquerdo"
+      ],
+      "profiles": [
+        "Defensivo",
+        "Construtor",
+        "Ofensivo",
+        "Híbrido"
+      ],
+      "count": 129
+    },
+    {
+      "key": "meio-campistas",
+      "label": "Meio-campistas",
+      "positions": [
+        "Meio-campista"
+      ],
+      "profiles": [
+        "Contenção",
+        "Construtor",
+        "Box-to-box",
+        "Híbrido"
+      ],
+      "count": 151
+    },
+    {
+      "key": "extremos",
+      "label": "Meias Ofensivos",
+      "positions": [
+        "Extremo Direito",
+        "Extremo Esquerdo",
+        "Meia Ofensivo"
+      ],
+      "profiles": [
+        "Driblador",
+        "Meia Ponta",
+        "Ruptura",
+        "Híbrido"
+      ],
+      "count": 191
+    },
+    {
+      "key": "atacantes",
+      "label": "Atacantes",
+      "positions": [
+        "Atacante"
+      ],
+      "profiles": [
+        "Finalizador",
+        "Alvo",
+        "Móvel",
+        "Híbrido"
+      ],
+      "count": 102
+    }
+  ],
+  "clubs": [
+    "ABC",
+    "AEL",
+    "APOEL",
+    "AZ",
+    "Al Ahli",
+    "Al Faisaly",
+    "Al Hilal",
+    "Al Najma",
+    "Al Nassr",
+    "Al Orooba",
+    "Al Rayyan",
+    "Al Sadd",
+    "Al Sharjah",
+    "Al Ula",
+    "Al Wahda",
+    "Al Wasl",
+    "Alanyaspor",
+    "Albirex Niigata",
+    "Alianza Lima",
+    "Aliança AL",
+    "Almería",
+    "Alverca",
+    "Amazonas",
+    "América Mineiro",
+    "América de Cali",
+    "Ankara Keçiörengücü",
+    "Anorthosis",
+    "Anyang",
+    "Arema",
+    "Athletic Club",
+    "Athletico Paranaense",
+    "Atlético Bucaramanga",
+    "Atlético GO",
+    "Atlético Madrid",
+    "Atlético Mineiro",
+    "Atlético de San Luis",
+    "Audax Italiano",
+    "Austin FC",
+    "Avaí",
+    "Azuriz",
+    "Bahia",
+    "Bani Yas",
+    "Barcelona",
+    "Barra SC U20",
+    "Bayer Leverkusen",
+    "Boavista",
+    "Boca Juniors",
+    "Botafogo",
+    "Botafogo PB",
+    "Botafogo SP",
+    "Botafogo SP B",
+    "Botev Plovdiv",
+    "Brasiliense",
+    "Brusque",
+    "Buriram United",
+    "Burnley",
+    "CRB",
+    "CSA",
+    "CSKA Moskva",
+    "Casa Pia AC",
+    "Caxias",
+    "Ceará",
+    "Ceará U20",
+    "Cercle Brugge",
+    "Cerezo Osaka",
+    "Chapecoense",
+    "Colo Colo",
+    "Colorado Rapids",
+    "Confiança",
+    "Corinthians",
+    "Coritiba",
+    "Criciuma U23",
+    "Criciúma",
+    "Cruzeiro",
+    "Cuiabá",
+    "DC United",
+    "Dallas",
+    "Danubio",
+    "Defensor Sporting",
+    "Deportivo Alavés",
+    "Deportivo Cali",
+    "Deportivo Pereira",
+    "Deportivo Recoleta",
+    "Dinamo Moskva",
+    "Dom Bosco",
+    "Estoril",
+    "Estrela Amadora",
+    "Estudiantes",
+    "Estudiantes de Mérida",
+    "Eyüpspor",
+    "Fagiano Okayama",
+    "Famalicão",
+    "Ferroviária",
+    "Figueirense",
+    "Flamengo",
+    "Floresta EC",
+    "Fluminense",
+    "Fortaleza",
+    "Fénix",
+    "Galatasaray",
+    "Gangwon",
+    "Gençlerbirliği",
+    "Gimnasia La Plata",
+    "Goiás",
+    "Goiás U20",
+    "Grêmio",
+    "Grêmio Novorizontino",
+    "Guarani",
+    "Göztepe",
+    "Ha Noi",
+    "Hapoel Be'er Sheva",
+    "Hellas Verona",
+    "Henan",
+    "Hoffenheim",
+    "Hồ Chí Minh City",
+    "Imabari",
+    "Independiente",
+    "Independiente del Valle",
+    "Inter de Limeira",
+    "Internacional",
+    "Internazionale",
+    "Ipatinga",
+    "Itabirito",
+    "Ituano",
+    "Jeonnam Dragons",
+    "Juventude",
+    "Juventude U20",
+    "Juárez",
+    "Júbilo Iwata",
+    "Kairat",
+    "Karpaty",
+    "Kawasaki Frontale",
+    "Krasnodar",
+    "Kyoto Sanga",
+    "LDU Portoviejo",
+    "Leixões",
+    "Liaoning Tieren",
+    "Liefering",
+    "Lokomotiv Moskva",
+    "Londrina",
+    "Los Angeles FC",
+    "Los Angeles Galaxy",
+    "Ludogorets",
+    "Madureira",
+    "Mafra",
+    "Malmö FF",
+    "Manauara",
+    "Manchester City",
+    "Mazatlán",
+    "Mirassol",
+    "Monsoon FC",
+    "Nacional",
+    "New England",
+    "New York City",
+    "Newell's Old Boys",
+    "Nova Iguaçu",
+    "Náutico",
+    "Oeste",
+    "Olympiacos Piraeus",
+    "Olympique Lyonnais",
+    "Olympique Marseille",
+    "Once Caldas",
+    "Operário PR",
+    "Orenburg",
+    "Oriental",
+    "Orlando City",
+    "PAOK",
+    "PSG",
+    "PSS Sleman",
+    "Pachuca",
+    "Pafos",
+    "Palmeiras",
+    "Paraná",
+    "Paysandu",
+    "Paços de Ferreira",
+    "Persija",
+    "Petrolul 52",
+    "Peñarol",
+    "Polissya",
+    "Ponte Preta",
+    "Portimonense",
+    "Porto II",
+    "Portuguesa",
+    "Portuguesa Santista",
+    "Primorje",
+    "Pumas UNAM",
+    "Qarabag",
+    "Querétaro",
+    "Quilmes",
+    "RB Leipzig",
+    "RWD Molenbeek",
+    "Racing Club",
+    "Ratchaburi",
+    "Rayo Vallecano",
+    "Real Betis",
+    "Real Madrid",
+    "Real Murcia",
+    "Real Salt Lake",
+    "Red Bull Bragantino",
+    "Remo",
+    "Rentistas",
+    "Rio Ave",
+    "River Plate",
+    "Rukh Lviv",
+    "Sabah",
+    "Sampaio Corrêa",
+    "San Martín San Juan",
+    "Santa Clara",
+    "Santa Cruz",
+    "Santos",
+    "Shabab Al Ahli Dubai",
+    "Shakhtar Donetsk",
+    "Shanghai Port",
+    "Shenzhen Peng City",
+    "Shimizu S-Pulse",
+    "Southampton",
+    "Sparta Praha",
+    "Sport Recife",
+    "Suwon",
+    "São Bernardo FC",
+    "São Paulo",
+    "São Paulo U20",
+    "Talleres Córdoba",
+    "Tenerife",
+    "Tigres UANL",
+    "Tokushima Vortis",
+    "Tokyo",
+    "Toluca",
+    "Tombense",
+    "Torpedo Kutaisi",
+    "Torque",
+    "Trabzonspor",
+    "Universidad Católica",
+    "Universitario",
+    "Varzim",
+    "Vasco da Gama",
+    "Ventforet Kofu",
+    "Vila Nova",
+    "Vissel Kobe",
+    "Vitória",
+    "Volta Redonda",
+    "Vélez Sarsfield",
+    "Wieczysta Kraków",
+    "Wolverhampton Wanderers",
+    "Wuhan Three Towns",
+    "XV de Jaú",
+    "Ypiranga Erechim",
+    "Zalaegerszegi TE",
+    "Zenit",
+    "Água Santa"
+  ],
+  "nationalities": [
+    "Argentina",
+    "Belgium",
+    "Bolivia",
+    "Brazil",
+    "Chile",
+    "Colombia",
+    "Ecuador",
+    "Paraguay",
+    "Peru",
+    "Portugal",
+    "United States",
+    "Uruguay",
+    "Venezuela"
+  ],
+  "filters": {
+    "height": [
+      158,
+      199
+    ],
+    "minutes": [
+      0,
+      3478
+    ],
+    "birth_year": [
+      1984,
+      2008
+    ],
+    "rating": [
+      5.9,
+      7.5
+    ]
+  },
+  "scatter_metrics": {
+    "zagueiros": [
+      {
+        "key": "intervencoes",
+        "label": "Intervenções",
+        "field": "interception_won_p90"
+      },
+      {
+        "key": "confrontos_of",
+        "label": "Confrontos Ofensivos",
+        "field": "DuelosOf"
+      },
+      {
+        "key": "construcao",
+        "label": "Construção",
+        "field": "n_construcao"
+      },
+      {
+        "key": "duelo_ar",
+        "label": "Duelo Aéreo",
+        "field": "n_duelo_ar"
+      },
+      {
+        "key": "contencao",
+        "label": "Contenção",
+        "field": "n_contencao"
+      },
+      {
+        "key": "ofensividade",
+        "label": "Ofensividade",
+        "field": "n_conducao"
+      },
+      {
+        "key": "passes_prog",
+        "label": "Passes Progressivos",
+        "field": "PassesProg"
+      },
+      {
+        "key": "duelos_def",
+        "label": "Duelos Defensivos",
+        "field": "DuelosDef"
+      }
+    ],
+    "laterais": [
+      {
+        "key": "cruzamentos",
+        "label": "Cruzamentos",
+        "field": "Cruz."
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "construcao",
+        "label": "Construção",
+        "field": "n_construcao"
+      },
+      {
+        "key": "duelos_def",
+        "label": "Duelos Defensivos",
+        "field": "DuelosDef"
+      }
+    ],
+    "meio-campistas": [
+      {
+        "key": "finalizacao",
+        "label": "Finalizações",
+        "field": "Finalizações"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "construcao",
+        "label": "Construção",
+        "field": "n_construcao"
+      },
+      {
+        "key": "duelos_def",
+        "label": "Duelos Defensivos",
+        "field": "DuelosDef"
+      }
+    ],
+    "extremos": [
+      {
+        "key": "dribles",
+        "label": "Dribles",
+        "field": "Dribles"
+      },
+      {
+        "key": "xa",
+        "label": "xA",
+        "field": "xA"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      },
+      {
+        "key": "cruzamentos",
+        "label": "Cruzamentos",
+        "field": "Cruz."
+      },
+      {
+        "key": "toques_area",
+        "label": "Toques na Área",
+        "field": "ToquesArea"
+      }
+    ],
+    "atacantes": [
+      {
+        "key": "gols",
+        "label": "Gols",
+        "field": "Gols"
+      },
+      {
+        "key": "finalizacao",
+        "label": "Finalizações",
+        "field": "Finalizações"
+      },
+      {
+        "key": "toques_area",
+        "label": "Toques na Área",
+        "field": "ToquesArea"
+      },
+      {
+        "key": "progressao",
+        "label": "Progressão",
+        "field": "Cond.Prog"
+      }
+    ]
+  },
+  "heatmaps_enabled": true,
+  "physical_run_enabled": true
+}

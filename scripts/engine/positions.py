@@ -10,6 +10,7 @@ from .normalize import (
     apply_bonus,
     composite_z,
     normalize_rating_component,
+    numeric_col,
     percentile_rank,
     rank_desc_normalized,
     rank_players,
@@ -266,12 +267,20 @@ DEF_ERROR_WEIGHT_SHOT = 2.5
 DEF_ERROR_WEIGHT_GOAL = 10.0
 
 
+def _gol_minus_xg(out: pd.DataFrame) -> pd.Series:
+    gols = numeric_col(out, "Gols")
+    xg = numeric_col(out, "xGTotal")
+    if "Golos esperados" in out.columns and (xg == 0).all():
+        xg = numeric_col(out, "Golos esperados")
+    return gols - xg
+
+
 def _error_cost_p90(pool: pd.DataFrame) -> pd.Series:
     """Weighted error rate per 90 — enters defensive cost numerator."""
-    shot = pd.to_numeric(pool.get("error_lead_to_a_shot_p90", 0), errors="coerce").fillna(0)
-    goal = pd.to_numeric(pool.get("error_lead_to_a_goal_p90", 0), errors="coerce").fillna(0)
+    shot = numeric_col(pool, "error_lead_to_a_shot_p90")
+    goal = numeric_col(pool, "error_lead_to_a_goal_p90")
     if (shot + goal).sum() == 0:
-        combined = pd.to_numeric(pool.get("ss_def_error_p90", 0), errors="coerce").fillna(0)
+        combined = numeric_col(pool, "ss_def_error_p90")
         return combined * DEF_ERROR_WEIGHT_SHOT
     return DEF_ERROR_WEIGHT_SHOT * shot + DEF_ERROR_WEIGHT_GOAL * goal
 
@@ -977,7 +986,7 @@ def _acoes_def_bem_sucedidas(pool: pd.DataFrame) -> pd.Series:
     """Interceptações + rebatidas + duelos def vencidos + bloqueios (p90)."""
     inter = _ss_inter_col(pool)
     clear = _ss_clearance_col(pool)
-    block = pd.to_numeric(pool.get("outfielder_block_p90", 0), errors="coerce").fillna(0)
+    block = numeric_col(pool, "outfielder_block_p90")
     dd_won = _duelos_won_p90(pool, "DuelosDef", "%DuelosDefW")
     return inter + clear + dd_won + block
 
@@ -987,7 +996,7 @@ def _def_cost_numerator_p90(pool: pd.DataFrame) -> pd.Series:
     beta = 0.45
     dd = pool["DuelosDef"].astype(float)
     pct_w = pool["%DuelosDefW"].astype(float)
-    faltas = pd.to_numeric(pool.get("Faltas/90", 0), errors="coerce").fillna(0)
+    faltas = numeric_col(pool, "Faltas/90")
     dd_perd = dd * (1 - pct_w)
     return dd_perd + np.maximum(0, faltas - beta * dd_perd) + _error_cost_p90(pool)
 
@@ -1083,10 +1092,10 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     out["_def_eff_benchmark_mu"] = def_mu
     out["_asp_custo_def_eff"] = percentile_rank(def_z, ascending=True)
     out["_def_eff_nota_10"] = def_z.round(1)
-    err_def_total = pd.to_numeric(out.get("ss_def_error_total", 0), errors="coerce").fillna(0)
+    err_def_total = numeric_col(out, "ss_def_error_total")
     if (err_def_total == 0).all():
-        err_shot = pd.to_numeric(out.get("error_lead_to_a_shot_total", 0), errors="coerce").fillna(0)
-        err_goal = pd.to_numeric(out.get("error_lead_to_a_goal_total", 0), errors="coerce").fillna(0)
+        err_shot = numeric_col(out, "error_lead_to_a_shot_total")
+        err_goal = numeric_col(out, "error_lead_to_a_goal_total")
         err_def_total = err_shot + err_goal
     out["_asp_error_def_inv"] = percentile_rank(-err_def_total, ascending=True)
 
@@ -1112,7 +1121,7 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     line_def = clear_vol + da_vol
     contact_def = dd_vol + inter_vol
     m4_ratio = (contact_def / line_def.replace(0, np.nan)).fillna(0.0)
-    faltas = pd.to_numeric(out.get("Faltas/90", 0), errors="coerce").fillna(0)
+    faltas = numeric_col(out, "Faltas/90")
     out["_def_m4_ratio"] = m4_ratio.astype(float)
     out["_pool_avg_def_m4"] = float(distribution(m4_ratio).mean())
     out["_asp_def_style"] = percentile_rank(m4_ratio, ascending=True)
@@ -1128,10 +1137,7 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "duelos_ar_won_vol": percentile_rank(da_won, ascending=True),
         "inter_vol": percentile_rank(_ss_inter_col(out), ascending=True),
         "cortes_vol": percentile_rank(_ss_clearance_col(out), ascending=True),
-        "block_vol": percentile_rank(
-            pd.to_numeric(out.get("outfielder_block_p90", 0), errors="coerce").fillna(0),
-            ascending=True,
-        ),
+        "block_vol": percentile_rank(numeric_col(out, "outfielder_block_p90"), ascending=True),
         "duelos_of_vol": _pool_percentile(out, "Duelos ofensivos/90", "DuelosOf"),
         "duelos_of_eff": _pct_eff(out, "Duelos ofensivos ganhos, %", "%DuelosOfW"),
         "duelos_of_won_vol": percentile_rank(do_won, ascending=True),
@@ -1175,11 +1181,7 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "passes_prof_eff": _pct_eff(out, "Passes em profundidade certos, %", "%EffPassesProf"),
         "gols_total_vol": _pool_percentile(out, "Golos"),
         "xg_total_vol": _pool_percentile(out, "xGTotal", "Golos esperados"),
-        "gol_xg_diff": percentile_rank(
-            pd.to_numeric(out.get("Gols", 0), errors="coerce").fillna(0)
-            - pd.to_numeric(out.get("xGTotal", out.get("Golos esperados", 0)), errors="coerce").fillna(0),
-            ascending=True,
-        ),
+        "gol_xg_diff": percentile_rank(_gol_minus_xg(out), ascending=True),
         "gols_vol": _pool_percentile(out, "Golos/90", "Gols"),
         "fin_on_target_eff": _pct_eff(out, "Remates à baliza, %", "%EffFin"),
         "def_actions_vol": percentile_rank(

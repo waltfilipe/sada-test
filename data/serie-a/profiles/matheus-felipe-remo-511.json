@@ -760,5 +760,47 @@
       "high_speed_km_p90": 93,
       "sprinting_km_p90": 93
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 1960,
+        "club": "Hồ Chí Minh City"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 594,
+        "club": "Hồ Chí Minh City"
+      },
+      {
+        "year": "2025",
+        "league": "serie-b",
+        "minutes": 1155,
+        "club": "Hồ Chí Minh City"
+      }
+    ],
+    "metrics": {
+      "Ações Defensivas::Interceptações": {
+        "predicted": 4.4112,
+        "history_mean": 4.595,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Duelos Defensivos": {
+        "predicted": 4.4712,
+        "history_mean": 4.6094,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Progressivos": {
+        "predicted": 5.963,
+        "history_mean": 6.2738,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

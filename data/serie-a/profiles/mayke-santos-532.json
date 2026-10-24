@@ -1077,5 +1077,41 @@
     "sprinting_km_p90": 0.16,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 1620,
+        "club": "Santos"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 2828,
+        "club": "Santos"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 1125,
+        "club": "Santos"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 3.3829,
+        "history_mean": 3.6445,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Duelos Defensivos": {
+        "predicted": 5.6684,
+        "history_mean": 6.4566,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

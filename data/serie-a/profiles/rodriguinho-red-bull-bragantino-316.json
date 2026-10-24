@@ -2098,5 +2098,47 @@
       "high_speed_km_p90": 37,
       "sprinting_km_p90": 42
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 208,
+        "club": "Ceará"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 1403,
+        "club": "Ceará"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 1183,
+        "club": "Cruzeiro"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 6.0282,
+        "history_mean": 6.4328,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 8.5139,
+        "history_mean": 10.5904,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 2.5241,
+        "history_mean": 1.7962,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

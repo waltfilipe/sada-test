@@ -27,7 +27,7 @@ const SCENARIO_TABS: { key: ProjectionScenario; label: string; hint: string }[] 
   {
     key: "realista",
     label: "Esperado",
-    hint: "50% média dos titulares + 50% média do mesmo perfil na divisão; puxa mais quanto mais faltam minutos para 50% do time.",
+    hint: "Titulares + perfil na divisão, ancorado no histórico Wyscout quando existir; poucos minutos puxam para onde ele costuma jogar de verdade.",
   },
   {
     key: "positiva",
@@ -53,7 +53,7 @@ export function MinuteProjection({ player, family, players }: Props) {
 
   return (
     <>
-      <Tooltip content="Ajusta estatísticas até 50% dos minutos do time: amostra dele vs 50% média dos titulares + 50% do mesmo perfil na divisão. Faixas pessimista, esperada e otimista.">
+      <Tooltip content="Projeção de titularidade: mistura amostra atual, grupo da divisão e temporadas anteriores (quando houver). Não é ‘resto de 2026’ — é leitura de patamar quando joga de verdade.">
         <button
           type="button"
           className={`btn btn-ghost btn-sm${open ? " is-open" : ""}`}
@@ -77,6 +77,16 @@ export function MinuteProjection({ player, family, players }: Props) {
                     · métricas quentes tendem a cair ~{Math.round(rel.hotStreakRegressionPct)}% em direção ao
                     grupo
                   </>
+                ) : null}
+                {rel.crossSeasonSeasons > 0 ? (
+                  <>
+                    {" "}
+                    · histórico Wyscout ({rel.crossSeasonSeasons}{" "}
+                    {rel.crossSeasonSeasons === 1 ? "temporada" : "temporadas"})
+                  </>
+                ) : null}
+                {rel.roleChangeFlags > 0 ? (
+                  <> · {rel.roleChangeFlags} métrica(s) com possível mudança de papel ou ruído de amostra</>
                 ) : null}
               </p>
               <div className="projection-scenario-tabs" role="tablist" aria-label="Cenário de projeção">

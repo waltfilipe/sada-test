@@ -29,6 +29,9 @@ export type ProjectionReliability = {
   tier: "baixa" | "media" | "alta";
   /** Average % drop on volume/efficiency lines already above the mixed prior (hot streak). */
   hotStreakRegressionPct: number | null;
+  /** Metrics where current season looks like noise vs prior seasons (low minutes). */
+  roleChangeFlags: number;
+  crossSeasonSeasons: number;
 };
 
 export type MinuteProjectionReport = {
@@ -73,6 +76,8 @@ type MetricFit = {
   sample: string;
   adverse?: boolean;
   seasonCount?: boolean;
+  /** Low-minute 2026 diverges from stable cross-season history — trust anchor over spike. */
+  roleChangeFlag?: boolean;
 };
 
 type BuiltModel = {
@@ -199,6 +204,7 @@ function projectedMetrics(model: BuiltModel, scenario: ProjectionScenario): Map<
       minutesPct,
       metric.adverse,
       metric.kind,
+      metric.roleChangeFlag,
     );
     const value = metric.kind === "percent" ? clamp(next.value, 0, 100) : next.value;
     const standing = midrankPercentile(value, metric.referenceRates);
@@ -255,18 +261,20 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
   const metrics: MetricFit[] = [];
   for (const sample of target) {
     const points = observations.get(sample.key) ?? [];
-    const prior = fitPrior(points, player.profile ?? null);
-    if (!prior) continue;
+    const basePrior = fitPrior(points, player.profile ?? null);
+    if (!basePrior) continue;
+    const prior = applyCrossSeasonPrior(basePrior, player, sample.key);
     metrics.push({
       key: sample.key,
       y: sample.value,
-      prior,
-      referenceRates: [...prior.refRates].sort((a, b) => a - b),
+      prior: prior.prior,
+      referenceRates: [...prior.prior.refRates].sort((a, b) => a - b),
       kind: sample.kind,
       rank: sample.rank,
       sample: sample.sample,
       adverse: sample.adverse,
       seasonCount: sample.seasonCount,
+      roleChangeFlag: prior.roleChangeFlag,
     });
   }
   if (metrics.filter((metric) => metric.rank).length < MIN_METRICS) return null;
@@ -427,6 +435,21 @@ function formatProjected(metric: ProjectedMetric): string {
   return formatted;
 }
 
+function applyCrossSeasonPrior(
+  base: Prior,
+  player: PlayerProfile,
+  sampleKey: string,
+): { prior: Prior; roleChangeFlag?: boolean } {
+  const cross = player.cross_season?.metrics?.[sampleKey];
+  if (!cross) return { prior: base };
+  const historyWeight = cross.consistent ? 0.72 : 0.55;
+  const mu = (1 - historyWeight) * base.mu + historyWeight * cross.predicted;
+  return {
+    prior: { ...base, mu },
+    roleChangeFlag: cross.role_change_flag,
+  };
+}
+
 function fitPrior(points: PoolPoint[], targetProfile: string | null): Prior | null {
   const pool = points.filter((point) => point.e > 0);
   if (pool.length < MIN_GROUP) return null;
@@ -500,8 +523,10 @@ function projectRate(
   minutesPct: number,
   adverse = false,
   kind: MetricKind = "rate",
+  roleChangeFlag = false,
 ): { value: number; weight: number } {
-  const weight = observationWeight(minutesPct);
+  let weight = observationWeight(minutesPct);
+  if (roleChangeFlag) weight = Math.min(weight, 0.3);
   const posteriorMean = weight * y + (1 - weight) * prior.mu;
   const sd = predictiveSd(y, exposure, prior, weight, kind, adverse);
   let value = posteriorMean;
@@ -545,10 +570,15 @@ function reliabilityFrom(model: BuiltModel, sampleWeight: number): ProjectionRel
     hotN += 1;
   }
 
+  const roleChangeFlags = model.metrics.filter((metric) => metric.roleChangeFlag).length;
+  const crossSeasonSeasons = model.target.cross_season?.seasons?.length ?? 0;
+
   return {
     sampleWeight,
     tier: confidenceTier(sampleWeight),
     hotStreakRegressionPct: hotN ? (hotSum / hotN) * 100 : null,
+    roleChangeFlags,
+    crossSeasonSeasons,
   };
 }
 

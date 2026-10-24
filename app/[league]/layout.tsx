@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { LeagueProvider } from "@/components/LeagueProvider";
+import { SeasonLeagueProvider } from "@/components/SeasonLeagueProvider";
 import { isLeagueId } from "@/lib/leagues";
 import { leagueStaticParams } from "@/lib/staticParams";
 
@@ -17,5 +17,5 @@ type Props = {
 export default async function LeagueLayout({ children, params }: Props) {
   const { league } = await params;
   if (!isLeagueId(league)) notFound();
-  return <LeagueProvider leagueId={league}>{children}</LeagueProvider>;
+  return <SeasonLeagueProvider leagueId={league}>{children}</SeasonLeagueProvider>;
 }

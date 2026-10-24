@@ -255,12 +255,17 @@ def _load_from_pbix() -> pd.DataFrame:
     return pbix.get_table("Tb_SerieC25")
 
 
-def load_players_dataframe(league_id: str = "serie-a") -> pd.DataFrame:
+def load_players_dataframe(
+    league_id: str = "serie-a",
+    *,
+    xlsx_override: list[Path] | None = None,
+) -> pd.DataFrame:
     league = LEAGUES.get(league_id)
     if not league:
         raise ValueError(f"Liga desconhecida: {league_id}")
 
-    df = _load_from_xlsx(league["xlsx"])
+    xlsx_source = xlsx_override if xlsx_override is not None else league["xlsx"]
+    df = _load_from_xlsx(xlsx_source)
     source = "xlsx"
     if df is None and league_id == "serie-a" and PBIX_PATH.exists():
         df = _load_from_pbix()

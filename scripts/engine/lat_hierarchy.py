@@ -5,6 +5,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from .normalize import numeric_col
+
 ARCHETYPE_LABELS = ("Defensivo", "Construtor", "Ofensivo", "Híbrido")
 
 # Two or more axes above pool mean → Híbrido with a dual badge.
@@ -102,7 +104,7 @@ def build_lat_feature_df(pool: pd.DataFrame) -> pd.DataFrame:
     if "RecPasse" not in out.columns:
         out["RecPasse"] = pd.to_numeric(out.get("Passes recebidos/90"), errors="coerce").fillna(0)
     for col in DEF_COLS + CON_COLS + OFF_COLS:
-        out[col] = pd.to_numeric(out.get(col), errors="coerce").fillna(0.0)
+        out[col] = numeric_col(out, col)
     return out[DEF_COLS + CON_COLS + OFF_COLS].copy()
 
 

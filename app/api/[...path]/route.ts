@@ -19,7 +19,8 @@ export async function GET(request: Request, { params }: Params) {
 
   if (resource === "meta" && path.length === 1) {
     const league = url.searchParams.get("league") ?? undefined;
-    return NextResponse.json(getMeta(league));
+    const season = url.searchParams.get("season") ?? url.searchParams.get("temporada") ?? undefined;
+    return NextResponse.json(getMeta(league, season));
   }
 
   if (resource === "players" && path.length === 1) {
@@ -28,14 +29,16 @@ export async function GET(request: Request, { params }: Params) {
 
   if (resource === "players" && path.length === 2) {
     const league = url.searchParams.get("league") ?? undefined;
-    const profile = getPlayerProfile(id, league);
+    const season = url.searchParams.get("season") ?? url.searchParams.get("temporada") ?? undefined;
+    const profile = getPlayerProfile(id, league, season);
     if (!profile) return NextResponse.json({ error: "not_found" }, { status: 404 });
     return NextResponse.json(profile);
   }
 
   if (resource === "families" && path.length === 2) {
     const league = url.searchParams.get("league") ?? undefined;
-    const players = getFamilyPlayers(id as PositionFamily, league);
+    const season = url.searchParams.get("season") ?? url.searchParams.get("temporada") ?? undefined;
+    const players = getFamilyPlayers(id as PositionFamily, league, season);
     return NextResponse.json({ family: id, players, total: players.length });
   }
 
@@ -57,9 +60,10 @@ export async function GET(request: Request, { params }: Params) {
 function listPlayers(url: URL) {
   const params = url.searchParams;
   const league = params.get("league") ?? undefined;
+  const season = params.get("season") ?? params.get("temporada") ?? undefined;
   const family = params.get("family") as PositionFamily | null;
   const players = filterPlayers(
-    getPlayers(league),
+    getPlayers(league, season),
     {
       family: family ?? undefined,
       club: params.get("club") ?? undefined,
@@ -72,6 +76,7 @@ function listPlayers(url: URL) {
       rating: readRange(params, "rating"),
     },
     league,
+    season,
   );
   return { players, total: players.length };
 }
