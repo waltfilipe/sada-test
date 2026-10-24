@@ -344,6 +344,12 @@
   object-fit: contain;
 }
 
+.scout-header-logo-stacked {
+  max-width: min(132px, 34vw);
+  max-height: 40px;
+  object-position: left center;
+}
+
 .sc-brand-mark {
   display: grid;
   place-items: center;
@@ -3487,6 +3493,11 @@ select:focus-visible {
 @media (max-width: 900px) {
   .scout-header-logo {
     max-width: min(180px, 48vw);
+  }
+
+  .scout-header-logo-stacked {
+    max-width: min(112px, 40vw);
+    max-height: 36px;
   }
 
   .scout-body {

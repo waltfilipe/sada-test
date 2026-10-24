@@ -98,7 +98,9 @@ export function HubSeasonPicker() {
           <div className="hub-serie-grid">
             {BRASILEIRAO_LEAGUES.map((league) => (
               <Link key={league.id} href={serieHref(league.id)} className="hub-serie-card">
-                <img src={league.logo} alt="" className="hub-serie-logo" />
+                <span className="hub-serie-logo-frame" aria-hidden>
+                  <img src={league.logo} alt="" className="hub-serie-logo" />
+                </span>
                 <span>
                   <strong>{league.name}</strong>
                   <em>{season}</em>

@@ -42,7 +42,7 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
     <div className="scout-topbar-wrap">
       <header className="scout-topbar scout-topbar-compact">
         <Link href={brandHref} className="scout-brand" aria-label="SADA | Scout — Início">
-          <SiteLogo variant="header" className="scout-header-logo" height={44} />
+          <SiteLogo variant="stacked" className="scout-header-logo scout-header-logo-stacked" height={40} />
         </Link>
 
         <nav className="topbar-links topbar-links-primary" aria-label="Seções">
