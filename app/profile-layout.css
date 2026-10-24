@@ -4359,6 +4359,64 @@
   max-height: min(88vh, 900px);
 }
 
+.projection-lab-modal {
+  width: min(1100px, 100%);
+  max-height: min(90vh, 920px);
+}
+
+.projection-lab-table-wrap {
+  overflow: auto;
+  margin-top: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.projection-lab-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+
+.projection-lab-table th,
+.projection-lab-table td {
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.projection-lab-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-raised, #1a1f26);
+  color: var(--muted);
+  font-weight: 600;
+  z-index: 1;
+}
+
+.projection-lab-table tbody th[scope="row"] {
+  text-align: left;
+  color: var(--text);
+  font-weight: 500;
+  max-width: 9rem;
+  white-space: normal;
+}
+
+.projection-lab-cell {
+  font-variant-numeric: tabular-nums;
+}
+
+.projection-lab-legend {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.projection-lab-legend ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+}
+
 .projection-modal-copy {
   display: flex;
   flex-direction: column;
