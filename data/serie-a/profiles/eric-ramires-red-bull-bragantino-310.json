@@ -2058,5 +2058,53 @@
       "high_speed_km_p90": 83,
       "sprinting_km_p90": 103
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 1301,
+        "club": "Red Bull Bragantino"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 1531,
+        "club": "Red Bull Bragantino"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 1244,
+        "club": "Red Bull Bragantino"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 1973,
+        "club": "Red Bull Bragantino"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 4.4021,
+        "history_mean": 4.3197,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 6.6535,
+        "history_mean": 7.1428,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.4111,
+        "history_mean": 0.4686,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

@@ -2406,5 +2406,47 @@
       "high_speed_km_p90": 6,
       "sprinting_km_p90": 3
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2023",
+        "league": "serie-b",
+        "minutes": 2163,
+        "club": "Juventude"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 1885,
+        "club": "Coritiba"
+      },
+      {
+        "year": "2025",
+        "league": "serie-b",
+        "minutes": 1167,
+        "club": "Coritiba"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 3.2844,
+        "history_mean": 2.9042,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 8.101,
+        "history_mean": 9.0817,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.3907,
+        "history_mean": 0.4842,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

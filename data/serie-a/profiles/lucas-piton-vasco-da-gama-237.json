@@ -3205,5 +3205,35 @@
       "high_speed_km_p90": 26,
       "sprinting_km_p90": 23
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 1950,
+        "club": "Corinthians"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 2803,
+        "club": "Vasco da Gama"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 3.4329,
+        "history_mean": 3.5692,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 5.3452,
+        "history_mean": 5.8077,
+        "consistent": false,
+        "role_change_flag": false
+      }
+    }
   }
 }

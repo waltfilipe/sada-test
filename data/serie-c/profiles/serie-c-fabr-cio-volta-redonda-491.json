@@ -288,5 +288,53 @@
       "combativo": 6.7
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-b",
+        "minutes": 705,
+        "club": "Ponte Preta"
+      },
+      {
+        "year": "2023",
+        "league": "serie-b",
+        "minutes": 1430,
+        "club": "ABC"
+      },
+      {
+        "year": "2024",
+        "league": "serie-c",
+        "minutes": 325,
+        "club": "Volta Redonda"
+      },
+      {
+        "year": "2025",
+        "league": "serie-b",
+        "minutes": 1054,
+        "club": "Volta Redonda"
+      }
+    ],
+    "metrics": {
+      "Ações Defensivas::Interceptações": {
+        "predicted": 4.591,
+        "history_mean": 4.8281,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 3.9238,
+        "history_mean": 3.7139,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Passes Progressivos": {
+        "predicted": 7.7697,
+        "history_mean": 9.7142,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
+  }
 }

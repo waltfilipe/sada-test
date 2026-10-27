@@ -2666,5 +2666,47 @@
       "high_speed_km_p90": 80,
       "sprinting_km_p90": 83
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 750,
+        "club": "Santos"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 365,
+        "club": "Fluminense"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 1027,
+        "club": "Fluminense"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 4.5828,
+        "history_mean": 4.2252,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 6.4299,
+        "history_mean": 6.7147,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.5833,
+        "history_mean": 0.6751,
+        "consistent": false,
+        "role_change_flag": false
+      }
+    }
   }
 }

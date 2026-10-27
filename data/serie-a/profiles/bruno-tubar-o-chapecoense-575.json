@@ -777,5 +777,47 @@
     "sprinting_km_p90": 0.12,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 488,
+        "club": "Red Bull Bragantino"
+      },
+      {
+        "year": "2022",
+        "league": "serie-b",
+        "minutes": 337,
+        "club": "Vasco da Gama"
+      },
+      {
+        "year": "2023",
+        "league": "serie-b",
+        "minutes": 2767,
+        "club": "Atlético GO"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 1788,
+        "club": "Atlético GO"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 3.1847,
+        "history_mean": 3.4441,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 5.3484,
+        "history_mean": 6.0215,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

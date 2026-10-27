@@ -760,5 +760,47 @@
       "high_speed_km_p90": 39,
       "sprinting_km_p90": 28
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 720,
+        "club": "Palmeiras"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 619,
+        "club": "Palmeiras"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 1441,
+        "club": "Red Bull Bragantino"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 5.8491,
+        "history_mean": 6.0,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 6.6796,
+        "history_mean": 7.3319,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.4579,
+        "history_mean": 0.4446,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

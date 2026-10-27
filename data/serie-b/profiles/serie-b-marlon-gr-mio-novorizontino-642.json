@@ -376,5 +376,53 @@
       "boxtobox": 6.3
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 430,
+        "club": "Juventude"
+      },
+      {
+        "year": "2023",
+        "league": "serie-b",
+        "minutes": 2799,
+        "club": "Grêmio Novorizontino"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 2620,
+        "club": "Grêmio Novorizontino"
+      },
+      {
+        "year": "2025",
+        "league": "serie-b",
+        "minutes": 973,
+        "club": "Grêmio Novorizontino"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 5.0689,
+        "history_mean": 5.09,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 6.7821,
+        "history_mean": 7.1351,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 2.0592,
+        "history_mean": 0.9799,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
+  }
 }

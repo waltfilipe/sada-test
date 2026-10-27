@@ -406,5 +406,53 @@
       "high_speed_km_p90": 107,
       "sprinting_km_p90": 104
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 188,
+        "club": "São Paulo"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 679,
+        "club": "São Paulo"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 1747,
+        "club": "Vitória"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 202,
+        "club": "São Paulo"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 4.6957,
+        "history_mean": 3.8913,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 5.1712,
+        "history_mean": 5.0659,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.3993,
+        "history_mean": 0.2127,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

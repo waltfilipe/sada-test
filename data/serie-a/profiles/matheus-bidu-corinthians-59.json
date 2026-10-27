@@ -5077,5 +5077,47 @@
       "high_speed_km_p90": 14,
       "sprinting_km_p90": 7
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-b",
+        "minutes": 2276,
+        "club": "Cruzeiro"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 1873,
+        "club": "Corinthians"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 1723,
+        "club": "Corinthians"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 2200,
+        "club": "Corinthians"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 3.0803,
+        "history_mean": 3.5492,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 4.925,
+        "history_mean": 5.5667,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

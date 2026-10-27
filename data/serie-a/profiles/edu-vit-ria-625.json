@@ -506,5 +506,47 @@
     "sprinting_km_p90": 0.06,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 506,
+        "club": "Goiás"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 861,
+        "club": "Vitória"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 1223,
+        "club": "Vitória"
+      }
+    ],
+    "metrics": {
+      "Ações Defensivas::Interceptações": {
+        "predicted": 4.6601,
+        "history_mean": 5.2707,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Duelos Defensivos": {
+        "predicted": 4.7449,
+        "history_mean": 5.7223,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Progressivos": {
+        "predicted": 5.6157,
+        "history_mean": 6.4977,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

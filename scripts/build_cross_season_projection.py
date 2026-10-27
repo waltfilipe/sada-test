@@ -85,10 +85,30 @@ def read_metric(player: dict, aspect: str, sub: str | None) -> float | None:
         return None
 
 
-def player_key(player: dict) -> str:
-    """Link seasons by normalized name + birth year (Wyscout archives lack Transfermarkt ids)."""
-    birth = player.get("birth_year") or 0
-    return f"name:{norm_name(player.get('name', ''))}|{birth}"
+def assign_season_keys(rows: list[dict]) -> dict[tuple[str, int], str]:
+    """Link seasons by normalized name + birth-year cluster.
+
+    Wyscout archives report the same athlete's birth year inconsistently across
+    seasons (±1), so an exact name|birth match loses most history. Rows of the
+    same normalized name are clustered by birth proximity (each member within
+    ±1 year of the cluster's earliest birth) and share a key.
+    """
+    by_name: dict[str, list[dict]] = {}
+    for row in rows:
+        by_name.setdefault(norm_name(row.get("name", "")), []).append(row)
+    index: dict[tuple[str, int], str] = {}
+    for name, members in by_name.items():
+        members.sort(key=lambda r: (r.get("birth_year") or 0))
+        cluster_min: int | None = None
+        for row in members:
+            birth = row.get("birth_year") or 0
+            if not birth:
+                index[(name, 0)] = f"name:{name}|0"
+                continue
+            if cluster_min is None or birth - cluster_min > 1:
+                cluster_min = birth
+            index[(name, birth)] = f"name:{name}|{cluster_min}"
+    return index
 
 
 def load_season_players(league: str, season: str) -> list[dict]:
@@ -141,17 +161,24 @@ def league_tier(league_id: str) -> float:
 
 
 def main() -> None:
-    # Index all seasons by player key
-    timeline: dict[str, list[dict]] = {}
+    # Index all seasons by clustered player key (computed over every row so
+    # minute thresholds don't shift the clusters)
+    all_rows: list[dict] = []
     for league in BR_LEAGUES:
         for season in (*SEASONS, CURRENT):
             if season != CURRENT:
                 if not (DATA / league / "seasons" / season).is_dir():
                     continue
-            for p in load_season_players(league, season):
-                if (p.get("minutes") or 0) < 180:
-                    continue
-                timeline.setdefault(player_key(p), []).append(p)
+            all_rows.extend(load_season_players(league, season))
+    key_index = assign_season_keys(all_rows)
+
+    timeline: dict[str, list[dict]] = {}
+    for p in all_rows:
+        if (p.get("minutes") or 0) < 180:
+            continue
+        key = key_index.get((norm_name(p.get("name", "")), p.get("birth_year") or 0))
+        if key:
+            timeline.setdefault(key, []).append(p)
 
     for key in timeline:
         timeline[key].sort(key=lambda r: (r.get("_season") or "", r.get("_league") or ""))
@@ -202,8 +229,8 @@ def main() -> None:
             payload = json.loads(path.read_text(encoding="utf-8"))
             coef = models.get(f"{league}:{family}") or {}
             for player in payload.get("players", []):
-                key = player_key(player)
-                hist = timeline.get(key, [])
+                key = key_index.get((norm_name(player.get("name", "")), player.get("birth_year") or 0))
+                hist = timeline.get(key, []) if key else []
                 past = [h for h in hist if h.get("_season") != CURRENT]
                 if not past:
                     continue

@@ -392,5 +392,41 @@
     "sprinting_km_p90": 0.03,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 2255,
+        "club": "Atlético Mineiro"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 612,
+        "club": "Vasco da Gama"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 5.4374,
+        "history_mean": 5.6438,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 7.0003,
+        "history_mean": 7.2281,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.5174,
+        "history_mean": 0.6506,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

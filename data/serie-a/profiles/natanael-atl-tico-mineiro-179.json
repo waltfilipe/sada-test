@@ -3729,5 +3729,47 @@
       "high_speed_km_p90": 11,
       "sprinting_km_p90": 2
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 1594,
+        "club": "Coritiba"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 2804,
+        "club": "Coritiba"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 3443,
+        "club": "Coritiba"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 2395,
+        "club": "Atlético Mineiro"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 2.6364,
+        "history_mean": 2.6213,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 7.9386,
+        "history_mean": 9.3974,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

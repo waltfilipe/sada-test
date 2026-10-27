@@ -724,3 +724,59 @@
   text-align: right;
   max-width: 200px;
 }
+
+.season-peek-profiles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.85rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line, rgba(186, 204, 224, 0.11));
+}
+
+.season-peek-profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+}
+
+.season-peek-profile-label {
+  font-weight: 600;
+}
+
+.season-peek-profile-nums {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--text-3, #93a0b3);
+  font-size: 0.74rem;
+}
+
+.season-peek-profile-nums strong {
+  font-size: 0.84rem;
+}
+
+.season-peek-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.85rem;
+}
+
+.season-peek-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--line-2, rgba(186, 204, 224, 0.18));
+  border-radius: 4px;
+  color: var(--text-2, #c5d0de);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.season-peek-badge i {
+  color: var(--hero-accent, #1be7ff);
+  font-size: 0.68rem;
+}

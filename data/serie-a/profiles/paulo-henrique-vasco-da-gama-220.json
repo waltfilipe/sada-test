@@ -3721,5 +3721,35 @@
       "high_speed_km_p90": 29,
       "sprinting_km_p90": 10
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 1623,
+        "club": "Juventude"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 2744,
+        "club": "Vasco da Gama"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 4.1506,
+        "history_mean": 4.4318,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 7.2473,
+        "history_mean": 8.3513,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

@@ -2,8 +2,10 @@ import "server-only";
 
 import { withResolvedPlayerPhoto } from "@/lib/playerPhotoLookup.server";
 import { POSITION_FAMILIES } from "@/lib/positions";
+import { archetypeRank, sortedProfileShareRows } from "@/lib/profileShares";
+import { profileGradeFromRank } from "@/lib/scoutTheme";
 import type { LeagueId } from "@/lib/leagues";
-import type { PlayerProfile } from "@/lib/types";
+import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { getFamilyPlayers } from "@/lib/data.server";
 
 export function normPlayerName(name: string): string {
@@ -15,18 +17,47 @@ export function normPlayerName(name: string): string {
     .trim();
 }
 
+function withSeasonMeta(player: PlayerProfile, pool: PlayerProfile[], family: PositionFamily): PlayerProfile {
+  const resolved = withResolvedPlayerPhoto(player) as PlayerProfile;
+  const profiles = sortedProfileShareRows(resolved).map((row) => {
+    const rank = archetypeRank(resolved, pool, row.label, family);
+    return { label: row.label, share: row.share, rank, grade: rank ? profileGradeFromRank(rank, pool.length) : null };
+  });
+  resolved.season_meta = { pool_size: pool.length, profiles };
+  return resolved;
+}
+
+/**
+ * Wyscout archives report birth years inconsistently (±1 vs the current season),
+ * so an exact name|birth match misses most athletes. Try exact first, then fall
+ * back to a unique-name match within ±1 year (tie-broken by the expected club).
+ */
 export function findPlayerInSeason(
   league: LeagueId,
   season: string,
   name: string,
   birthYear: number | null | undefined,
+  club?: string | null,
 ): PlayerProfile | null {
-  const key = `${normPlayerName(name)}|${birthYear ?? 0}`;
+  const norm = normPlayerName(name);
+  const wanted = `${norm}|${birthYear ?? 0}`;
+  let best: { player: PlayerProfile; pool: PlayerProfile[]; family: PositionFamily; diff: number } | null = null;
   for (const family of POSITION_FAMILIES) {
-    for (const player of getFamilyPlayers(family.key, league, season)) {
-      const pk = `${normPlayerName(player.name)}|${player.birth_year ?? 0}`;
-      if (pk === key) return withResolvedPlayerPhoto(player) as PlayerProfile;
+    const pool = getFamilyPlayers(family.key, league, season) as PlayerProfile[];
+    for (const player of pool) {
+      if (normPlayerName(player.name) !== norm) continue;
+      if (`${norm}|${player.birth_year ?? 0}` === wanted) {
+        return withSeasonMeta(player, pool, family.key);
+      }
+      const pb = player.birth_year ?? null;
+      if (birthYear == null || pb == null) continue;
+      const diff = Math.abs(pb - birthYear);
+      if (diff > 1) continue;
+      const clubHit = club ? player.club === club : false;
+      if (!best || diff < best.diff || (diff === best.diff && clubHit)) {
+        best = { player, pool, family: family.key, diff: clubHit ? diff - 0.5 : diff };
+      }
     }
   }
-  return null;
+  return best ? withSeasonMeta(best.player, best.pool, best.family) : null;
 }

@@ -411,5 +411,53 @@
       "ofensivo": 6.4
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-c",
+        "minutes": 1345,
+        "club": "Atlético Cearense"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 682,
+        "club": "Bahia"
+      },
+      {
+        "year": "2023",
+        "league": "serie-c",
+        "minutes": 1169,
+        "club": "EC São José"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 1278,
+        "club": "CRB"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 3.3861,
+        "history_mean": 3.4176,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 4.7754,
+        "history_mean": 4.9573,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Conduções Progressivas": {
+        "predicted": 1.6349,
+        "history_mean": 0.286,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
+  }
 }

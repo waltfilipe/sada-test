@@ -3030,5 +3030,47 @@
       "high_speed_km_p90": 26,
       "sprinting_km_p90": 47
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 2533,
+        "club": "Botafogo"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 2972,
+        "club": "Botafogo"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 2189,
+        "club": "Vasco da Gama"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 5.0993,
+        "history_mean": 4.9399,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 4.8684,
+        "history_mean": 5.0525,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.5798,
+        "history_mean": 0.5456,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

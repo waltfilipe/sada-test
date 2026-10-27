@@ -1291,5 +1291,47 @@
       "high_speed_km_p90": 32,
       "sprinting_km_p90": 45
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 1550,
+        "club": "Coritiba"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 3404,
+        "club": "Cuiabá"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 2763,
+        "club": "Cuiabá"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 1988,
+        "club": "Sport Recife"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 2.0349,
+        "history_mean": 1.9559,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 6.6628,
+        "history_mean": 7.6372,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

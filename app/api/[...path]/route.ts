@@ -68,7 +68,13 @@ export async function GET(request: Request, { params }: Params) {
       return NextResponse.json({ error: "missing_params" }, { status: 400 });
     }
     const birth = birthRaw ? Number(birthRaw) : null;
-    const hit = findPlayerInSeason(league, season, name, Number.isFinite(birth) ? birth : null);
+    const hit = findPlayerInSeason(
+      league,
+      season,
+      name,
+      Number.isFinite(birth) ? birth : null,
+      url.searchParams.get("club"),
+    );
     if (!hit) return NextResponse.json({ error: "not_found" }, { status: 404 });
     return NextResponse.json(hit, { headers: archiveCacheHeaders(season) });
   }

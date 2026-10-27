@@ -534,5 +534,41 @@
     "sprinting_km_p90": 0.1,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 499,
+        "club": "Vasco da Gama"
+      },
+      {
+        "year": "2025",
+        "league": "serie-b",
+        "minutes": 1856,
+        "club": "Avaí"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 4.2091,
+        "history_mean": 4.0822,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 7.5,
+        "history_mean": 7.5,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.5662,
+        "history_mean": 0.8212,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

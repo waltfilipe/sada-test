@@ -3964,5 +3964,47 @@
       "high_speed_km_p90": 75,
       "sprinting_km_p90": 88
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 2141,
+        "club": "São Paulo"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 732,
+        "club": "Atlético Mineiro"
+      },
+      {
+        "year": "2025",
+        "league": "serie-b",
+        "minutes": 2082,
+        "club": "Athletico Paranaense"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 4.0745,
+        "history_mean": 3.7976,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 6.2346,
+        "history_mean": 6.6,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.6571,
+        "history_mean": 0.9183,
+        "consistent": false,
+        "role_change_flag": false
+      }
+    }
   }
 }

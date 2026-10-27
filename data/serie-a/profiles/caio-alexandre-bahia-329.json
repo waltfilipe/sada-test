@@ -2726,5 +2726,53 @@
       "high_speed_km_p90": 66,
       "sprinting_km_p90": 86
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 1081,
+        "club": "Fortaleza"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 2934,
+        "club": "Fortaleza"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 2979,
+        "club": "Bahia"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 1443,
+        "club": "Bahia"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 7.0727,
+        "history_mean": 7.2421,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 7.1491,
+        "history_mean": 7.9796,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.863,
+        "history_mean": 0.9392,
+        "consistent": false,
+        "role_change_flag": false
+      }
+    }
   }
 }

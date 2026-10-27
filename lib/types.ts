@@ -170,8 +170,22 @@ export type CrossSeasonProjection = {
   metrics: Record<string, CrossSeasonMetricPrior>;
 };
 
+export type SeasonMetaProfile = {
+  label: string;
+  share: number;
+  rank: number | null;
+  grade: string | null;
+};
+
+export type SeasonMeta = {
+  pool_size: number;
+  profiles: SeasonMetaProfile[];
+};
+
 export type PlayerProfile = PlayerSummary & {
   cross_season?: CrossSeasonProjection;
+  /** Filled by /api/player-season for the peek popup. */
+  season_meta?: SeasonMeta;
   goals: number;
   assists: number;
   heatmap?: PlayerHeatmapData;

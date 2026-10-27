@@ -1312,5 +1312,41 @@
       "high_speed_km_p90": 25,
       "sprinting_km_p90": 30
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 1122,
+        "club": "Flamengo"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 1103,
+        "club": "Flamengo"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 8.8842,
+        "history_mean": 9.9068,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 5.6601,
+        "history_mean": 5.7,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 2.2724,
+        "history_mean": 1.553,
+        "consistent": false,
+        "role_change_flag": false
+      }
+    }
   }
 }

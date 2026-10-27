@@ -709,5 +709,41 @@
     "sprinting_km_p90": 0.05,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-c",
+        "minutes": 1261,
+        "club": "Botafogo PB"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 2943,
+        "club": "Vila Nova"
+      },
+      {
+        "year": "2025",
+        "league": "serie-b",
+        "minutes": 3331,
+        "club": "Vila Nova"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 3.0745,
+        "history_mean": 3.1734,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 6.9952,
+        "history_mean": 8.1291,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

@@ -897,5 +897,41 @@
     "sprinting_km_p90": 0.03,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 2314,
+        "club": "Vasco da Gama"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 1279,
+        "club": "Vasco da Gama"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 1623,
+        "club": "Vasco da Gama"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 4.0401,
+        "history_mean": 4.3803,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 5.0437,
+        "history_mean": 5.9185,
+        "consistent": false,
+        "role_change_flag": false
+      }
+    }
   }
 }

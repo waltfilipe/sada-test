@@ -7,9 +7,9 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { flattenAspects } from "@/lib/aspectLookup";
 import { formatFoot } from "@/lib/feet";
-import { isLeagueId } from "@/lib/leagues";
+import { getLeague, isLeagueId } from "@/lib/leagues";
 import { profileAccent } from "@/lib/profileShares";
-import { playerInitials } from "@/lib/scoutTheme";
+import { playerStatBadges } from "@/lib/statBadges";
 import type { PlayerProfile } from "@/lib/types";
 
 type Props = {
@@ -32,15 +32,18 @@ export function SeasonPeekModal({ year, scout, onClose, onOpenFicha }: Props) {
   const [player, setPlayer] = useState<PlayerProfile | null>(null);
   const [failed, setFailed] = useState(false);
 
+  const seasonRow = scout.cross_season?.seasons.find((s) => s.year === year);
+  const leagueLabel = getLeague(seasonRow?.league ?? "")?.name;
+
   useEffect(() => {
-    const row = scout.cross_season?.seasons.find((s) => s.year === year);
-    const league = row?.league && isLeagueId(row.league) ? row.league : leagueId;
+    const league = seasonRow?.league && isLeagueId(seasonRow.league) ? seasonRow.league : leagueId;
     const qs = new URLSearchParams({
       league,
       season: year,
       name: scout.name,
       birth_year: String(scout.birth_year ?? ""),
     });
+    if (seasonRow?.club) qs.set("club", seasonRow.club);
     let cancelled = false;
     fetch(`/api/player-season?${qs}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
@@ -53,7 +56,7 @@ export function SeasonPeekModal({ year, scout, onClose, onOpenFicha }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [year, scout, leagueId]);
+  }, [year, scout, leagueId, seasonRow]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -67,9 +70,14 @@ export function SeasonPeekModal({ year, scout, onClose, onOpenFicha }: Props) {
     () => profileAccent(((player?.profile ?? scout.profile) || "").split("+").pop()!.trim()),
     [player, scout],
   );
+  const badges = useMemo(() => (player ? playerStatBadges(player).slice(0, 7) : []), [player]);
 
   const age = player?.birth_year ? Number(year) - player.birth_year : null;
   const foot = player ? formatFoot(player.foot) : null;
+  const marketValue = player?.transfermarkt?.market_value ?? null;
+  const contract = player?.transfermarkt?.contract_remaining ?? null;
+  const profiles = player?.season_meta?.profiles ?? [];
+  const poolSize = player?.season_meta?.pool_size ?? 0;
 
   return createPortal(
     <div className="season-peek-backdrop" role="presentation" onClick={onClose}>
@@ -83,7 +91,9 @@ export function SeasonPeekModal({ year, scout, onClose, onOpenFicha }: Props) {
       >
         <header className="season-peek-head">
           <div>
-            <p className="season-peek-kicker">Temporada {year}</p>
+            <p className="season-peek-kicker">
+              {leagueLabel ? `${leagueLabel} · ${year}` : `Temporada ${year}`}
+            </p>
             <h3 className="season-peek-name">{scout.name}</h3>
           </div>
           <button type="button" className="season-peek-close" aria-label="Fechar" onClick={onClose}>
@@ -106,9 +116,6 @@ export function SeasonPeekModal({ year, scout, onClose, onOpenFicha }: Props) {
                   <ClubLogo club={player.club} size={20} />
                   <span>{player.club}</span>
                   <span className="season-peek-pos">{player.position}</span>
-                </p>
-                <p className="season-peek-profile" style={{ color: accent }}>
-                  {player.profile || "—"}
                 </p>
                 <dl className="season-peek-facts">
                   {age != null ? (
@@ -135,9 +142,42 @@ export function SeasonPeekModal({ year, scout, onClose, onOpenFicha }: Props) {
                       <dd>{player.nationality}</dd>
                     </div>
                   ) : null}
+                  {marketValue ? (
+                    <div>
+                      <dt>Valor</dt>
+                      <dd>{marketValue}</dd>
+                    </div>
+                  ) : null}
+                  {contract ? (
+                    <div>
+                      <dt>Contrato</dt>
+                      <dd>{contract}</dd>
+                    </div>
+                  ) : null}
                 </dl>
               </div>
             </div>
+
+            {profiles.length ? (
+              <div className="season-peek-profiles">
+                {profiles.slice(0, 3).map((row) => (
+                  <div className="season-peek-profile-row" key={row.label}>
+                    <span className="season-peek-profile-label" style={{ color: profileAccent(row.label) }}>
+                      {row.label}
+                    </span>
+                    <span className="season-peek-profile-nums">
+                      {row.grade ? <strong style={{ color: profileAccent(row.label) }}>{row.grade}</strong> : null}
+                      {row.rank ? <span className="tabular">{row.rank}º de {poolSize}</span> : null}
+                      <span className="tabular">{Math.round(row.share)}%</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : player.profile ? (
+              <p className="season-peek-profile" style={{ color: accent }}>
+                {player.profile}
+              </p>
+            ) : null}
 
             <div className="season-peek-stats">
               <div>
@@ -161,6 +201,16 @@ export function SeasonPeekModal({ year, scout, onClose, onOpenFicha }: Props) {
                 <strong className="tabular">{metricDisplay(player, "xA")}</strong>
               </div>
             </div>
+
+            {badges.length ? (
+              <div className="season-peek-badges" aria-label="Selos">
+                {badges.map((badge) => (
+                  <span className="season-peek-badge" key={badge.key} title={badge.title}>
+                    <i className={`fa-solid ${badge.icon}`} aria-hidden="true" /> {badge.label}
+                  </span>
+                ))}
+              </div>
+            ) : null}
 
             <footer className="season-peek-actions">
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => onOpenFicha(year)}>

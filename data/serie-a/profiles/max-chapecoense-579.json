@@ -662,5 +662,41 @@
     "sprinting_km_p90": 0.15,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 1340,
+        "club": "Cuiabá"
+      },
+      {
+        "year": "2025",
+        "league": "serie-b",
+        "minutes": 2680,
+        "club": "Cuiabá"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 6.7478,
+        "history_mean": 7.2,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 3.8,
+        "history_mean": 3.8,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.8005,
+        "history_mean": 1.1,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

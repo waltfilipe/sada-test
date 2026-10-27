@@ -1422,5 +1422,65 @@
     "sprinting_km_p90": 0.07,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 1048,
+        "club": "São Paulo"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 2425,
+        "club": "São Paulo"
+      },
+      {
+        "year": "2023",
+        "league": "serie-c",
+        "minutes": 1705,
+        "club": "Floresta EC"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 1778,
+        "club": "São Paulo"
+      },
+      {
+        "year": "2024",
+        "league": "serie-c",
+        "minutes": 1052,
+        "club": "Floresta EC"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 2212,
+        "club": "São Paulo"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 6.3155,
+        "history_mean": 6.5016,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 5.3873,
+        "history_mean": 5.5453,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 2.1671,
+        "history_mean": 1.1365,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

@@ -486,5 +486,47 @@
     "sprinting_km_p90": 0.4,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 1332,
+        "club": "Santos"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 474,
+        "club": "Santos"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 1022,
+        "club": "Santos"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 5.3737,
+        "history_mean": 5.1067,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Duelos Defensivos": {
+        "predicted": 7.0659,
+        "history_mean": 7.4511,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.5494,
+        "history_mean": 0.4723,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }
