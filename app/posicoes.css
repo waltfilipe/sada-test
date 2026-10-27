@@ -12,13 +12,13 @@
 }
 
 /* Navegação: abas sublinhadas em vez de pílulas preenchidas */
-.zag-v2 .scout-topbar {
+.scout-root .scout-topbar {
   background: #0b1824;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 
-.zag-v2 .scout-topbar-compact .topbar-links-primary {
+.scout-topbar-compact .topbar-links-primary {
   flex: 0 1 auto;
   padding: 0;
   border: 0;
@@ -27,7 +27,7 @@
   gap: 1.4rem;
 }
 
-.zag-v2 .scout-topbar-compact .topbar-links-primary a {
+.scout-topbar-compact .topbar-links-primary a {
   padding: 0.35rem 0;
   border-radius: 0;
   background: none;
@@ -35,11 +35,11 @@
   box-shadow: inset 0 -2px 0 transparent;
 }
 
-.zag-v2 .scout-topbar-compact .topbar-links-primary a:hover {
+.scout-topbar-compact .topbar-links-primary a:hover {
   color: var(--text);
 }
 
-.zag-v2 .scout-topbar-compact .topbar-links-primary a.active {
+.scout-topbar-compact .topbar-links-primary a.active {
   color: var(--text);
   background: none;
   box-shadow: inset 0 -2px 0 var(--select);
@@ -285,14 +285,9 @@
   border-radius: inherit;
   opacity: 1;
   pointer-events: none;
-  background:
-    radial-gradient(560px 300px at var(--hero-glow-x, 18%) var(--hero-glow-y, 0%),
-      color-mix(in srgb, var(--hero-accent) 24%, transparent), transparent 70%),
-    repeating-linear-gradient(115deg,
-      transparent 0 44px,
-      rgba(186, 204, 224, 0.045) 44px 45px);
-  background-size: 100% 100%, 200% 100%;
-  animation: hero-drift 14s ease-in-out infinite alternate;
+  background: radial-gradient(560px 300px at var(--hero-glow-x, 18%) var(--hero-glow-y, 0%),
+    color-mix(in srgb, var(--hero-accent) 18%, transparent), transparent 70%);
+  animation: hero-drift 20s ease-in-out infinite alternate;
 }
 
 @property --hero-glow-x {
@@ -311,7 +306,6 @@
   0% {
     --hero-glow-x: 12%;
     --hero-glow-y: 0%;
-    background-position: 0 0, 0 0;
   }
   50% {
     --hero-glow-x: 48%;
@@ -320,7 +314,6 @@
   100% {
     --hero-glow-x: 82%;
     --hero-glow-y: 10%;
-    background-position: 0 0, 100% 0;
   }
 }
 
@@ -338,12 +331,24 @@
 .zag-v2.league-serie-b .player-hero-photo,
 .zag-v2.league-serie-c .player-hero-photo,
 .zag-v2.league-serie-d .player-hero-photo {
-  width: 168px;
-  margin: 1rem 0 1rem 1rem;
+  width: 150px;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  align-self: center;
+  margin: 0 0 0 0.85rem;
   border: 2px solid var(--hero-accent);
   border-radius: 6px;
   background: linear-gradient(180deg, #17334c 0%, #102235 100%);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--hero-accent) 14%, transparent);
+}
+
+.zag-v2 .player-hero-photo img,
+.zag-v2.league-serie-b .player-hero-photo img,
+.zag-v2.league-serie-c .player-hero-photo img,
+.zag-v2.league-serie-d .player-hero-photo img {
+  object-fit: contain;
+  object-position: center;
+  transform: none;
 }
 
 .zag-v2 .player-hero-photo-fallback {
@@ -518,7 +523,7 @@
     grid-template-columns: 1fr;
   }
 
-  .zag-v2 .scout-topbar-compact .topbar-links-primary {
+  .scout-topbar-compact .topbar-links-primary {
     gap: 1rem;
   }
 
@@ -532,4 +537,190 @@
     border-left: 0;
     border-top: 1px solid var(--line);
   }
+}
+
+/* Popup de temporada do atleta */
+.season-peek-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgba(5, 10, 17, 0.6);
+}
+
+.season-peek {
+  width: min(440px, 100%);
+  border: 1px solid var(--line, rgba(186, 204, 224, 0.16));
+  border-radius: 10px;
+  background: #102235;
+  padding: 1.1rem 1.15rem 1rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+.season-peek-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.season-peek-kicker {
+  margin: 0 0 0.15rem;
+  color: var(--text-3, #93a0b3);
+  font-size: 0.74rem;
+  font-weight: 500;
+}
+
+.season-peek-name {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.season-peek-close {
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--text-3, #93a0b3);
+  font-size: 1rem;
+  padding: 0.3rem 0.45rem;
+  cursor: pointer;
+}
+
+.season-peek-close:hover {
+  color: var(--text, #e8eef6);
+  background: rgba(186, 204, 224, 0.08);
+}
+
+.season-peek-status {
+  margin: 1rem 0 0.25rem;
+  color: var(--text-3, #93a0b3);
+  font-size: 0.85rem;
+}
+
+.season-peek-body {
+  display: flex;
+  gap: 0.9rem;
+  margin-top: 0.9rem;
+  align-items: stretch;
+}
+
+.season-peek-photo {
+  width: 92px;
+  aspect-ratio: 4 / 5;
+  border: 2px solid var(--hero-accent, #1be7ff);
+  border-radius: 6px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #17334c 0%, #0d1b2a 100%);
+  flex-shrink: 0;
+}
+
+.season-peek-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
+}
+
+.season-peek-meta {
+  min-width: 0;
+}
+
+.season-peek-club {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.2rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.season-peek-pos {
+  padding: 0.08rem 0.4rem;
+  border: 1px solid var(--line-2, rgba(186, 204, 224, 0.2));
+  border-radius: 4px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-2, #c5d0de);
+}
+
+.season-peek-profile {
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.season-peek-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  margin: 0;
+}
+
+.season-peek-facts div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.season-peek-facts dt {
+  color: var(--text-3, #93a0b3);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.season-peek-facts dd {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.season-peek-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.2rem;
+  margin-top: 0.9rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line, rgba(186, 204, 224, 0.11));
+}
+
+.season-peek-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.season-peek-stats span {
+  color: var(--text-3, #93a0b3);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.season-peek-stats strong {
+  font-size: 1rem;
+}
+
+.season-peek-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+
+.season-peek-hint {
+  color: var(--text-3, #93a0b3);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  text-align: right;
+  max-width: 200px;
 }

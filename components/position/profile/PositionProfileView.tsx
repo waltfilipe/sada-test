@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useLeague } from "@/components/LeagueProvider";
 import { usePlayerArchiveProfile } from "@/hooks/usePlayerArchiveProfile";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { CURRENT_SEASON } from "@/lib/seasons";
 import { PlayerHero } from "./PlayerHero";
+import { SeasonPeekModal } from "./SeasonPeekModal";
 import { PlayerHeatmap } from "./PlayerHeatmap";
 import { ProfileCard } from "./ProfileCard";
 import { ScoutStatsSections } from "./ScoutStatsSections";
@@ -20,6 +22,7 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
   const { isCurrentSeason, season: hubSeason } = useLeague();
   const archive = usePlayerArchiveProfile(player, family);
   const { displayPlayer, isArchiveView, showSlicer, loading, setFichaSeason, fichaSeason, basePlayer } = archive;
+  const [peekYear, setPeekYear] = useState<string | null>(null);
 
   const showHeatmap = heatmapsEnabled && !isArchiveView && isCurrentSeason;
 
@@ -57,7 +60,10 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
                 active: fichaSeason,
                 archiveYears: archive.archiveYears,
                 loading,
-                onSelect: setFichaSeason,
+                onSelect: (year) => {
+                  if (year === CURRENT_SEASON) setFichaSeason(year);
+                  else setPeekYear(year);
+                },
               }
             : undefined
         }
@@ -91,6 +97,18 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
           </div>
         </div>
       </div>
+
+      {peekYear ? (
+        <SeasonPeekModal
+          year={peekYear}
+          scout={basePlayer}
+          onClose={() => setPeekYear(null)}
+          onOpenFicha={(year) => {
+            setPeekYear(null);
+            setFichaSeason(year as Parameters<typeof setFichaSeason>[0]);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

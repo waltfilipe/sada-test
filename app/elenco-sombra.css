@@ -11,40 +11,6 @@
   background: #0b1824;
 }
 
-/* Navegação: abas sublinhadas */
-.shadow-page .scout-topbar {
-  background: #0b1824;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-.shadow-page .scout-topbar-compact .topbar-links-primary {
-  flex: 0 1 auto;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  gap: 1.4rem;
-}
-
-.shadow-page .scout-topbar-compact .topbar-links-primary a {
-  padding: 0.35rem 0;
-  border-radius: 0;
-  background: none;
-  color: var(--text-3);
-  box-shadow: inset 0 -2px 0 transparent;
-}
-
-.shadow-page .scout-topbar-compact .topbar-links-primary a:hover {
-  color: var(--text);
-}
-
-.shadow-page .scout-topbar-compact .topbar-links-primary a.active {
-  color: var(--text);
-  background: none;
-  box-shadow: inset 0 -2px 0 var(--select);
-}
-
 /* Cabeçalho e controles */
 .shadow-page-header {
   align-items: center;
