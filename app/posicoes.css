@@ -338,8 +338,8 @@
 .zag-v2.league-serie-b .player-hero-photo,
 .zag-v2.league-serie-c .player-hero-photo,
 .zag-v2.league-serie-d .player-hero-photo {
-  width: 124px;
-  margin: 0.8rem 0 0.8rem 0.8rem;
+  width: 168px;
+  margin: 1rem 0 1rem 1rem;
   border: 2px solid var(--hero-accent);
   border-radius: 6px;
   background: linear-gradient(180deg, #17334c 0%, #102235 100%);
@@ -434,6 +434,7 @@
   padding: 1.05rem 1.2rem;
   border-left: 1px solid var(--line);
   gap: 0.55rem;
+  justify-content: space-between;
 }
 
 .zag-v2 .hero-market-card,
@@ -473,7 +474,6 @@
 }
 
 .zag-v2 .hero-action-grid {
-  margin-top: auto;
   padding-top: 0.7rem;
   border-top: 1px solid var(--line);
 }

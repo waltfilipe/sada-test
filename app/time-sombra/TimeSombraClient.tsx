@@ -18,7 +18,8 @@ import { TeamStatsBar } from "@/components/shadow/TeamStatsBar";
 import { useShadowTeam } from "@/hooks/useShadowTeam";
 import { buildClubLineup, positionLines, type PositionLine } from "@/lib/clubLineup";
 import { FORMATIONS, fieldSlots, formationById, type FormationSlot } from "@/lib/formations";
-import { LEAGUES, isLeagueId, type LeagueId } from "@/lib/leagues";
+import { LEAGUES, BRASILEIRAO_LEAGUES, isLeagueId, type LeagueId } from "@/lib/leagues";
+import { ESTADUAIS_LEAGUE_IDS } from "@/lib/estaduaisHub";
 import { benchPlayerIds, boardAssignments, boardReserves, boardSquad, type ShadowScope, type TeamBoard } from "@/lib/shadowTeamStorage";
 import { gradeTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
@@ -41,9 +42,10 @@ function fold(value: string): string {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
-function readSombraLeague(fallback: LeagueId): LeagueId {
+function readSombraLeague(fallback: LeagueId | "estaduais"): LeagueId | "estaduais" {
   if (typeof window === "undefined") return fallback;
   const value = sessionStorage.getItem(SOMBRA_LEAGUE_KEY) ?? "";
+  if (value === "estaduais") return value;
   return isLeagueId(value) ? value : fallback;
 }
 
@@ -54,7 +56,7 @@ type Props = {
 export function TimeSombraClient({ playersByLeague }: Props) {
   const { href, leagueId } = useLeague();
   const [mode, setMode] = useState<SquadSource>("elenco");
-  const [sombraLeague, setSombraLeague] = useState<LeagueId>(leagueId);
+  const [sombraLeague, setSombraLeague] = useState<LeagueId | "estaduais">(leagueId);
 
   useEffect(() => {
     setMode(readSource());
@@ -86,6 +88,11 @@ export function TimeSombraClient({ playersByLeague }: Props) {
 
   const pickerPool = useMemo(() => {
     if (mode === "sombra-todas") return taggedPlayers;
+    if (mode === "sombra" && sombraLeague === "estaduais") {
+      return taggedPlayers.filter((player) =>
+        (ESTADUAIS_LEAGUE_IDS as readonly string[]).includes(player.sourceLeague),
+      );
+    }
     const series = mode === "elenco" ? leagueId : sombraLeague;
     return taggedPlayers.filter((player) => player.sourceLeague === series);
   }, [taggedPlayers, mode, leagueId, sombraLeague]);
@@ -242,7 +249,7 @@ export function TimeSombraClient({ playersByLeague }: Props) {
     setSlotQuery("");
   }
 
-  function chooseSombraLeague(next: LeagueId) {
+  function chooseSombraLeague(next: LeagueId | "estaduais") {
     setSombraLeague(next);
     sessionStorage.setItem(SOMBRA_LEAGUE_KEY, next);
     setSelectedSlotId(null);
@@ -271,7 +278,7 @@ export function TimeSombraClient({ playersByLeague }: Props) {
         : "Elenco atual"
       : mode === "sombra-todas"
         ? "Time sombra · todas as competições"
-        : `Time sombra · ${LEAGUES.find((league) => league.id === sombraLeague)?.name ?? ""}`;
+        : `Time sombra · ${sombraLeague === "estaduais" ? "Estaduais" : (LEAGUES.find((league) => league.id === sombraLeague)?.name ?? "")}`;
   const rosterLabel = mode === "elenco" ? "Elenco" : mode === "sombra-todas" ? "Todas" : "Time sombra";
 
   return (
@@ -327,7 +334,7 @@ export function TimeSombraClient({ playersByLeague }: Props) {
               <div className="shadow-formation-picker">
               <span className="shadow-formation-label">Série</span>
               <div className="shadow-formation-chips" role="group" aria-label="Competição do time sombra">
-                {LEAGUES.map((league) => (
+                {BRASILEIRAO_LEAGUES.map((league) => (
                   <button
                     key={league.id}
                     type="button"
@@ -338,6 +345,14 @@ export function TimeSombraClient({ playersByLeague }: Props) {
                     {league.name}
                   </button>
                 ))}
+                <button
+                  type="button"
+                  className={`shadow-formation-chip${sombraLeague === "estaduais" ? " active" : ""}`}
+                  aria-pressed={sombraLeague === "estaduais"}
+                  onClick={() => chooseSombraLeague("estaduais")}
+                >
+                  Estaduais
+                </button>
               </div>
               </div>
             ) : null}
