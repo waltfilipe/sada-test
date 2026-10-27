@@ -12,7 +12,7 @@ import { archetypesForFamily } from "@/lib/clusterMeta";
 import { useLeague } from "@/components/LeagueProvider";
 import { markFiltersReturn } from "@/lib/filterSession";
 import { formatFoot } from "@/lib/feet";
-import { familyBySlug, formatRating, ratingColor } from "@/lib/positions";
+import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
 import { badgeCatalogForFamily, playerStatBadges } from "@/lib/statBadges";
@@ -438,7 +438,6 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
               {visible.map((player, index) => {
                 const photo = player.transfermarkt?.photo;
                 const active = player.player_id === selected?.player_id;
-                const score = positionRating(player);
                 return (
                   <li key={player.player_id}>
                     <button
@@ -469,9 +468,6 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
                           {player.club}
                           {player.profile ? ` · ${player.profile}` : ""}
                         </em>
-                      </span>
-                      <span className="zag-v2-score tabular" style={{ color: ratingColor(score) }}>
-                        {formatRating(score)}
                       </span>
                     </button>
                   </li>
