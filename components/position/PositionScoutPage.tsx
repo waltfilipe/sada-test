@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { FICHA_TEMPORADA_PARAM } from "@/lib/seasons";
@@ -51,32 +51,52 @@ type Props = {
 
 const NO_PLAYERS: PlayerProfile[] = [];
 
+type ArchiveRoster = { key: string; players: PlayerProfile[]; failed: boolean };
+
+const subscribeNoop = () => () => {};
+const isClient = () => true;
+const isServer = () => false;
+
 export function PositionScoutPage({ family, players: initialPlayers, heatmapsEnabled = true }: Props) {
   const { leagueId, href, season, isCurrentSeason, name: leagueName } = useLeague();
   const router = useRouter();
   const searchParams = useSearchParams();
-  // Static page props always hold the current season. Historical rosters are fetched once per
-  // league/family/season and must not be reset when a navigation re-sends the static props,
-  // otherwise the selection falls back to the first athlete of the list.
+  // Static page props always hold the current season, and the server render cannot see
+  // ?temporada. The roster is therefore only shown after hydration: the current season
+  // uses the static props, past seasons are fetched once per league/family/season and are
+  // not reset when a navigation re-sends the static props.
+  const hydrated = useSyncExternalStore(subscribeNoop, isClient, isServer);
   const seasonKey = `${leagueId}:${family}:${season}`;
-  const [archiveRoster, setArchiveRoster] = useState<{ key: string; players: PlayerProfile[] } | null>(null);
+  const [archiveRoster, setArchiveRoster] = useState<ArchiveRoster | null>(null);
   const archiveReady = archiveRoster?.key === seasonKey;
-  const seasonLoading = !isCurrentSeason && !archiveReady;
-  const players = useMemo(
-    () => (isCurrentSeason ? initialPlayers : archiveReady ? archiveRoster!.players : NO_PLAYERS),
-    [isCurrentSeason, initialPlayers, archiveReady, archiveRoster],
-  );
+  const archiveFailed = archiveReady && archiveRoster!.failed;
+  const seasonLoading = !hydrated || (!isCurrentSeason && !archiveReady);
+  const players = useMemo(() => {
+    if (!hydrated) return NO_PLAYERS;
+    if (isCurrentSeason) return initialPlayers;
+    return archiveReady ? archiveRoster!.players : NO_PLAYERS;
+  }, [hydrated, isCurrentSeason, initialPlayers, archiveReady, archiveRoster]);
 
   useEffect(() => {
     if (isCurrentSeason || archiveReady) return;
     let cancelled = false;
-    fetch(`/api/families/${family}?league=${leagueId}&season=${season}`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("season_fetch"))))
-      .then((payload: { players?: PlayerProfile[] }) => {
-        if (!cancelled) setArchiveRoster({ key: seasonKey, players: payload.players ?? [] });
+    const url = `/api/families/${family}?league=${leagueId}&season=${season}`;
+    const load = (attempt: number): Promise<PlayerProfile[]> =>
+      fetch(url)
+        .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`season_fetch_${res.status}`))))
+        .then((payload: { players?: PlayerProfile[] }) => payload.players ?? [])
+        .catch((error) => {
+          if (cancelled || attempt >= 2) throw error;
+          return new Promise<PlayerProfile[]>((resolve) => setTimeout(resolve, 800 * (attempt + 1))).then(() =>
+            load(attempt + 1),
+          );
+        });
+    load(0)
+      .then((roster) => {
+        if (!cancelled) setArchiveRoster({ key: seasonKey, players: roster, failed: false });
       })
       .catch(() => {
-        if (!cancelled) setArchiveRoster({ key: seasonKey, players: [] });
+        if (!cancelled) setArchiveRoster({ key: seasonKey, players: [], failed: true });
       });
     return () => {
       cancelled = true;
@@ -180,8 +200,9 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
   useEffect(() => {
     if (!visible.length) return;
     if (visible.some((player) => player.player_id === selectedId)) return;
-    setSelectedId(visible[0]!.player_id);
-  }, [visible, selectedId]);
+    const requested = requestedId && visible.some((player) => player.player_id === requestedId);
+    setSelectedId(requested ? requestedId : visible[0]!.player_id);
+  }, [visible, selectedId, requestedId]);
 
   const selected = players.find((player) => player.player_id === selectedId) ?? visible[0] ?? null;
 
@@ -449,7 +470,20 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
                 );
               })}
             </ul>
-            {!visible.length ? <p className="zag-v2-empty">Nenhum atleta com esses filtros.</p> : null}
+            {seasonLoading ? (
+              <p className="zag-v2-empty">
+                Carregando atletas{!isCurrentSeason ? ` da temporada ${season}` : ""}…
+              </p>
+            ) : archiveFailed ? (
+              <p className="zag-v2-empty">
+                Não foi possível carregar os atletas de {season}.{" "}
+                <button type="button" className="zag-v2-retry" onClick={() => setArchiveRoster(null)}>
+                  Tentar de novo
+                </button>
+              </p>
+            ) : !visible.length ? (
+              <p className="zag-v2-empty">Nenhum atleta com esses filtros.</p>
+            ) : null}
           </aside>
 
           <main className="zag-v2-detail">
@@ -461,7 +495,7 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
                 players={players}
                 heatmapsEnabled={heatmapsEnabled}
               />
-            ) : (
+            ) : seasonLoading ? null : (
               <p className="zag-v2-empty">Escolha um atleta na lista.</p>
             )}
           </main>

@@ -3,9 +3,16 @@ import { filterPlayers, getFamilyPlayers, getMeta, getPlayerProfile, getPlayers 
 import { findPlayerInSeason } from "@/lib/playerSeasonMatch.server";
 import { rankCrossLeagueSimilarity } from "@/lib/crossLeagueSimilarity";
 import { isLeagueId, type LeagueId } from "@/lib/leagues";
+import { CURRENT_SEASON, parseSeasonParam } from "@/lib/seasons";
 import type { PositionFamily } from "@/lib/types";
 
 type Params = { params: Promise<{ path: string[] }> };
+
+/** Past seasons only change on deploy (which purges the CDN), so let Vercel's edge cache them. */
+function archiveCacheHeaders(season: string | null | undefined): HeadersInit | undefined {
+  if (parseSeasonParam(season) === CURRENT_SEASON) return undefined;
+  return { "Cache-Control": "public, max-age=300, s-maxage=31536000, stale-while-revalidate=86400" };
+}
 
 /**
  * One route handler for every JSON API. Each `route.ts` is its own serverless
@@ -38,7 +45,10 @@ export async function GET(request: Request, { params }: Params) {
     const league = url.searchParams.get("league") ?? undefined;
     const season = url.searchParams.get("season") ?? url.searchParams.get("temporada") ?? undefined;
     const players = getFamilyPlayers(id as PositionFamily, league, season);
-    return NextResponse.json({ family: id, players, total: players.length });
+    return NextResponse.json(
+      { family: id, players, total: players.length },
+      { headers: archiveCacheHeaders(season) },
+    );
   }
 
   if (resource === "scatter" && path.length === 2) {
@@ -60,7 +70,7 @@ export async function GET(request: Request, { params }: Params) {
     const birth = birthRaw ? Number(birthRaw) : null;
     const hit = findPlayerInSeason(league, season, name, Number.isFinite(birth) ? birth : null);
     if (!hit) return NextResponse.json({ error: "not_found" }, { status: 404 });
-    return NextResponse.json(hit);
+    return NextResponse.json(hit, { headers: archiveCacheHeaders(season) });
   }
 
   return NextResponse.json({ error: "not_found" }, { status: 404 });

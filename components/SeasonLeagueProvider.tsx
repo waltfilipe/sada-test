@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo } from "react";
+import { Suspense, useMemo, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import { LeagueProvider, useLeague } from "@/components/LeagueProvider";
 import { getLeague, leaguePath, type LeagueId } from "@/lib/leagues";
@@ -11,9 +11,16 @@ type Props = {
   children: React.ReactNode;
 };
 
+const subscribeNoop = () => () => {};
+const isClient = () => true;
+const isServer = () => false;
+
 function SeasonLeagueProviderInner({ leagueId, children }: Props) {
   const searchParams = useSearchParams();
-  const season = parseSeasonParam(searchParams.get("temporada"));
+  // League pages are prerendered without ?temporada, so hydrate as the current season
+  // (matching the static HTML) and switch to the requested season right after.
+  const hydrated = useSyncExternalStore(subscribeNoop, isClient, isServer);
+  const season = hydrated ? parseSeasonParam(searchParams.get("temporada")) : CURRENT_SEASON;
   const info = getLeague(leagueId)!;
 
   const value = useMemo(
