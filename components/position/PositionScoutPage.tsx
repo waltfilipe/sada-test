@@ -12,7 +12,7 @@ import { archetypesForFamily } from "@/lib/clusterMeta";
 import { useLeague } from "@/components/LeagueProvider";
 import { markFiltersReturn } from "@/lib/filterSession";
 import { formatFoot } from "@/lib/feet";
-import { familyBySlug } from "@/lib/positions";
+import { familyBySlug, formatRating, ratingColor } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
 import { badgeCatalogForFamily, playerStatBadges } from "@/lib/statBadges";
@@ -255,10 +255,13 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
         <header className="zag-v2-title-card">
           <div>
             <p className="zag-v2-kicker">
-              Scouting{!isCurrentSeason ? ` · hub ${season}` : ""}
+              {leagueName} · {season}
               {seasonLoading ? " · carregando…" : ""}
             </p>
-            <h1>{familyMeta.label}</h1>
+            <h1>
+              {familyMeta.label}
+              {!seasonLoading ? <span className="zag-v2-title-count tabular">{players.length} atletas</span> : null}
+            </h1>
             {!isCurrentSeason ? (
               <p className="zag-v2-archive-notice">
                 Arquivo Wyscout {season} · {leagueName}. Volte ao hub para scout {season === "2026" ? "" : "2026"}.
@@ -432,9 +435,10 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
             </p>
 
             <ul className="zag-v2-list">
-              {visible.map((player) => {
+              {visible.map((player, index) => {
                 const photo = player.transfermarkt?.photo;
                 const active = player.player_id === selected?.player_id;
+                const score = positionRating(player);
                 return (
                   <li key={player.player_id}>
                     <button
@@ -451,6 +455,7 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
                         });
                       }}
                     >
+                      <span className="zag-v2-rank tabular">{index + 1}</span>
                       <span className="zag-v2-photo">
                         {photo ? (
                           <PlayerPhoto src={photo} alt="" />
@@ -464,6 +469,9 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
                           {player.club}
                           {player.profile ? ` · ${player.profile}` : ""}
                         </em>
+                      </span>
+                      <span className="zag-v2-score tabular" style={{ color: ratingColor(score) }}>
+                        {formatRating(score)}
                       </span>
                     </button>
                   </li>

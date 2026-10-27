@@ -10,6 +10,7 @@ import "./scatter.css";
 import "./time-sombra.css";
 import "./home.css";
 import "./zag-v2.css";
+import "./posicoes.css";
 
 export const metadata: Metadata = {
   title: "SADA | Scout",
