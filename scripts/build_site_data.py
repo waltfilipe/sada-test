@@ -51,6 +51,7 @@ def build_league(
     skip_transfermarkt: bool = False,
     skip_sofascore: bool = False,
     skip_profiles_dir: bool = False,
+    prefer_period_club: bool = False,
 ) -> None:
     league = LEAGUES[league_id]
     out_dir = out_dir or (DATA_DIR / league_id)
@@ -59,7 +60,9 @@ def build_league(
 
     print(f"\n=== {league['label']} ({league_id}) season {season} ===")
     print("Loading player data…")
-    raw_df = load_players_dataframe(league_id, xlsx_override=xlsx_override)
+    raw_df = load_players_dataframe(
+        league_id, xlsx_override=xlsx_override, prefer_period_club=prefer_period_club
+    )
     source = raw_df.attrs.get("source", "unknown")
     print(f"Source: {source} ({len(raw_df)} players)")
 

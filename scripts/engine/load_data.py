@@ -259,6 +259,7 @@ def load_players_dataframe(
     league_id: str = "serie-a",
     *,
     xlsx_override: list[Path] | None = None,
+    prefer_period_club: bool = False,
 ) -> pd.DataFrame:
     league = LEAGUES.get(league_id)
     if not league:
@@ -289,7 +290,8 @@ def load_players_dataframe(
 
     period_club = "Equipa dentro de um período de tempo seleccionado"
     estadual_pool = league_id in LEVEL_IDS or league_id == "estaduais"
-    if period_club in df.columns and estadual_pool:
+    # "Equipa" is the club at export time; past seasons must show the club of that season.
+    if period_club in df.columns and (estadual_pool or prefer_period_club):
         period_values = df[period_club].map(lambda value: "" if pd.isna(value) else str(value).strip())
         has_period = period_values.ne("")
         df.loc[has_period, "Equipe"] = period_values.loc[has_period]

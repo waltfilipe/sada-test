@@ -49,39 +49,39 @@ type Props = {
   heatmapsEnabled?: boolean;
 };
 
+const NO_PLAYERS: PlayerProfile[] = [];
+
 export function PositionScoutPage({ family, players: initialPlayers, heatmapsEnabled = true }: Props) {
   const { leagueId, href, season, isCurrentSeason, name: leagueName } = useLeague();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [players, setPlayers] = useState(initialPlayers);
-  const [seasonLoading, setSeasonLoading] = useState(false);
+  // Static page props always hold the current season. Historical rosters are fetched once per
+  // league/family/season and must not be reset when a navigation re-sends the static props,
+  // otherwise the selection falls back to the first athlete of the list.
+  const seasonKey = `${leagueId}:${family}:${season}`;
+  const [archiveRoster, setArchiveRoster] = useState<{ key: string; players: PlayerProfile[] } | null>(null);
+  const archiveReady = archiveRoster?.key === seasonKey;
+  const seasonLoading = !isCurrentSeason && !archiveReady;
+  const players = useMemo(
+    () => (isCurrentSeason ? initialPlayers : archiveReady ? archiveRoster!.players : NO_PLAYERS),
+    [isCurrentSeason, initialPlayers, archiveReady, archiveRoster],
+  );
 
   useEffect(() => {
-    setPlayers(initialPlayers);
-  }, [initialPlayers]);
-
-  useEffect(() => {
-    if (isCurrentSeason) {
-      setPlayers(initialPlayers);
-      return;
-    }
+    if (isCurrentSeason || archiveReady) return;
     let cancelled = false;
-    setSeasonLoading(true);
     fetch(`/api/families/${family}?league=${leagueId}&season=${season}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error("season_fetch"))))
       .then((payload: { players?: PlayerProfile[] }) => {
-        if (!cancelled) setPlayers(payload.players ?? []);
+        if (!cancelled) setArchiveRoster({ key: seasonKey, players: payload.players ?? [] });
       })
       .catch(() => {
-        if (!cancelled) setPlayers([]);
-      })
-      .finally(() => {
-        if (!cancelled) setSeasonLoading(false);
+        if (!cancelled) setArchiveRoster({ key: seasonKey, players: [] });
       });
     return () => {
       cancelled = true;
     };
-  }, [family, leagueId, season, isCurrentSeason, initialPlayers]);
+  }, [family, leagueId, season, seasonKey, isCurrentSeason, archiveReady]);
   const requestedId = searchParams.get("atleta");
   const fromFilters = searchParams.get("origem") === "filtros";
   const familyMeta = familyBySlug(family);
@@ -421,6 +421,7 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
                       className={active ? "active" : ""}
                       onClick={() => {
                         setSelectedId(player.player_id);
+                        if (!searchParams.has(FICHA_TEMPORADA_PARAM)) return;
                         const params = new URLSearchParams(searchParams.toString());
                         params.delete(FICHA_TEMPORADA_PARAM);
                         const qs = params.toString();

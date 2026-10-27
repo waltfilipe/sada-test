@@ -48,6 +48,7 @@ def main() -> None:
             skip_transfermarkt=True,
             skip_sofascore=True,
             skip_profiles_dir=True,
+            prefer_period_club=True,
         )
 
 
