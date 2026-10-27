@@ -205,3 +205,412 @@
     padding-top: 1.4rem;
   }
 }
+
+/* ---------- Hub (/) ---------- */
+
+.hub-main {
+  padding-top: 2rem;
+}
+
+.hub-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2rem;
+  padding: 2.4rem 2.6rem;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(70% 120% at 100% 0%, rgba(27, 231, 255, 0.12), transparent 60%),
+    radial-gradient(60% 90% at 0% 100%, rgba(137, 128, 245, 0.1), transparent 60%),
+    rgba(13, 27, 42, 0.7);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.hub-hero-copy {
+  min-width: 0;
+}
+
+.hub-hero .home-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hub-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand-green);
+  box-shadow: 0 0 0 4px rgba(49, 233, 129, 0.18);
+}
+
+.hub-status-dot.is-archive {
+  background: #f59e0b;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+}
+
+.hub-hero h1 {
+  margin: 0;
+  font-size: clamp(2.1rem, 4.4vw, 3.4rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+}
+
+.hub-hero .home-lead {
+  max-width: 38rem;
+}
+
+.hub-hero-brand {
+  display: grid;
+  place-items: center;
+  width: 220px;
+  aspect-ratio: 1;
+  border-radius: 28px;
+  border: 1px solid rgba(27, 231, 255, 0.14);
+  background:
+    radial-gradient(circle at 50% 40%, rgba(27, 231, 255, 0.16), transparent 70%),
+    rgba(255, 255, 255, 0.02);
+}
+
+.hub-logo {
+  width: 150px;
+  max-width: 100%;
+  height: auto;
+  object-position: center;
+}
+
+.hub-page .hub-season-picker {
+  justify-content: flex-start;
+  margin-top: 1.6rem;
+}
+
+.hub-page .hub-season-picker-tabs {
+  padding: 0.22rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.hub-page .hub-season-picker-tabs button {
+  padding: 0.4rem 0.9rem;
+  font-weight: 600;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.hub-page .hub-season-picker-tabs button:hover:not(.is-active) {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.hub-page .hub-season-picker-tabs button.is-active {
+  background: var(--accent);
+  color: #0d1b2a;
+}
+
+.hub-page-archive .hub-season-picker-tabs button.is-active {
+  background: #f59e0b;
+}
+
+.hub-section {
+  margin-top: 2.8rem;
+}
+
+.hub-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.hub-section-head h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.hub-section-meta {
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.hub-serie-card,
+.hub-level-card {
+  position: relative;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(27, 231, 255, 0.07), transparent 55%),
+    rgba(13, 27, 42, 0.82);
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.hub-serie-card:hover,
+.hub-level-card:hover,
+.hub-serie-card:focus-visible,
+.hub-level-card:focus-visible {
+  border-color: rgba(27, 231, 255, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
+  outline: none;
+}
+
+.hub-card-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-3);
+  transition: color 0.18s ease, gap 0.18s ease;
+}
+
+.hub-serie-card:hover .hub-card-go,
+.hub-level-card:hover .hub-card-go {
+  color: var(--accent);
+  gap: 0.6rem;
+}
+
+/* Séries */
+
+.hub-serie-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.hub-serie-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 1rem 1.1rem;
+}
+
+.hub-serie-logo-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 150px;
+  padding: 1.1rem;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #e9eef4 100%);
+  box-shadow: inset 0 -1px 0 rgba(13, 27, 42, 0.08);
+  overflow: hidden;
+}
+
+.hub-serie-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+  transition: transform 0.25s ease;
+}
+
+.hub-serie-card:hover .hub-serie-logo {
+  transform: scale(1.05);
+}
+
+.hub-serie-body {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0 0.2rem;
+}
+
+.hub-serie-body strong {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.hub-serie-body em {
+  font-style: normal;
+  font-size: 0.82rem;
+  color: var(--text-3);
+}
+
+.hub-serie-card .hub-card-go {
+  padding: 0 0.2rem;
+  margin-top: auto;
+}
+
+/* Estaduais */
+
+.hub-level-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.hub-level-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.3rem 1.35rem 1.25rem;
+}
+
+.hub-level-head {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.hub-level-kicker {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.hub-level-head strong {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.hub-level-head p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.hub-level-marks {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hub-level-mark {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+  justify-items: center;
+}
+
+.hub-mini-logo-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 64px;
+  padding: 0.5rem 0.6rem;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #e9eef4 100%);
+  overflow: hidden;
+}
+
+.hub-mini-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+}
+
+.hub-mini-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.hub-level-card .hub-card-go {
+  margin-top: auto;
+}
+
+@media (max-width: 1080px) {
+  .hub-serie-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .hub-level-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .hub-hero {
+    grid-template-columns: 1fr;
+    gap: 1.4rem;
+    padding: 1.6rem 1.3rem;
+  }
+
+  .hub-hero-brand {
+    order: -1;
+    width: auto;
+    aspect-ratio: auto;
+    place-items: start;
+    border: 0;
+    background: none;
+  }
+
+  .hub-logo {
+    width: 120px;
+  }
+
+  .hub-page .hub-season-picker-tabs {
+    max-width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .hub-serie-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hub-serie-card {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .hub-serie-logo-frame {
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+    padding: 0.7rem;
+  }
+
+  .hub-serie-card .hub-card-go {
+    margin: 0 0 0 auto;
+    font-size: 0;
+    gap: 0;
+  }
+
+  .hub-serie-card .hub-card-go i {
+    font-size: 0.9rem;
+  }
+
+  .hub-level-marks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hub-section-head {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+}
