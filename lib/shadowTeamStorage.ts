@@ -9,7 +9,7 @@ import {
 import type { LeagueId } from "@/lib/leagues";
 import type { PositionFamily } from "@/lib/types";
 
-export type ShadowScope = LeagueId | "todas";
+export type ShadowScope = LeagueId | "todas" | "estaduais";
 
 export function storageKey(scope: ShadowScope) {
   if (scope === "todas") return "all-competitions-scout:shadow-team-v1";
