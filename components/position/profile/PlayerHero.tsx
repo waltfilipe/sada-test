@@ -16,6 +16,7 @@ import { PlayerRunModal } from "@/components/position/profile/PlayerRunModal";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { PassTendencies } from "./PassTendencies";
 import { PlayerSeasonSlicer } from "@/components/PlayerSeasonSlicer";
+import { profileAccent } from "@/lib/profileShares";
 import type { BrasileiraoSeason } from "@/lib/seasons";
 import { CURRENT_SEASON } from "@/lib/seasons";
 
@@ -127,8 +128,13 @@ export function PlayerHero({
       : months != null && months < 12
         ? "Contrato termina em menos de 1 ano."
         : "Tempo restante de contrato.";
+  const heroAccent = profileAccent((player.profile ?? "").split("+").pop()!.trim());
   return (
-    <section className="player-hero player-card" aria-label={`Perfil de ${player.name}`}>
+    <section
+      className="player-hero player-card"
+      aria-label={`Perfil de ${player.name}`}
+      style={{ "--hero-accent": heroAccent } as React.CSSProperties}
+    >
       <div className="player-hero-main">
         <div className="player-hero-photo">
           <PlayerPhoto

@@ -264,12 +264,70 @@
 
 /* Ficha do atleta: retrato na lateral, nome e bio ao centro, contexto à direita */
 .zag-v2 .player-hero {
+  --hero-accent: #1be7ff;
   padding: 0;
-  overflow: hidden;
+  isolation: isolate;
 }
 
+.zag-v2 .player-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fundo vivo: brilho na cor do perfil que deriva devagar + linhas de campo */
 .zag-v2 .player-hero::before {
-  display: none;
+  content: "";
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: auto;
+  border-radius: inherit;
+  opacity: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(560px 300px at var(--hero-glow-x, 18%) var(--hero-glow-y, 0%),
+      color-mix(in srgb, var(--hero-accent) 24%, transparent), transparent 70%),
+    repeating-linear-gradient(115deg,
+      transparent 0 44px,
+      rgba(186, 204, 224, 0.045) 44px 45px);
+  background-size: 100% 100%, 200% 100%;
+  animation: hero-drift 14s ease-in-out infinite alternate;
+}
+
+@property --hero-glow-x {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 18%;
+}
+
+@property --hero-glow-y {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+@keyframes hero-drift {
+  0% {
+    --hero-glow-x: 12%;
+    --hero-glow-y: 0%;
+    background-position: 0 0, 0 0;
+  }
+  50% {
+    --hero-glow-x: 48%;
+    --hero-glow-y: 100%;
+  }
+  100% {
+    --hero-glow-x: 82%;
+    --hero-glow-y: 10%;
+    background-position: 0 0, 100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zag-v2 .player-hero::before {
+    animation: none;
+  }
 }
 
 .zag-v2 .player-hero-main {
@@ -280,11 +338,12 @@
 .zag-v2.league-serie-b .player-hero-photo,
 .zag-v2.league-serie-c .player-hero-photo,
 .zag-v2.league-serie-d .player-hero-photo {
-  width: 132px;
-  border: 0;
-  border-right: 1px solid var(--line);
-  border-radius: 0;
+  width: 124px;
+  margin: 0.8rem 0 0.8rem 0.8rem;
+  border: 2px solid var(--hero-accent);
+  border-radius: 6px;
   background: linear-gradient(180deg, #17334c 0%, #102235 100%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--hero-accent) 14%, transparent);
 }
 
 .zag-v2 .player-hero-photo-fallback {
