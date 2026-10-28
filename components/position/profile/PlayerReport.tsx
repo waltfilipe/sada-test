@@ -329,6 +329,17 @@ function reportTendencies(player: PlayerProfile, players: PlayerProfile[], lang:
   return rows;
 }
 
+/** Brighter block colors for the dark on-screen radar. */
+const SCREEN_TONE_COLORS: Record<string, string> = {
+  defensivos: "#2dd4bf",
+  aereo: "#38bdf8",
+  passes: "#60a5fa",
+  dribles: "#a78bfa",
+  finais: "#e879f9",
+  ofensividade: "#fb923c",
+  finalizacao: "#fb7185",
+};
+
 const TONE_COLORS: Record<string, string> = {
   defensivos: "#0f766e",
   aereo: "#0369a1",
@@ -489,22 +500,63 @@ export function SectionRadar({ scores, variant = "print" }: { scores: SectionSco
   const ring = (value: number) =>
     scores.map((_, index) => point(index, value).map((n) => n.toFixed(1)).join(",")).join(" ");
   const shape = scores.map((item, index) => point(index, Math.max(4, item.score)).map((n) => n.toFixed(1)).join(",")).join(" ");
+  const colorOf = (item: SectionScore) =>
+    item.color ?? (screen ? SCREEN_TONE_COLORS[item.tone] : TONE_COLORS[item.tone]) ?? "#0e7490";
+  /** Wedge from the center spanning this axis' share of the circle. */
+  const sector = (index: number, value: number) => {
+    const half = Math.PI / count - 0.06;
+    const r = (radius * value) / 100;
+    const a0 = angle(index) - half;
+    const a1 = angle(index) + half;
+    const x0 = cx + r * Math.cos(a0);
+    const y0 = cy + r * Math.sin(a0);
+    const x1 = cx + r * Math.cos(a1);
+    const y1 = cy + r * Math.sin(a1);
+    const large = half * 2 > Math.PI ? 1 : 0;
+    return `M${cx},${cy} L${x0.toFixed(1)},${y0.toFixed(1)} A${r.toFixed(1)},${r.toFixed(1)} 0 ${large} 1 ${x1.toFixed(1)},${y1.toFixed(1)} Z`;
+  };
 
   return (
-    <svg className="player-report-radar" viewBox={`0 0 ${width} ${height}`} role="img" aria-hidden="true">
-      {[25, 75, 100].map((value) => (
-        <polygon key={value} points={ring(value)} className="radar-ring" />
-      ))}
-      <polygon points={ring(50)} className="radar-ring is-median" />
-      {scores.map((item, index) => {
-        const [x, y] = point(index, 100);
-        return <line key={item.title} x1={cx} y1={cy} x2={x} y2={y} className="radar-axis" />;
-      })}
-      <polygon points={shape} className="radar-shape" />
-      {scores.map((item, index) => {
-        const [x, y] = point(index, Math.max(4, item.score));
-        return <circle key={item.title} cx={x} cy={y} r={3.4} fill={item.color ?? TONE_COLORS[item.tone] ?? "#0e7490"} className="radar-dot" />;
-      })}
+    <svg className={`player-report-radar${screen ? " is-sectors" : ""}`} viewBox={`0 0 ${width} ${height}`} role="img" aria-hidden="true">
+      {screen ? (
+        <>
+          {[25, 75, 100].map((value) => (
+            <circle key={value} cx={cx} cy={cy} r={(radius * value) / 100} className="radar-ring" />
+          ))}
+          <circle cx={cx} cy={cy} r={radius / 2} className="radar-ring is-median" />
+          {scores.map((item, index) => (
+            <path key={`bg-${item.title}`} d={sector(index, 100)} fill={colorOf(item)} opacity={0.07} />
+          ))}
+          {scores.map((item, index) => (
+            <path
+              key={item.title}
+              d={sector(index, Math.max(6, item.score))}
+              fill={colorOf(item)}
+              fillOpacity={0.55}
+              stroke={colorOf(item)}
+              strokeWidth={1.5}
+              className="radar-sector"
+            />
+          ))}
+          <circle cx={cx} cy={cy} r={3} className="radar-center" />
+        </>
+      ) : (
+        <>
+          {[25, 75, 100].map((value) => (
+            <polygon key={value} points={ring(value)} className="radar-ring" />
+          ))}
+          <polygon points={ring(50)} className="radar-ring is-median" />
+          {scores.map((item, index) => {
+            const [x, y] = point(index, 100);
+            return <line key={item.title} x1={cx} y1={cy} x2={x} y2={y} className="radar-axis" />;
+          })}
+          <polygon points={shape} className="radar-shape" />
+          {scores.map((item, index) => {
+            const [x, y] = point(index, Math.max(4, item.score));
+            return <circle key={item.title} cx={x} cy={y} r={3.4} fill={colorOf(item)} className="radar-dot" />;
+          })}
+        </>
+      )}
       {scores.map((item, index) => {
         const a = angle(index);
         const x = cx + (radius + 14) * Math.cos(a);
@@ -522,7 +574,7 @@ export function SectionRadar({ scores, variant = "print" }: { scores: SectionSco
                 {line}
               </tspan>
             ))}
-            <tspan x={x} dy={lineHeight + (screen ? 1 : 0)} className="radar-score" fill={item.color ?? TONE_COLORS[item.tone] ?? "#0e7490"}>
+            <tspan x={x} dy={lineHeight + (screen ? 1 : 0)} className="radar-score" fill={colorOf(item)}>
               {item.display ?? item.score}
             </tspan>
           </text>
