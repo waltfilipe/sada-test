@@ -257,7 +257,7 @@ export function PlayerHero({
             </Tooltip>
           </div>
           <div className="hero-action-cell hero-action-similar">
-            <Tooltip content="Top 5 por estilo de jogo nesta divisão; dá para comparar também com outras séries.">
+            <Tooltip content="Escolha a competição e veja o top 5 por estilo de jogo.">
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSimilarOpen(true)}>
                 <i className="fa-solid fa-shuffle" aria-hidden="true" /> Similares
               </button>

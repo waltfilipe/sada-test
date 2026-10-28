@@ -11,7 +11,7 @@ import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { ClubLogo } from "@/components/ClubLogo";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 
-type Step = "main" | "pick-league" | "loading" | "cross-results" | "error";
+type Step = "pick-league" | "loading" | "results" | "error";
 
 type Props = {
   player: PlayerProfile;
@@ -70,7 +70,7 @@ function SimilarResultsList({
                   <span className="similar-result-name">{hit.name}</span>
                   <span className="similar-result-meta">
                     <ClubLogo club={hit.club} size={14} />
-                    {hit.club} · {hit.profile} · {hit.rating.toFixed(1)}
+                    {hit.club} · {hit.profile}
                   </span>
                 </div>
               </div>
@@ -101,23 +101,22 @@ function SimilarResultsList({
 
 export function SimilarCrossLeagueModal({ player, family, currentLeagueId, players, onClose }: Props) {
   const [mounted, setMounted] = useState(false);
-  const [step, setStep] = useState<Step>("main");
+  const [step, setStep] = useState<Step>("pick-league");
   const [targetLeague, setTargetLeague] = useState<LeagueId | null>(null);
-  const [crossMatches, setCrossMatches] = useState<SimilarPlayerHit[]>([]);
+  const [matches, setMatches] = useState<SimilarPlayerHit[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
   const referencePhoto = player.transfermarkt?.photo;
   const positionSections = useMemo(() => statSectionsForFamily(family), [family]);
-  const currentLeague = LEAGUES.find((l) => l.id === currentLeagueId);
-
-  const sameDivisionMatches = useMemo(
-    () => withPhotos(rankCrossLeagueSimilarity(player, players, { limit: 5 }), players),
-    [player, players],
+  const leagueOptions = useMemo(
+    () => [
+      ...LEAGUES.filter((league) => league.id === currentLeagueId),
+      ...LEAGUES.filter((league) => league.id !== currentLeagueId),
+    ],
+    [currentLeagueId],
   );
-
-  const otherLeagues = LEAGUES.filter((league) => league.id !== currentLeagueId);
 
   const fetchSimilar = useCallback(
     async (to: LeagueId) => {
@@ -136,14 +135,27 @@ export function SimilarCrossLeagueModal({ player, family, currentLeagueId, playe
         if (!res.ok) {
           throw new Error(data.error ?? "request_failed");
         }
-        setCrossMatches(data.matches ?? []);
-        setStep("cross-results");
+        setMatches(data.matches ?? []);
+        setStep("results");
       } catch {
         setErrorMessage("Não foi possível calcular similares. Tente de novo.");
         setStep("error");
       }
     },
     [currentLeagueId, family, player.player_id],
+  );
+
+  const pickLeague = useCallback(
+    (to: LeagueId) => {
+      setTargetLeague(to);
+      if (to === currentLeagueId) {
+        setMatches(withPhotos(rankCrossLeagueSimilarity(player, players, { limit: 5 }), players));
+        setStep("results");
+        return;
+      }
+      void fetchSimilar(to);
+    },
+    [currentLeagueId, fetchSimilar, player, players],
   );
 
   useEffect(() => {
@@ -202,53 +214,27 @@ export function SimilarCrossLeagueModal({ player, family, currentLeagueId, playe
             </div>
           </div>
 
-          {step === "main" ? (
-            <>
-              <div className="similar-results-head">
-                <span>Top 5 · {currentLeague?.name ?? "Esta divisão"}</span>
-              </div>
-              <SimilarResultsList
-                matches={sameDivisionMatches}
-                leagueId={currentLeagueId}
-                family={family}
-                onClose={onClose}
-              />
-              {otherLeagues.length ? (
-                <div className="similar-league-pick similar-league-pick-secondary">
-                  <p className="similar-cross-hint">Comparar estilo de jogo em outra divisão:</p>
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => setStep("pick-league")}>
-                    Escolher divisão
-                  </button>
-                </div>
-              ) : null}
-            </>
-          ) : null}
-
           {step === "pick-league" ? (
             <div className="similar-league-pick">
-              <p className="similar-cross-hint">Escolha a divisão para comparar o estilo de jogo:</p>
+              <p className="similar-cross-hint">Em qual competição buscar atletas parecidos?</p>
               <div className="similar-league-buttons">
-                {otherLeagues.map((league) => (
+                {leagueOptions.map((league) => (
                   <button
                     key={league.id}
                     type="button"
-                    className="btn btn-primary similar-league-btn"
-                    onClick={() => {
-                      setTargetLeague(league.id);
-                      void fetchSimilar(league.id);
-                    }}
+                    className={`btn similar-league-btn${league.id === currentLeagueId ? " is-current" : ""}`}
+                    onClick={() => pickLeague(league.id)}
                   >
                     <span className="similar-league-brand">{league.brand}</span>
                     <span>
                       {league.name}
-                      <span className="similar-league-season">{league.season}</span>
+                      <span className="similar-league-season">
+                        {league.id === currentLeagueId ? `Competição atual · ${league.season}` : league.season}
+                      </span>
                     </span>
                   </button>
                 ))}
               </div>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setStep("main")}>
-                Voltar
-              </button>
             </div>
           ) : null}
 
@@ -267,20 +253,15 @@ export function SimilarCrossLeagueModal({ player, family, currentLeagueId, playe
             </div>
           ) : null}
 
-          {step === "cross-results" ? (
+          {step === "results" && targetLeague ? (
             <>
               <div className="similar-results-head">
                 <span>Top 5 · {LEAGUES.find((l) => l.id === targetLeague)?.name}</span>
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setStep("main")}>
-                  Voltar
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setStep("pick-league")}>
+                  Trocar competição
                 </button>
               </div>
-              <SimilarResultsList
-                matches={crossMatches}
-                leagueId={targetLeague!}
-                family={family}
-                onClose={onClose}
-              />
+              <SimilarResultsList matches={matches} leagueId={targetLeague} family={family} onClose={onClose} />
             </>
           ) : null}
         </div>
