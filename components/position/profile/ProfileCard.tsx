@@ -11,7 +11,7 @@ import {
   type ArchetypeTrait,
 } from "@/lib/clusterMeta";
 import { activeProfileKeys, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
-import { gradeTier, profileGradeFromRank, rankPercentile, tierVars } from "@/lib/scoutTheme";
+import { gradeTier, profileGradeFromRank, tierVars } from "@/lib/scoutTheme";
 import { SectionRadar } from "@/components/position/profile/PlayerReport";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -198,7 +198,7 @@ export function ProfileRadarCard({ player, family, players }: Props) {
           ...row,
           rank,
           grade,
-          score: rank ? Math.round(rankPercentile(rank, poolSize)) : 0,
+          score: Math.round(row.share),
           accent: profileAccent(row.label),
         };
       }),
@@ -212,14 +212,14 @@ export function ProfileRadarCard({ player, family, players }: Props) {
     tone: row.tone,
     score: row.score,
     color: row.accent,
-    display: row.grade ?? "—",
+    display: `${row.score}%`,
   }));
 
   return (
     <div className="player-card profile-perfil-card stat-radar-card profile-radar-card">
       <div className="profile-card-head">
         <span className="section-label">Perfil</span>
-        <span className="profile-card-head-hint">Colocação em cada perfil</span>
+        <span className="profile-card-head-hint">Afinidade com cada perfil</span>
       </div>
       <div className="stat-radar-figure">
         <SectionRadar scores={scores} variant="screen" />
