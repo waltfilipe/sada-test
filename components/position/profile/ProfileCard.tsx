@@ -222,7 +222,7 @@ export function ProfileRadarCard({ player, family, players }: Props) {
         <span className="profile-card-head-hint">Afinidade com cada perfil</span>
       </div>
       <div className="stat-radar-figure">
-        <SectionRadar scores={scores} variant="screen" />
+        <SectionRadar scores={scores} variant="screen" shape="sectors" />
       </div>
       <ul className="profile-radar-list">
         {rows.map((row) => (

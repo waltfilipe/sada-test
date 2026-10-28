@@ -484,8 +484,18 @@ function radarLabelLines(title: string, wrap: boolean): string[] {
   return [words.slice(0, best).join(" "), words.slice(best).join(" ")];
 }
 
-export function SectionRadar({ scores, variant = "print" }: { scores: SectionScore[]; variant?: "print" | "screen" }) {
+export function SectionRadar({
+  scores,
+  variant = "print",
+  shape: shapeStyle = "polygon",
+}: {
+  scores: SectionScore[];
+  variant?: "print" | "screen";
+  /** "sectors" draws one wedge per axis (on-screen profile radar). */
+  shape?: "polygon" | "sectors";
+}) {
   const screen = variant === "screen";
+  const sectors = screen && shapeStyle === "sectors";
   const width = screen ? 300 : 340;
   const height = screen ? 290 : 270;
   const cx = width / 2;
@@ -517,8 +527,8 @@ export function SectionRadar({ scores, variant = "print" }: { scores: SectionSco
   };
 
   return (
-    <svg className={`player-report-radar${screen ? " is-sectors" : ""}`} viewBox={`0 0 ${width} ${height}`} role="img" aria-hidden="true">
-      {screen ? (
+    <svg className={`player-report-radar${sectors ? " is-sectors" : ""}`} viewBox={`0 0 ${width} ${height}`} role="img" aria-hidden="true">
+      {sectors ? (
         <>
           {[25, 75, 100].map((value) => (
             <circle key={value} cx={cx} cy={cy} r={(radius * value) / 100} className="radar-ring" />
