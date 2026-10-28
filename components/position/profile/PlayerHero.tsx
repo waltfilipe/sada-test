@@ -7,6 +7,7 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { flattenAspects } from "@/lib/aspectLookup";
 import { formatFoot } from "@/lib/feet";
+import type { LeagueId } from "@/lib/leagues";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
@@ -28,6 +29,7 @@ type Props = {
   scoutPlayer?: PlayerProfile;
   isArchiveView?: boolean;
   fichaSeason?: string;
+  similarSource?: { league: LeagueId; season: string };
   seasonSlicer?: {
     active: string;
     archiveYears: BrasileiraoSeason[];
@@ -108,10 +110,12 @@ export function PlayerHero({
   scoutPlayer,
   isArchiveView = false,
   fichaSeason,
+  similarSource,
   seasonSlicer,
 }: Props) {
-  const { href, leagueId } = useLeague();
+  const { href, leagueId, season: hubSeason } = useLeague();
   const scout = scoutPlayer ?? player;
+  const source = similarSource ?? { league: leagueId, season: hubSeason };
   const [similarOpen, setSimilarOpen] = useState(false);
   const [runOpen, setRunOpen] = useState(false);
   const showRun = Boolean(scout.physical_run) && !isArchiveView;
@@ -306,9 +310,11 @@ export function PlayerHero({
 
       {similarOpen ? (
         <SimilarCrossLeagueModal
-          player={scout}
+          player={player}
           family={family}
           currentLeagueId={leagueId}
+          sourceLeague={source.league}
+          sourceSeason={source.season}
           players={players}
           onClose={() => setSimilarOpen(false)}
         />

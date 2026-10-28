@@ -1,5 +1,6 @@
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
+import type { LeagueId } from "@/lib/leagues";
 import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
 
 export type SimilarBlockScore = {
@@ -14,6 +15,7 @@ export type SimilarPlayerHit = {
   club: string;
   profile: string;
   rating: number;
+  league?: LeagueId;
   photo?: string | null;
   /** Total similarity (0–100), same field as before for API consumers. */
   similarity: number;
@@ -21,6 +23,22 @@ export type SimilarPlayerHit = {
 };
 
 const NEUTRAL_PERCENTILE = 50;
+
+function normName(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function isSameAthlete(a: PlayerProfile, b: PlayerProfile): boolean {
+  if (a.player_id === b.player_id) return true;
+  if (normName(a.name) !== normName(b.name)) return false;
+  if (a.birth_year == null || b.birth_year == null) return true;
+  return Math.abs(a.birth_year - b.birth_year) <= 1;
+}
 /** Minimum players sharing the reference profile before profile weights kick in. */
 const MIN_PROFILE_GROUP = 5;
 /** Extra weight (on top of 1) for a metric where the profile sits 25 percentiles away from the median. */
@@ -226,7 +244,7 @@ function round1(n: number) {
 export function rankCrossLeagueSimilarity(
   source: PlayerProfile,
   targetPool: PlayerProfile[],
-  options: { limit?: number; minMinutes?: number } = {},
+  options: { limit?: number; minMinutes?: number; leagueOf?: (p: PlayerProfile) => LeagueId | undefined } = {},
 ): SimilarPlayerHit[] {
   const limit = options.limit ?? 5;
   const minMinutes = options.minMinutes ?? 300;
@@ -254,7 +272,7 @@ export function rankCrossLeagueSimilarity(
   const scored: SimilarPlayerHit[] = [];
 
   for (const candidate of sameFamily) {
-    if (candidate.player_id === source.player_id) continue;
+    if (isSameAthlete(candidate, source)) continue;
 
     const candVec = vectors.get(candidate.player_id)!;
     const total = percentileSimilarity(sourceVec, candVec, weights);
@@ -270,6 +288,7 @@ export function rankCrossLeagueSimilarity(
       club: candidate.club,
       profile: candidate.profile,
       rating: candidate.rating,
+      league: options.leagueOf?.(candidate),
       similarity: round1(total),
       blocks: blockScores,
     });

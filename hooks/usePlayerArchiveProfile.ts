@@ -32,13 +32,18 @@ export function usePlayerArchiveProfile(basePlayer: PlayerProfile, _family: Posi
 
   const showSlicer = isCurrentSeason && archiveYears.length > 0;
 
+  const fichaLeague = useMemo((): LeagueId => {
+    if (!fichaSeason) return leagueId;
+    const row = basePlayer.cross_season?.seasons.find((s) => s.year === fichaSeason);
+    return (row?.league && isLeagueId(row.league) ? row.league : leagueId) as LeagueId;
+  }, [fichaSeason, basePlayer.cross_season, leagueId]);
+
   useEffect(() => {
     if (!fichaSeason || !isCurrentSeason) {
       setArchivePlayer(null);
       return;
     }
-    const row = basePlayer.cross_season?.seasons.find((s) => s.year === fichaSeason);
-    const league = (row?.league && isLeagueId(row.league) ? row.league : leagueId) as LeagueId;
+    const league = fichaLeague;
     let cancelled = false;
     setLoading(true);
     const qs = new URLSearchParams({
@@ -58,7 +63,7 @@ export function usePlayerArchiveProfile(basePlayer: PlayerProfile, _family: Posi
     return () => {
       cancelled = true;
     };
-  }, [fichaSeason, basePlayer, leagueId, isCurrentSeason]);
+  }, [fichaSeason, basePlayer, leagueId, isCurrentSeason, fichaLeague]);
 
   const isArchiveView = Boolean(fichaSeason && archivePlayer);
   const displayPlayer = isArchiveView ? archivePlayer! : basePlayer;
@@ -79,6 +84,7 @@ export function usePlayerArchiveProfile(basePlayer: PlayerProfile, _family: Posi
     displayPlayer,
     isArchiveView,
     fichaSeason: fichaSeason ?? CURRENT_SEASON,
+    fichaLeague,
     archiveYears,
     showSlicer,
     loading,

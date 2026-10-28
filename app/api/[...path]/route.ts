@@ -3,8 +3,9 @@ import { filterPlayers, getFamilyPlayers, getMeta, getPlayerProfile, getPlayers 
 import { findPlayerInSeason } from "@/lib/playerSeasonMatch.server";
 import { rankCrossLeagueSimilarity } from "@/lib/crossLeagueSimilarity";
 import { isLeagueId, type LeagueId } from "@/lib/leagues";
+import { ESTADUAIS_LEAGUE_IDS } from "@/lib/estaduaisHub";
 import { CURRENT_SEASON, parseSeasonParam } from "@/lib/seasons";
-import type { PositionFamily } from "@/lib/types";
+import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Params = { params: Promise<{ path: string[] }> };
 
@@ -140,28 +141,39 @@ function similarPayload(url: URL) {
   const playerId = url.searchParams.get("playerId");
   const family = url.searchParams.get("family") as PositionFamily | null;
   const limitRaw = url.searchParams.get("limit");
+  const season = url.searchParams.get("season") ?? url.searchParams.get("temporada");
 
   if (!fromLeague || !toLeague || !playerId) {
     return NextResponse.json({ error: "missing_params" }, { status: 400 });
   }
-  if (!isLeagueId(fromLeague) || !isLeagueId(toLeague)) {
+  if (!isLeagueId(fromLeague) || (toLeague !== "estaduais" && !isLeagueId(toLeague))) {
     return NextResponse.json({ error: "invalid_league" }, { status: 400 });
   }
-  if (fromLeague === toLeague) {
-    return NextResponse.json({ error: "same_league" }, { status: 400 });
-  }
 
-  const source = getPlayerProfile(playerId, fromLeague);
+  const source = getPlayerProfile(playerId, fromLeague, season ? parseSeasonParam(season) : undefined);
   if (!source) {
     return NextResponse.json({ error: "player_not_found" }, { status: 404 });
   }
 
   const positionFamily = family ?? source.position_family;
-  const targetPool = getFamilyPlayers(positionFamily, toLeague as LeagueId);
+  const targets: LeagueId[] = toLeague === "estaduais" ? [...ESTADUAIS_LEAGUE_IDS] : [toLeague as LeagueId];
+  const leagueByPlayer = new Map<PlayerProfile, LeagueId>();
+  const targetPool: PlayerProfile[] = [];
+  for (const league of targets) {
+    for (const pooled of getFamilyPlayers(positionFamily, league)) {
+      leagueByPlayer.set(pooled, league);
+      targetPool.push(pooled);
+    }
+  }
   const limit = limitRaw ? Math.min(20, Math.max(1, Number(limitRaw))) : 5;
-  const matches = rankCrossLeagueSimilarity(source, targetPool, { limit }).map((hit) => ({
+  const matches = rankCrossLeagueSimilarity(source, targetPool, {
+    limit,
+    leagueOf: (p) => leagueByPlayer.get(p),
+  }).map((hit) => ({
     ...hit,
-    photo: getPlayerProfile(hit.player_id, toLeague)?.transfermarkt?.photo ?? null,
+    photo:
+      getPlayerProfile(hit.player_id, hit.league ?? (toLeague === "estaduais" ? undefined : toLeague))
+        ?.transfermarkt?.photo ?? null,
   }));
 
   return NextResponse.json({
