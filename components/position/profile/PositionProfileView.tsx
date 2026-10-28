@@ -8,7 +8,7 @@ import { CURRENT_SEASON } from "@/lib/seasons";
 import { PlayerHero } from "./PlayerHero";
 import { SeasonPeekModal } from "./SeasonPeekModal";
 import { PlayerHeatmap } from "./PlayerHeatmap";
-import { ProfileCard } from "./ProfileCard";
+import { StatProfileRadarCard } from "./PlayerReport";
 import { ScoutStatsSections } from "./ScoutStatsSections";
 
 type Props = {
@@ -82,7 +82,7 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
         ) : null}
 
         <div className="profile-content-col profile-col-middle">
-          <ProfileCard player={displayPlayer} family={family} players={players} />
+          <StatProfileRadarCard player={displayPlayer} />
         </div>
 
         <div className="profile-content-col profile-col-stats">

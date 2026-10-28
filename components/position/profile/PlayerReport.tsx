@@ -453,12 +453,29 @@ function ReportColophon({ generated, page }: { generated: string; page: string }
 }
 
 /** Section averages on a 0–100 radar. The dashed ring is the positional median. */
-function SectionRadar({ scores }: { scores: SectionScore[] }) {
-  const width = 340;
-  const height = 270;
+/** Breaks long block names in two lines for the narrow on-screen card. */
+function radarLabelLines(title: string, wrap: boolean): string[] {
+  if (!wrap || title.length <= 10 || !title.includes(" ")) return [title];
+  const words = title.split(" ");
+  let best = 1;
+  let bestDiff = Infinity;
+  for (let i = 1; i < words.length; i++) {
+    const diff = Math.abs(words.slice(0, i).join(" ").length - words.slice(i).join(" ").length);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      best = i;
+    }
+  }
+  return [words.slice(0, best).join(" "), words.slice(best).join(" ")];
+}
+
+function SectionRadar({ scores, variant = "print" }: { scores: SectionScore[]; variant?: "print" | "screen" }) {
+  const screen = variant === "screen";
+  const width = screen ? 300 : 340;
+  const height = screen ? 290 : 270;
   const cx = width / 2;
   const cy = height / 2;
-  const radius = 92;
+  const radius = screen ? 90 : 92;
   const count = scores.length;
   const angle = (index: number) => -Math.PI / 2 + (index / count) * Math.PI * 2;
   const point = (index: number, value: number) => {
@@ -490,17 +507,46 @@ function SectionRadar({ scores }: { scores: SectionScore[] }) {
         const y = cy + (radius + 14) * Math.sin(a);
         const cos = Math.cos(a);
         const anchor = Math.abs(cos) < 0.2 ? "middle" : cos > 0 ? "start" : "end";
-        const dy = Math.sin(a) < -0.5 ? -4 : Math.sin(a) > 0.5 ? 10 : 0;
+        const lines = radarLabelLines(item.title, screen);
+        const lineHeight = screen ? 13 : 11;
+        const lift = (lines.length - 1) * lineHeight;
+        const dy = Math.sin(a) < -0.5 ? -4 - lift : Math.sin(a) > 0.5 ? 10 : -lift / 2;
         return (
           <text key={item.title} x={x} y={y + dy} textAnchor={anchor} className="radar-label">
-            <tspan>{item.title}</tspan>
-            <tspan x={x} dy={11} className="radar-score" fill={TONE_COLORS[item.tone] ?? "#0e7490"}>
+            {lines.map((line, lineIndex) => (
+              <tspan key={line} x={x} dy={lineIndex ? lineHeight : 0}>
+                {line}
+              </tspan>
+            ))}
+            <tspan x={x} dy={lineHeight + (screen ? 1 : 0)} className="radar-score" fill={TONE_COLORS[item.tone] ?? "#0e7490"}>
               {item.score}
             </tspan>
           </text>
         );
       })}
     </svg>
+  );
+}
+
+/** Screen version of the PDF "Perfil estatístico" radar for the position page. */
+export function StatProfileRadarCard({ player }: { player: PlayerProfile }) {
+  const copy: ReportCopy = REPORT_COPY.pt;
+  const scores = useMemo(() => sectionScores(reportSections(player, "pt")), [player]);
+  if (!scores.length) return null;
+  return (
+    <div className="player-card profile-perfil-card stat-radar-card">
+      <div className="profile-card-head">
+        <span className="section-label">{copy.radar}</span>
+      </div>
+      <div className="stat-radar-figure">
+        <SectionRadar scores={scores} variant="screen" />
+      </div>
+      <p className="player-report-chart-key">
+        <span className="is-player">{player.name}</span>
+        <span className="is-median">{copy.medianKey}</span>
+      </p>
+      <p className="stat-radar-hint">{copy.radarHint}</p>
+    </div>
   );
 }
 

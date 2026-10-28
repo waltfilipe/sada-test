@@ -19,9 +19,9 @@ type Props = {
   sheetUrl: string;
 };
 
-/** Charts per PDF page — keeps each plot large enough to read. */
-const CHARTS_PER_PAGE = 2;
-const PLOT_SIZE = { width: 640, height: 320 };
+/** One chart per landscape A4 page. */
+const CHARTS_PER_PAGE = 1;
+const PLOT_SIZE = { width: 1040, height: 560 };
 
 export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, lang, sheetUrl }: Props) {
   const league = useLeague();
@@ -59,7 +59,7 @@ export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, 
         totalPages={totalPages}
       />
       {chartPages.map((charts, pageIndex) => (
-        <div key={pageIndex} className="player-report-page scatter-report-page">
+        <div key={pageIndex} className="player-report-page scatter-report-page scatter-report-landscape">
           <header className="player-report-banner">
             <img src="/brand/sada-wordmark.png" alt="SADA — Sistema de Análise de Dados de Atletas" className="player-report-logo" />
             <p className="player-report-kicker">{copy.summaryKicker}</p>

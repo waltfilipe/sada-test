@@ -1187,6 +1187,36 @@
 }
 
 @media print {
+  @page scatter-landscape {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  .player-report-page.scatter-report-landscape {
+    page: scatter-landscape;
+    width: 297mm;
+    height: 210mm;
+  }
+
+  .scatter-report-landscape .scatter-report-card {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  .scatter-report-landscape .scatter-report-plot {
+    flex: 1;
+    align-items: center;
+  }
+
+  .scatter-report-landscape .scatter-report-plot .scatter-plot-wrap,
+  .scatter-report-landscape .scatter-report-plot svg {
+    max-width: 273mm;
+    max-height: 150mm;
+  }
+}
+
+@media print {
   .scatter-report-page .scatter-report-body {
     flex: 1;
     display: flex;

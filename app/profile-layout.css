@@ -4020,6 +4020,108 @@
   flex-direction: column;
 }
 
+/* Radar "Perfil estatístico" (mesmo desenho do PDF) na aba Posições */
+.stat-radar-card {
+  gap: 0.4rem;
+}
+
+.stat-radar-figure {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding-top: 0.4rem;
+}
+
+.stat-radar-card .player-report-radar {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  overflow: visible;
+}
+
+.stat-radar-card .radar-ring {
+  fill: none;
+  stroke: rgba(186, 204, 224, 0.16);
+  stroke-width: 1;
+}
+
+.stat-radar-card .radar-ring.is-median {
+  stroke: rgba(186, 204, 224, 0.42);
+  stroke-dasharray: 3 3;
+}
+
+.stat-radar-card .radar-axis {
+  stroke: rgba(186, 204, 224, 0.1);
+  stroke-width: 1;
+}
+
+.stat-radar-card .radar-shape {
+  fill: rgba(27, 231, 255, 0.16);
+  stroke: #1be7ff;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.stat-radar-card .radar-dot {
+  stroke: #0d1b2a;
+  stroke-width: 1.2;
+}
+
+.stat-radar-card .radar-label {
+  fill: var(--text-2, #c4cfdc);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.stat-radar-card .radar-score {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.stat-radar-hint {
+  margin: 0;
+  color: var(--text-3, #8a9bb0);
+  font-size: 0.66rem;
+  text-align: center;
+}
+
+.stat-radar-card .player-report-chart-key {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0;
+  color: var(--text-3, #8a9bb0);
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+.stat-radar-card .player-report-chart-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.stat-radar-card .player-report-chart-key span::before {
+  content: "";
+  width: 1rem;
+  height: 0.5rem;
+  border-radius: 2px;
+}
+
+.stat-radar-card .player-report-chart-key .is-player::before {
+  border: 1.5px solid #1be7ff;
+  background: rgba(27, 231, 255, 0.16);
+}
+
+.stat-radar-card .player-report-chart-key .is-median::before {
+  height: 0;
+  border-top: 1.5px dashed rgba(186, 204, 224, 0.5);
+  border-radius: 0;
+}
+
 .profile-perfil-list {
   list-style: none;
   margin: 0;
