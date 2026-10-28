@@ -102,7 +102,22 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
       cancelled = true;
     };
   }, [family, leagueId, season, seasonKey, isCurrentSeason, archiveReady]);
-  const requestedId = searchParams.get("atleta");
+  const requestedId = useMemo(() => {
+    const id = searchParams.get("atleta");
+    if (id && players.some((player) => player.player_id === id)) return id;
+    const name = searchParams.get("atleta_nome");
+    if (name) {
+      const nasc = Number(searchParams.get("atleta_nasc"));
+      const candidates = players.filter((player) => player.name === name);
+      const match =
+        candidates.find(
+          (player) =>
+            player.birth_year == null || !Number.isFinite(nasc) || Math.abs(player.birth_year - nasc) <= 1,
+        ) ?? (candidates.length === 1 ? candidates[0] : undefined);
+      if (match) return match.player_id;
+    }
+    return id;
+  }, [searchParams, players]);
   const fromFilters = searchParams.get("origem") === "filtros";
   const familyMeta = familyBySlug(family);
   const archetypes = useMemo(() => archetypesForFamily(family), [family]);
@@ -497,6 +512,7 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
                 player={selected}
                 family={family}
                 players={players}
+                currentPlayers={initialPlayers}
                 heatmapsEnabled={heatmapsEnabled}
               />
             ) : seasonLoading ? null : (

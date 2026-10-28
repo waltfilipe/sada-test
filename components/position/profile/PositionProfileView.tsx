@@ -1,10 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLeague } from "@/components/LeagueProvider";
 import { usePlayerArchiveProfile } from "@/hooks/usePlayerArchiveProfile";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
-import { CURRENT_SEASON } from "@/lib/seasons";
+import {
+  BRASILEIRAO_SEASONS,
+  CURRENT_SEASON,
+  FICHA_TEMPORADA_PARAM,
+  type BrasileiraoSeason,
+} from "@/lib/seasons";
 import { PlayerHero } from "./PlayerHero";
 import { SeasonPeekModal } from "./SeasonPeekModal";
 import { PlayerHeatmap } from "./PlayerHeatmap";
@@ -16,14 +22,52 @@ type Props = {
   player: PlayerProfile;
   family: PositionFamily;
   players: PlayerProfile[];
+  currentPlayers?: PlayerProfile[];
   heatmapsEnabled?: boolean;
 };
 
-export function PositionProfileView({ player, family, players, heatmapsEnabled = true }: Props) {
-  const { isCurrentSeason, season: hubSeason } = useLeague();
+export function PositionProfileView({ player, family, players, currentPlayers, heatmapsEnabled = true }: Props) {
+  const { leagueId, isCurrentSeason, season: hubSeason } = useLeague();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const archive = usePlayerArchiveProfile(player, family);
   const { displayPlayer, isArchiveView, showSlicer, loading, setFichaSeason, fichaSeason, basePlayer } = archive;
   const [peekYear, setPeekYear] = useState<string | null>(null);
+
+  const archiveHubSlicer = useMemo(() => {
+    if (isCurrentSeason || !currentPlayers) return undefined;
+    const counterpart = currentPlayers.find(
+      (item) =>
+        item.name === player.name &&
+        (item.birth_year == null ||
+          player.birth_year == null ||
+          Math.abs(item.birth_year - player.birth_year) <= 1),
+    );
+    if (!counterpart) return undefined;
+    const archiveYears = BRASILEIRAO_SEASONS.filter(
+      (year) =>
+        year !== CURRENT_SEASON &&
+        (year === hubSeason ||
+          (counterpart.cross_season?.seasons.some((s) => s.year === year && s.league === leagueId) ?? false)),
+    );
+    return {
+      active: hubSeason as string,
+      archiveYears,
+      onSelect: (year: BrasileiraoSeason) => {
+        if (year === hubSeason) return;
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("atleta");
+        params.delete(FICHA_TEMPORADA_PARAM);
+        params.set("atleta_nome", player.name);
+        params.set("atleta_nasc", String(player.birth_year ?? ""));
+        if (year === CURRENT_SEASON) params.delete("temporada");
+        else params.set("temporada", year);
+        const qs = params.toString();
+        router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      },
+    };
+  }, [isCurrentSeason, currentPlayers, player, hubSeason, leagueId, searchParams, pathname, router]);
 
   const showHeatmap = heatmapsEnabled && !isArchiveView && isCurrentSeason;
 
@@ -55,6 +99,11 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
         scoutPlayer={basePlayer}
         isArchiveView={isArchiveView}
         fichaSeason={isArchiveView ? fichaSeason : undefined}
+        similarSource={
+          isArchiveView
+            ? { league: archive.fichaLeague, season: fichaSeason }
+            : { league: leagueId, season: hubSeason }
+        }
         seasonSlicer={
           showSlicer
             ? {
@@ -66,7 +115,7 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
                   else setPeekYear(year);
                 },
               }
-            : undefined
+            : archiveHubSlicer
         }
       />
 
