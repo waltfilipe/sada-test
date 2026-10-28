@@ -21,7 +21,10 @@ export type SimilarPlayerHit = {
 };
 
 const NEUTRAL_PERCENTILE = 50;
-const PROFILE_MATCH_BONUS = 3;
+/** Minimum players sharing the reference profile before profile weights kick in. */
+const MIN_PROFILE_GROUP = 5;
+/** Extra weight (on top of 1) for a metric where the profile sits 25 percentiles away from the median. */
+const PROFILE_WEIGHT_SCALE = 1;
 
 function percentileInPool(value: number, pool: number[]): number {
   if (!pool.length) return NEUTRAL_PERCENTILE;
@@ -182,17 +185,33 @@ function featureVector(
   });
 }
 
-function cosineSimilarity(a: number[], b: number[]): number {
-  let dot = 0;
-  let na = 0;
-  let nb = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    na += a[i] * a[i];
-    nb += b[i] * b[i];
+/**
+ * 100 = identical percentiles; each point off the reference percentile, on average, costs 1%.
+ * Weighted mean of |Δ percentile| across the given features.
+ */
+function percentileSimilarity(a: number[], b: number[], weights: number[], indices?: number[]): number {
+  const idx = indices ?? a.map((_, i) => i);
+  let diff = 0;
+  let total = 0;
+  for (const i of idx) {
+    diff += Math.abs(a[i] - b[i]) * weights[i];
+    total += weights[i];
   }
-  if (na === 0 || nb === 0) return 0;
-  return dot / (Math.sqrt(na) * Math.sqrt(nb));
+  if (!total) return 0;
+  return Math.max(0, 100 * (1 - diff / total));
+}
+
+/**
+ * Metrics that define the reference profile weigh more: for players of the same profile
+ * in the pool, how far their average percentile sits from the median (50).
+ */
+function profileWeights(source: PlayerProfile, vectors: Map<string, number[]>, pool: PlayerProfile[], size: number): number[] {
+  const group = pool.filter((p) => p.profile && p.profile === source.profile && p.player_id !== source.player_id);
+  if (group.length < MIN_PROFILE_GROUP) return Array(size).fill(1);
+  return Array.from({ length: size }, (_, i) => {
+    const mean = group.reduce((sum, p) => sum + (vectors.get(p.player_id)?.[i] ?? 0.5), 0) / group.length;
+    return 1 + (PROFILE_WEIGHT_SCALE * Math.abs(mean - 0.5)) / 0.25;
+  });
 }
 
 function round1(n: number) {
@@ -200,9 +219,9 @@ function round1(n: number) {
 }
 
 /**
- * Cross-league similarity from **successful actions per 90** (certos / vencidos),
- * grouped by dossier stat blocks. Total = cosine over all certos features;
- * each block score = cosine within that block's features only.
+ * Similarity from **successful actions per 90** (certos / vencidos) as percentiles in the
+ * target pool, grouped by dossier stat blocks. 100% = same percentiles as the reference;
+ * total and block scores = 100 − weighted mean |Δ percentile| (profile-defining metrics weigh more).
  */
 export function rankCrossLeagueSimilarity(
   source: PlayerProfile,
@@ -230,22 +249,19 @@ export function rankCrossLeagueSimilarity(
   }));
 
   const sourceVec = featureVector(source, sameFamily, featureIds);
+  const vectors = new Map(sameFamily.map((p) => [p.player_id, featureVector(p, sameFamily, featureIds)]));
+  const weights = profileWeights(source, vectors, sameFamily, featureIds.length);
   const scored: SimilarPlayerHit[] = [];
 
   for (const candidate of sameFamily) {
     if (candidate.player_id === source.player_id) continue;
 
-    const candVec = featureVector(candidate, sameFamily, featureIds);
-    let total = cosineSimilarity(sourceVec, candVec) * 100;
-    if (candidate.profile === source.profile) {
-      total = Math.min(100, total + PROFILE_MATCH_BONUS);
-    }
+    const candVec = vectors.get(candidate.player_id)!;
+    const total = percentileSimilarity(sourceVec, candVec, weights);
 
     const blockScores: SimilarBlockScore[] = blockRanges.map(({ title, tone, indices }) => {
       if (!indices.length) return { title, tone, similarity: NEUTRAL_PERCENTILE };
-      const a = indices.map((i) => sourceVec[i]);
-      const b = indices.map((i) => candVec[i]);
-      return { title, tone, similarity: round1(cosineSimilarity(a, b) * 100) };
+      return { title, tone, similarity: round1(percentileSimilarity(sourceVec, candVec, weights, indices)) };
     });
 
     scored.push({

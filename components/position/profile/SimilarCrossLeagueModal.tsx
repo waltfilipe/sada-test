@@ -209,7 +209,7 @@ export function SimilarCrossLeagueModal({ player, family, currentLeagueId, playe
                 {player.club} · {player.profile}
               </p>
               <p className="similar-cross-intro-note">
-                Ações certas por 90 · % total e por bloco ({positionSections.map((s) => s.title).join(" · ")})
+                100% = mesmos percentis de ações certas por 90 · métricas do perfil pesam mais · total e por bloco ({positionSections.map((s) => s.title).join(" · ")})
               </p>
             </div>
           </div>
