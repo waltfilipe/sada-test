@@ -221,39 +221,40 @@ export function ProfileRadarCard({ player, family, players }: Props) {
         <span className="section-label">Perfil</span>
         <span className="profile-card-head-hint">Afinidade com cada perfil</span>
       </div>
-      <div className="stat-radar-figure">
-        <SectionRadar scores={scores} variant="screen" shape="sectors" />
+      <div className="profile-radar-body">
+        <div className="stat-radar-figure">
+          <SectionRadar scores={scores} variant="screen" shape="sectors" />
+        </div>
+        <ul className="profile-radar-list">
+          {rows.map((row) => (
+            <li key={row.key}>
+              <Tooltip
+                content={
+                  <ProfileTooltipContent
+                    label={row.label}
+                    grade={row.grade}
+                    rank={row.rank}
+                    poolSize={poolSize}
+                    family={family}
+                  />
+                }
+                block
+              >
+                <div className="profile-radar-row" style={{ "--profile-accent": row.accent } as React.CSSProperties}>
+                  <span className="profile-radar-row-label">
+                    <i aria-hidden="true" />
+                    {row.label}
+                  </span>
+                  <span className="profile-radar-row-rank tabular">{row.rank ? `${row.rank}º de ${poolSize}` : "—"}</span>
+                  <span className="profile-perfil-grade tabular" style={tierVars(gradeTier(row.grade ?? "C"))}>
+                    {row.grade ?? "—"}
+                  </span>
+                </div>
+              </Tooltip>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="profile-radar-list">
-        {rows.map((row) => (
-          <li key={row.key}>
-            <Tooltip
-              content={
-                <ProfileTooltipContent
-                  label={row.label}
-                  grade={row.grade}
-                  rank={row.rank}
-                  poolSize={poolSize}
-                  family={family}
-                />
-              }
-              block
-            >
-              <div className="profile-radar-row" style={{ "--profile-accent": row.accent } as React.CSSProperties}>
-                <span className="profile-radar-row-label">
-                  <i aria-hidden="true" />
-                  {row.label}
-                </span>
-                <span className="profile-radar-row-rank tabular">{row.rank ? `${row.rank}º de ${poolSize}` : "—"}</span>
-                <span className="profile-radar-row-share tabular">{Math.round(row.share)}%</span>
-                <span className="profile-perfil-grade tabular" style={tierVars(gradeTier(row.grade ?? "C"))}>
-                  {row.grade ?? "—"}
-                </span>
-              </div>
-            </Tooltip>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

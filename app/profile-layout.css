@@ -4177,6 +4177,28 @@
 }
 
 /* Radar de perfis (Construtor, Defensor de Área…) */
+.profile-radar-body {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.85rem;
+  min-height: 0;
+}
+
+.profile-radar-body .stat-radar-figure {
+  flex: 0 0 46%;
+  padding-top: 0;
+}
+
+.profile-radar-body .stat-radar-figure .player-report-radar {
+  max-width: 240px;
+}
+
+.profile-radar-body .profile-radar-list {
+  flex: 1;
+  align-self: center;
+}
+
 .profile-radar-list {
   display: grid;
   gap: 0.3rem;
@@ -4187,9 +4209,10 @@
 
 .profile-radar-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto 2.1rem;
+  grid-template-columns: minmax(0, 1fr) 2.1rem;
+  grid-template-rows: auto auto;
+  column-gap: 0.55rem;
   align-items: center;
-  gap: 0.55rem;
   padding: 0.32rem 0.45rem;
   border-radius: 7px;
   background: rgba(186, 204, 224, 0.04);
@@ -4198,14 +4221,14 @@
 
 .profile-radar-row-label {
   display: flex;
+  grid-column: 1;
+  grid-row: 1;
   align-items: center;
   gap: 0.4rem;
   min-width: 0;
-  overflow: hidden;
   color: var(--text, #e8eef6);
   font-weight: 650;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .profile-radar-row-label i {
@@ -4216,13 +4239,18 @@
   background: var(--profile-accent);
 }
 
-.profile-radar-row-rank,
-.profile-radar-row-share {
+.profile-radar-row-rank {
+  grid-column: 1;
+  grid-row: 2;
   color: var(--text-3, #8a9bb0);
   font-size: 0.68rem;
+  line-height: 1.25;
 }
 
 .profile-radar-row .profile-perfil-grade {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  justify-self: center;
   min-width: 0;
   padding: 0.12rem 0.3rem;
   font-size: 0.72rem;
