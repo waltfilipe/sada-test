@@ -11,6 +11,7 @@ import { getLeague, isLeagueId } from "@/lib/leagues";
 import { profileAccent } from "@/lib/profileShares";
 import { playerStatBadges } from "@/lib/statBadges";
 import type { PlayerProfile } from "@/lib/types";
+import { StatSectionsBoard } from "./ScoutStatsSections";
 
 type Props = {
   year: string;
@@ -77,6 +78,7 @@ export function SeasonPeekModal({ year, scout, onClose, onOpenFicha }: Props) {
   const marketValue = player?.transfermarkt?.market_value ?? null;
   const contract = player?.transfermarkt?.contract_remaining ?? null;
   const profiles = player?.season_meta?.profiles ?? [];
+  const mainProfile = profiles[0] ?? null;
   const poolSize = player?.season_meta?.pool_size ?? 0;
 
   return createPortal(
@@ -158,20 +160,20 @@ export function SeasonPeekModal({ year, scout, onClose, onOpenFicha }: Props) {
               </div>
             </div>
 
-            {profiles.length ? (
+            {mainProfile ? (
               <div className="season-peek-profiles">
-                {profiles.slice(0, 3).map((row) => (
-                  <div className="season-peek-profile-row" key={row.label}>
-                    <span className="season-peek-profile-label" style={{ color: profileAccent(row.label) }}>
-                      {row.label}
-                    </span>
-                    <span className="season-peek-profile-nums">
-                      {row.grade ? <strong style={{ color: profileAccent(row.label) }}>{row.grade}</strong> : null}
-                      {row.rank ? <span className="tabular">{row.rank}º de {poolSize}</span> : null}
-                      <span className="tabular">{Math.round(row.share)}%</span>
-                    </span>
-                  </div>
-                ))}
+                <div className="season-peek-profile-row">
+                  <span className="season-peek-profile-label" style={{ color: profileAccent(mainProfile.label) }}>
+                    {mainProfile.label}
+                  </span>
+                  <span className="season-peek-profile-nums">
+                    {mainProfile.grade ? (
+                      <strong style={{ color: profileAccent(mainProfile.label) }}>{mainProfile.grade}</strong>
+                    ) : null}
+                    {mainProfile.rank ? <span className="tabular">{mainProfile.rank}º de {poolSize}</span> : null}
+                    <span className="tabular">{Math.round(mainProfile.share)}%</span>
+                  </span>
+                </div>
               </div>
             ) : player.profile ? (
               <p className="season-peek-profile" style={{ color: accent }}>
@@ -211,6 +213,10 @@ export function SeasonPeekModal({ year, scout, onClose, onOpenFicha }: Props) {
                 ))}
               </div>
             ) : null}
+
+            <div className="season-peek-data" aria-label={`Dados de ${year}`}>
+              <StatSectionsBoard player={player} family={player.position_family} showBadges={false} />
+            </div>
 
             <footer className="season-peek-actions">
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => onOpenFicha(year)}>

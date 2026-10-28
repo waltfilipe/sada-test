@@ -19,11 +19,9 @@ type Props = {
   sheetUrl: string;
 };
 
-function plotSize(count: number): { width: number; height: number } {
-  if (count >= 3) return { width: 520, height: 156 };
-  if (count === 2) return { width: 520, height: 210 };
-  return { width: 560, height: 280 };
-}
+/** Charts per PDF page — keeps each plot large enough to read. */
+const CHARTS_PER_PAGE = 2;
+const PLOT_SIZE = { width: 640, height: 320 };
 
 export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, lang, sheetUrl }: Props) {
   const league = useLeague();
@@ -31,17 +29,24 @@ export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, 
   const copy = REPORT_COPY[lang];
   const locale = reportLocale(lang);
   const familyLabel = familyBySlug(family).label;
-  const leagueBanner = `${league.name} · ${league.season}`;
   const generated = copy.generated(
     new Date().toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" }),
   );
-  const totalPages = savedCharts.length ? 3 : 2;
-  const size = plotSize(savedCharts.length);
 
   const built = useMemo(
     () => savedCharts.map((saved) => buildScatterChartView(saved, players, family, href)),
     [savedCharts, players, family, href],
   );
+
+  const chartPages = useMemo(() => {
+    const pages: typeof built[] = [];
+    for (let index = 0; index < built.length; index += CHARTS_PER_PAGE) {
+      pages.push(built.slice(index, index + CHARTS_PER_PAGE));
+    }
+    return pages;
+  }, [built]);
+
+  const totalPages = 2 + chartPages.length;
 
   return (
     <div className="scout-print-export" lang={lang === "en" ? "en" : "pt-BR"}>
@@ -53,42 +58,48 @@ export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, 
         sheetUrl={sheetUrl}
         totalPages={totalPages}
       />
-      {built.length ? (
-        <div className="player-report-page scatter-report-page">
+      {chartPages.map((charts, pageIndex) => (
+        <div key={pageIndex} className="player-report-page scatter-report-page">
           <header className="player-report-banner">
             <img src="/brand/sada-wordmark.png" alt="SADA — Sistema de Análise de Dados de Atletas" className="player-report-logo" />
             <p className="player-report-kicker">{copy.summaryKicker}</p>
             <p className="player-report-league">
-              {leagueBanner}
+              {league.name}
               <span>{familyLabel}</span>
+            </p>
+            <p className="player-report-season">
+              <b>{league.season}</b>
+              <span>{copy.seasonTag}</span>
             </p>
           </header>
           <div className="player-report-body scatter-report-body">
             <h2 className="player-report-heading">Mapas de dispersão</h2>
             <div className="scatter-report-stack">
-              {built.map((chart, index) => (
-                <section key={savedCharts[index]?.id ?? index} className="scatter-report-card">
-                  <p className="player-report-label">
-                    {chart.xLabel} × {chart.yLabel}
-                    {chart.highlightCount
-                      ? ` · ${chart.highlightCount} em destaque`
-                      : ""}
-                  </p>
-                  <div className="scatter-report-plot">
-                    <ScatterPlot
-                      instanceId={`print-${savedCharts[index]?.id ?? index}`}
-                      fixedSize={size}
-                      interactive={false}
-                      points={chart.points}
-                      avgX={chart.avgX}
-                      avgY={chart.avgY}
-                      highlights={chart.highlights}
-                      xLabel={chart.xLabel}
-                      yLabel={chart.yLabel}
-                    />
-                  </div>
-                </section>
-              ))}
+              {charts.map((chart, index) => {
+                const globalIndex = pageIndex * CHARTS_PER_PAGE + index;
+                return (
+                  <section key={savedCharts[globalIndex]?.id ?? globalIndex} className="scatter-report-card">
+                    <p className="player-report-label">
+                      {chart.xLabel} × {chart.yLabel}
+                      {chart.highlightCount ? ` · ${chart.highlightCount} em destaque` : ""}
+                    </p>
+                    <div className="scatter-report-plot">
+                      <ScatterPlot
+                        instanceId={`print-${savedCharts[globalIndex]?.id ?? globalIndex}`}
+                        fixedSize={PLOT_SIZE}
+                        interactive={false}
+                        variant="print"
+                        points={chart.points}
+                        avgX={chart.avgX}
+                        avgY={chart.avgY}
+                        highlights={chart.highlights}
+                        xLabel={chart.xLabel}
+                        yLabel={chart.yLabel}
+                      />
+                    </div>
+                  </section>
+                );
+              })}
             </div>
             <ul className="scatter-report-legend" aria-label="Legenda">
               <li>
@@ -111,12 +122,12 @@ export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, 
               <p className="player-report-colophon">
                 <span>SADA | Scout</span>
                 <span>{generated}</span>
-                <span>{copy.page(totalPages, totalPages)}</span>
+                <span>{copy.page(3 + pageIndex, totalPages)}</span>
               </p>
             </footer>
           </div>
         </div>
-      ) : null}
+      ))}
     </div>
   );
 }

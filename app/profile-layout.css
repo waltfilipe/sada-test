@@ -4728,6 +4728,34 @@
     text-transform: uppercase;
   }
 
+  .player-report-season {
+    display: grid;
+    flex: 0 0 auto;
+    min-width: 16mm;
+    padding: 1.4mm 3mm;
+    border: 1px solid rgba(125, 211, 230, 0.4);
+    border-radius: 2mm;
+    background: rgba(27, 231, 255, 0.1);
+    text-align: center;
+  }
+
+  .player-report-season b {
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .player-report-season span {
+    margin-top: 0.6mm;
+    color: #7dd3e6;
+    font-size: 6.4px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
   .player-report-body {
     display: flex;
     flex: 1 1 auto;
@@ -5693,6 +5721,137 @@
     color: var(--r-faint);
     font-size: 8px;
     font-weight: 600;
+  }
+
+  /* ── Multi-season summary page ─────────────────────────────────────────── */
+
+  .player-report-summary-charts {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  }
+
+  .player-report-summary .player-report-metrics li {
+    grid-template-columns: minmax(0, 1fr) 15mm 18mm 6mm;
+  }
+
+  .player-report-summary .player-report-metric-value {
+    font-size: 7px;
+  }
+
+  .player-report-seasons {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .player-report-seasons th,
+  .player-report-seasons td {
+    padding: 1.6mm 1.8mm;
+    font-size: 8px;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .player-report-seasons thead th {
+    color: var(--r-faint);
+    font-size: 6.6px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--r-line);
+  }
+
+  .player-report-seasons tbody tr + tr {
+    border-top: 1px solid var(--r-hair);
+  }
+
+  .player-report-seasons tbody th {
+    color: var(--r-ink);
+    font-size: 9px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .player-report-seasons tbody th small {
+    display: block;
+    margin-top: 0.4mm;
+    color: var(--r-muted);
+    font-size: 6.6px;
+    font-weight: 650;
+  }
+
+  .player-report-seasons td {
+    color: var(--r-text);
+  }
+
+  .player-report-seasons .tabular,
+  .player-report-matrix .tabular {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .player-report-matrix {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .player-report-matrix th,
+  .player-report-matrix td {
+    padding: 1.5mm 1.6mm;
+    font-size: 8px;
+    text-align: left;
+  }
+
+  .player-report-matrix thead th {
+    color: var(--r-faint);
+    font-size: 6.6px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--r-line);
+  }
+
+  .player-report-matrix thead th.tabular,
+  .player-report-matrix td.tabular {
+    text-align: right;
+  }
+
+  .player-report-matrix tbody tr + tr {
+    border-top: 1px solid var(--r-hair);
+  }
+
+  .player-report-matrix tbody th {
+    color: var(--r-ink);
+    font-size: 7.6px;
+    font-weight: 750;
+    white-space: nowrap;
+  }
+
+  .player-report-matrix tbody th i {
+    display: inline-block;
+    width: 2.4mm;
+    height: 2.4mm;
+    margin-right: 1.6mm;
+    border-radius: 0.7mm;
+    vertical-align: -0.3mm;
+  }
+
+  .player-report-matrix td.is-high { color: var(--r-high); font-weight: 800; }
+  .player-report-matrix td.is-low { color: var(--r-low); font-weight: 800; }
+  .player-report-matrix td.is-mid { color: var(--r-text); font-weight: 700; }
+  .player-report-matrix td.is-empty { color: var(--r-faint); }
+
+  .player-report-matrix th.is-avg,
+  .player-report-matrix td.is-avg {
+    background: var(--r-hair);
+    font-weight: 800;
+  }
+
+  .player-report-avg-note {
+    margin: 0;
+    color: var(--r-faint);
+    font-size: 7px;
+    font-weight: 600;
+    line-height: 1.4;
   }
 
   /* Passing tendencies beside badges */

@@ -551,7 +551,9 @@
 }
 
 .season-peek {
-  width: min(440px, 100%);
+  width: min(560px, 100%);
+  max-height: min(86vh, 780px);
+  overflow-y: auto;
   border: 1px solid var(--line, rgba(186, 204, 224, 0.16));
   border-radius: 10px;
   background: #102235;
@@ -779,4 +781,24 @@
 .season-peek-badge i {
   color: var(--hero-accent, #1be7ff);
   font-size: 0.68rem;
+}
+
+/* Cards expansivos de dados dentro do popup */
+.season-peek-data {
+  margin-top: 0.9rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line, rgba(186, 204, 224, 0.11));
+}
+
+.season-peek-data .projection-groups {
+  grid-template-columns: 1fr;
+  margin-top: 0;
+}
+
+.season-peek-data .projection-group {
+  background: rgba(186, 204, 224, 0.04);
+}
+
+.season-peek-data .projection-group-toggle {
+  padding: 0.6rem 0.7rem;
 }

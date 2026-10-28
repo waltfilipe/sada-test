@@ -832,6 +832,40 @@
   transition: opacity 0.16s ease;
 }
 
+/* ── Light variant (PDF export) ──────────────────────────────────────────── */
+
+.scatter-plot--light .scatter-grid {
+  stroke: rgba(100, 116, 139, 0.3);
+}
+
+.scatter-plot--light .scatter-avg-line {
+  stroke: rgba(180, 83, 9, 0.8);
+}
+
+.scatter-plot--light .scatter-tick {
+  fill: #64748b;
+}
+
+.scatter-plot--light .scatter-axis-label {
+  fill: #334155;
+}
+
+.scatter-plot--light .scatter-avg-tag {
+  fill: #b45309;
+}
+
+.scatter-plot--light .scatter-tag.tag-a {
+  fill: #059669;
+}
+
+.scatter-plot--light .scatter-tag.tag-b {
+  fill: #6d5ef0;
+}
+
+.scatter-plot--light .scatter-tag.tag-c {
+  fill: #0284c7;
+}
+
 /* ── Stat cards below chart ───────────────────────────────────────────────── */
 
 .scatter-stats {
@@ -1212,23 +1246,23 @@
   }
 
   .scatter-report-legend .lg-a {
-    background: #31e981;
+    background: #059669;
   }
 
   .scatter-report-legend .lg-b {
-    background: #8980f5;
+    background: #6d5ef0;
   }
 
   .scatter-report-legend .lg-c {
-    background: #38bdf8;
+    background: #0284c7;
   }
 
   .scatter-report-legend .lg-pool {
-    background: rgba(148, 163, 184, 0.9);
+    background: rgba(100, 116, 139, 0.85);
   }
 
   .scatter-report-legend .lg-avg {
-    border: 1px dashed var(--r-muted);
+    border: 1px dashed rgba(180, 83, 9, 0.8);
     background: transparent;
   }
 }

@@ -32,6 +32,8 @@ type Props = {
   instanceId?: string;
   /** When false, points are not clickable and tooltips are off. */
   interactive?: boolean;
+  /** "print" renders a light palette for white PDF pages. */
+  variant?: "screen" | "print";
 };
 
 const PAD = { top: 26, right: 20, bottom: 56, left: 88 };
@@ -40,6 +42,12 @@ const TONE_FILL = {
   a: "var(--side-a)",
   b: "var(--side-b)",
   c: "var(--side-c)",
+} as const;
+
+const TONE_FILL_PRINT = {
+  a: "#059669",
+  b: "#6d5ef0",
+  c: "#0284c7",
 } as const;
 
 function formatAxis(value: number): string {
@@ -71,7 +79,9 @@ export function ScatterPlot({
   fixedSize,
   instanceId = "main",
   interactive = true,
+  variant = "screen",
 }: Props) {
+  const light = variant === "print";
   const router = useRouter();
   const { beginLoad } = useLoading();
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -163,8 +173,14 @@ export function ScatterPlot({
     const cy = scaleY(point.y);
     const highlighted = Boolean(tone);
     const size = highlighted ? 8 : 5;
-    const fill = tone ? TONE_FILL[tone] : "rgba(148, 163, 184, 0.9)";
-    const opacity = highlighted ? 1 : quietPool ? 0.38 : 0.78;
+    const fill = tone
+      ? light
+        ? TONE_FILL_PRINT[tone]
+        : TONE_FILL[tone]
+      : light
+        ? "rgba(100, 116, 139, 0.85)"
+        : "rgba(148, 163, 184, 0.9)";
+    const opacity = highlighted ? 1 : quietPool ? (light ? 0.55 : 0.38) : 0.78;
 
     return (
       <g
@@ -201,7 +217,13 @@ export function ScatterPlot({
           height={size * 2}
           transform={`rotate(45 ${cx} ${cy})`}
           fill={fill}
-          stroke={highlighted ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.16)"}
+          stroke={
+            light
+              ? "rgba(255,255,255,0.95)"
+              : highlighted
+                ? "rgba(255,255,255,0.45)"
+                : "rgba(255,255,255,0.16)"
+          }
           strokeWidth={highlighted ? 1 : 0.6}
         />
         {tone && (
@@ -217,7 +239,7 @@ export function ScatterPlot({
   const marked = points.filter((point) => toneById.has(point.player_id));
 
   return (
-    <div className="scatter-plot-wrap" ref={wrapRef}>
+    <div className={`scatter-plot-wrap${light ? " scatter-plot--light" : ""}`} ref={wrapRef}>
       <svg
         viewBox={`0 0 ${width} ${height}`}
         className="scatter-plot"
@@ -228,8 +250,17 @@ export function ScatterPlot({
       >
         <defs>
           <linearGradient id={`scatter-bg-${instanceId}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(20, 27, 38, 0.95)" />
-            <stop offset="100%" stopColor="rgba(12, 17, 25, 0.98)" />
+            {light ? (
+              <>
+                <stop offset="0%" stopColor="#fbfdff" />
+                <stop offset="100%" stopColor="#eef2f7" />
+              </>
+            ) : (
+              <>
+                <stop offset="0%" stopColor="rgba(20, 27, 38, 0.95)" />
+                <stop offset="100%" stopColor="rgba(12, 17, 25, 0.98)" />
+              </>
+            )}
           </linearGradient>
         </defs>
 
@@ -242,10 +273,10 @@ export function ScatterPlot({
           rx="14"
         />
 
-        <rect x={avgLineX} y={plotTop} width={plotRight - avgLineX} height={avgLineY - plotTop} fill="rgba(52, 211, 153, 0.03)" />
-        <rect x={plotLeft} y={plotTop} width={avgLineX - plotLeft} height={avgLineY - plotTop} fill="rgba(167, 139, 250, 0.025)" />
-        <rect x={avgLineX} y={avgLineY} width={plotRight - avgLineX} height={plotBottom - avgLineY} fill="rgba(94, 234, 212, 0.025)" />
-        <rect x={plotLeft} y={avgLineY} width={avgLineX - plotLeft} height={plotBottom - avgLineY} fill="rgba(148, 163, 184, 0.02)" />
+        <rect x={avgLineX} y={plotTop} width={plotRight - avgLineX} height={avgLineY - plotTop} fill={light ? "rgba(5, 150, 105, 0.05)" : "rgba(52, 211, 153, 0.03)"} />
+        <rect x={plotLeft} y={plotTop} width={avgLineX - plotLeft} height={avgLineY - plotTop} fill={light ? "rgba(109, 94, 240, 0.05)" : "rgba(167, 139, 250, 0.025)"} />
+        <rect x={avgLineX} y={avgLineY} width={plotRight - avgLineX} height={plotBottom - avgLineY} fill={light ? "rgba(2, 132, 199, 0.05)" : "rgba(94, 234, 212, 0.025)"} />
+        <rect x={plotLeft} y={avgLineY} width={avgLineX - plotLeft} height={plotBottom - avgLineY} fill={light ? "rgba(100, 116, 139, 0.04)" : "rgba(148, 163, 184, 0.02)"} />
 
         {xTicks.map((tick) => (
           <line key={`gx-${tick.value}`} x1={tick.x} y1={plotTop} x2={tick.x} y2={plotBottom} className="scatter-grid" />

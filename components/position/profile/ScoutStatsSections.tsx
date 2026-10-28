@@ -275,7 +275,15 @@ function edgeAgainst(mine: number | null | undefined, others: Array<number | nul
   return null;
 }
 
-export function StatSectionsBoard({ player, family }: { player: PlayerProfile; family: PositionFamily }) {
+export function StatSectionsBoard({
+  player,
+  family,
+  showBadges = true,
+}: {
+  player: PlayerProfile;
+  family: PositionFamily;
+  showBadges?: boolean;
+}) {
   const entries = useMemo(() => sectionEntries(player, family), [player, family]);
   const [openTitles, setOpenTitles] = useState<Set<string>>(() => new Set());
   const allBadges = useMemo<TonedStatBadge[]>(
@@ -293,7 +301,7 @@ export function StatSectionsBoard({ player, family }: { player: PlayerProfile; f
 
   return (
     <div className="projection-board">
-      <PlayerBadgesSection badges={allBadges} />
+      {showBadges ? <PlayerBadgesSection badges={allBadges} /> : null}
       <div className="projection-groups">
         {entries.map((entry) => {
           const open = openTitles.has(entry.title);

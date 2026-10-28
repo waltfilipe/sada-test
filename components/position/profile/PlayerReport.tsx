@@ -12,6 +12,7 @@ import { centeredTendencyPosition } from "@/lib/tendencyScale";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { isZagCluster } from "@/lib/clusterMeta";
 import { formatFoot } from "@/lib/feet";
+import { getLeague } from "@/lib/leagues";
 import { familyBySlug } from "@/lib/positions";
 import { profileMetaForFamily } from "@/lib/profileMeta";
 import { activeProfileKeys, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
@@ -410,12 +411,17 @@ function ReportBanner({
   kicker,
   league,
   family,
-  archiveSeason,
+  season,
+  seasonTag,
+  seasonSub,
 }: {
   kicker: string;
   league: string;
   family: string;
-  archiveSeason?: string;
+  /** Big label identifying what is evaluated on this page (e.g. "2024" or "3 temporadas"). */
+  season: string;
+  seasonTag: string;
+  seasonSub?: string;
 }) {
   return (
     <header className="player-report-banner">
@@ -424,7 +430,13 @@ function ReportBanner({
       <p className="player-report-league">
         {league}
         <span>{family}</span>
-        {archiveSeason ? <span className="player-report-archive-tag">Arquivo {archiveSeason}</span> : null}
+      </p>
+      <p className="player-report-season">
+        <b>{season}</b>
+        <span>
+          {seasonTag}
+          {seasonSub ? ` · ${seasonSub}` : ""}
+        </span>
       </p>
     </header>
   );
@@ -550,6 +562,7 @@ export function ReportSheet({
   pageOffset = 0,
   totalPages = 2,
   archiveSeasonLabel,
+  leagueName,
   skipProjection = false,
 }: {
   player: PlayerProfile;
@@ -561,6 +574,8 @@ export function ReportSheet({
   pageOffset?: number;
   totalPages?: number;
   archiveSeasonLabel?: string;
+  /** League of the evaluated season (archive sheets may come from another division). */
+  leagueName?: string;
   skipProjection?: boolean;
 }) {
   const league = useLeague();
@@ -597,8 +612,10 @@ export function ReportSheet({
   const highlightsHref = youtubeHighlightsHref(player);
   const xg = localizeValue(metricDisplay(player, "xG"), lang);
   const xa = localizeValue(metricDisplay(player, "xA"), lang);
-  const leagueLabel = `${league.name} ${league.season}`;
-  const leagueBanner = `${league.name} · ${league.season}`;
+  const sheetLeague = leagueName ?? league.name;
+  const sheetSeason = archiveSeasonLabel ?? league.season;
+  const leagueLabel = `${sheetLeague} ${sheetSeason}`;
+  const leagueBanner = sheetLeague;
 
   const bio = [
     age != null ? copy.age(age) : null,
@@ -662,7 +679,9 @@ export function ReportSheet({
           kicker={copy.kicker}
           league={leagueBanner}
           family={familyLabel}
-          archiveSeason={archiveSeasonLabel}
+          season={sheetSeason}
+          seasonTag={archiveSeasonLabel ? copy.seasonArchive : copy.seasonTag}
+          seasonSub={archiveSeasonLabel ? copy.seasonArchiveSub : undefined}
         />
 
         <div className="player-report-body">
@@ -829,7 +848,9 @@ export function ReportSheet({
           kicker={copy.summaryKicker}
           league={leagueBanner}
           family={familyLabel}
-          archiveSeason={archiveSeasonLabel}
+          season={sheetSeason}
+          seasonTag={archiveSeasonLabel ? copy.seasonArchive : copy.seasonTag}
+          seasonSub={archiveSeasonLabel ? copy.seasonArchiveSub : undefined}
         />
 
         <div className="player-report-body">
@@ -1008,8 +1029,297 @@ export function ReportSheet({
   );
 }
 
+type SummarySheetRow = {
+  player: PlayerProfile;
+  /** Season year shown in the sheet (e.g. "2024"). */
+  year: string;
+  leagueName: string;
+};
+
+function weightedMean(values: { value: number; weight: number }[]): number | null {
+  const total = values.reduce((sum, item) => sum + item.weight, 0);
+  if (!total) return null;
+  return values.reduce((sum, item) => sum + item.value * item.weight, 0) / total;
+}
+
+/** Last page of a multi-season export: the athlete's "average profile" across the picked years. */
+export function SeasonSummarySheet({
+  rows,
+  family,
+  lang,
+  pageNumber,
+  totalPages,
+}: {
+  rows: SummarySheetRow[];
+  family: PositionFamily;
+  lang: ReportLang;
+  pageNumber: number;
+  totalPages: number;
+}) {
+  const copy: ReportCopy = REPORT_COPY[lang];
+  const locale = reportLocale(lang);
+  const familyLabel = translateLabel(familyBySlug(family).label, lang);
+  const generated = copy.generated(
+    new Date().toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" }),
+  );
+
+  const main = rows[0].player;
+  const ordered = useMemo(() => [...rows].sort((a, b) => a.year.localeCompare(b.year)), [rows]);
+
+  const detail = useMemo(() => {
+    const minutes = ordered.map((row) => Math.max(0, row.player.minutes ?? 0));
+    const sum = minutes.reduce((a, b) => a + b, 0);
+    return ordered.map((row, index) => ({
+      row,
+      weight: sum ? minutes[index] : 1,
+      scores: sectionScores(reportSections(row.player, lang)),
+      metrics: reportMetrics(reportSections(row.player, lang), copy),
+      mix: sortedProfileShareRows(row.player),
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ordered, lang]);
+
+  const weightTotal = detail.reduce((sum, item) => sum + item.weight, 0) || 1;
+
+  /** Profile shares averaged across seasons, minutes-weighted. */
+  const avgMix = useMemo(() => {
+    const sums = new Map<string, number>();
+    for (const item of detail) {
+      for (const row of item.mix) sums.set(row.label, (sums.get(row.label) ?? 0) + row.share * item.weight);
+    }
+    return [...sums.entries()]
+      .map(([label, share]) => ({ label, share: share / weightTotal }))
+      .sort((a, b) => b.share - a.share)
+      .slice(0, 4);
+  }, [detail, weightTotal]);
+
+  const dominant = avgMix[0] ?? null;
+
+  /** Section score matrix: one column per season plus the weighted average. */
+  const matrix = useMemo(() => {
+    const titles: { title: string; tone: string }[] = [];
+    for (const item of detail) {
+      for (const score of item.scores) {
+        if (!titles.some((entry) => entry.title === score.title)) titles.push({ title: score.title, tone: score.tone });
+      }
+    }
+    return titles
+      .map((entry) => {
+        const cells = detail.map((item) => item.scores.find((score) => score.title === entry.title)?.score ?? null);
+        const avg = weightedMean(
+          cells
+            .map((value, index) => ({ value, weight: detail[index].weight }))
+            .filter((cell): cell is { value: number; weight: number } => cell.value != null),
+        );
+        return { ...entry, cells, avg };
+      })
+      .filter((entry) => entry.avg != null);
+  }, [detail]);
+
+  /** Metrics averaged across seasons for the strengths/areas lists. */
+  const avgMetrics = useMemo(() => {
+    type Agg = ReportMetric & { weighted: number; weight: number; per: (number | null)[] };
+    const map = new Map<string, Agg>();
+    detail.forEach((item, seasonIndex) => {
+      for (const metric of item.metrics) {
+        const key = `${metric.name}::${metric.context}`;
+        const agg = map.get(key) ?? { ...metric, weighted: 0, weight: 0, per: Array(detail.length).fill(null) };
+        agg.weighted += metric.percentile * item.weight;
+        agg.weight += item.weight;
+        agg.per[seasonIndex] = metric.percentile;
+        map.set(key, agg);
+      }
+    });
+    return [...map.values()].map((agg) => ({
+      name: agg.name,
+      context: agg.context,
+      tone: agg.tone,
+      percentile: Math.round(agg.weighted / agg.weight),
+      value: agg.per.map((value) => (value == null ? "—" : value)).join(" · "),
+    }));
+  }, [detail]);
+
+  const ranked = [...avgMetrics].sort((a, b) => b.percentile - a.percentile);
+  const strengths = ranked.filter((metric) => metric.percentile >= 50).slice(0, 6);
+  const weaknesses = [...ranked]
+    .reverse()
+    .filter((metric) => metric.percentile < 50)
+    .slice(0, 6);
+
+  return (
+    <article className="player-report player-report-summary" lang={lang === "en" ? "en" : "pt-BR"}>
+      <div className="player-report-page">
+        <ReportBanner
+        kicker={copy.multiKicker}
+        league={familyLabel}
+        family={copy.multiSeasons(ordered.length)}
+        season={
+          ordered.length > 1
+            ? `${ordered[0].year}–${ordered[ordered.length - 1].year}`
+            : ordered[0].year
+        }
+        seasonTag={copy.multiTag}
+      />
+
+      <div className="player-report-body">
+        <section className="player-report-mini">
+          <PlayerPhoto
+            src={main.transfermarkt?.photo}
+            alt=""
+            className="player-report-mini-photo"
+            fallback={<span className="player-report-mini-photo player-report-photo-fallback">{playerInitials(main.name)}</span>}
+          />
+          <div>
+            <h1>{main.name}</h1>
+            <p>
+              <span>{translateLabel(main.position, lang)}</span>
+              <span className="player-report-dot">·</span>
+              <span>{familyLabel}</span>
+              {dominant ? (
+                <>
+                  <span className="player-report-dot">·</span>
+                  <span>
+                    {copy.avgProfileTitle}: {translateLabel(dominant.label, lang)}
+                  </span>
+                </>
+              ) : null}
+            </p>
+          </div>
+        </section>
+
+        <section className="player-report-card player-report-seasons-card" aria-label={copy.coveredSeasons}>
+          <header className="player-report-card-head">
+            <h2>{copy.coveredSeasons}</h2>
+            <span>{copy.multiSeasons(ordered.length)}</span>
+          </header>
+          <table className="player-report-seasons">
+            <thead>
+              <tr>
+                <th>{copy.seasonTag}</th>
+                <th>{REPORT_COPY[lang].profile}</th>
+                <th>{copy.club}</th>
+                <th>{copy.minutes}</th>
+                <th>{copy.goals}</th>
+                <th>{copy.assists}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ordered.map((item) => (
+                <tr key={`${item.year}-${item.leagueName}`}>
+                  <th scope="row">
+                    {item.year}
+                    <small>{item.leagueName}</small>
+                  </th>
+                  <td>{translateLabel(reportProfileName(item.player), lang)}</td>
+                  <td>{item.player.club}</td>
+                  <td className="tabular">{item.player.minutes.toLocaleString(locale)}</td>
+                  <td className="tabular">{item.player.goals}</td>
+                  <td className="tabular">{item.player.assists}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+
+        <div className="player-report-charts player-report-summary-charts">
+          {avgMix.length ? (
+            <section className="player-report-card">
+              <header className="player-report-card-head">
+                <h2>{copy.avgProfileTitle}</h2>
+                <span>{copy.avgProfileHint}</span>
+              </header>
+              <ul className="player-report-archetypes player-report-avg-mix">
+                {avgMix.map((item, index) => (
+                  <li key={item.label} className={index === 0 ? "is-active" : undefined}>
+                    <p className="player-report-archetype-name">
+                      <i style={{ background: profileAccent(item.label) }} aria-hidden="true" />
+                      <span>{translateLabel(item.label, lang)}</span>
+                    </p>
+                    <p className="player-report-archetype-share">
+                      <strong>{Math.round(item.share)}%</strong>
+                    </p>
+                    <span className="player-report-archetype-track" aria-hidden="true">
+                      <span style={{ width: `${Math.max(3, Math.round(item.share))}%`, background: profileAccent(item.label) }} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          {matrix.length ? (
+            <section className="player-report-card">
+              <header className="player-report-card-head">
+                <h2>{copy.blocksPerSeasonTitle}</h2>
+                <span>{copy.blocksPerSeasonHint}</span>
+              </header>
+              <table className="player-report-matrix">
+                <thead>
+                  <tr>
+                    <th>{copy.blocks}</th>
+                    {ordered.map((item) => (
+                      <th key={`${item.year}-${item.leagueName}`} className="tabular">
+                        {item.year}
+                      </th>
+                    ))}
+                    <th className="tabular is-avg">{copy.avgCol}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {matrix.map((entry) => (
+                    <tr key={entry.title}>
+                      <th scope="row">
+                        <i style={{ background: TONE_COLORS[entry.tone] }} aria-hidden="true" />
+                        {entry.title}
+                      </th>
+                      {entry.cells.map((value, index) => (
+                        <td key={`${entry.title}-${index}`} className={`tabular ${percentileTone(value)}`}>
+                          {value ?? "—"}
+                        </td>
+                      ))}
+                      <td className={`tabular is-avg ${percentileTone(entry.avg != null ? Math.round(entry.avg) : null)}`}>
+                        {entry.avg != null ? Math.round(entry.avg) : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+          ) : null}
+        </div>
+
+        <div className="player-report-split">
+          <MetricList
+            title={copy.strengths}
+            hint={copy.avgMetricsHint}
+            metrics={strengths}
+            empty={copy.noStrengths}
+            tone="is-strong"
+          />
+          <MetricList
+            title={copy.weaknesses}
+            hint={copy.avgMetricsHint}
+            metrics={weaknesses}
+            empty={copy.noWeaknesses}
+            tone="is-weak"
+          />
+        </div>
+
+        <footer className="player-report-foot">
+          <p className="player-report-avg-note">{copy.avgNote}</p>
+          <ReportColophon generated={generated} page={copy.page(pageNumber, totalPages)} />
+        </footer>
+      </div>
+      </div>
+    </article>
+  );
+}
+
 type ReportSheetSpec = {
   player: PlayerProfile;
+  /** Season year evaluated on this sheet (for the summary page and the banner). */
+  seasonYear: string;
+  leagueName: string;
   archiveSeasonLabel?: string;
   skipProjection?: boolean;
 };
@@ -1027,7 +1337,7 @@ export function PlayerReportButton({
   players: PlayerProfile[];
   primaryArchiveLabel?: string;
 }) {
-  const { leagueId } = useLeague();
+  const { leagueId, name: currentLeagueName, season: currentSeason } = useLeague();
   const scout = scoutPlayer ?? player;
   const { beginLoad, endLoad } = useLoading();
   const [mounted, setMounted] = useState(false);
@@ -1035,7 +1345,9 @@ export function PlayerReportButton({
   const [lang, setLang] = useState<ReportLang>("pt");
   const [menuOpen, setMenuOpen] = useState(false);
   const [printRequest, setPrintRequest] = useState(0);
-  const [reportSheets, setReportSheets] = useState<ReportSheetSpec[]>([{ player, skipProjection: false }]);
+  const [reportSheets, setReportSheets] = useState<ReportSheetSpec[]>([
+    { player, seasonYear: "", leagueName: "", skipProjection: false },
+  ]);
   const [includeArchive, setIncludeArchive] = useState<Record<string, boolean>>({});
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -1087,7 +1399,12 @@ export function PlayerReportButton({
     return () => window.cancelAnimationFrame(frame);
   }, [printRequest]);
 
-  async function fetchArchiveProfile(year: string): Promise<PlayerProfile | null> {
+  function leagueNameFor(rowLeague?: string): string {
+    if (!rowLeague || rowLeague === leagueId) return currentLeagueName;
+    return getLeague(rowLeague)?.name ?? rowLeague;
+  }
+
+  async function fetchArchiveProfile(year: string): Promise<{ profile: PlayerProfile; league: string } | null> {
     const row = scout.cross_season?.seasons.find((s) => s.year === year);
     const league = row?.league ?? leagueId;
     const qs = new URLSearchParams({
@@ -1098,26 +1415,35 @@ export function PlayerReportButton({
     });
     const res = await fetch(`/api/player-season?${qs}`);
     if (!res.ok) return null;
-    return (await res.json()) as PlayerProfile;
+    return { profile: (await res.json()) as PlayerProfile, league };
   }
 
   async function exportPdf(next: ReportLang) {
     setMenuOpen(false);
     setLang(next);
     beginLoad();
+    const primaryRow = scout.cross_season?.seasons.find((s) => s.year === primaryArchiveLabel);
     const sheets: ReportSheetSpec[] = [
       {
         player,
         skipProjection: player.player_id !== scout.player_id,
         archiveSeasonLabel: primaryArchiveLabel,
+        seasonYear: primaryArchiveLabel ?? currentSeason,
+        leagueName: leagueNameFor(primaryRow?.league),
       },
     ];
     const covered = new Set(primaryArchiveLabel ? [primaryArchiveLabel] : []);
     for (const year of archiveYears) {
       if (!includeArchive[year] || covered.has(year)) continue;
-      const profile = await fetchArchiveProfile(year);
-      if (profile) {
-        sheets.push({ player: profile, archiveSeasonLabel: year, skipProjection: true });
+      const found = await fetchArchiveProfile(year);
+      if (found) {
+        sheets.push({
+          player: found.profile,
+          archiveSeasonLabel: year,
+          seasonYear: year,
+          leagueName: leagueNameFor(found.league),
+          skipProjection: true,
+        });
         covered.add(year);
       }
     }
@@ -1189,11 +1515,25 @@ export function PlayerReportButton({
                   lang={lang}
                   sheetUrl={sheetUrl}
                   archiveSeasonLabel={sheet.archiveSeasonLabel}
+                  leagueName={sheet.leagueName}
                   skipProjection={sheet.skipProjection}
                   pageOffset={index * 2}
-                  totalPages={reportSheets.length * 2}
+                  totalPages={reportSheets.length * 2 + (reportSheets.length > 1 ? 1 : 0)}
                 />
               ))}
+              {reportSheets.length > 1 ? (
+                <SeasonSummarySheet
+                  rows={reportSheets.map((sheet) => ({
+                    player: sheet.player,
+                    year: sheet.seasonYear,
+                    leagueName: sheet.leagueName,
+                  }))}
+                  family={family}
+                  lang={lang}
+                  pageNumber={reportSheets.length * 2 + 1}
+                  totalPages={reportSheets.length * 2 + 1}
+                />
+              ) : null}
             </>,
             document.body,
           )
