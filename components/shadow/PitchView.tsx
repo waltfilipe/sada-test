@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { ShadowPlayerChip } from "@/components/shadow/ShadowPlayerChip";
 import { ShadowPlayerTooltip } from "@/components/shadow/ShadowPlayerMiniReport";
 import { fieldSlots, formationById, type FormationSlot } from "@/lib/formations";
+import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
 
 const DRAG_MIME = "application/x-shadow-player";
@@ -27,8 +29,12 @@ function parseDrag(data: DataTransfer): DragPayload | null {
 }
 
 function PitchToken({ player }: { player: PlayerSearchRow }) {
+  const initials = <span className="shadow-pitch-token-initials">{playerInitials(player.name)}</span>;
   return (
-    <div className="shadow-pitch-token shadow-pitch-token-name-only">
+    <div className="shadow-pitch-token">
+      <span className="shadow-pitch-token-photo">
+        <PlayerPhoto src={player.transfermarkt?.photo} alt="" loading="lazy" fallback={initials} />
+      </span>
       <span className="shadow-pitch-token-name" title={player.name}>
         {player.name}
       </span>

@@ -36,12 +36,10 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
     return item.key === active;
   }
 
-  const brandHref = league && !hubMode ? league.href("/posicao/zagueiros") : "/";
-
   return (
     <div className="scout-topbar-wrap">
       <header className="scout-topbar scout-topbar-compact">
-        <Link href={brandHref} className="scout-brand" aria-label="SADA | Scout — Início">
+        <Link href="/" className="scout-brand" aria-label="SADA | Scout — Início">
           <SiteLogo variant="stacked" className="scout-header-logo scout-header-logo-stacked" height={40} />
         </Link>
 

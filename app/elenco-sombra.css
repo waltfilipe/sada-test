@@ -190,14 +190,27 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
+.shadow-pitch-token-photo img {
+  object-position: center 12%;
+}
+
+.shadow-pitch-token-initials {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
 .shadow-pitch-token-name {
-  max-width: none;
+  display: block;
+  max-width: 84px;
   min-width: 76px;
   padding: 0.14rem 0.4rem;
   border-radius: 4px;
   background: rgba(8, 15, 24, 0.85);
   font-size: 0.64rem;
-  -webkit-line-clamp: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .shadow-pitch-token-name-only .shadow-pitch-token-name {
