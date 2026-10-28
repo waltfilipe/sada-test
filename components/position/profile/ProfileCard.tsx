@@ -11,7 +11,8 @@ import {
   type ArchetypeTrait,
 } from "@/lib/clusterMeta";
 import { activeProfileKeys, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
-import { gradeTier, profileGradeFromRank, tierVars } from "@/lib/scoutTheme";
+import { gradeTier, profileGradeFromRank, rankPercentile, tierVars } from "@/lib/scoutTheme";
+import { SectionRadar } from "@/components/position/profile/PlayerReport";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Props = {
@@ -179,6 +180,79 @@ export function ProfileCard({ player, family, players }: Props) {
             </li>
           );
         })}
+      </ul>
+    </div>
+  );
+}
+
+/** Radar of the position profiles: each axis is the player's percentile in that archetype ranking. */
+export function ProfileRadarCard({ player, family, players }: Props) {
+  const shareRows = useMemo(() => sortedProfileShareRows(player), [player]);
+  const poolSize = players.length;
+  const rows = useMemo(
+    () =>
+      shareRows.map((row) => {
+        const rank = archetypeRank(player, players, row.label, family);
+        const grade = rank ? profileGradeFromRank(rank, poolSize) : null;
+        return {
+          ...row,
+          rank,
+          grade,
+          score: rank ? Math.round(rankPercentile(rank, poolSize)) : 0,
+          accent: profileAccent(row.label),
+        };
+      }),
+    [shareRows, player, players, family, poolSize],
+  );
+
+  if (rows.length < 3) return <ProfileCard player={player} family={family} players={players} />;
+
+  const scores = rows.map((row) => ({
+    title: row.label,
+    tone: row.tone,
+    score: row.score,
+    color: row.accent,
+    display: row.grade ?? "—",
+  }));
+
+  return (
+    <div className="player-card profile-perfil-card stat-radar-card profile-radar-card">
+      <div className="profile-card-head">
+        <span className="section-label">Perfil</span>
+        <span className="profile-card-head-hint">Colocação em cada perfil</span>
+      </div>
+      <div className="stat-radar-figure">
+        <SectionRadar scores={scores} variant="screen" />
+      </div>
+      <ul className="profile-radar-list">
+        {rows.map((row) => (
+          <li key={row.key}>
+            <Tooltip
+              content={
+                <ProfileTooltipContent
+                  label={row.label}
+                  grade={row.grade}
+                  rank={row.rank}
+                  poolSize={poolSize}
+                  family={family}
+                />
+              }
+              block
+            >
+              <div className="profile-radar-row" style={{ "--profile-accent": row.accent } as React.CSSProperties}>
+                <span className="profile-radar-row-label">
+                  <i aria-hidden="true" />
+                  {row.label}
+                </span>
+                <span className="profile-radar-row-rank tabular">{row.rank ? `${row.rank}º de ${poolSize}` : "—"}</span>
+                <span className="profile-radar-row-share tabular">{Math.round(row.share)}%</span>
+                <span className="profile-perfil-grade tabular" style={tierVars(gradeTier(row.grade ?? "C"))}>
+                  {row.grade ?? "—"}
+                </span>
+              </div>
+            </Tooltip>
+          </li>
+        ))}
       </ul>
     </div>
   );

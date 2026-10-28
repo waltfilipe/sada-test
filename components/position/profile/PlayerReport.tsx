@@ -351,6 +351,10 @@ type SectionScore = {
   title: string;
   tone: string;
   score: number;
+  /** Overrides the tone color (e.g. profile accent). */
+  color?: string;
+  /** Text under the axis label; defaults to the score. */
+  display?: string;
 };
 
 /** Volume and efficiency rows read as "Block · Per 90"; sub-metric rows keep their own label. */
@@ -469,7 +473,7 @@ function radarLabelLines(title: string, wrap: boolean): string[] {
   return [words.slice(0, best).join(" "), words.slice(best).join(" ")];
 }
 
-function SectionRadar({ scores, variant = "print" }: { scores: SectionScore[]; variant?: "print" | "screen" }) {
+export function SectionRadar({ scores, variant = "print" }: { scores: SectionScore[]; variant?: "print" | "screen" }) {
   const screen = variant === "screen";
   const width = screen ? 300 : 340;
   const height = screen ? 290 : 270;
@@ -499,7 +503,7 @@ function SectionRadar({ scores, variant = "print" }: { scores: SectionScore[]; v
       <polygon points={shape} className="radar-shape" />
       {scores.map((item, index) => {
         const [x, y] = point(index, Math.max(4, item.score));
-        return <circle key={item.title} cx={x} cy={y} r={3.4} fill={TONE_COLORS[item.tone] ?? "#0e7490"} className="radar-dot" />;
+        return <circle key={item.title} cx={x} cy={y} r={3.4} fill={item.color ?? TONE_COLORS[item.tone] ?? "#0e7490"} className="radar-dot" />;
       })}
       {scores.map((item, index) => {
         const a = angle(index);
@@ -518,8 +522,8 @@ function SectionRadar({ scores, variant = "print" }: { scores: SectionScore[]; v
                 {line}
               </tspan>
             ))}
-            <tspan x={x} dy={lineHeight + (screen ? 1 : 0)} className="radar-score" fill={TONE_COLORS[item.tone] ?? "#0e7490"}>
-              {item.score}
+            <tspan x={x} dy={lineHeight + (screen ? 1 : 0)} className="radar-score" fill={item.color ?? TONE_COLORS[item.tone] ?? "#0e7490"}>
+              {item.display ?? item.score}
             </tspan>
           </text>
         );
@@ -529,15 +533,17 @@ function SectionRadar({ scores, variant = "print" }: { scores: SectionScore[]; v
 }
 
 /** Screen version of the PDF "Perfil estatístico" radar for the position page. */
-export function StatProfileRadarCard({ player }: { player: PlayerProfile }) {
+export function StatProfileRadarCard({ player, bare = false }: { player: PlayerProfile; bare?: boolean }) {
   const copy: ReportCopy = REPORT_COPY.pt;
   const scores = useMemo(() => sectionScores(reportSections(player, "pt")), [player]);
   if (!scores.length) return null;
   return (
-    <div className="player-card profile-perfil-card stat-radar-card">
-      <div className="profile-card-head">
-        <span className="section-label">{copy.radar}</span>
-      </div>
+    <div className={bare ? "stat-radar-card stat-radar-bare" : "player-card profile-perfil-card stat-radar-card"}>
+      {bare ? null : (
+        <div className="profile-card-head">
+          <span className="section-label">{copy.radar}</span>
+        </div>
+      )}
       <div className="stat-radar-figure">
         <SectionRadar scores={scores} variant="screen" />
       </div>

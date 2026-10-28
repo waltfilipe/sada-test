@@ -345,10 +345,13 @@ export function ScoutStatsSections({
   active: activeProp,
   onActiveChange,
   peers = NO_PEERS,
+  radarView,
 }: {
   player: PlayerProfile;
   family: PositionFamily;
   players?: PlayerProfile[];
+  /** When set, a switch toggles between stats/badges and this radar. */
+  radarView?: ReactNode;
   /** When set, projection M7 uses this player (2026 scout) while stats show `player`. */
   projectionSource?: PlayerProfile;
   disableProjection?: boolean;
@@ -358,6 +361,8 @@ export function ScoutStatsSections({
 }) {
   const [localActive, setLocalActive] = useState<string | null>(null);
   const [projectionOn, setProjectionOn] = useState(false);
+  const [view, setView] = useState<"stats" | "radar">("stats");
+  const showRadar = Boolean(radarView) && view === "radar";
   const active = onActiveChange ? (activeProp ?? null) : localActive;
   const setActive = (title: string | null) => {
     if (onActiveChange) onActiveChange(title);
@@ -387,8 +392,31 @@ export function ScoutStatsSections({
     <div className={`stats-swap-panel${projectionOn ? " is-projection" : ""}`} key={`${player.player_id}-index`}>
       <div className="profile-card-head">
         <div className="stats-head-title">
-          <h3 className="section-label">Estatísticas e selos</h3>
-          {projection ? (
+          {radarView ? (
+            <div className="stats-view-switch" role="tablist" aria-label="Visualização">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={!showRadar}
+                className={!showRadar ? "is-active" : undefined}
+                onClick={() => setView("stats")}
+              >
+                Estatísticas e Selos
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={showRadar}
+                className={showRadar ? "is-active" : undefined}
+                onClick={() => setView("radar")}
+              >
+                Radar de Perfil Estatístico
+              </button>
+            </div>
+          ) : (
+            <h3 className="section-label">Estatísticas e selos</h3>
+          )}
+          {projection && !showRadar ? (
             <button
               type="button"
               className={`projection-mini${projectionOn ? " is-on" : ""}`}
@@ -405,6 +433,9 @@ export function ScoutStatsSections({
         </div>
       </div>
 
+      {showRadar ? (
+        <div className="stats-radar-body">{radarView}</div>
+      ) : (
       <div className="stats-and-badges-body">
         <PlayerBadgesSection badges={allBadges} />
 
@@ -432,6 +463,7 @@ export function ScoutStatsSections({
           </div>
         </section>
       </div>
+      )}
 
       {!onActiveChange && activeEntry ? (
         <StatWindow title={activeEntry.title} onClose={() => setActive(null)}>

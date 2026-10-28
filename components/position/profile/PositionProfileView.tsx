@@ -9,6 +9,7 @@ import { PlayerHero } from "./PlayerHero";
 import { SeasonPeekModal } from "./SeasonPeekModal";
 import { PlayerHeatmap } from "./PlayerHeatmap";
 import { StatProfileRadarCard } from "./PlayerReport";
+import { ProfileRadarCard } from "./ProfileCard";
 import { ScoutStatsSections } from "./ScoutStatsSections";
 
 type Props = {
@@ -82,7 +83,7 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
         ) : null}
 
         <div className="profile-content-col profile-col-middle">
-          <StatProfileRadarCard player={displayPlayer} />
+          <ProfileRadarCard player={displayPlayer} family={family} players={players} />
         </div>
 
         <div className="profile-content-col profile-col-stats">
@@ -93,6 +94,7 @@ export function PositionProfileView({ player, family, players, heatmapsEnabled =
               players={players}
               projectionSource={isArchiveView ? undefined : basePlayer}
               disableProjection={isArchiveView || !isCurrentSeason}
+              radarView={<StatProfileRadarCard player={displayPlayer} bare />}
             />
           </div>
         </div>
