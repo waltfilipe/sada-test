@@ -32,28 +32,30 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const archive = usePlayerArchiveProfile(player, family);
-  const { displayPlayer, isArchiveView, showSlicer, loading, setFichaSeason, fichaSeason, basePlayer } = archive;
+  const { displayPlayer, isArchiveView, loading, setFichaSeason, fichaSeason, basePlayer, archiveYears } = archive;
   const [peekYear, setPeekYear] = useState<string | null>(null);
 
   const archiveHubSlicer = useMemo(() => {
-    if (isCurrentSeason || !currentPlayers) return undefined;
-    const counterpart = currentPlayers.find(
+    if (isCurrentSeason) return undefined;
+    const counterpart = currentPlayers?.find(
       (item) =>
         item.name === player.name &&
         (item.birth_year == null ||
           player.birth_year == null ||
           Math.abs(item.birth_year - player.birth_year) <= 1),
     );
-    if (!counterpart) return undefined;
-    const archiveYears = BRASILEIRAO_SEASONS.filter(
+    if (!counterpart) {
+      return { active: hubSeason as string, years: [hubSeason] as BrasileiraoSeason[], onSelect: () => {} };
+    }
+    const years = BRASILEIRAO_SEASONS.filter(
       (year) =>
-        year !== CURRENT_SEASON &&
-        (year === hubSeason ||
-          (counterpart.cross_season?.seasons.some((s) => s.year === year && s.league === leagueId) ?? false)),
+        year === CURRENT_SEASON ||
+        year === hubSeason ||
+        (counterpart.cross_season?.seasons.some((s) => s.year === year && s.league === leagueId) ?? false),
     );
     return {
       active: hubSeason as string,
-      archiveYears,
+      years,
       onSelect: (year: BrasileiraoSeason) => {
         if (year === hubSeason) return;
         const params = new URLSearchParams(searchParams.toString());
@@ -105,10 +107,10 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
             : { league: leagueId, season: hubSeason }
         }
         seasonSlicer={
-          showSlicer
+          isCurrentSeason
             ? {
                 active: fichaSeason,
-                archiveYears: archive.archiveYears,
+                years: [CURRENT_SEASON, ...archiveYears],
                 loading,
                 onSelect: (year) => {
                   if (year === CURRENT_SEASON) setFichaSeason(year);

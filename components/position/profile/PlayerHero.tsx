@@ -32,9 +32,9 @@ type Props = {
   similarSource?: { league: LeagueId; season: string };
   seasonSlicer?: {
     active: string;
-    archiveYears: BrasileiraoSeason[];
+    years: BrasileiraoSeason[];
     loading?: boolean;
-    onSelect: (year: BrasileiraoSeason | typeof CURRENT_SEASON) => void;
+    onSelect: (year: BrasileiraoSeason) => void;
   };
 };
 
@@ -150,18 +150,18 @@ export function PlayerHero({
 
         <div className="player-hero-copy">
           <div className="player-hero-title-wrap">
-            <div className="player-hero-name-row">
-              <h2 className="player-hero-name">{player.name}</h2>
-              {seasonSlicer ? (
+            <h2 className="player-hero-name">{player.name}</h2>
+            {seasonSlicer ? (
+              <div className="player-hero-season-row">
                 <PlayerSeasonSlicer
                   inline
                   active={seasonSlicer.active}
-                  archiveYears={seasonSlicer.archiveYears}
+                  years={seasonSlicer.years}
                   loading={seasonSlicer.loading}
                   onSelect={seasonSlicer.onSelect}
                 />
-              ) : null}
-            </div>
+              </div>
+            ) : null}
             <p className="player-hero-club">
               <ClubLogo club={player.club} size={22} />
               <span className="player-hero-club-name">{player.club}</span>

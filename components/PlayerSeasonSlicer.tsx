@@ -4,15 +4,16 @@ import { CURRENT_SEASON, type BrasileiraoSeason } from "@/lib/seasons";
 
 type Props = {
   active: string;
-  archiveYears: BrasileiraoSeason[];
+  /** Anos exibidos, na ordem. Inclui a temporada atual quando ela existe para o atleta. */
+  years: BrasileiraoSeason[];
   loading?: boolean;
-  onSelect: (year: BrasileiraoSeason | typeof CURRENT_SEASON) => void;
+  onSelect: (year: BrasileiraoSeason) => void;
   /** Ao lado do nome no hero (sem rótulo “Ficha”). */
   inline?: boolean;
 };
 
-export function PlayerSeasonSlicer({ active, archiveYears, loading, onSelect, inline = false }: Props) {
-  if (!archiveYears.length) return null;
+export function PlayerSeasonSlicer({ active, years, loading, onSelect, inline = false }: Props) {
+  if (!years.length) return null;
   const viewingArchive = active !== CURRENT_SEASON;
   return (
     <div
@@ -27,16 +28,7 @@ export function PlayerSeasonSlicer({ active, archiveYears, loading, onSelect, in
     >
       {inline ? null : <span className="player-season-slicer-label">Ficha</span>}
       <div className="player-season-slicer-tabs" role="tablist">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={active === CURRENT_SEASON}
-          className={active === CURRENT_SEASON ? "is-active" : ""}
-          onClick={() => onSelect(CURRENT_SEASON)}
-        >
-          {CURRENT_SEASON}
-        </button>
-        {archiveYears.map((year) => (
+        {years.map((year) => (
           <button
             key={year}
             type="button"
