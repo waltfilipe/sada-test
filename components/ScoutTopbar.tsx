@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { SiteLogo } from "@/components/SiteLogo";
 import { useLeagueOptional } from "@/components/LeagueProvider";
+import { CURRENT_SEASON, isBrasileiraoLeague } from "@/lib/seasons";
 
 const NAV = [
   { key: "inicio", path: "/", label: "Início", global: true },
@@ -36,6 +37,12 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
     return item.key === active;
   }
 
+  const showSeasonBadge =
+    !hubMode &&
+    league != null &&
+    isBrasileiraoLeague(league.leagueId) &&
+    league.season !== CURRENT_SEASON;
+
   return (
     <div className="scout-topbar-wrap">
       <header className="scout-topbar scout-topbar-compact">
@@ -60,6 +67,12 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
             );
           })}
         </nav>
+
+        {showSeasonBadge ? (
+          <span className="topbar-season-badge" title={`Arquivo Wyscout ${league!.season}`}>
+            Temporada {league!.season}
+          </span>
+        ) : null}
       </header>
 
       {subnav ? <div className="scout-subnav">{subnav}</div> : null}

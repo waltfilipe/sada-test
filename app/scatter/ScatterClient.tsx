@@ -10,8 +10,10 @@ import { ScatterPlot, type ScatterHighlight } from "@/components/scatter/Scatter
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { useSeasonRoster } from "@/hooks/useSeasonRoster";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { familyBySlug } from "@/lib/positions";
+import { resolveSeasonPlayerId } from "@/lib/seasonRosterMatch";
 import { scatterAxis, scatterAxisLabel } from "@/lib/scatterAxis";
 import {
   newSavedChartId,
@@ -31,6 +33,12 @@ type Props = {
   initialA?: string;
   initialB?: string;
   initialC?: string;
+  initialAName?: string;
+  initialANasc?: number;
+  initialBName?: string;
+  initialBNasc?: number;
+  initialCName?: string;
+  initialCNasc?: number;
   initialX?: string;
   initialY?: string;
 };
@@ -68,15 +76,29 @@ function quadrantLabel(
 
 export function ScatterClient({
   family,
-  players,
+  players: initialPlayers,
   metrics,
   initialA,
   initialB,
   initialC,
+  initialAName,
+  initialANasc,
+  initialBName,
+  initialBNasc,
+  initialCName,
+  initialCNasc,
   initialX,
   initialY,
 }: Props) {
   const { href, leagueId } = useLeague();
+  // Static props always carry the current season; in ?temporada=YYYY the family
+  // roster is fetched client-side and the a=/b=/c= ids are re-resolved against it.
+  const { players, season, isCurrentSeason, seasonLoading, archiveFailed, retry } =
+    useSeasonRoster<PlayerProfile>({
+      initial: initialPlayers,
+      scope: family,
+      resource: `families/${family}`,
+    });
   const rootRef = useRef<HTMLDivElement>(null);
   const familyMeta = familyBySlug(family);
   const axisMetrics = useMemo(() => {
@@ -84,25 +106,50 @@ export function ScatterClient({
     return fromPosition.length ? fromPosition : metrics;
   }, [family, metrics]);
 
-  const pick = (requested: string | undefined, fallbackIndex: number | null) => {
-    if (requested === "") return "";
-    if (requested && players.some((player) => player.player_id === requested)) return requested;
-    if (fallbackIndex == null) return "";
-    return players[fallbackIndex]?.player_id ?? "";
-  };
-
   const defaultX = axisMetrics[0]?.key ?? "intervencoes";
   const defaultY = axisMetrics[1]?.key ?? axisMetrics[0]?.key ?? "confrontos_of";
 
-  const [idA, setIdA] = useState(() => pick(initialA, 0));
-  const [idB, setIdB] = useState(() => {
-    if (initialB === "") return "";
-    const chosen = pick(initialB, 1);
-    const first = pick(initialA, 0);
-    if (!chosen || chosen !== first) return chosen;
-    return players.find((player) => player.player_id !== first)?.player_id ?? "";
-  });
-  const [idC, setIdC] = useState(() => pick(initialC, null));
+  const [idA, setIdA] = useState("");
+  const [idB, setIdB] = useState("");
+  const [idC, setIdC] = useState("");
+
+  useEffect(() => {
+    if (!players.length) return;
+    const reference = initialPlayers;
+    const a =
+      initialA === ""
+        ? ""
+        : (resolveSeasonPlayerId(players, initialA, {
+            name: initialAName,
+            birthYear: initialANasc,
+            reference,
+          }) ??
+          players[0]?.player_id ??
+          "");
+    let b = "";
+    if (initialB !== "") {
+      b =
+        resolveSeasonPlayerId(players, initialB, {
+          name: initialBName,
+          birthYear: initialBNasc,
+          reference,
+        }) ??
+        players[1]?.player_id ??
+        "";
+      if (b === a) b = players.find((player) => player.player_id !== a)?.player_id ?? "";
+    }
+    const c = initialC
+      ? resolveSeasonPlayerId(players, initialC, {
+          name: initialCName,
+          birthYear: initialCNasc,
+          reference,
+        }) ?? ""
+      : "";
+    setIdA(a);
+    setIdB(b);
+    setIdC(c);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [players]);
   const [xKey, setXKey] = useState(() => {
     if (initialX && axisMetrics.some((metric) => metric.key === initialX && metric.key !== initialY)) {
       return initialX;
@@ -228,6 +275,31 @@ export function ScatterClient({
   const positionTabs = (
     <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/scatter/${slug}`)} />
   );
+
+  if (seasonLoading) {
+    return (
+      <div className="scout-root scatter-root" ref={rootRef}>
+        <ScoutTopbar active="scatter" subnav={positionTabs} />
+        <div className="scout-empty">
+          Carregando atletas{!isCurrentSeason ? ` da temporada ${season}` : ""}…
+        </div>
+      </div>
+    );
+  }
+
+  if (archiveFailed) {
+    return (
+      <div className="scout-root scatter-root" ref={rootRef}>
+        <ScoutTopbar active="scatter" subnav={positionTabs} />
+        <div className="scout-empty">
+          Não foi possível carregar os atletas de {season}.{" "}
+          <button type="button" className="zag-v2-retry" onClick={retry}>
+            Tentar de novo
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!players.length) {
     return (
@@ -417,14 +489,39 @@ export function ScatterClient({
   );
 }
 
-export function ScatterWithQuery(props: Omit<Props, "initialA" | "initialB" | "initialC" | "initialX" | "initialY">) {
+export function ScatterWithQuery(
+  props: Omit<
+    Props,
+    | "initialA"
+    | "initialB"
+    | "initialC"
+    | "initialAName"
+    | "initialANasc"
+    | "initialBName"
+    | "initialBNasc"
+    | "initialCName"
+    | "initialCNasc"
+    | "initialX"
+    | "initialY"
+  >,
+) {
   const search = useSearchParams();
+  const nasc = (key: string) => {
+    const value = Number(search.get(`${key}_nasc`));
+    return Number.isFinite(value) && value > 0 ? value : undefined;
+  };
   return (
     <ScatterClient
       {...props}
       initialA={search.get("a") ?? undefined}
       initialB={search.get("b") ?? undefined}
       initialC={search.get("c") ?? undefined}
+      initialAName={search.get("a_nome") ?? undefined}
+      initialANasc={nasc("a")}
+      initialBName={search.get("b_nome") ?? undefined}
+      initialBNasc={nasc("b")}
+      initialCName={search.get("c_nome") ?? undefined}
+      initialCNasc={nasc("c")}
       initialX={search.get("x") ?? undefined}
       initialY={search.get("y") ?? undefined}
     />

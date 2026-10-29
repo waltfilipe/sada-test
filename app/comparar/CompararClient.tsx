@@ -8,8 +8,10 @@ import { StatSectionPanel, StatWindow } from "@/components/position/profile/Scou
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
+import { useSeasonRoster } from "@/hooks/useSeasonRoster";
 import { compareSummary } from "@/lib/compareNarrative";
 import { familyBySlug } from "@/lib/positions";
+import { resolveSeasonPlayerId } from "@/lib/seasonRosterMatch";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Metric = { key: string; label: string };
@@ -21,6 +23,12 @@ type Props = {
   initialA?: string;
   initialB?: string;
   initialC?: string;
+  initialAName?: string;
+  initialANasc?: number;
+  initialBName?: string;
+  initialBNasc?: number;
+  initialCName?: string;
+  initialCNasc?: number;
   initialTriple?: boolean;
   heatmapsEnabled?: boolean;
 };
@@ -41,28 +49,74 @@ function pickPlayer(
 
 export function CompararClient({
   family,
-  players,
+  players: initialPlayers,
   initialA,
   initialB,
   initialC,
+  initialAName,
+  initialANasc,
+  initialBName,
+  initialBNasc,
+  initialCName,
+  initialCNasc,
   initialTriple,
   heatmapsEnabled = true,
 }: Props) {
   const { href } = useLeague();
+  // Static props always carry the current season; in ?temporada=YYYY the family
+  // roster is fetched client-side and the a=/b=/c= ids are re-resolved against it.
+  const { players, season, isCurrentSeason, seasonLoading, archiveFailed, retry } =
+    useSeasonRoster<PlayerProfile>({
+      initial: initialPlayers,
+      scope: family,
+      resource: `families/${family}`,
+    });
   const familyMeta = familyBySlug(family);
 
   const [triple, setTriple] = useState(() => Boolean(initialTriple || initialC));
   const [openSection, setOpenSection] = useState<string | null>(null);
-  const [idA, setIdA] = useState(() => pickPlayer(initialA, players, new Set(), 0));
-  const [idB, setIdB] = useState(() => {
-    const first = pickPlayer(initialA, players, new Set(), 0);
-    return pickPlayer(initialB, players, new Set([first]), 1);
-  });
-  const [idC, setIdC] = useState(() => {
-    const first = pickPlayer(initialA, players, new Set(), 0);
-    const second = pickPlayer(initialB, players, new Set([first]), 1);
-    return pickPlayer(initialC, players, new Set([first, second]), 2);
-  });
+  const [idA, setIdA] = useState("");
+  const [idB, setIdB] = useState("");
+  const [idC, setIdC] = useState("");
+
+  useEffect(() => {
+    if (!players.length) return;
+    const reference = initialPlayers;
+    const first = pickPlayer(
+      resolveSeasonPlayerId(players, initialA, {
+        name: initialAName,
+        birthYear: initialANasc,
+        reference,
+      }),
+      players,
+      new Set(),
+      0,
+    );
+    const second = pickPlayer(
+      resolveSeasonPlayerId(players, initialB, {
+        name: initialBName,
+        birthYear: initialBNasc,
+        reference,
+      }),
+      players,
+      new Set([first]),
+      1,
+    );
+    const third = pickPlayer(
+      resolveSeasonPlayerId(players, initialC, {
+        name: initialCName,
+        birthYear: initialCNasc,
+        reference,
+      }),
+      players,
+      new Set([first, second]),
+      2,
+    );
+    setIdA(first);
+    setIdB(second);
+    setIdC(third);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [players]);
 
   const playerA = players.find((p) => p.player_id === idA) ?? players[0];
   const playerB = players.find((p) => p.player_id === idB) ?? players[1] ?? players[0];
@@ -88,6 +142,31 @@ export function CompararClient({
   const positionTabs = (
     <PositionFamilyTabs active={family} hrefFor={(slug) => href(`/comparar/${slug}`)} />
   );
+
+  if (seasonLoading) {
+    return (
+      <div className="scout-root compare-root">
+        <ScoutTopbar active="comparar" subnav={positionTabs} />
+        <div className="scout-empty">
+          Carregando atletas{!isCurrentSeason ? ` da temporada ${season}` : ""}…
+        </div>
+      </div>
+    );
+  }
+
+  if (archiveFailed) {
+    return (
+      <div className="scout-root compare-root">
+        <ScoutTopbar active="comparar" subnav={positionTabs} />
+        <div className="scout-empty">
+          Não foi possível carregar os atletas de {season}.{" "}
+          <button type="button" className="zag-v2-retry" onClick={retry}>
+            Tentar de novo
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!playerA || !playerB || players.length < 2) {
     return (
@@ -226,15 +305,39 @@ export function CompararClient({
   );
 }
 
-export function CompararWithQuery(props: Omit<Props, "initialA" | "initialB" | "initialC" | "initialTriple">) {
+export function CompararWithQuery(
+  props: Omit<
+    Props,
+    | "initialA"
+    | "initialB"
+    | "initialC"
+    | "initialAName"
+    | "initialANasc"
+    | "initialBName"
+    | "initialBNasc"
+    | "initialCName"
+    | "initialCNasc"
+    | "initialTriple"
+  >,
+) {
   const search = useSearchParams();
   const c = search.get("c") ?? undefined;
+  const nasc = (key: string) => {
+    const value = Number(search.get(`${key}_nasc`));
+    return Number.isFinite(value) && value > 0 ? value : undefined;
+  };
   return (
     <CompararClient
       {...props}
       initialA={search.get("a") ?? undefined}
       initialB={search.get("b") ?? undefined}
       initialC={c}
+      initialAName={search.get("a_nome") ?? undefined}
+      initialANasc={nasc("a")}
+      initialBName={search.get("b_nome") ?? undefined}
+      initialBNasc={nasc("b")}
+      initialCName={search.get("c_nome") ?? undefined}
+      initialCNasc={nasc("c")}
       initialTriple={search.get("triple") === "1" || Boolean(c)}
     />
   );

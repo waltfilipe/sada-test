@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSeasonRoster } from "@/hooks/useSeasonRoster";
 import { BadgeFilterBox } from "@/components/filters/BadgeFilterBox";
 import { PlayerResultRow } from "@/components/filters/PlayerResultRow";
 import { RangeSlider } from "@/components/filters/RangeSlider";
@@ -143,9 +144,20 @@ type Props = {
   players: PlayerSearchRow[];
 };
 
-export function FiltrosClient({ meta, players }: Props) {
+export function FiltrosClient({ meta, players: initialPlayers }: Props) {
   const { leagueId } = useLeague();
+  // Static props always carry the current season; in ?temporada=YYYY the rows
+  // are fetched client-side, so the filter bounds wait for the archive roster.
+  const { players, season, isCurrentSeason, seasonLoading, archiveFailed, retry } =
+    useSeasonRoster<PlayerSearchRow>({
+      initial: initialPlayers,
+      scope: "all",
+      resource: "search-rows",
+    });
   const bounds = useMemo(() => {
+    if (!players.length) {
+      return { height: [0, 0] as Range, age: [0, 0] as Range, minutes: [0, 0] as Range };
+    }
     const heights = players.map((p) => p.height).filter((value): value is number => !!value);
     const years = players.map((p) => p.birth_year).filter((value): value is number => !!value);
     const minutes = players.map((p) => p.minutes);
@@ -193,6 +205,31 @@ export function FiltrosClient({ meta, players }: Props) {
     }
     setReady(true);
   }, [leagueId]);
+
+  // Sliders start as [0,0] while the roster is empty (SSR / archive fetch). On
+  // the first non-empty roster, expand that sentinel and clamp restored values;
+  // when the roster swaps (?temporada) reset to the new bounds entirely.
+  const loadedRoster = useRef<typeof players | null>(null);
+  useEffect(() => {
+    if (!players.length || loadedRoster.current === players) return;
+    const swapped = loadedRoster.current !== null;
+    loadedRoster.current = players;
+    if (swapped) {
+      setAge(bounds.age);
+      setHeight(bounds.height);
+      setMinutes(bounds.minutes);
+      return;
+    }
+    const fix = (current: Range, range: Range): Range => {
+      if (sameRange(current, [0, 0] as Range) && !sameRange(range, [0, 0] as Range)) return range;
+      const next: Range = [Math.max(current[0], range[0]), Math.min(current[1], range[1])];
+      if (next[0] > next[1]) return range;
+      return sameRange(current, next) ? current : next;
+    };
+    setAge((current) => fix(current, bounds.age));
+    setHeight((current) => fix(current, bounds.height));
+    setMinutes((current) => fix(current, bounds.minutes));
+  }, [players, bounds]);
 
   useEffect(() => {
     if (!sort.startsWith("stat:")) return;
@@ -588,7 +625,20 @@ export function FiltrosClient({ meta, players }: Props) {
             </div>
           )}
 
-          {results.length > 0 ? (
+          {seasonLoading ? (
+            <div className="results-empty">
+              <strong>
+                Carregando filtros{!isCurrentSeason ? ` de ${season}` : ""}…
+              </strong>
+            </div>
+          ) : archiveFailed ? (
+            <div className="results-empty">
+              <strong>Não foi possível carregar os atletas de {season}</strong>
+              <button type="button" onClick={retry}>
+                Tentar de novo
+              </button>
+            </div>
+          ) : results.length > 0 ? (
             <div className="results-list">
               {results.map((player) => (
                 <PlayerResultRow key={player.player_id} player={player} catalog={badgeOptions} />

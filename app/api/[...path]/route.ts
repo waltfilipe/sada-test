@@ -1,5 +1,12 @@
 import { NextResponse } from "next/server";
-import { filterPlayers, getFamilyPlayers, getMeta, getPlayerProfile, getPlayers } from "@/lib/data.server";
+import {
+  filterPlayers,
+  getFamilyPlayers,
+  getMeta,
+  getPlayerProfile,
+  getPlayers,
+  getSearchRows,
+} from "@/lib/data.server";
 import { findPlayerInSeason } from "@/lib/playerSeasonMatch.server";
 import { rankCrossLeagueSimilarity } from "@/lib/crossLeagueSimilarity";
 import { isLeagueId, type LeagueId } from "@/lib/leagues";
@@ -50,6 +57,21 @@ export async function GET(request: Request, { params }: Params) {
       { family: id, players, total: players.length },
       { headers: archiveCacheHeaders(season) },
     );
+  }
+
+  if (resource === "search-rows" && path.length === 1) {
+    const league = url.searchParams.get("league") ?? undefined;
+    const season = url.searchParams.get("season") ?? url.searchParams.get("temporada") ?? undefined;
+    try {
+      const players = getSearchRows(league, season);
+      return NextResponse.json(
+        { players, total: players.length },
+        { headers: archiveCacheHeaders(season) },
+      );
+    } catch {
+      // Missing archive slice (ex.: liga sem a temporada) — same contract as `families`.
+      return NextResponse.json({ players: [], total: 0 });
+    }
   }
 
   if (resource === "scatter" && path.length === 2) {
