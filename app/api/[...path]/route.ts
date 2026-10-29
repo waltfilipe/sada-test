@@ -7,6 +7,7 @@ import {
   getPlayers,
   getSearchRows,
 } from "@/lib/data.server";
+import { getAveragePlayers } from "@/lib/avgPlayer.server";
 import { findPlayerInSeason } from "@/lib/playerSeasonMatch.server";
 import { rankCrossLeagueSimilarity } from "@/lib/crossLeagueSimilarity";
 import { isLeagueId, type LeagueId } from "@/lib/leagues";
@@ -72,6 +73,29 @@ export async function GET(request: Request, { params }: Params) {
       // Missing archive slice (ex.: liga sem a temporada) — same contract as `families`.
       return NextResponse.json({ players: [], total: 0 });
     }
+  }
+
+  if (resource === "avg-player" && path.length === 1) {
+    const league = url.searchParams.get("league");
+    const family = url.searchParams.get("family");
+    const profile = url.searchParams.get("profile");
+    const payload = getAveragePlayers(league, family);
+    if (!payload) return NextResponse.json({ error: "invalid_family" }, { status: 400 });
+    // O médio acumula todas as temporadas — estático por deploy, como os arquivos.
+    const headers = {
+      "Cache-Control": "public, max-age=300, s-maxage=31536000, stale-while-revalidate=86400",
+    };
+    if (profile) {
+      const variants = payload.players.filter((item) => !item.player_id.endsWith("-todos"));
+      const player = variants.find(
+        (item) =>
+          item.profile.toLowerCase() === profile.toLowerCase() ||
+          item.player_id === `media-${payload.league}-${payload.family}-${profile}`,
+      );
+      if (!player) return NextResponse.json({ error: "not_found" }, { status: 404 });
+      return NextResponse.json({ player }, { headers });
+    }
+    return NextResponse.json(payload, { headers });
   }
 
   if (resource === "scatter" && path.length === 2) {

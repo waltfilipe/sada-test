@@ -6,7 +6,8 @@ import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
 import { ProfileTag, profileTagProps } from "@/components/position/ProfileTag";
 import { PlayerHeatmap } from "@/components/position/profile/PlayerHeatmap";
-import { ProfileCard } from "@/components/position/profile/ProfileCard";
+import { ProfileRadarCard } from "@/components/position/profile/ProfileCard";
+import { StatProfileRadarCard } from "@/components/position/profile/PlayerReport";
 import { ScoutStatsSections } from "@/components/position/profile/ScoutStatsSections";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { playerInitials } from "@/lib/scoutTheme";
@@ -20,6 +21,8 @@ type Props = {
   label: string;
   player: PlayerProfile;
   players: PlayerProfile[];
+  /** Variantes do jogador médio (/api/avg-player) exibidas no grupo "Médios". */
+  mediaPlayers?: PlayerProfile[];
   family: PositionFamily;
   pool: PlayerProfile[];
   excludeIds: Set<string>;
@@ -50,6 +53,7 @@ export function ComparePlayerColumn({
   label,
   player,
   players,
+  mediaPlayers = [],
   family,
   pool,
   excludeIds,
@@ -66,6 +70,14 @@ export function ComparePlayerColumn({
   const [open, setOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
+  const isMedia = player.player_id.startsWith("media-");
+  const mediaRange = useMemo(() => {
+    const seasons = player.media_seasons ?? [];
+    if (!seasons.length) return null;
+    const sorted = [...seasons].sort();
+    return sorted.length === 1 ? sorted[0] : `${sorted[0]}–${sorted[sorted.length - 1]}`;
+  }, [player.media_seasons]);
+
   const matches = useMemo(() => {
     const q = fold(query.trim());
     return players.filter((option) => {
@@ -74,6 +86,15 @@ export function ComparePlayerColumn({
       return fold(option.name).includes(q) || fold(option.club).includes(q);
     });
   }, [players, query, excludeIds, player.player_id]);
+
+  const mediaMatches = useMemo(() => {
+    const q = fold(query.trim());
+    return mediaPlayers.filter((option) => {
+      if (excludeIds.has(option.player_id) && option.player_id !== player.player_id) return false;
+      if (!q) return true;
+      return fold(option.name).includes(q);
+    });
+  }, [mediaPlayers, query, excludeIds, player.player_id]);
 
   useEffect(() => {
     if (!open) return;
@@ -119,6 +140,28 @@ export function ComparePlayerColumn({
             />
             {open ? (
               <ul className="compare-col-results" id={`compare-results-${side}`} role="listbox">
+                {mediaMatches.length ? (
+                  <>
+                    <li className="compare-col-results-group" aria-hidden="true">Médios</li>
+                    {mediaMatches.map((option) => (
+                      <li key={option.player_id}>
+                        <button
+                          type="button"
+                          role="option"
+                          aria-selected={option.player_id === player.player_id}
+                          className={option.player_id === player.player_id ? "is-current" : ""}
+                          onMouseDown={(event) => {
+                            event.preventDefault();
+                            pick(option.player_id);
+                          }}
+                        >
+                          <strong>{option.name}</strong>
+                          <em>{option.club}</em>
+                        </button>
+                      </li>
+                    ))}
+                  </>
+                ) : null}
                 {matches.length ? (
                   matches.slice(0, 30).map((option) => (
                     <li key={option.player_id}>
@@ -137,7 +180,7 @@ export function ComparePlayerColumn({
                       </button>
                     </li>
                   ))
-                ) : (
+                ) : mediaMatches.length ? null : (
                   <li className="compare-col-results-empty">Nenhum atleta com esse nome.</li>
                 )}
               </ul>
@@ -157,27 +200,40 @@ export function ComparePlayerColumn({
           <div className="compare-col-side">
             <div className="compare-col-identity">
               <h2 className="compare-col-name">{player.name}</h2>
-              <p className="compare-col-club">
-                <ClubLogo club={player.club} size={16} />
-                <span>{player.club}</span>
-                <span aria-hidden="true">·</span>
-                <span className="compare-col-position">{player.position}</span>
-              </p>
+              {isMedia ? (
+                <p className="compare-col-club">
+                  <i className="fa-solid fa-layer-group" aria-hidden="true" />
+                  <span>
+                    Média {mediaRange} · {player.club}
+                  </span>
+                </p>
+              ) : (
+                <p className="compare-col-club">
+                  <ClubLogo club={player.club} size={16} />
+                  <span>{player.club}</span>
+                  <span aria-hidden="true">·</span>
+                  <span className="compare-col-position">{player.position}</span>
+                </p>
+              )}
               <div className="compare-col-tag-row">
                 <ProfileTag {...profileTagProps(player)} />
               </div>
             </div>
 
             <div className="compare-col-actions">
-              <Link className="btn btn-ghost btn-sm" href={href(`/posicao/${family}?atleta=${player.player_id}`)}>
-                <i className="fa-solid fa-user" aria-hidden="true" /> Ver perfil
-              </Link>
-              {tm?.profile_url ? (
-                <a className="btn btn-ghost btn-sm" href={tm.profile_url} target="_blank" rel="noreferrer">
-                  <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
-                </a>
-              ) : null}
-              <AddToShadowMenu playerId={player.player_id} family={family} />
+              {isMedia ? null : (
+                <>
+                  <Link className="btn btn-ghost btn-sm" href={href(`/posicao/${family}?atleta=${player.player_id}`)}>
+                    <i className="fa-solid fa-user" aria-hidden="true" /> Ver perfil
+                  </Link>
+                  {tm?.profile_url ? (
+                    <a className="btn btn-ghost btn-sm" href={tm.profile_url} target="_blank" rel="noreferrer">
+                      <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
+                    </a>
+                  ) : null}
+                  <AddToShadowMenu playerId={player.player_id} family={family} />
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -222,7 +278,11 @@ export function ComparePlayerColumn({
 
       <div className="compare-col-stack">
         <div className="compare-col-profile">
-          <ProfileCard player={player} family={family} players={pool} />
+          <ProfileRadarCard player={player} family={family} players={pool} />
+        </div>
+
+        <div className="player-card compare-col-radar">
+          <StatProfileRadarCard player={player} bare />
         </div>
 
         <div className="player-card compare-col-stats">

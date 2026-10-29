@@ -186,6 +186,8 @@ export type PlayerProfile = PlayerSummary & {
   cross_season?: CrossSeasonProjection;
   /** Filled by /api/player-season for the peek popup. */
   season_meta?: SeasonMeta;
+  /** Jogador médio sintético (/api/avg-player) — temporadas combinadas na média. */
+  media_seasons?: string[];
   goals: number;
   assists: number;
   heatmap?: PlayerHeatmapData;

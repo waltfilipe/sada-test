@@ -33,13 +33,22 @@ type Props = {
   heatmapsEnabled?: boolean;
 };
 
+/** Ids `media-*` são o jogador médio sintético — não existem no elenco, resolvem via /api/avg-player. */
+function isMediaId(id: string | null | undefined): boolean {
+  return Boolean(id?.startsWith("media-"));
+}
+
 function pickPlayer(
   requested: string | undefined,
   players: PlayerProfile[],
   exclude: Set<string>,
   fallbackIndex: number,
 ): string {
-  if (requested && players.some((p) => p.player_id === requested) && !exclude.has(requested)) {
+  if (
+    requested &&
+    (isMediaId(requested) || players.some((p) => p.player_id === requested)) &&
+    !exclude.has(requested)
+  ) {
     return requested;
   }
   const available = players.find((p, index) => index >= fallbackIndex && !exclude.has(p.player_id));
@@ -62,7 +71,7 @@ export function CompararClient({
   initialTriple,
   heatmapsEnabled = true,
 }: Props) {
-  const { href } = useLeague();
+  const { href, leagueId } = useLeague();
   // Static props always carry the current season; in ?temporada=YYYY the family
   // roster is fetched client-side and the a=/b=/c= ids are re-resolved against it.
   const { players, season, isCurrentSeason, seasonLoading, archiveFailed, retry } =
@@ -73,6 +82,27 @@ export function CompararClient({
     });
   const familyMeta = familyBySlug(family);
 
+  // Jogador médio acumula todas as temporadas — independe do hub ?temporada.
+  const [mediaPlayers, setMediaPlayers] = useState<PlayerProfile[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/avg-player?league=${leagueId}&family=${family}`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`avg_${res.status}`))))
+      .then((payload: { players?: PlayerProfile[] }) => {
+        if (!cancelled) setMediaPlayers(payload.players ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setMediaPlayers([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [leagueId, family]);
+  const mediaById = useMemo(
+    () => new Map(mediaPlayers.map((player) => [player.player_id, player])),
+    [mediaPlayers],
+  );
+
   const [triple, setTriple] = useState(() => Boolean(initialTriple || initialC));
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [idA, setIdA] = useState("");
@@ -82,32 +112,29 @@ export function CompararClient({
   useEffect(() => {
     if (!players.length) return;
     const reference = initialPlayers;
+    // Ids media-* apontam para o jogador médio e passam direto pela resolução de elenco.
+    const resolve = (
+      requested: string | undefined,
+      name: string | undefined,
+      birthYear: number | undefined,
+    ) =>
+      isMediaId(requested)
+        ? requested
+        : resolveSeasonPlayerId(players, requested, { name, birthYear, reference });
     const first = pickPlayer(
-      resolveSeasonPlayerId(players, initialA, {
-        name: initialAName,
-        birthYear: initialANasc,
-        reference,
-      }),
+      resolve(initialA, initialAName, initialANasc),
       players,
       new Set(),
       0,
     );
     const second = pickPlayer(
-      resolveSeasonPlayerId(players, initialB, {
-        name: initialBName,
-        birthYear: initialBNasc,
-        reference,
-      }),
+      resolve(initialB, initialBName, initialBNasc),
       players,
       new Set([first]),
       1,
     );
     const third = pickPlayer(
-      resolveSeasonPlayerId(players, initialC, {
-        name: initialCName,
-        birthYear: initialCNasc,
-        reference,
-      }),
+      resolve(initialC, initialCName, initialCNasc),
       players,
       new Set([first, second]),
       2,
@@ -118,9 +145,9 @@ export function CompararClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [players]);
 
-  const playerA = players.find((p) => p.player_id === idA) ?? players[0];
-  const playerB = players.find((p) => p.player_id === idB) ?? players[1] ?? players[0];
-  const playerC = players.find((p) => p.player_id === idC) ?? players[2] ?? players[0];
+  const playerA = mediaById.get(idA) ?? players.find((p) => p.player_id === idA) ?? players[0];
+  const playerB = mediaById.get(idB) ?? players.find((p) => p.player_id === idB) ?? players[1] ?? players[0];
+  const playerC = mediaById.get(idC) ?? players.find((p) => p.player_id === idC) ?? players[2] ?? players[0];
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -223,6 +250,7 @@ export function CompararClient({
             label="Atleta 1"
             player={playerA}
             players={players}
+            mediaPlayers={mediaPlayers}
             family={family}
             pool={players}
             excludeIds={excludeForA}
@@ -238,6 +266,7 @@ export function CompararClient({
             label="Atleta 2"
             player={playerB}
             players={players}
+            mediaPlayers={mediaPlayers}
             family={family}
             pool={players}
             excludeIds={excludeForB}
@@ -254,6 +283,7 @@ export function CompararClient({
               label="Atleta 3"
               player={playerC}
               players={players}
+              mediaPlayers={mediaPlayers}
               family={family}
               pool={players}
               excludeIds={excludeForC}
