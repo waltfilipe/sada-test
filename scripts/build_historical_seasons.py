@@ -39,6 +39,7 @@ SOFASCORE_CSV: dict[tuple[str, str], Path] = {
 
 HEATMAPS_DIR: dict[tuple[str, str], Path] = {
     ("serie-a", "2025"): ROOT / "HeatmapsBRA25",
+    ("serie-c", "2025"): ROOT / "HeatmapsBRC25",
 }
 
 
