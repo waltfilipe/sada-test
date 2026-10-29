@@ -37,6 +37,10 @@ SOFASCORE_CSV: dict[tuple[str, str], Path] = {
     ("serie-c", "2025"): ROOT / "BRC25_defensive.csv",
 }
 
+HEATMAPS_DIR: dict[tuple[str, str], Path] = {
+    ("serie-a", "2025"): ROOT / "HeatmapsBRA25",
+}
+
 
 def main() -> None:
     for league_id, year, xlsx in SNAPSHOTS:
@@ -44,6 +48,7 @@ def main() -> None:
             print(f"skip missing {xlsx}")
             continue
         defensive_csv = SOFASCORE_CSV.get((league_id, year))
+        heatmaps_dir = HEATMAPS_DIR.get((league_id, year))
         out_dir = ROOT / "data" / league_id / "seasons" / year
         print(f"\n=== {league_id} {year} → {out_dir} ===")
         build_league(
@@ -51,13 +56,14 @@ def main() -> None:
             out_dir=out_dir,
             xlsx_override=[xlsx],
             season_label=year,
-            skip_heatmaps=True,
+            skip_heatmaps=heatmaps_dir is None,
             skip_physical_run=True,
             skip_transfermarkt=True,
             skip_sofascore=defensive_csv is None,
             skip_profiles_dir=True,
             prefer_period_club=True,
             defensive_csv_override=defensive_csv,
+            heatmaps_source_dir=heatmaps_dir,
         )
 
 

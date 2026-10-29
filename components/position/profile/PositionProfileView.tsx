@@ -71,7 +71,8 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
     };
   }, [isCurrentSeason, currentPlayers, player, hubSeason, leagueId, searchParams, pathname, router]);
 
-  const showHeatmap = heatmapsEnabled && !isArchiveView && isCurrentSeason;
+  const showHeatmap =
+    heatmapsEnabled && ((isCurrentSeason && !isArchiveView) || Boolean(displayPlayer?.heatmap));
 
   return (
     <div

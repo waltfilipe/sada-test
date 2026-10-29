@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
@@ -53,6 +54,7 @@ def build_league(
     skip_profiles_dir: bool = False,
     prefer_period_club: bool = False,
     defensive_csv_override: Path | None = None,
+    heatmaps_source_dir: Path | None = None,
 ) -> None:
     league = LEAGUES[league_id]
     out_dir = out_dir or (DATA_DIR / league_id)
@@ -68,8 +70,9 @@ def build_league(
     print(f"Source: {source} ({len(raw_df)} players)")
 
     df = attach_base_measures(raw_df)
+    def_csv = defensive_csv_override or league["defensive_csv"]
     if not skip_sofascore:
-        df = attach_sofascore_metrics(df, path=defensive_csv_override or league["defensive_csv"])
+        df = attach_sofascore_metrics(df, path=def_csv)
     df = df[df["Posição"] != "Goleiro"].copy()
 
     all_players: list[dict] = []
@@ -96,11 +99,24 @@ def build_league(
         all_players = enrich_players_with_transfermarkt(all_players)
 
     use_heatmaps = league["heatmaps"] and not skip_heatmaps
-    if use_heatmaps:
+    if use_heatmaps and heatmaps_source_dir:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_dir = Path(tmp)
+            imported = import_heatmaps_from_br26(
+                raw_df,
+                source_dir=heatmaps_source_dir,
+                out_dir=tmp_dir,
+                public_dir=tmp_dir,
+                csv_path=def_csv,
+            )
+            print(f"  Heatmaps importados de {heatmaps_source_dir.name}: {imported}")
+            attached = attach_heatmaps_to_players(all_players, out_dir=tmp_dir, public_dir=tmp_dir)
+        print(f"  Heatmaps anexados: {attached}/{len(all_players)}")
+    elif use_heatmaps:
         imported = import_heatmaps_from_br26(
             raw_df,
             source_dir=league["heatmaps_dir"],
-            csv_path=league["defensive_csv"],
+            csv_path=def_csv,
         )
         print(f"  Heatmaps importados de {league['heatmaps_dir'].name if league['heatmaps_dir'] else 'HeatmapsBR26'}: {imported}")
         attached = attach_heatmaps_to_players(all_players)
@@ -112,7 +128,7 @@ def build_league(
         run_attached = attach_physical_run_to_players(
             all_players,
             raw_df,
-            defensive_csv=league["defensive_csv"],
+            defensive_csv=def_csv,
             run_csv=league["run_csv"],
         )
         print(f"  GPS/Run anexado: {run_attached}/{len(all_players)}")
