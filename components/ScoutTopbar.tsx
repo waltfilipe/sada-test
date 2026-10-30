@@ -56,7 +56,8 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
             return (
               <Link
                 key={item.key}
-                href={navHref(item)}
+                href={disabled ? "#" : navHref(item)}
+                onClick={disabled ? (event) => event.preventDefault() : undefined}
                 className={[navActive(item) ? "active" : "", disabled ? "topbar-link-muted" : ""].filter(Boolean).join(" ")}
                 aria-current={navActive(item) ? "page" : undefined}
                 aria-disabled={disabled ? true : undefined}
