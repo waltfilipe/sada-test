@@ -10,7 +10,6 @@ import { crossingReading, formatPer90 } from "@/lib/crossingTendency";
 import { statRowLabel } from "@/lib/seasonTotals";
 import { centeredTendencyPosition } from "@/lib/tendencyScale";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import { isZagCluster } from "@/lib/clusterMeta";
 import { formatFoot } from "@/lib/feet";
 import { getLeague } from "@/lib/leagues";
 import { familyBySlug } from "@/lib/positions";
@@ -226,13 +225,25 @@ function clampPct(value: number): number {
   return Math.max(0, Math.min(100, value));
 }
 
-/** Profile name as the site classifies it, including the construtor or hybrid tone. */
+/** Profile name as the site classifies it (same macro label as ClusterTag). */
 function reportProfileName(player: PlayerProfile): string {
-  const cluster = player.cluster;
-  if (!cluster) return player.profile;
-  if (isZagCluster(cluster)) return cluster.construtor_badge || cluster.archetype;
-  if (cluster.archetype === "Híbrido" && cluster.hybrid_badge) return cluster.hybrid_badge;
-  return cluster.archetype;
+  return player.cluster?.archetype_label ?? player.profile;
+}
+
+type BioItem = { icon: string; label: string; value: string };
+
+function reportBio(player: PlayerProfile, lang: ReportLang): BioItem[] {
+  const copy = REPORT_COPY[lang];
+  const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
+  const foot = formatFoot(player.foot);
+  const nationality = translateNationality(player.nationality, lang);
+  const items: (BioItem | null)[] = [
+    age != null ? { icon: "fa-user", label: copy.bioAge, value: copy.bioYears(age) } : null,
+    player.height ? { icon: "fa-arrows-up-down", label: copy.bioHeight, value: `${player.height} cm` } : null,
+    foot ? { icon: "fa-shoe-prints", label: copy.bioFoot, value: translateLabel(foot, lang) } : null,
+    nationality ? { icon: "fa-flag", label: copy.bioNationality, value: nationality } : null,
+  ];
+  return items.filter((item): item is BioItem => Boolean(item));
 }
 
 function reportMix(player: PlayerProfile, family: PositionFamily, players: PlayerProfile[]): ReportMix[] {
@@ -713,9 +724,7 @@ export function ReportSheet({
   }, [family]);
   const familyLabel = translateLabel(familyBySlug(family).label, lang);
   const tm = player.transfermarkt;
-  const age = player.birth_year ? new Date().getFullYear() - player.birth_year : null;
   const contractDate = formatIso(tm?.contract_until, lang);
-  const foot = formatFoot(player.foot);
   const profileLabel = translateLabel(reportProfileName(player), lang);
   const mix = reportMix(player, family, players);
   const poolSize = players.length || 1;
@@ -731,12 +740,7 @@ export function ReportSheet({
   const leagueLabel = `${sheetLeague} ${sheetSeason}`;
   const leagueBanner = sheetLeague;
 
-  const bio = [
-    age != null ? copy.age(age) : null,
-    player.height ? `${player.height} cm` : null,
-    foot ? translateLabel(foot, lang) : null,
-    translateNationality(player.nationality, lang),
-  ].filter((item): item is string => Boolean(item));
+  const bio = reportBio(player, lang);
 
   const ranked = [...metrics].sort((a, b) => b.percentile - a.percentile);
   const strengths = ranked.filter((metric) => metric.percentile >= 50).slice(0, 6);
@@ -816,7 +820,13 @@ export function ReportSheet({
               {bio.length ? (
                 <ul className="player-report-bio">
                   {bio.map((item) => (
-                    <li key={item}>{item}</li>
+                    <li key={item.label}>
+                      <i className={`fa-solid ${item.icon}`} aria-hidden="true" />
+                      <span className="player-report-bio-text">
+                        <span className="player-report-bio-label">{item.label}</span>
+                        <strong>{item.value}</strong>
+                      </span>
+                    </li>
                   ))}
                 </ul>
               ) : null}
@@ -1156,6 +1166,87 @@ function weightedMean(values: { value: number; weight: number }[]): number | nul
   return values.reduce((sum, item) => sum + item.value * item.weight, 0) / total;
 }
 
+type SummaryDetail = {
+  row: SummarySheetRow;
+  weight: number;
+};
+
+/** Minutes-weighted pass tendencies across the picked seasons (short↔long and progressive share). */
+function summaryTendencies(detail: SummaryDetail[], lang: ReportLang): ReportTendency[] {
+  const copy = REPORT_COPY[lang];
+  const rows: ReportTendency[] = [];
+
+  const aggregate = (barKey: "pass_tendency" | "progressive_share") => {
+    const entries = detail.map((item) => ({
+      weight: item.weight,
+      aspect: (item.row.player.aspects.perfil_construcao ?? []).find((aspect) => aspect.bar_key === barKey),
+    }));
+    const share = weightedMean(
+      entries.flatMap((entry) =>
+        entry.aspect?.share_pct != null ? [{ value: entry.aspect.share_pct, weight: entry.weight }] : [],
+      ),
+    );
+    const average = weightedMean(
+      entries.flatMap((entry) =>
+        entry.aspect?.pool_avg_pct != null ? [{ value: entry.aspect.pool_avg_pct, weight: entry.weight }] : [],
+      ),
+    );
+    const scale = Math.max(
+      ...entries.map((entry) => entry.aspect?.scale_max_pct ?? 0),
+      share ?? 0,
+      average ?? 0,
+      1,
+    );
+    const left = entries.find((entry) => entry.aspect?.axis_left)?.aspect?.axis_left ?? null;
+    const right = entries.find((entry) => entry.aspect?.axis_right)?.aspect?.axis_right ?? null;
+    return { share, average, scale, left, right };
+  };
+
+  const longo = aggregate("pass_tendency");
+  if (longo.share != null) {
+    const gap = longo.average == null ? null : longo.share - longo.average;
+    const verdict = gap == null ? null : gap >= 2 ? copy.longer : gap <= -2 ? copy.shorter : copy.onAverage;
+    const bits = [
+      verdict,
+      copy.longShare(Math.round(longo.share)),
+      longo.average == null ? null : `${copy.average} ${Math.round(longo.average)}%`,
+    ].filter((bit): bit is string => Boolean(bit));
+    rows.push({
+      key: "curto",
+      label: copy.shortPass,
+      detail: bits.join(" · "),
+      fill:
+        longo.average == null
+          ? clampPct((longo.share / longo.scale) * 100)
+          : clampPct(centeredTendencyPosition(longo.share, longo.average, longo.scale)),
+      averageFill: longo.average == null ? null : 50,
+      left: translateLabel(longo.left || "Curto", lang),
+      right: translateLabel(longo.right || "Longo", lang),
+    });
+  }
+
+  const progressivo = aggregate("progressive_share");
+  if (progressivo.share != null) {
+    rows.push({
+      key: "progressivo",
+      label: copy.progressivePass,
+      detail:
+        progressivo.average == null
+          ? `${Math.round(progressivo.share)}%`
+          : `${Math.round(progressivo.share)}% · ${copy.average} ${Math.round(progressivo.average)}%`,
+      fill:
+        progressivo.average == null
+          ? clampPct((progressivo.share / progressivo.scale) * 100)
+          : clampPct(centeredTendencyPosition(progressivo.share, progressivo.average, progressivo.scale)),
+      averageFill: progressivo.average == null ? null : 50,
+      left: translateLabel(progressivo.left || "Baixo", lang),
+      right: translateLabel(progressivo.right || "Alto", lang),
+    });
+  }
+
+  return rows;
+}
+
 /** Last page of a multi-season export: the athlete's "average profile" across the picked years. */
 export function SeasonSummarySheet({
   rows,
@@ -1260,6 +1351,9 @@ export function SeasonSummarySheet({
     .filter((metric) => metric.percentile < 50)
     .slice(0, 6);
 
+  const tendencies = useMemo(() => summaryTendencies(detail, lang), [detail, lang]);
+  const bio = useMemo(() => reportBio(main, lang), [main, lang]);
+
   return (
     <article className="player-report player-report-summary" lang={lang === "en" ? "en" : "pt-BR"}>
       <div className="player-report-page">
@@ -1298,6 +1392,19 @@ export function SeasonSummarySheet({
                 </>
               ) : null}
             </p>
+            {bio.length ? (
+              <ul className="player-report-bio player-report-bio-mini">
+                {bio.map((item) => (
+                  <li key={item.label}>
+                    <i className={`fa-solid ${item.icon}`} aria-hidden="true" />
+                    <span className="player-report-bio-text">
+                      <span className="player-report-bio-label">{item.label}</span>
+                      <strong>{item.value}</strong>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         </section>
 
@@ -1401,6 +1508,35 @@ export function SeasonSummarySheet({
             </section>
           ) : null}
         </div>
+
+        {tendencies.length ? (
+          <section className="player-report-tendencies player-report-summary-tendencies" aria-label={copy.tendencies}>
+            <h2 className="player-report-heading">
+              {copy.tendencies}
+              <span className="player-report-tend-hint">{copy.avgTendenciesHint}</span>
+            </h2>
+            <div className="player-report-tendency-grid">
+              {tendencies.map((item) => (
+                <div key={item.key} className={`player-report-tendency${item.key === "curto" ? " is-length" : ""}`}>
+                  <p className="player-report-label">{item.label}</p>
+                  <strong>{item.detail}</strong>
+                  <div className="player-report-tendency-bar">
+                    <div className="player-report-tendency-track">
+                      <span style={{ width: `${item.fill}%` }} />
+                    </div>
+                    {item.averageFill != null ? (
+                      <i className="player-report-tendency-avg" style={{ left: `${item.averageFill}%` }} />
+                    ) : null}
+                  </div>
+                  <div className="player-report-axis">
+                    <span>{item.left}</span>
+                    <span>{item.right}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <div className="player-report-split">
           <MetricList
