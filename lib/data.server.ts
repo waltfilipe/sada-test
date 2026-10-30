@@ -77,6 +77,7 @@ export function getPlayers(league?: string, season?: string): PlayerSummary[] {
       parseSeasonParam(season) === CURRENT_SEASON
         ? payload.players
         : withResolvedSeasonPhotos(id, season ?? CURRENT_SEASON, payload.players);
+    playersCache.set(key, { ...payload, players: resolved });
   }
   return playersCache.get(key)!.players;
 }
