@@ -32,6 +32,10 @@ type PhotoIndex = {
   byTmId: Map<string, TransfermarktInfo>;
   byNameClub: Map<string, TransfermarktInfo>;
   byName: Map<string, PhotoCandidate[]>;
+  /** person_key → Transfermarkt of the 2026 row of the same person. */
+  byPerson: Map<string, TransfermarktInfo>;
+  /** "league/season/player_id" → person_key (from cross-season persons.json). */
+  rowPerson: Map<string, string>;
 };
 
 type PhotoCandidate = {
@@ -82,6 +86,30 @@ function remember(
   maps.byName.set(n, nameList);
 }
 
+function loadPersonsMap(maps: PhotoIndex): Map<string, string[]> {
+  /** Reads persons.json; returns person_key → ["league/player_id"] of 2026 rows. */
+  const currentByKey = new Map<string, string[]>();
+  const file = path.join(DATA_DIR, "cross-season", "persons.json");
+  if (!fs.existsSync(file)) return currentByKey;
+  const persons = JSON.parse(fs.readFileSync(file, "utf-8")) as Record<
+    string,
+    Record<string, Record<string, string>>
+  >;
+  for (const [league, seasons] of Object.entries(persons)) {
+    for (const [season, rows] of Object.entries(seasons)) {
+      for (const [playerId, key] of Object.entries(rows)) {
+        maps.rowPerson.set(`${league}/${season}/${playerId}`, key);
+        if (season === CURRENT_SEASON) {
+          const list = currentByKey.get(key) ?? [];
+          list.push(`${league}/${playerId}`);
+          currentByKey.set(key, list);
+        }
+      }
+    }
+  }
+  return currentByKey;
+}
+
 function loadCurrentSeasonProfiles(maps: PhotoIndex) {
   for (const league of BR_LEAGUES) {
     const base = path.join(DATA_DIR, league);
@@ -90,6 +118,10 @@ function loadCurrentSeasonProfiles(maps: PhotoIndex) {
       if (!fs.existsSync(file)) continue;
       const payload = JSON.parse(fs.readFileSync(file, "utf-8")) as { players: PlayerProfile[] };
       for (const player of payload.players ?? []) {
+        const personKey = maps.rowPerson.get(`${league}/${CURRENT_SEASON}/${player.player_id}`);
+        if (personKey && player.transfermarkt?.photo) {
+          maps.byPerson.set(personKey, pickRicher(maps.byPerson.get(personKey), player.transfermarkt));
+        }
         if (player.transfermarkt?.photo) {
           remember(maps, player.transfermarkt, player.name, player.club, player.birth_year);
         }
@@ -142,7 +174,10 @@ function buildPhotoIndex(): PhotoIndex {
     byTmId: new Map(),
     byNameClub: new Map(),
     byName: new Map(),
+    byPerson: new Map(),
+    rowPerson: new Map(),
   };
+  loadPersonsMap(maps);
   loadCurrentSeasonProfiles(maps);
   loadTransfermarktCache(maps);
   loadPhotoManifest(maps);
@@ -183,10 +218,7 @@ function lookupTransfermarkt(
   return player.transfermarkt ?? null;
 }
 
-export function withResolvedPlayerPhoto<T extends PlayerSummary>(player: T): T {
-  if (player.transfermarkt?.photo) return player;
-  const tm = lookupTransfermarkt(player);
-  if (!tm?.photo) return player;
+function mergeTm<T extends PlayerSummary>(player: T, tm: NonNullable<TransfermarktInfo>): T {
   return {
     ...player,
     transfermarkt: {
@@ -200,6 +232,40 @@ export function withResolvedPlayerPhoto<T extends PlayerSummary>(player: T): T {
   };
 }
 
+export function withResolvedPlayerPhoto<T extends PlayerSummary>(player: T): T {
+  if (player.transfermarkt?.photo) return player;
+  const tm = lookupTransfermarkt(player);
+  if (!tm?.photo) return player;
+  return mergeTm(player, tm);
+}
+
 export function withResolvedPlayerPhotos<T extends PlayerSummary>(players: T[]): T[] {
   return players.map((player) => withResolvedPlayerPhoto(player));
+}
+
+/**
+ * Archive-season photo resolution. The row's person_key (same identity graph as
+ * cross_season) points to that athlete's 2026 Transfermarkt — the photo follows
+ * the person, never the name. Falls back to the legacy lookups when the archive
+ * player has no 2026 counterpart (left/retired).
+ */
+export function withResolvedSeasonPhoto<T extends PlayerSummary>(
+  league: string,
+  season: string,
+  player: T,
+): T {
+  if (player.transfermarkt?.photo) return player;
+  const maps = photoIndex();
+  const key = maps.rowPerson.get(`${league}/${season}/${player.player_id}`);
+  const tm = key ? maps.byPerson.get(key) : undefined;
+  if (tm?.photo) return mergeTm(player, tm);
+  return withResolvedPlayerPhoto(player);
+}
+
+export function withResolvedSeasonPhotos<T extends PlayerSummary>(
+  league: string,
+  season: string,
+  players: T[],
+): T[] {
+  return players.map((player) => withResolvedSeasonPhoto(league, season, player));
 }

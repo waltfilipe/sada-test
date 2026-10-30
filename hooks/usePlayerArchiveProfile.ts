@@ -59,7 +59,21 @@ export function usePlayerArchiveProfile(basePlayer: PlayerProfile, _family: Posi
     fetch(`/api/player-season?${qs}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data: PlayerProfile | null) => {
-        if (!cancelled) setArchivePlayer(data);
+        if (cancelled) return;
+        if (data && !data.transfermarkt?.photo && basePlayer.transfermarkt?.photo) {
+          const base = basePlayer.transfermarkt;
+          data.transfermarkt = {
+            market_value: data.transfermarkt?.market_value ?? null,
+            market_value_eur: data.transfermarkt?.market_value_eur ?? null,
+            contract_until: data.transfermarkt?.contract_until ?? null,
+            contract_remaining: data.transfermarkt?.contract_remaining ?? null,
+            club: data.transfermarkt?.club ?? null,
+            photo: base.photo,
+            id: base.id ?? data.transfermarkt?.id ?? null,
+            profile_url: base.profile_url ?? data.transfermarkt?.profile_url ?? null,
+          };
+        }
+        setArchivePlayer(data);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

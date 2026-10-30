@@ -7,7 +7,7 @@ import { CURRENT_SEASON, parseSeasonParam } from "./seasons";
 import { DEFAULT_LEAGUE, isLeagueId, type LeagueId } from "./leagues";
 import { POSITION_FAMILIES } from "./positions";
 import { playerStatBadges } from "./statBadges";
-import { withResolvedPlayerPhoto, withResolvedPlayerPhotos } from "./playerPhotoLookup.server";
+import { withResolvedSeasonPhoto, withResolvedSeasonPhotos } from "./playerPhotoLookup.server";
 import type { PlayerHeatmapData, PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -76,8 +76,7 @@ export function getPlayers(league?: string, season?: string): PlayerSummary[] {
     const resolved =
       parseSeasonParam(season) === CURRENT_SEASON
         ? payload.players
-        : withResolvedPlayerPhotos(payload.players);
-    playersCache.set(key, { ...payload, players: resolved });
+        : withResolvedSeasonPhotos(id, season ?? CURRENT_SEASON, payload.players);
   }
   return playersCache.get(key)!.players;
 }
@@ -136,7 +135,9 @@ function profileIndex(league: LeagueId, season?: string): Map<string, PlayerProf
 export function getPlayerProfile(playerId: string, league?: string, season?: string): PlayerProfile | null {
   const player = profileIndex(resolveLeague(league), season).get(playerId) ?? null;
   if (!player) return null;
-  return parseSeasonParam(season) === CURRENT_SEASON ? player : (withResolvedPlayerPhoto(player) as PlayerProfile);
+  return parseSeasonParam(season) === CURRENT_SEASON
+    ? player
+    : (withResolvedSeasonPhoto(resolveLeague(league), season ?? CURRENT_SEASON, player) as PlayerProfile);
 }
 
 export function getFamilyPlayers(family: PositionFamily, league?: string, season?: string): PlayerProfile[] {
@@ -150,7 +151,7 @@ export function getFamilyPlayers(family: PositionFamily, league?: string, season
   const resolved =
     parseSeasonParam(season) === CURRENT_SEASON
       ? payload.players
-      : withResolvedPlayerPhotos(payload.players);
+      : withResolvedSeasonPhotos(id, season ?? CURRENT_SEASON, payload.players);
   familyCache.set(key, resolved);
   return resolved;
 }

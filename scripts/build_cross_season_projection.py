@@ -234,12 +234,15 @@ def main() -> None:
     key_index = assign_season_keys(all_rows)
 
     timeline: dict[str, list[dict]] = {}
+    persons_map: dict[str, dict[str, dict[str, str]]] = {}
     for p in all_rows:
+        key = p.get("_person_key")
+        if not key:
+            continue
+        persons_map.setdefault(p["_league"], {}).setdefault(p["_season"], {})[p["player_id"]] = key
         if (p.get("minutes") or 0) < 180:
             continue
-        key = p.get("_person_key")
-        if key:
-            timeline.setdefault(key, []).append(p)
+        timeline.setdefault(key, []).append(p)
 
     for key in timeline:
         timeline[key].sort(key=lambda r: (r.get("_season") or "", r.get("_league") or ""))
@@ -280,6 +283,7 @@ def main() -> None:
     out_models = DATA / "cross-season" / "models.json"
     out_models.parent.mkdir(parents=True, exist_ok=True)
     out_models.write_text(dumps_json(models), encoding="utf-8")
+    (DATA / "cross-season" / "persons.json").write_text(dumps_json(persons_map), encoding="utf-8")
 
     enriched = 0
     for league in BR_LEAGUES:

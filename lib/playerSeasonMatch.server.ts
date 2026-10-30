@@ -1,6 +1,6 @@
 import "server-only";
 
-import { withResolvedPlayerPhoto } from "@/lib/playerPhotoLookup.server";
+import { withResolvedSeasonPhoto } from "@/lib/playerPhotoLookup.server";
 import { POSITION_FAMILIES } from "@/lib/positions";
 import { archetypeRank, sortedProfileShareRows } from "@/lib/profileShares";
 import { profileGradeFromRank } from "@/lib/scoutTheme";
@@ -17,8 +17,14 @@ export function normPlayerName(name: string): string {
     .trim();
 }
 
-function withSeasonMeta(player: PlayerProfile, pool: PlayerProfile[], family: PositionFamily): PlayerProfile {
-  const resolved = withResolvedPlayerPhoto(player) as PlayerProfile;
+function withSeasonMeta(
+  league: LeagueId,
+  season: string,
+  player: PlayerProfile,
+  pool: PlayerProfile[],
+  family: PositionFamily,
+): PlayerProfile {
+  const resolved = withResolvedSeasonPhoto(league, season, player) as PlayerProfile;
   const profiles = sortedProfileShareRows(resolved).map((row) => {
     const rank = archetypeRank(resolved, pool, row.label, family);
     return { label: row.label, share: row.share, rank, grade: rank ? profileGradeFromRank(rank, pool.length) : null };
@@ -56,5 +62,5 @@ export function findPlayerInSeason(
       }
     }
   }
-  return best ? withSeasonMeta(best.player, best.pool, best.family) : null;
+  return best ? withSeasonMeta(league, season, best.player, best.pool, best.family) : null;
 }
