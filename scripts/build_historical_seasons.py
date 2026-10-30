@@ -32,6 +32,7 @@ SNAPSHOTS: list[tuple[str, str, Path]] = [
 
 
 SOFASCORE_CSV: dict[tuple[str, str], Path] = {
+    ("serie-a", "2023"): ROOT / "BRA23_defensive.csv",
     ("serie-a", "2024"): ROOT / "BRA24_defensive.csv",
     ("serie-a", "2025"): ROOT / "BRA25_defensive.csv",
     ("serie-b", "2024"): ROOT / "BRB24_defensive.csv",
