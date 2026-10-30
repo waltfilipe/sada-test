@@ -12,6 +12,7 @@ import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { useSeasonRoster } from "@/hooks/useSeasonRoster";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
+import { isProjectionEligible, realisticProjection } from "@/lib/minuteProjection";
 import { familyBySlug } from "@/lib/positions";
 import { resolveSeasonPlayerId } from "@/lib/seasonRosterMatch";
 import { scatterAxis, scatterAxisLabel } from "@/lib/scatterAxis";
@@ -163,6 +164,8 @@ export function ScatterClient({
     return axisMetrics.find((metric) => metric.key !== defaultX)?.key ?? defaultY;
   });
   const [savedCharts, setSavedCharts] = useState<SavedScatterChart[]>([]);
+  const [minMinutes, setMinMinutes] = useState(0);
+  const [useProjection, setUseProjection] = useState(false);
 
   useEffect(() => {
     setSavedCharts(readSavedScatterCharts(leagueId, family));
@@ -183,18 +186,37 @@ export function ScatterClient({
     return rows;
   }, [idA, idB, idC, players]);
 
+  const visiblePlayers = useMemo(
+    () => players.filter((player) => (player.minutes_pct ?? 0) >= minMinutes),
+    [players, minMinutes],
+  );
+
+  const projectedCount = useMemo(() => players.filter(isProjectionEligible).length, [players]);
+
+  const projectionById = useMemo(() => {
+    const map = new Map<string, PlayerProfile>();
+    if (!useProjection) return map;
+    for (const player of players) {
+      map.set(player.player_id, realisticProjection(player, players)?.profile ?? player);
+    }
+    return map;
+  }, [players, useProjection]);
+
   const points = useMemo(
     () =>
-      players.map((player) => ({
-        player_id: player.player_id,
-        label: player.name,
-        name: player.name,
-        club: player.club,
-        href: href(`/posicao/${family}?atleta=${player.player_id}`),
-        x: scatterAxis(player, xKey).value,
-        y: scatterAxis(player, yKey).value,
-      })),
-    [players, xKey, yKey, href, family],
+      visiblePlayers.map((player) => {
+        const source = projectionById.get(player.player_id) ?? player;
+        return {
+          player_id: player.player_id,
+          label: player.name,
+          name: player.name,
+          club: player.club,
+          href: href(`/posicao/${family}?atleta=${player.player_id}`),
+          x: scatterAxis(source, xKey).value,
+          y: scatterAxis(source, yKey).value,
+        };
+      }),
+    [visiblePlayers, projectionById, xKey, yKey, href, family],
   );
 
   const avgX = useMemo(
@@ -361,6 +383,38 @@ export function ScatterClient({
                 onChange={setYKey}
                 onSwap={swapAxes}
               />
+
+              <div className="scatter-controls">
+                <label className="scatter-minutes">
+                  <span>
+                    Minutos mínimos <b>{minMinutes}%</b>
+                  </span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={90}
+                    step={5}
+                    value={minMinutes}
+                    onChange={(event) => setMinMinutes(Number(event.target.value))}
+                    aria-label="Filtro de minutos mínimos"
+                  />
+                </label>
+                <button
+                  type="button"
+                  className={`scatter-proj-toggle${useProjection ? " on" : ""}`}
+                  onClick={() => setUseProjection((value) => !value)}
+                  aria-pressed={useProjection}
+                >
+                  <i className="fa-solid fa-chart-line" aria-hidden />{" "}
+                  {useProjection ? "Projeção ativa" : "Plotar projeção"}
+                </button>
+                {useProjection ? (
+                  <p className="scatter-proj-note">
+                    {projectedCount} reserva(s) projetados por EB + histórico; titulares mantêm o
+                    valor atual.
+                  </p>
+                ) : null}
+              </div>
             </section>
 
             <div className="scatter-slots">
@@ -419,6 +473,12 @@ export function ScatterClient({
                     <i className="lg lg-avg" aria-hidden />
                     <span>Média do grupo</span>
                   </li>
+                  {useProjection ? (
+                    <li>
+                      <i className="lg lg-proj" aria-hidden />
+                      <span>Projeção EB (amostra curta)</span>
+                    </li>
+                  ) : null}
                 </ul>
               </section>
             </div>
@@ -448,6 +508,9 @@ export function ScatterClient({
                     {quadrantLabel(point.x, point.y, avgX, avgY, xLabel, yLabel)}
                   </p>
                   <strong className="scatter-stat-name">{slot.player.name}</strong>
+                  {useProjection && isProjectionEligible(slot.player) ? (
+                    <span className="scatter-proj-tag">projeção EB</span>
+                  ) : null}
                   <p className="scatter-stat-values">
                     <span>
                       {xLabel} <b>{formatMetric(point.x)}</b>

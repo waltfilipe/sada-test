@@ -730,6 +730,85 @@
   border-radius: 0;
 }
 
+.legend-list .lg-proj {
+  background: transparent;
+  border: 2px dashed rgba(34, 211, 238, 0.7);
+}
+
+.scatter-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-top: 0.65rem;
+  margin-top: 0.65rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.scatter-minutes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--muted, #94a3b8);
+}
+
+.scatter-minutes b {
+  color: #e2e8f0;
+}
+
+.scatter-minutes input[type="range"] {
+  width: 100%;
+  accent-color: #22d3ee;
+  cursor: pointer;
+}
+
+.scatter-proj-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(8, 51, 68, 0.35);
+  color: #a5f3fc;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.scatter-proj-toggle:hover {
+  border-color: rgba(34, 211, 238, 0.7);
+}
+
+.scatter-proj-toggle.on {
+  background: rgba(34, 211, 238, 0.16);
+  border-color: #22d3ee;
+  color: #67e8f9;
+}
+
+.scatter-proj-note {
+  margin: 0;
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: var(--muted, #94a3b8);
+}
+
+.scatter-proj-tag {
+  display: inline-block;
+  margin-top: 0.15rem;
+  padding: 0.08rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(34, 211, 238, 0.45);
+  background: rgba(34, 211, 238, 0.1);
+  color: #67e8f9;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 /* ── Chart ───────────────────────────────────────────────────────────────── */
 
 .scatter-plot-wrap {
