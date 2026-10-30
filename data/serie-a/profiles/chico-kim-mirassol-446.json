@@ -764,5 +764,47 @@
       "high_speed_km_p90": 65,
       "sprinting_km_p90": 80
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 2340,
+        "club": "Juventude"
+      },
+      {
+        "year": "2023",
+        "league": "serie-b",
+        "minutes": 2964,
+        "club": "Mirassol"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 1897,
+        "club": "Mirassol"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 422,
+        "club": "Mirassol"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 5.0632,
+        "history_mean": 5.3595,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 2.041,
+        "history_mean": 1.114,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

@@ -138,18 +138,17 @@ def assign_season_keys(rows: list[dict]) -> dict[tuple[str, int], str]:
         members.sort(key=lambda r: (r.get("birth_year") or 0))
         cluster_min: int | None = None
         prev_birth = 0
-        groups: dict[tuple[int, str], list[dict]] = {}
+        groups: dict[int, list[dict]] = {}
         for row in members:
             birth = row.get("birth_year") or 0
             if not birth:
-                groups.setdefault((0, row.get("position_family") or ""), []).append(row)
+                groups.setdefault(0, []).append(row)
                 continue
             if cluster_min is None or birth - prev_birth > 1:
                 cluster_min = birth
             prev_birth = birth
-            key = (cluster_min, row.get("position_family") or "")
-            groups.setdefault(key, []).append(row)
-        for (cluster, family), group_rows in groups.items():
+            groups.setdefault(cluster_min, []).append(row)
+        for cluster, group_rows in groups.items():
             season_counts: dict[str, int] = {}
             for row in group_rows:
                 s = row.get("_season") or ""
@@ -160,10 +159,15 @@ def assign_season_keys(rows: list[dict]) -> dict[tuple[str, int], str]:
                 else _split_persons(group_rows)
             )
             for person_i, person in enumerate(persons):
-                person_key = f"name:{name}|{cluster}|{family}|{person_i}"
+                person_key = f"name:{name}|{cluster}|{person_i}"
                 for row in person:
                     row["_person_key"] = person_key
-                    sig = (name, row.get("birth_year") or 0, family, norm_name(row.get("club") or ""))
+                    sig = (
+                        name,
+                        row.get("birth_year") or 0,
+                        row.get("position_family") or "",
+                        norm_name(row.get("club") or ""),
+                    )
                     index.setdefault(sig, person_key)
     return index
 

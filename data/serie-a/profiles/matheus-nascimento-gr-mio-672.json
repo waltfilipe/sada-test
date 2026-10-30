@@ -376,5 +376,29 @@
       "boxtobox": 6.3
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 755,
+        "club": "Botafogo"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 0.9,
+        "history_mean": 0.9,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 0.1,
+        "history_mean": 0.1,
+        "consistent": false,
+        "role_change_flag": false
+      }
+    }
+  }
 }

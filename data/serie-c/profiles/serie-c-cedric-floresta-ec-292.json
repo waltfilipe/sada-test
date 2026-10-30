@@ -1865,6 +1865,12 @@
   "cross_season": {
     "seasons": [
       {
+        "year": "2023",
+        "league": "serie-c",
+        "minutes": 859,
+        "club": "CSA"
+      },
+      {
         "year": "2024",
         "league": "serie-c",
         "minutes": 612,
@@ -1879,15 +1885,21 @@
     ],
     "metrics": {
       "Cruzamentos::Cruzamentos": {
-        "predicted": 2.3885,
+        "predicted": 2.4244,
         "history_mean": 2.0893,
         "consistent": true,
         "role_change_flag": false
       },
       "Duelos Defensivos": {
-        "predicted": 6.4833,
-        "history_mean": 7.4479,
-        "consistent": true,
+        "predicted": 5.6109,
+        "history_mean": 6.5126,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Conduções Progressivas": {
+        "predicted": 0.9,
+        "history_mean": 0.9,
+        "consistent": false,
         "role_change_flag": false
       }
     }
