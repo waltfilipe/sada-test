@@ -52,6 +52,10 @@ export function usePlayerArchiveProfile(basePlayer: PlayerProfile, _family: Posi
       name: basePlayer.name,
       birth_year: String(basePlayer.birth_year ?? ""),
     });
+    const expectedClub =
+      basePlayer.cross_season?.seasons.find((s) => s.year === fichaSeason && s.league === league)?.club ??
+      basePlayer.club;
+    if (expectedClub) qs.set("club", expectedClub);
     fetch(`/api/player-season?${qs}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data: PlayerProfile | null) => {

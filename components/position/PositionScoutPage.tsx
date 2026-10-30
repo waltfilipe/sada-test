@@ -108,12 +108,16 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
     const name = searchParams.get("atleta_nome");
     if (name) {
       const nasc = Number(searchParams.get("atleta_nasc"));
+      const expectedClub = searchParams.get("atleta_clube");
       const candidates = players.filter((player) => player.name === name);
+      const pool = expectedClub ? candidates.filter((p) => p.club === expectedClub) : [];
       const match =
+        pool[0] ??
         candidates.find(
           (player) =>
             player.birth_year == null || !Number.isFinite(nasc) || Math.abs(player.birth_year - nasc) <= 1,
-        ) ?? (candidates.length === 1 ? candidates[0] : undefined);
+        ) ??
+        (candidates.length === 1 ? candidates[0] : undefined);
       if (match) return match.player_id;
     }
     return id;

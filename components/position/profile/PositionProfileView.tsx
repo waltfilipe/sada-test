@@ -63,6 +63,10 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
         params.delete(FICHA_TEMPORADA_PARAM);
         params.set("atleta_nome", player.name);
         params.set("atleta_nasc", String(player.birth_year ?? ""));
+        const targetClub =
+          counterpart.cross_season?.seasons.find((s) => s.year === year && s.league === leagueId)?.club ??
+          player.club;
+        if (targetClub) params.set("atleta_clube", targetClub);
         if (year === CURRENT_SEASON) params.delete("temporada");
         else params.set("temporada", year);
         const qs = params.toString();

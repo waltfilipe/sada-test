@@ -40,22 +40,19 @@ export function findPlayerInSeason(
   club?: string | null,
 ): PlayerProfile | null {
   const norm = normPlayerName(name);
-  const wanted = `${norm}|${birthYear ?? 0}`;
-  let best: { player: PlayerProfile; pool: PlayerProfile[]; family: PositionFamily; diff: number } | null = null;
+  let best: { player: PlayerProfile; pool: PlayerProfile[]; family: PositionFamily; score: number } | null = null;
   for (const family of POSITION_FAMILIES) {
     const pool = getFamilyPlayers(family.key, league, season) as PlayerProfile[];
     for (const player of pool) {
       if (normPlayerName(player.name) !== norm) continue;
-      if (`${norm}|${player.birth_year ?? 0}` === wanted) {
-        return withSeasonMeta(player, pool, family.key);
-      }
       const pb = player.birth_year ?? null;
       if (birthYear == null || pb == null) continue;
       const diff = Math.abs(pb - birthYear);
       if (diff > 1) continue;
-      const clubHit = club ? player.club === club : false;
-      if (!best || diff < best.diff || (diff === best.diff && clubHit)) {
-        best = { player, pool, family: family.key, diff: clubHit ? diff - 0.5 : diff };
+      const clubHit = club != null && player.club === club;
+      const score = (club ? (clubHit ? 0 : 2) : diff === 0 ? 0 : 1) * 10 + diff;
+      if (!best || score < best.score) {
+        best = { player, pool, family: family.key, score };
       }
     }
   }

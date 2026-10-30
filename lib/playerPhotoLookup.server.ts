@@ -28,11 +28,27 @@ function athleteKey(name: string, birthYear: number | null | undefined): string 
 }
 
 type PhotoIndex = {
-  byAthlete: Map<string, TransfermarktInfo>;
+  byAthlete: Map<string, PhotoCandidate[]>;
   byTmId: Map<string, TransfermarktInfo>;
   byNameClub: Map<string, TransfermarktInfo>;
-  byName: Map<string, TransfermarktInfo>;
+  byName: Map<string, PhotoCandidate[]>;
 };
+
+type PhotoCandidate = {
+  tm: TransfermarktInfo;
+  club: string;
+};
+
+/** Normalized club comparison — Wyscout and Transfermarkt spell names differently. */
+function clubCompatible(a: string, b: string): boolean {
+  const na = normClub(a);
+  const nb = normClub(b);
+  if (!na || !nb) return true;
+  if (na === nb || na.includes(nb) || nb.includes(na)) return true;
+  const ta = new Set(na.split(" "));
+  const tb = new Set(nb.split(" "));
+  return [...ta].some((t) => tb.has(t));
+}
 
 let indexCache: PhotoIndex | null = null;
 
@@ -51,14 +67,19 @@ function remember(
 ) {
   if (!tm?.photo) return;
   const athlete = athleteKey(name, birthYear);
-  maps.byAthlete.set(athlete, pickRicher(maps.byAthlete.get(athlete), tm));
+  const cand: PhotoCandidate = { tm, club: club || tm.club || "" };
+  const athleteList = maps.byAthlete.get(athlete) ?? [];
+  if (!athleteList.some((c) => c.tm?.photo === tm.photo)) athleteList.push(cand);
+  maps.byAthlete.set(athlete, athleteList);
   if (tm.id) maps.byTmId.set(String(tm.id), pickRicher(maps.byTmId.get(String(tm.id)), tm));
   if (club) {
     const nc = `${normName(name)}::${normClub(club)}`;
     maps.byNameClub.set(nc, pickRicher(maps.byNameClub.get(nc), tm));
   }
   const n = normName(name);
-  maps.byName.set(n, pickRicher(maps.byName.get(n), tm));
+  const nameList = maps.byName.get(n) ?? [];
+  if (!nameList.some((c) => c.tm?.photo === tm.photo)) nameList.push(cand);
+  maps.byName.set(n, nameList);
 }
 
 function loadCurrentSeasonProfiles(maps: PhotoIndex) {
@@ -142,8 +163,6 @@ function lookupTransfermarkt(
 ): TransfermarktInfo | null {
   if (player.transfermarkt?.photo) return player.transfermarkt;
   const maps = photoIndex();
-  const fromAthlete = maps.byAthlete.get(athleteKey(player.name, player.birth_year));
-  if (fromAthlete?.photo) return fromAthlete;
   const tmId = player.transfermarkt?.id;
   if (tmId) {
     const fromId = maps.byTmId.get(String(tmId));
@@ -151,7 +170,15 @@ function lookupTransfermarkt(
   }
   const fromNc = maps.byNameClub.get(`${normName(player.name)}::${normClub(player.club)}`);
   if (fromNc?.photo) return fromNc;
-  const fromName = maps.byName.get(normName(player.name));
+  const resolve = (candidates: PhotoCandidate[] | undefined): TransfermarktInfo | null => {
+    if (!candidates?.length) return null;
+    const clubHit = candidates.find((c) => clubCompatible(c.club, player.club));
+    if (clubHit) return clubHit.tm;
+    return candidates.length === 1 ? candidates[0].tm : null;
+  };
+  const fromAthlete = resolve(maps.byAthlete.get(athleteKey(player.name, player.birth_year)));
+  if (fromAthlete?.photo) return fromAthlete;
+  const fromName = resolve(maps.byName.get(normName(player.name)));
   if (fromName?.photo) return fromName;
   return player.transfermarkt ?? null;
 }

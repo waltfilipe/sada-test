@@ -85,13 +85,38 @@ def read_metric(player: dict, aspect: str, sub: str | None) -> float | None:
         return None
 
 
+def _split_persons(rows: list[dict]) -> list[list[dict]]:
+    """Split same-(name, birth, family) rows into persons by club continuity.
+
+    Homonyms exist (e.g. two "Maurício" born 2001 — a left back and a winger),
+    so the raw name|birth cluster can hold more than one career. Each person is
+    a chain of seasons whose club history intersects; unmatched rows start a
+    new person.
+    """
+    persons: list[list[dict]] = []
+    for row in sorted(rows, key=lambda r: (r.get("_season") or "", r.get("_league") or "")):
+        row_club = norm_name(row.get("club") or "")
+        candidates = [
+            person
+            for person in persons
+            if row_club and any(norm_name(r.get("club") or "") == row_club for r in person)
+        ]
+        if not candidates:
+            persons.append([row])
+        else:
+            best = max(candidates, key=lambda p: (p[-1].get("_season") or ""))
+            best.append(row)
+    return persons
+
+
 def assign_season_keys(rows: list[dict]) -> dict[tuple[str, int], str]:
-    """Link seasons by normalized name + birth-year cluster.
+    """Link seasons by normalized name + birth-year cluster + family + club chain.
 
     Wyscout archives report the same athlete's birth year inconsistently across
     seasons (±1), so an exact name|birth match loses most history. Rows of the
     same normalized name are clustered by birth proximity (each member within
-    ±1 year of the cluster's earliest birth) and share a key.
+    ±1 year of the cluster's earliest birth), then split by position family
+    and club-chain so homonyms don't merge into one career.
     """
     by_name: dict[str, list[dict]] = {}
     for row in rows:
@@ -100,14 +125,25 @@ def assign_season_keys(rows: list[dict]) -> dict[tuple[str, int], str]:
     for name, members in by_name.items():
         members.sort(key=lambda r: (r.get("birth_year") or 0))
         cluster_min: int | None = None
+        prev_birth = 0
+        groups: dict[tuple[int, str], list[dict]] = {}
         for row in members:
             birth = row.get("birth_year") or 0
             if not birth:
-                index[(name, 0)] = f"name:{name}|0"
+                groups.setdefault((0, row.get("position_family") or ""), []).append(row)
                 continue
-            if cluster_min is None or birth - cluster_min > 1:
+            if cluster_min is None or birth - prev_birth > 1:
                 cluster_min = birth
-            index[(name, birth)] = f"name:{name}|{cluster_min}"
+            prev_birth = birth
+            key = (cluster_min, row.get("position_family") or "")
+            groups.setdefault(key, []).append(row)
+        for (cluster, family), group_rows in groups.items():
+            for person_i, person in enumerate(_split_persons(group_rows)):
+                person_key = f"name:{name}|{cluster}|{family}|{person_i}"
+                for row in person:
+                    row["_person_key"] = person_key
+                    sig = (name, row.get("birth_year") or 0, family, norm_name(row.get("club") or ""))
+                    index.setdefault(sig, person_key)
     return index
 
 
@@ -176,7 +212,7 @@ def main() -> None:
     for p in all_rows:
         if (p.get("minutes") or 0) < 180:
             continue
-        key = key_index.get((norm_name(p.get("name", "")), p.get("birth_year") or 0))
+        key = p.get("_person_key")
         if key:
             timeline.setdefault(key, []).append(p)
 
@@ -229,7 +265,14 @@ def main() -> None:
             payload = json.loads(path.read_text(encoding="utf-8"))
             coef = models.get(f"{league}:{family}") or {}
             for player in payload.get("players", []):
-                key = key_index.get((norm_name(player.get("name", "")), player.get("birth_year") or 0))
+                player.pop("cross_season", None)
+                sig = (
+                    norm_name(player.get("name", "")),
+                    player.get("birth_year") or 0,
+                    family,
+                    norm_name(player.get("club") or ""),
+                )
+                key = key_index.get(sig)
                 hist = timeline.get(key, []) if key else []
                 past = [h for h in hist if h.get("_season") != CURRENT]
                 if not past:
