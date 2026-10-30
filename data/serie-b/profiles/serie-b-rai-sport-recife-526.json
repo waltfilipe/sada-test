@@ -411,5 +411,35 @@
       "ofensivo": 6.1
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-c",
+        "minutes": 1462,
+        "club": "Confiança"
+      },
+      {
+        "year": "2023",
+        "league": "serie-c",
+        "minutes": 814,
+        "club": "Figueirense"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 1.945,
+        "history_mean": 1.7292,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 5.8004,
+        "history_mean": 6.5715,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
+  }
 }

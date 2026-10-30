@@ -1324,5 +1324,53 @@
       "high_speed_km_p90": 16,
       "sprinting_km_p90": 20
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 1507,
+        "club": "Flamengo"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 1410,
+        "club": "Fortaleza"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 1484,
+        "club": "Fortaleza"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 782,
+        "club": "Fortaleza"
+      }
+    ],
+    "metrics": {
+      "1v1 - Ofensivo": {
+        "predicted": 5.4563,
+        "history_mean": 6.2232,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Pré Assistências e xA::Pré Assistências": {
+        "predicted": 2.3791,
+        "history_mean": 2.0033,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Ações Terminais::Toques na Área": {
+        "predicted": 2.3349,
+        "history_mean": 2.5013,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

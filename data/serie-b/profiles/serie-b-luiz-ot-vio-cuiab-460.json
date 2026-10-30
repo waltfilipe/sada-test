@@ -376,5 +376,53 @@
       "boxtobox": 6.0
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-c",
+        "minutes": 822,
+        "club": "Confiança"
+      },
+      {
+        "year": "2023",
+        "league": "serie-b",
+        "minutes": 697,
+        "club": "Sampaio Corrêa"
+      },
+      {
+        "year": "2024",
+        "league": "serie-c",
+        "minutes": 993,
+        "club": "Confiança"
+      },
+      {
+        "year": "2025",
+        "league": "serie-c",
+        "minutes": 1238,
+        "club": "Confiança"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 7.4489,
+        "history_mean": 8.0073,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 4.4661,
+        "history_mean": 4.5764,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.2136,
+        "history_mean": 0.4447,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
+  }
 }

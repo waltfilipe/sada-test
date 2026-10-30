@@ -330,5 +330,47 @@
       "high_speed_km_p90": 4,
       "sprinting_km_p90": 19
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 1288,
+        "club": "São Paulo"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 2468,
+        "club": "São Paulo"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 2537,
+        "club": "São Paulo"
+      }
+    ],
+    "metrics": {
+      "Ações Defensivas::Interceptações": {
+        "predicted": 1.2386,
+        "history_mean": 1.3361,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 3.6912,
+        "history_mean": 4.5191,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Progressivos": {
+        "predicted": 6.1543,
+        "history_mean": 8.095,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

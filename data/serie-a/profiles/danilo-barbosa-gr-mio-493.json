@@ -376,5 +376,47 @@
       "boxtobox": 6.2
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 193,
+        "club": "Botafogo"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 1186,
+        "club": "Botafogo"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 1301,
+        "club": "Botafogo"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 6.0477,
+        "history_mean": 6.2447,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 5.7746,
+        "history_mean": 5.8382,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.1031,
+        "history_mean": 0.3587,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
+  }
 }

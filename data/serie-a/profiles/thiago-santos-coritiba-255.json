@@ -2414,5 +2414,41 @@
       "high_speed_km_p90": 105,
       "sprinting_km_p90": 96
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-b",
+        "minutes": 967,
+        "club": "Grêmio"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 350,
+        "club": "Fluminense"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 6.5449,
+        "history_mean": 6.6797,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 8.3757,
+        "history_mean": 9.1545,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 2.4653,
+        "history_mean": 0.4405,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

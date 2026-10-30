@@ -525,5 +525,47 @@
     "sprinting_km_p90": 0.21,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 1280,
+        "club": "Cuiabá"
+      },
+      {
+        "year": "2023",
+        "league": "serie-b",
+        "minutes": 1131,
+        "club": "Sport Recife"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 1541,
+        "club": "Sport Recife"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 1915,
+        "club": "Sport Recife"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 2.5138,
+        "history_mean": 2.7933,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 6.9068,
+        "history_mean": 7.7856,
+        "consistent": false,
+        "role_change_flag": false
+      }
+    }
   }
 }

@@ -411,5 +411,35 @@
       "ofensivo": 6.5
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 682,
+        "club": "Bahia"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 1278,
+        "club": "CRB"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 3.3828,
+        "history_mean": 3.4176,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 5.3787,
+        "history_mean": 6.0389,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
+  }
 }

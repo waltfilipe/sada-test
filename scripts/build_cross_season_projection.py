@@ -86,12 +86,12 @@ def read_metric(player: dict, aspect: str, sub: str | None) -> float | None:
 
 
 def _split_persons(rows: list[dict]) -> list[list[dict]]:
-    """Split same-(name, birth, family) rows into persons by club continuity.
+    """Split an ambiguous (name, birth, family) group into persons.
 
-    Homonyms exist (e.g. two "Maurício" born 2001 — a left back and a winger),
-    so the raw name|birth cluster can hold more than one career. Each person is
-    a chain of seasons whose club history intersects; unmatched rows start a
-    new person.
+    Only called when some season has 2+ rows — that alone proves homonyms.
+    Rows are chained by shared club; afterwards, persons whose season sets are
+    disjoint are re-merged: the same athlete changing clubs produces exactly
+    that pattern, while real homonyms almost always coexist in a season.
     """
     persons: list[list[dict]] = []
     for row in sorted(rows, key=lambda r: (r.get("_season") or "", r.get("_league") or "")):
@@ -106,7 +106,19 @@ def _split_persons(rows: list[dict]) -> list[list[dict]]:
         else:
             best = max(candidates, key=lambda p: (p[-1].get("_season") or ""))
             best.append(row)
-    return persons
+    merged: list[list[dict]] = []
+    for person in persons:
+        seasons = {r.get("_season") for r in person}
+        target = next(
+            (m for m in merged if not seasons & {r.get("_season") for r in m}),
+            None,
+        )
+        if target is None:
+            merged.append(person)
+        else:
+            target.extend(person)
+            target.sort(key=lambda r: (r.get("_season") or "", r.get("_league") or ""))
+    return merged
 
 
 def assign_season_keys(rows: list[dict]) -> dict[tuple[str, int], str]:
@@ -138,7 +150,16 @@ def assign_season_keys(rows: list[dict]) -> dict[tuple[str, int], str]:
             key = (cluster_min, row.get("position_family") or "")
             groups.setdefault(key, []).append(row)
         for (cluster, family), group_rows in groups.items():
-            for person_i, person in enumerate(_split_persons(group_rows)):
+            season_counts: dict[str, int] = {}
+            for row in group_rows:
+                s = row.get("_season") or ""
+                season_counts[s] = season_counts.get(s, 0) + 1
+            persons = (
+                [group_rows]
+                if all(count == 1 for count in season_counts.values())
+                else _split_persons(group_rows)
+            )
+            for person_i, person in enumerate(persons):
                 person_key = f"name:{name}|{cluster}|{family}|{person_i}"
                 for row in person:
                     row["_person_key"] = person_key

@@ -1550,5 +1550,47 @@
       "high_speed_km_p90": 32,
       "sprinting_km_p90": 44
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-b",
+        "minutes": 3374,
+        "club": "Cruzeiro"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 1500,
+        "club": "Cruzeiro"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 294,
+        "club": "Vasco da Gama"
+      }
+    ],
+    "metrics": {
+      "Ações Defensivas::Interceptações": {
+        "predicted": 3.7268,
+        "history_mean": 5.0774,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Duelos Defensivos": {
+        "predicted": 3.7365,
+        "history_mean": 4.4118,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Progressivos": {
+        "predicted": 7.4753,
+        "history_mean": 11.272,
+        "consistent": false,
+        "role_change_flag": false
+      }
+    }
   }
 }

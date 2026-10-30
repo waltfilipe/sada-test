@@ -3738,5 +3738,53 @@
       "high_speed_km_p90": 88,
       "sprinting_km_p90": 93
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 773,
+        "club": "Cuiabá"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 2138,
+        "club": "Cuiabá"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 2239,
+        "club": "Cuiabá"
+      },
+      {
+        "year": "2025",
+        "league": "serie-b",
+        "minutes": 3056,
+        "club": "Cuiabá"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 5.2662,
+        "history_mean": 5.3927,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 5.1917,
+        "history_mean": 5.5966,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.603,
+        "history_mean": 1.1641,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

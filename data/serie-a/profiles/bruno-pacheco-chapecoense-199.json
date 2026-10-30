@@ -3165,5 +3165,47 @@
       "high_speed_km_p90": 37,
       "sprinting_km_p90": 38
     }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-a",
+        "minutes": 2568,
+        "club": "Ceará"
+      },
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 3035,
+        "club": "Fortaleza"
+      },
+      {
+        "year": "2024",
+        "league": "serie-a",
+        "minutes": 1370,
+        "club": "Fortaleza"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 1401,
+        "club": "Fortaleza"
+      }
+    ],
+    "metrics": {
+      "Cruzamentos::Cruzamentos": {
+        "predicted": 1.6092,
+        "history_mean": 1.5552,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 5.6567,
+        "history_mean": 6.7434,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
   }
 }

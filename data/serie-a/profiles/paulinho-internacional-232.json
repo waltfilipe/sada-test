@@ -878,5 +878,47 @@
     "sprinting_km_p90": 0.21,
     "percentiles": {},
     "ranks": {}
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 1575,
+        "club": "Vasco da Gama"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 946,
+        "club": "Brusque"
+      },
+      {
+        "year": "2025",
+        "league": "serie-a",
+        "minutes": 354,
+        "club": "Vasco da Gama"
+      }
+    ],
+    "metrics": {
+      "Passes Progressivos": {
+        "predicted": 5.9471,
+        "history_mean": 6.3826,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Duelos Defensivos": {
+        "predicted": 8.1615,
+        "history_mean": 8.6474,
+        "consistent": true,
+        "role_change_flag": false
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 1.4058,
+        "history_mean": 0.6903,
+        "consistent": false,
+        "role_change_flag": true
+      }
+    }
   }
 }

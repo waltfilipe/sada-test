@@ -288,5 +288,41 @@
       "combativo": 6.2
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-b",
+        "minutes": 343,
+        "club": "Operário PR"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 1215,
+        "club": "Operário PR"
+      }
+    ],
+    "metrics": {
+      "Ações Defensivas::Interceptações": {
+        "predicted": 2.1467,
+        "history_mean": 1.3209,
+        "consistent": false,
+        "role_change_flag": true
+      },
+      "Duelos Defensivos": {
+        "predicted": 3.7668,
+        "history_mean": 4.397,
+        "consistent": false,
+        "role_change_flag": false
+      },
+      "Passes Progressivos": {
+        "predicted": 6.8719,
+        "history_mean": 8.2642,
+        "consistent": true,
+        "role_change_flag": false
+      }
+    }
+  }
 }
