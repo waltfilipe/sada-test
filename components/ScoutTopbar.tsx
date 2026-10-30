@@ -4,7 +4,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { SiteLogo } from "@/components/SiteLogo";
 import { useLeagueOptional } from "@/components/LeagueProvider";
-import { CURRENT_SEASON, isBrasileiraoLeague } from "@/lib/seasons";
+import { getLeague } from "@/lib/leagues";
+import { isBrasileiraoLeague } from "@/lib/seasons";
 
 const NAV = [
   { key: "inicio", path: "/", label: "Início", global: true },
@@ -37,11 +38,10 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
     return item.key === active;
   }
 
-  const showSeasonBadge =
-    !hubMode &&
-    league != null &&
-    isBrasileiraoLeague(league.leagueId) &&
-    league.season !== CURRENT_SEASON;
+  const leagueInfo = league ? getLeague(league.leagueId) : undefined;
+  const showContext = !hubMode && league != null;
+  const contextLogo =
+    league != null && isBrasileiraoLeague(league.leagueId) ? leagueInfo?.logo : undefined;
 
   return (
     <div className="scout-topbar-wrap">
@@ -69,10 +69,30 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
           })}
         </nav>
 
-        {showSeasonBadge ? (
-          <span className="topbar-season-badge" title={`Arquivo Wyscout ${league!.season}`}>
-            Temporada {league!.season}
-          </span>
+        {showContext ? (
+          <div
+            className={["topbar-context", league!.isCurrentSeason ? "" : "topbar-context-archive"].filter(Boolean).join(" ")}
+            title={
+              league!.isCurrentSeason
+                ? `${league!.name} — temporada ${league!.season}`
+                : `Arquivo Wyscout ${league!.season}`
+            }
+          >
+            {contextLogo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={contextLogo} alt="" className="topbar-context-logo" />
+            ) : (
+              <span className="topbar-context-brand" aria-hidden="true">
+                {league!.brand}
+              </span>
+            )}
+            <span className="topbar-context-text">
+              <span className="topbar-context-name">{league!.name}</span>
+              <span className="topbar-context-season">
+                {league!.isCurrentSeason ? `Temporada ${league!.season}` : `Arquivo ${league!.season}`}
+              </span>
+            </span>
+          </div>
         ) : null}
       </header>
 

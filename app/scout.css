@@ -140,19 +140,72 @@
   cursor: not-allowed;
 }
 
-/* Pill da temporada de arquivo (?temporada=YYYY) ao lado da navegação. */
-.topbar-season-badge {
+/* Chip de contexto: competição + temporada sempre visível no canto do topbar. */
+.topbar-context {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
   align-self: center;
-  padding: 0.32rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  background: rgba(245, 158, 11, 0.12);
-  color: #fcd34d;
-  font-size: 0.74rem;
-  font-weight: 650;
-  letter-spacing: 0.02em;
+  margin-left: 0.6rem;
+  padding: 0.28rem 0.85rem 0.28rem 0.34rem;
+  border-radius: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.38);
+  background: rgba(8, 51, 68, 0.42);
   white-space: nowrap;
+}
+
+.topbar-context-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.topbar-context-brand {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: rgba(56, 189, 248, 0.16);
+  color: #7dd3fc;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.topbar-context-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.topbar-context-name {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: 0.01em;
+}
+
+.topbar-context-season {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #67e8f9;
+}
+
+.topbar-context-archive {
+  border-color: rgba(245, 158, 11, 0.55);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.topbar-context-archive .topbar-context-season {
+  color: #fcd34d;
+}
+
+.topbar-context-archive .topbar-context-brand {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fcd34d;
 }
 
 .scout-subnav {
