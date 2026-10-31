@@ -485,7 +485,7 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
                       <span className="zag-v2-copy">
                         <strong>{player.name}</strong>
                         <em>
-                          {player.club}
+                          {player.display_club ?? player.club}
                           {player.profile ? ` · ${player.profile}` : ""}
                         </em>
                       </span>

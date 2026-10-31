@@ -211,6 +211,8 @@ export type SeasonMeta = {
 
 export type PlayerProfile = PlayerSummary & {
   cross_season?: CrossSeasonProjection;
+  /** Clube real do atleta nesta liga quando a linha usa clube-artefato do export (ex.: "Grêmio" na B-2026 → exibe CRB). */
+  display_club?: string | null;
   /** Presente quando esta linha é a última passagem do atleta pelo clube (ele saiu). */
   departure?: PlayerDeparture | null;
   /** Filled by /api/player-season for the peek popup. */

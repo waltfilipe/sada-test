@@ -814,8 +814,8 @@ export function ReportSheet({
               <p className="player-report-eyebrow">{translateLabel(player.position, lang)}</p>
               <h1>{player.name}</h1>
               <p className="player-report-club">
-                <ClubLogo club={player.club} size={16} />
-                <span>{player.club}</span>
+                <ClubLogo club={player.display_club ?? player.club} size={16} />
+                <span>{player.display_club ?? player.club}</span>
               </p>
               {bio.length ? (
                 <ul className="player-report-bio">
@@ -988,8 +988,8 @@ export function ReportSheet({
             <div>
               <h1>{player.name}</h1>
               <p>
-                <ClubLogo club={player.club} size={14} />
-                <span>{player.club}</span>
+                <ClubLogo club={player.display_club ?? player.club} size={14} />
+                <span>{player.display_club ?? player.club}</span>
                 <span className="player-report-dot">·</span>
                 <span>{translateLabel(player.position, lang)}</span>
                 <span className="player-report-dot">·</span>

@@ -141,6 +141,7 @@ export function PlayerHero({
         ? "Contrato termina em menos de 1 ano."
         : "Tempo restante de contrato.";
   const departure = player.departure ?? null;
+  const displayClub = player.display_club ?? player.club;
   const heroAccent = profileAccent((player.profile ?? "").split("+").pop()!.trim());
   return (
     <section
@@ -172,10 +173,28 @@ export function PlayerHero({
               </div>
             ) : null}
             <p className="player-hero-club">
-              <ClubLogo club={player.club} size={22} />
-              <span className="player-hero-club-name">{player.club}</span>
+              <ClubLogo club={displayClub} size={22} />
+              <span className="player-hero-club-name">{displayClub}</span>
               <span className="player-hero-club-sep" aria-hidden="true">·</span>
               <span className="player-hero-position">{player.position}</span>
+              {departure ? (
+                <span
+                  className="hero-depart-chip"
+                  title={
+                    departure.date
+                      ? "Saiu da competição para este clube. Data e valor conforme o Transfermarkt."
+                      : "Saiu da competição para este clube; data exata indisponível."
+                  }
+                >
+                  <i className="fa-solid fa-arrow-right hero-depart-chip-arrow" aria-hidden="true" />
+                  <ClubLogo club={departure.to_club} size={15} />
+                  <span className="hero-depart-chip-club">{departure.to_club}</span>
+                  <span className="hero-depart-chip-date">
+                    {departureDateLabel(departure)}
+                    {departure.fee ? ` · ${departure.fee}` : ""}
+                  </span>
+                </span>
+              ) : null}
             </p>
           </div>
 
@@ -257,32 +276,6 @@ export function PlayerHero({
             </span>
           </MarketCard>
         </div>
-
-        {departure ? (
-          <MarketCard
-            icon="fa-right-left"
-            label="Saiu do clube"
-            wide
-            tooltip={
-              departure.date
-                ? "Não atua mais por este clube. Data e valor conforme o Transfermarkt."
-                : "Não atua mais por este clube; data exata indisponível."
-            }
-          >
-            <span className="hero-transfer">
-              <span className="hero-transfer-line">
-                <i className="fa-solid fa-arrow-right hero-transfer-arrow" aria-hidden="true" />
-                <ClubLogo club={departure.to_club} size={16} />
-                <span className="hero-transfer-club">{departure.to_club}</span>
-              </span>
-              <span className="hero-transfer-sub">
-                {departure.kind === "loan" ? "Emprestado" : "Transferido"} em{" "}
-                {departureDateLabel(departure)}
-                {departure.fee ? ` · ${departure.fee}` : ""}
-              </span>
-            </span>
-          </MarketCard>
-        ) : null}
 
         <div className={`hero-action-grid${showRun ? " hero-action-grid-has-run" : ""}`}>
           <div className="hero-action-cell hero-action-tendencies">

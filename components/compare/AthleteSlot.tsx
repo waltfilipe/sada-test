@@ -74,8 +74,8 @@ export function AthleteSlot({ side, player, players, onChange, compact = false, 
           <div className="slot-identity">
             <h2>{player.name}</h2>
             <p className="slot-club">
-              <ClubLogo club={player.club} size={16} />
-              {player.club}
+              <ClubLogo club={player.display_club ?? player.club} size={16} />
+              {player.display_club ?? player.club}
               <i aria-hidden>·</i>
               <span>{player.position}</span>
             </p>
@@ -117,8 +117,8 @@ export function AthleteSlot({ side, player, players, onChange, compact = false, 
         <div className="slot-identity">
           <h2>{player.name}</h2>
           <p className="slot-club">
-            <ClubLogo club={player.club} size={18} />
-            {player.club}
+            <ClubLogo club={player.display_club ?? player.club} size={18} />
+            {player.display_club ?? player.club}
             <i aria-hidden>·</i>
             <span>{player.position}</span>
           </p>

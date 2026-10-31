@@ -52,8 +52,8 @@ export function DossierHeader({ player, poolSize, family }: Props) {
 
         <h1>{player.name}</h1>
         <p className="dossier-club">
-          <ClubLogo club={player.club} size={20} />
-          {player.club}
+          <ClubLogo club={player.display_club ?? player.club} size={20} />
+          {player.display_club ?? player.club}
         </p>
 
         <dl className="dossier-facts">

@@ -99,8 +99,8 @@ function DuelSide({
         <div className="duel-copy">
           <h2 className="duel-name">{player.name}</h2>
           <p className="duel-club">
-            <ClubLogo club={player.club} size={16} />
-            <span className="duel-club-name">{player.club}</span>
+            <ClubLogo club={player.display_club ?? player.club} size={16} />
+            <span className="duel-club-name">{player.display_club ?? player.club}</span>
             <span aria-hidden="true">·</span>
             <span className="duel-position">{player.position}</span>
           </p>

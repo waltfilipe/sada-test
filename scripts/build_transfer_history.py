@@ -216,6 +216,10 @@ def main() -> None:
             "current_club": current,
             "last": {"club": last["club"], "season": last["season"], "league": last["league"]},
             "legs": legs,
+            "stints": [
+                {"club": s["club"], "league": s["league"], "season": s["season"]}
+                for s in ordered
+            ],
         }
     print(f"pessoas com saida detectada: {len(entries)}")
 

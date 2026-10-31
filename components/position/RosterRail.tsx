@@ -220,8 +220,8 @@ export function RosterRail({
                 <span className="roster-info">
                   <strong>{player.name}</strong>
                   <em className="roster-club">
-                    <ClubLogo club={player.club} size={14} />
-                    {player.club}
+                    <ClubLogo club={player.display_club ?? player.club} size={14} />
+                    {player.display_club ?? player.club}
                   </em>
                 </span>
 

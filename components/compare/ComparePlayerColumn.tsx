@@ -209,8 +209,8 @@ export function ComparePlayerColumn({
                 </p>
               ) : (
                 <p className="compare-col-club">
-                  <ClubLogo club={player.club} size={16} />
-                  <span>{player.club}</span>
+                  <ClubLogo club={player.display_club ?? player.club} size={16} />
+                  <span>{player.display_club ?? player.club}</span>
                   <span aria-hidden="true">·</span>
                   <span className="compare-col-position">{player.position}</span>
                 </p>
