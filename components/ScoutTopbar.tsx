@@ -16,8 +16,8 @@ const NAV_SCOUT = [
 ] as const;
 
 const NAV_SQUAD = [
-  { key: "elenco", path: "/elenco", label: "Elenco", global: false },
-  { key: "time-sombra", path: "/time-sombra", label: "Time Sombra", global: false },
+  { key: "elenco", path: "/elenco", label: "Elenco", global: false, anywhere: true },
+  { key: "time-sombra", path: "/time-sombra", label: "Time Sombra", global: false, anywhere: true },
 ] as const;
 
 export type ScoutSection =
@@ -34,15 +34,17 @@ type Props = {
 export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
   const league = useLeagueOptional();
 
-  function navHref(item: { path: string; global: boolean }) {
+  function navHref(item: { path: string; global: boolean; anywhere?: boolean }) {
     if (item.global) return item.path;
-    if (hubMode || !league) return "/";
+    if (hubMode || !league) return item.anywhere ? item.path : "/";
     return league.href(item.path);
   }
 
-  function renderLinks(items: readonly { key: string; path: string; label: string; global: boolean }[]) {
+  function renderLinks(
+    items: readonly { key: string; path: string; label: string; global: boolean; anywhere?: boolean }[],
+  ) {
     return items.map((item) => {
-      const disabled = !item.global && (hubMode || !league);
+      const disabled = !item.global && !item.anywhere && (hubMode || !league);
       const isActive = item.key === active;
       return (
         <Link
