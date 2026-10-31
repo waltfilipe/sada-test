@@ -84,6 +84,12 @@ const TOOLS = [
     copy: "Escale o elenco atual de qualquer clube por posição e minutos.",
   },
   {
+    path: "/elencos-previos",
+    icon: "fa-clock-rotate-left",
+    title: "Elencos Prévios",
+    copy: "O time mais usado de qualquer temporada, com 5 similares por titular.",
+  },
+  {
     path: "/time-sombra",
     icon: "fa-chess-board",
     title: "Time Sombra",

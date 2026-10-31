@@ -17,6 +17,7 @@ const NAV_SCOUT = [
 
 const NAV_SQUAD = [
   { key: "elenco", path: "/elenco", label: "Elenco", global: false, anywhere: true },
+  { key: "elencos-previos", path: "/elencos-previos", label: "Elencos Prévios", global: false, anywhere: true },
   { key: "time-sombra", path: "/time-sombra", label: "Time Sombra", global: false, anywhere: true },
 ] as const;
 

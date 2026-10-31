@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
@@ -18,10 +18,12 @@ import { TeamStatsBar } from "@/components/shadow/TeamStatsBar";
 import { useShadowTeam } from "@/hooks/useShadowTeam";
 import { buildClubLineup, positionLines, type PositionLine } from "@/lib/clubLineup";
 import { FORMATIONS, fieldSlots, formationById, type FormationSlot } from "@/lib/formations";
-import { LEAGUES, BRASILEIRAO_LEAGUES, isLeagueId, type LeagueId } from "@/lib/leagues";
+import { LEAGUES, BRASILEIRAO_LEAGUES, isLeagueId, leaguePath, type LeagueId } from "@/lib/leagues";
+import { BRASILEIRAO_SEASONS, CURRENT_SEASON, isBrasileiraoLeague } from "@/lib/seasons";
 import { ESTADUAIS_LEAGUE_IDS } from "@/lib/estaduaisHub";
 import { benchPlayerIds, boardAssignments, boardReserves, boardSquad, type ShadowScope, type TeamBoard } from "@/lib/shadowTeamStorage";
-import { gradeTier, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
+import { gradeTier, playerInitials, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
+import type { SimilarPlayerHit } from "@/lib/crossLeagueSimilarity";
 import type { PlayerSearchRow } from "@/lib/types";
 
 type SquadSource = "elenco" | "sombra" | "sombra-todas";
@@ -51,23 +53,33 @@ function readSombraLeague(fallback: LeagueId | "estaduais"): LeagueId | "estadua
 
 type Props = {
   playersByLeague: Record<LeagueId, PlayerSearchRow[]>;
-  /** elenco = escalacao do clube real | sombra = times sombra por competicao/todas. */
-  board: "elenco" | "sombra";
+  /** elenco = escalacao do clube real | previos = elencos de temporadas anteriores | sombra = times sombra. */
+  board: "elenco" | "sombra" | "previos";
 };
 
 export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
   const { href, leagueId } = useLeague();
+  const isPrevios = viewBoard === "previos";
   const [savedMode, setSavedMode] = useState<SquadSource>("elenco");
   const [sombraLeague, setSombraLeague] = useState<LeagueId | "estaduais">(leagueId);
+  const [prevLeague, setPrevLeague] = useState<LeagueId>(() =>
+    leagueId === "serie-d" || isBrasileiraoLeague(leagueId) ? leagueId : "serie-a",
+  );
+  const [prevSeason, setPrevSeason] = useState<string>(CURRENT_SEASON);
+  const [prevRows, setPrevRows] = useState<SquadPlayer[] | null>(null);
+  const [prevLoading, setPrevLoading] = useState(false);
+  const [prevFailed, setPrevFailed] = useState(false);
+  const [prevClubKey, setPrevClubKey] = useState<string | null>(null);
 
   useEffect(() => {
     setSavedMode(readSource());
     setSombraLeague(readSombraLeague(leagueId));
     setClubKey(sessionStorage.getItem(CLUB_KEY));
+    setPrevLeague(leagueId === "serie-d" || isBrasileiraoLeague(leagueId) ? leagueId : "serie-a");
   }, [leagueId]);
-  // A rota fixa o quadro: /elenco sempre mostra o elenco; /time-sombra ignora um
-  // modo "elenco" salvo na sessão e cai no time sombra da competição.
-  const mode: SquadSource = viewBoard === "elenco" ? "elenco" : savedMode === "elenco" ? "sombra" : savedMode;
+  // A rota fixa o quadro: /elenco e /elencos-previos mostram escalação por
+  // minutos; /time-sombra ignora um modo "elenco" salvo e cai no time sombra.
+  const mode: SquadSource = viewBoard === "sombra" ? (savedMode === "elenco" ? "sombra" : savedMode) : "elenco";
   const scope: ShadowScope = mode === "sombra-todas" ? "todas" : mode === "sombra" ? sombraLeague : leagueId;
   const board: TeamBoard = mode === "elenco" ? "proprio" : "sombra";
   const { state, ready, changeFormation, assign, dropOnSlot, reserve, removeFromSquad, removeFromWatchlist } =
@@ -104,9 +116,56 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
 
   const playersById = useMemo(() => new Map(taggedPlayers.map((player) => [player.player_id, player])), [taggedPlayers]);
 
+  // Elencos prévios: a temporada atual vem de props; as antigas chegam por fetch
+  // uma vez por série/ano, no mesmo formato dos rows atuais.
+  useEffect(() => {
+    if (!isPrevios || prevSeason === CURRENT_SEASON) {
+      setPrevRows(null);
+      setPrevFailed(false);
+      return;
+    }
+    let cancelled = false;
+    setPrevRows(null);
+    setPrevLoading(true);
+    setPrevFailed(false);
+    fetch(`/api/search-rows?league=${prevLeague}&season=${prevSeason}`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("previos_fetch_failed"))))
+      .then((data: { players?: PlayerSearchRow[] }) => {
+        if (cancelled) return;
+        setPrevRows((data.players ?? []).map((row) => ({ ...row, sourceLeague: prevLeague })));
+        setPrevLoading(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setPrevRows([]);
+        setPrevFailed(true);
+        setPrevLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isPrevios, prevLeague, prevSeason]);
+
+  const prevPool = useMemo<SquadPlayer[]>(() => {
+    if (!isPrevios) return [];
+    if (prevSeason === CURRENT_SEASON) {
+      return taggedPlayers.filter((player) => player.sourceLeague === prevLeague);
+    }
+    return prevRows ?? [];
+  }, [isPrevios, prevSeason, prevLeague, taggedPlayers, prevRows]);
+
+  // O caminho de escalação por clube usa este pool: atual no /elenco, temporada
+  // escolhida no /elencos-previos. Quadros sombra seguem nos pools próprios.
+  const elencoPool = isPrevios ? prevPool : taggedPlayers;
+  const elencoById = useMemo(
+    () => new Map(elencoPool.map((player) => [player.player_id, player])),
+    [elencoPool],
+  );
+  const lookupById = isPrevios ? elencoById : playersById;
+
   const clubOptions = useMemo<ClubOption[]>(() => {
     const counts = new Map<string, ClubOption>();
-    for (const player of taggedPlayers) {
+    for (const player of elencoPool) {
       if (!player.club) continue;
       const key = `${player.sourceLeague}::${player.club}`;
       const current = counts.get(key);
@@ -123,20 +182,21 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
     return [...counts.values()].sort(
       (a, b) => a.leagueId.localeCompare(b.leagueId) || a.club.localeCompare(b.club, "pt"),
     );
-  }, [taggedPlayers]);
+  }, [elencoPool]);
 
-  const selectedClub = clubOptions.find((option) => `${option.leagueId}::${option.club}` === clubKey) ?? null;
+  const activeClubKey = isPrevios ? prevClubKey : clubKey;
+  const selectedClub = clubOptions.find((option) => `${option.leagueId}::${option.club}` === activeClubKey) ?? null;
 
   const clubPlayers = useMemo(() => {
     if (!selectedClub) return [];
-    return taggedPlayers.filter(
+    return elencoPool.filter(
       (player) => player.sourceLeague === selectedClub.leagueId && player.club === selectedClub.club,
     );
-  }, [taggedPlayers, selectedClub]);
+  }, [elencoPool, selectedClub]);
 
   useEffect(() => {
     setElencoHidden(new Set());
-  }, [clubKey]);
+  }, [activeClubKey]);
 
   const visibleClubPlayers = useMemo(
     () => clubPlayers.filter((player) => !elencoHidden.has(player.player_id)),
@@ -175,7 +235,11 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
   if (!ready || !state) {
     return (
       <div className="scout-root profile-page">
-        <ScoutTopbar active={viewBoard === "elenco" ? "elenco" : "time-sombra"} />
+        <ScoutTopbar
+          active={
+            viewBoard === "elenco" ? "elenco" : viewBoard === "previos" ? "elencos-previos" : "time-sombra"
+          }
+        />
         <div className="scout-empty">Carregando elenco…</div>
       </div>
     );
@@ -194,11 +258,11 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
   const lines: PositionLine[] =
     mode === "elenco"
       ? (clubLineup?.lines ?? [])
-      : positionLines(formation, viewAssignments, viewReserves, viewLoose, playersById);
+      : positionLines(formation, viewAssignments, viewReserves, viewLoose, lookupById);
   const reserveIds = lines.flatMap((line) => line.entries.filter((entry) => entry.role === "reserva").map((entry) => entry.playerId));
   const reserveLabels = new Map(lines.flatMap((line) => line.entries.filter((entry) => entry.role === "reserva").map((entry) => [entry.playerId, line.label] as const)));
   const selectedPlayerId = detailPlayerId ?? (selectedSlotId ? viewAssignments[selectedSlotId] : null);
-  const selectedPlayer = selectedPlayerId ? playersById.get(selectedPlayerId) : null;
+  const selectedPlayer = selectedPlayerId ? lookupById.get(selectedPlayerId) : null;
   const activeSquadIds = mode === "elenco" ? clubPlayers.map((player) => player.player_id) : boardSquad(state, board);
 
   const squadPlayers = (
@@ -211,7 +275,7 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
         ]
       : activeSquadIds
   )
-    .map((id) => playersById.get(id))
+    .map((id) => lookupById.get(id))
     .filter((p): p is SquadPlayer => Boolean(p));
   const watchPlayers = state.watchlistIds
     .map((id) => playersById.get(id))
@@ -219,8 +283,15 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
 
   const starters = Object.values(viewAssignments)
     .filter((id): id is string => Boolean(id))
-    .map((id) => playersById.get(id))
+    .map((id) => lookupById.get(id))
     .filter((p): p is SquadPlayer => Boolean(p));
+  // Titulares na ordem das linhas (GOL -> AT) para o card de similares.
+  const orderedStarters = lines.flatMap((line) =>
+    line.entries
+      .filter((entry) => entry.role === "titular")
+      .map((entry) => ({ player: lookupById.get(entry.playerId), slot: line.label }))
+      .filter((item): item is { player: SquadPlayer; slot: string } => Boolean(item.player)),
+  );
   const editable = mode !== "elenco";
 
   const excludeCandidates = (() => {
@@ -266,9 +337,35 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
 
   function chooseClub(option: ClubOption | null) {
     const key = option ? `${option.leagueId}::${option.club}` : null;
-    setClubKey(key);
-    if (key) sessionStorage.setItem(CLUB_KEY, key);
-    else sessionStorage.removeItem(CLUB_KEY);
+    if (isPrevios) {
+      setPrevClubKey(key);
+    } else {
+      setClubKey(key);
+      if (key) sessionStorage.setItem(CLUB_KEY, key);
+      else sessionStorage.removeItem(CLUB_KEY);
+    }
+    setSelectedSlotId(null);
+    setDetailPlayerId(null);
+    setPlacementPlayerId(null);
+    setPicker(null);
+    setSlotQuery("");
+  }
+
+  function choosePrevLeague(next: LeagueId) {
+    setPrevLeague(next);
+    setPrevClubKey(null);
+    if (next === "serie-d") setPrevSeason(CURRENT_SEASON);
+    setSelectedSlotId(null);
+    setDetailPlayerId(null);
+    setPlacementPlayerId(null);
+    setPicker(null);
+    setSlotQuery("");
+  }
+
+  function choosePrevSeason(next: string) {
+    setPrevSeason(next);
+    setPrevClubKey(null);
+    if (next !== CURRENT_SEASON && prevLeague === "serie-d") setPrevLeague("serie-a");
     setSelectedSlotId(null);
     setDetailPlayerId(null);
     setPlacementPlayerId(null);
@@ -279,8 +376,12 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
   const sourceLabel =
     mode === "elenco"
       ? selectedClub
-        ? `Elenco atual · ${selectedClub.club}`
-        : "Elenco atual"
+        ? isPrevios
+          ? `Elenco ${prevSeason} · ${selectedClub.club}`
+          : `Elenco atual · ${selectedClub.club}`
+        : isPrevios
+          ? "Elencos prévios"
+          : "Elenco atual"
       : mode === "sombra-todas"
         ? "Time sombra · todas as competições"
         : `Time sombra · ${sombraLeague === "estaduais" ? "Estaduais" : (LEAGUES.find((league) => league.id === sombraLeague)?.name ?? "")}`;
@@ -288,12 +389,18 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
 
   return (
     <div className="scout-root profile-page shadow-page">
-      <ScoutTopbar active={viewBoard === "elenco" ? "elenco" : "time-sombra"} />
+      <ScoutTopbar
+        active={
+          viewBoard === "elenco" ? "elenco" : viewBoard === "previos" ? "elencos-previos" : "time-sombra"
+        }
+      />
 
       <div className="shadow-page-body">
         <header className="shadow-page-header">
           <div className="shadow-page-heading">
-            <h1 className="shadow-page-title">{viewBoard === "elenco" ? "Elenco" : "Time Sombra"}</h1>
+            <h1 className="shadow-page-title">
+              {viewBoard === "elenco" ? "Elenco" : viewBoard === "previos" ? "Elencos Prévios" : "Time Sombra"}
+            </h1>
             <p className="shadow-page-sub">
               {sourceLabel} · {starters.length} titulares · {reserveIds.length} reservas
               {avgLetter != null ? ` · letra ${avgLetter}` : ""}
@@ -324,7 +431,46 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
               </div>
             ) : null}
 
-            {mode === "elenco" ? (
+            {isPrevios ? (
+              <>
+                <div className="shadow-formation-picker">
+                  <span className="shadow-formation-label">Série</span>
+                  <div className="shadow-formation-chips" role="group" aria-label="Competição do elenco">
+                    {BRASILEIRAO_LEAGUES.map((league) => (
+                      <button
+                        key={league.id}
+                        type="button"
+                        className={`shadow-formation-chip${league.id === prevLeague ? " active" : ""}`}
+                        aria-pressed={league.id === prevLeague}
+                        disabled={league.id === "serie-d" && prevSeason !== CURRENT_SEASON}
+                        title={league.id === "serie-d" ? "Série D só tem a temporada atual" : undefined}
+                        onClick={() => choosePrevLeague(league.id)}
+                      >
+                        {league.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="shadow-formation-picker">
+                  <span className="shadow-formation-label">Ano</span>
+                  <div className="shadow-formation-chips" role="group" aria-label="Temporada do elenco">
+                    {BRASILEIRAO_SEASONS.map((season) => (
+                      <button
+                        key={season}
+                        type="button"
+                        className={`shadow-formation-chip${season === prevSeason ? " active" : ""}`}
+                        aria-pressed={season === prevSeason}
+                        disabled={prevLeague === "serie-d" && season !== CURRENT_SEASON}
+                        onClick={() => choosePrevSeason(season)}
+                      >
+                        {season}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <ClubSearch options={clubOptions} value={selectedClub} onChange={chooseClub} />
+              </>
+            ) : mode === "elenco" ? (
               <ClubSearch options={clubOptions} value={selectedClub} onChange={chooseClub} />
             ) : null}
 
@@ -386,13 +532,21 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
             <div className="shadow-pitch-stage">
               <div className="shadow-stage-pitch">
                 {mode === "elenco" && !selectedClub ? (
-                  <p className="shadow-club-prompt">Busque um clube para escalar o elenco inteiro, por minutos e por posição.</p>
+                  <p className="shadow-club-prompt">
+                    {isPrevios
+                      ? prevLoading
+                        ? `Carregando elencos de ${prevSeason}…`
+                        : prevFailed
+                          ? "Não foi possível carregar essa temporada. Troque a série ou o ano."
+                          : "Escolha a série, o ano e o clube para escalar o elenco da temporada, por minutos e por posição."
+                      : "Busque um clube para escalar o elenco inteiro, por minutos e por posição."}
+                  </p>
                 ) : null}
                 <PitchView
                   formationId={state.formationId}
                   assignments={viewAssignments}
-                  compareAssignments={mode === "elenco" ? state.assignments : null}
-                  playersById={playersById}
+                  compareAssignments={mode === "elenco" && !isPrevios ? state.assignments : null}
+                  playersById={lookupById}
                   selectedSlotId={selectedSlotId}
                   placementPlayerId={editable ? placementPlayerId : null}
                   editable={editable}
@@ -441,14 +595,14 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
               <TeamProfileMap
                 formationId={state.formationId}
                 assignments={viewAssignments}
-                playersById={playersById}
+                playersById={lookupById}
               />
             </div>
 
             {mode === "elenco" && !selectedClub ? null : (
               <ReserveBench
                 playerIds={reserveIds}
-                playersById={playersById}
+                playersById={lookupById}
                 labels={reserveLabels}
                 placementPlayerId={editable ? placementPlayerId : null}
                 editable={editable}
@@ -466,6 +620,10 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
             )}
 
             {mode === "elenco" && !selectedClub ? null : <PositionAnalysis lines={lines} />}
+
+            {isPrevios && selectedClub && orderedStarters.length ? (
+              <PreviosSimilarSection league={prevLeague} season={prevSeason} starters={orderedStarters} />
+            ) : null}
           </section>
 
           <aside className="shadow-side">
@@ -601,15 +759,19 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                   <div className="shadow-slot-detail-actions">
                     <Link
                       className="btn btn-ghost btn-sm"
-                      href={`/${selectedPlayer.sourceLeague}/posicao/${selectedPlayer.position_family}?atleta=${selectedPlayer.player_id}`}
+                      href={`/${selectedPlayer.sourceLeague}/posicao/${selectedPlayer.position_family}?atleta=${selectedPlayer.player_id}${
+                        isPrevios && prevSeason !== CURRENT_SEASON ? `&temporada=${prevSeason}` : ""
+                      }`}
                     >
                       Ver perfil
                     </Link>
-                    <AddToShadowMenu
-                      playerId={selectedPlayer.player_id}
-                      family={selectedPlayer.position_family}
-                      compact
-                    />
+                    {isPrevios ? null : (
+                      <AddToShadowMenu
+                        playerId={selectedPlayer.player_id}
+                        family={selectedPlayer.position_family}
+                        compact
+                      />
+                    )}
                   </div>
                   </div>
                 </div>
@@ -688,5 +850,161 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
         </div>
       </div>
     </div>
+  );
+}
+
+type SimilarTarget = LeagueId | "estaduais";
+
+const SIMILAR_TARGETS: { id: SimilarTarget; name: string }[] = [
+  ...BRASILEIRAO_LEAGUES.map((league) => ({ id: league.id as SimilarTarget, name: league.name })),
+  { id: "estaduais", name: "Estaduais" },
+];
+
+/** Card duplo dos Elencos Prévios: escolhe a competição e lista o top 5 similar de cada titular. */
+function PreviosSimilarSection({
+  league,
+  season,
+  starters,
+}: {
+  league: LeagueId;
+  season: string;
+  starters: { player: SquadPlayer; slot: string }[];
+}) {
+  const [target, setTarget] = useState<SimilarTarget | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [results, setResults] = useState<Record<string, SimilarPlayerHit[]>>({});
+  const reqRef = useRef(0);
+
+  async function choose(to: SimilarTarget) {
+    setTarget(to);
+    setLoading(true);
+    setFailed(false);
+    const req = ++reqRef.current;
+    try {
+      const entries = await Promise.all(
+        starters.map(async ({ player }) => {
+          const params = new URLSearchParams({
+            from: league,
+            to,
+            playerId: player.player_id,
+            family: player.position_family,
+            limit: "5",
+          });
+          if (season !== CURRENT_SEASON) params.set("season", season);
+          const res = await fetch(`/api/similar?${params.toString()}`);
+          if (!res.ok) return [player.player_id, []] as const;
+          const data = (await res.json()) as { matches?: SimilarPlayerHit[] };
+          return [player.player_id, data.matches ?? []] as const;
+        }),
+      );
+      if (reqRef.current !== req) return;
+      setResults(Object.fromEntries(entries));
+    } catch {
+      if (reqRef.current === req) setFailed(true);
+    } finally {
+      if (reqRef.current === req) setLoading(false);
+    }
+  }
+
+  const targetName =
+    target === "estaduais" ? "Estaduais" : (LEAGUES.find((item) => item.id === target)?.name ?? "");
+
+  return (
+    <>
+      <article className="player-card previos-similar-pick">
+        <div className="profile-card-head">
+          <h3 className="section-label">Atletas similares</h3>
+          <span className="previos-similar-note">top 5 por titular</span>
+        </div>
+        <p className="previos-similar-hint">
+          Em qual competição buscar atletas parecidos com os titulares de {season}?
+        </p>
+        <div className="shadow-formation-chips previos-similar-leagues">
+          {SIMILAR_TARGETS.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              className={`shadow-formation-chip${target === option.id ? " active" : ""}`}
+              aria-pressed={target === option.id}
+              onClick={() => void choose(option.id)}
+            >
+              {option.name}
+            </button>
+          ))}
+        </div>
+      </article>
+
+      {target ? (
+        <article className="player-card previos-similar-results" aria-live="polite">
+          <div className="profile-card-head">
+            <h3 className="section-label">Top 5 por titular · {targetName}</h3>
+            <span className="previos-similar-note">percentis de ações certas por 90</span>
+          </div>
+          {loading ? (
+            <p className="previos-similar-hint">Calculando similares em {targetName}…</p>
+          ) : failed ? (
+            <p className="previos-similar-hint">
+              Não foi possível calcular agora — toque na competição para tentar de novo.
+            </p>
+          ) : (
+            <div className="previos-similar-groups">
+              {starters.map(({ player, slot }) => {
+                const hits = results[player.player_id] ?? [];
+                return (
+                  <section key={player.player_id} className="previos-similar-group">
+                    <header className="previos-similar-starter">
+                      <span className="previos-similar-slot">{slot}</span>
+                      <div className="previos-similar-starter-copy">
+                        <strong>{player.name}</strong>
+                        <em>
+                          {player.club} · {player.position} · {player.profile}
+                        </em>
+                      </div>
+                    </header>
+                    {hits.length ? (
+                      <ul className="previos-similar-hits">
+                        {hits.map((hit, index) => (
+                          <li key={hit.player_id}>
+                            <Link
+                              className="previos-similar-hit"
+                              href={leaguePath(
+                                hit.league ?? (target === "estaduais" ? "est-nv1" : target),
+                                `/posicao/${player.position_family}?atleta=${encodeURIComponent(hit.player_id)}`,
+                              )}
+                            >
+                              <span className="previos-similar-rank tabular">{index + 1}</span>
+                              <PlayerPhoto
+                                className="previos-similar-photo"
+                                src={hit.photo}
+                                alt=""
+                                fallback={
+                                  <span className="previos-similar-photo previos-similar-fallback">
+                                    {playerInitials(hit.name)}
+                                  </span>
+                                }
+                              />
+                              <span className="previos-similar-copy">
+                                <strong>{hit.name}</strong>
+                                <em>
+                                  <ClubLogo club={hit.club} size={13} /> {hit.club} · {hit.profile}
+                                </em>
+                              </span>
+                              <span className="previos-similar-score tabular">{hit.similarity}%</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="previos-similar-empty">Sem atletas com minutos suficientes nessa posição.</p>
+                    )}
+                  </section>
+                );
+              })}
+            </div>
+          )}
+        </article>
+      ) : null}
+    </>
   );
 }

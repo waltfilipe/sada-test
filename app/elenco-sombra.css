@@ -294,3 +294,170 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Elencos Prévios — chips desabilitados (ex.: Série D sem arquivo) */
+.shadow-formation-chip:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.shadow-formation-chip:disabled:hover {
+  border-color: var(--line-2);
+}
+
+/* Elencos Prévios — seletor de competição e top 5 similares por titular */
+.previos-similar-pick,
+.previos-similar-results {
+  margin-top: 14px;
+  padding: 14px;
+}
+
+.previos-similar-note {
+  color: var(--text-3);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.previos-similar-hint {
+  margin: 0 0 0.75rem;
+  color: var(--text-3);
+  font-size: 0.84rem;
+}
+
+.previos-similar-leagues {
+  row-gap: 0.4rem;
+}
+
+.previos-similar-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.85rem;
+}
+
+.previos-similar-group {
+  border-top: 1px solid var(--line);
+  padding-top: 0.85rem;
+}
+
+.previos-similar-group:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.previos-similar-starter {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.55rem;
+}
+
+.previos-similar-slot {
+  min-width: 2.1rem;
+  padding: 0.2rem 0.35rem;
+  border-radius: 6px;
+  background: rgba(27, 231, 255, 0.1);
+  color: var(--select);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.previos-similar-starter-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.previos-similar-starter-copy strong {
+  font-size: 0.9rem;
+}
+
+.previos-similar-starter-copy em {
+  color: var(--text-3);
+  font-size: 0.74rem;
+  font-style: normal;
+}
+
+.previos-similar-hits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.previos-similar-hit {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.previos-similar-hit:hover {
+  border-color: rgba(27, 231, 255, 0.4);
+  background: rgba(27, 231, 255, 0.04);
+}
+
+.previos-similar-rank {
+  width: 1.2rem;
+  color: var(--text-3);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.previos-similar-photo {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.previos-similar-fallback {
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-2);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.previos-similar-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.previos-similar-copy strong {
+  font-size: 0.86rem;
+}
+
+.previos-similar-copy em {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text-3);
+  font-size: 0.72rem;
+  font-style: normal;
+}
+
+.previos-similar-score {
+  color: var(--select);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.previos-similar-empty {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 0.78rem;
+}
