@@ -32,7 +32,7 @@ import {
 } from "@/lib/reportI18n";
 import { useLoading } from "@/components/LoadingProvider";
 import { PlayerHeatmap } from "./PlayerHeatmap";
-import type { AspectItem, PlayerProfile, PositionFamily } from "@/lib/types";
+import type { AspectItem, PlayerHeatmapData, PlayerProfile, PositionFamily } from "@/lib/types";
 
 type ReportCopy = (typeof REPORT_COPY)[ReportLang];
 
@@ -1171,6 +1171,25 @@ type SummaryDetail = {
   weight: number;
 };
 
+/** One heatmap per picked season merged into a minute-weighted "average" map. */
+function mergedSummaryHeatmap(rows: SummarySheetRow[]): PlayerHeatmapData | null {
+  const mapped = rows.map((row) => ({
+    minutes: Math.max(0, row.player.minutes ?? 0),
+    points: row.player.heatmap?.points ?? [],
+  }));
+  const total = mapped.reduce((sum, item) => sum + (item.points.length ? item.minutes : 0), 0);
+  if (!total) return null;
+  const points: { x: number; y: number; w: number }[] = [];
+  for (const item of mapped) {
+    if (!item.points.length) continue;
+    const share = item.minutes / total;
+    for (const pt of item.points) {
+      points.push({ x: pt.x, y: pt.y, w: (pt.w ?? 1) * share });
+    }
+  }
+  return points.length ? { points } : null;
+}
+
 /** Minutes-weighted pass tendencies across the picked seasons (short↔long and progressive share). */
 function summaryTendencies(detail: SummaryDetail[], lang: ReportLang): ReportTendency[] {
   const copy = REPORT_COPY[lang];
@@ -1353,6 +1372,7 @@ export function SeasonSummarySheet({
 
   const tendencies = useMemo(() => summaryTendencies(detail, lang), [detail, lang]);
   const bio = useMemo(() => reportBio(main, lang), [main, lang]);
+  const heatmap = useMemo(() => mergedSummaryHeatmap(ordered), [ordered]);
 
   return (
     <article className="player-report player-report-summary" lang={lang === "en" ? "en" : "pt-BR"}>
@@ -1406,6 +1426,12 @@ export function SeasonSummarySheet({
               </ul>
             ) : null}
           </div>
+          {heatmap ? (
+            <div className="player-report-heat player-report-heat-summary">
+              <p className="player-report-label">{copy.avgHeatmapTitle}</p>
+              <PlayerHeatmap playerName={main.name} heatmap={heatmap} fixed={{ width: 200, height: 130 }} />
+            </div>
+          ) : null}
         </section>
 
         <section className="player-report-card player-report-seasons-card" aria-label={copy.coveredSeasons}>

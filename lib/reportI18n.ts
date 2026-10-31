@@ -88,6 +88,7 @@ export const REPORT_COPY = {
     blocksPerSeasonHint: "Média dos percentis de cada bloco",
     avgMetricsHint: "Média dos percentis entre as temporadas",
     avgTendenciesHint: "Média ponderada pelos minutos em campo",
+    avgHeatmapTitle: "Mapa de calor médio",
     avgNote:
       "Percentis comparados ao pool da posição de cada temporada; médias ponderadas pelos minutos em campo.",
   },
@@ -176,6 +177,7 @@ export const REPORT_COPY = {
     blocksPerSeasonHint: "Average percentile of each block",
     avgMetricsHint: "Average percentile across seasons",
     avgTendenciesHint: "Minutes-weighted average",
+    avgHeatmapTitle: "Average heatmap",
     avgNote:
       "Percentiles vs each season's positional pool; averages weighted by minutes played.",
   },
