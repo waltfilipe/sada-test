@@ -51,18 +51,23 @@ function readSombraLeague(fallback: LeagueId | "estaduais"): LeagueId | "estadua
 
 type Props = {
   playersByLeague: Record<LeagueId, PlayerSearchRow[]>;
+  /** elenco = escalacao do clube real | sombra = times sombra por competicao/todas. */
+  board: "elenco" | "sombra";
 };
 
-export function TimeSombraClient({ playersByLeague }: Props) {
+export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
   const { href, leagueId } = useLeague();
-  const [mode, setMode] = useState<SquadSource>("elenco");
+  const [savedMode, setSavedMode] = useState<SquadSource>("elenco");
   const [sombraLeague, setSombraLeague] = useState<LeagueId | "estaduais">(leagueId);
 
   useEffect(() => {
-    setMode(readSource());
+    setSavedMode(readSource());
     setSombraLeague(readSombraLeague(leagueId));
     setClubKey(sessionStorage.getItem(CLUB_KEY));
   }, [leagueId]);
+  // A rota fixa o quadro: /elenco sempre mostra o elenco; /time-sombra ignora um
+  // modo "elenco" salvo na sessão e cai no time sombra da competição.
+  const mode: SquadSource = viewBoard === "elenco" ? "elenco" : savedMode === "elenco" ? "sombra" : savedMode;
   const scope: ShadowScope = mode === "sombra-todas" ? "todas" : mode === "sombra" ? sombraLeague : leagueId;
   const board: TeamBoard = mode === "elenco" ? "proprio" : "sombra";
   const { state, ready, changeFormation, assign, dropOnSlot, reserve, removeFromSquad, removeFromWatchlist } =
@@ -170,7 +175,7 @@ export function TimeSombraClient({ playersByLeague }: Props) {
   if (!ready || !state) {
     return (
       <div className="scout-root profile-page">
-        <ScoutTopbar active="elenco" />
+        <ScoutTopbar active={viewBoard === "elenco" ? "elenco" : "time-sombra"} />
         <div className="scout-empty">Carregando elenco…</div>
       </div>
     );
@@ -240,7 +245,7 @@ export function TimeSombraClient({ playersByLeague }: Props) {
       : null;
 
   function setSource(next: SquadSource) {
-    setMode(next);
+    setSavedMode(next);
     sessionStorage.setItem(SOURCE_KEY, next);
     setSelectedSlotId(null);
     setDetailPlayerId(null);
@@ -283,12 +288,12 @@ export function TimeSombraClient({ playersByLeague }: Props) {
 
   return (
     <div className="scout-root profile-page shadow-page">
-      <ScoutTopbar active="elenco" />
+      <ScoutTopbar active={viewBoard === "elenco" ? "elenco" : "time-sombra"} />
 
       <div className="shadow-page-body">
         <header className="shadow-page-header">
           <div className="shadow-page-heading">
-            <h1 className="shadow-page-title">Elenco + Time Sombra</h1>
+            <h1 className="shadow-page-title">{viewBoard === "elenco" ? "Elenco" : "Time Sombra"}</h1>
             <p className="shadow-page-sub">
               {sourceLabel} · {starters.length} titulares · {reserveIds.length} reservas
               {avgLetter != null ? ` · letra ${avgLetter}` : ""}
@@ -296,35 +301,28 @@ export function TimeSombraClient({ playersByLeague }: Props) {
           </div>
 
           <div className="shadow-page-controls">
-            <div className="shadow-board-switch" role="tablist" aria-label="Fonte do elenco">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={mode === "elenco"}
-                className={`shadow-board-tab${mode === "elenco" ? " active" : ""}`}
-                onClick={() => setSource("elenco")}
-              >
-                Elenco atual
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={mode === "sombra"}
-                className={`shadow-board-tab${mode === "sombra" ? " active" : ""}`}
-                onClick={() => setSource("sombra")}
-              >
-                Time sombra
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={mode === "sombra-todas"}
-                className={`shadow-board-tab${mode === "sombra-todas" ? " active" : ""}`}
-                onClick={() => setSource("sombra-todas")}
-              >
-                Todas as competições
-              </button>
-            </div>
+            {viewBoard === "sombra" ? (
+              <div className="shadow-board-switch" role="tablist" aria-label="Fonte do time sombra">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === "sombra"}
+                  className={`shadow-board-tab${mode === "sombra" ? " active" : ""}`}
+                  onClick={() => setSource("sombra")}
+                >
+                  Time sombra
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === "sombra-todas"}
+                  className={`shadow-board-tab${mode === "sombra-todas" ? " active" : ""}`}
+                  onClick={() => setSource("sombra-todas")}
+                >
+                  Todas as competições
+                </button>
+              </div>
+            ) : null}
 
             {mode === "elenco" ? (
               <ClubSearch options={clubOptions} value={selectedClub} onChange={chooseClub} />

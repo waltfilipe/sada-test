@@ -78,10 +78,16 @@ const TOOLS = [
     copy: "O grupo inteiro em dois eixos para achar quem foge da curva.",
   },
   {
-    path: "/time-sombra",
+    path: "/elenco",
     icon: "fa-people-group",
-    title: "Elenco + Time Sombra",
-    copy: "Monte o elenco atual e a lista de alvos para cada posição.",
+    title: "Elenco",
+    copy: "Escale o elenco atual de qualquer clube por posição e minutos.",
+  },
+  {
+    path: "/time-sombra",
+    icon: "fa-chess-board",
+    title: "Time Sombra",
+    copy: "Monte o time dos alvos por posição, numa liga ou em todas.",
   },
 ];
 

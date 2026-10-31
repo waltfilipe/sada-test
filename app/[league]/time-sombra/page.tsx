@@ -25,5 +25,5 @@ export default async function TimeSombraPage({ params }: Props) {
     LeagueId,
     PlayerSearchRow[]
   >;
-  return <TimeSombraClient playersByLeague={playersByLeague} />;
+  return <TimeSombraClient playersByLeague={playersByLeague} board="sombra" />;
 }

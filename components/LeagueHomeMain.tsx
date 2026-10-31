@@ -10,7 +10,8 @@ const SECTIONS = [
   { path: "/filtros", kicker: "Busca", title: "Filtros", text: "Cruze clube, idade, minutagem, pé e tendências para achar o perfil certo." },
   { path: "/comparar", kicker: "Duelo", title: "Comparar", text: "Coloque dois ou três atletas da mesma posição lado a lado." },
   { path: "/scatter", kicker: "Mapa", title: "Scatter", text: "Veja a posição inteira num gráfico e encontre quem se destaca." },
-  { path: "/time-sombra", kicker: "Elenco", title: "Elenco + Time Sombra", text: "Elenco da competição, time sombra de uma liga ou de todas, com atletas de qualquer competição." },
+  { path: "/elenco", kicker: "Escalação", title: "Elenco", text: "Escale o elenco de qualquer clube por posição e minutos jogados." },
+  { path: "/time-sombra", kicker: "Alvos", title: "Time Sombra", text: "Monte o time dos seus sonhos com atletas de uma liga ou de todas." },
   { path: "/atletas", kicker: "Atletas", title: "Atletas", text: "Ficha resumida por jogador, com temporadas 2026 (scout) e 2025 (Wyscout)." },
 ] as const;
 
@@ -37,8 +38,8 @@ export function LeagueHomeMain({ leagueId }: { leagueId: LeagueId }) {
             <Link className="home-cta" href={href("/posicao/zagueiros")}>
               Explorar posições
             </Link>
-            <Link className="home-cta home-cta-ghost" href={href("/time-sombra")}>
-              Elenco + Time Sombra
+            <Link className="home-cta home-cta-ghost" href={href("/elenco")}>
+              Ver elencos
             </Link>
           </div>
           <dl className="home-stats">

@@ -7,16 +7,22 @@ import { useLeagueOptional } from "@/components/LeagueProvider";
 import { getLeague } from "@/lib/leagues";
 import { isBrasileiraoLeague } from "@/lib/seasons";
 
-const NAV = [
+const NAV_SCOUT = [
   { key: "inicio", path: "/", label: "Início", global: true },
   { key: "posicoes", path: "/posicao/zagueiros", label: "Posições", global: false },
   { key: "filtros", path: "/filtros", label: "Filtros", global: false },
   { key: "comparar", path: "/comparar", label: "Comparar", global: false },
   { key: "scatter", path: "/scatter", label: "Scatter", global: false },
-  { key: "elenco", path: "/time-sombra", label: "Elenco + Time Sombra", global: false },
 ] as const;
 
-export type ScoutSection = (typeof NAV)[number]["key"];
+const NAV_SQUAD = [
+  { key: "elenco", path: "/elenco", label: "Elenco", global: false },
+  { key: "time-sombra", path: "/time-sombra", label: "Time Sombra", global: false },
+] as const;
+
+export type ScoutSection =
+  | (typeof NAV_SCOUT)[number]["key"]
+  | (typeof NAV_SQUAD)[number]["key"];
 
 type Props = {
   active: ScoutSection;
@@ -28,14 +34,30 @@ type Props = {
 export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
   const league = useLeagueOptional();
 
-  function navHref(item: (typeof NAV)[number]) {
+  function navHref(item: { path: string; global: boolean }) {
     if (item.global) return item.path;
     if (hubMode || !league) return "/";
     return league.href(item.path);
   }
 
-  function navActive(item: (typeof NAV)[number]) {
-    return item.key === active;
+  function renderLinks(items: readonly { key: string; path: string; label: string; global: boolean }[]) {
+    return items.map((item) => {
+      const disabled = !item.global && (hubMode || !league);
+      const isActive = item.key === active;
+      return (
+        <Link
+          key={item.key}
+          href={disabled ? "#" : navHref(item)}
+          onClick={disabled ? (event) => event.preventDefault() : undefined}
+          className={[isActive ? "active" : "", disabled ? "topbar-link-muted" : ""].filter(Boolean).join(" ")}
+          aria-current={isActive ? "page" : undefined}
+          aria-disabled={disabled ? true : undefined}
+          title={disabled ? "Escolha uma competição no início" : undefined}
+        >
+          {item.label}
+        </Link>
+      );
+    });
   }
 
   const leagueInfo = league ? getLeague(league.leagueId) : undefined;
@@ -50,23 +72,12 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
           <SiteLogo variant="stacked" className="scout-header-logo scout-header-logo-stacked" height={40} />
         </Link>
 
-        <nav className="topbar-links topbar-links-primary" aria-label="Seções">
-          {NAV.map((item) => {
-            const disabled = !item.global && (hubMode || !league);
-            return (
-              <Link
-                key={item.key}
-                href={disabled ? "#" : navHref(item)}
-                onClick={disabled ? (event) => event.preventDefault() : undefined}
-                className={[navActive(item) ? "active" : "", disabled ? "topbar-link-muted" : ""].filter(Boolean).join(" ")}
-                aria-current={navActive(item) ? "page" : undefined}
-                aria-disabled={disabled ? true : undefined}
-                title={disabled ? "Escolha uma competição no início" : undefined}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
+        <nav className="topbar-links topbar-links-primary" aria-label="Seções de scout">
+          {renderLinks(NAV_SCOUT)}
+        </nav>
+
+        <nav className="topbar-links topbar-links-squad" aria-label="Elencos e times sombra">
+          {renderLinks(NAV_SQUAD)}
         </nav>
 
         {showContext ? (
