@@ -2,21 +2,28 @@ import "server-only";
 
 import fs from "fs";
 import path from "path";
-import type { PlayerProfile, TransferLeg } from "@/lib/types";
+import type { PlayerDeparture, PlayerProfile, TransferLeg } from "@/lib/types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
-type TransfersFile = Record<string, { current_club: string; legs: TransferLeg[] }>;
+type TransferEntry = {
+  current_club: string;
+  last?: { club: string; season: string; league: string } | null;
+  joined?: string | null;
+  legs: TransferLeg[];
+};
 
-let transfers: TransfersFile | null | undefined;
+type TransfersFile = Record<string, TransferEntry>;
+
+let transfers: TransfersFile | undefined;
 let rowPerson: Map<string, string> | undefined;
 
 function transfersFile(): TransfersFile {
   if (transfers === undefined) {
     const file = path.join(DATA_DIR, "cross-season", "transfers.json");
-    transfers = fs.existsSync(file) ? (JSON.parse(fs.readFileSync(file, "utf-8")) as TransfersFile) : null;
+    transfers = fs.existsSync(file) ? (JSON.parse(fs.readFileSync(file, "utf-8")) as TransfersFile) : {};
   }
-  return transfers ?? {};
+  return transfers;
 }
 
 function personIndex(): Map<string, string> {
@@ -38,26 +45,86 @@ function personIndex(): Map<string, string> {
   return rowPerson;
 }
 
+function normClub(club?: string | null): string {
+  return (club ?? "")
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+const CLUB_STOP = new Set(["de", "da", "do", "e", "fc", "sc", "ec", "ac", "ca", "se", "sp", "clube", "futebol"]);
+
+function sameClub(a?: string | null, b?: string | null): boolean {
+  const na = normClub(a);
+  const nb = normClub(b);
+  if (!na || !nb) return false;
+  if (na === nb || na.includes(nb) || nb.includes(na)) return true;
+  const ta = new Set([...na.split(" ")].filter((t) => !CLUB_STOP.has(t)));
+  const tb = new Set([...nb.split(" ")].filter((t) => !CLUB_STOP.has(t)));
+  return [...ta].some((t) => tb.has(t));
+}
+
 /**
- * Attaches the athlete's transfer legs (club changes across seasons, dated via
- * Transfermarkt when available) to the player row. Identity follows person_key,
- * the same graph used for photos and cross-season history.
+ * Resolves whether the viewed row is the athlete's last stint at that club —
+ * he left the competition (transfer during/after the season, possibly abroad).
+ * Returns the departure to show on the ficha, or null when he is still there.
  */
-export function withPlayerTransfers<T extends PlayerProfile>(
+export function playerDeparture(
+  league: string,
+  season: string,
+  player: Pick<PlayerProfile, "player_id" | "club">,
+): PlayerDeparture | null {
+  const key = personIndex().get(`${league}/${season}/${player.player_id}`);
+  const entry = key ? transfersFile()[key] : undefined;
+  if (!entry) return null;
+  const leg = entry.legs.find(
+    (l) => l.from_season === season && sameClub(l.from_club, player.club),
+  );
+  if (leg) {
+    return {
+      to_club: leg.to_club,
+      to_league: leg.to_league ?? null,
+      to_season: leg.to_season ?? null,
+      date: leg.date ?? null,
+      fee: leg.fee ?? null,
+      kind: leg.kind ?? "permanent",
+    };
+  }
+  const last = entry.last;
+  if (
+    last &&
+    last.season === season &&
+    sameClub(last.club, player.club) &&
+    entry.current_club &&
+    !sameClub(entry.current_club, player.club)
+  ) {
+    return {
+      to_club: entry.current_club,
+      to_league: null,
+      date: entry.joined ?? null,
+      fee: null,
+      kind: "permanent",
+    };
+  }
+  return null;
+}
+
+export function withPlayerDeparture<T extends PlayerProfile>(
   league: string,
   season: string,
   player: T,
 ): T {
-  const key = personIndex().get(`${league}/${season}/${player.player_id}`);
-  const legs = key ? transfersFile()[key]?.legs : undefined;
-  if (!legs?.length) return player;
-  return { ...player, transfers: legs };
+  const departure = playerDeparture(league, season, player);
+  if (!departure) return player;
+  return { ...player, departure };
 }
 
-export function withPlayersTransfers<T extends PlayerProfile>(
+export function withPlayersDepartures<T extends PlayerProfile>(
   league: string,
   season: string,
   players: T[],
 ): T[] {
-  return players.map((player) => withPlayerTransfers(league, season, player));
+  return players.map((player) => withPlayerDeparture(league, season, player));
 }

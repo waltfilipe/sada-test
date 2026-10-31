@@ -34,6 +34,20 @@ SEASONS = ["2022", "2023", "2024", "2025", "2026"]
 CURRENT = "2026"
 TIER = {"serie-a": 0, "serie-b": 1, "serie-c": 2, "serie-d": 3}
 
+NO_CLUB = {
+    "sem clube",
+    "sem equipa",
+    "fim de carreira",
+    "aposentado",
+    "retired",
+    "career break",
+    "free agent",
+    "jogador livre",
+    "youth",
+    "unknown",
+}
+
+
 CACHE_FILE = DATA / "cross-season" / "tm-profile-cache.json"
 OUT_FILE = DATA / "cross-season" / "transfers.json"
 UA = (
@@ -98,6 +112,9 @@ def build_stints():
                     prev = tm.get(key)
                     if not prev or season == CURRENT:
                         tm[key] = {"id": str(info["id"]), "profile_url": info["profile_url"], "club": info.get("club")}
+                elif season == CURRENT and info.get("club"):
+                    cur = tm.setdefault(key, {})
+                    cur.setdefault("club", info["club"])
     return stints, tm
 
 
@@ -184,10 +201,23 @@ def main() -> None:
     stints, tm = build_stints()
     entries: dict[str, dict] = {}
     for key, rows in stints.items():
+        ordered = sorted(rows, key=lambda s: (s["season"], TIER.get(s["league"], 9)))
+        last = ordered[-1]
         legs = legs_for(rows)
-        if legs:
-            entries[key] = {"current_club": rows[-1]["club"], "legs": legs}
-    print(f"pessoas com transferencias: {len(entries)}")
+        tm_club = (tm.get(key) or {}).get("club")
+        if tm_club and norm(tm_club) in NO_CLUB:
+            tm_club = None
+        current = tm_club or last["club"]
+        # keep people who changed clubs (legs) or whose last stint no longer
+        # matches the club shown by Transfermarkt (left for abroad/untracked)
+        if not legs and clubs_match(current, last["club"]):
+            continue
+        entries[key] = {
+            "current_club": current,
+            "last": {"club": last["club"], "season": last["season"], "league": last["league"]},
+            "legs": legs,
+        }
+    print(f"pessoas com saida detectada: {len(entries)}")
 
     cache: dict[str, dict] = load_json(CACHE_FILE) if CACHE_FILE.is_file() else {}
     targets = [(k, t) for k, t in tm.items() if k in entries]
@@ -223,29 +253,57 @@ def main() -> None:
         move = parsed.get("move")
         joined = parsed.get("joined")
         legs = entry["legs"]
+
+        # Trust check: the move's origin club must be one of the person's own
+        # stints — otherwise the fetched TM profile belongs to a homonym and
+        # its date/club would corrupt this athlete's record.
+        trusted = True
+        if move and move.get("from_club"):
+            own_clubs = [s["club"] for s in stints.get(key, [])]
+            trusted = any(clubs_match(move["from_club"], c) for c in own_clubs)
+        if not trusted:
+            move = None
+            joined = None
+            last_club = (entry.get("last") or {}).get("club")
+            if last_club:
+                entry["current_club"] = last_club
+
+        if joined:
+            entry["joined"] = joined
         applied = False
-        if move and move.get("date"):
+        if move and move.get("date") and legs:
             # find the leg whose origin club matches the TM "from" club
             hits = [i for i, leg in enumerate(legs) if clubs_match(leg["from_club"], move.get("from_club"))]
             if hits:
                 leg = legs[hits[-1]]
-            else:
-                # origin club not in our stints (e.g. arrived from abroad)
-                leg = legs[-1]
-                if move.get("from_club") and not clubs_match(leg["from_club"], move["from_club"]):
-                    leg["from_club"] = move["from_club"]
-                    leg["from_league"] = None
-                    leg["from_season"] = None
-            leg["date"] = move["date"]
-            leg["fee"] = move.get("fee")
-            leg["kind"] = move.get("kind") or "permanent"
-            applied = True
-        elif joined:
-            legs[-1]["date"] = joined
-            applied = True
+                leg["date"] = move["date"]
+                leg["fee"] = move.get("fee")
+                leg["kind"] = move.get("kind") or "permanent"
+                applied = True
+        if not applied and joined and legs:
+            # "No time desde" dates the arrival at the CURRENT club: accept it
+            # when it lands on/after the window before the arrival season; an
+            # older date means the TM record is stale.
+            to_year = int(legs[-1]["to_season"] or 0)
+            if to_year and int(joined[:4]) >= to_year - 1:
+                legs[-1]["date"] = joined
+                applied = True
         dated += 1 if applied else 0
         undated += 0 if applied else 1
     print(f"pernas datadas via TM: {dated} | sem data (label temporada): {undated}")
+
+    # stale TM check: a "No time desde" older than the last stint means the TM
+    # club predates our data — distrust both the date and the foreign club.
+    stale = 0
+    for key, entry in entries.items():
+        joined = entry.get("joined")
+        last = entry.get("last")
+        if joined and last and joined[:4] < last["season"]:
+            entry.pop("joined", None)
+            if not clubs_match(entry["current_club"], last["club"]):
+                entry["current_club"] = last["club"]
+                stale += 1
+    print(f"registros TM desatualizados ignorados: {stale}")
 
     OUT_FILE.write_text(json.dumps(entries, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"ok -> {OUT_FILE.relative_to(DATA.parent)}")

@@ -173,12 +173,25 @@ export type CrossSeasonProjection = {
 /** Uma mudança de clube do atleta entre passagens consecutivas (person_key). */
 export type TransferLeg = {
   from_club: string;
-  from_league?: string;
-  from_season?: string;
+  from_league?: string | null;
+  from_season?: string | null;
   to_club: string;
-  to_league?: string;
-  to_season?: string;
+  to_league?: string | null;
+  to_season?: string | null;
   /** ISO date from Transfermarkt; null = janela da temporada apenas. */
+  date?: string | null;
+  fee?: string | null;
+  kind?: "permanent" | "loan" | "free" | "return";
+};
+
+/**
+ * Saída do atleta do clube exibido nesta linha — ele deixou a competição/clube
+ * (transferência durante ou após a temporada, inclusive para o exterior).
+ */
+export type PlayerDeparture = {
+  to_club: string;
+  to_league?: string | null;
+  to_season?: string | null;
   date?: string | null;
   fee?: string | null;
   kind?: "permanent" | "loan" | "free" | "return";
@@ -198,8 +211,8 @@ export type SeasonMeta = {
 
 export type PlayerProfile = PlayerSummary & {
   cross_season?: CrossSeasonProjection;
-  /** Pernas de transferência detectadas (clube muda entre temporadas do person_key). */
-  transfers?: TransferLeg[];
+  /** Presente quando esta linha é a última passagem do atleta pelo clube (ele saiu). */
+  departure?: PlayerDeparture | null;
   /** Filled by /api/player-season for the peek popup. */
   season_meta?: SeasonMeta;
   /** Jogador médio sintético (/api/avg-player) — temporadas combinadas na média. */
