@@ -371,7 +371,7 @@ def main() -> None:
                     if cid and (prof_dir / f"{cid}.json").is_file():
                         (prof_dir / f"{cid}.json").write_text(dumps_json(player), encoding="utf-8")
 
-    print(f"Wrote models → {out_models}")
+    print(f"Wrote models -> {out_models}")
     print(f"Enriched {enriched} player rows with cross_season")
 
 

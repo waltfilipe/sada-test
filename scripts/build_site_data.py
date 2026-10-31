@@ -220,7 +220,7 @@ def build_league(
             encoding="utf-8",
         )
 
-    print(f"Wrote {len(all_players)} profiles → {out_dir}")
+    print(f"Wrote {len(all_players)} profiles -> {out_dir}")
 
 
 def _sync_serie_a_legacy() -> None:

@@ -32,6 +32,7 @@ SNAPSHOTS: list[tuple[str, str, Path]] = [
 
 
 SOFASCORE_CSV: dict[tuple[str, str], Path] = {
+    ("serie-a", "2022"): ROOT / "BRA22_defensive.csv",
     ("serie-a", "2023"): ROOT / "BRA23_defensive.csv",
     ("serie-a", "2024"): ROOT / "BRA24_defensive.csv",
     ("serie-a", "2025"): ROOT / "BRA25_defensive.csv",
@@ -56,7 +57,7 @@ def main() -> None:
         defensive_csv = SOFASCORE_CSV.get((league_id, year))
         heatmaps_dir = HEATMAPS_DIR.get((league_id, year))
         out_dir = ROOT / "data" / league_id / "seasons" / year
-        print(f"\n=== {league_id} {year} → {out_dir} ===")
+        print(f"\n=== {league_id} {year} -> {out_dir} ===")
         build_league(
             league_id,
             out_dir=out_dir,
