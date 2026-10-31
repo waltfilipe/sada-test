@@ -461,3 +461,73 @@
   color: var(--text-3);
   font-size: 0.78rem;
 }
+
+/* Elencos Prévios — lista de clubes na ordem da tabela */
+.previos-clubs {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.previos-clubs-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.previos-club-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 0.35rem;
+  max-height: 238px;
+  overflow-y: auto;
+}
+
+.previos-club {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.38rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: none;
+  color: var(--text-2);
+  font-size: 0.82rem;
+  text-align: left;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.previos-club:hover {
+  border-color: rgba(27, 231, 255, 0.4);
+  color: var(--text);
+}
+
+.previos-club.active {
+  border-color: rgba(27, 231, 255, 0.6);
+  background: rgba(27, 231, 255, 0.09);
+  color: var(--text);
+}
+
+.previos-club-pos {
+  min-width: 1.6rem;
+  color: var(--text-3);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.previos-club.active .previos-club-pos {
+  color: var(--select);
+}
+
+.previos-club-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

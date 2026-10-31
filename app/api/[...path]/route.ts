@@ -6,6 +6,7 @@ import {
   getPlayerProfile,
   getPlayers,
   getSearchRows,
+  getStandings,
 } from "@/lib/data.server";
 import { getAveragePlayers } from "@/lib/avgPlayer.server";
 import { findPlayerInSeason } from "@/lib/playerSeasonMatch.server";
@@ -73,6 +74,15 @@ export async function GET(request: Request, { params }: Params) {
       // Missing archive slice (ex.: liga sem a temporada) — same contract as `families`.
       return NextResponse.json({ players: [], total: 0 });
     }
+  }
+
+  if (resource === "standings" && path.length === 1) {
+    const league = url.searchParams.get("league") ?? undefined;
+    const season = url.searchParams.get("season") ?? url.searchParams.get("temporada") ?? undefined;
+    return NextResponse.json(
+      { clubs: getStandings(league, season) },
+      { headers: archiveCacheHeaders(season) },
+    );
   }
 
   if (resource === "avg-player" && path.length === 1) {

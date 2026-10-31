@@ -70,6 +70,7 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
   const [prevLoading, setPrevLoading] = useState(false);
   const [prevFailed, setPrevFailed] = useState(false);
   const [prevClubKey, setPrevClubKey] = useState<string | null>(null);
+  const [prevStandings, setPrevStandings] = useState<string[] | null>(null);
 
   useEffect(() => {
     setSavedMode(readSource());
@@ -146,6 +147,24 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
     };
   }, [isPrevios, prevLeague, prevSeason]);
 
+  // Tabela da competição para ordenar a lista de clubes.
+  useEffect(() => {
+    if (!isPrevios) return;
+    let cancelled = false;
+    setPrevStandings(null);
+    fetch(`/api/standings?league=${prevLeague}&season=${prevSeason}`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("standings_fetch_failed"))))
+      .then((data: { clubs?: string[] }) => {
+        if (!cancelled) setPrevStandings(data.clubs ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setPrevStandings([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isPrevios, prevLeague, prevSeason]);
+
   const prevPool = useMemo<SquadPlayer[]>(() => {
     if (!isPrevios) return [];
     if (prevSeason === CURRENT_SEASON) {
@@ -186,6 +205,17 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
 
   const activeClubKey = isPrevios ? prevClubKey : clubKey;
   const selectedClub = clubOptions.find((option) => `${option.leagueId}::${option.club}` === activeClubKey) ?? null;
+
+  // Elencos prévios: clubes na ordem da tabela do campeonato; sem tabela, alfabética.
+  const prevClubOptions = useMemo(() => {
+    if (!isPrevios || !prevStandings?.length) return clubOptions;
+    const rank = new Map(prevStandings.map((club, index) => [club, index]));
+    return [...clubOptions].sort((a, b) => {
+      const ra = rank.get(a.club) ?? Number.MAX_SAFE_INTEGER;
+      const rb = rank.get(b.club) ?? Number.MAX_SAFE_INTEGER;
+      return ra - rb || a.club.localeCompare(b.club, "pt");
+    });
+  }, [isPrevios, clubOptions, prevStandings]);
 
   const clubPlayers = useMemo(() => {
     if (!selectedClub) return [];
@@ -468,7 +498,6 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                     ))}
                   </div>
                 </div>
-                <ClubSearch options={clubOptions} value={selectedClub} onChange={chooseClub} />
               </>
             ) : mode === "elenco" ? (
               <ClubSearch options={clubOptions} value={selectedClub} onChange={chooseClub} />
@@ -529,6 +558,44 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
 
         <div className="shadow-layout">
           <section className="shadow-main player-card" aria-label="Campo e reservas">
+            {isPrevios ? (
+              <div className="previos-clubs">
+                <div className="previos-clubs-head">
+                  <h3 className="section-label">Clubes</h3>
+                  <span className="previos-similar-note">
+                    {prevStandings?.length
+                      ? `ordem da tabela · ${LEAGUES.find((l) => l.id === prevLeague)?.name ?? ""} ${prevSeason}`
+                      : "ordem alfabética"}
+                  </span>
+                </div>
+                {prevLoading ? (
+                  <p className="previos-similar-hint">Carregando clubes de {prevSeason}…</p>
+                ) : (
+                  <div className="previos-club-grid">
+                    {prevClubOptions.map((option) => {
+                      const pos = prevStandings?.indexOf(option.club) ?? -1;
+                      const active =
+                        selectedClub?.club === option.club && selectedClub.leagueId === option.leagueId;
+                      return (
+                        <button
+                          key={`${option.leagueId}-${option.club}`}
+                          type="button"
+                          className={`previos-club${active ? " active" : ""}`}
+                          aria-pressed={active}
+                          onClick={() => chooseClub(active ? null : option)}
+                        >
+                          {prevStandings?.length ? (
+                            <span className="previos-club-pos tabular">{pos >= 0 ? `${pos + 1}º` : "—"}</span>
+                          ) : null}
+                          <ClubLogo club={option.club} size={16} />
+                          <span className="previos-club-name">{option.club}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ) : null}
             <div className="shadow-pitch-stage">
               <div className="shadow-stage-pitch">
                 {mode === "elenco" && !selectedClub ? (

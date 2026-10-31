@@ -68,6 +68,25 @@ export function getMeta(league?: string, season?: string): SiteMeta {
   return metaCache.get(key)!;
 }
 
+const standingsFile = { data: null as Record<string, Record<string, string[]>> | null };
+const standingsCache = new Map<string, string[]>();
+
+/** Ordem final da tabela por liga/temporada (fonte: classificação oficial). */
+export function getStandings(league?: string, season?: string): string[] {
+  const id = resolveLeague(league);
+  const key = cacheKey(id, season);
+  if (!standingsCache.has(key)) {
+    if (!standingsFile.data) {
+      const file = path.join(DATA_DIR, "cross-season", "standings.json");
+      standingsFile.data = fs.existsSync(file)
+        ? readJson<Record<string, Record<string, string[]>>>(file)
+        : {};
+    }
+    standingsCache.set(key, standingsFile.data[id]?.[parseSeasonParam(season)] ?? []);
+  }
+  return standingsCache.get(key)!;
+}
+
 export function getPlayers(league?: string, season?: string): PlayerSummary[] {
   const id = resolveLeague(league);
   const key = cacheKey(id, season);
