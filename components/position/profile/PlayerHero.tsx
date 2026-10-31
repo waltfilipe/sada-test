@@ -64,6 +64,38 @@ function metricDisplay(player: PlayerProfile, label: string): string {
   return "—";
 }
 
+function normClubName(name?: string | null): string {
+  return (name ?? "")
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .trim();
+}
+
+function pickTransferLeg(player: PlayerProfile) {
+  const legs = player.transfers ?? [];
+  if (!legs.length) return null;
+  const club = normClubName(player.club);
+  const depart = legs.find((leg) => normClubName(leg.from_club) === club);
+  const arrive = [...legs].reverse().find((leg) => normClubName(leg.to_club) === club);
+  const leg = depart ?? arrive ?? legs[legs.length - 1];
+  return { leg, direction: depart ? "depart" : "arrive" } as const;
+}
+
+function transferDateLabel(leg: { date?: string | null; to_season?: string }): string {
+  if (leg.date) {
+    const d = new Date(`${leg.date}T12:00:00`);
+    return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+  }
+  return `Janela de ${leg.to_season ?? "—"}`;
+}
+
+const TRANSFER_KIND_LABEL: Record<string, string> = {
+  loan: "empréstimo",
+  return: "retorno de empréstimo",
+  free: "livre",
+};
+
 function HeroFact({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="hero-fact">
@@ -132,6 +164,7 @@ export function PlayerHero({
       : months != null && months < 12
         ? "Contrato termina em menos de 1 ano."
         : "Tempo restante de contrato.";
+  const transfer = pickTransferLeg(player);
   const heroAccent = profileAccent((player.profile ?? "").split("+").pop()!.trim());
   return (
     <section
@@ -248,6 +281,36 @@ export function PlayerHero({
             </span>
           </MarketCard>
         </div>
+
+        {transfer ? (
+          <MarketCard
+            icon="fa-right-left"
+            label={transfer.direction === "depart" ? "Transferido para" : "Última transferência"}
+            wide
+            tooltip={
+              transfer.leg.date
+                ? "Data e valor conforme o Transfermarkt."
+                : "Clube anterior/seguinte detectado pelo histórico do atleta; data exata indisponível."
+            }
+          >
+            <span className="hero-transfer">
+              <span className="hero-transfer-line">
+                <ClubLogo club={transfer.leg.from_club} size={16} />
+                <span className="hero-transfer-club">{transfer.leg.from_club}</span>
+                <i className="fa-solid fa-arrow-right hero-transfer-arrow" aria-hidden="true" />
+                <ClubLogo club={transfer.leg.to_club} size={16} />
+                <span className="hero-transfer-club">{transfer.leg.to_club}</span>
+              </span>
+              <span className="hero-transfer-sub">
+                {transferDateLabel(transfer.leg)}
+                {transfer.leg.fee ? ` · ${transfer.leg.fee}` : ""}
+                {transfer.leg.kind && TRANSFER_KIND_LABEL[transfer.leg.kind]
+                  ? ` · ${TRANSFER_KIND_LABEL[transfer.leg.kind]}`
+                  : ""}
+              </span>
+            </span>
+          </MarketCard>
+        ) : null}
 
         <div className={`hero-action-grid${showRun ? " hero-action-grid-has-run" : ""}`}>
           <div className="hero-action-cell hero-action-tendencies">

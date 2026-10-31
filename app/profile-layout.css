@@ -2092,6 +2092,43 @@
   font-size: 0.52rem;
 }
 
+/* Transfer card — from → to clubs with date/fee */
+.hero-transfer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  min-width: 0;
+}
+
+.hero-transfer-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  min-width: 0;
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.hero-transfer-club {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-transfer-arrow {
+  color: var(--gold);
+  font-size: 0.62rem;
+  flex-shrink: 0;
+}
+
+.hero-transfer-sub {
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
 /* Rating anchor — fills the hero's full right corner */
 .player-hero > .tip-wrap-trigger:last-child {
   display: flex;

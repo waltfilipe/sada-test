@@ -8,6 +8,7 @@ import { DEFAULT_LEAGUE, isLeagueId, type LeagueId } from "./leagues";
 import { POSITION_FAMILIES } from "./positions";
 import { playerStatBadges } from "./statBadges";
 import { withResolvedSeasonPhoto, withResolvedSeasonPhotos } from "./playerPhotoLookup.server";
+import { withPlayersTransfers } from "./transfersLookup.server";
 import type { PlayerHeatmapData, PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -153,8 +154,9 @@ export function getFamilyPlayers(family: PositionFamily, league?: string, season
     parseSeasonParam(season) === CURRENT_SEASON
       ? payload.players
       : withResolvedSeasonPhotos(id, season ?? CURRENT_SEASON, payload.players);
-  familyCache.set(key, resolved);
-  return resolved;
+  const withTransfers = withPlayersTransfers(id, parseSeasonParam(season), resolved);
+  familyCache.set(key, withTransfers);
+  return withTransfers;
 }
 
 export function filterPlayers(
