@@ -7,7 +7,9 @@ import { isLeagueId, type LeagueId } from "@/lib/leagues";
 import {
   BRASILEIRAO_SEASONS,
   CURRENT_SEASON,
+  FICHA_ORIGEM_PARAM,
   FICHA_TEMPORADA_PARAM,
+  parseFichaOrigemParam,
   parseFichaSeasonParam,
 } from "@/lib/seasons";
 import type { BrasileiraoSeason } from "@/lib/seasons";
@@ -19,6 +21,7 @@ export function usePlayerArchiveProfile(basePlayer: PlayerProfile, _family: Posi
   const router = useRouter();
   const pathname = usePathname();
   const fichaSeason = parseFichaSeasonParam(searchParams.get(FICHA_TEMPORADA_PARAM));
+  const fichaOrigem = parseFichaOrigemParam(searchParams.get(FICHA_ORIGEM_PARAM));
   const [archivePlayer, setArchivePlayer] = useState<PlayerProfile | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -89,23 +92,43 @@ export function usePlayerArchiveProfile(basePlayer: PlayerProfile, _family: Posi
   const setFichaSeason = useCallback(
     (year: BrasileiraoSeason | typeof CURRENT_SEASON) => {
       const params = new URLSearchParams(searchParams.toString());
-      if (year === CURRENT_SEASON) params.delete(FICHA_TEMPORADA_PARAM);
-      else params.set(FICHA_TEMPORADA_PARAM, year);
+      if (year === CURRENT_SEASON) {
+        params.delete(FICHA_TEMPORADA_PARAM);
+        params.delete(FICHA_ORIGEM_PARAM);
+      } else {
+        params.set(FICHA_TEMPORADA_PARAM, year);
+        // First archive hop records where the athlete was being viewed; further
+        // year switches keep the original return target.
+        if (!params.has(FICHA_ORIGEM_PARAM)) {
+          params.set(FICHA_ORIGEM_PARAM, fichaSeason ?? CURRENT_SEASON);
+        }
+      }
       const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     },
-    [pathname, router, searchParams],
+    [pathname, router, searchParams, fichaSeason],
   );
+
+  const goBackFicha = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete(FICHA_ORIGEM_PARAM);
+    if (fichaOrigem === CURRENT_SEASON) params.delete(FICHA_TEMPORADA_PARAM);
+    else params.set(FICHA_TEMPORADA_PARAM, fichaOrigem);
+    const qs = params.toString();
+    router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [pathname, router, searchParams, fichaOrigem]);
 
   return {
     basePlayer,
     displayPlayer,
     isArchiveView,
     fichaSeason: fichaSeason ?? CURRENT_SEASON,
+    fichaOrigem,
     fichaLeague,
     archiveYears,
     showSlicer,
     loading,
     setFichaSeason,
+    goBackFicha,
   };
 }

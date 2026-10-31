@@ -29,11 +29,21 @@ export function withSeasonQuery(path: string, season: string): string {
 /** Per-player archive slice while hub season stays 2026. */
 export const FICHA_TEMPORADA_PARAM = "ficha_temporada";
 
+/** Season the athlete ficha was viewed at before opening an archive year. */
+export const FICHA_ORIGEM_PARAM = "ficha_origem";
+
 export function parseFichaSeasonParam(value: string | null | undefined): BrasileiraoSeason | null {
   if (value && (BRASILEIRAO_SEASONS as readonly string[]).includes(value) && value !== CURRENT_SEASON) {
     return value as BrasileiraoSeason;
   }
   return null;
+}
+
+export function parseFichaOrigemParam(value: string | null | undefined): BrasileiraoSeason {
+  if (value && (BRASILEIRAO_SEASONS as readonly string[]).includes(value)) {
+    return value as BrasileiraoSeason;
+  }
+  return CURRENT_SEASON;
 }
 
 export const HUB_SEASON_STORAGE_KEY = "sada-hub-season";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLeague } from "@/components/LeagueProvider";
 import { usePlayerArchiveProfile } from "@/hooks/usePlayerArchiveProfile";
@@ -8,11 +8,11 @@ import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import {
   BRASILEIRAO_SEASONS,
   CURRENT_SEASON,
+  FICHA_ORIGEM_PARAM,
   FICHA_TEMPORADA_PARAM,
   type BrasileiraoSeason,
 } from "@/lib/seasons";
 import { PlayerHero } from "./PlayerHero";
-import { SeasonPeekModal } from "./SeasonPeekModal";
 import { PlayerHeatmap } from "./PlayerHeatmap";
 import { StatProfileRadarCard } from "./PlayerReport";
 import { ProfileRadarCard } from "./ProfileCard";
@@ -32,8 +32,8 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const archive = usePlayerArchiveProfile(player, family);
-  const { displayPlayer, isArchiveView, loading, setFichaSeason, fichaSeason, basePlayer, archiveYears } = archive;
-  const [peekYear, setPeekYear] = useState<string | null>(null);
+  const { displayPlayer, isArchiveView, loading, setFichaSeason, goBackFicha, fichaSeason, fichaOrigem, basePlayer, archiveYears } =
+    archive;
 
   const archiveHubSlicer = useMemo(() => {
     if (isCurrentSeason) return undefined;
@@ -61,6 +61,7 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
         const params = new URLSearchParams(searchParams.toString());
         params.delete("atleta");
         params.delete(FICHA_TEMPORADA_PARAM);
+        params.delete(FICHA_ORIGEM_PARAM);
         params.set("atleta_nome", player.name);
         params.set("atleta_nasc", String(player.birth_year ?? ""));
         const targetClub =
@@ -89,9 +90,14 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
         .join(" ")}
     >
       {isArchiveView ? (
-        <p className="profile-archive-banner" role="status">
-          Arquivo Wyscout · temporada {fichaSeason} · dados históricos (não é o scout {CURRENT_SEASON})
-        </p>
+        <div className="profile-archive-banner" role="status">
+          <span>
+            Arquivo Wyscout · temporada {fichaSeason} · dados históricos (não é o scout {CURRENT_SEASON})
+          </span>
+          <button type="button" className="profile-archive-back" onClick={goBackFicha}>
+            <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Voltar para {fichaOrigem}
+          </button>
+        </div>
       ) : null}
       {!isCurrentSeason ? (
         <p className="profile-archive-banner profile-archive-banner-hub" role="status">
@@ -117,10 +123,7 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
                 active: fichaSeason,
                 years: [CURRENT_SEASON, ...archiveYears],
                 loading,
-                onSelect: (year) => {
-                  if (year === CURRENT_SEASON) setFichaSeason(year);
-                  else setPeekYear(year);
-                },
+                onSelect: (year) => setFichaSeason(year),
               }
             : archiveHubSlicer
         }
@@ -156,17 +159,6 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
         </div>
       </div>
 
-      {peekYear ? (
-        <SeasonPeekModal
-          year={peekYear}
-          scout={basePlayer}
-          onClose={() => setPeekYear(null)}
-          onOpenFicha={(year) => {
-            setPeekYear(null);
-            setFichaSeason(year as Parameters<typeof setFichaSeason>[0]);
-          }}
-        />
-      ) : null}
     </div>
   );
 }

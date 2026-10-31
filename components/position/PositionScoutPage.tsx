@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
-import { FICHA_TEMPORADA_PARAM } from "@/lib/seasons";
+import { FICHA_ORIGEM_PARAM, FICHA_TEMPORADA_PARAM } from "@/lib/seasons";
 import { BadgeFilterBox } from "@/components/filters/BadgeFilterBox";
 import { PositionProfileView } from "@/components/position/profile/PositionProfileView";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
@@ -467,6 +467,7 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
                         if (!searchParams.has(FICHA_TEMPORADA_PARAM)) return;
                         const params = new URLSearchParams(searchParams.toString());
                         params.delete(FICHA_TEMPORADA_PARAM);
+                        params.delete(FICHA_ORIGEM_PARAM);
                         const qs = params.toString();
                         router.replace(qs ? `${window.location.pathname}?${qs}` : window.location.pathname, {
                           scroll: false,
