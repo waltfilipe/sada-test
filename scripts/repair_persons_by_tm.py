@@ -69,6 +69,15 @@ def main() -> int:
             for pid, key in mapping.items():
                 person_rows[key].append((league, season, pid))
 
+    # Index usage must be tracked globally across repairs — two different
+    # conflicts can share the same name|birth stem (e.g. two "cassio|1993"
+    # persons each splitting) and would otherwise mint the same new key.
+    used_by_stem: dict[str, set[int]] = defaultdict(set)
+    for key in person_rows:
+        m = re.match(r"^(name:.*\|\d+\|)(\d+)$", key)
+        if m:
+            used_by_stem[m.group(1)].add(int(m.group(2)))
+
     repaired = 0
     for person_key in targets:
         rows = person_rows.get(person_key) or []
@@ -98,7 +107,7 @@ def main() -> int:
 
         m = re.match(r"^(name:.*\|\d+\|)(\d+)$", person_key)
         stem, base_idx = (m.group(1), int(m.group(2))) if m else (f"{person_key}|", 0)
-        used = {int(k[len(stem):]) for k in person_rows if k.startswith(stem) and k[len(stem):].isdigit()}
+        used = used_by_stem[stem]
 
         keep_tm = ordered[0][0]  # largest pinned group keeps the original key
         for tm_id, rws in ordered:
@@ -111,7 +120,7 @@ def main() -> int:
             new_key = f"{stem}{idx}"
             for league, season, pid in rws:
                 persons[league][season][pid] = new_key
-            print(f"  {person_key} → split {new_key}: tm {tm_id} ({len(rws)} linhas)")
+            print(f"  {person_key} -> split {new_key}: tm {tm_id} ({len(rws)} linhas)")
         repaired += 1
 
     if repaired:
