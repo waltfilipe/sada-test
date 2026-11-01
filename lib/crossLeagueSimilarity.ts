@@ -186,37 +186,147 @@ function rawCertos(player: PlayerProfile, featureId: string): number | null {
   return null;
 }
 
+type FeatureRow = { vec: number[]; mask: boolean[] };
+
 function featureVector(
   player: PlayerProfile,
   pool: PlayerProfile[],
   featureIds: string[],
-): number[] {
-  return featureIds.map((fid) => {
+): FeatureRow {
+  const vec = new Array<number>(featureIds.length);
+  const mask = new Array<boolean>(featureIds.length);
+  for (let i = 0; i < featureIds.length; i++) {
+    const fid = featureIds[i]!;
     const values = pool
       .map((p) => rawCertos(p, fid))
       .filter((value): value is number => value != null);
     const raw = rawCertos(player, fid);
     if (raw != null && values.length >= 3) {
-      return Math.max(0, Math.min(1, percentileInPool(raw, values) / 100));
+      vec[i] = Math.max(0, Math.min(1, percentileInPool(raw, values) / 100));
+      mask[i] = true;
+    } else {
+      vec[i] = NEUTRAL_PERCENTILE / 100;
+      mask[i] = false;
     }
-    return NEUTRAL_PERCENTILE / 100;
-  });
+  }
+  return { vec, mask };
 }
 
 /**
- * 100 = identical percentiles; each point off the reference percentile, on average, costs 1%.
- * Weighted mean of |Δ percentile| across the given features.
+ * Empirical-Bayes-style shrinkage: percentiles from small samples regress
+ * toward the pool median so a 300-minute player's noisy extremes don't
+ * dominate the distance. Full strength at ~900+ minutes.
  */
-function percentileSimilarity(a: number[], b: number[], weights: number[], indices?: number[]): number {
-  const idx = indices ?? a.map((_, i) => i);
-  let diff = 0;
-  let total = 0;
-  for (const i of idx) {
-    diff += Math.abs(a[i] - b[i]) * weights[i];
-    total += weights[i];
+const SHRINK_FULL_MINUTES = 900;
+const SHRINK_FLOOR = 0.35;
+
+function shrinkVector(vec: number[], minutes: number): number[] {
+  const s = Math.min(1, Math.max(SHRINK_FLOOR, minutes / SHRINK_FULL_MINUTES));
+  return vec.map((v) => 0.5 + (v - 0.5) * s);
+}
+
+/**
+ * Whitened (Mahalanobis) distance on percentile vectors. Metrics in Wyscout
+ * dossiers are heavily correlated — pass volume, progression and possession
+ * features move together — so a plain |Δ percentile| double-counts the same
+ * signal. The pool covariance de-correlates features, the standard approach
+ * in club similarity engines (equivalent to kNN in a PCA-whitened space).
+ */
+type Matrix = number[][];
+
+/** Ridge-regularized sample covariance of the given columns. */
+function sampleCovariance(rows: number[][], indices: number[]): Matrix {
+  const d = indices.length;
+  const n = rows.length;
+  const mean = new Array<number>(d).fill(0);
+  for (const r of rows) for (let i = 0; i < d; i++) mean[i] += r[indices[i]!];
+  for (let i = 0; i < d; i++) mean[i] /= n;
+  const cov: Matrix = Array.from({ length: d }, () => new Array<number>(d).fill(0));
+  for (const r of rows) {
+    for (let i = 0; i < d; i++) {
+      const di = r[indices[i]!]! - mean[i]!;
+      for (let j = i; j < d; j++) {
+        cov[i]![j]! += di * (r[indices[j]!]! - mean[j]!);
+      }
+    }
   }
-  if (!total) return 0;
-  return Math.max(0, 100 * (1 - diff / total));
+  let meanDiag = 0;
+  for (let i = 0; i < d; i++) {
+    for (let j = 0; j <= i; j++) {
+      cov[i]![j]! = cov[j]![i]! = cov[i]![j]! / Math.max(1, n - 1);
+    }
+    meanDiag += cov[i]![i]!;
+  }
+  meanDiag = meanDiag / d || 1;
+  for (let i = 0; i < d; i++) cov[i]![i]! += meanDiag * 0.2;
+  return cov;
+}
+
+/** Gauss-Jordan inverse with partial pivoting; null when singular. */
+function invertMatrix(m: Matrix): Matrix | null {
+  const d = m.length;
+  const aug = m.map((row, i) => {
+    const out = [...row];
+    for (let j = 0; j < d; j++) out.push(i === j ? 1 : 0);
+    return out;
+  });
+  for (let col = 0; col < d; col++) {
+    let pivot = col;
+    for (let r = col + 1; r < d; r++) {
+      if (Math.abs(aug[r]![col]!) > Math.abs(aug[pivot]![col]!)) pivot = r;
+    }
+    if (Math.abs(aug[pivot]![col]!) < 1e-9) return null;
+    [aug[col], aug[pivot]] = [aug[pivot]!, aug[col]!];
+    const inv = 1 / aug[col]![col]!;
+    for (let j = 0; j < 2 * d; j++) aug[col]![j]! *= inv;
+    for (let r = 0; r < d; r++) {
+      if (r === col) continue;
+      const factor = aug[r]![col]!;
+      if (!factor) continue;
+      for (let j = 0; j < 2 * d; j++) aug[r]![j]! -= factor * aug[col]![j]!;
+    }
+  }
+  return aug.map((row) => row.slice(d));
+}
+
+/**
+ * Squared whitened distance restricted to `indices`, with per-feature
+ * profile weights applied to the difference vector. Falls back to plain
+ * weighted Euclidean (on pooled variances) when inversion fails.
+ */
+function whitenedDistance2(
+  a: number[],
+  b: number[],
+  weights: number[],
+  inv: Matrix | null,
+  indices: number[],
+  diagVar: number[],
+): number {
+  const wDiff = indices.map((i) => weights[i]! * (a[i]! - b[i]!));
+  if (!inv) {
+    let s = 0;
+    for (let k = 0; k < indices.length; k++) {
+      s += (wDiff[k]! * wDiff[k]!) / Math.max(diagVar[k]!, 1e-4);
+    }
+    return s;
+  }
+  let s = 0;
+  for (let i = 0; i < indices.length; i++) {
+    for (let j = 0; j < indices.length; j++) {
+      s += wDiff[i]! * inv[i]![j]! * wDiff[j]!;
+    }
+  }
+  return Math.max(0, s);
+}
+
+/**
+ * Gaussian kernel on the whitened distance: for a random pair the expected
+ * squared distance is ~2·nFeatures, so bandwidth 2·nf maps a median pair to
+ * ~37 and close stylistic matches to 80+.
+ */
+function distanceToSimilarity(d2: number, nFeatures: number): number {
+  if (!nFeatures) return 0;
+  return Math.max(0, Math.min(100, 100 * Math.exp(-d2 / (2 * nFeatures))));
 }
 
 /**
@@ -238,8 +348,10 @@ function round1(n: number) {
 
 /**
  * Similarity from **successful actions per 90** (certos / vencidos) as percentiles in the
- * target pool, grouped by dossier stat blocks. 100% = same percentiles as the reference;
- * total and block scores = 100 − weighted mean |Δ percentile| (profile-defining metrics weigh more).
+ * target pool, grouped by dossier stat blocks. Distances use a whitened (Mahalanobis)
+ * metric over the pool covariance so correlated metrics don't double-count; vectors are
+ * shrunk toward the median by minutes played; the score is a Gaussian kernel on the
+ * squared distance (profile-defining metrics weigh more, coverage-scaled).
  */
 export function rankCrossLeagueSimilarity(
   source: PlayerProfile,
@@ -258,6 +370,7 @@ export function rankCrossLeagueSimilarity(
   const { blocks, featureIds } = buildCertosModel(family, sameFamily);
   if (!featureIds.length) return [];
 
+  const allIdx = featureIds.map((_, i) => i);
   const blockRanges = blocks.map((block) => ({
     title: block.title,
     tone: block.tone,
@@ -266,20 +379,40 @@ export function rankCrossLeagueSimilarity(
       .filter((index) => index >= 0),
   }));
 
-  const sourceVec = featureVector(source, sameFamily, featureIds);
-  const vectors = new Map(sameFamily.map((p) => [p.player_id, featureVector(p, sameFamily, featureIds)]));
-  const weights = profileWeights(source, vectors, sameFamily, featureIds.length);
+  const sourceRaw = featureVector(source, sameFamily, featureIds);
+  const sourceVec = shrinkVector(sourceRaw.vec, source.minutes);
+  const rawRows = new Map(sameFamily.map((p) => [p.player_id, featureVector(p, sameFamily, featureIds)]));
+  const vectors = new Map(
+    sameFamily.map((p) => [p.player_id, shrinkVector(rawRows.get(p.player_id)!.vec, p.minutes)]),
+  );
+  const vecMapForWeights = new Map(sameFamily.map((p) => [p.player_id, vectors.get(p.player_id)!]));
+  const weights = profileWeights(source, vecMapForWeights, sameFamily, featureIds.length);
+
+  const allRows = [...vectors.values()];
+  const globalCov = sampleCovariance(allRows, allIdx);
+  const globalInv = invertMatrix(globalCov);
+  const globalDiag = allIdx.map((i) => globalCov[i]![i]!);
+  const blockInv = blockRanges.map(({ indices }) =>
+    indices.length ? invertMatrix(sampleCovariance(allRows, indices)) : null,
+  );
+
   const scored: SimilarPlayerHit[] = [];
 
   for (const candidate of sameFamily) {
     if (isSameAthlete(candidate, source)) continue;
 
     const candVec = vectors.get(candidate.player_id)!;
-    const total = percentileSimilarity(sourceVec, candVec, weights);
+    const candMask = rawRows.get(candidate.player_id)!.mask;
+    const covered = allIdx.filter((i) => sourceRaw.mask[i] || candMask[i]);
+    const totalD2 = whitenedDistance2(sourceVec, candVec, weights, globalInv, allIdx, globalDiag);
+    const total = distanceToSimilarity(totalD2, Math.max(1, covered.length));
 
-    const blockScores: SimilarBlockScore[] = blockRanges.map(({ title, tone, indices }) => {
-      if (!indices.length) return { title, tone, similarity: NEUTRAL_PERCENTILE };
-      return { title, tone, similarity: round1(percentileSimilarity(sourceVec, candVec, weights, indices)) };
+    const blockScores: SimilarBlockScore[] = blockRanges.map(({ title, tone, indices }, bi) => {
+      const blockCovered = indices.filter((i) => sourceRaw.mask[i] || candMask[i]);
+      if (!indices.length || !blockCovered.length) return { title, tone, similarity: NEUTRAL_PERCENTILE };
+      const blockDiag = indices.map((i) => globalCov[i]![i]!);
+      const d2 = whitenedDistance2(sourceVec, candVec, weights, blockInv[bi]!, indices, blockDiag);
+      return { title, tone, similarity: round1(distanceToSimilarity(d2, blockCovered.length)) };
     });
 
     scored.push({
