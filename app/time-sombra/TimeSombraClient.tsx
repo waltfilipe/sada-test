@@ -206,15 +206,19 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
   const activeClubKey = isPrevios ? prevClubKey : clubKey;
   const selectedClub = clubOptions.find((option) => `${option.leagueId}::${option.club}` === activeClubKey) ?? null;
 
-  // Elencos prévios: clubes na ordem da tabela do campeonato; sem tabela, alfabética.
+  // Elencos prévios: só clubes que disputaram a competição. Com tabela oficial,
+  // filtra pelos participantes (remove artefatos de saída no meio da temporada);
+  // sem tabela (Série D), mantém só elencos reais (>=10 atletas).
   const prevClubOptions = useMemo(() => {
-    if (!isPrevios || !prevStandings?.length) return clubOptions;
+    if (!isPrevios) return clubOptions;
+    if (!prevStandings?.length) return clubOptions.filter((option) => option.count >= 10);
     const rank = new Map(prevStandings.map((club, index) => [club, index]));
-    return [...clubOptions].sort((a, b) => {
-      const ra = rank.get(a.club) ?? Number.MAX_SAFE_INTEGER;
-      const rb = rank.get(b.club) ?? Number.MAX_SAFE_INTEGER;
-      return ra - rb || a.club.localeCompare(b.club, "pt");
-    });
+    return clubOptions
+      .filter((option) => rank.has(option.club))
+      .sort(
+        (a, b) =>
+          (rank.get(a.club) ?? 0) - (rank.get(b.club) ?? 0) || a.club.localeCompare(b.club, "pt"),
+      );
   }, [isPrevios, clubOptions, prevStandings]);
 
   const clubPlayers = useMemo(() => {
