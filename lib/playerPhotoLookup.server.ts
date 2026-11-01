@@ -36,6 +36,8 @@ type PhotoIndex = {
   byPerson: Map<string, TransfermarktInfo>;
   /** "league/season/player_id" → person_key (from cross-season persons.json). */
   rowPerson: Map<string, string>;
+  /** normalized name → distinct person_keys — the homonym guard. */
+  personsByName: Map<string, Set<string>>;
 };
 
 type PhotoCandidate = {
@@ -99,6 +101,12 @@ function loadPersonsMap(maps: PhotoIndex): Map<string, string[]> {
     for (const [season, rows] of Object.entries(seasons)) {
       for (const [playerId, key] of Object.entries(rows)) {
         maps.rowPerson.set(`${league}/${season}/${playerId}`, key);
+        if (key.startsWith("name:")) {
+          const namePart = key.slice(5).split("|")[0];
+          const set = maps.personsByName.get(namePart) ?? new Set<string>();
+          set.add(key);
+          maps.personsByName.set(namePart, set);
+        }
         if (season === CURRENT_SEASON) {
           const list = currentByKey.get(key) ?? [];
           list.push(`${league}/${playerId}`);
@@ -176,6 +184,7 @@ function buildPhotoIndex(): PhotoIndex {
     byName: new Map(),
     byPerson: new Map(),
     rowPerson: new Map(),
+    personsByName: new Map(),
   };
   loadPersonsMap(maps);
   loadCurrentSeasonProfiles(maps);
@@ -205,11 +214,15 @@ function lookupTransfermarkt(
   }
   const fromNc = maps.byNameClub.get(`${normName(player.name)}::${normClub(player.club)}`);
   if (fromNc?.photo) return fromNc;
+  // When the name maps to a single identity, any candidate is that athlete.
+  // When shared (homonyms), only a club-verified candidate may apply — no
+  // photo is better than a wrong one.
+  const uniquePerson = (maps.personsByName.get(normName(player.name))?.size ?? 0) <= 1;
   const resolve = (candidates: PhotoCandidate[] | undefined): TransfermarktInfo | null => {
     if (!candidates?.length) return null;
-    const clubHit = candidates.find((c) => clubCompatible(c.club, player.club));
+    const clubHit = candidates.find((c) => c.club && clubCompatible(c.club, player.club));
     if (clubHit) return clubHit.tm;
-    return candidates.length === 1 ? candidates[0].tm : null;
+    return uniquePerson ? candidates[0].tm : null;
   };
   const fromAthlete = resolve(maps.byAthlete.get(athleteKey(player.name, player.birth_year)));
   if (fromAthlete?.photo) return fromAthlete;

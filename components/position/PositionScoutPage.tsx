@@ -223,6 +223,30 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
     setSelectedId(requested ? requestedId : visible[0]!.player_id);
   }, [visible, selectedId, requestedId]);
 
+  // After a season/ficha hop the requested athlete may be hidden by the active
+  // filters — drop the filters so the athlete stays selected instead of
+  // resetting to the first filtered row. The flag waits for the roster to
+  // settle (archive rosters load async) and resolves against the fresh
+  // requestedId so the target season's player_id is the one checked.
+  const fichaSeasonParam = searchParams.get(FICHA_TEMPORADA_PARAM);
+  const navSig = `${season}|${fichaSeasonParam ?? ""}`;
+  const [lastNavSig, setLastNavSig] = useState(navSig);
+  const pendingNav = useRef(false);
+  useEffect(() => {
+    if (navSig === lastNavSig) return;
+    setLastNavSig(navSig);
+    pendingNav.current = true;
+  }, [navSig, lastNavSig]);
+
+  useEffect(() => {
+    if (!pendingNav.current || !players.length) return;
+    pendingNav.current = false;
+    if (!requestedId || !players.some((player) => player.player_id === requestedId)) return;
+    if (visible.some((player) => player.player_id === requestedId)) return;
+    clearAll();
+    setSelectedId(requestedId);
+  }, [players, visible, requestedId, navSig]);
+
   const selected = players.find((player) => player.player_id === selectedId) ?? visible[0] ?? null;
 
   function toggleBadge(key: string) {
