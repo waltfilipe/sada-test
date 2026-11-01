@@ -118,6 +118,31 @@ function loadPersonsMap(maps: PhotoIndex): Map<string, string[]> {
   return currentByKey;
 }
 
+/** Canonical identity layer: person_key → verified TM record (people.json). */
+function loadPeople(maps: PhotoIndex) {
+  const file = path.join(DATA_DIR, "cross-season", "people.json");
+  if (!fs.existsSync(file)) return;
+  const people = JSON.parse(fs.readFileSync(file, "utf-8")) as Record<
+    string,
+    { tm_id?: string | null; photo?: string | null; tm_club?: string | null; profile_url?: string | null }
+  >;
+  for (const [key, rec] of Object.entries(people)) {
+    if (!rec?.photo) continue;
+    const tm: TransfermarktInfo = {
+      id: rec.tm_id ?? null,
+      photo: rec.photo,
+      market_value: null,
+      market_value_eur: null,
+      contract_until: null,
+      contract_remaining: null,
+      club: rec.tm_club ?? null,
+      profile_url: rec.profile_url ?? null,
+    };
+    maps.byPerson.set(key, pickRicher(maps.byPerson.get(key), tm));
+    if (tm.id) maps.byTmId.set(String(tm.id), pickRicher(maps.byTmId.get(String(tm.id)), tm));
+  }
+}
+
 function loadCurrentSeasonProfiles(maps: PhotoIndex) {
   for (const league of BR_LEAGUES) {
     const base = path.join(DATA_DIR, league);
@@ -187,6 +212,7 @@ function buildPhotoIndex(): PhotoIndex {
     personsByName: new Map(),
   };
   loadPersonsMap(maps);
+  loadPeople(maps);
   loadCurrentSeasonProfiles(maps);
   loadTransfermarktCache(maps);
   loadPhotoManifest(maps);

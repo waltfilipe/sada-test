@@ -7,6 +7,7 @@ import json
 import re
 import sys
 import unicodedata
+from collections import Counter
 from pathlib import Path
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
@@ -85,22 +86,43 @@ def read_metric(player: dict, aspect: str, sub: str | None) -> float | None:
         return None
 
 
+def _tm_id(row: dict) -> str | None:
+    tm = row.get("transfermarkt") or {}
+    return str(tm.get("id")) if tm.get("id") else None
+
+
+def _person_tm_ids(person: list[dict]) -> set[str]:
+    return {tm_id for tm_id in (_tm_id(r) for r in person) if tm_id}
+
+
 def _split_persons(rows: list[dict]) -> list[list[dict]]:
     """Split an ambiguous (name, birth, family) group into persons.
 
     Only called when some season has 2+ rows — that alone proves homonyms.
-    Rows are chained by shared club; afterwards, persons whose season sets are
-    disjoint are re-merged: the same athlete changing clubs produces exactly
-    that pattern, while real homonyms almost always coexist in a season.
+    Verified Transfermarkt ids are a hard partition: rows sharing a tm_id are
+    provably the same athlete, rows with different tm_ids can never merge.
+    Unpinned rows are chained by shared club; afterwards, persons whose season
+    sets are disjoint are re-merged (same athlete changing clubs), unless both
+    carry conflicting verified ids.
     """
     persons: list[list[dict]] = []
     for row in sorted(rows, key=lambda r: (r.get("_season") or "", r.get("_league") or "")):
         row_club = norm_name(row.get("club") or "")
-        candidates = [
-            person
-            for person in persons
-            if row_club and any(norm_name(r.get("club") or "") == row_club for r in person)
-        ]
+        row_tm = _tm_id(row)
+        candidates = []
+        for person in persons:
+            person_tm = _person_tm_ids(person)
+            if row_tm and person_tm:
+                # verified ids disagree → provably different athletes
+                if row_tm not in person_tm:
+                    continue
+            if row_club and any(norm_name(r.get("club") or "") == row_club for r in person):
+                candidates.append(person)
+        if row_tm and not candidates:
+            # pin to the person already holding this tm_id, if any
+            pinned = next((p for p in persons if row_tm in _person_tm_ids(p)), None)
+            if pinned is not None:
+                candidates.append(pinned)
         if not candidates:
             persons.append([row])
         else:
@@ -109,8 +131,14 @@ def _split_persons(rows: list[dict]) -> list[list[dict]]:
     merged: list[list[dict]] = []
     for person in persons:
         seasons = {r.get("_season") for r in person}
+        person_tm = _person_tm_ids(person)
         target = next(
-            (m for m in merged if not seasons & {r.get("_season") for r in m}),
+            (
+                m
+                for m in merged
+                if not seasons & {r.get("_season") for r in m}
+                and not (person_tm and _person_tm_ids(m) and person_tm != _person_tm_ids(m))
+            ),
             None,
         )
         if target is None:
@@ -121,7 +149,10 @@ def _split_persons(rows: list[dict]) -> list[list[dict]]:
     return merged
 
 
-def assign_season_keys(rows: list[dict]) -> dict[tuple[str, int], str]:
+def assign_season_keys(
+    rows: list[dict],
+    prev_keys: dict[tuple[str, str, str], str] | None = None,
+) -> dict[tuple[str, int], str]:
     """Link seasons by normalized name + birth-year cluster + family + club chain.
 
     Wyscout archives report the same athlete's birth year inconsistently across
@@ -158,8 +189,24 @@ def assign_season_keys(rows: list[dict]) -> dict[tuple[str, int], str]:
                 if all(count == 1 for count in season_counts.values())
                 else _split_persons(group_rows)
             )
-            for person_i, person in enumerate(persons):
-                person_key = f"name:{name}|{cluster}|{person_i}"
+            # Carry-forward: a person identical to a previous build keeps its
+            # person_key, so transfers.json/people.json survive rebuilds.
+            prev_keys = prev_keys or {}
+            prefix = f"name:{name}|{cluster}|"
+            taken: set[str] = set()
+            for person in persons:
+                votes: Counter[str] = Counter()
+                for row in person:
+                    old = prev_keys.get((row.get("_league"), row.get("_season"), row.get("player_id")))
+                    if old and old.startswith(prefix):
+                        votes[old] += 1
+                person_key = next((key for key, _ in votes.most_common() if key not in taken), None)
+                if person_key is None:
+                    i = 0
+                    while f"{prefix}{i}" in taken:
+                        i += 1
+                    person_key = f"{prefix}{i}"
+                taken.add(person_key)
                 for row in person:
                     row["_person_key"] = person_key
                     sig = (
@@ -231,7 +278,18 @@ def main() -> None:
                 if not (DATA / league / "seasons" / season).is_dir():
                     continue
             all_rows.extend(load_season_players(league, season))
-    key_index = assign_season_keys(all_rows)
+    prev_keys: dict[tuple[str, str, str], str] = {}
+    prev_path = DATA / "cross-season" / "persons.json"
+    if prev_path.exists():
+        try:
+            prev_persons = json.loads(prev_path.read_text(encoding="utf-8"))
+            for lg, seasons in prev_persons.items():
+                for s, mapping in seasons.items():
+                    for pid, key in mapping.items():
+                        prev_keys[(lg, s, pid)] = key
+        except json.JSONDecodeError:
+            pass
+    key_index = assign_season_keys(all_rows, prev_keys)
 
     timeline: dict[str, list[dict]] = {}
     persons_map: dict[str, dict[str, dict[str, str]]] = {}
