@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLoading } from "@/components/LoadingProvider";
 import { Tooltip } from "@/components/ui/Tooltip";
-import type { DisciplineInfo, PlayerProfile } from "@/lib/types";
+import type { AspectItem, DisciplineInfo, PlayerProfile } from "@/lib/types";
+import { ConstructionProfileBars, type TendencyBarEntry } from "../ConstructionProfileBars";
 import { StatWindow } from "./ScoutStatsSections";
 
 type MetricKey = "fouls" | "yellow" | "red";
@@ -148,34 +149,19 @@ function SummaryTile({ metric }: { metric: Metric }) {
   );
 }
 
-function CompareRow({ metric }: { metric: Metric & { per90: number; avg: number } }) {
-  const tone = toneFor(metric.per90, metric.avg);
+/** Converte a métrica de disciplina em entrada da barra clássica do site (/90). */
+function compareEntry(metric: Metric & { per90: number; avg: number }): TendencyBarEntry {
   const scale = Math.max(metric.per90, metric.avg, metric.key === "fouls" ? 0.5 : 0.05) * 1.6;
-  const fill = Math.min(100, (metric.per90 / scale) * 100);
-  const avgPos = Math.min(100, (metric.avg / scale) * 100);
-  const tip = `${fmt(metric.per90, metric.decimals)} por 90 · média da posição ${fmt(metric.avg, metric.decimals)}`;
-  return (
-    <div className={`disc-row disc-row-${tone}`}>
-      <div className="disc-row-head">
-        <span className="disc-row-label">
-          <MetricIcon metric={metric.key} />
-          {metric.label}
-        </span>
-        <span className="disc-row-values tabular">
-          <strong>{fmt(metric.per90, metric.decimals)}</strong>
-          <span>média {fmt(metric.avg, metric.decimals)}</span>
-        </span>
-      </div>
-      <Tooltip content={tip} block>
-        <div className="disc-track" role="img" aria-label={tip}>
-          <span className="disc-track-fill" style={{ width: `${fill}%` }} />
-          <span className="disc-track-avg" style={{ left: `${avgPos}%` }}>
-            <span className="disc-track-avg-label">média</span>
-          </span>
-        </div>
-      </Tooltip>
-    </div>
-  );
+  const item: AspectItem = {
+    label: metric.label,
+    grade: "",
+    stats: [],
+    share_pct: metric.per90,
+    pool_avg_pct: metric.avg,
+    scale_max_pct: scale,
+    display_value: fmt(metric.per90, metric.decimals),
+  };
+  return { item, displayLabel: metric.label, valueScale: "per90" };
 }
 
 export function DisciplineTendencies({ player }: { player: PlayerProfile }) {
@@ -243,9 +229,7 @@ export function DisciplineTendencies({ player }: { player: PlayerProfile }) {
             {comparable.length ? (
               <section className="disc-compare" aria-label="Comparação com a posição">
                 <h4 className="disc-section-title">Por 90 minutos vs média da posição</h4>
-                {comparable.map((metric) => (
-                  <CompareRow key={metric.key} metric={metric} />
-                ))}
+                <ConstructionProfileBars entries={comparable.map(compareEntry)} embedded />
               </section>
             ) : null}
 

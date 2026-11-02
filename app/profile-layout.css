@@ -6893,11 +6893,15 @@
 .disc-compare {
   display: flex;
   flex-direction: column;
-  gap: 1.15rem;
-  padding: 0.85rem 0.95rem 1.25rem;
+  gap: 0.7rem;
+  padding: 0.85rem 0.95rem 0.4rem;
   border-radius: 12px;
   border: 1px solid rgba(147, 197, 253, 0.1);
   background: rgba(255, 255, 255, 0.015);
+}
+
+.disc-compare .constr-share-stack {
+  padding-bottom: 0.5rem;
 }
 
 .disc-section-title {
@@ -6907,100 +6911,6 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-3);
-}
-
-.disc-row {
-  --tone: var(--disc-even);
-  display: flex;
-  flex-direction: column;
-  gap: 0.42rem;
-}
-
-.disc-row-good { --tone: var(--disc-good); }
-.disc-row-bad { --tone: var(--disc-bad); }
-
-.disc-row-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-}
-
-.disc-row-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.disc-row-label .disc-card {
-  width: 0.62rem;
-  height: 0.84rem;
-}
-
-.disc-row-values {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.45rem;
-}
-
-.disc-row-values strong {
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: var(--tone);
-}
-
-.disc-row-values span {
-  font-size: 0.66rem;
-  color: var(--text-3);
-}
-
-.disc-track {
-  position: relative;
-  height: 0.5rem;
-  border-radius: 999px;
-  background: rgba(147, 197, 253, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(147, 197, 253, 0.08);
-  cursor: help;
-}
-
-.disc-track-fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  border-radius: inherit;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 45%, transparent) 0%, var(--tone) 100%);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--tone) 35%, transparent);
-  transition: width 0.4s ease;
-}
-
-.disc-track-avg {
-  position: absolute;
-  top: -0.22rem;
-  bottom: -0.22rem;
-  width: 2px;
-  margin-left: -1px;
-  border-radius: 2px;
-  background: #e2e8f0;
-  box-shadow: 0 0 0 2px rgba(6, 14, 24, 0.85);
-}
-
-.disc-track-avg-label {
-  position: absolute;
-  top: calc(100% + 0.18rem);
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.56rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-3);
-  white-space: nowrap;
-}
-
-.disc-row + .disc-row {
-  padding-top: 0.25rem;
 }
 
 .disc-footnote {
