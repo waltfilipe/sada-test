@@ -1916,8 +1916,8 @@
 }
 
 .hero-side {
-  flex: 0 0 470px;
-  width: 470px;
+  flex: 0 0 560px;
+  width: 560px;
   max-width: 100%;
   display: flex;
   flex-direction: column;
@@ -1939,7 +1939,7 @@
 
 .hero-market-trio {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 0.95fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.18fr) minmax(0, 1fr);
   gap: 0.45rem;
   align-items: stretch;
 }
@@ -2202,6 +2202,14 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+}
+
+.hero-market-trio .hero-contract-value {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.12rem 0.35rem;
+  white-space: normal;
+  overflow: hidden;
 }
 
 .hero-loan-pill {
