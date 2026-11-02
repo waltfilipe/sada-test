@@ -51,7 +51,6 @@ export function DisciplineTendencies({ player }: { player: PlayerProfile }) {
 
   if (!disc) return null;
 
-  const foulsText = disc.fouls_per90 != null ? formatPer90(disc.fouls_per90) : "–";
   const totalsText = [
     disc.fouls_total != null ? `${disc.fouls_total} faltas` : null,
     `${disc.yellow_total} amarelos`,
@@ -75,10 +74,7 @@ export function DisciplineTendencies({ player }: { player: PlayerProfile }) {
           aria-expanded={open}
           onClick={openModal}
         >
-          <i className="fa-solid fa-flag" aria-hidden="true" /> Disciplina{" "}
-          <span className="discipline-btn-nums">
-            {foulsText} · {disc.yellow_total} · {disc.red_total}
-          </span>
+          <i className="fa-solid fa-flag" aria-hidden="true" /> Disciplina
         </button>
       </Tooltip>
       {open ? (

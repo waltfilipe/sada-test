@@ -257,6 +257,18 @@ export function PlayerHero({
           >
             <span className="hero-market-minutes tabular">
               <span>{player.minutes.toLocaleString("pt-BR")}</span>
+              {player.minutes_pct != null ? (
+                <span
+                  className="identity-minutes-track identity-minutes-track-wide"
+                  role="img"
+                  aria-label={`${Math.round(player.minutes_pct)}% dos minutos do líder`}
+                >
+                  <span
+                    className="identity-minutes-cover"
+                    style={{ left: `${Math.max(0, Math.min(100, player.minutes_pct))}%` }}
+                  />
+                </span>
+              ) : null}
             </span>
           </MarketCard>
           <MarketCard icon="fa-coins" label="Valor de mercado" tooltip="Estimativa de valor no Transfermarkt.">
