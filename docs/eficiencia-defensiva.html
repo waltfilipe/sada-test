@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Eficiência Defensiva — Especificação do Cálculo (SADA Scout)</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: #16202e; font-size: 10.2pt; line-height: 1.5; margin: 0;
+  }
+  h1 { font-size: 20pt; color: #0d1b2a; border-bottom: 3px solid #1be7ff;
+       padding-bottom: 6px; margin: 0 0 4px; }
+  h2 { font-size: 13pt; color: #0d1b2a; margin: 22px 0 6px;
+       border-left: 4px solid #1be7ff; padding-left: 8px; }
+  h3 { font-size: 11pt; color: #0d1b2a; margin: 14px 0 4px; }
+  p { margin: 5px 0; }
+  .sub { color: #5b6b7f; font-size: 9.5pt; margin-bottom: 14px; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 9pt; }
+  th { background: #0d1b2a; color: #fff; text-align: left; padding: 4px 7px; }
+  td { border: 1px solid #d4dce6; padding: 4px 7px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f3f7fb; }
+  code, .mono { font-family: Consolas, "Courier New", monospace; font-size: 8.8pt;
+    background: #eef3f8; padding: 0 3px; border-radius: 3px; }
+  pre { font-family: Consolas, monospace; font-size: 8.6pt; background: #0d1b2a;
+    color: #e8eef6; padding: 10px 12px; border-radius: 6px; overflow-x: auto;
+    line-height: 1.45; white-space: pre; }
+  pre .c { color: #7fb3c8; } pre .k { color: #1be7ff; } pre .n { color: #fed766; }
+  .formula { background: #f0f7fa; border: 1px solid #bfe8f2; border-radius: 6px;
+    padding: 8px 12px; margin: 8px 0; font-family: Consolas, monospace;
+    font-size: 9.2pt; }
+  .note { background: #fff8e1; border: 1px solid #fed766; border-radius: 6px;
+    padding: 8px 12px; margin: 8px 0; font-size: 9.2pt; }
+  .warn { background: #fdecec; border: 1px solid #f3b0ae; border-radius: 6px;
+    padding: 8px 12px; margin: 8px 0; font-size: 9.2pt; }
+  .ok   { background: #e9fbf1; border: 1px solid #9fe4bd; border-radius: 6px;
+    padding: 8px 12px; margin: 8px 0; font-size: 9.2pt; }
+  .tag { display: inline-block; font-size: 7.6pt; font-weight: 700; color: #fff;
+    border-radius: 3px; padding: 1px 6px; vertical-align: middle; }
+  .t-wy { background: #4a6fa5; } .t-ss { background: #2e8b57; }
+  .t-eng { background: #8980f5; }
+  .pagebreak { page-break-before: always; }
+  ul, ol { margin: 4px 0 4px 18px; padding: 0; }
+  li { margin: 2px 0; }
+  .small { font-size: 8.6pt; color: #5b6b7f; }
+  .center { text-align: center; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pos { color: #1a7f37; font-weight: 600; } .neg { color: #c0392b; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>Eficiência Defensiva — Especificação do Cálculo</h1>
+<p class="sub">SADA Scout · documento técnico para leitura e interpretação por humanos e por IA · gerado a partir do código em produção (<code>scripts/engine/positions.py</code>) · dados de exemplo: Série A 2026, pool de zagueiros</p>
+
+<h2>1. O que é</h2>
+<p><b>Eficiência Defensiva</b> é uma métrica composta que resume, num único z-score, o balanço entre o que um defensor <b>produz</b> em ações defensivas e o que ele <b>custa</b> em duelos perdidos, faltas e erros capitais. Ela não mede volume bruto (isso fica nos cards "Duelos Defensivos" e "Ações Defensivas"); mede <b>saldo</b>: ações bem-sucedidas <i>menos</i> custos, tudo padronizado contra os colegas de posição na mesma liga e temporada.</p>
+<p>O número é calculado <b>offline, em Python</b>, na geração dos dados do site, e gravado nos JSONs de perfil. O front-end nunca recalcula — só exibe e deriva produtos (percentil, nota, selo).</p>
+<table>
+  <tr><th>Quem recebe o card</th><th>Onde aparece</th><th>Onde é calculado</th></tr>
+  <tr><td><b>Zagueiros, laterais e meio-campistas</b>. Extremos e atacantes não têm.</td>
+      <td>Seção "Defensivos" do dossiê do atleta; barra "Disciplina defensiva"; eixo do scatter; amostras da projeção; nota da seção.</td>
+      <td><code>_def_efficiency_z_scores()</code> e <code>_def_efficiency_group_aspect()</code> em <code>scripts/engine/positions.py</code></td></tr>
+</table>
+
+<h2>2. Pool de referência (em quem a régua é calibrada)</h2>
+<p>Todos os z-scores e percentis são relativos a um <b>pool de posição</b> (ex.: todos os zagueiros da Série A 2026) e a uma <b>amostra qualificada</b> dentro dele:</p>
+<ul>
+  <li><b>Critério de qualificação:</b> <code>%Minutos &gt; 0.20</code> — o atleta precisa ter mais de 20% dos minutos do líder de minutos da liga. <code>%Minutos = minutos do atleta ÷ minutos do líder</code>.</li>
+  <li><b>Mínimo de amostra:</b> se menos de 8 atletas se qualificam, o pool inteiro vira referência (<code>MIN_REFERENCE_PLAYERS = 8</code>).</li>
+  <li><b>Efeito:</b> médias e desvios são estimados <b>só nos qualificados</b>, mas <b>todos</b> os jogadores recebem nota — quem tem poucos minutos é medido na régua dos titulares, sem influenciá-la.</li>
+  <li><b>Escopo:</b> o cálculo é refeito <b>separadamente por posição, por liga e por temporada</b>. Um z-score "+1,0" na Série A não é comparável a "+1,0" na Série C — são réguas diferentes.</li>
+</ul>
+<p class="small">Exemplo real: Série A 2026 tem 114 zagueiros no pool; 73 estão acima da linha de 20% dos minutos do líder e formam a amostra de calibração.</p>
+
+<h2>3. Dicionário das métricas fonte</h2>
+<p>Oito componentes por 90 minutos — quatro de <b>ação</b> e quatro de <b>custo</b>. Provedores: <span class="tag t-wy">WYSCOUT</span> <span class="tag t-ss">SOFASCORE</span> <span class="tag t-eng">DERIVADO</span></p>
+<h3>3.1 Componentes de ação (quanto maior, melhor)</h3>
+<table>
+  <tr><th>Componente</th><th>Fórmula / coluna</th><th>Fonte</th><th>O que mede</th></tr>
+  <tr><td><b>Duelos defensivos vencidos</b></td><td><code>DuelosDef × %DuelosDefW</code><br><span class="small">"Duelos defensivos/90" × "% ganhos"/100</span></td><td><span class="tag t-eng">DERIVADO</span> de <span class="tag t-wy">WYSCOUT</span></td><td>Volume de duelos defensivos (disputas por bola, divididas, carrinhos contestados) em que o atleta saiu vencedor, por 90 min.</td></tr>
+  <tr><td><b>Interceptações</b></td><td><code>interception_won_p90</code><br><span class="small">fallback: "Interseções/90"</span></td><td><span class="tag t-ss">SOFASCORE</span></td><td>Passes do adversário cortados por leitura/antecipação, por 90 min.</td></tr>
+  <tr><td><b>Rebatidas (cortes)</b></td><td><code>total_clearance_p90</code><br><span class="small">fallback: "Cortes/90"</span></td><td><span class="tag t-ss">SOFASCORE</span></td><td>Bolas afastadas da zona de perigo, por 90 min.</td></tr>
+  <tr><td><b>Chutes bloqueados</b></td><td><code>outfielder_block_p90</code></td><td><span class="tag t-ss">SOFASCORE</span></td><td>Finalizações adversárias bloqueadas pelo atleta, por 90 min.</td></tr>
+</table>
+<h3>3.2 Componentes de custo (quanto maior, pior)</h3>
+<table>
+  <tr><th>Componente</th><th>Fórmula / coluna</th><th>Fonte</th><th>O que mede</th></tr>
+  <tr><td><b>Duelos defensivos perdidos</b></td><td><code>DuelosDef × (1 − %DuelosDefW)</code></td><td><span class="tag t-eng">DERIVADO</span> de <span class="tag t-wy">WYSCOUT</span></td><td>Volume de duelos defensivos perdidos, por 90 min.</td></tr>
+  <tr><td><b>Faltas cometidas</b></td><td><code>Faltas/90</code></td><td><span class="tag t-wy">WYSCOUT</span></td><td>Faltas cometidas por 90 min, <b>sem</b> correção de contexto (ver §8).</td></tr>
+  <tr><td><b>Erro que leva a chute</b></td><td><code>error_lead_to_a_shot_p90</code></td><td><span class="tag t-ss">SOFASCORE</span></td><td>Erros individuais que resultaram em finalização adversária, por 90 min.</td></tr>
+  <tr><td><b>Erro que leva a gol</b></td><td><code>error_lead_to_a_goal_p90</code></td><td><span class="tag t-ss">SOFASCORE</span></td><td>Erros individuais que resultaram em gol adversário, por 90 min.</td></tr>
+</table>
+<p class="small">Observação: as quatro ações também alimentam, como percentis de volume individuais, o card irmão "Ações Defensivas". Na Eficiência elas entram padronizadas e combinadas com o custo.</p>
+
+<h2>4. O algoritmo, passo a passo</h2>
+<div class="formula">
+<b>Passo 1 — z-score de cada componente</b> (contra a amostra qualificada):<br>
+&nbsp;&nbsp;z_i = (x_i − μ_ref,i) / σ_ref,i &nbsp;&nbsp;&nbsp; <span class="small">se σ ≈ 0 → z = 0</span><br><br>
+<b>Passo 2 — médias simples (peso igual) dos dois blocos:</b><br>
+&nbsp;&nbsp;action_z = (z_duelos_venc + z_intercept + z_rebatidas + z_bloqueios) / 4<br>
+&nbsp;&nbsp;cost_z&nbsp;&nbsp;&nbsp; = (z_duelos_perd + z_faltas + z_erro_chute + z_erro_gol) / 4<br><br>
+<b>Passo 3 — saldo:</b><br>
+&nbsp;&nbsp;raw = action_z − cost_z<br><br>
+<b>Passo 4 — re-padronização do saldo</b> (segunda camada, contra a amostra qualificada):<br>
+&nbsp;&nbsp;z_final = (raw − μ_ref(raw)) / σ_ref(raw)<br><br>
+<b>Passo 5 — percentil:</b><br>
+&nbsp;&nbsp;percentil = posto de z_final na escala da amostra qualificada, 0–100 (valores fora da amostra são fixados nos extremos)
+</div>
+<p>O resultado é uma <b>"padronização de padronizações"</b>: primeiro cada métrica vira desvios-padrão da média da posição (o que torna comparáveis métricas com escalas muito diferentes — rebatidas ~5/90 vs. erros ~0,05/90); depois o saldo ações−custos é re-padronizado para ter média 0 e desvio 1 no pool. <b>Interpretação:</b> z = +1,0 significa "um desvio-padrão acima do zagueiro típico da liga no saldo defesa−custo".</p>
+<p><b>Por que média simples e não soma?</b> A divisão por 4 mantém action_z e cost_z na mesma escala de um z-score, então a diferença entre eles tem interpretação direta.</p>
+
+<h2 class="pagebreak">5. Exemplo numérico completo (dados reais — Série A 2026, zagueiros)</h2>
+<p>Momentos da amostra qualificada (73 zagueiros):</p>
+<table>
+  <tr><th>Componente</th><th class="num">μ_ref</th><th class="num">σ_ref</th></tr>
+  <tr><td>Duelos def. vencidos /90</td><td class="num">2,539</td><td class="num">0,686</td></tr>
+  <tr><td>Interceptações /90</td><td class="num">1,065</td><td class="num">0,429</td></tr>
+  <tr><td>Rebatidas /90</td><td class="num">5,242</td><td class="num">1,424</td></tr>
+  <tr><td>Chutes bloqueados /90</td><td class="num">0,800</td><td class="num">0,392</td></tr>
+  <tr><td>Duelos def. perdidos /90</td><td class="num">1,635</td><td class="num">0,496</td></tr>
+  <tr><td>Faltas /90</td><td class="num">0,896</td><td class="num">0,348</td></tr>
+  <tr><td>Erro p/ chute /90</td><td class="num">0,055</td><td class="num">0,063</td></tr>
+  <tr><td>Erro p/ gol /90</td><td class="num">0,018</td><td class="num">0,042</td></tr>
+  <tr><td><b>raw (saldo)</b></td><td class="num">≈ 0</td><td class="num">0,729</td></tr>
+</table>
+
+<h3>5.1 Jonathan (Cruzeiro) — 1.816 min, qualificado, topo da escala</h3>
+<table>
+  <tr><th>Bloco</th><th>Componente</th><th class="num">Valor /90</th><th class="num">z_i = (x−μ)/σ</th></tr>
+  <tr><td rowspan="4"><b>Ação</b></td><td>Duelos vencidos</td><td class="num">3,219</td><td class="num pos">+0,990</td></tr>
+  <tr><td>Interceptações</td><td class="num">2,573</td><td class="num pos">+3,521</td></tr>
+  <tr><td>Rebatidas</td><td class="num">5,576</td><td class="num pos">+0,234</td></tr>
+  <tr><td>Bloqueios</td><td class="num">0,643</td><td class="num neg">−0,399</td></tr>
+  <tr><td rowspan="4"><b>Custo</b></td><td>Duelos perdidos</td><td class="num">1,881</td><td class="num neg">+0,496</td></tr>
+  <tr><td>Faltas</td><td class="num">0,940</td><td class="num neg">+0,127</td></tr>
+  <tr><td>Erro p/ chute</td><td class="num">0,000</td><td class="num pos">−0,863</td></tr>
+  <tr><td>Erro p/ gol</td><td class="num">0,000</td><td class="num pos">−0,430</td></tr>
+</table>
+<div class="formula">
+action_z = (0,990 + 3,521 + 0,234 − 0,399) / 4 = <b>+1,086</b><br>
+cost_z&nbsp;&nbsp;&nbsp; = (0,496 + 0,127 − 0,863 − 0,430) / 4 = <b>−0,167</b><br>
+raw&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1,086 − (−0,167) = <b>+1,254</b><br>
+z_final&nbsp;&nbsp; = (1,254 − 0) / 0,729 = <b>+1,72</b> → exibido como "+1,7"<br>
+percentil = <b>100</b> (maior z da escala qualificada) · erros totais = 0 → pct_erros = 100
+</div>
+<p>Leitura: zagueiro elite — produz acima da média (destaque: +3,5σ em interceptações) e custa abaixo dela. Selo <b>ouro</b> (ambos percentis &gt; 90).</p>
+
+<h3>5.2 Luan Peres (Santos) — 2.119 min, qualificado, perfil mediano</h3>
+<div class="formula">
+action_z = +0,199 &nbsp;·&nbsp; cost_z = +0,256 &nbsp;·&nbsp; raw = −0,057<br>
+z_final = −0,057 / 0,729 ≈ <b>−0,08</b> → percentil <b>43</b> · erros totais = 2 → pct_erros = 33
+</div>
+<p>Leitura: saldo praticamente neutro; os 2 erros capitais na temporada derrubam o percentil de erros para 33 — e como o selo exige <b>os dois</b> percentis acima de 50, o card fica sem medalha mesmo com z mediano.</p>
+
+<h3>5.3 Casos-limite (o que a métrica faz sem tratamento de amostra)</h3>
+<table>
+  <tr><th>Jogador</th><th class="num">Min</th><th>Qualificado?</th><th class="num">z_final</th><th class="num">Percentil</th><th>Por quê</th></tr>
+  <tr><td>Igor Rabello (Fluminense)</td><td class="num">190</td><td>não</td><td class="num pos">+4,88</td><td class="num">100</td><td>Amostra mínima com taxas irreais: 6,2 duelos vencidos/90 (z +5,3), 2,2 bloqueios/90 (z +3,6), 0 faltas (z −2,6 no custo). z extrapola a escala → fixado em 100.</td></tr>
+  <tr><td>Lucas Monzón (Botafogo)</td><td class="num">527</td><td>não</td><td class="num neg">−5,44</td><td class="num">0</td><td>1 erro p/ chute em 527 min (0,19/90 vs σ 0,063) = z <b>+14,96</b> naquele componente → cost_z +4,0 afunda o saldo inteiro.</td></tr>
+</table>
+<div class="warn"><b>Leitura obrigatória:</b> não há encolhimento por tamanho de amostra no z (o peso <code>_def_eff_sample_weight</code> existe no código mas <b>não é aplicado</b>). Extremos como ±5σ devem ser lidos sempre junto com os minutos — é ruído de amostra pequena, não certeza de nível.</div>
+
+<h2>6. Produtos derivados no site</h2>
+<table>
+  <tr><th>Onde</th><th>Como usa o valor</th></tr>
+  <tr><td><b>Card "Eficiência Defensiva"</b> (dossiê)</td><td>Expansível com 2 linhas: "Erros Totais" (contagem da temporada, percentil invertido — menos erros = percentil maior, esmaecida) e "Eficiência Defensiva" (o z com sinal, ex.: "+1,7"). Nota do card: faixas do percentil — A≥85, B+≥75, B≥65, B−≥55, C+≥45, C≥35, C−≥25, D&lt;25.</td></tr>
+  <tr><td><b>Selo de medalha</b></td><td>Par <code>[pct_erros_invertido, pct_eficiência]</code>: exige <b>ambos &gt; 50</b>; o nível sai do pior dos dois — &gt;90 ouro, &gt;75 prata, &gt;50 bronze.</td></tr>
+  <tr><td><b>Nota da seção "Defensivos"</b></td><td>O bloco vale <code>0,4 × pct_erros + 0,6 × pct_eficiência</code> e entra na média da seção junto com "Duelos Defensivos" e "Ações Defensivas".</td></tr>
+  <tr><td><b>Barra "Disciplina defensiva"</b></td><td>O percentil do card é o de eficiência, mas a posição do ponto na barra é o percentil de <code>Faltas/90</code>.</td></tr>
+  <tr><td><b>Rating do zagueiro</b></td><td>O percentil é 1 das 5 métricas <b>core</b> do índice de zagueiro (peso cheio). Para laterais/MEIs aparece no card e na seção, mas não no rating composto.</td></tr>
+  <tr><td><b>Scatter</b></td><td>O eixo "Eficiência Defensiva" plota o <b>z bruto</b>, não o percentil.</td></tr>
+  <tr><td><b>Projeção de minutos</b></td><td>Vira 2 amostras: "Erros Totais" como taxa adversa (contagem ÷ noventas) e o z como amostra com sinal — afetam a projeção.</td></tr>
+  <tr><td><b>Similares</b></td><td><b>Excluída</b> de propósito — z-score não é feature por-90 e não pode ser re-normalizado entre pools.</td></tr>
+</table>
+
+<h2>7. Convenções e comportamentos de borda</h2>
+<ul>
+  <li><b>Sinal:</b> positivo = melhor que a média da posição. O display usa sempre sinal explícito ("+0,6", "−1,2").</li>
+  <li><b>Percentil é da escala qualificada:</b> valores fora da amostra (não-qualificados) são fixados em 0/100 — nunca acima de 100 nem abaixo de 0.</li>
+  <li><b>Distribuição achatada:</b> se algum componente tiver σ ≈ 0 no pool (ex.: liga sem dados SofaScore → erros todos zerados), seu z é 0 para todos — o componente simplesmente sai da conta, não quebra.</li>
+  <li><b>SofaScore ausente:</b> interceptações/rebatidas caem nas colunas Wyscout equivalentes; erros e bloqueios vão a 0 → o custo fica subestimado e a métrica pende para "volume defensivo".</li>
+  <li><b>Idempotentemente relativo:</b> a métrica é puramente comparativa — não existe "eficiência absoluta". O mesmo desempenho rende z diferente em pools diferentes.</li>
+</ul>
+
+<h2>8. Limitações conhecidas (para interpretação honesta)</h2>
+<ul>
+  <li><b>Sem encolhimento bayesiano:</b> minutos baixos não puxam o z para a média (a função de peso existe, mas está desativada — código morto).</li>
+  <li><b>Faltas sem ajuste de contexto:</b> a versão anterior descontava duelos perdidos sobrepostos (β=0,45); a atual conta <code>Faltas/90</code> cheio — pune duplamente quem falta em duelo.</li>
+  <li><b>Pesos iguais:</b> bloqueios contam tanto quanto duelos vencidos; erro para gol conta tanto quanto falta (na média dos z's — embora sua variância baixa limite o impacto típico, um evento raro gera z enorme, cf. Monzón).</li>
+  <li><b>Dupla contagem parcial:</b> ações bem-sucedidas aparecem também nos cards de volume da mesma seção — a nota da seção não é independente entre blocos.</li>
+  <li><b>_custo_def_ajustado legado:</b> a razão custo÷ações antiga ainda é computada (<code>_custo_def_raw</code>) mas nada a consome.</li>
+</ul>
+
+<h2>9. Pseudocódigo canônico</h2>
+<pre><span class="c"># por posição, por liga, por temporada</span>
+qualificados = pool[%Minutos &gt; 0.20]            <span class="c"># ≥ 8, senão pool inteiro</span>
+μ_ref, σ_ref = momentos(qualificados)            <span class="c"># por componente</span>
+
+<span class="k">para cada jogador</span>:
+    z[i]        = (x[i] − μ_ref[i]) / σ_ref[i]   <span class="c"># i ∈ 8 componentes; σ≈0 → 0</span>
+    action_z    = média(z[duelos_venc, intercept, rebatidas, bloqueios])
+    cost_z      = média(z[duelos_perd, faltas, erro_chute, erro_gol])
+    raw         = action_z − cost_z
+    z_final     = (raw − μ_ref(raw)) / σ_ref(raw)
+    percentil   = posto(z_final) na escala dos qualificados, fixado em [0,100]
+    erros_pct   = percentil_invertido(erros_totais_temporada)
+    selo        = ouro se min(erros_pct, percentil)&gt;90; prata &gt;75; bronze &gt;50; senão nenhum</pre>
+
+<h2>10. Mapa do código</h2>
+<table>
+  <tr><th>Responsabilidade</th><th>Arquivo : função</th></tr>
+  <tr><td>Núcleo (z de z's)</td><td><code>scripts/engine/positions.py</code> : <code>_def_efficiency_z_scores</code> (~L1032)</td></tr>
+  <tr><td>Pool de referência</td><td><code>scripts/engine/pool_reference.py</code> : <code>reference_pool</code>, <code>distribution</code></td></tr>
+  <tr><td>z-score de componente</td><td><code>positions.py</code> : <code>_pool_z</code> (L1021) · <code>normalize.py</code> : <code>percentile_rank</code> (L61)</td></tr>
+  <tr><td>Colunas fonte</td><td><code>measures.py</code> : <code>compute_base_measures</code> (<code>DuelosDef</code>, <code>%DuelosDefW</code>, <code>%Minutos</code>) · <code>positions.py</code> : <code>_ss_inter_col</code>, <code>_ss_clearance_col</code>, <code>_num_col</code></td></tr>
+  <tr><td>Card no JSON</td><td><code>positions.py</code> : <code>_def_efficiency_group_aspect</code> (~L1397), emitido p/ zag/lat/mei (L1911)</td></tr>
+  <tr><td>Selo / nota / seção</td><td><code>lib/aspectBadges.ts</code> : <code>resolveAspectBadge</code> · <code>lib/sectionGrades.ts</code> : <code>defEfficiencyGroupScore</code> · <code>lib/aspectGrades.ts</code></td></tr>
+  <tr><td>Outros consumidores</td><td><code>lib/scatterAxis.ts</code> (z bruto) · <code>lib/minuteProjection.ts</code> (amostras) · <code>lib/crossLeagueSimilarity.ts</code> (excluída)</td></tr>
+</table>
+<p class="small">Valores das tabelas deste documento reproduzidos do pipeline real (Série A 2026, Wyscout + SofaScore). Nomes de colunas e constantes conforme o código na data de geração.</p>
+
+</body>
+</html>
