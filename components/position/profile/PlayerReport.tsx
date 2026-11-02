@@ -1606,12 +1606,14 @@ export function PlayerReportButton({
   family,
   players,
   primaryArchiveLabel,
+  cta,
 }: {
   player: PlayerProfile;
   scoutPlayer?: PlayerProfile;
   family: PositionFamily;
   players: PlayerProfile[];
   primaryArchiveLabel?: string;
+  cta?: boolean;
 }) {
   const { leagueId, name: currentLeagueName, season: currentSeason } = useLeague();
   const scout = scoutPlayer ?? player;
@@ -1735,13 +1737,13 @@ export function PlayerReportButton({
       <div className="shadow-add-menu player-report-menu" ref={rootRef}>
         <button
           type="button"
-          className={`btn btn-ghost btn-sm${menuOpen ? " active" : ""}`}
+          className={`btn btn-ghost ${cta ? "hero-report-cta-btn" : "btn-sm"}${menuOpen ? " active" : ""}`}
           onClick={() => setMenuOpen((open) => !open)}
           aria-expanded={menuOpen}
           aria-haspopup="menu"
           aria-label={copy.pdfTitle}
         >
-          <i className="fa-solid fa-file-lines" aria-hidden="true" /> PDF
+          <i className="fa-solid fa-file-lines" aria-hidden="true" /> {cta ? "Gerar Relatório PDF" : "PDF"}
         </button>
         {menuOpen ? (
           <div className="shadow-add-dropdown" role="menu">

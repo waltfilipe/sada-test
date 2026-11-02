@@ -182,11 +182,18 @@ export function PlayerHero({
                 />
               ) : null}
             </div>
+            {(player.position || player.profile) ? (
+              <p className="player-hero-posline">
+                <span className="hero-pos-card">
+                  {player.position}
+                  {player.position && player.profile ? <span className="hero-pos-sep" aria-hidden="true">|</span> : null}
+                  {player.profile ? <span className="hero-pos-profile">{player.profile}</span> : null}
+                </span>
+              </p>
+            ) : null}
             <p className="player-hero-club">
-              <ClubLogo club={displayClub} size={22} />
+              <ClubLogo club={displayClub} size={28} />
               <span className="player-hero-club-name">{displayClub}</span>
-              <span className="player-hero-club-sep" aria-hidden="true">·</span>
-              <span className="player-hero-position">{player.position}</span>
               {departure ? (
                 <span
                   className="hero-depart-chip"
@@ -238,34 +245,20 @@ export function PlayerHero({
       </div>
 
       <aside className="hero-side" aria-label="Minutos, contrato e ações">
-        <MarketCard
-          icon="fa-clock"
-          label="Minutos"
-          wide
-          tooltip={
-            player.minutes_pct != null
-              ? `${player.minutes.toLocaleString("pt-BR")} minutos, ${Math.round(player.minutes_pct)}% do líder da temporada.`
-              : "Minutos jogados na temporada."
-          }
-        >
-          <span className="hero-market-minutes hero-market-minutes-wide tabular">
-            <span>{player.minutes.toLocaleString("pt-BR")}</span>
-            {player.minutes_pct != null ? (
-              <span
-                className="identity-minutes-track identity-minutes-track-wide"
-                role="img"
-                aria-label={`${Math.round(player.minutes_pct)}% dos minutos do líder`}
-              >
-                <span
-                  className="identity-minutes-cover"
-                  style={{ left: `${Math.max(0, Math.min(100, player.minutes_pct))}%` }}
-                />
-              </span>
-            ) : null}
-          </span>
-        </MarketCard>
-
-        <div className="hero-market-pair">
+        <div className="hero-market-trio">
+          <MarketCard
+            icon="fa-clock"
+            label="Minutos"
+            tooltip={
+              player.minutes_pct != null
+                ? `${player.minutes.toLocaleString("pt-BR")} minutos, ${Math.round(player.minutes_pct)}% do líder da temporada.`
+                : "Minutos jogados na temporada."
+            }
+          >
+            <span className="hero-market-minutes tabular">
+              <span>{player.minutes.toLocaleString("pt-BR")}</span>
+            </span>
+          </MarketCard>
           <MarketCard icon="fa-coins" label="Valor de mercado" tooltip="Estimativa de valor no Transfermarkt.">
             {tm?.market_value ?? "—"}
           </MarketCard>
@@ -287,21 +280,50 @@ export function PlayerHero({
           </MarketCard>
         </div>
 
-        <div className={`hero-action-grid${showRun ? " hero-action-grid-has-run" : ""}`}>
+        <div className="hero-action-grid">
           <div className="hero-action-cell hero-action-tendencies">
             <PassTendencies player={player} players={players} />
           </div>
-          {player.discipline ? (
-            <div className="hero-action-cell hero-action-discipline">
-              <DisciplineTendencies player={player} />
-            </div>
-          ) : null}
           <div className="hero-action-cell hero-action-compare">
             <Tooltip content="Abre o comparador já com este atleta.">
               <Link className="btn btn-ghost btn-sm" href={href(`/comparar/${family}?a=${player.player_id}`)}>
                 <i className="fa-solid fa-scale-balanced" aria-hidden="true" /> Comparar
               </Link>
             </Tooltip>
+          </div>
+          <div className="hero-action-cell hero-action-run">
+            <Tooltip
+              content={
+                showRun
+                  ? "Distância, velocidade e sprints vs. atletas na mesma posição."
+                  : "Sem dados de GPS para este atleta nesta competição."
+              }
+            >
+              <span className="hero-action-slot">
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={showRun ? () => setRunOpen(true) : undefined}
+                  disabled={!showRun}
+                  aria-disabled={!showRun}
+                >
+                  <i className="fa-solid fa-person-running" aria-hidden="true" /> GPS
+                </button>
+              </span>
+            </Tooltip>
+          </div>
+          <div className="hero-action-cell hero-action-discipline">
+            {player.discipline ? (
+              <DisciplineTendencies player={player} />
+            ) : (
+              <Tooltip content="Sem dados de disciplina para este atleta nesta competição.">
+                <span className="hero-action-slot">
+                  <button type="button" className="btn btn-ghost btn-sm" disabled aria-disabled>
+                    <i className="fa-solid fa-flag" aria-hidden="true" /> Disciplina
+                  </button>
+                </span>
+              </Tooltip>
+            )}
           </div>
           <div className="hero-action-cell hero-action-similar">
             <Tooltip content="Escolha a competição e veja o top 5 por estilo de jogo.">
@@ -310,37 +332,32 @@ export function PlayerHero({
               </button>
             </Tooltip>
           </div>
-          {showRun ? (
-            <div className="hero-action-cell hero-action-run">
-              <Tooltip content="Distância, velocidade e sprints vs. atletas na mesma posição.">
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setRunOpen(true)}>
-                  <i className="fa-solid fa-person-running" aria-hidden="true" /> GPS
-                </button>
-              </Tooltip>
-            </div>
-          ) : null}
-          <div className="hero-action-cell hero-action-pdf">
-            <Tooltip content="Gera um relatório em PDF deste atleta.">
+          <div className="hero-action-cell hero-action-transfermarkt">
+            <Tooltip content={tm?.profile_url ? "Abre o perfil no Transfermarkt." : "Perfil no Transfermarkt indisponível."}>
               <span className="hero-action-slot">
-                <PlayerReportButton
-                  player={player}
-                  scoutPlayer={scout}
-                  family={family}
-                  players={players}
-                  primaryArchiveLabel={fichaSeason}
-                />
+                {tm?.profile_url ? (
+                  <a className="btn btn-ghost btn-sm" href={tm.profile_url} target="_blank" rel="noreferrer">
+                    <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
+                  </a>
+                ) : (
+                  <button type="button" className="btn btn-ghost btn-sm" disabled aria-disabled>
+                    <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
+                  </button>
+                )}
               </span>
             </Tooltip>
           </div>
-          {tm?.profile_url ? (
-            <div className="hero-action-cell hero-action-transfermarkt">
-              <Tooltip content="Abre o perfil no Transfermarkt.">
-                <a className="btn btn-ghost btn-sm" href={tm.profile_url} target="_blank" rel="noreferrer">
-                  <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> Transfermarkt
-                </a>
-              </Tooltip>
-            </div>
-          ) : null}
+        </div>
+
+        <div className="hero-report-cta">
+          <PlayerReportButton
+            player={player}
+            scoutPlayer={scout}
+            family={family}
+            players={players}
+            primaryArchiveLabel={fichaSeason}
+            cta
+          />
         </div>
       </aside>
 
