@@ -17,6 +17,7 @@ import {
 import type { PositionFamily } from "@/lib/types";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
+import { SiteLogo } from "@/components/SiteLogo";
 
 export type HubLeagueStats = {
   players: number;
@@ -94,9 +95,12 @@ function useCarousel(count: number) {
   }, [count]);
 
   useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
     measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    const observer = new ResizeObserver(measure);
+    observer.observe(track);
+    return () => observer.disconnect();
   }, [measure]);
 
   const goTo = (next: number) => {
@@ -179,10 +183,12 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
             <span className="hb-stripe hb-stripe-1" aria-hidden />
             <span className="hb-stripe hb-stripe-2" aria-hidden />
             <span className="hb-stripe hb-stripe-3" aria-hidden />
+            <SiteLogo variant="mark" className="hb-hero-watermark" alt="" />
             {heroAthlete ? (
               <Link href={athleteHref("serie-a", heroAthlete)} className="hb-hero-athlete">
                 <PlayerPhoto src={heroAthlete.photo} alt={heroAthlete.name} className="hb-hero-photo" />
                 <span className="hb-hero-caption">
+                  <SiteLogo variant="mark" className="hb-caption-mark" alt="" />
                   <em>Destaque · Série A {season}</em>
                   <strong>{heroAthlete.name}</strong>
                   <span>
@@ -194,6 +200,7 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
           </div>
 
           <div className="hb-hero-copy">
+            <SiteLogo variant="horizontal" className="hb-hero-lockup" />
             <p className="hx-status">
               <span className="hx-status-dot" aria-hidden />
               {isArchiveHub ? `Arquivo Wyscout · temporada ${season}` : `Temporada ${season} · scout ao vivo`}
@@ -264,11 +271,17 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
                   key={league.id}
                   href={leagueHref(league.id)}
                   className={`hb-comp ${index % 2 ? "is-accent" : "is-dark"}${onlyCurrent ? " is-unavailable" : ""}`}
+                  aria-label={onlyCurrent ? `${league.name}: sem dados em ${season}` : undefined}
                   title={onlyCurrent ? `${league.name} · sem arquivo ${season}, abre ${CURRENT_SEASON}` : league.name}
                 >
                   <span className="hb-comp-panel" aria-hidden />
-                  {athlete ? (
+                  {athlete && !onlyCurrent ? (
                     <PlayerPhoto src={athlete.photo} alt="" className="hb-comp-photo" loading="lazy" />
+                  ) : null}
+                  {onlyCurrent ? (
+                    <span className="hb-comp-empty" aria-hidden>
+                      <SiteLogo variant="mark" alt="" />
+                    </span>
                   ) : null}
                   <span className="hb-comp-logo">
                     <img src={league.logo} alt="" />
@@ -276,9 +289,11 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
                   <span className="hb-comp-label">
                     <strong>{league.name}</strong>
                     <em>
-                      {TIER_LABEL[league.id]} · {fmt(stats?.players)} atletas
+                      {onlyCurrent
+                        ? `Sem dados em ${season} · abre ${CURRENT_SEASON}`
+                        : `${TIER_LABEL[league.id]} · ${fmt(stats?.players)} atletas`}
                     </em>
-                    {athlete ? (
+                    {athlete && !onlyCurrent ? (
                       <small>
                         {athlete.name} · {fmtRating(athlete.rating)}
                       </small>
@@ -315,7 +330,10 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
         {/* 3 · Vitrine: as ferramentas do site como produtos */}
         <section className="hb-shop" aria-labelledby="hb-shop-title">
           <header className="hb-shop-head">
-            <h2 id="hb-shop-title">ferramentas do scout</h2>
+            <h2 id="hb-shop-title">
+              <SiteLogo variant="mark" className="hb-shop-mark" alt="" />
+              ferramentas do scout
+            </h2>
             <span className="hb-shop-meta">Abrem na Série A {season}</span>
           </header>
           <div className="hb-shop-track" ref={carousel.trackRef} onScroll={carousel.onScroll}>
@@ -366,7 +384,9 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
             <PlayerPhoto key={athlete.id} src={athlete.photo} alt="" className={`hb-crowd-photo hb-crowd-${i}`} loading="lazy" />
           ))}
         </div>
+        <SiteLogo variant="stacked" className="hb-custom-watermark" alt="" />
         <div className="hb-custom-copy">
+          <SiteLogo variant="horizontal" className="hb-custom-lockup" />
           <span className="hb-custom-eyebrow">Monte o seu elenco ideal</span>
           <h2 id="hb-custom-title">time sombra</h2>
           <p>
@@ -382,9 +402,10 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
         </div>
       </section>
 
-      <footer className="hx-footer">
-        <span>
-          <strong>SADA</strong> · Sistema de Análise de Dados de Atletas
+      <footer className="hx-footer hb-footer">
+        <span className="hb-footer-brand">
+          <SiteLogo variant="horizontal" className="hb-footer-lockup" />
+          Sistema de Análise de Dados de Atletas
         </span>
         <span>
           Dados Wyscout · Brasileirão {BRASILEIRAO_SEASONS[BRASILEIRAO_SEASONS.length - 1]}–{CURRENT_SEASON} · Estaduais{" "}

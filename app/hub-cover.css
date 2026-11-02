@@ -91,7 +91,7 @@
   position: absolute;
   left: 50%;
   bottom: 0;
-  height: 94%;
+  height: min(94%, 390px);
   width: auto;
   max-width: none;
   transform: translateX(-50%);
@@ -214,7 +214,7 @@
   overflow: visible;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
-  padding: 0 1.2rem;
+  padding: 0 3.8rem;
 }
 
 .hb-comp {
@@ -239,9 +239,13 @@
   transition: background 0.25s ease, box-shadow 0.25s ease;
 }
 
+/* Destaque: foto sobre fundo escuro; o ciano fica só na faixa do rótulo. */
 .hb-comp.is-accent .hb-comp-panel {
-  background: var(--hx-accent);
-  border-color: transparent;
+  background:
+    linear-gradient(to top, var(--hx-accent) 0, var(--hx-accent) 92px, transparent 92px),
+    radial-gradient(120% 80% at 50% 10%, rgba(var(--hx-accent-rgb), 0.16), transparent 70%),
+    #0b1c2d;
+  border-color: rgba(var(--hx-accent-rgb), 0.55);
 }
 
 .hb-comp:hover .hb-comp-panel,
@@ -268,8 +272,8 @@
 }
 
 .hb-comp.is-accent .hb-comp-photo {
-  filter: grayscale(1) contrast(1.25) brightness(0.92);
-  mix-blend-mode: multiply;
+  bottom: 92px;
+  height: 236px;
 }
 
 .hb-comp:hover .hb-comp-photo,
@@ -336,8 +340,40 @@
   color: var(--hb-ink);
 }
 
-.hb-comp.is-unavailable {
-  opacity: 0.55;
+/* Sem dados na temporada (Série D antes de 2026): tudo em cinza. */
+.hb-comp.is-unavailable .hb-comp-panel,
+.hb-comp.is-unavailable.is-accent .hb-comp-panel {
+  background: repeating-linear-gradient(135deg, #1a222c 0 10px, #161d26 10px 20px);
+  border-color: rgba(147, 160, 179, 0.22);
+  box-shadow: none;
+}
+
+.hb-comp.is-unavailable .hb-comp-logo {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.hb-comp.is-unavailable .hb-comp-label strong,
+.hb-comp.is-unavailable.is-accent .hb-comp-label strong {
+  color: #7d8896;
+}
+
+.hb-comp.is-unavailable .hb-comp-label em,
+.hb-comp.is-unavailable.is-accent .hb-comp-label em {
+  color: #6b7684;
+}
+
+.hb-comp-empty {
+  position: absolute;
+  left: 50%;
+  top: 150px;
+  transform: translateX(-50%);
+  opacity: 0.18;
+}
+
+.hb-comp-empty img {
+  width: 120px;
+  height: auto;
 }
 
 .hb-estaduais {
@@ -756,6 +792,7 @@
   .hb-comp-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     row-gap: 2.6rem;
+    padding: 0 1.4rem;
   }
 
   .hb-comp.is-accent {
@@ -806,5 +843,81 @@
   .hb-product-art i,
   .hb-cta {
     transition: none;
+  }
+}
+
+/* Marca SADA na capa */
+
+.hb-hero-lockup {
+  display: block;
+  height: 34px;
+  width: auto;
+  margin-bottom: 1.3rem;
+}
+
+.hb-hero-watermark {
+  position: absolute;
+  left: 6%;
+  top: 7%;
+  width: 46%;
+  height: auto;
+  opacity: 0.035;
+  pointer-events: none;
+}
+
+.hb-caption-mark {
+  height: 12px;
+  width: auto;
+  margin-bottom: 0.25rem;
+  opacity: 0.85;
+}
+
+.hb-shop-head h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.hb-shop-mark {
+  height: 18px;
+  width: auto;
+}
+
+.hb-custom-watermark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  width: 460px;
+  height: auto;
+  transform: translate(-50%, -50%);
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+.hb-custom-lockup {
+  height: 26px;
+  width: auto;
+  margin-bottom: 0.6rem;
+}
+
+.hb-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.hb-footer-lockup {
+  height: 22px;
+  width: auto;
+}
+
+@media (max-width: 640px) {
+  .hb-hero-lockup {
+    height: 28px;
+  }
+
+  .hb-custom-watermark {
+    width: 300px;
   }
 }

@@ -1,3 +1,5 @@
+import { existsSync } from "fs";
+import path from "path";
 import { Suspense } from "react";
 import { HubSeasonPicker, type HubAthlete, type HubData } from "@/components/HubSeasonPicker";
 import { getMeta, getPlayers } from "@/lib/data.server";
@@ -7,6 +9,21 @@ import type { SiteMeta } from "@/lib/types";
 
 const FEATURED_MIN_MINUTES = 900;
 const FEATURED_PER_LEAGUE = 3;
+const COVER_PHOTO_DIR = path.join(process.cwd(), "public", "athletes");
+const COVER_PHOTO_EXTS = ["webp", "png", "jpg"] as const;
+
+/**
+ * Cover art for an athlete. A curated file at public/athletes/<transfermarkt id>.<ext> wins —
+ * keyed by the verified TM id, never by name — otherwise the largest Transfermarkt portrait.
+ */
+function coverPhoto(tmId: string | null | undefined, tmPhoto: string): string {
+  if (tmId) {
+    for (const ext of COVER_PHOTO_EXTS) {
+      if (existsSync(path.join(COVER_PHOTO_DIR, `${tmId}.${ext}`))) return `/athletes/${tmId}.${ext}`;
+    }
+  }
+  return tmPhoto.replace("/portrait/header/", "/portrait/big/");
+}
 
 /** Top-rated athletes with a real Transfermarkt portrait — the faces of each competition on the cover. */
 function featuredAthletes(league: LeagueId, season: string): HubAthlete[] {
@@ -30,7 +47,7 @@ function featuredAthletes(league: LeagueId, season: string): HubAthlete[] {
       position: player.position,
       family: player.position_family,
       rating: player.rating,
-      photo: player.transfermarkt!.photo!.replace("/portrait/header/", "/portrait/big/"),
+      photo: coverPhoto(player.transfermarkt?.id, player.transfermarkt!.photo!),
     }));
 }
 
