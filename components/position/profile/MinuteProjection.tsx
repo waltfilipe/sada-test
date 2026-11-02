@@ -22,17 +22,17 @@ const SCENARIO_TABS: { key: ProjectionScenario; label: string; hint: string }[] 
   {
     key: "negativa",
     label: "Pessimista",
-    hint: "Faixa inferior (~10%): números ainda plausíveis se a fase quente não se sustenta.",
+    hint: "Percentil 10 do nível real do atleta: números ainda plausíveis se a fase quente não se sustenta.",
   },
   {
     key: "realista",
     label: "Esperado",
-    hint: "M7: EB com k calibrado no pool; μ = previsão supervisionada Wyscout (2022–25) quando existir, senão titulares + perfil.",
+    hint: "Regressão Bayesiana com k = variância de amostragem ÷ variância entre atletas; μ = previsão ridge por métrica (Wyscout 2022–25, validada leave-one-out) quando existir, senão titulares + perfil.",
   },
   {
     key: "positiva",
     label: "Otimista",
-    hint: "Faixa superior (~10%): se a forma atual se mantivesse como titular.",
+    hint: "Percentil 90 do nível real do atleta: se a forma atual se mantivesse como titular.",
   },
 ];
 
@@ -53,7 +53,7 @@ export function MinuteProjection({ player, family, players }: Props) {
 
   return (
     <>
-      <Tooltip content="M7 + histórico Wyscout: regressão empírica Bayesiana (k calibrado) em direção ao patamar previsto entre temporadas. Não projeta ‘resto de 2026’.">
+      <Tooltip content="Regressão empírica Bayesiana em direção ao patamar previsto entre temporadas (ridge por métrica, Wyscout). Não projeta ‘resto de 2026’.">
         <button
           type="button"
           className={`btn btn-ghost btn-sm${open ? " is-open" : ""}`}
@@ -65,7 +65,7 @@ export function MinuteProjection({ player, family, players }: Props) {
       </Tooltip>
 
       {open ? (
-        <StatWindow title="Projeção M7 · histórico Wyscout" onClose={() => setOpen(false)}>
+        <StatWindow title="Projeção · histórico Wyscout" onClose={() => setOpen(false)}>
           {report && active && rel ? (
             <div className="projection-modal-copy">
               <p className="projection-reliability">

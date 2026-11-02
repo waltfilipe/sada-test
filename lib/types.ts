@@ -159,10 +159,13 @@ export type PlayerPhysicalRun = {
 };
 
 export type CrossSeasonMetricPrior = {
+  /** Ridge prediction of the athlete's per-90 level (or % rate). */
   predicted: number;
-  history_mean: number;
-  consistent: boolean;
-  role_change_flag: boolean;
+  /** Leave-one-out RMSE of the ridge model for this metric (out-of-sample error of `predicted`). */
+  resid_sd?: number;
+  /** Mean nineties of the seasons used to train the model (observation noise inside resid_sd). */
+  train_n90?: number;
+  role_change_flag?: boolean;
 };
 
 export type CrossSeasonProjection = {

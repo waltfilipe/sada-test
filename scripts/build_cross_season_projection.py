@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cross-season history index + supervised priors for projection (method 7 variant)."""
+"""Cross-season history index + per-metric supervised priors for projection (see projection_model.py)."""
 
 from __future__ import annotations
 
@@ -22,68 +22,11 @@ BR_LEAGUES = ("serie-a", "serie-b", "serie-c")
 SEASONS = ("2022", "2023", "2024", "2025")
 CURRENT = "2026"
 
-# Maps projection sample keys (minuteProjection) → aspect path
-METRIC_SPECS: dict[str, list[tuple[str, str | None, str]]] = {
-    "zagueiros": [
-        ("Ações Defensivas::Interceptações", "Ações Defensivas", "Interceptações"),
-        ("Duelos Defensivos", "Duelos Defensivos", None),
-        ("Passes Progressivos", "Passes Progressivos", None),
-    ],
-    "laterais": [
-        ("Cruzamentos::Cruzamentos", "Cruzamentos", "Cruzamentos"),
-        ("Duelos Defensivos", "Duelos Defensivos", None),
-        ("Conduções Progressivas", "Conduções Progressivas", None),
-    ],
-    "meio-campistas": [
-        ("Passes Progressivos", "Passes Progressivos", None),
-        ("Duelos Defensivos", "Duelos Defensivos", None),
-        ("Passes Chave e Área::Passes para Área", "Passes Chave e Área", "Passes para Área"),
-    ],
-    "extremos": [
-        ("1v1 - Ofensivo", "1v1 - Ofensivo", None),
-        ("Pré Assistências e xA::Pré Assistências", "Pré Assistências e xA", "Pré Assistências"),
-        ("Ações Terminais::Toques na Área", "Ações Terminais", "Toques na Área"),
-    ],
-    "atacantes": [
-        ("Finalização::Finalizações", "Finalização", "Finalizações"),
-        ("Ações Terminais::Toques na Área", "Ações Terminais", "Toques na Área"),
-        ("Aéreo", "Aéreo", None),
-    ],
-}
-
-
 def norm_name(name: str) -> str:
     value = unicodedata.normalize("NFD", name)
     value = "".join(ch for ch in value if not unicodedata.combining(ch))
     value = re.sub(r"[^a-z0-9]+", " ", value.lower()).strip()
     return value
-
-
-def read_metric(player: dict, aspect: str, sub: str | None) -> float | None:
-    aspects = player.get("aspects") or {}
-    flat = []
-    for group in aspects.values():
-        if group:
-            flat.extend(group)
-    item = next((a for a in flat if a.get("label") == aspect), None)
-    if not item:
-        return None
-    if sub:
-        for sm in item.get("sub_metrics") or []:
-            if sm.get("label") == sub:
-                raw = sm.get("display_value")
-                break
-        else:
-            return None
-    else:
-        raw = item.get("display_value")
-    if raw is None:
-        return None
-    text = str(raw).replace(",", ".").replace("%", "").strip()
-    try:
-        return float(text)
-    except ValueError:
-        return None
 
 
 def _tm_id(row: dict) -> str | None:
@@ -235,39 +178,6 @@ def load_season_players(league: str, season: str) -> list[dict]:
     return out
 
 
-def ridge_predict(y1: float | None, y2: float | None, age: float, league_tier: float, coef: dict) -> float:
-    return (
-        coef["b0"]
-        + coef.get("b_y1", 0) * (y1 or coef.get("fallback", 0))
-        + coef.get("b_y2", 0) * (y2 or coef.get("fallback", 0))
-        + coef.get("b_age", 0) * age
-        + coef.get("b_tier", 0) * league_tier
-    )
-
-
-def fit_ridge(rows: list[dict]) -> dict:
-    if len(rows) < 12:
-        return {"b0": rows[0]["y"] if rows else 0, "b_y1": 0.55, "b_y2": 0.25, "b_age": 0, "b_tier": 0, "fallback": 0}
-    # simple OLS on y ~ y1 + y2 + age + tier
-    import numpy as np
-
-    y = np.array([r["y"] for r in rows], dtype=float)
-    x = np.array([[1, r["y1"], r["y2"], r["age"], r["tier"]] for r in rows], dtype=float)
-    coef, _, _, _ = np.linalg.lstsq(x, y, rcond=None)
-    return {
-        "b0": float(coef[0]),
-        "b_y1": float(coef[1]),
-        "b_y2": float(coef[2]),
-        "b_age": float(coef[3]),
-        "b_tier": float(coef[4]),
-        "fallback": float(np.median(y)),
-    }
-
-
-def league_tier(league_id: str) -> float:
-    return {"serie-a": 3.0, "serie-b": 2.0, "serie-c": 1.0}.get(league_id, 1.0)
-
-
 def main() -> None:
     # Index all seasons by clustered player key (computed over every row so
     # minute thresholds don't shift the clusters)
@@ -305,54 +215,53 @@ def main() -> None:
     for key in timeline:
         timeline[key].sort(key=lambda r: (r.get("_season") or "", r.get("_league") or ""))
 
+    from projection_model import (  # noqa: E402
+        backtest,
+        extract_samples,
+        fit_ridge,
+        league_tier,
+        predict,
+        transitions,
+        _features,
+    )
+
+    for rows in timeline.values():
+        for row in rows:
+            row["_samples"] = extract_samples(row)
+            row["_n90"] = (row.get("minutes") or 0) / 90
+
+    families = sorted({r.get("position_family") for rows in timeline.values() for r in rows if r.get("position_family")})
+    keys_by_family: dict[str, set[str]] = {}
+    for rows in timeline.values():
+        for r in rows:
+            keys_by_family.setdefault(r.get("position_family"), set()).update(r["_samples"].keys())
+
     models: dict[str, dict] = {}
+    fitted = 0
+    for family in families:
+        for key in sorted(keys_by_family.get(family, ())):
+            model = fit_ridge(transitions(timeline, family, key))
+            if model:
+                models[f"{family}|{key}"] = model
+                fitted += 1
 
-    for league in BR_LEAGUES:
-        for family, specs in METRIC_SPECS.items():
-            train_rows = []
-            for key, rows in timeline.items():
-                if len(rows) < 2:
-                    continue
-                for i in range(1, len(rows)):
-                    cur = rows[i]
-                    if cur.get("_league") != league or cur.get("position_family") != family:
-                        continue
-                    if (cur.get("minutes") or 0) < 900:
-                        continue
-                    prev = rows[i - 1]
-                    y = read_metric(cur, specs[0][1], specs[0][2])
-                    y1 = read_metric(prev, specs[0][1], specs[0][2])
-                    y2 = read_metric(rows[i - 2], specs[0][1], specs[0][2]) if i >= 2 else None
-                    if y is None or y1 is None:
-                        continue
-                    age = 2026 - (cur.get("birth_year") or 1998)
-                    train_rows.append(
-                        {
-                            "y": y,
-                            "y1": y1,
-                            "y2": y2 or y1,
-                            "age": age,
-                            "tier": league_tier(prev.get("_league") or league),
-                        }
-                    )
-            model_key = f"{league}:{family}"
-            models[model_key] = fit_ridge(train_rows)
-
+    bt = backtest(timeline, families, keys_by_family)
     out_models = DATA / "cross-season" / "models.json"
     out_models.parent.mkdir(parents=True, exist_ok=True)
     out_models.write_text(dumps_json(models), encoding="utf-8")
+    (DATA / "cross-season" / "backtest.json").write_text(dumps_json(bt), encoding="utf-8")
     (DATA / "cross-season" / "persons.json").write_text(dumps_json(persons_map), encoding="utf-8")
+    print(f"Fitted {fitted} per-metric ridge models; backtest 2025 (train<=2024):")
+    for fam, rep in bt.items():
+        print(f"  {fam}: {rep}")
 
     enriched = 0
     for league in BR_LEAGUES:
-        for family, specs in METRIC_SPECS.items():
-            path = DATA / league / f"family-{family}.json"
-            if not path.is_file():
-                continue
+        for path in sorted((DATA / league).glob("family-*.json")):
             payload = json.loads(path.read_text(encoding="utf-8"))
-            coef = models.get(f"{league}:{family}") or {}
             for player in payload.get("players", []):
                 player.pop("cross_season", None)
+                family = player.get("position_family") or path.stem.removeprefix("family-")
                 sig = (
                     norm_name(player.get("name", "")),
                     player.get("birth_year") or 0,
@@ -364,47 +273,37 @@ def main() -> None:
                 past = [h for h in hist if h.get("_season") != CURRENT]
                 if not past:
                     continue
+                ordered = sorted(past, key=lambda h: (h.get("_season") or "", h.get("_league") or ""))
                 age = 2026 - (player.get("birth_year") or 1998)
-                ordered = sorted(past, key=lambda h: h.get("_season") or "")
-                y1_row = ordered[-1] if ordered else None
-                y2_row = ordered[-2] if len(ordered) >= 2 else None
+                tier_cur = league_tier(league)
+                cur_samples = extract_samples(player)
+                low_minutes = (player.get("minutes_pct") or 100) < 50
                 metrics: dict[str, dict] = {}
-                for sample_key, aspect, sub in specs:
-                    hist_vals = []
-                    hist_weights = []
-                    for h in past:
-                        v = read_metric(h, aspect, sub)
-                        if v is not None:
-                            hist_vals.append(v)
-                            hist_weights.append(max(1.0, (h.get("minutes") or 0) / 90))
-                    if not hist_vals:
+                for sample_key, cur_sample in cur_samples.items():
+                    feats = _features(ordered, sample_key, age, tier_cur)
+                    if feats is None:
                         continue
-                    hist_mean = sum(v * w for v, w in zip(hist_vals, hist_weights)) / sum(hist_weights)
-                    y1 = read_metric(y1_row, aspect, sub) if y1_row else None
-                    y2 = read_metric(y2_row, aspect, sub) if y2_row else None
-                    predicted = ridge_predict(
-                        y1,
-                        y2,
-                        age,
-                        league_tier(y1_row.get("_league") if y1_row else league),
-                        coef,
-                    )
-                    # Blend history mean with ridge when we have 2+ seasons
-                    if len(hist_vals) >= 2:
-                        predicted = 0.45 * predicted + 0.55 * hist_mean
+                    model = models.get(f"{family}|{sample_key}")
+                    signed = cur_sample["signed"]
+                    if model:
+                        predicted = predict(model, feats, signed)
+                        resid_sd, train_n90 = model["resid_sd"], model["train_n90"]
                     else:
-                        predicted = hist_mean
-                    obs = read_metric(player, aspect, sub)
-                    spread = max(hist_vals) - min(hist_vals) if len(hist_vals) >= 2 else 999.0
-                    consistent = spread <= max(0.35 * max(hist_mean, 0.01), 0.4)
-                    diverges = obs is not None and abs(obs - predicted) > max(0.5 * max(abs(predicted), 0.5), 0.6)
-                    flag = diverges and (player.get("minutes_pct") or 100) < 50 and not consistent
-                    metrics[sample_key] = {
-                        "predicted": round(predicted, 4),
-                        "history_mean": round(hist_mean, 4),
-                        "consistent": consistent,
-                        "role_change_flag": flag,
-                    }
+                        predicted = feats[2]
+                        resid_sd, train_n90 = None, None
+                    vals = [h["_samples"][sample_key]["value"] for h in ordered if sample_key in h["_samples"]]
+                    spread = max(vals) - min(vals) if len(vals) >= 2 else 999.0
+                    consistent = spread <= max(0.35 * max(feats[2], 0.01), 0.4)
+                    obs = cur_sample["value"]
+                    tol = max(0.5 * max(abs(predicted), 0.5), 0.6, 2 * (resid_sd or 0))
+                    flag = bool(abs(obs - predicted) > tol and low_minutes and not consistent)
+                    entry = {"predicted": round(predicted, 4)}
+                    if flag:
+                        entry["role_change_flag"] = True
+                    if resid_sd is not None:
+                        entry["resid_sd"] = round(resid_sd, 4)
+                        entry["train_n90"] = round(train_n90, 2)
+                    metrics[sample_key] = entry
                 if not metrics:
                     continue
                 player["cross_season"] = {
@@ -421,7 +320,6 @@ def main() -> None:
                 }
                 enriched += 1
             path.write_text(dumps_json(payload), encoding="utf-8")
-            # sync profiles
             prof_dir = DATA / league / "profiles"
             if prof_dir.is_dir():
                 for player in payload.get("players", []):

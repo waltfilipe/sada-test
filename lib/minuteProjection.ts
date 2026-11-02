@@ -1,12 +1,16 @@
 /**
- * Minute projection for scouts (M7 + cross-season history).
+ * Minute projection for scouts (empirical Bayes + cross-season ridge prior).
  *
- * Empirical Bayes with k calibrated on the division pool (pseudo-holdout, same idea as lab M7):
- *   posterior = (y · n90 + μ · k) / (n90 + k)
- * μ is the supervised cross-season prediction when available (Wyscout 2022–2025 build);
- * otherwise μ = 50% titulares + 50% mesmo perfil na divisão.
- * role_change_flag caps effective n90 so short noisy 2026 samples regress to μ.
- * Pessimista / otimista: posterior ± z90 · σ_pred.
+ *   posterior = (y · n90 + μ · k) / (n90 + k),   k = σ² / τ²
+ * σ² = per-90 sampling variance, τ² = between-athlete variance of the true level, both estimated
+ * from the division pool (low-minute vs regular players). μ is the per-metric ridge prediction
+ * (Wyscout 2022–2025, leave-one-out validated) when the athlete has history; otherwise
+ * μ = 50% titulares + 50% mesmo perfil na divisão. With a ridge μ, τ² is the ridge LOO error
+ * minus the sampling noise it contains, so k reflects how good the individual prior is.
+ * role_change_flag caps effective n90 so short noisy samples regress to μ.
+ * Pessimista / otimista are the 10% / 90% quantiles of the posterior of the true level:
+ * log-normal for rates (never negative), logit-normal for percentages (stay in 0–100), normal for
+ * signed z-scores.
  */
 import { isSeasonTotalLabel } from "@/lib/seasonTotals";
 import type { AspectItem, PlayerProfile } from "@/lib/types";
@@ -44,30 +48,29 @@ export type MinuteProjectionReport = {
 };
 
 const Z90 = 1.2815515655446004;
-/** Typical decision events per 90 used to widen % intervals when attempt counts are unknown. */
-const EFF_TRIALS_PER_90 = 6;
 const MIN_GROUP = 8;
 const MIN_METRICS = 3;
 const FALLBACK_N0 = 4;
-const N0_FLOOR = 18;
-const N0_MAX = 40;
+/** Prior strength k = σ²/τ² is kept inside this range of nineties. */
+const K_FLOOR = 4;
+const K_MAX = 40;
+const N0_FLOOR = 8;
+const N0_MAX = 45;
+/** The ridge prior can never claim to know the true level better than this share of its LOO variance. */
+const TAU_CS_FLOOR_FRAC = 0.25;
 const STARTER_MINUTES_PCT = 50;
-/** Default EB prior strength (nineties) before pool calibration. */
-const DEFAULT_K_EB = 10;
-const K_EB_MIN = 4;
-const K_EB_MAX = 22;
-const K_EB_STEP = 2;
-const HELD_N90 = 10;
-const PSEUDO_SAMPLE_FRAC = 0.45;
 
 /** Share bars (pass tendency) are pool percents, not per-90 rates — projection stays on volume/efficiency metrics. */
 const SKIP_KINDS = new Set(["construction_share"]);
 
 type Prior = {
   mu: number;
+  /** Between-athlete variance of the true level around μ. */
   tau2: number;
+  /** Per-90 sampling variance (variance of an observed rate is sigma2 / n90). */
+  sigma2: number;
   n0: number;
-  /** Calibrated EB k (M7) for this metric. */
+  /** EB prior strength in nineties: σ² / τ². */
   kEb: number;
   refRates: number[];
   /** Mean nineties of the regulars. Used to write a predicted season count. */
@@ -88,6 +91,8 @@ type MetricFit = {
   rank: boolean;
   sample: string;
   adverse?: boolean;
+  /** Signed z-score metric: interval stays symmetric. */
+  signed?: boolean;
   seasonCount?: boolean;
   /** Low-minute 2026 diverges from stable cross-season history — trust anchor over spike. */
   roleChangeFlag?: boolean;
@@ -109,6 +114,7 @@ type Sample = {
   adverse?: boolean;
   /** Observed value is a season count. The fit uses a per-90 rate and the display writes an integer total. */
   seasonCount?: boolean;
+  signed?: boolean;
 };
 
 type PoolPoint = {
@@ -208,15 +214,7 @@ function placementFrom(model: BuiltModel, scenario: ProjectionScenario): Project
 function projectedMetrics(model: BuiltModel, scenario: ProjectionScenario): Map<string, ProjectedMetric> {
   const projected = new Map<string, ProjectedMetric>();
   for (const metric of model.metrics) {
-    const next = projectRate(
-      metric.y,
-      model.exposure,
-      metric.prior,
-      scenario,
-      metric.adverse,
-      metric.kind,
-      metric.roleChangeFlag,
-    );
+    const next = projectRate(metric.y, model.exposure, metric.prior, scenario, metric.kind, metric.signed, metric.roleChangeFlag);
     const value = metric.kind === "percent" ? clamp(next.value, 0, 100) : next.value;
     const standing = midrankPercentile(value, metric.referenceRates);
     projected.set(metric.key, {
@@ -274,7 +272,7 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
     const points = observations.get(sample.key) ?? [];
     const basePrior = fitPrior(points, player.profile ?? null);
     if (!basePrior) continue;
-    const resolved = resolveM7Prior(basePrior, player, sample.key, points);
+    const resolved = resolveM7Prior(basePrior, player, sample.key);
     metrics.push({
       key: sample.key,
       y: sample.value,
@@ -284,6 +282,7 @@ function buildModel(player: PlayerProfile, players: PlayerProfile[]): BuiltModel
       rank: sample.rank,
       sample: sample.sample,
       adverse: sample.adverse,
+      signed: sample.signed,
       seasonCount: sample.seasonCount,
       roleChangeFlag: resolved.roleChangeFlag,
     });
@@ -387,7 +386,7 @@ function sampleFrom(
     return { key, value: parsed / exposure, kind: "rate", rank: false, sample: raw, adverse, seasonCount };
   }
   if (options?.zScore) {
-    return { key, value: parsed, kind: "rate", rank: true, sample: raw };
+    return { key, value: parsed, kind: "rate", rank: true, sample: raw, signed: true };
   }
   if (!isVolumeLabel(label)) return null;
   return { key, value: parsed, kind: "rate", rank: true, sample: raw };
@@ -452,48 +451,24 @@ function ebShrink(rate: number, n90: number, mu: number, k: number): number {
   return (rate * n90 + mu * k) / denom;
 }
 
-function calibrateKEb(points: PoolPoint[], mu: number): number {
-  const held = points.filter((point) => point.e > 0 && !point.low && point.e >= HELD_N90);
-  if (held.length < 12) return DEFAULT_K_EB;
-  let bestK = DEFAULT_K_EB;
-  let bestErr = Infinity;
-  for (let k = K_EB_MIN; k <= K_EB_MAX; k += K_EB_STEP) {
-    let err = 0;
-    let n = 0;
-    for (const point of held) {
-      const nPartial = point.e * PSEUDO_SAMPLE_FRAC;
-      const pseudo = ebShrink(point.value, nPartial, mu, k);
-      err += (pseudo - point.value) ** 2;
-      n += 1;
-    }
-    if (n && err / n < bestErr) {
-      bestErr = err / n;
-      bestK = k;
-    }
-  }
-  return bestK;
-}
-
-/** M7 prior: μ from cross-season ridge when present, else division hierarchical mean; k calibrated on pool. */
+/** Prior for one metric: ridge μ + its own τ² when the athlete has history, else the division prior. */
 function resolveM7Prior(
   base: Prior,
   player: PlayerProfile,
   sampleKey: string,
-  points: PoolPoint[],
 ): { prior: Prior; roleChangeFlag?: boolean } {
   const cross = player.cross_season?.metrics?.[sampleKey];
-  let mu = base.mu;
-  let muFromCrossSeason = false;
-  let roleChangeFlag = cross?.role_change_flag;
-  if (cross && Number.isFinite(cross.predicted)) {
-    mu = cross.predicted;
-    muFromCrossSeason = true;
+  if (!cross || !Number.isFinite(cross.predicted)) return { prior: base };
+  const prior: Prior = { ...base, mu: cross.predicted, muFromCrossSeason: true };
+  const resid = cross.resid_sd;
+  const trainN90 = cross.train_n90;
+  if (resid != null && resid > 0 && trainN90 != null && trainN90 > 0) {
+    const looVar = resid * resid;
+    const tau2 = Math.max(looVar - base.sigma2 / trainN90, looVar * TAU_CS_FLOOR_FRAC);
+    prior.tau2 = tau2;
+    prior.kEb = clamp(base.sigma2 / tau2, K_FLOOR, K_MAX);
   }
-  const kEb = calibrateKEb(points, mu);
-  return {
-    prior: { ...base, mu, kEb, muFromCrossSeason },
-    roleChangeFlag,
-  };
+  return { prior, roleChangeFlag: cross.role_change_flag === true };
 }
 
 function fitPrior(points: PoolPoint[], targetProfile: string | null): Prior | null {
@@ -529,6 +504,7 @@ function fitPrior(points: PoolPoint[], targetProfile: string | null): Prior | nu
 
   let tau2 = 0;
   let n0 = FALLBACK_N0;
+  let sigma2Est = 0;
 
   const low = pool.filter((point) => point.low);
   if (low.length >= MIN_GROUP && msdRef > 0) {
@@ -543,6 +519,7 @@ function fitPrior(points: PoolPoint[], targetProfile: string | null): Prior | nu
       const tau = msdRef - sigma2 * invRef;
       if (tau > 1e-8) {
         tau2 = tau;
+        sigma2Est = sigma2;
         n0 = clamp(sigma2 / tau2, N0_FLOOR, N0_MAX);
       }
     }
@@ -558,11 +535,13 @@ function fitPrior(points: PoolPoint[], targetProfile: string | null): Prior | nu
   }
   if (!(tau2 > 0) || !Number.isFinite(mu)) return null;
 
+  const k = clamp(n0, N0_FLOOR, N0_MAX);
   return {
     mu,
     tau2,
-    n0: clamp(Math.max(n0, N0_FLOOR), N0_FLOOR, N0_MAX),
-    kEb: DEFAULT_K_EB,
+    sigma2: sigma2Est > 0 ? sigma2Est : k * tau2,
+    n0: k,
+    kEb: k,
     refRates,
     refExposure,
   };
@@ -573,8 +552,8 @@ function projectRate(
   exposure: number,
   prior: Prior,
   scenario: ProjectionScenario,
-  adverse = false,
   kind: MetricKind = "rate",
+  signed = false,
   roleChangeFlag = false,
 ): { value: number; weight: number } {
   const k = prior.kEb;
@@ -582,33 +561,27 @@ function projectRate(
   if (roleChangeFlag) n90 = Math.max(n90 * 0.22, 0.35);
   const posteriorMean = ebShrink(y, n90, prior.mu, k);
   const weight = n90 / (n90 + k);
-  const sd = predictiveSd(y, n90, prior, weight, kind, adverse);
-  let value = posteriorMean;
-  if (scenario === "negativa") value = posteriorMean - Z90 * sd;
-  else if (scenario === "positiva") value = posteriorMean + Z90 * sd;
-  return { value: metricFloor(value, adverse), weight };
+  if (scenario === "realista") return { value: posteriorMean, weight };
+  const sd = Math.sqrt(Math.max(prior.tau2 * (1 - weight), 0));
+  return { value: posteriorQuantile(posteriorMean, sd, scenario === "negativa" ? -Z90 : Z90, kind, signed), weight };
 }
 
-/** Epistemic (between-player) + sampling noise for small per-90 / % samples. */
-function predictiveSd(
-  y: number,
-  exposure: number,
-  prior: Prior,
-  weight: number,
-  kind: MetricKind,
-  adverse: boolean,
-): number {
-  const epistemic = Math.sqrt(Math.max(prior.tau2 * (1 - weight), 0));
-  let aleatory = 0;
+/**
+ * Quantile of the posterior of the true level. The posterior is skewed and bounded, so the interval
+ * is built on a transformed scale: log for non-negative rates, logit for percentages.
+ */
+function posteriorQuantile(mean: number, sd: number, z: number, kind: MetricKind, signed: boolean): number {
+  if (!(sd > 0)) return mean;
   if (kind === "percent") {
-    const p = clamp(y, 0.05, 99.95) / 100;
-    const trials = Math.max(exposure * EFF_TRIALS_PER_90, 8);
-    aleatory = Math.sqrt((p * (1 - p)) / trials);
-  } else if (!adverse) {
-    const rate = Math.max(Math.abs(y), 0.04);
-    aleatory = Math.sqrt(rate / Math.max(exposure, 0.35));
+    const p = clamp(mean, 0.5, 99.5) / 100;
+    const sdLogit = sd / (100 * p * (1 - p));
+    const logit = Math.log(p / (1 - p)) + z * sdLogit;
+    return 100 / (1 + Math.exp(-logit));
   }
-  return Math.sqrt(epistemic * epistemic + aleatory * aleatory);
+  if (signed) return mean + z * sd;
+  if (mean <= 1e-9) return Math.max(0, mean + z * sd);
+  const sdLog = Math.sqrt(Math.log(1 + (sd / mean) ** 2));
+  return mean * Math.exp(z * sdLog - (sdLog * sdLog) / 2);
 }
 
 function reliabilityFrom(model: BuiltModel, sampleWeight: number): ProjectionReliability {
@@ -637,20 +610,15 @@ function reliabilityFrom(model: BuiltModel, sampleWeight: number): ProjectionRel
 }
 
 export function confidenceTier(sampleWeight: number): ProjectionReliability["tier"] {
-  if (sampleWeight >= 0.34) return "alta";
-  if (sampleWeight >= 0.22) return "media";
+  if (sampleWeight >= 0.45) return "alta";
+  if (sampleWeight >= 0.25) return "media";
   return "baixa";
 }
 
 export function confidenceTierLabel(tier: ProjectionReliability["tier"]): string {
   if (tier === "alta") return "Confiança alta na amostra";
-  if (tier === "media") return "Confiança média — EB ainda puxa ao prior histórico/divisão";
-  return "Confiança baixa — poucos minutos; leitura domina o prior M7 (histórico Wyscout quando houver)";
-}
-
-function metricFloor(value: number, adverse: boolean): number {
-  if (adverse) return value < 0 ? 0 : value;
-  return value;
+  if (tier === "media") return "Confiança média — a regressão ainda puxa para o prior histórico/divisão";
+  return "Confiança baixa — poucos minutos; a leitura é dominada pelo prior (histórico Wyscout quando houver)";
 }
 
 function isVolumeLabel(label: string | undefined): boolean {
