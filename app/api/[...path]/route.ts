@@ -222,10 +222,16 @@ function similarPayload(url: URL) {
     }
   }
   const limit = limitRaw ? Math.min(20, Math.max(1, Number(limitRaw))) : 5;
+  const metricLabels = url.searchParams
+    .get("metrics")
+    ?.split("|")
+    .map((value) => value.trim())
+    .filter(Boolean);
   const matches = rankCrossLeagueSimilarity(source, targetPool, {
     limit,
     leagueOf: (p) => leagueByPlayer.get(p),
     debug: url.searchParams.get("debug") === "1",
+    metricLabels: metricLabels?.length ? metricLabels : undefined,
   }).map((hit) => ({
     ...hit,
     photo:

@@ -146,7 +146,11 @@ type BlockModel = {
   featureIds: string[];
 };
 
-function buildCertosModel(family: PositionFamily, pool: PlayerProfile[]): BlockModel {
+function buildCertosModel(
+  family: PositionFamily,
+  pool: PlayerProfile[],
+  metricLabels?: ReadonlySet<string>,
+): BlockModel {
   const sections = statSectionsForFamily(family);
   const blockMap = new Map<string, { tone: StatSectionTone; featureIds: string[] }>();
 
@@ -154,6 +158,7 @@ function buildCertosModel(family: PositionFamily, pool: PlayerProfile[]): BlockM
     const collected = new Set<string>();
     for (const label of section.labels) {
       if (label === "Eficiência Defensiva") continue;
+      if (metricLabels && !metricLabels.has(label)) continue;
       for (const player of pool) {
         for (const f of certosFeaturesForLabel(player, label)) {
           collected.add(`${label} · ${f.key}`);
@@ -359,7 +364,14 @@ function round1(n: number) {
 export function rankCrossLeagueSimilarity(
   source: PlayerProfile,
   targetPool: PlayerProfile[],
-  options: { limit?: number; minMinutes?: number; leagueOf?: (p: PlayerProfile) => LeagueId | undefined; debug?: boolean } = {},
+  options: {
+    limit?: number;
+    minMinutes?: number;
+    leagueOf?: (p: PlayerProfile) => LeagueId | undefined;
+    debug?: boolean;
+    /** Restrict the distance model to these dossier aspect labels (e.g. "Duelos Defensivos"). */
+    metricLabels?: string[];
+  } = {},
 ): SimilarPlayerHit[] {
   const limit = options.limit ?? 5;
   const minMinutes = options.minMinutes ?? 300;
@@ -371,7 +383,8 @@ export function rankCrossLeagueSimilarity(
   );
   if (!sameFamily.length) return [];
 
-  const { blocks, featureIds } = buildCertosModel(family, sameFamily);
+  const metricFilter = options.metricLabels?.length ? new Set(options.metricLabels) : undefined;
+  const { blocks, featureIds } = buildCertosModel(family, sameFamily, metricFilter);
   if (!featureIds.length) return [];
 
   const allIdx = featureIds.map((_, i) => i);

@@ -14,7 +14,7 @@ import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { ClubLogo } from "@/components/ClubLogo";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 
-type Step = "pick-league" | "loading" | "results" | "error";
+type Step = "config" | "loading" | "results" | "error";
 
 type SimilarTarget = LeagueId | "estaduais";
 
@@ -120,7 +120,7 @@ export function SimilarCrossLeagueModal({
 }: Props) {
   const { isCurrentSeason } = useLeague();
   const [mounted, setMounted] = useState(false);
-  const [step, setStep] = useState<Step>("pick-league");
+  const [step, setStep] = useState<Step>("config");
   const [targetLeague, setTargetLeague] = useState<SimilarTarget | null>(null);
   const [matches, setMatches] = useState<SimilarPlayerHit[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -129,6 +129,27 @@ export function SimilarCrossLeagueModal({
 
   const referencePhoto = player.transfermarkt?.photo;
   const positionSections = useMemo(() => statSectionsForFamily(family), [family]);
+  // "Eficiência Defensiva" never enters the distance model (z-score, not per-90 volume).
+  const allMetricLabels = useMemo(
+    () => positionSections.flatMap((section) => section.labels).filter((label) => label !== "Eficiência Defensiva"),
+    [positionSections],
+  );
+  const [pickedMetrics, setPickedMetrics] = useState<ReadonlySet<string>>(() => new Set(allMetricLabels));
+  const allPicked = pickedMetrics.size === allMetricLabels.length;
+  const toggleMetric = useCallback(
+    (label: string) => {
+      setPickedMetrics((prev) => {
+        const next = new Set(prev);
+        if (next.has(label)) next.delete(label);
+        else next.add(label);
+        return next;
+      });
+    },
+    [setPickedMetrics],
+  );
+  const toggleAllMetrics = useCallback(() => {
+    setPickedMetrics((prev) => (prev.size === allMetricLabels.length ? new Set() : new Set(allMetricLabels)));
+  }, [allMetricLabels]);
   const leagueOptions = useMemo(() => {
     const isEstadual = (ESTADUAIS_LEAGUE_IDS as readonly string[]).includes(currentLeagueId);
     const options = [
@@ -151,7 +172,7 @@ export function SimilarCrossLeagueModal({
   }, [currentLeagueId]);
 
   const fetchSimilar = useCallback(
-    async (to: SimilarTarget) => {
+    async (to: SimilarTarget, metricLabels?: string[]) => {
       setStep("loading");
       setErrorMessage(null);
       try {
@@ -163,6 +184,7 @@ export function SimilarCrossLeagueModal({
           limit: "5",
         });
         if (sourceSeason !== CURRENT_SEASON) params.set("season", sourceSeason);
+        if (metricLabels?.length) params.set("metrics", metricLabels.join("|"));
         const res = await fetch(`/api/similar?${params.toString()}`);
         const data = await res.json();
         if (!res.ok) {
@@ -178,13 +200,13 @@ export function SimilarCrossLeagueModal({
     [sourceLeague, sourceSeason, family, player.player_id],
   );
 
-  const pickLeague = useCallback(
+  const computeSimilar = useCallback(
     (to: SimilarTarget) => {
-      setTargetLeague(to);
+      const metricLabels = pickedMetrics.size === allMetricLabels.length ? undefined : [...pickedMetrics];
       if (to === currentLeagueId && sourceSeason === CURRENT_SEASON && isCurrentSeason) {
         setMatches(
           withPhotos(
-            rankCrossLeagueSimilarity(player, players, { limit: 5 }).map((hit) => ({
+            rankCrossLeagueSimilarity(player, players, { limit: 5, metricLabels }).map((hit) => ({
               ...hit,
               league: currentLeagueId,
             })),
@@ -194,9 +216,9 @@ export function SimilarCrossLeagueModal({
         setStep("results");
         return;
       }
-      void fetchSimilar(to);
+      void fetchSimilar(to, metricLabels);
     },
-    [currentLeagueId, sourceSeason, isCurrentSeason, fetchSimilar, player, players],
+    [currentLeagueId, sourceSeason, isCurrentSeason, fetchSimilar, player, players, pickedMetrics, allMetricLabels.length],
   );
 
   useEffect(() => {
@@ -255,7 +277,7 @@ export function SimilarCrossLeagueModal({
             </div>
           </div>
 
-          {step === "pick-league" ? (
+          {step === "config" ? (
             <div className="similar-league-pick">
               <p className="similar-cross-hint">Em qual competição buscar atletas parecidos?</p>
               {sourceSeason !== CURRENT_SEASON ? (
@@ -266,8 +288,10 @@ export function SimilarCrossLeagueModal({
                   <button
                     key={league.key}
                     type="button"
-                    className={`btn similar-league-btn${league.isCurrent ? " is-current" : ""}`}
-                    onClick={() => pickLeague(league.key)}
+                    className={`btn similar-league-btn${league.isCurrent ? " is-current" : ""}${
+                      targetLeague === league.key ? " is-selected" : ""
+                    }`}
+                    onClick={() => setTargetLeague(league.key)}
                   >
                     <span className="similar-league-brand">{league.brand}</span>
                     <span>
@@ -279,6 +303,50 @@ export function SimilarCrossLeagueModal({
                   </button>
                 ))}
               </div>
+
+              <div className="similar-metrics">
+                <div className="similar-metrics-head">
+                  <p className="similar-cross-hint">Quais stats entram no cálculo?</p>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={toggleAllMetrics}>
+                    {allPicked ? "Limpar seleção" : "Todos os stats"}
+                  </button>
+                </div>
+                <div className="similar-metric-groups">
+                  {positionSections.map((section) => {
+                    const labels = section.labels.filter((label) => label !== "Eficiência Defensiva");
+                    if (!labels.length) return null;
+                    return (
+                      <div key={section.title} className={`similar-metric-group tone-${section.tone}`}>
+                        <span className="similar-metric-group-title">{section.title}</span>
+                        <div className="similar-metric-chips">
+                          {labels.map((label) => (
+                            <button
+                              key={label}
+                              type="button"
+                              className={`similar-metric-chip${pickedMetrics.has(label) ? " is-on" : ""}`}
+                              aria-pressed={pickedMetrics.has(label)}
+                              onClick={() => toggleMetric(label)}
+                            >
+                              <i className={`fa-solid ${pickedMetrics.has(label) ? "fa-square-check" : "fa-square"}`} aria-hidden />
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="btn btn-primary similar-calc-btn"
+                disabled={!targetLeague || pickedMetrics.size === 0}
+                onClick={() => targetLeague && computeSimilar(targetLeague)}
+              >
+                {allPicked ? "Calcular com todos os stats" : `Calcular com ${pickedMetrics.size} stats`}
+                <i className="fa-solid fa-circle-chevron-right" aria-hidden />
+              </button>
             </div>
           ) : null}
 
@@ -295,7 +363,7 @@ export function SimilarCrossLeagueModal({
           {step === "error" ? (
             <div className="similar-cross-error">
               <p>{errorMessage}</p>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setStep("pick-league")}>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setStep("config")}>
                 Voltar
               </button>
             </div>
@@ -309,9 +377,11 @@ export function SimilarCrossLeagueModal({
                   {targetLeague === "estaduais"
                     ? "Estaduais"
                     : LEAGUES.find((l) => l.id === targetLeague)?.name}
+                  {" · "}
+                  {allPicked ? "todos os stats" : `${pickedMetrics.size} stats`}
                 </span>
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setStep("pick-league")}>
-                  Trocar competição
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setStep("config")}>
+                  Ajustar busca
                 </button>
               </div>
               <SimilarResultsList matches={matches} target={targetLeague} family={family} onClose={onClose} />

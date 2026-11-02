@@ -3332,6 +3332,107 @@
   opacity: 0.75;
 }
 
+.similar-league-btn.is-selected {
+  border-color: var(--accent, #1be7ff);
+  background: rgba(27, 231, 255, 0.16);
+  box-shadow: 0 0 0 1px rgba(27, 231, 255, 0.35);
+}
+
+.similar-metrics {
+  margin-top: 1rem;
+}
+
+.similar-metrics-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+
+.similar-metrics-head .similar-cross-hint {
+  margin: 0;
+}
+
+.similar-metric-groups {
+  display: grid;
+  gap: 0.55rem;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.similar-metric-group.tone-defensivos { --tone: #0f766e; }
+.similar-metric-group.tone-aereo { --tone: #0369a1; }
+.similar-metric-group.tone-passes { --tone: #1d4ed8; }
+.similar-metric-group.tone-dribles { --tone: #6d28d9; }
+.similar-metric-group.tone-finais { --tone: #a21caf; }
+.similar-metric-group.tone-ofensividade { --tone: #c2410c; }
+.similar-metric-group.tone-finalizacao { --tone: #be123c; }
+
+.similar-metric-group-title {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tone, var(--muted));
+}
+
+.similar-metric-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.similar-metric-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(13, 27, 42, 0.4);
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.similar-metric-chip i {
+  font-size: 0.7rem;
+  opacity: 0.55;
+}
+
+.similar-metric-chip:hover {
+  border-color: rgba(27, 231, 255, 0.4);
+}
+
+.similar-metric-chip.is-on {
+  border-color: rgba(27, 231, 255, 0.55);
+  background: rgba(27, 231, 255, 0.12);
+  color: var(--text);
+}
+
+.similar-metric-chip.is-on i {
+  color: var(--accent, #1be7ff);
+  opacity: 1;
+}
+
+.similar-calc-btn {
+  width: 100%;
+  margin-top: 0.9rem;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.similar-calc-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .similar-results-head {
   display: flex;
   align-items: center;
