@@ -32,6 +32,7 @@ export function buildScatterChartView(
     href: href(`/posicao/${family}?atleta=${player.player_id}`),
     x: scatterAxis(player, xKey).value,
     y: scatterAxis(player, yKey).value,
+    minutes: player.minutes,
   }));
   const avgX = points.reduce((sum, point) => sum + point.x, 0) / (points.length || 1);
   const avgY = points.reduce((sum, point) => sum + point.y, 0) / (points.length || 1);

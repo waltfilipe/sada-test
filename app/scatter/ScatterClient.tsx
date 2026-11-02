@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AthleteSlot } from "@/components/compare/AthleteSlot";
+import { ClubLogo } from "@/components/ClubLogo";
+import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { MetricAxisPicker } from "@/components/scatter/MetricAxisPicker";
 import { ScatterSavedChartsBar } from "@/components/scatter/ScatterSavedChartsBar";
 import { ScatterPlot, type ScatterHighlight } from "@/components/scatter/ScatterPlot";
@@ -22,10 +23,167 @@ import {
   writeSavedScatterCharts,
   type SavedScatterChart,
 } from "@/lib/scatterSavedCharts";
+import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Metric = { key: string; label: string };
 type Tone = ScatterHighlight["tone"];
+
+function normName(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase();
+}
+
+function shortLabel(label: string): string {
+  const base = label.split("/")[0]?.trim() ?? label;
+  return base.length > 24 ? `${base.slice(0, 22)}…` : base;
+}
+
+function deltaText(value: number, avg: number): string {
+  const d = value - avg;
+  const formatted = Math.abs(d).toLocaleString("pt-BR", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  return d >= 0 ? `+${formatted}` : `−${formatted}`;
+}
+
+function ShapeMark({ tone }: { tone: Tone }) {
+  return (
+    <svg viewBox="0 0 14 14" className={`sc-shape sc-shape-${tone}`} aria-hidden>
+      {tone === "b" ? (
+        <circle cx="7" cy="7" r="5.4" />
+      ) : tone === "c" ? (
+        <rect x="1.8" y="1.8" width="10.4" height="10.4" rx="1.6" />
+      ) : (
+        <rect x="2.6" y="2.6" width="8.8" height="8.8" transform="rotate(45 7 7)" />
+      )}
+    </svg>
+  );
+}
+
+type SlotCardProps = {
+  tone: Tone;
+  ordinal: string;
+  player: PlayerProfile | null;
+  dossierHref?: string;
+  xShort: string;
+  yShort: string;
+  xVal?: number;
+  yVal?: number;
+  outOfFilter?: boolean;
+  avgX: number;
+  avgY: number;
+  options: PlayerProfile[];
+  onPick: (id: string) => void;
+  onClear: () => void;
+};
+
+function ScatterSlotCard({ tone, ordinal, player, dossierHref, xShort, yShort, xVal, yVal, outOfFilter, avgX, avgY, options, onPick, onClear }: SlotCardProps) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const results = useMemo(() => {
+    const q = normName(query.trim());
+    const pool = q
+      ? options.filter((p) => normName(`${p.name} ${p.club}`).includes(q))
+      : options;
+    return pool.slice(0, 8);
+  }, [options, query]);
+
+  useEffect(() => {
+    if (player) {
+      setOpen(false);
+      setQuery("");
+    }
+  }, [player]);
+
+  if (!player) {
+    return (
+      <div className={`sc-card sc-card-empty side-${tone}`}>
+        {open ? (
+          <div className="sc-search">
+            <input
+              autoFocus
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") setOpen(false);
+              }}
+              placeholder="Buscar atleta ou clube…"
+              aria-label={`Buscar ${ordinal} atleta`}
+            />
+            <ul className="sc-search-results">
+              {results.map((option) => (
+                <li key={option.player_id}>
+                  <button type="button" onClick={() => onPick(option.player_id)}>
+                    <span>{option.name}</span>
+                    <em>{option.club}</em>
+                  </button>
+                </li>
+              ))}
+              {!results.length ? <li className="sc-search-none">Nenhum atleta</li> : null}
+            </ul>
+          </div>
+        ) : (
+          <button type="button" className="sc-add" onClick={() => setOpen(true)}>
+            <i className="fa-solid fa-plus" aria-hidden /> Adicionar {ordinal} atleta
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={`sc-card side-${tone}`}>
+      <ShapeMark tone={tone} />
+      {dossierHref ? (
+        <Link href={dossierHref} className="sc-card-photo" aria-label={`Abrir dossiê de ${player.name}`}>
+          {player.transfermarkt?.photo ? (
+            <PlayerPhoto src={player.transfermarkt.photo} alt="" />
+          ) : (
+            <span className="sc-card-initials">{playerInitials(player.name)}</span>
+          )}
+        </Link>
+      ) : (
+        <span className="sc-card-photo">
+          {player.transfermarkt?.photo ? (
+            <PlayerPhoto src={player.transfermarkt.photo} alt="" />
+          ) : (
+            <span className="sc-card-initials">{playerInitials(player.name)}</span>
+          )}
+        </span>
+      )}
+      <div className="sc-card-body">
+        <strong>{player.name}</strong>
+        <span className="sc-card-meta">
+          <ClubLogo club={player.display_club ?? player.club} size={13} />
+          {player.display_club ?? player.club} · {player.position}
+        </span>
+        {outOfFilter ? (
+          <span className="sc-card-values">
+            <span>Abaixo do filtro de minutos</span>
+          </span>
+        ) : (
+          <span className="sc-card-values">
+            <span>
+              <b>{xVal != null ? formatMetric(xVal) : "—"}</b> {xShort}
+              <em>{xVal != null ? deltaText(xVal, avgX) : ""}</em>
+            </span>
+            <span>
+              <b>{yVal != null ? formatMetric(yVal) : "—"}</b> {yShort}
+              <em>{yVal != null ? deltaText(yVal, avgY) : ""}</em>
+            </span>
+          </span>
+        )}
+      </div>
+      <button type="button" className="sc-card-remove" onClick={onClear} aria-label={`Remover ${player.name}`}>
+        <i className="fa-solid fa-xmark" aria-hidden />
+      </button>
+    </div>
+  );
+}
 
 type Props = {
   family: PositionFamily;
@@ -59,22 +217,6 @@ function formatMetric(value: number): string {
   });
 }
 
-function quadrantLabel(
-  x: number,
-  y: number,
-  avgX: number,
-  avgY: number,
-  xLabel: string,
-  yLabel: string,
-): string {
-  const highX = x >= avgX;
-  const highY = y >= avgY;
-  if (highX && highY) return `Quadrante Alto em ${xLabel} e ${yLabel}`;
-  if (highY) return `Quadrante Alto em ${yLabel}`;
-  if (highX) return `Quadrante Alto em ${xLabel}`;
-  return `Abaixo da média em ${xLabel} e ${yLabel}`;
-}
-
 export function ScatterClient({
   family,
   players: initialPlayers,
@@ -91,7 +233,7 @@ export function ScatterClient({
   initialX,
   initialY,
 }: Props) {
-  const { href, leagueId } = useLeague();
+  const { href, leagueId, name: leagueName } = useLeague();
   // Static props always carry the current season; in ?temporada=YYYY the family
   // roster is fetched client-side and the a=/b=/c= ids are re-resolved against it.
   const { players, season, isCurrentSeason, seasonLoading, archiveFailed, retry } =
@@ -164,7 +306,7 @@ export function ScatterClient({
     return axisMetrics.find((metric) => metric.key !== defaultX)?.key ?? defaultY;
   });
   const [savedCharts, setSavedCharts] = useState<SavedScatterChart[]>([]);
-  const [minMinutes, setMinMinutes] = useState(0);
+  const [minMinutes, setMinMinutes] = useState(0); // minutos absolutos (ex.: 450 min)
   const [useProjection, setUseProjection] = useState(false);
 
   useEffect(() => {
@@ -186,8 +328,13 @@ export function ScatterClient({
     return rows;
   }, [idA, idB, idC, players]);
 
+  const maxMinutes = useMemo(
+    () => Math.max(90, ...players.map((player) => player.minutes)),
+    [players],
+  );
+
   const visiblePlayers = useMemo(
-    () => players.filter((player) => (player.minutes_pct ?? 0) >= minMinutes),
+    () => players.filter((player) => player.minutes >= minMinutes),
     [players, minMinutes],
   );
 
@@ -214,6 +361,7 @@ export function ScatterClient({
           href: href(`/posicao/${family}?atleta=${player.player_id}`),
           x: scatterAxis(source, xKey).value,
           y: scatterAxis(source, yKey).value,
+          minutes: player.minutes,
         };
       }),
     [visiblePlayers, projectionById, xKey, yKey, href, family],
@@ -231,6 +379,17 @@ export function ScatterClient({
   const xLabel = scatterAxisLabel(players, xKey);
   const yLabel = scatterAxisLabel(players, yKey);
   const highlights = selected.map((slot) => ({ id: slot.id, tone: slot.tone }));
+
+  const quickRead = useMemo(() => {
+    const rows = selected
+      .map((slot) => ({ slot, point: points.find((p) => p.player_id === slot.id) }))
+      .filter((row): row is { slot: (typeof selected)[number]; point: (typeof points)[number] } => Boolean(row.point));
+    if (!rows.length) return null;
+    const topX = rows.reduce((best, row) => (row.point.x > best.point.x ? row : best));
+    const topY = rows.reduce((best, row) => (row.point.y > best.point.y ? row : best));
+    const aboveBoth = rows.filter((row) => row.point.x >= avgX && row.point.y >= avgY);
+    return { topX, topY, aboveBoth };
+  }, [selected, points, avgX, avgY]);
 
   const swapAxes = () => {
     setXKey(yKey);
@@ -341,6 +500,21 @@ export function ScatterClient({
       <ScoutTopbar active="scatter" subnav={positionTabs} />
 
       <main className="scatter-canvas">
+        <div className="scatter-context">
+          <h1>
+            {familyMeta.label} <i aria-hidden>|</i> {leagueName} {season}
+          </h1>
+          <div className="scatter-context-chips">
+            <span className="sc-chip">Temporada {season}</span>
+            <span className="sc-chip">{leagueName}</span>
+            <span className="sc-chip">{familyMeta.label}</span>
+            <span className="sc-chip is-count">
+              {visiblePlayers.length} de {players.length} atletas
+            </span>
+            {minMinutes > 0 ? <span className="sc-chip">Mín. {minMinutes} min</span> : null}
+          </div>
+        </div>
+
         <ScatterSavedChartsBar
           family={family}
           players={players}
@@ -357,43 +531,24 @@ export function ScatterClient({
             <section className="sc-panel scatter-panel scatter-axis-panel">
               <header className="sc-panel-head">
                 <div>
-                  <p className="sc-eyebrow">Configuração</p>
-                  <h2>Eixos do gráfico</h2>
+                  <p className="sc-eyebrow">Filtros</p>
+                  <h2>Pool do gráfico</h2>
                 </div>
-                <p className="sc-note">{players.length} atletas</p>
+                <p className="sc-note">
+                  {visiblePlayers.length} de {players.length}
+                </p>
               </header>
 
-              <MetricAxisPicker
-                axis="x"
-                metrics={axisMetrics}
-                groups={statSectionsForFamily(family)}
-                value={xKey}
-                otherValue={yKey}
-                plottedLabel={xLabel}
-                onChange={setXKey}
-                onSwap={swapAxes}
-              />
-              <MetricAxisPicker
-                axis="y"
-                metrics={axisMetrics}
-                groups={statSectionsForFamily(family)}
-                value={yKey}
-                otherValue={xKey}
-                plottedLabel={yLabel}
-                onChange={setYKey}
-                onSwap={swapAxes}
-              />
-
-              <div className="scatter-controls">
+              <div className="scatter-controls scatter-controls-top">
                 <label className="scatter-minutes">
                   <span>
-                    Minutos mínimos <b>{minMinutes}%</b>
+                    Minutos mínimos <b>{minMinutes} min</b>
                   </span>
                   <input
                     type="range"
                     min={0}
-                    max={90}
-                    step={5}
+                    max={maxMinutes}
+                    step={90}
                     value={minMinutes}
                     onChange={(event) => setMinMinutes(Number(event.target.value))}
                     aria-label="Filtro de minutos mínimos"
@@ -406,7 +561,7 @@ export function ScatterClient({
                   aria-pressed={useProjection}
                 >
                   <i className="fa-solid fa-chart-line" aria-hidden />{" "}
-                  {useProjection ? "Projeção ativa" : "Plotar projeção"}
+                  {useProjection ? "Projeção EB ativa" : "Projetar reservas (EB)"}
                 </button>
                 {useProjection ? (
                   <p className="scatter-proj-note">
@@ -417,74 +572,100 @@ export function ScatterClient({
               </div>
             </section>
 
-            <div className="scatter-slots">
-              <AthleteSlot
-                compact
-                allowEmpty
-                side="a"
-                player={players.find((player) => player.player_id === idA) ?? null}
-                players={optionsFor(idA)}
-                onChange={setIdA}
-              />
-              <AthleteSlot
-                compact
-                allowEmpty
-                side="b"
-                player={players.find((player) => player.player_id === idB) ?? null}
-                players={optionsFor(idB)}
-                onChange={setIdB}
-              />
-              <AthleteSlot
-                compact
-                allowEmpty
-                side="c"
-                player={players.find((player) => player.player_id === idC) ?? null}
-                players={optionsFor(idC)}
-                onChange={setIdC}
-              />
-            </div>
+            <section className="sc-panel scatter-panel scatter-athletes-panel">
+              <header className="sc-panel-head">
+                <div>
+                  <p className="sc-eyebrow">Atletas</p>
+                  <h2>{selected.length} de 3 em destaque</h2>
+                </div>
+              </header>
+              <div className="sc-card-list">
+                {([idA, idB, idC] as const).map((id, index) => {
+                  const tone = TONES[index]!;
+                  const player = players.find((item) => item.player_id === id) ?? null;
+                  const point = id ? points.find((item) => item.player_id === id) : undefined;
+                  const setId = index === 0 ? setIdA : index === 1 ? setIdB : setIdC;
+                  return (
+                    <ScatterSlotCard
+                      key={tone}
+                      tone={tone}
+                      ordinal={`${index + 1}º`}
+                      player={player}
+                      dossierHref={
+                        player ? href(`/posicao/${family}?atleta=${player.player_id}`) : undefined
+                      }
+                      xShort={shortLabel(xLabel)}
+                      yShort={shortLabel(yLabel)}
+                      xVal={point?.x}
+                      yVal={point?.y}
+                      outOfFilter={Boolean(player && !point)}
+                      avgX={avgX}
+                      avgY={avgY}
+                      options={optionsFor(id)}
+                      onPick={setId}
+                      onClear={() => setId("")}
+                    />
+                  );
+                })}
+              </div>
+            </section>
 
-            <div className="scatter-rail-extra">
-              <section className="sc-panel scatter-panel scatter-legend">
+            {quickRead ? (
+              <section className="sc-panel scatter-panel scatter-read">
                 <header className="sc-panel-head">
                   <div>
-                    <p className="sc-eyebrow">Leitura</p>
-                    <h2>Legenda</h2>
+                    <p className="sc-eyebrow">Leitura rápida</p>
                   </div>
                 </header>
-                <ul className="legend-list">
-                  <li>
-                    <i className="lg lg-a" aria-hidden />
-                    <span>Atleta 1</span>
-                  </li>
-                  <li>
-                    <i className="lg lg-b" aria-hidden />
-                    <span>Atleta 2</span>
-                  </li>
-                  <li>
-                    <i className="lg lg-c" aria-hidden />
-                    <span>Atleta 3</span>
-                  </li>
-                  <li>
-                    <i className="lg lg-pool" aria-hidden />
-                    <span>Pool da posição</span>
-                  </li>
-                  <li>
-                    <i className="lg lg-avg" aria-hidden />
-                    <span>Média do grupo</span>
-                  </li>
-                  {useProjection ? (
-                    <li>
-                      <i className="lg lg-proj" aria-hidden />
-                      <span>Projeção EB (amostra curta)</span>
-                    </li>
-                  ) : null}
-                </ul>
+                <p>
+                  <b>{quickRead.topX.slot.player.name}</b> lidera {shortLabel(xLabel)} (
+                  {formatMetric(quickRead.topX.point.x)}) e <b>{quickRead.topY.slot.player.name}</b>{" "}
+                  lidera {shortLabel(yLabel)} ({formatMetric(quickRead.topY.point.y)}) entre os
+                  selecionados.
+                </p>
+                <p>
+                  {quickRead.aboveBoth.length
+                    ? `${quickRead.aboveBoth.map((row) => row.slot.player.name).join(" e ")} acima da média nos dois eixos.`
+                    : "Nenhum selecionado acima da média nos dois eixos."}
+                </p>
               </section>
-            </div>
+            ) : null}
           </aside>
 
           <section className="scatter-map" aria-label="Mapa de dispersão">
+            <div className="scatter-axisbar">
+              <span className="scatter-axisbar-tag">X</span>
+              <MetricAxisPicker
+                bare
+                axis="x"
+                metrics={axisMetrics}
+                groups={statSectionsForFamily(family)}
+                value={xKey}
+                otherValue={yKey}
+                onChange={setXKey}
+                onSwap={swapAxes}
+              />
+              <button
+                type="button"
+                className="axis-swap"
+                onClick={swapAxes}
+                title="Trocar eixos X e Y"
+                aria-label="Trocar eixos X e Y"
+              >
+                ⇄
+              </button>
+              <span className="scatter-axisbar-tag">Y</span>
+              <MetricAxisPicker
+                bare
+                axis="y"
+                metrics={axisMetrics}
+                groups={statSectionsForFamily(family)}
+                value={yKey}
+                otherValue={xKey}
+                onChange={setYKey}
+                onSwap={swapAxes}
+              />
+            </div>
             <ScatterPlot
               points={points}
               avgX={avgX}
@@ -496,35 +677,6 @@ export function ScatterClient({
           </section>
         </div>
 
-        {selected.length > 0 && (
-          <div className="scatter-stats">
-            {selected.map((slot, index) => {
-              const point = points.find((item) => item.player_id === slot.id);
-              if (!point) return null;
-              return (
-                <article key={slot.tone} className={`scatter-stat side-${slot.tone}`}>
-                  <p className="scatter-stat-line">
-                    <span>Atleta {index + 1}</span>{" "}
-                    {quadrantLabel(point.x, point.y, avgX, avgY, xLabel, yLabel)}
-                  </p>
-                  <strong className="scatter-stat-name">{slot.player.name}</strong>
-                  {useProjection && isProjectionEligible(slot.player) ? (
-                    <span className="scatter-proj-tag">projeção EB</span>
-                  ) : null}
-                  <p className="scatter-stat-values">
-                    <span>
-                      {xLabel} <b>{formatMetric(point.x)}</b>
-                    </span>
-                    <span>
-                      {yLabel} <b>{formatMetric(point.y)}</b>
-                    </span>
-                  </p>
-                </article>
-              );
-            })}
-          </div>
-        )}
-
         <section className="scatter-guide">
           <h2>Como ler este gráfico</h2>
           <p>
@@ -534,9 +686,9 @@ export function ScatterClient({
             progressiva e pré-assistências.
           </p>
           <p>
-            Passe o mouse em um ponto para ver o jogador e o clube. Clique para abrir o dossiê. Dá para
-            destacar um, dois ou três atletas ao mesmo tempo; o restante do grupo continua no gráfico, mais
-            discreto. As linhas tracejadas marcam a média.
+            Passe o mouse em um ponto para ver jogador, clube, valores e percentil. Clique para abrir o
+            dossiê. Até três atletas podem ser destacados; cada cartão usa a mesma cor e forma (losango,
+            círculo ou quadrado) do marcador no gráfico. As linhas tracejadas marcam a média do grupo.
           </p>
           <div className="scatter-links">
             <Link href={href(`/comparar/${family}?${compareQuery.toString()}`)}>Comparar atletas</Link>

@@ -506,6 +506,8 @@
 }
 
 .scatter-axis-panel.scatter-panel,
+.scatter-athletes-panel.scatter-panel,
+.scatter-read.scatter-panel,
 .scatter-legend.scatter-panel {
   padding: 0.7rem 0.85rem 0.75rem;
 }
@@ -1439,4 +1441,462 @@
   .scatter-canvas {
     padding: 0.75rem 0.7rem 2.5rem;
   }
+}
+
+/* ── Context bar (proposta de layout) ────────────────────────────────────── */
+
+.scatter-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+}
+
+.scatter-context h1 {
+  margin: 0;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.scatter-context h1 i {
+  font-style: normal;
+  margin: 0 0.35rem;
+  color: var(--text-3);
+}
+
+.scatter-context-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.sc-chip {
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(13, 27, 42, 0.45);
+  font-size: 0.7rem;
+  font-weight: 650;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.sc-chip.is-count {
+  border-color: rgba(34, 211, 238, 0.4);
+  color: #a5f3fc;
+}
+
+/* ── Axis bar inside the chart area ──────────────────────────────────────── */
+
+.scatter-map {
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.scatter-axisbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.scatter-axisbar-tag {
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-3);
+}
+
+.scatter-axisbar .axis-select-wrap {
+  min-width: 13rem;
+  max-width: 17rem;
+}
+
+.scatter-axisbar .axis-select {
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 650;
+  background-color: rgba(8, 16, 28, 0.8);
+}
+
+/* ── Compact athlete cards ───────────────────────────────────────────────── */
+
+.sc-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.sc-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 1.6rem 0.45rem 0.55rem;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--card-accent);
+  background: rgba(13, 27, 42, 0.4);
+}
+
+.sc-card.side-a { --card-accent: var(--side-a); }
+.sc-card.side-b { --card-accent: var(--side-b); }
+.sc-card.side-c { --card-accent: var(--side-c); }
+
+.sc-shape {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  fill: var(--card-accent);
+}
+
+.sc-card-photo {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 46px;
+  flex: 0 0 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  background: #0d1b2a;
+}
+
+.sc-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.sc-card-initials {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-3);
+}
+
+.sc-card-body {
+  min-width: 0;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.sc-card-body > strong {
+  font-size: 0.86rem;
+  font-weight: 750;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sc-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sc-card-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.7rem;
+  margin-top: 0.15rem;
+  font-size: 0.68rem;
+  color: var(--text-3);
+}
+
+.sc-card-values b {
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.sc-card-values em {
+  font-style: normal;
+  margin-left: 0.25rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--card-accent);
+}
+
+.sc-card-remove {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.35rem;
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.sc-card-remove:hover {
+  color: var(--text);
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.sc-card-empty {
+  border-style: dashed;
+  border-left-width: 1px;
+  padding: 0;
+}
+
+.sc-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.6rem 0.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 0.78rem;
+  font-weight: 650;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.sc-add:hover {
+  color: var(--text);
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.sc-search {
+  display: grid;
+  width: 100%;
+}
+
+.sc-search input {
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.sc-search-results {
+  list-style: none;
+  margin: 0;
+  padding: 0.2rem 0;
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+.sc-search-results button {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.38rem 0.65rem;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sc-search-results button:hover {
+  background: rgba(34, 211, 238, 0.1);
+}
+
+.sc-search-results button em {
+  font-style: normal;
+  font-size: 0.66rem;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sc-search-none {
+  padding: 0.4rem 0.65rem;
+  font-size: 0.74rem;
+  color: var(--text-3);
+}
+
+/* ── Quick read panel ────────────────────────────────────────────────────── */
+
+.scatter-read p {
+  margin: 0 0 0.4rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.scatter-read p:last-child {
+  margin-bottom: 0;
+}
+
+.scatter-read b {
+  color: var(--text);
+}
+
+/* ── In-chart elements ───────────────────────────────────────────────────── */
+
+.scatter-quad {
+  fill: var(--text-3);
+  opacity: 0.5;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-family: "TASA Orbiter Variable", system-ui, sans-serif;
+}
+
+.scatter-plot--light .scatter-quad {
+  fill: #64748b;
+  opacity: 0.75;
+}
+
+.scatter-tag {
+  paint-order: stroke;
+  stroke: rgba(8, 13, 20, 0.9);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+}
+
+.scatter-tag-values {
+  font-size: 9.5px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.scatter-tag-line {
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: 0.4;
+}
+
+.scatter-plot--light .scatter-tag {
+  stroke: rgba(255, 255, 255, 0.95);
+}
+
+.scatter-plot-legend {
+  position: absolute;
+  left: calc(88px + 0.6rem);
+  bottom: 0.4rem;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(8, 14, 22, 0.75);
+  font-size: 0.62rem;
+  font-weight: 650;
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+.scatter-plot-legend .lg-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(160, 176, 196, 0.95);
+}
+
+.scatter-plot-legend .lg-line {
+  display: inline-block;
+  width: 14px;
+  border-top: 2px dashed rgba(250, 204, 21, 0.6);
+}
+
+.scatter-outlier-badge {
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.4rem;
+  z-index: 3;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(34, 211, 238, 0.4);
+  background: rgba(8, 20, 28, 0.85);
+  color: #a5f3fc;
+  font-size: 0.64rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scatter-outlier-badge:hover {
+  border-color: #22d3ee;
+}
+
+.scatter-tip-row {
+  font-size: 0.68rem;
+  color: var(--text-2);
+}
+
+.scatter-tip-row b {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.scatter-controls-top {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: none;
+}
+
+/* ── Responsive: rail vira faixa de cards acima do gráfico ────────────────── */
+
+@media (max-width: 1000px) {
+  .scatter-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    height: auto;
+    min-height: calc(100dvh - var(--scatter-chrome, 168px));
+  }
+
+  .scatter-rail {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.25rem;
+  }
+
+  .scatter-rail > * {
+    flex: 0 0 auto;
+    width: min(320px, 82vw);
+  }
+
+  .scatter-athletes-panel .sc-card-list {
+    flex-direction: row;
+  }
+
+  .scatter-athletes-panel .sc-card {
+    min-width: 240px;
+  }
+
+  .scatter-map {
+    min-height: 60dvh;
+  }
+}
+
+a.sc-card-photo {
+  text-decoration: none;
+  color: inherit;
+}
+
+a.sc-card-photo:hover {
+  border-color: var(--card-accent, var(--line-2));
 }

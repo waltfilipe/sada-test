@@ -11,6 +11,8 @@ type Props = {
   value: string;
   otherValue: string;
   plottedLabel?: string;
+  /** Render only the grouped select — for embedding inside the chart. */
+  bare?: boolean;
   onChange: (key: string) => void;
   onSwap: () => void;
 };
@@ -26,6 +28,7 @@ export function MetricAxisPicker({
   value,
   otherValue,
   plottedLabel,
+  bare = false,
   onChange,
   onSwap,
 }: Props) {
@@ -41,6 +44,39 @@ export function MetricAxisPicker({
 
   const extra = metrics.filter((metric) => !groupedKeys.has(metric.key));
 
+  const selectEl = (
+    <label className="axis-select-wrap">
+      <span className="sr-only">{axis === "x" ? "Métrica do eixo X" : "Métrica do eixo Y"}</span>
+      <select
+        className="axis-select"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        aria-label={axis === "x" ? "Métrica do eixo X" : "Métrica do eixo Y"}
+      >
+        {sections.map((section) => (
+          <optgroup key={section.title} label={section.title}>
+            {section.options.map((metric) => (
+              <option key={metric.key} value={metric.key} disabled={metric.key === otherValue}>
+                {metric.label}
+              </option>
+            ))}
+          </optgroup>
+        ))}
+        {extra.length ? (
+          <optgroup label="Outras métricas">
+            {extra.map((metric) => (
+              <option key={metric.key} value={metric.key} disabled={metric.key === otherValue}>
+                {metric.label}
+              </option>
+            ))}
+          </optgroup>
+        ) : null}
+      </select>
+    </label>
+  );
+
+  if (bare) return selectEl;
+
   return (
     <div className={`axis-picker axis-${axis}`}>
       <div className="axis-picker-head">
@@ -53,37 +89,10 @@ export function MetricAxisPicker({
       </div>
       {plottedLabel ? <p className="axis-plotted">No gráfico: {plottedLabel}</p> : null}
 
-      <label className="axis-select-wrap">
-        <span className="sr-only">{axis === "x" ? "Métrica do eixo X" : "Métrica do eixo Y"}</span>
-        <select
-          className="axis-select"
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          aria-label={axis === "x" ? "Métrica do eixo X" : "Métrica do eixo Y"}
-        >
-          {sections.map((section) => (
-            <optgroup key={section.title} label={section.title}>
-              {section.options.map((metric) => (
-                <option key={metric.key} value={metric.key} disabled={metric.key === otherValue}>
-                  {metric.label}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-          {extra.length ? (
-            <optgroup label="Outras métricas">
-              {extra.map((metric) => (
-                <option key={metric.key} value={metric.key} disabled={metric.key === otherValue}>
-                  {metric.label}
-                </option>
-              ))}
-            </optgroup>
-          ) : null}
-        </select>
-      </label>
+      {selectEl}
 
       <p className="axis-select-hint">
-        Selecionado: <strong>{metricLabel(metrics, value)}</strong>
+        Selecionado: <strong>{plottedLabel ?? metricLabel(metrics, value)}</strong>
       </p>
     </div>
   );
