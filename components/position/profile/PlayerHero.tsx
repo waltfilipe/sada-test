@@ -82,34 +82,45 @@ function HeroFact({ label, children }: { label: string; children: React.ReactNod
   );
 }
 
-function MarketCard({
+function contractEndLabel(iso?: string | null): string | null {
+  if (!iso) return null;
+  const [year, month] = iso.split("-").map(Number);
+  if (!year || !month) return null;
+  const label = new Date(year, month - 1, 1).toLocaleDateString("pt-BR", { month: "short", year: "numeric" });
+  return `até ${label.replace(".", "").replace(" de ", "/")}`;
+}
+
+function HeroStat({
   icon,
   label,
   tone,
-  wide,
   tooltip,
-  children,
+  value,
+  foot,
 }: {
   icon: string;
   label: string;
   tone?: "warn" | "danger";
-  wide?: boolean;
   tooltip?: string;
-  children: React.ReactNode;
+  value: React.ReactNode;
+  foot?: React.ReactNode;
 }) {
-  const card = (
-    <div className={`hero-market-card${tone ? ` hero-market-card-${tone}` : ""}${wide ? " hero-market-card-wide" : ""}`}>
-      <span className="hero-market-icon" aria-hidden="true">
-        <i className={`fa-solid ${icon}`} />
+  const cell = (
+    <div className={`hero-stat${tone ? ` hero-stat-${tone}` : ""}`}>
+      <span className="hero-stat-head">
+        <i className={`fa-solid ${icon}`} aria-hidden="true" />
+        <span>{label}</span>
       </span>
-      <span className="hero-market-copy">
-        <span className="hero-market-label">{label}</span>
-        <span className="hero-market-value">{children}</span>
-      </span>
+      <strong className="hero-stat-value tabular">{value}</strong>
+      <span className="hero-stat-foot">{foot}</span>
     </div>
   );
-  if (!tooltip) return card;
-  return <Tooltip content={tooltip}>{card}</Tooltip>;
+  if (!tooltip) return cell;
+  return (
+    <Tooltip content={tooltip} block>
+      {cell}
+    </Tooltip>
+  );
 }
 
 export function PlayerHero({
@@ -245,8 +256,8 @@ export function PlayerHero({
       </div>
 
       <aside className="hero-side" aria-label="Minutos, contrato e ações">
-        <div className="hero-market-trio">
-          <MarketCard
+        <div className="hero-stats" role="group" aria-label="Minutos, valor de mercado e contrato">
+          <HeroStat
             icon="fa-clock"
             label="Minutos"
             tooltip={
@@ -254,42 +265,51 @@ export function PlayerHero({
                 ? `${player.minutes.toLocaleString("pt-BR")} minutos, ${Math.round(player.minutes_pct)}% do líder da temporada.`
                 : "Minutos jogados na temporada."
             }
-          >
-            <span className="hero-market-minutes tabular">
-              <span>{player.minutes.toLocaleString("pt-BR")}</span>
-              {player.minutes_pct != null ? (
-                <span
-                  className="identity-minutes-track identity-minutes-track-wide"
-                  role="img"
-                  aria-label={`${Math.round(player.minutes_pct)}% dos minutos do líder`}
-                >
+            value={player.minutes.toLocaleString("pt-BR")}
+            foot={
+              player.minutes_pct != null ? (
+                <span className="hero-stat-minutes">
                   <span
-                    className="identity-minutes-cover"
-                    style={{ left: `${Math.max(0, Math.min(100, player.minutes_pct))}%` }}
-                  />
+                    className="identity-minutes-track identity-minutes-track-wide"
+                    role="img"
+                    aria-label={`${Math.round(player.minutes_pct)}% dos minutos do líder`}
+                  >
+                    <span
+                      className="identity-minutes-cover"
+                      style={{ left: `${Math.max(0, Math.min(100, player.minutes_pct))}%` }}
+                    />
+                  </span>
+                  <span className="hero-stat-minutes-pct tabular">{Math.round(player.minutes_pct)}%</span>
                 </span>
-              ) : null}
-            </span>
-          </MarketCard>
-          <MarketCard icon="fa-coins" label="Valor de mercado" tooltip="Estimativa de valor no Transfermarkt.">
-            {tm?.market_value ?? "—"}
-          </MarketCard>
-          <MarketCard
+              ) : (
+                "na temporada"
+              )
+            }
+          />
+          <HeroStat
+            icon="fa-coins"
+            label="Valor de mercado"
+            tooltip="Estimativa de valor no Transfermarkt."
+            value={tm?.market_value ?? "—"}
+            foot="Transfermarkt"
+          />
+          <HeroStat
             icon={onLoanFrom ? "fa-right-left" : "fa-file-signature"}
-            label={onLoanFrom ? "Contrato · Empréstimo" : "Contrato"}
+            label={onLoanFrom ? "Empréstimo" : "Contrato"}
             tone={contractTone}
             tooltip={onLoanFrom ? `Emprestado por ${onLoanFrom}. ${contractTooltip}` : contractTooltip}
-          >
-            <span className="hero-contract-value">
-              {months != null ? `${months} ${months === 1 ? "mês" : "meses"}` : "—"}
-              {onLoanFrom ? (
-                <span className="hero-loan-pill">
-                  <ClubLogo club={onLoanFrom} size={14} />
-                  {onLoanFrom}
+            value={months != null ? `${months} ${months === 1 ? "mês" : "meses"}` : "—"}
+            foot={
+              onLoanFrom ? (
+                <span className="hero-stat-loan">
+                  <ClubLogo club={onLoanFrom} size={13} />
+                  <span>de {onLoanFrom}</span>
                 </span>
-              ) : null}
-            </span>
-          </MarketCard>
+              ) : (
+                contractEndLabel(tm?.contract_until) ?? "sem data"
+              )
+            }
+          />
         </div>
 
         <div className="hero-action-grid">

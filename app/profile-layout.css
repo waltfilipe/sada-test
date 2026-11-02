@@ -1916,13 +1916,13 @@
 }
 
 .hero-side {
-  flex: 0 0 560px;
-  width: 560px;
+  flex: 0 1 520px;
+  width: 520px;
   max-width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  min-width: 0;
+  gap: 0.7rem;
+  min-width: 440px;
 }
 
 .hero-side > .tip-wrap {
@@ -1937,67 +1937,146 @@
   align-items: stretch;
 }
 
-.hero-market-trio {
+/* Painel único de contexto: três colunas separadas por divisórias finas.
+   Rótulo com ícone em linha, valor em destaque, rodapé de apoio. */
+.hero-stats {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.18fr) minmax(0, 1fr);
-  gap: 0.45rem;
-  align-items: stretch;
-}
-
-.hero-market-trio .hero-market-card {
-  gap: 0.45rem;
-  padding: 0.5rem 0.6rem 0.5rem 0.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid rgba(147, 197, 253, 0.14);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.01) 100%);
   overflow: hidden;
 }
 
-.hero-market-trio .hero-market-icon {
-  width: 1.6rem;
-  height: 1.6rem;
-  font-size: 0.7rem;
-}
-
-.hero-market-trio .hero-market-copy {
-  flex: 1;
+.hero-stats > .tip-wrap {
+  display: block;
+  width: 100%;
   min-width: 0;
 }
 
-.hero-market-trio .hero-market-label {
-  font-size: 0.56rem;
-  letter-spacing: 0.06em;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.hero-stats > .tip-wrap + .tip-wrap,
+.hero-stats > .hero-stat + .hero-stat {
+  border-left: 1px solid rgba(147, 197, 253, 0.12);
 }
 
-.hero-market-trio .hero-market-value {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.hero-market-trio .hero-market-minutes {
+.hero-stat {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 0.3rem;
-  width: 100%;
-}
-
-.hero-market-trio .identity-minutes-track-wide {
-  height: 4px;
-  margin-top: 0;
-}
-
-.hero-market-trio .tip-wrap {
-  display: flex;
-  width: 100%;
+  gap: 0.28rem;
+  height: 100%;
   min-width: 0;
-  height: 100%;
-}
-
-.hero-market-trio .hero-market-card {
-  width: 100%;
-  height: 100%;
   box-sizing: border-box;
+  padding: 0.65rem 0.85rem 0.7rem;
+}
+
+.hero-stat-head {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
   min-width: 0;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.hero-stat-head > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-stat-head i {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  color: var(--gold);
+  opacity: 0.9;
+}
+
+.hero-stat-value {
+  font-size: 1.22rem;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-stat-foot {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 0.95rem;
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-stat-minutes {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.hero-stat-minutes .identity-minutes-track-wide {
+  flex: 1;
+  height: 5px;
+  margin: 0;
+}
+
+.hero-stat-minutes-pct {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.hero-stat-loan {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  color: #a5a0ff;
+}
+
+.hero-stat-loan > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-stat-warn .hero-stat-value,
+.hero-stat-warn .hero-stat-head i {
+  color: #fed766;
+}
+
+.hero-stat-danger .hero-stat-value,
+.hero-stat-danger .hero-stat-head i {
+  color: #fe6b6a;
+}
+
+.hero-stat-warn::before,
+.hero-stat-danger::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: currentColor;
+}
+
+.hero-stat-warn::before {
+  color: rgba(254, 215, 102, 0.7);
+}
+
+.hero-stat-danger::before {
+  color: rgba(254, 74, 73, 0.75);
 }
 
 .hero-report-cta {
@@ -2012,29 +2091,35 @@
 .hero-report-cta-btn {
   width: 100%;
   justify-content: center;
-  padding: 0.55rem 0.5rem;
+  gap: 0.5rem;
+  padding: 0.62rem 0.75rem;
+  border-radius: 10px !important;
   font-size: 0.8rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: #fcd34d !important;
-  border-color: rgba(252, 211, 77, 0.55) !important;
-  box-shadow: 0 0 14px rgba(252, 211, 77, 0.12);
+  border: 1px solid rgba(252, 211, 77, 0.6) !important;
+  background: linear-gradient(180deg, rgba(252, 211, 77, 0.12) 0%, rgba(252, 211, 77, 0.04) 100%) !important;
+  box-shadow: 0 0 0 1px rgba(252, 211, 77, 0.06), 0 6px 18px rgba(252, 211, 77, 0.08);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
-.hero-report-cta-btn:hover {
-  border-color: rgba(252, 211, 77, 0.9) !important;
-  box-shadow: 0 0 18px rgba(252, 211, 77, 0.25);
+.hero-report-cta-btn:hover,
+.hero-report-cta-btn.active {
+  border-color: rgba(252, 211, 77, 0.95) !important;
+  background: linear-gradient(180deg, rgba(252, 211, 77, 0.2) 0%, rgba(252, 211, 77, 0.07) 100%) !important;
+  box-shadow: 0 0 0 1px rgba(252, 211, 77, 0.12), 0 8px 22px rgba(252, 211, 77, 0.16);
 }
 
 .hero-action-cell .btn:disabled {
-  opacity: 0.42;
+  opacity: 0.38;
   cursor: not-allowed;
 }
 
 .hero-action-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.35rem;
+  gap: 0.4rem;
   align-items: stretch;
   align-self: stretch;
   flex: 0 0 auto;
@@ -2093,16 +2178,23 @@
 }
 
 .hero-action-cell .btn {
-  min-height: 2.05rem;
-  padding: 0.42rem 0.28rem;
-  font-size: 0.7rem;
-  gap: 0.28rem;
+  min-height: 2.2rem;
+  padding: 0.45rem 0.4rem;
+  font-size: 0.74rem;
+  gap: 0.4rem;
   line-height: 1.15;
   white-space: nowrap;
 }
 
 .hero-action-cell .btn i {
   flex-shrink: 0;
+  font-size: 0.72rem;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+.hero-action-cell .btn:disabled i {
+  color: inherit;
 }
 
 .hero-action-cell .shadow-add-menu {
@@ -4768,6 +4860,7 @@
   .hero-side {
     flex: 1 1 100%;
     width: 100%;
+    min-width: 0;
   }
 }
 

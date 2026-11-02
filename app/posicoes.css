@@ -408,12 +408,13 @@
 
 /* Coluna de contexto: meta chapada + ações */
 .zag-v2 .hero-side {
-  flex-basis: 400px;
-  width: 400px;
-  padding: 1.05rem 1.2rem;
+  flex: 0 1 520px;
+  width: 520px;
+  min-width: 440px;
+  padding: 1rem 1.15rem;
   border-left: 1px solid var(--line);
-  gap: 0.55rem;
-  justify-content: space-between;
+  gap: 0.7rem;
+  justify-content: center;
 }
 
 .zag-v2 .hero-market-card,
@@ -453,25 +454,25 @@
 }
 
 .zag-v2 .hero-action-grid {
-  padding-top: 0.7rem;
-  border-top: 1px solid var(--line);
+  padding-top: 0;
+  border-top: 0;
 }
 
 .zag-v2 .hero-action-cell .btn {
   border-color: var(--line-2);
-  background: none;
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.015);
+  border-radius: 8px;
   font-weight: 600;
 }
 
-.zag-v2 .hero-action-cell .btn:hover,
-.zag-v2 .hero-action-group .btn.is-open {
+.zag-v2 .hero-action-cell .btn:hover:not(:disabled),
+.zag-v2 .hero-action-cell .btn.is-open {
   border-color: rgba(27, 231, 255, 0.5);
-  background: rgba(27, 231, 255, 0.06);
+  background: rgba(27, 231, 255, 0.07);
+  color: var(--text);
 }
 
-.zag-v2 .hero-market-card,
-.zag-v2 .player-hero .btn {
+.zag-v2 .hero-market-card {
   border-radius: 6px;
 }
 
@@ -492,6 +493,20 @@
   animation: none;
 }
 
+@media (max-width: 1180px) {
+  .zag-v2 .player-hero {
+    flex-wrap: wrap;
+  }
+
+  .zag-v2 .hero-side {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+}
+
 @media (max-width: 980px) {
   .zag-v2-shell {
     grid-template-columns: 1fr;
@@ -499,13 +514,6 @@
 
   .zag-v2 .position-tabs {
     gap: 1.1rem;
-  }
-
-  .zag-v2 .hero-side {
-    flex-basis: 100%;
-    width: 100%;
-    border-left: 0;
-    border-top: 1px solid var(--line);
   }
 }
 
