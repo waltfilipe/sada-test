@@ -225,6 +225,7 @@ function similarPayload(url: URL) {
   const matches = rankCrossLeagueSimilarity(source, targetPool, {
     limit,
     leagueOf: (p) => leagueByPlayer.get(p),
+    debug: url.searchParams.get("debug") === "1",
   }).map((hit) => ({
     ...hit,
     photo:

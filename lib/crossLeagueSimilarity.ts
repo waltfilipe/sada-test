@@ -20,6 +20,7 @@ export type SimilarPlayerHit = {
   /** Total similarity (0–100), same field as before for API consumers. */
   similarity: number;
   blocks: SimilarBlockScore[];
+  debugInfo?: unknown;
 };
 
 const NEUTRAL_PERCENTILE = 50;
@@ -64,10 +65,12 @@ function parseDisplayNumber(raw?: string | null): number | null {
 }
 
 function parseEffPct(item: AspectItem): number | null {
-  if (item.efficiency_pct != null) return item.efficiency_pct;
+  // efficiency_value is the success RATE ("59%") used for vencidos = vol x rate.
+  // efficiency_pct is the rate's percentile within the league pool — using it
+  // as a rate produces volume x percentile, a meaningless product that makes
+  // dissimilar players look identical.
   const raw = item.efficiency_value?.replace("%", "").trim();
-  if (!raw) return null;
-  return parseDisplayNumber(raw);
+  return raw ? parseDisplayNumber(raw) : null;
 }
 
 /** Successful actions per 90 (certos / vencidos) from dossier cards. */
@@ -356,10 +359,11 @@ function round1(n: number) {
 export function rankCrossLeagueSimilarity(
   source: PlayerProfile,
   targetPool: PlayerProfile[],
-  options: { limit?: number; minMinutes?: number; leagueOf?: (p: PlayerProfile) => LeagueId | undefined } = {},
+  options: { limit?: number; minMinutes?: number; leagueOf?: (p: PlayerProfile) => LeagueId | undefined; debug?: boolean } = {},
 ): SimilarPlayerHit[] {
   const limit = options.limit ?? 5;
   const minMinutes = options.minMinutes ?? 300;
+  const debug = options.debug === true;
   const family = source.position_family;
 
   const sameFamily = targetPool.filter(
@@ -424,6 +428,22 @@ export function rankCrossLeagueSimilarity(
       league: options.leagueOf?.(candidate),
       similarity: round1(total),
       blocks: blockScores,
+      debugInfo: debug
+        ? {
+            featureIds,
+            sourceVec,
+            sourceMask: sourceRaw.mask,
+            candVec,
+            candMask,
+            weights,
+            covered,
+            totalD2,
+            blockDiag: blockRanges.map(({ indices }) => indices.map((i) => globalCov[i]![i]!)),
+            raws: Object.fromEntries(
+              featureIds.map((fid) => [fid, { s: rawCertos(source, fid), c: rawCertos(candidate, fid) }]),
+            ),
+          }
+        : undefined,
     });
   }
 
