@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { SiteLogo } from "@/components/SiteLogo";
 import { useLeagueOptional } from "@/components/LeagueProvider";
-import { getLeague } from "@/lib/leagues";
-import { isBrasileiraoLeague } from "@/lib/seasons";
+import { getLeague, leaguePath, LEAGUES, type LeagueInfo } from "@/lib/leagues";
+import { isBrasileiraoLeague, withSeasonQuery } from "@/lib/seasons";
 
 const NAV_SCOUT = [
   { key: "inicio", path: "/", label: "Início", global: true },
@@ -34,6 +35,31 @@ type Props = {
 
 export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
   const league = useLeagueOptional();
+  const pathname = usePathname() ?? "/";
+  const [leagueMenuOpen, setLeagueMenuOpen] = useState(false);
+  const contextRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!leagueMenuOpen) return;
+    function onDocClick(event: MouseEvent) {
+      if (!contextRef.current?.contains(event.target as Node)) setLeagueMenuOpen(false);
+    }
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") setLeagueMenuOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [leagueMenuOpen]);
+
+  function switchHref(target: LeagueInfo) {
+    const rest = pathname.replace(/^\/[^/]+/, "") || "/";
+    const base = leaguePath(target.id, rest);
+    return isBrasileiraoLeague(target.id) ? withSeasonQuery(base, league?.season ?? "2026") : base;
+  }
 
   function navHref(item: { path: string; global: boolean; anywhere?: boolean }) {
     if (item.global) return item.path;
@@ -67,6 +93,15 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
   const showContext = !hubMode && league != null;
   const contextLogo =
     league != null && isBrasileiraoLeague(league.leagueId) ? leagueInfo?.logo : undefined;
+  // Outras séries da mesma temporada: arquivo só existe para as séries do
+  // Brasileirão A/B/C; na temporada atual valem todas as ligas.
+  const switchOptions = league
+    ? LEAGUES.filter(
+        (item) =>
+          item.id !== league.leagueId &&
+          (league.isCurrentSeason || item.id === "serie-a" || item.id === "serie-b" || item.id === "serie-c"),
+      )
+    : [];
 
   return (
     <div className="scout-topbar-wrap">
@@ -85,6 +120,7 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
 
         {showContext ? (
           <div
+            ref={contextRef}
             className={["topbar-context", league!.isCurrentSeason ? "" : "topbar-context-archive"].filter(Boolean).join(" ")}
             title={
               league!.isCurrentSeason
@@ -106,6 +142,37 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
                 {league!.isCurrentSeason ? `Temporada ${league!.season}` : `Arquivo ${league!.season}`}
               </span>
             </span>
+            {switchOptions.length ? (
+              <button
+                type="button"
+                className="topbar-context-arrow"
+                aria-label="Trocar de série mantendo a temporada"
+                aria-expanded={leagueMenuOpen}
+                onClick={() => setLeagueMenuOpen((open) => !open)}
+              >
+                <i className={`fa-solid fa-chevron-${leagueMenuOpen ? "up" : "down"}`} aria-hidden="true" />
+              </button>
+            ) : null}
+            {leagueMenuOpen ? (
+              <div className="topbar-context-menu" role="menu" aria-label="Outras séries">
+                {switchOptions.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={switchHref(item)}
+                    className="topbar-context-menu-item"
+                    role="menuitem"
+                    onClick={() => setLeagueMenuOpen(false)}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={item.logo} alt="" className="topbar-context-logo" />
+                    <span className="topbar-context-menu-name">{item.name}</span>
+                    <span className="topbar-context-menu-season">
+                      {league!.isCurrentSeason ? league!.season : `Arquivo ${league!.season}`}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
           </div>
         ) : null}
       </header>

@@ -18,6 +18,13 @@ import { TeamStatsBar } from "@/components/shadow/TeamStatsBar";
 import { useShadowTeam } from "@/hooks/useShadowTeam";
 import { buildClubLineup, positionLines, type PositionLine } from "@/lib/clubLineup";
 import { FORMATIONS, fieldSlots, formationById, type FormationSlot } from "@/lib/formations";
+import {
+  clearElencoOverrides,
+  elencoOverrideKey,
+  loadElencoOverrides,
+  saveElencoOverrides,
+  type ElencoOverrides,
+} from "@/lib/elencoOverrides";
 import { LEAGUES, BRASILEIRAO_LEAGUES, isLeagueId, leaguePath, type LeagueId } from "@/lib/leagues";
 import { BRASILEIRAO_SEASONS, CURRENT_SEASON, isBrasileiraoLeague } from "@/lib/seasons";
 import { ESTADUAIS_LEAGUE_IDS } from "@/lib/estaduaisHub";
@@ -93,6 +100,7 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
   const [slotQuery, setSlotQuery] = useState("");
   const [elencoHidden, setElencoHidden] = useState<Set<string>>(() => new Set());
   const [picker, setPicker] = useState<{ slot: FormationSlot; mode: "starter" | "reserve" } | null>(null);
+  const [elencoOverride, setElencoOverride] = useState<ElencoOverrides | null>(null);
 
   const taggedPlayers = useMemo(() => {
     const rows: SquadPlayer[] = [];
@@ -232,6 +240,21 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
     setElencoHidden(new Set());
   }, [activeClubKey]);
 
+  // Overrides manuais do campo automático (elenco e prévios): por quadro,
+  // série, temporada, clube e formação. Trocar de formação zera o override.
+  const overrideKey = activeClubKey
+    ? elencoOverrideKey(
+        viewBoard,
+        isPrevios ? prevLeague : leagueId,
+        isPrevios ? prevSeason : CURRENT_SEASON,
+        activeClubKey,
+        state?.formationId ?? "4-3-3",
+      )
+    : null;
+  useEffect(() => {
+    setElencoOverride(overrideKey ? loadElencoOverrides(overrideKey) : null);
+  }, [overrideKey]);
+
   const visibleClubPlayers = useMemo(
     () => clubPlayers.filter((player) => !elencoHidden.has(player.player_id)),
     [clubPlayers, elencoHidden],
@@ -244,17 +267,26 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
 
   const slotCandidates = useMemo(() => {
     if (!state || !picker) return [];
-    const assignments = boardAssignments(state, board);
-    const squadIds = new Set(boardSquad(state, board));
+    const elencoPicking = mode === "elenco";
+    const assignments = elencoPicking
+      ? { ...(elencoOverride?.assignments ?? clubLineup?.assignments ?? {}) }
+      : boardAssignments(state, board);
+    const reservesOn = elencoPicking
+      ? new Set(Object.values(elencoOverride?.reservesBySlot ?? clubLineup?.reservesBySlot ?? {}).flat())
+      : new Set(boardSquad(state, board));
     const occupantId = assignments[picker.slot.id];
     if (picker.mode === "starter" && occupantId) return [];
     const query = slotQuery.trim().toLowerCase();
     const taken = new Set(
       picker.mode === "starter"
         ? (Object.values(assignments).filter((id): id is string => Boolean(id)))
-        : squadIds,
+        : [
+            ...Object.values(assignments).filter((id): id is string => Boolean(id)),
+            ...reservesOn,
+          ],
     );
-    return pickerPool
+    const candidatePool = elencoPicking ? visibleClubPlayers : pickerPool;
+    return candidatePool
       .filter((player) => {
         if (!picker.slot.families.includes(player.position_family)) return false;
         if (taken.has(player.player_id)) return false;
@@ -264,7 +296,7 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
         return fold(player.name).includes(q) || fold(player.club).includes(q) || fold(leagueName).includes(q);
       })
       .sort((a, b) => b.rating - a.rating);
-  }, [pickerPool, state, picker, slotQuery, board]);
+  }, [pickerPool, visibleClubPlayers, state, picker, slotQuery, board, mode, elencoOverride, clubLineup]);
 
   if (!ready || !state) {
     return (
@@ -286,12 +318,32 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
   const slottedReserveIds = new Set(Object.values(reservesBySlot).flat());
   const looseReserveIds = benchIds.filter((id) => !slottedReserveIds.has(id));
   const emptyAssignments = Object.fromEntries(fieldSlots(formation).map((slot) => [slot.id, null]));
-  const viewAssignments = mode === "elenco" ? (clubLineup?.assignments ?? emptyAssignments) : storedAssignments;
-  const viewReserves = mode === "elenco" ? (clubLineup?.reservesBySlot ?? {}) : reservesBySlot;
+  const elencoBaseAssignments = elencoOverride?.assignments ?? clubLineup?.assignments ?? emptyAssignments;
+  const elencoBaseReserves = elencoOverride?.reservesBySlot ?? clubLineup?.reservesBySlot ?? {};
+  const viewAssignments =
+    mode === "elenco"
+      ? Object.fromEntries(
+          Object.entries(elencoBaseAssignments).map(([slotId, id]) => [
+            slotId,
+            id && elencoHidden.has(id) ? null : id,
+          ]),
+        )
+      : storedAssignments;
+  const viewReserves =
+    mode === "elenco"
+      ? Object.fromEntries(
+          Object.entries(elencoBaseReserves).map(([slotId, ids]) => [
+            slotId,
+            ids.filter((id) => !elencoHidden.has(id)),
+          ]),
+        )
+      : reservesBySlot;
   const viewLoose = mode === "elenco" ? [] : looseReserveIds;
   const lines: PositionLine[] =
     mode === "elenco"
-      ? (clubLineup?.lines ?? [])
+      ? elencoOverride
+        ? positionLines(formation, viewAssignments, viewReserves, viewLoose, lookupById)
+        : (clubLineup?.lines ?? [])
       : positionLines(formation, viewAssignments, viewReserves, viewLoose, lookupById);
   const reserveIds = lines.flatMap((line) => line.entries.filter((entry) => entry.role === "reserva").map((entry) => entry.playerId));
   const reserveLabels = new Map(lines.flatMap((line) => line.entries.filter((entry) => entry.role === "reserva").map((entry) => [entry.playerId, line.label] as const)));
@@ -326,7 +378,88 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
       .map((entry) => ({ player: lookupById.get(entry.playerId), slot: line.label }))
       .filter((item): item is { player: SquadPlayer; slot: string } => Boolean(item.player)),
   );
-  const editable = mode !== "elenco";
+  const editable = true;
+  const usingAutoElenco = mode === "elenco";
+
+  const applyElencoOverride = (produce: (current: ElencoOverrides) => ElencoOverrides) => {
+    if (!overrideKey) return;
+    setElencoOverride((current) => {
+      const base = current ?? {
+        assignments: clubLineup?.assignments ?? emptyAssignments,
+        reservesBySlot: clubLineup?.reservesBySlot ?? {},
+      };
+      const next = produce(base);
+      saveElencoOverrides(overrideKey, next);
+      return next;
+    });
+  };
+
+  const stripFromReserves = (reserves: Record<string, string[]>, playerId: string) => {
+    const next: Record<string, string[]> = {};
+    for (const [slotId, ids] of Object.entries(reserves)) {
+      const kept = ids.filter((id) => id !== playerId);
+      if (kept.length) next[slotId] = kept;
+    }
+    return next;
+  };
+
+  // Espelha dropPlayerOnSlot: slot↔slot troca, banco→slot desloca o titular
+  // para a reserva daquela posição. O limpar volta o atleta ao banco.
+  const elencoDrop = (sourceSlotId: string | null, targetSlotId: string, playerId: string) => {
+    applyElencoOverride((current) => {
+      const assignments = { ...current.assignments };
+      const reservesBySlot = stripFromReserves(current.reservesBySlot, playerId);
+      const occupant = assignments[targetSlotId] ?? null;
+      if (sourceSlotId) {
+        for (const key of Object.keys(assignments)) {
+          if (key !== targetSlotId && assignments[key] === playerId) assignments[key] = null;
+        }
+        assignments[sourceSlotId] = occupant && occupant !== playerId ? occupant : null;
+        assignments[targetSlotId] = playerId;
+      } else {
+        for (const key of Object.keys(assignments)) {
+          if (assignments[key] === playerId) assignments[key] = null;
+        }
+        assignments[targetSlotId] = playerId;
+        if (occupant && occupant !== playerId) {
+          reservesBySlot[targetSlotId] = [...(reservesBySlot[targetSlotId] ?? []), occupant];
+        }
+      }
+      return { assignments, reservesBySlot };
+    });
+  };
+
+  const elencoAssign = (slotId: string, playerId: string | null) => {
+    applyElencoOverride((current) => {
+      const assignments = { ...current.assignments };
+      const reservesBySlot = { ...current.reservesBySlot };
+      const cleared = assignments[slotId] ?? null;
+      assignments[slotId] = playerId;
+      let reserves = reservesBySlot;
+      if (cleared && cleared !== playerId) {
+        reserves = { ...reserves, [slotId]: [...(reserves[slotId] ?? []), cleared] };
+      }
+      if (playerId) {
+        for (const key of Object.keys(assignments)) {
+          if (key !== slotId && assignments[key] === playerId) assignments[key] = null;
+        }
+        reserves = stripFromReserves(reserves, playerId);
+      }
+      return { assignments, reservesBySlot: reserves };
+    });
+  };
+
+  const elencoReserveAdd = (slotId: string, playerId: string) => {
+    applyElencoOverride((current) => {
+      const assignments = { ...current.assignments };
+      for (const key of Object.keys(assignments)) {
+        if (assignments[key] === playerId) assignments[key] = null;
+      }
+      const reservesBySlot = stripFromReserves(current.reservesBySlot, playerId);
+      reservesBySlot[slotId] = [...(reservesBySlot[slotId] ?? []), playerId];
+      return { assignments, reservesBySlot };
+    });
+  };
 
   const excludeCandidates = (() => {
     const query = slotQuery.trim();
@@ -602,6 +735,19 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
             ) : null}
             <div className="shadow-pitch-stage">
               <div className="shadow-stage-pitch">
+                {mode === "elenco" && elencoOverride ? (
+                  <button
+                    type="button"
+                    className="shadow-pitch-reset"
+                    title="Volta à escalação automática por minutos"
+                    onClick={() => {
+                      if (overrideKey) clearElencoOverrides(overrideKey);
+                      setElencoOverride(null);
+                    }}
+                  >
+                    <i className="fa-solid fa-rotate-left" aria-hidden="true" /> Por minutos
+                  </button>
+                ) : null}
                 {mode === "elenco" && !selectedClub ? (
                   <p className="shadow-club-prompt">
                     {isPrevios
@@ -638,7 +784,8 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                   }}
                   onAssign={(slotId, playerId) => {
                     if (!editable) return;
-                    assign(slotId, playerId, board);
+                    if (usingAutoElenco) elencoAssign(slotId, playerId);
+                    else assign(slotId, playerId, board);
                     setPlacementPlayerId(null);
                     setDetailPlayerId(null);
                     setPicker(null);
@@ -646,7 +793,8 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                   }}
                   onDrop={(sourceSlotId, targetSlotId, playerId) => {
                     if (!editable) return;
-                    dropOnSlot(sourceSlotId, targetSlotId, playerId, board);
+                    if (usingAutoElenco) elencoDrop(sourceSlotId, targetSlotId, playerId);
+                    else dropOnSlot(sourceSlotId, targetSlotId, playerId, board);
                     setPlacementPlayerId(null);
                     setDetailPlayerId(null);
                     setPicker(null);
@@ -764,8 +912,14 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                           type="button"
                           className="shadow-slot-picker-item"
                           onClick={() => {
-                            if (picker.mode === "reserve") reserve(player.player_id, board, picker.slot.id);
-                            else assign(picker.slot.id, player.player_id, board);
+                            if (picker.mode === "reserve") {
+                              if (usingAutoElenco) elencoReserveAdd(picker.slot.id, player.player_id);
+                              else reserve(player.player_id, board, picker.slot.id);
+                            } else if (usingAutoElenco) {
+                              elencoAssign(picker.slot.id, player.player_id);
+                            } else {
+                              assign(picker.slot.id, player.player_id, board);
+                            }
                             setPicker(null);
                             setSelectedSlotId(picker.slot.id);
                           }}

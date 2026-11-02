@@ -134,6 +134,30 @@ a.shadow-formation-chip {
 
 .shadow-stage-pitch {
   min-width: 0;
+  position: relative;
+}
+
+.shadow-pitch-reset {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  z-index: 45;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(27, 231, 255, 0.35);
+  background: rgba(8, 14, 24, 0.85);
+  color: var(--accent);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.shadow-pitch-reset:hover {
+  border-color: rgba(27, 231, 255, 0.7);
 }
 
 .shadow-club-prompt {
