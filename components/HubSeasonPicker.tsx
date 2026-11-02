@@ -77,7 +77,6 @@ const FEATURES: Feature[] = [
 
 const numberFormat = new Intl.NumberFormat("pt-BR");
 const fmt = (value: number | undefined) => (value == null ? "—" : numberFormat.format(value));
-const fmtRating = (value: number) => value.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 function useCarousel(count: number) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -183,24 +182,19 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
             <span className="hb-stripe hb-stripe-1" aria-hidden />
             <span className="hb-stripe hb-stripe-2" aria-hidden />
             <span className="hb-stripe hb-stripe-3" aria-hidden />
-            <SiteLogo variant="mark" className="hb-hero-watermark" alt="" />
             {heroAthlete ? (
               <Link href={athleteHref("serie-a", heroAthlete)} className="hb-hero-athlete">
                 <PlayerPhoto src={heroAthlete.photo} alt={heroAthlete.name} className="hb-hero-photo" />
                 <span className="hb-hero-caption">
-                  <SiteLogo variant="mark" className="hb-caption-mark" alt="" />
                   <em>Destaque · Série A {season}</em>
                   <strong>{heroAthlete.name}</strong>
-                  <span>
-                    {heroAthlete.club} · nota <b>{fmtRating(heroAthlete.rating)}</b>
-                  </span>
+                  <span>{heroAthlete.club}</span>
                 </span>
               </Link>
             ) : null}
           </div>
 
           <div className="hb-hero-copy">
-            <SiteLogo variant="horizontal" className="hb-hero-lockup" />
             <p className="hx-status">
               <span className="hx-status-dot" aria-hidden />
               {isArchiveHub ? `Arquivo Wyscout · temporada ${season}` : `Temporada ${season} · scout ao vivo`}
@@ -276,7 +270,10 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
                 >
                   <span className="hb-comp-panel" aria-hidden />
                   {athlete && !onlyCurrent ? (
-                    <PlayerPhoto src={athlete.photo} alt="" className="hb-comp-photo" loading="lazy" />
+                    <>
+                      <PlayerPhoto src={athlete.photo} alt="" className="hb-comp-photo" loading="lazy" />
+                      <span className="hb-comp-name">{athlete.name}</span>
+                    </>
                   ) : null}
                   {onlyCurrent ? (
                     <span className="hb-comp-empty" aria-hidden>
@@ -293,9 +290,9 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
                         ? `Sem dados em ${season} · abre ${CURRENT_SEASON}`
                         : `${TIER_LABEL[league.id]} · ${fmt(stats?.players)} atletas`}
                     </em>
-                    {athlete && !onlyCurrent ? (
-                      <small>
-                        {athlete.name} · {fmtRating(athlete.rating)}
+                    {!onlyCurrent ? (
+                      <small className="hb-comp-cta">
+                        Clique para acessar <i className="fa-solid fa-chevron-right" aria-hidden />
                       </small>
                     ) : null}
                   </span>
