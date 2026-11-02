@@ -1,7 +1,8 @@
-"""Reproduce the defensive-efficiency pipeline for a worked example.
+"""Reproduce the defensive-efficiency pipeline (new model) for a worked example.
 
-Prints, for a few zagueiros of Série A 2026: the 8 raw components, each
-component z-score, action_z, cost_z, raw, final z and pool percentile.
+Prints pool moments, shrunk components, winsorized z's, block z's, final z
+and percentile for selected zagueiros of Série A 2026, plus diagnostics
+(component correlation matrix, action/cost correlation, shrinkage alphas).
 """
 from __future__ import annotations
 
@@ -18,12 +19,17 @@ import numpy as np
 from engine.leagues import LEAGUES
 from engine.load_data import load_players_dataframe
 from engine.measures import attach_base_measures
-from engine.sofascore import attach_sofascore_metrics
-from engine.normalize import numeric_col, percentile_rank
+from engine.normalize import numeric_col
 from engine.pool_reference import distribution, reference_pool
+from engine.sofascore import attach_sofascore_metrics
 from engine.positions import (
+    DEF_WINSOR_Z,
+    _capital_errors_p90,
+    _duelos_net_p90,
+    _noventas,
     _num_col,
     _pool_z,
+    _shrink_count_rate,
     _ss_clearance_col,
     _ss_inter_col,
     attach_aspect_percentiles,
@@ -42,32 +48,57 @@ reference_index = computed.attrs.get("reference_index")
 with reference_pool(reference_index):
     pool = attach_aspect_percentiles(computed)
 
-    # --- rebuild intermediate values INSIDE the reference context --------
-    dd = _num_col(pool, "DuelosDef")
-    pct_w = _num_col(pool, "%DuelosDefW")
-    comps = pd.DataFrame(
+    n90 = _noventas(pool)
+    act_raw = pd.DataFrame(
         {
-            "duelos_venc": dd * pct_w,
-            "intercept": _ss_inter_col(pool),
-            "rebatidas": _ss_clearance_col(pool),
-            "bloqueios": _num_col(pool, "outfielder_block_p90"),
-            "duelos_perd": dd * (1 - pct_w),
-            "faltas": _num_col(pool, "Faltas/90"),
-            "erro_chute": _num_col(pool, "error_lead_to_a_shot_p90"),
-            "erro_gol": _num_col(pool, "error_lead_to_a_goal_p90"),
+            "saldo_duelos": _duelos_net_p90(pool, n90),
+            "intercept": _shrink_count_rate(_ss_inter_col(pool), n90),
+            "rebatidas": _shrink_count_rate(_ss_clearance_col(pool), n90),
+            "bloqueios": _shrink_count_rate(_num_col(pool, "outfielder_block_p90"), n90),
         }
     )
-    zcomps = comps.apply(_pool_z)
-    action_z = zcomps[["duelos_venc", "intercept", "rebatidas", "bloqueios"]].mean(axis=1)
-    cost_z = zcomps[["duelos_perd", "faltas", "erro_chute", "erro_gol"]].mean(axis=1)
-    raw_score = action_z - cost_z
+    cst_raw = pd.DataFrame(
+        {
+            "faltas": _shrink_count_rate(_num_col(pool, "Faltas/90"), n90),
+            "erros_cap": _shrink_count_rate(_capital_errors_p90(pool), n90),
+        }
+    )
+    z_act = act_raw.apply(_pool_z).clip(-DEF_WINSOR_Z, DEF_WINSOR_Z)
+    z_cst = cst_raw.apply(_pool_z).clip(-DEF_WINSOR_Z, DEF_WINSOR_Z)
+    a_std = _pool_z(z_act.mean(axis=1))
+    c_std = _pool_z(z_cst.mean(axis=1))
+    raw2 = a_std - c_std
+    mu = float(distribution(raw2).mean())
+    sigma = float(distribution(raw2).std(ddof=0))
 
-    moments = {}
-    for col in comps.columns:
-        sample = distribution(comps[col])
-        moments[col] = (float(sample.mean()), float(sample.std(ddof=0)))
-    mu = float(distribution(raw_score).mean())
-    sigma = float(distribution(raw_score).std(ddof=0))
+    # shrinkage diagnostics: effective alpha per component
+    def alpha_of(rate):
+        count = rate * n90
+        rc, rn = distribution(count), distribution(n90)
+        mu_ = rc.sum() / rn.sum()
+        var_obs = distribution(rate).var(ddof=0)
+        samp = float((mu_ / rn.replace(0, np.nan)).mean())
+        vt = var_obs - (0 if np.isnan(samp) else samp)
+        return mu_, (np.inf if vt <= 1e-8 else mu_ / vt)
+
+    print("=== SHRINKAGE (mu pool, alpha em noventas) ===")
+    for name, rate in [
+        ("intercept", _ss_inter_col(pool)),
+        ("rebatidas", _ss_clearance_col(pool)),
+        ("bloqueios", _num_col(pool, "outfielder_block_p90")),
+        ("faltas", _num_col(pool, "Faltas/90")),
+        ("erros_cap", _capital_errors_p90(pool)),
+        ("duelos_D", _num_col(pool, "DuelosDef")),
+    ]:
+        m, a = alpha_of(rate.astype(float))
+        print(f"{name:12s} mu={m:7.4f} alpha={a:8.2f}")
+
+    print("\n=== CORR componentes z (amostra qualificada) ===")
+    zall = pd.concat([z_act, z_cst], axis=1)
+    print(zall.corr().round(2).to_string())
+    print(f"\ncorr(action_std, cost_std) = {a_std.corr(c_std):.3f}")
+    print(f"pool={len(pool)} qualificados={int(pool.index.isin(reference_index).sum())}")
+    print(f"raw2 mu={mu:.4f} sigma={sigma:.4f}")
 
 out = pd.concat(
     [
@@ -76,47 +107,33 @@ out = pd.concat(
                 "nome": pool["Jogador"],
                 "clube": pool["Equipe"],
                 "min": pool["Minutos jogados:"],
-                "qualificado": pool.index.isin(reference_index),
+                "qual": pool.index.isin(reference_index),
             }
         ),
-        comps,
-        zcomps.add_prefix("z_"),
+        act_raw,
+        cst_raw,
+        z_act.add_prefix("z_"),
+        z_cst.add_prefix("z_"),
         pd.DataFrame(
             {
-                "action_z": action_z,
-                "cost_z": cost_z,
-                "raw": raw_score,
-                "z_stored": pool["_def_eff_z"],
-                "z_check": (raw_score - mu) / sigma,
+                "a_std": a_std,
+                "c_std": c_std,
+                "raw": raw2,
+                "z": pool["_def_eff_z"],
                 "pct": pool["_asp_custo_def_eff"],
-                "erros_totais": numeric_col(pool, "ss_def_error_total"),
-                "pct_erros_inv": pool["_asp_error_def_inv"],
+                "err_tot": numeric_col(pool, "ss_def_error_total"),
             }
         ),
     ],
     axis=1,
-).sort_values("z_stored", ascending=False)
+).sort_values("z", ascending=False)
 
-qualified = out[out["qualificado"]]
-pick_names = [
-    qualified.iloc[0]["nome"],
-    out.iloc[0]["nome"],
-    out.iloc[len(out) // 2]["nome"],
-    out.iloc[-1]["nome"],
-]
-print("=== POOL MOMENTS (amostra qualificada) ===")
-for col, (m, s) in moments.items():
-    print(f"{col:14s} mu={m:8.4f} sigma={s:8.4f}")
-print(f"raw_score   mu={mu:.4f} sigma={sigma:.4f}")
-print(f"pool={len(pool)} qualificados={int(out['qualificado'].sum())}")
-print("\n=== EXEMPLOS ===")
-pd.set_option("display.width", 300)
+picks = ["Igor Rabello", "Jonathan", "Luan Peres", "Lucas Monzón"]
+print("\n=== EXEMPLOS (novo modelo) ===")
+pd.set_option("display.width", 320)
 pd.set_option("display.max_columns", 60)
-cols = ["nome", "clube", "min", "qualificado", "duelos_venc", "intercept", "rebatidas",
-        "bloqueios", "duelos_perd", "faltas", "erro_chute", "erro_gol",
-        "z_duelos_venc", "z_intercept", "z_rebatidas", "z_bloqueios",
-        "z_duelos_perd", "z_faltas", "z_erro_chute", "z_erro_gol",
-        "action_z", "cost_z", "raw", "z_stored", "z_check", "pct",
-        "erros_totais", "pct_erros_inv"]
-sel = out[out["nome"].isin(pick_names)][cols]
+sel = out[out["nome"].isin(picks)]
 print(sel.to_string(index=False))
+print("\n=== TOP/BOTTOM 5 z ===")
+print(out[["nome", "min", "qual", "z", "pct"]].head(5).to_string(index=False))
+print(out[["nome", "min", "qual", "z", "pct"]].tail(5).to_string(index=False))

@@ -255,16 +255,21 @@ CONF_MINUTES_P75_CUTOFF = 75.0
 CONF_MINUTES_FLOOR = 0.70
 CONF_MINUTES_EXP = 0.25
 
-# Defensive efficiency: shrink percentile toward median when sample is thin
-DEF_SAMPLE_ACTIONS_LO = 6.5
-DEF_SAMPLE_ACTIONS_HI = 10.0
-DEF_MINUTES_BELOW_P75_EXP = 0.38
-DEF_EFF_SHRINK_MEDIAN = 50.0
+# Defensive efficiency: Gamma–Poisson / Beta–Binomial shrinkage per component,
+# winsorized component z's, blocks re-standardized before the saldo.
+DEF_SHRINK_ALPHA_MIN = 2.0
+DEF_SHRINK_ALPHA_CAP = 90.0
+DEF_DUEL_KAPPA_MIN = 2.0
+DEF_DUEL_KAPPA_CAP = 120.0
+DEF_WINSOR_Z = 3.0
 
-# Explicit error cost (p90): shot vs goal. Tuned so weighted errors ≈15% of the
-# mean defensive cost numerator for zagueiros in the BR26 pool.
+# Capital errors (p90), shot-equivalent weights: goal = 4x shot.
 DEF_ERROR_WEIGHT_SHOT = 2.5
 DEF_ERROR_WEIGHT_GOAL = 10.0
+
+# Reference sample: share of the league leader's minutes AND an absolute
+# floor, so a low-minute leader cannot qualify tiny samples.
+MIN_ABS_MINUTES = 450
 
 
 def _gol_minus_xg(out: pd.DataFrame) -> pd.Series:
@@ -275,8 +280,12 @@ def _gol_minus_xg(out: pd.DataFrame) -> pd.Series:
     return gols - xg
 
 
-def _error_cost_p90(pool: pd.DataFrame) -> pd.Series:
-    """Weighted error rate per 90 — enters defensive cost numerator."""
+def _capital_errors_p90(pool: pd.DataFrame) -> pd.Series:
+    """Capital defensive errors per 90, shot-equivalent (goal = 4x shot).
+
+    Rare events modelled as a single component so two nearly-constant
+    columns do not each take 25% of the cost block.
+    """
     shot = numeric_col(pool, "error_lead_to_a_shot_p90")
     goal = numeric_col(pool, "error_lead_to_a_goal_p90")
     if (shot + goal).sum() == 0:
@@ -604,23 +613,6 @@ def _apply_confidence_to_rating(rating: float, minutes_pool_pct: float) -> float
     return ZAG_SHRINK_MU + (float(rating) - ZAG_SHRINK_MU) * conf
 
 
-def _def_eff_minutes_weight(minutes_pool_pct: pd.Series) -> pd.Series:
-    """1.0 above P75; ramps down aggressively below."""
-    pct = pd.to_numeric(minutes_pool_pct, errors="coerce").fillna(0).clip(0, 100)
-    w = pd.Series(1.0, index=pct.index)
-    below = pct <= CONF_MINUTES_P75_CUTOFF
-    w.loc[below] = (pct.loc[below] / CONF_MINUTES_P75_CUTOFF).pow(DEF_MINUTES_BELOW_P75_EXP)
-    return w
-
-
-def _def_eff_sample_weight(acoes_p90: pd.Series, minutes_pool_pct: pd.Series) -> pd.Series:
-    """Trust in def-efficiency estimate: enough actions/90 and pool minutes ≥ P75."""
-    acoes = pd.to_numeric(acoes_p90, errors="coerce").fillna(0)
-    span = max(DEF_SAMPLE_ACTIONS_HI - DEF_SAMPLE_ACTIONS_LO, 0.1)
-    w_act = ((acoes - DEF_SAMPLE_ACTIONS_LO) / span).clip(0, 1).pow(0.75)
-    return w_act * _def_eff_minutes_weight(minutes_pool_pct)
-
-
 def _apply_badge_bonus(pct: float, eff_pct: Any) -> float:
     badge = _accuracy_badge(eff_pct)
     if not badge:
@@ -916,8 +908,9 @@ def compute_family_metrics(
     """Position metrics. The site publishes every outfield player.
 
     Percentiles and archetypes stay fitted on the qualified sample (more than
-    20% of the league leader's minutes), so a short appearance does not move
-    the players who were already in that sample.
+    20% of the league leader's minutes AND at least 450 absolute minutes, so
+    a low-minute leader cannot qualify tiny samples). The 450-minute floor
+    falls back to the share rule alone when it would leave too few players.
     """
     family = POSITION_FAMILIES[family_key]
     pool = _eligible_pool(df, family["positions"], min_pct=None if publish_all else QUALIFIED_MIN_PCT)
@@ -927,8 +920,14 @@ def compute_family_metrics(
     # Keep player ids as index values so the reference sample can be selected,
     # but drop the index name: pandas refuses merges when "player_id" is both.
     pool.index.name = None
-    qualified = pool["%Minutos"] > QUALIFIED_MIN_PCT if publish_all else pd.Series(True, index=pool.index)
-    if int(qualified.sum()) < MIN_REFERENCE_PLAYERS:
+    if publish_all:
+        share_rule = pool["%Minutos"] > QUALIFIED_MIN_PCT
+        qualified = share_rule & (numeric_col(pool, "Minutos jogados:") >= MIN_ABS_MINUTES)
+        if int(qualified.sum()) < MIN_REFERENCE_PLAYERS:
+            qualified = share_rule
+        if int(qualified.sum()) < MIN_REFERENCE_PLAYERS:
+            qualified = pd.Series(True, index=pool.index)
+    else:
         qualified = pd.Series(True, index=pool.index)
 
     def _dispatch() -> pd.DataFrame:
@@ -991,27 +990,6 @@ def _acoes_def_bem_sucedidas(pool: pd.DataFrame) -> pd.Series:
     return inter + clear + dd_won + block
 
 
-def _def_cost_numerator_p90(pool: pd.DataFrame) -> pd.Series:
-    """Defensive cost rate per 90 (duelos perdidos + faltas ajustadas + erros ponderados)."""
-    beta = 0.45
-    dd = pool["DuelosDef"].astype(float)
-    pct_w = pool["%DuelosDefW"].astype(float)
-    faltas = numeric_col(pool, "Faltas/90")
-    dd_perd = dd * (1 - pct_w)
-    return dd_perd + np.maximum(0, faltas - beta * dd_perd) + _error_cost_p90(pool)
-
-
-def _custo_def_ajustado(pool: pd.DataFrame) -> pd.Series:
-    """Adjusted defensive cost: lower is better (β=0.45 overlap correction)."""
-    num_adj = _def_cost_numerator_p90(pool)
-    if "_acoes_def_comp" in pool.columns:
-        den = pool["_acoes_def_comp"].astype(float)
-    else:
-        den = _acoes_def_bem_sucedidas(pool)
-    den = den.replace(0, np.nan)
-    return (num_adj / den).fillna(num_adj)
-
-
 def _num_col(pool: pd.DataFrame, name: str) -> pd.Series:
     if name not in pool.columns:
         return pd.Series(0.0, index=pool.index)
@@ -1029,33 +1007,109 @@ def _pool_z(values: pd.Series) -> pd.Series:
     return (values - mu) / sigma
 
 
-def _def_efficiency_z_scores(pool: pd.DataFrame) -> tuple[pd.Series, float, float]:
-    """Equal-weight component z-scores, then a pool z-score of actions minus cost.
+def _noventas(pool: pd.DataFrame) -> pd.Series:
+    """Exposure in 90-minute units."""
+    return _num_col(pool, "Minutos jogados:") / 90.0
 
-    Actions: duelos defensivos vencidos, interceptações, rebatidas, chutes bloqueados.
-    Cost: duelos defensivos perdidos, faltas, erro para chute, erro para gol.
+
+def _shrink_count_rate(rate_p90: pd.Series, noventas: pd.Series) -> pd.Series:
+    """Gamma–Poisson shrinkage of a per-90 count rate toward the pool rate.
+
+    r_adj = (count + alpha * mu_ref) / (n + alpha). The prior strength alpha
+    (in noventas) comes from the method of moments on the reference sample:
+    var_true = var_obs - mu * mean(1/n), alpha = mu / var_true. Tiny samples
+    collapse to the qualified mean; heavy starters barely move.
     """
-    dd = _num_col(pool, "DuelosDef")
-    pct_w = _num_col(pool, "%DuelosDefW")
-    action_z = pd.concat(
-        [
-            _pool_z(dd * pct_w),
-            _pool_z(_ss_inter_col(pool)),
-            _pool_z(_ss_clearance_col(pool)),
-            _pool_z(_num_col(pool, "outfielder_block_p90")),
-        ],
-        axis=1,
-    ).mean(axis=1)
-    cost_z = pd.concat(
-        [
-            _pool_z(dd * (1 - pct_w)),
-            _pool_z(_num_col(pool, "Faltas/90")),
-            _pool_z(_num_col(pool, "error_lead_to_a_shot_p90")),
-            _pool_z(_num_col(pool, "error_lead_to_a_goal_p90")),
-        ],
-        axis=1,
-    ).mean(axis=1)
-    raw = action_z - cost_z
+    rate = rate_p90.astype(float)
+    count = rate * noventas
+    ref_count = distribution(count)
+    ref_n = distribution(noventas)
+    n_sum = float(ref_n.sum())
+    if n_sum <= 0 or len(ref_n) < 2:
+        return rate
+    mu = float(ref_count.sum()) / n_sum
+    var_obs = float(distribution(rate).var(ddof=0))
+    sampling_var = float((mu / ref_n.replace(0, np.nan)).mean())
+    var_true = var_obs - (0.0 if np.isnan(sampling_var) else sampling_var)
+    if var_true <= 1e-8:
+        alpha = DEF_SHRINK_ALPHA_CAP
+    else:
+        alpha = float(np.clip(mu / var_true, DEF_SHRINK_ALPHA_MIN, DEF_SHRINK_ALPHA_CAP))
+    return (count + alpha * mu) / (noventas + alpha)
+
+
+def _duelos_net_p90(pool: pd.DataFrame, noventas: pd.Series) -> pd.Series:
+    """Net defensive duels won per 90: D/90 * (2p - 1), shrunk piecewise.
+
+    Duel volume gets Gamma–Poisson shrinkage; the win share gets
+    Beta–Binomial shrinkage (prior = pooled win share of the reference
+    sample, kappa = prior duels). Replaces the old double counting of
+    duels won (action) plus duels lost (cost) built from the same (D, p).
+    """
+    d_p90 = _num_col(pool, "DuelosDef")
+    p = _num_col(pool, "%DuelosDefW")
+    d_tot = d_p90 * noventas
+    won = d_tot * p
+    d_adj = _shrink_count_rate(d_p90, noventas)
+
+    ref_won = distribution(won)
+    ref_d = distribution(d_tot)
+    d_sum = float(ref_d.sum())
+    if d_sum <= 0 or len(ref_d) < 2:
+        return d_adj * (2.0 * p - 1.0)
+    p0 = float(ref_won.sum()) / d_sum
+    var_obs = float(distribution(p).var(ddof=0))
+    sampling_var = float((p0 * (1 - p0) / ref_d.replace(0, np.nan)).mean())
+    var_true = var_obs - (0.0 if np.isnan(sampling_var) else sampling_var)
+    if var_true <= 1e-8:
+        kappa = DEF_DUEL_KAPPA_CAP
+    else:
+        kappa = float(
+            np.clip(p0 * (1 - p0) / var_true - 1.0, DEF_DUEL_KAPPA_MIN, DEF_DUEL_KAPPA_CAP)
+        )
+    p_adj = (won + kappa * p0) / (d_tot + kappa)
+    return d_adj * (2.0 * p_adj - 1.0)
+
+
+def _def_efficiency_z_scores(pool: pd.DataFrame) -> tuple[pd.Series, float, float]:
+    """Component shrinkage + winsorized z's; blocks re-standardized apart.
+
+    Action block (mean of winsorized component z's): net duels won,
+    interceptions, clearances, blocked shots — each rate Gamma–Poisson
+    shrunk toward the qualified pool (duels get piecewise shrinkage of
+    volume and win share).
+    Cost block: fouls, capital errors (shot = 2.5, goal = 10 shot-equiv).
+
+    Each block is re-standardized on its own so the noisier side cannot
+    dominate the saldo; the saldo is then standardized once more. Component
+    z's are winsorized at +-3 so one rare event cannot carry the metric.
+    """
+    n90 = _noventas(pool)
+    action_z = (
+        pd.concat(
+            [
+                _pool_z(_duelos_net_p90(pool, n90)),
+                _pool_z(_shrink_count_rate(_ss_inter_col(pool), n90)),
+                _pool_z(_shrink_count_rate(_ss_clearance_col(pool), n90)),
+                _pool_z(_shrink_count_rate(_num_col(pool, "outfielder_block_p90"), n90)),
+            ],
+            axis=1,
+        )
+        .clip(-DEF_WINSOR_Z, DEF_WINSOR_Z)
+        .mean(axis=1)
+    )
+    cost_z = (
+        pd.concat(
+            [
+                _pool_z(_shrink_count_rate(_num_col(pool, "Faltas/90"), n90)),
+                _pool_z(_shrink_count_rate(_capital_errors_p90(pool), n90)),
+            ],
+            axis=1,
+        )
+        .clip(-DEF_WINSOR_Z, DEF_WINSOR_Z)
+        .mean(axis=1)
+    )
+    raw = _pool_z(action_z) - _pool_z(cost_z)
     sample = distribution(raw)
     mu = float(sample.mean())
     sigma = float(sample.std(ddof=0))
@@ -1084,7 +1138,6 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     long_res = percentile_rank(_residualize_on(out, long_certos, prog_certos), ascending=True)
 
     out["_acoes_def_comp"] = _acoes_def_bem_sucedidas(out)
-    out["_custo_def_raw"] = _custo_def_ajustado(out)
     if "_minutes_pool_pct" not in out.columns:
         out["_minutes_pool_pct"] = _minutes_pool_pct(out)
     def_z, def_mu, _def_sigma = _def_efficiency_z_scores(out)

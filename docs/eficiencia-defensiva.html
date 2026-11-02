@@ -67,19 +67,19 @@
 <h2>2. Pool de referência (em quem a régua é calibrada)</h2>
 <p>Todos os z-scores e percentis são relativos a um <b>pool de posição</b> (ex.: todos os zagueiros da Série A 2026) e a uma <b>amostra qualificada</b> dentro dele:</p>
 <ul>
-  <li><b>Critério de qualificação:</b> <code>%Minutos &gt; 0.20</code> — o atleta precisa ter mais de 20% dos minutos do líder de minutos da liga. <code>%Minutos = minutos do atleta ÷ minutos do líder</code>.</li>
-  <li><b>Mínimo de amostra:</b> se menos de 8 atletas se qualificam, o pool inteiro vira referência (<code>MIN_REFERENCE_PLAYERS = 8</code>).</li>
+  <li><b>Critério de qualificação:</b> <code>%Minutos &gt; 0.20</code> <b>e</b> <code>Minutos ≥ 450</code> — mais de 20% dos minutos do líder <b>e</b> um piso absoluto, para que um líder de minutagem atípica não qualifique amostras mínimas. <code>%Minutos = minutos do atleta ÷ minutos do líder</code>.</li>
+  <li><b>Mínimo de amostra:</b> se o piso de 450 min deixar menos de 8 qualificados, volta-se à regra só de 20%; se ainda assim forem menos de 8, o pool inteiro vira referência.</li>
   <li><b>Efeito:</b> médias e desvios são estimados <b>só nos qualificados</b>, mas <b>todos</b> os jogadores recebem nota — quem tem poucos minutos é medido na régua dos titulares, sem influenciá-la.</li>
   <li><b>Escopo:</b> o cálculo é refeito <b>separadamente por posição, por liga e por temporada</b>. Um z-score "+1,0" na Série A não é comparável a "+1,0" na Série C — são réguas diferentes.</li>
 </ul>
 <p class="small">Exemplo real: Série A 2026 tem 114 zagueiros no pool; 73 estão acima da linha de 20% dos minutos do líder e formam a amostra de calibração.</p>
 
 <h2>3. Dicionário das métricas fonte</h2>
-<p>Oito componentes por 90 minutos — quatro de <b>ação</b> e quatro de <b>custo</b>. Provedores: <span class="tag t-wy">WYSCOUT</span> <span class="tag t-ss">SOFASCORE</span> <span class="tag t-eng">DERIVADO</span></p>
+<p>Seis componentes por 90 minutos — quatro de <b>ação</b> e dois de <b>custo</b> — todos passados por <b>encolhimento bayesiano</b> antes do z-score (ver §4). Provedores: <span class="tag t-wy">WYSCOUT</span> <span class="tag t-ss">SOFASCORE</span> <span class="tag t-eng">DERIVADO</span></p>
 <h3>3.1 Componentes de ação (quanto maior, melhor)</h3>
 <table>
   <tr><th>Componente</th><th>Fórmula / coluna</th><th>Fonte</th><th>O que mede</th></tr>
-  <tr><td><b>Duelos defensivos vencidos</b></td><td><code>DuelosDef × %DuelosDefW</code><br><span class="small">"Duelos defensivos/90" × "% ganhos"/100</span></td><td><span class="tag t-eng">DERIVADO</span> de <span class="tag t-wy">WYSCOUT</span></td><td>Volume de duelos defensivos (disputas por bola, divididas, carrinhos contestados) em que o atleta saiu vencedor, por 90 min.</td></tr>
+  <tr><td><b>Saldo de duelos defensivos</b></td><td><code>D_adj × (2·p_adj − 1)</code><br><span class="small">D = "Duelos defensivos/90"; p = "% ganhos"/100; volume e % encolhidos separadamente</span></td><td><span class="tag t-eng">DERIVADO</span> de <span class="tag t-wy">WYSCOUT</span></td><td>Duelos vencidos <b>menos</b> perdidos, por 90 min. Substitui os antigos "vencidos" (ação) + "perdidos" (custo), que contavam o mesmo evento duas vezes.</td></tr>
   <tr><td><b>Interceptações</b></td><td><code>interception_won_p90</code><br><span class="small">fallback: "Interseções/90"</span></td><td><span class="tag t-ss">SOFASCORE</span></td><td>Passes do adversário cortados por leitura/antecipação, por 90 min.</td></tr>
   <tr><td><b>Rebatidas (cortes)</b></td><td><code>total_clearance_p90</code><br><span class="small">fallback: "Cortes/90"</span></td><td><span class="tag t-ss">SOFASCORE</span></td><td>Bolas afastadas da zona de perigo, por 90 min.</td></tr>
   <tr><td><b>Chutes bloqueados</b></td><td><code>outfielder_block_p90</code></td><td><span class="tag t-ss">SOFASCORE</span></td><td>Finalizações adversárias bloqueadas pelo atleta, por 90 min.</td></tr>
@@ -87,80 +87,72 @@
 <h3>3.2 Componentes de custo (quanto maior, pior)</h3>
 <table>
   <tr><th>Componente</th><th>Fórmula / coluna</th><th>Fonte</th><th>O que mede</th></tr>
-  <tr><td><b>Duelos defensivos perdidos</b></td><td><code>DuelosDef × (1 − %DuelosDefW)</code></td><td><span class="tag t-eng">DERIVADO</span> de <span class="tag t-wy">WYSCOUT</span></td><td>Volume de duelos defensivos perdidos, por 90 min.</td></tr>
-  <tr><td><b>Faltas cometidas</b></td><td><code>Faltas/90</code></td><td><span class="tag t-wy">WYSCOUT</span></td><td>Faltas cometidas por 90 min, <b>sem</b> correção de contexto (ver §8).</td></tr>
-  <tr><td><b>Erro que leva a chute</b></td><td><code>error_lead_to_a_shot_p90</code></td><td><span class="tag t-ss">SOFASCORE</span></td><td>Erros individuais que resultaram em finalização adversária, por 90 min.</td></tr>
-  <tr><td><b>Erro que leva a gol</b></td><td><code>error_lead_to_a_goal_p90</code></td><td><span class="tag t-ss">SOFASCORE</span></td><td>Erros individuais que resultaram em gol adversário, por 90 min.</td></tr>
+  <tr><td><b>Faltas cometidas</b></td><td><code>Faltas/90</code></td><td><span class="tag t-wy">WYSCOUT</span></td><td>Faltas cometidas por 90 min.</td></tr>
+  <tr><td><b>Erros capitais</b></td><td><code>2,5 × erro p/ chute + 10 × erro p/ gol</code><br><span class="small">error_lead_to_a_shot_p90, error_lead_to_a_goal_p90; gol vale 4× chute</span></td><td><span class="tag t-ss">SOFASCORE</span></td><td>Eventos raros fundidos num único componente ponderado — antes eram duas colunas quase constantes pesando 50% do custo.</td></tr>
 </table>
-<p class="small">Observação: as quatro ações também alimentam, como percentis de volume individuais, o card irmão "Ações Defensivas". Na Eficiência elas entram padronizadas e combinadas com o custo.</p>
+<p class="small">Observação: as ações de volume (duelos vencidos, interceptações, rebatidas, bloqueios) também alimentam o card irmão "Ações Defensivas" como percentis individuais <b>não encolhidos</b> — lá é cartão de volume, não de eficiência.</p>
 
 <h2>4. O algoritmo, passo a passo</h2>
 <div class="formula">
-<b>Passo 1 — z-score de cada componente</b> (contra a amostra qualificada):<br>
-&nbsp;&nbsp;z_i = (x_i − μ_ref,i) / σ_ref,i &nbsp;&nbsp;&nbsp; <span class="small">se σ ≈ 0 → z = 0</span><br><br>
-<b>Passo 2 — médias simples (peso igual) dos dois blocos:</b><br>
-&nbsp;&nbsp;action_z = (z_duelos_venc + z_intercept + z_rebatidas + z_bloqueios) / 4<br>
-&nbsp;&nbsp;cost_z&nbsp;&nbsp;&nbsp; = (z_duelos_perd + z_faltas + z_erro_chute + z_erro_gol) / 4<br><br>
-<b>Passo 3 — saldo:</b><br>
-&nbsp;&nbsp;raw = action_z − cost_z<br><br>
-<b>Passo 4 — re-padronização do saldo</b> (segunda camada, contra a amostra qualificada):<br>
-&nbsp;&nbsp;z_final = (raw − μ_ref(raw)) / σ_ref(raw)<br><br>
-<b>Passo 5 — percentil:</b><br>
-&nbsp;&nbsp;percentil = posto de z_final na escala da amostra qualificada, 0–100 (valores fora da amostra são fixados nos extremos)
+<b>Passo 1 — encolhimento bayesiano de cada taxa</b> (contra ruído de amostra pequena):<br>
+&nbsp;&nbsp;contagens (interceptações, rebatidas, bloqueios, faltas, erros capitais):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<b>r_adj = (eventos + α·μ_ref) / (noventas + α)</b> &nbsp;&nbsp;<span class="small">Gamma–Poisson</span><br>
+&nbsp;&nbsp;α (força do prior, em noventas) vem do método dos momentos na amostra<br>
+&nbsp;&nbsp;qualificada: α = μ / (var_observada − μ·E[1/n]), limitado a [2, 90].<br><br>
+&nbsp;&nbsp;duelos — duas peças encolhidas separadamente:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;volume D/90 → mesmo Gamma–Poisson;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;% vitória p → <b>Beta–Binomial</b>: p_adj = (vencidos + κ·p_ref)/(duelos + κ),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;κ = prior em duelos estimado por momentos, limitado a [2, 120];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;componente final = <b>saldo líquido</b> = D_adj × (2·p_adj − 1) /90.<br><br>
+<b>Passo 2 — z-score de cada componente encolhido</b> (contra a amostra qualificada),<br>
+&nbsp;&nbsp;<b>winsorizado em ±3</b> — um evento raro não carrega a métrica sozinho:<br>
+&nbsp;&nbsp;z_i = clip((r_adj,i − μ_ref,i) / σ_ref,i, −3, +3)<br><br>
+<b>Passo 3 — médias simples dos blocos, cada bloco re-padronizado:</b><br>
+&nbsp;&nbsp;action_z = média(z_saldo_duelos, z_intercept, z_rebatidas, z_bloqueios)<br>
+&nbsp;&nbsp;cost_z&nbsp;&nbsp;&nbsp; = média(z_faltas, z_erros_capitais)<br>
+&nbsp;&nbsp;a* = z(action_z) &nbsp;·&nbsp; c* = z(cost_z) &nbsp;&nbsp;<span class="small">blocos com variâncias diferentes não se dominam</span><br><br>
+<b>Passo 4 — saldo e padronização final:</b><br>
+&nbsp;&nbsp;z_final = z( a* − c* ) = (raw − μ_ref(raw)) / σ_ref(raw)<br><br>
+<b>Passo 5 — percentil:</b> posto de z_final na escala da amostra qualificada, 0–100<br>
+&nbsp;&nbsp;(valores fora da amostra fixados nos extremos)
 </div>
-<p>O resultado é uma <b>"padronização de padronizações"</b>: primeiro cada métrica vira desvios-padrão da média da posição (o que torna comparáveis métricas com escalas muito diferentes — rebatidas ~5/90 vs. erros ~0,05/90); depois o saldo ações−custos é re-padronizado para ter média 0 e desvio 1 no pool. <b>Interpretação:</b> z = +1,0 significa "um desvio-padrão acima do zagueiro típico da liga no saldo defesa−custo".</p>
-<p><b>Por que média simples e não soma?</b> A divisão por 4 mantém action_z e cost_z na mesma escala de um z-score, então a diferença entre eles tem interpretação direta.</p>
+<p><b>Por que encolher antes do z?</b> Com 190 minutos, taxas por 90 são dominadas por ruído Poisson. O encolhimento puxa cada taxa para a média da posição proporcionalmente à falta de evidência — quem tem 2.000 min quase não muda; quem tem 190 min volta para perto da média, em vez de gerar z de ±5σ.</p>
+<p><b>Por que re-padronizar blocos separadamente?</b> σ(action_z) e σ(cost_z) não são iguais — padronizar cada um dá ao saldo pesos implícitos iguais entre os blocos (o saldo final é padronizado mais uma vez para ter σ = 1).</p>
 
 <h2 class="pagebreak">5. Exemplo numérico completo (dados reais — Série A 2026, zagueiros)</h2>
-<p>Momentos da amostra qualificada (73 zagueiros):</p>
+<p>Força do prior estimada por componente (α em noventas) e taxa média da amostra qualificada (73 zagueiros):</p>
 <table>
-  <tr><th>Componente</th><th class="num">μ_ref</th><th class="num">σ_ref</th></tr>
-  <tr><td>Duelos def. vencidos /90</td><td class="num">2,539</td><td class="num">0,686</td></tr>
-  <tr><td>Interceptações /90</td><td class="num">1,065</td><td class="num">0,429</td></tr>
-  <tr><td>Rebatidas /90</td><td class="num">5,242</td><td class="num">1,424</td></tr>
-  <tr><td>Chutes bloqueados /90</td><td class="num">0,800</td><td class="num">0,392</td></tr>
-  <tr><td>Duelos def. perdidos /90</td><td class="num">1,635</td><td class="num">0,496</td></tr>
-  <tr><td>Faltas /90</td><td class="num">0,896</td><td class="num">0,348</td></tr>
-  <tr><td>Erro p/ chute /90</td><td class="num">0,055</td><td class="num">0,063</td></tr>
-  <tr><td>Erro p/ gol /90</td><td class="num">0,018</td><td class="num">0,042</td></tr>
-  <tr><td><b>raw (saldo)</b></td><td class="num">≈ 0</td><td class="num">0,729</td></tr>
+  <tr><th>Componente</th><th class="num">μ_ref /90</th><th class="num">α (noventas)</th><th>Leitura</th></tr>
+  <tr><td>Interceptações</td><td class="num">1,081</td><td class="num">9,8</td><td rowspan="5">α ≈ 3–14 noventas: um jogador com ~300 min carrega ~25% da amostra dele no estimador; com 2.000 min, ~70%.</td></tr>
+  <tr><td>Rebatidas</td><td class="num">5,371</td><td class="num">3,2</td></tr>
+  <tr><td>Chutes bloqueados</td><td class="num">0,796</td><td class="num">8,0</td></tr>
+  <tr><td>Faltas</td><td class="num">0,886</td><td class="num">14,4</td></tr>
+  <tr><td>Erros capitais (eq. chute)</td><td class="num">0,297</td><td class="num">1,7</td></tr>
+  <tr><td>Volume de duelos</td><td class="num">4,148</td><td class="num">6,1</td><td>+ κ da % de vitória (Beta–Binomial)</td></tr>
 </table>
 
 <h3>5.1 Jonathan (Cruzeiro) — 1.816 min, qualificado, topo da escala</h3>
-<table>
-  <tr><th>Bloco</th><th>Componente</th><th class="num">Valor /90</th><th class="num">z_i = (x−μ)/σ</th></tr>
-  <tr><td rowspan="4"><b>Ação</b></td><td>Duelos vencidos</td><td class="num">3,219</td><td class="num pos">+0,990</td></tr>
-  <tr><td>Interceptações</td><td class="num">2,573</td><td class="num pos">+3,521</td></tr>
-  <tr><td>Rebatidas</td><td class="num">5,576</td><td class="num pos">+0,234</td></tr>
-  <tr><td>Bloqueios</td><td class="num">0,643</td><td class="num neg">−0,399</td></tr>
-  <tr><td rowspan="4"><b>Custo</b></td><td>Duelos perdidos</td><td class="num">1,881</td><td class="num neg">+0,496</td></tr>
-  <tr><td>Faltas</td><td class="num">0,940</td><td class="num neg">+0,127</td></tr>
-  <tr><td>Erro p/ chute</td><td class="num">0,000</td><td class="num pos">−0,863</td></tr>
-  <tr><td>Erro p/ gol</td><td class="num">0,000</td><td class="num pos">−0,430</td></tr>
-</table>
 <div class="formula">
-action_z = (0,990 + 3,521 + 0,234 − 0,399) / 4 = <b>+1,086</b><br>
-cost_z&nbsp;&nbsp;&nbsp; = (0,496 + 0,127 − 0,863 − 0,430) / 4 = <b>−0,167</b><br>
-raw&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1,086 − (−0,167) = <b>+1,254</b><br>
-z_final&nbsp;&nbsp; = (1,254 − 0) / 0,729 = <b>+1,72</b> → exibido como "+1,7"<br>
-percentil = <b>100</b> (maior z da escala qualificada) · erros totais = 0 → pct_erros = 100
+a* (bloco ação, re-padronizado) = <b>+1,84</b> · c* (bloco custo) = <b>−0,41</b><br>
+raw = 1,84 − (−0,41) = +2,24 → z_final = +2,24 / 1,35 = <b>+1,66</b> → "+1,7" · percentil <b>98,6</b><br>
+erros totais = 0 → pct_erros = 100 → selo <b>ouro</b>
 </div>
-<p>Leitura: zagueiro elite — produz acima da média (destaque: +3,5σ em interceptações) e custa abaixo dela. Selo <b>ouro</b> (ambos percentis &gt; 90).</p>
+<p>Leitura: zagueiro elite — destaque +3,0σ em interceptações (winsorizado de +3,5) e custo abaixo da média.</p>
 
-<h3>5.2 Luan Peres (Santos) — 2.119 min, qualificado, perfil mediano</h3>
+<h3>5.2 Luan Peres (Santos) — 2.119 min, qualificado, mediano</h3>
 <div class="formula">
-action_z = +0,199 &nbsp;·&nbsp; cost_z = +0,256 &nbsp;·&nbsp; raw = −0,057<br>
-z_final = −0,057 / 0,729 ≈ <b>−0,08</b> → percentil <b>43</b> · erros totais = 2 → pct_erros = 33
+a* = +0,65 · c* = +0,99 · raw = −0,34 → z_final = <b>−0,25</b> → percentil <b>32</b> · erros totais = 2 → pct_erros = 33
 </div>
-<p>Leitura: saldo praticamente neutro; os 2 erros capitais na temporada derrubam o percentil de erros para 33 — e como o selo exige <b>os dois</b> percentis acima de 50, o card fica sem medalha mesmo com z mediano.</p>
+<p>Leitura: saldo levemente abaixo da média, penalizado por 2 erros capitais — sem selo (pct_erros ≤ 50).</p>
 
-<h3>5.3 Casos-limite (o que a métrica faz sem tratamento de amostra)</h3>
+<h3>5.3 O efeito do encolhimento — antes × depois</h3>
 <table>
-  <tr><th>Jogador</th><th class="num">Min</th><th>Qualificado?</th><th class="num">z_final</th><th class="num">Percentil</th><th>Por quê</th></tr>
-  <tr><td>Igor Rabello (Fluminense)</td><td class="num">190</td><td>não</td><td class="num pos">+4,88</td><td class="num">100</td><td>Amostra mínima com taxas irreais: 6,2 duelos vencidos/90 (z +5,3), 2,2 bloqueios/90 (z +3,6), 0 faltas (z −2,6 no custo). z extrapola a escala → fixado em 100.</td></tr>
-  <tr><td>Lucas Monzón (Botafogo)</td><td class="num">527</td><td>não</td><td class="num neg">−5,44</td><td class="num">0</td><td>1 erro p/ chute em 527 min (0,19/90 vs σ 0,063) = z <b>+14,96</b> naquele componente → cost_z +4,0 afunda o saldo inteiro.</td></tr>
+  <tr><th>Jogador</th><th class="num">Min</th><th class="num">z antigo</th><th class="num">z novo</th><th>Por quê</th></tr>
+  <tr><td>Igor Rabello (Fluminense)</td><td class="num">190</td><td class="num pos">+4,88</td><td class="num pos">+1,78</td><td>Taxas encolhidas à média: 6,2 duelos vencidos/90 viram saldo 1,34 (z +1,6); 0 faltas param de zerar o custo. Ainda é bom — mas não mais um outlier impossível.</td></tr>
+  <tr><td>Lucas Monzón (Botafogo)</td><td class="num">527</td><td class="num neg">−5,44</td><td class="num neg">−1,69</td><td>Erros capitais encolhidos + z winsorizado em +3 (era +15). 6 erros p/ chute em 527 min continuam pesando — é ruim de verdade, não catástrofe estatística.</td></tr>
+  <tr><td>Jonathan (Cruzeiro)</td><td class="num">1.816</td><td class="num">+1,72</td><td class="num">+1,66</td><td>Starter: quase nada muda — como deve ser.</td></tr>
 </table>
-<div class="warn"><b>Leitura obrigatória:</b> não há encolhimento por tamanho de amostra no z (o peso <code>_def_eff_sample_weight</code> existe no código mas <b>não é aplicado</b>). Extremos como ±5σ devem ser lidos sempre junto com os minutos — é ruído de amostra pequena, não certeza de nível.</div>
+<div class="ok"><b>Efeito líquido:</b> o range do pool saiu de [−5,4 ; +4,9] para [−3,1 ; +2,2]. Extremos agora refletem evidência, não minutagem.</div>
 
 <h2>6. Produtos derivados no site</h2>
 <table>
@@ -178,40 +170,51 @@ z_final = −0,057 / 0,729 ≈ <b>−0,08</b> → percentil <b>43</b> · erros t
 <h2>7. Convenções e comportamentos de borda</h2>
 <ul>
   <li><b>Sinal:</b> positivo = melhor que a média da posição. O display usa sempre sinal explícito ("+0,6", "−1,2").</li>
-  <li><b>Percentil é da escala qualificada:</b> valores fora da amostra (não-qualificados) são fixados em 0/100 — nunca acima de 100 nem abaixo de 0.</li>
-  <li><b>Distribuição achatada:</b> se algum componente tiver σ ≈ 0 no pool (ex.: liga sem dados SofaScore → erros todos zerados), seu z é 0 para todos — o componente simplesmente sai da conta, não quebra.</li>
-  <li><b>SofaScore ausente:</b> interceptações/rebatidas caem nas colunas Wyscout equivalentes; erros e bloqueios vão a 0 → o custo fica subestimado e a métrica pende para "volume defensivo".</li>
-  <li><b>Idempotentemente relativo:</b> a métrica é puramente comparativa — não existe "eficiência absoluta". O mesmo desempenho rende z diferente em pools diferentes.</li>
+  <li><b>Percentil é da escala qualificada:</b> valores fora da amostra são fixados em 0/100 — mas agora o z encolhido torna raros os extremos artificiais.</li>
+  <li><b>Distribuição achatada:</b> σ ≈ 0 num componente → z = 0 para todos — o componente sai da conta sem quebrar.</li>
+  <li><b>SofaScore ausente:</b> interceptações/rebatidas caem nas colunas Wyscout; erros e bloqueios vão a 0 → custo subestimado.</li>
+  <li><b>Puramente relativo:</b> não existe "eficiência absoluta" — o mesmo desempenho rende z diferente em pools diferentes.</li>
+  <li><b>Encolhimento:</b> quem tem poucos minutos converge para a média da posição — o z dele carrega a incerteza, e a leitura deve ser "provavelmente mediano", não "elite/horrível".</li>
 </ul>
 
 <h2>8. Limitações conhecidas (para interpretação honesta)</h2>
 <ul>
-  <li><b>Sem encolhimento bayesiano:</b> minutos baixos não puxam o z para a média (a função de peso existe, mas está desativada — código morto).</li>
-  <li><b>Faltas sem ajuste de contexto:</b> a versão anterior descontava duelos perdidos sobrepostos (β=0,45); a atual conta <code>Faltas/90</code> cheio — pune duplamente quem falta em duelo.</li>
-  <li><b>Pesos iguais:</b> bloqueios contam tanto quanto duelos vencidos; erro para gol conta tanto quanto falta (na média dos z's — embora sua variância baixa limite o impacto típico, um evento raro gera z enorme, cf. Monzón).</li>
-  <li><b>Dupla contagem parcial:</b> ações bem-sucedidas aparecem também nos cards de volume da mesma seção — a nota da seção não é independente entre blocos.</li>
-  <li><b>_custo_def_ajustado legado:</b> a razão custo÷ações antiga ainda é computada (<code>_custo_def_raw</code>) mas nada a consome.</li>
+  <li><b>Sem ajuste de contexto de equipe:</b> zagueiros de times reativos acumulam rebatidas/bloqueios; não há posse de equipe nos dados para ponderar. É a limitação mais relevante que resta.</li>
+  <li><b>Pesos iguais dentro dos blocos:</b> matriz de correlação dos componentes não mostra pares &gt;0,6 (máx 0,34 em rebatidas×bloqueios), então a média simples é defensável — mas não há ponderação por "valor" (xG evitado/cedido).</li>
+  <li><b>Sem prior do próprio jogador:</b> o prior é a média da posição, não o histórico individual de temporadas anteriores (melhoria futura possível com os dados cross-season já existentes).</li>
+  <li><b>Validação externa pendente:</b> falta split-half (dados agregados por temporada, sem por-partida) e validação preditiva contra resultado de equipe (xGA).</li>
+  <li><b>Dupla contagem parcial com a seção:</b> ações bem-sucedidas aparecem também nos cards de volume — a nota da seção não é independente entre blocos.</li>
 </ul>
 
 <h2>9. Pseudocódigo canônico</h2>
 <pre><span class="c"># por posição, por liga, por temporada</span>
-qualificados = pool[%Minutos &gt; 0.20]            <span class="c"># ≥ 8, senão pool inteiro</span>
-μ_ref, σ_ref = momentos(qualificados)            <span class="c"># por componente</span>
+qualificados = pool[%Minutos &gt; 0.20 <span class="k">e</span> Minutos ≥ 450]   <span class="c"># ≥ 8; senão só %Minutos; senão pool</span>
+
+<span class="k">para cada componente de contagem</span> c (interceptações, rebatidas, bloqueios,
+                                faltas, erros_capitais, volume_duelos):
+    μ_c = Σ eventos / Σ noventas   <span class="c"># nos qualificados</span>
+    α_c = μ_c / (var_obs − μ_c·E[1/n])             <span class="c"># momentos; clip [2, 90]</span>
+    r_adj[c] = (eventos + α_c·μ_c) / (noventas + α_c)
+
+<span class="c"># % de vitória em duelos — Beta–Binomial</span>
+p0 = Σ vencidos / Σ duelos                          <span class="c"># qualificados</span>
+κ  = p0(1−p0)/var_verd − 1                          <span class="c"># momentos; clip [2, 120]</span>
+p_adj = (vencidos + κ·p0) / (duelos + κ)
+saldo_duelos = r_adj[vol_duelos] × (2·p_adj − 1)
 
 <span class="k">para cada jogador</span>:
-    z[i]        = (x[i] − μ_ref[i]) / σ_ref[i]   <span class="c"># i ∈ 8 componentes; σ≈0 → 0</span>
-    action_z    = média(z[duelos_venc, intercept, rebatidas, bloqueios])
-    cost_z      = média(z[duelos_perd, faltas, erro_chute, erro_gol])
-    raw         = action_z − cost_z
-    z_final     = (raw − μ_ref(raw)) / σ_ref(raw)
-    percentil   = posto(z_final) na escala dos qualificados, fixado em [0,100]
-    erros_pct   = percentil_invertido(erros_totais_temporada)
-    selo        = ouro se min(erros_pct, percentil)&gt;90; prata &gt;75; bronze &gt;50; senão nenhum</pre>
+    z[i]      = clip((r_adj[i] − μ_ref,i)/σ_ref,i, −3, +3)
+    a*        = z( média(z[saldo_duelos, intercept, rebatidas, bloqueios]) )
+    c*        = z( média(z[faltas, erros_capitais]) )
+    z_final   = z( a* − c* )
+    percentil = posto(z_final) na escala dos qualificados, fixado em [0,100]
+    erros_pct = percentil_invertido(erros_totais_temporada)
+    selo      = ouro se min(erros_pct, percentil)&gt;90; prata &gt;75; bronze &gt;50</pre>
 
 <h2>10. Mapa do código</h2>
 <table>
   <tr><th>Responsabilidade</th><th>Arquivo : função</th></tr>
-  <tr><td>Núcleo (z de z's)</td><td><code>scripts/engine/positions.py</code> : <code>_def_efficiency_z_scores</code> (~L1032)</td></tr>
+  <tr><td>Núcleo (encolhimento + z de z's)</td><td><code>scripts/engine/positions.py</code> : <code>_def_efficiency_z_scores</code>, <code>_shrink_count_rate</code>, <code>_duelos_net_p90</code>, <code>_capital_errors_p90</code></td></tr>
   <tr><td>Pool de referência</td><td><code>scripts/engine/pool_reference.py</code> : <code>reference_pool</code>, <code>distribution</code></td></tr>
   <tr><td>z-score de componente</td><td><code>positions.py</code> : <code>_pool_z</code> (L1021) · <code>normalize.py</code> : <code>percentile_rank</code> (L61)</td></tr>
   <tr><td>Colunas fonte</td><td><code>measures.py</code> : <code>compute_base_measures</code> (<code>DuelosDef</code>, <code>%DuelosDefW</code>, <code>%Minutos</code>) · <code>positions.py</code> : <code>_ss_inter_col</code>, <code>_ss_clearance_col</code>, <code>_num_col</code></td></tr>
