@@ -57,6 +57,11 @@ function ShareBarClassic({ entry }: { entry: TendencyBarEntry }) {
     : clampPercent((share / scale) * 100);
   const leftLabel = entry.lengthSpectrum ? "Curto" : per90 ? "0" : "0%";
   const rightLabel = entry.lengthSpectrum ? "Longo" : format(scale);
+  const gap = share - avg;
+  const gapText = per90
+    ? `${gap >= 0 ? "+" : ""}${gap.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`
+    : `${gap >= 0 ? "+" : ""}${gap.toLocaleString("pt-BR", { maximumFractionDigits: 0 })} p.p.`;
+  const dotTip = `${item.display_value ?? format(share)} · ${gapText} vs média`;
 
   return (
     <div className={`constr-share-bar${entry.lengthSpectrum ? " is-length" : ""}`}>
@@ -68,10 +73,12 @@ function ShareBarClassic({ entry }: { entry: TendencyBarEntry }) {
         <span className="constr-share-value">{item.display_value ?? format(share)}</span>
       </div>
 
-      <div className="constr-share-track" aria-hidden>
-        <span className="constr-share-rail" />
-        <span className="constr-share-center" style={{ left: `${avgPos}%` }} />
-        <span className="constr-share-dot" style={{ left: `${playerPos}%` }} />
+      <div className="constr-share-track">
+        <span className="constr-share-rail" aria-hidden />
+        <span className="constr-share-center" aria-hidden style={{ left: `${avgPos}%` }} />
+        <Tooltip content={dotTip}>
+          <button type="button" className="constr-share-dot" style={{ left: `${playerPos}%` }} aria-label={dotTip} />
+        </Tooltip>
       </div>
 
       <div className="constr-share-foot">

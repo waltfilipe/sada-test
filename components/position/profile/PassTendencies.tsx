@@ -212,23 +212,6 @@ export function PassTendencies({ player, players }: { player: PlayerProfile; pla
       {open ? (
         <StatWindow title="Tendências de passe" onClose={() => setOpen(false)}>
           <div className="tendency-modal">
-            {reading.verdict ? <p className="tendency-verdict">{reading.verdict}</p> : null}
-
-            {reading.chips.length ? (
-              <ul className="tendency-chip-grid" aria-label="Comparação com a média da posição">
-                {reading.chips.map((entry) => (
-                  <li key={entry.key} className={`tendency-chip tone-${entry.chip.tone}`}>
-                    <span className="tendency-chip-title">{entry.title}</span>
-                    <span className="tendency-chip-values">
-                      <strong>{entry.player}</strong>
-                      <span className="tendency-chip-sep">·</span>
-                      <span>média {entry.pool}</span>
-                    </span>
-                    <span className="tendency-chip-delta">{entry.chip.label}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
 
             {reading.rows.length ? (
               <ConstructionProfileBars entries={reading.rows} embedded />

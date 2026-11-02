@@ -1529,6 +1529,15 @@
   max-height: none;
   align-self: stretch;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.player-hero-photo-frame {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 96px;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid rgba(147, 197, 253, 0.25);
@@ -1544,6 +1553,25 @@
   object-position: center 18%;
   transform: none;
   display: block;
+}
+
+.player-hero-add {
+  flex: 0 0 auto;
+}
+
+.player-hero-add .hero-action-slot,
+.player-hero-add .shadow-add-menu,
+.player-hero-add .shadow-add-trigger {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.player-hero-add .shadow-add-trigger {
+  padding-inline: 0.3rem;
+  font-size: 0.72rem;
 }
 
 .player-hero-photo-fallback {
@@ -1881,7 +1909,6 @@
 .hero-action-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: auto auto;
   gap: 0.35rem;
   align-items: stretch;
   align-self: stretch;
@@ -1889,27 +1916,6 @@
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
-}
-
-.hero-action-compare { grid-column: 1; grid-row: 1; }
-.hero-action-tendencies { grid-column: 2; grid-row: 1; }
-.hero-action-pdf { grid-column: 3; grid-row: 1; }
-.hero-action-transfermarkt { grid-column: 1; grid-row: 2; }
-.hero-action-similar { grid-column: 2; grid-row: 2; }
-.hero-action-add { grid-column: 3; grid-row: 2; }
-
-.hero-action-grid-has-run {
-  grid-template-rows: auto auto auto;
-}
-
-.hero-action-grid-has-run .hero-action-run {
-  grid-column: 3;
-  grid-row: 2;
-}
-
-.hero-action-grid-has-run .hero-action-add {
-  grid-column: 1 / -1;
-  grid-row: 3;
 }
 
 .hero-market-pair .tip-wrap,
@@ -1948,6 +1954,13 @@
 
 .hero-action-cell {
   min-width: 0;
+}
+
+.discipline-btn-nums {
+  margin-left: 0.35rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
 }
 
 .hero-action-cell .hero-action-slot,

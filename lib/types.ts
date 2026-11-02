@@ -209,6 +209,20 @@ export type SeasonMeta = {
   profiles: SeasonMetaProfile[];
 };
 
+export type DisciplineInfo = {
+  fouls_per90: number | null;
+  fouls_total: number | null;
+  yellow_per90: number;
+  yellow_total: number;
+  red_per90: number;
+  red_total: number;
+  pool?: {
+    fouls_per90?: number;
+    yellow_per90?: number;
+    red_per90?: number;
+  };
+};
+
 export type PlayerProfile = PlayerSummary & {
   cross_season?: CrossSeasonProjection;
   /** Clube real do atleta nesta liga quando a linha usa clube-artefato do export (ex.: "Grêmio" na B-2026 → exibe CRB). */
@@ -248,6 +262,7 @@ export type PlayerProfile = PlayerSummary & {
   };
   profiles_available: string[];
   scatter: Record<string, number>;
+  discipline?: DisciplineInfo;
 };
 
 export type SiteMeta = {

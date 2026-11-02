@@ -15,6 +15,7 @@ import { PlayerReportButton } from "@/components/position/profile/PlayerReport";
 import { SimilarCrossLeagueModal } from "@/components/position/profile/SimilarCrossLeagueModal";
 import { PlayerRunModal } from "@/components/position/profile/PlayerRunModal";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
+import { DisciplineTendencies } from "./DisciplineTendencies";
 import { PassTendencies } from "./PassTendencies";
 import { PlayerSeasonSlicer } from "@/components/PlayerSeasonSlicer";
 import { profileAccent } from "@/lib/profileShares";
@@ -151,18 +152,27 @@ export function PlayerHero({
     >
       <div className="player-hero-main">
         <div className="player-hero-photo">
-          <PlayerPhoto
-            src={tm?.photo}
-            alt={player.name}
-            fallback={<span className="player-hero-photo-fallback">{playerInitials(player.name)}</span>}
-          />
+          <div className="player-hero-photo-frame">
+            <PlayerPhoto
+              src={tm?.photo}
+              alt={player.name}
+              fallback={<span className="player-hero-photo-fallback">{playerInitials(player.name)}</span>}
+            />
+          </div>
+          <div className="player-hero-add">
+            <Tooltip content="Adiciona ao elenco ou à lista de observação." block>
+              <span className="hero-action-slot">
+                <AddToShadowMenu playerId={scout.player_id} family={family} />
+              </span>
+            </Tooltip>
+          </div>
         </div>
 
         <div className="player-hero-copy">
           <div className="player-hero-title-wrap">
-            <h2 className="player-hero-name">{player.name}</h2>
-            {seasonSlicer ? (
-              <div className="player-hero-season-row">
+            <div className="player-hero-name-row">
+              <h2 className="player-hero-name">{player.name}</h2>
+              {seasonSlicer ? (
                 <PlayerSeasonSlicer
                   inline
                   active={seasonSlicer.active}
@@ -170,8 +180,8 @@ export function PlayerHero({
                   loading={seasonSlicer.loading}
                   onSelect={seasonSlicer.onSelect}
                 />
-              </div>
-            ) : null}
+              ) : null}
+            </div>
             <p className="player-hero-club">
               <ClubLogo club={displayClub} size={22} />
               <span className="player-hero-club-name">{displayClub}</span>
@@ -281,6 +291,11 @@ export function PlayerHero({
           <div className="hero-action-cell hero-action-tendencies">
             <PassTendencies player={player} players={players} />
           </div>
+          {player.discipline ? (
+            <div className="hero-action-cell hero-action-discipline">
+              <DisciplineTendencies player={player} />
+            </div>
+          ) : null}
           <div className="hero-action-cell hero-action-compare">
             <Tooltip content="Abre o comparador já com este atleta.">
               <Link className="btn btn-ghost btn-sm" href={href(`/comparar/${family}?a=${player.player_id}`)}>
@@ -326,13 +341,6 @@ export function PlayerHero({
               </Tooltip>
             </div>
           ) : null}
-          <div className="hero-action-cell hero-action-add">
-            <Tooltip content="Adiciona ao elenco ou à lista de observação.">
-              <span className="hero-action-slot">
-                <AddToShadowMenu playerId={scout.player_id} family={family} />
-              </span>
-            </Tooltip>
-          </div>
         </div>
       </aside>
 
