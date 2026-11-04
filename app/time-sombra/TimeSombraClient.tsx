@@ -276,7 +276,9 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
       : new Set(boardSquad(state, board));
     const occupantId = assignments[picker.slot.id];
     if (picker.mode === "starter" && occupantId) return [];
-    const query = slotQuery.trim().toLowerCase();
+    const query = fold(slotQuery.trim());
+    // Com texto digitado, a busca varre toda a base do site (todas as séries e posições).
+    const searching = query.length >= 2;
     const taken = new Set(
       picker.mode === "starter"
         ? (Object.values(assignments).filter((id): id is string => Boolean(id)))
@@ -285,18 +287,22 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
             ...reservesOn,
           ],
     );
-    const candidatePool = elencoPicking ? visibleClubPlayers : pickerPool;
-    return candidatePool
+    const families = picker.slot.families;
+    const familyRank = (player: SquadPlayer) => {
+      const index = families.indexOf(player.position_family);
+      return index < 0 ? families.length : index;
+    };
+    const candidatePool = searching ? elencoPool : elencoPicking ? visibleClubPlayers : pickerPool;
+    const matches = candidatePool
       .filter((player) => {
-        if (!picker.slot.families.includes(player.position_family)) return false;
         if (taken.has(player.player_id)) return false;
-        if (!query) return true;
+        if (!searching) return families.includes(player.position_family);
         const leagueName = LEAGUES.find((league) => league.id === player.sourceLeague)?.name ?? "";
-        const q = fold(query);
-        return fold(player.name).includes(q) || fold(player.club).includes(q) || fold(leagueName).includes(q);
+        return fold(player.name).includes(query) || fold(player.club).includes(query) || fold(leagueName).includes(query);
       })
-      .sort((a, b) => b.rating - a.rating);
-  }, [pickerPool, visibleClubPlayers, state, picker, slotQuery, board, mode, elencoOverride, clubLineup]);
+      .sort((a, b) => familyRank(a) - familyRank(b) || b.rating - a.rating);
+    return searching ? matches.slice(0, 120) : matches;
+  }, [pickerPool, visibleClubPlayers, elencoPool, state, picker, slotQuery, board, mode, elencoOverride, clubLineup]);
 
   if (!ready || !state) {
     return (
@@ -867,8 +873,8 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                   className="shadow-slot-search"
                   type="search"
                   value={slotQuery}
-                  placeholder="Buscar, escalar ou remover atleta…"
-                  aria-label="Buscar atleta para escalar ou remover"
+                  placeholder="Buscar em toda a base: nome, clube ou série…"
+                  aria-label="Buscar atleta em toda a base do site"
                   autoFocus
                   onChange={(event) => setSlotQuery(event.target.value)}
                 />
@@ -904,6 +910,11 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                     ))}
                   </ul>
                 ) : null}
+                <p className="shadow-slot-picker-hint">
+                  {slotQuery.trim().length >= 2
+                    ? `${slotCandidates.length >= 120 ? "120+" : slotCandidates.length} resultado(s) em toda a base`
+                    : `Sugestões para ${picker.slot.label} · digite para buscar em toda a base`}
+                </p>
                 {slotCandidates.length ? (
                   <ul className="shadow-slot-picker-list">
                     {slotCandidates.map((player) => (
@@ -940,7 +951,11 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                     ))}
                   </ul>
                 ) : (
-                  <p className="shadow-roster-empty">Nenhum atleta disponível para esta posição.</p>
+                  <p className="shadow-roster-empty">
+                    {slotQuery.trim().length >= 2
+                      ? "Nenhum atleta encontrado na base."
+                      : "Nenhum atleta disponível para esta posição."}
+                  </p>
                 )}
               </article>
             ) : selectedPlayer ? (

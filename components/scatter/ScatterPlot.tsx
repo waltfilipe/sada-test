@@ -62,9 +62,9 @@ function formatAxis(value: number, digits = 1): string {
   });
 }
 
+/** Nome da métrica sem o sufixo "/90" — sempre completo, nunca cortado. */
 function shortLabel(label: string): string {
-  const base = label.split("/")[0]?.trim() ?? label;
-  return base.length > 24 ? `${base.slice(0, 22)}…` : base;
+  return label.split("/")[0]?.trim() || label;
 }
 
 /** Round "nice" ticks: step in {1,2,2.5,5}·10^k covering [lo,hi] with ~5-7 marks. */
@@ -378,11 +378,12 @@ export function ScatterPlot({
   const pool = points.filter((point) => !toneById.has(point.player_id));
   const marked = points.filter((point) => toneById.has(point.player_id));
 
+  // Rótulos nos cantos do gráfico, em duas linhas (X em cima, Y embaixo), com o nome completo.
   const quadrants = [
-    { x: avgLineX + 10, y: plotTop + 30, anchor: "start" as const, text: `↑ ${xShort} · ↑ ${yShort}` },
-    { x: avgLineX - 10, y: plotTop + 30, anchor: "end" as const, text: `↓ ${xShort} · ↑ ${yShort}` },
-    { x: avgLineX + 10, y: plotBottom - 10, anchor: "start" as const, text: `↑ ${xShort} · ↓ ${yShort}` },
-    { x: avgLineX - 10, y: plotBottom - 10, anchor: "end" as const, text: `↓ ${xShort} · ↓ ${yShort}` },
+    { x: plotRight - 12, y: plotTop + 20, anchor: "end" as const, lines: [`↑ ${xShort}`, `↑ ${yShort}`] },
+    { x: plotLeft + 12, y: plotTop + 20, anchor: "start" as const, lines: [`↓ ${xShort}`, `↑ ${yShort}`] },
+    { x: plotRight - 12, y: plotBottom - 26, anchor: "end" as const, lines: [`↑ ${xShort}`, `↓ ${yShort}`] },
+    { x: plotLeft + 12, y: plotBottom - 26, anchor: "start" as const, lines: [`↓ ${xShort}`, `↓ ${yShort}`] },
   ];
 
   return (
@@ -435,9 +436,13 @@ export function ScatterPlot({
         <line x1={avgLineX} y1={plotTop} x2={avgLineX} y2={plotBottom} className="scatter-avg-line" />
         <line x1={plotLeft} y1={avgLineY} x2={plotRight} y2={avgLineY} className="scatter-avg-line" />
 
-        {quadrants.map((q) => (
-          <text key={q.text} x={q.x} y={q.y} textAnchor={q.anchor} className="scatter-quad" aria-hidden>
-            {q.text}
+        {plotRight - plotLeft >= 520 && quadrants.map((q) => (
+          <text key={q.lines.join("|")} x={q.x} y={q.y} textAnchor={q.anchor} className="scatter-quad" aria-hidden>
+            {q.lines.map((line, index) => (
+              <tspan key={line} x={q.x} dy={index ? 14 : 0}>
+                {line}
+              </tspan>
+            ))}
           </text>
         ))}
 

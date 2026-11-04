@@ -2,23 +2,15 @@
 
 import { useMemo } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
-import { GradeBadge } from "@/components/ui/GradeBadge";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { useFamilyGradeLookup } from "@/hooks/useFamilyGradeLookup";
+import { SectionRadar, statProfileScores, type SectionScore } from "@/components/position/profile/PlayerReport";
 import { usePlayerProfile } from "@/hooks/usePlayerProfileCache";
 import { formatFoot } from "@/lib/feet";
-import { sortedProfileShareRows } from "@/lib/profileShares";
-import { statSectionsForFamily } from "@/lib/aspectStatSections";
-import { getPlayerSectionGrade } from "@/lib/sectionGrades";
-import { sectionShortLabel } from "@/lib/sectionLabels";
-import {
-  gradeTier,
-  ratingToLetterGrade,
-  tierVars,
-} from "@/lib/scoutTheme";
-import { positionRating } from "@/lib/scoutUi";
+import { profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
 import type { LeagueId } from "@/lib/leagues";
 import type { PlayerSearchRow } from "@/lib/types";
+
+const numberFormat = new Intl.NumberFormat("pt-BR");
 
 function monthsRemaining(iso?: string | null): string {
   if (!iso) return "—";
@@ -36,27 +28,17 @@ export function formatDominantFoot(foot: string | null | undefined): string {
   return formatFoot(foot) ?? "—";
 }
 
-function CompareColumn({
-  title,
-  player,
-}: {
-  title: string;
-  player: PlayerSearchRow | null;
-}) {
-  const letter = player ? ratingToLetterGrade(player.rating) : null;
+function CompareColumn({ title, player }: { title: string; player: PlayerSearchRow | null }) {
   return (
     <div className="shadow-mini-compare-col">
       <span className="shadow-mini-report-section-label">{title}</span>
       {player ? (
         <>
           <strong className="shadow-mini-compare-name">{player.name}</strong>
-          <span className="shadow-mini-compare-meta">
-            <span className="shadow-mini-letter" style={tierVars(gradeTier(letter ?? "C"))}>
-              {letter}
-            </span>
-            {player.profile}
+          <span className="shadow-mini-compare-meta">{player.profile}</span>
+          <span className="shadow-mini-compare-foot">
+            {numberFormat.format(player.minutes)} min · Pé {formatDominantFoot(player.foot)}
           </span>
-          <span className="shadow-mini-compare-foot">Pé {formatDominantFoot(player.foot)}</span>
         </>
       ) : (
         <span className="shadow-mini-compare-empty">Sem titular nesta vaga</span>
@@ -65,6 +47,7 @@ function CompareColumn({
   );
 }
 
+/** Tooltip do atleta no campinho: infos gerais + radar de perfil e radar estatístico (sem notas/letras). */
 export function ShadowPlayerMiniReport({
   player,
   compareWith,
@@ -79,32 +62,30 @@ export function ShadowPlayerMiniReport({
 }) {
   const league = profileLeague ?? player.sourceLeague;
   const { profile, loading } = usePlayerProfile(player.player_id, true, league);
-  const { lookup: gradeLookup } = useFamilyGradeLookup(player.position_family, true, league);
-
   const tm = player.transfermarkt ?? profile?.transfermarkt;
-  const profileRating = profile ? positionRating(profile) : player.rating;
 
-  const dominant = useMemo(() => {
-    if (profile) {
-      const rows = sortedProfileShareRows(profile);
-      if (rows.length) return rows[0];
-    }
-    return {
-      label: player.cluster?.archetype_label ?? player.profile,
-      rating: profileRating,
-    };
-  }, [profile, player.cluster?.archetype_label, player.profile, profileRating]);
+  const profileScores = useMemo<SectionScore[]>(() => {
+    if (!profile) return [];
+    return sortedProfileShareRows(profile).map((row) => ({
+      title: row.label,
+      tone: row.tone,
+      score: Math.round(row.share),
+      color: profileAccent(row.label),
+      display: `${Math.round(row.share)}%`,
+    }));
+  }, [profile]);
+  const statScores = useMemo(() => (profile ? statProfileScores(profile) : []), [profile]);
 
-  const sectionGrades = useMemo(() => {
-    if (!gradeLookup) return [];
-    return statSectionsForFamily(player.position_family)
-      .map((section) => {
-        const letter = getPlayerSectionGrade(gradeLookup, player.player_id, section.title);
-        if (!letter) return null;
-        return { title: section.title, short: sectionShortLabel(section.title), letter };
-      })
-      .filter((entry): entry is { title: string; short: string; letter: string } => Boolean(entry));
-  }, [gradeLookup, player.player_id, player.position_family]);
+  const birthYear = player.birth_year ?? profile?.birth_year;
+  const height = player.height ?? profile?.height;
+  const facts = [
+    { label: "Minutos", value: numberFormat.format(player.minutes) },
+    { label: "Idade", value: birthYear ? `${new Date().getFullYear() - birthYear} anos` : "—" },
+    { label: "Altura", value: height ? `${(height / 100).toFixed(2).replace(".", ",")} m` : "—" },
+    { label: "Pé", value: formatDominantFoot(player.foot ?? profile?.foot) },
+    { label: "Contrato", value: monthsRemaining(tm?.contract_until) },
+    { label: "Valor", value: tm?.market_value ?? "—" },
+  ];
 
   return (
     <div className="shadow-mini-report">
@@ -113,46 +94,35 @@ export function ShadowPlayerMiniReport({
         <span className="shadow-mini-report-club">
           <ClubLogo club={player.club} size={14} />
           {player.club} · {player.position}
+          {player.profile ? <em> · {player.profile}</em> : null}
         </span>
       </div>
 
-      <div className="shadow-mini-report-hero">
-        <div className="shadow-mini-report-dominant shadow-mini-report-dominant-only">
-          <span className="shadow-mini-report-dominant-rating tabular" style={tierVars(gradeTier(ratingToLetterGrade(profileRating)))}>
-            {ratingToLetterGrade(profileRating)}
-          </span>
-          <span className="shadow-mini-report-profile">{dominant.label}</span>
-        </div>
-      </div>
-
-      {sectionGrades.length > 0 ? (
-        <div className="shadow-mini-report-blocks">
-          <span className="shadow-mini-report-section-label">Blocos de posição</span>
-          <div className="shadow-mini-report-block-grid">
-            {sectionGrades.map((section) => (
-              <div key={section.title} className="shadow-mini-report-block">
-                <GradeBadge letter={section.letter} size="sm" />
-                <span>{section.short}</span>
-              </div>
-            ))}
+      <dl className="shadow-mini-facts">
+        {facts.map((fact) => (
+          <div key={fact.label}>
+            <dt>{fact.label}</dt>
+            <dd>{fact.value}</dd>
           </div>
+        ))}
+      </dl>
+
+      {profileScores.length >= 3 || statScores.length >= 3 ? (
+        <div className="shadow-mini-radars stat-radar-card">
+          {profileScores.length >= 3 ? (
+            <figure>
+              <figcaption className="shadow-mini-report-section-label">Perfil</figcaption>
+              <SectionRadar scores={profileScores} variant="screen" shape="sectors" />
+            </figure>
+          ) : null}
+          {statScores.length >= 3 ? (
+            <figure>
+              <figcaption className="shadow-mini-report-section-label">Perfil estatístico</figcaption>
+              <SectionRadar scores={statScores} variant="screen" />
+            </figure>
+          ) : null}
         </div>
       ) : null}
-
-      <div className="shadow-mini-report-market">
-        <div>
-          <span className="shadow-mini-report-section-label">Pé</span>
-          <strong>{formatDominantFoot(player.foot)}</strong>
-        </div>
-        <div>
-          <span className="shadow-mini-report-section-label">Valor</span>
-          <strong>{tm?.market_value ?? "—"}</strong>
-        </div>
-        <div>
-          <span className="shadow-mini-report-section-label">Contrato</span>
-          <strong>{monthsRemaining(tm?.contract_until)}</strong>
-        </div>
-      </div>
 
       {compareWith !== undefined ? (
         <div className="shadow-mini-compare">
@@ -161,7 +131,7 @@ export function ShadowPlayerMiniReport({
         </div>
       ) : null}
 
-      {loading ? <p className="shadow-mini-report-loading">Carregando perfil…</p> : null}
+      {loading ? <p className="shadow-mini-report-loading">Carregando radares…</p> : null}
     </div>
   );
 }
@@ -181,9 +151,7 @@ export function ShadowPlayerTooltip({
 }) {
   return (
     <Tooltip
-      content={
-        <ShadowPlayerMiniReport player={player} compareWith={compareWith} profileLeague={profileLeague} />
-      }
+      content={<ShadowPlayerMiniReport player={player} compareWith={compareWith} profileLeague={profileLeague} />}
       block={block}
     >
       {children}

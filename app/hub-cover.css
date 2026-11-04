@@ -58,7 +58,7 @@ html:not(.sada-intro-seen) .hb:not(.is-live) > .scout-topbar-wrap {
   opacity: 0;
 }
 
-html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter > span {
+html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter {
   translate: 0 110%;
 }
 
@@ -78,8 +78,8 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter > span {
   animation: hb-hero-in 1.25s var(--hb-ease) 120ms backwards;
 }
 
-.hb.is-live .hb-hero-letter > span,
-.sada-intro-seen .hb .hb-hero-letter > span {
+.hb.is-live .hb-hero-letter,
+.sada-intro-seen .hb .hb-hero-letter {
   animation: hb-letter 1.3s var(--hb-ease) backwards;
   animation-delay: calc(480ms + var(--i) * 95ms);
 }
@@ -551,10 +551,11 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter > span {
 /* ============ 2 · Hero editorial (papel) ============ */
 
 .hb-hero {
-  --paper: #ece8e1;
-  --paper-ink: #0c1117;
-  --paper-mute: #5b6168;
-  --paper-line: rgba(12, 17, 23, 0.14);
+  /* Marca: ciano elétrico #1BE7FF de fundo, blue-black #0D1B2A de tinta. */
+  --paper: var(--hx-accent);
+  --paper-ink: #0d1b2a;
+  --paper-mute: rgba(13, 27, 42, 0.7);
+  --paper-line: rgba(13, 27, 42, 0.22);
   position: relative;
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -562,7 +563,8 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter > span {
   padding: 1.5rem 2.3rem 2.1rem;
   border-radius: 22px;
   background:
-    radial-gradient(900px 500px at 85% 20%, rgba(255, 255, 255, 0.55), transparent 65%),
+    radial-gradient(900px 520px at 82% 18%, rgba(255, 255, 255, 0.32), transparent 62%),
+    radial-gradient(700px 420px at 8% 100%, rgba(13, 27, 42, 0.16), transparent 70%),
     var(--paper);
   color: var(--paper-ink);
   overflow: hidden;
@@ -576,8 +578,8 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter > span {
   inset: 0;
   z-index: -1;
   background-image: var(--hb-noise);
-  opacity: 0.32;
-  mix-blend-mode: multiply;
+  opacity: 0.22;
+  mix-blend-mode: soft-light;
   pointer-events: none;
 }
 
@@ -655,7 +657,7 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter > span {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #12a150;
+  background: var(--paper-ink);
 }
 
 .hb-hero-live::after {
@@ -707,46 +709,43 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter > span {
 
 .hb-hero-badge:hover i,
 .hb-hero-badge:focus-visible i {
-  background: var(--hx-accent);
+  background: #fff;
   color: var(--paper-ink);
   rotate: -45deg;
 }
 
 .hb-hero-word {
-  position: relative;
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   align-self: center;
   justify-self: end;
-  margin: 1.2rem -0.035em 0 0;
-  font-size: clamp(7.5rem, 21.5vw, 16.8rem);
-  font-weight: 800;
-  line-height: 0.8;
-  letter-spacing: -0.07em;
+  width: clamp(300px, 72%, 880px);
+  margin-top: 1.4rem;
+}
+
+.hb-hero-mark {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: var(--paper-ink);
 }
 
 .hb-hero-letter {
-  display: inline-block;
-  overflow: hidden;
-  padding: 0.02em 0.035em 0.06em 0;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: fill 0.3s ease;
 }
 
-.hb-hero-letter > span {
-  display: inline-block;
-  transition: translate 0.45s var(--hb-ease);
-}
-
-.hb-hero-letter:hover > span {
-  translate: 0 -0.07em;
+.hb-hero-letter:hover {
+  fill: #fff;
 }
 
 .hb-hero-icon {
-  position: absolute;
-  top: -0.03em;
-  left: 0.03em;
-  height: 0.15em;
+  height: clamp(30px, 5.2vw, 66px);
   width: auto;
-  filter: invert(1);
-  opacity: 0.9;
+  margin: 0 0 clamp(0.7rem, 1.6vw, 1.3rem) 0.4%;
+  filter: brightness(0) saturate(100%) invert(9%) sepia(24%) saturate(1900%) hue-rotate(178deg) brightness(92%);
 }
 
 .hb-hero-foot {
@@ -1859,15 +1858,9 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter > span {
   }
 
   .hb-hero-word {
-    justify-self: start;
-    margin: 3.2rem 0 0;
-    font-size: 31vw;
-  }
-
-  .hb-hero-icon {
-    top: -0.32em;
-    left: 0.02em;
-    height: 0.2em;
+    justify-self: stretch;
+    width: 100%;
+    margin-top: 2.4rem;
   }
 
   .hb-hero-foot {

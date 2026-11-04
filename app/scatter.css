@@ -11,6 +11,7 @@
 
 .scatter-canvas {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
   width: 100%;
   max-width: none;
@@ -1899,4 +1900,89 @@ a.sc-card-photo {
 
 a.sc-card-photo:hover {
   border-color: var(--card-accent, var(--line-2));
+}
+
+/* Valores do cartão: número · nome completo da métrica (quebra linha) · delta. */
+.sc-card-values {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.sc-card-value {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: 0.35rem;
+}
+
+.sc-card-value small {
+  font-size: 0.66rem;
+  line-height: 1.2;
+  color: var(--text-3);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.sc-card-value em {
+  margin-left: 0;
+  white-space: nowrap;
+}
+
+.scatter-read p {
+  overflow-wrap: break-word;
+}
+
+/* Mobile: painéis em largura total; cartões de atleta rolam na horizontal sem alargar a página. */
+@media (max-width: 820px) {
+  .scatter-rail > * {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .scatter-athletes-panel .sc-card-list {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.3rem;
+  }
+
+  .scatter-athletes-panel .sc-card {
+    flex: 0 0 min(260px, 78vw);
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  /* Legenda óbvia no celular; o selo de escala sobe para o canto do gráfico (não cobre o eixo X). */
+  .scatter-plot-legend {
+    display: none;
+  }
+
+  .scatter-outlier-badge {
+    top: 0.35rem;
+    right: 0.35rem;
+    bottom: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .scatter-axisbar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.4rem;
+    width: 100%;
+  }
+
+  .scatter-axisbar .axis-select-wrap {
+    min-width: 0;
+    max-width: none;
+  }
+
+  /* X [select] ⇄ / Y [select]: o botão de inverter fica na 1ª linha, o eixo Y ocupa a 2ª. */
+  .scatter-axisbar > :nth-child(4) {
+    grid-column: 1;
+  }
+
+  .scatter-axisbar > :nth-child(5) {
+    grid-column: 2 / span 2;
+  }
 }

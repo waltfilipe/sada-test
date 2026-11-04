@@ -369,7 +369,7 @@ type ReportMetric = {
   tone: string;
 };
 
-type SectionScore = {
+export type SectionScore = {
   title: string;
   tone: string;
   score: number;
@@ -603,6 +603,11 @@ export function SectionRadar({
       })}
     </svg>
   );
+}
+
+/** Scores (0–100, média dos percentis por bloco) do radar "Perfil estatístico". */
+export function statProfileScores(player: PlayerProfile): SectionScore[] {
+  return sectionScores(reportSections(player, "pt"));
 }
 
 /** Screen version of the PDF "Perfil estatístico" radar for the position page. */

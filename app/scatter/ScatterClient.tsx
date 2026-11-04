@@ -36,9 +36,9 @@ function normName(value: string): string {
     .toLowerCase();
 }
 
+/** Nome da métrica sem o sufixo "/90" — sempre completo, nunca cortado. */
 function shortLabel(label: string): string {
-  const base = label.split("/")[0]?.trim() ?? label;
-  return base.length > 24 ? `${base.slice(0, 22)}…` : base;
+  return label.split("/")[0]?.trim() || label;
 }
 
 function deltaText(value: number, avg: number): string {
@@ -167,12 +167,14 @@ function ScatterSlotCard({ tone, ordinal, player, dossierHref, xShort, yShort, x
           </span>
         ) : (
           <span className="sc-card-values">
-            <span>
-              <b>{xVal != null ? formatMetric(xVal) : "—"}</b> {xShort}
+            <span className="sc-card-value">
+              <b>{xVal != null ? formatMetric(xVal) : "—"}</b>
+              <small>{xShort}</small>
               <em>{xVal != null ? deltaText(xVal, avgX) : ""}</em>
             </span>
-            <span>
-              <b>{yVal != null ? formatMetric(yVal) : "—"}</b> {yShort}
+            <span className="sc-card-value">
+              <b>{yVal != null ? formatMetric(yVal) : "—"}</b>
+              <small>{yShort}</small>
               <em>{yVal != null ? deltaText(yVal, avgY) : ""}</em>
             </span>
           </span>

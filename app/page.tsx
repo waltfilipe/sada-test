@@ -5,8 +5,11 @@ import { BRASILEIRAO_LEAGUES, LEAGUES } from "@/lib/leagues";
 import { BRASILEIRAO_SEASONS, CURRENT_SEASON, INTRO_STORAGE_KEY } from "@/lib/seasons";
 import type { SiteMeta } from "@/lib/types";
 
-/** Roda antes do primeiro paint: se o splash já foi visto nesta sessão, ele nem chega a aparecer. */
-const INTRO_SEEN_SCRIPT = `try{if(sessionStorage.getItem(${JSON.stringify(INTRO_STORAGE_KEY)}))document.documentElement.classList.add("sada-intro-seen")}catch(e){}`;
+/**
+ * Roda antes do primeiro paint: se o splash já foi visto nesta sessão, ele nem chega a aparecer.
+ * `?intro=1` (logo da topbar) força o splash de novo.
+ */
+const INTRO_SEEN_SCRIPT = `try{var k=${JSON.stringify(INTRO_STORAGE_KEY)};if(new URLSearchParams(location.search).has("intro"))sessionStorage.removeItem(k);else if(sessionStorage.getItem(k))document.documentElement.classList.add("sada-intro-seen")}catch(e){}`;
 
 function loadHubData(): HubData {
   const seasons: HubData["seasons"] = {};

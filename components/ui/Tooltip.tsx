@@ -47,6 +47,15 @@ export function Tooltip({ content, children, block }: Props) {
     setCoords({ x, y, placement });
   }, []);
 
+  // Conteúdo assíncrono (ex.: radares) muda a altura depois de aberto: reposiciona.
+  useEffect(() => {
+    const tip = tipRef.current;
+    if (!visible || !tip) return;
+    const observer = new ResizeObserver(() => updatePosition());
+    observer.observe(tip);
+    return () => observer.disconnect();
+  }, [visible, mounted, updatePosition]);
+
   const show = () => {
     setVisible(true);
     requestAnimationFrame(updatePosition);

@@ -315,7 +315,7 @@ a.shadow-formation-chip {
 
 /* Mini-report tooltip */
 .shadow-mini-report {
-  width: min(300px, 88vw);
+  width: min(520px, 90vw);
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
@@ -453,8 +453,67 @@ a.shadow-formation-chip {
 }
 
 .tip-portal:has(.shadow-mini-report) {
-  max-width: min(380px, 92vw);
-  padding: 0.65rem 0.75rem;
+  max-width: min(560px, 94vw);
+  padding: 0.8rem 0.9rem;
+}
+
+.shadow-mini-report-club em {
+  font-style: normal;
+  color: var(--accent, #1be7ff);
+}
+
+.shadow-mini-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.shadow-mini-facts > div {
+  padding: 0.4rem 0.55rem;
+  border-radius: 8px;
+  background: rgba(27, 231, 255, 0.06);
+  border: 1px solid rgba(27, 231, 255, 0.12);
+  min-width: 0;
+}
+
+.shadow-mini-facts dt {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted, #9aabc0);
+}
+
+.shadow-mini-facts dd {
+  margin: 0.1rem 0 0;
+  font-size: 0.84rem;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+
+.shadow-mini-radars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid rgba(27, 231, 255, 0.15);
+}
+
+.shadow-mini-radars figure {
+  margin: 0;
+  min-width: 0;
+  text-align: center;
+}
+
+.shadow-mini-radars .player-report-radar {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
 }
 
 /* Pitch */
@@ -552,6 +611,9 @@ a.shadow-formation-chip {
 }
 
 .shadow-pitch-slot {
+  /* Diâmetro e topo do círculo do slot: ancoram os botões + e ×. */
+  --disc: 52px;
+  --disc-top: calc(14px + 0.12rem);
   position: absolute;
   transform: translate(-50%, -50%);
   width: 76px;
@@ -614,6 +676,8 @@ a.shadow-formation-chip {
 }
 
 .shadow-slot-label {
+  height: 14px;
+  line-height: 14px;
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -801,10 +865,13 @@ a.shadow-formation-chip {
 
 .shadow-slot-plus {
   position: absolute;
-  top: 10px;
-  right: 0;
+  /* Na borda do círculo, a 45° embaixo à direita. */
+  top: calc(var(--disc-top) + var(--disc) / 2 + var(--disc) * 0.3536 - 10px);
+  left: calc(50% + var(--disc) * 0.3536 - 10px);
   width: 20px;
   height: 20px;
+  padding: 0;
+  line-height: 1;
   border-radius: 50%;
   border: 1px solid rgba(27, 231, 255, 0.55);
   background: rgba(13, 27, 42, 0.94);
@@ -822,10 +889,14 @@ a.shadow-formation-chip {
 
 .shadow-slot-clear {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  /* Na borda do círculo, a 45° em cima à direita. */
+  top: calc(var(--disc-top) + var(--disc) / 2 - var(--disc) * 0.3536 - 11px);
+  left: calc(50% + var(--disc) * 0.3536 - 11px);
+  z-index: 3;
   width: 22px;
   height: 22px;
+  padding: 0;
+  line-height: 1;
   border-radius: 50%;
   border: 1px solid rgba(254, 74, 73, 0.5);
   background: rgba(13, 27, 42, 0.9);
@@ -1637,4 +1708,14 @@ a.shadow-formation-chip {
     width: 44px;
     height: 44px;
   }
+}
+
+.shadow-pitch-slot.filled {
+  --disc: 46px;
+}
+
+.shadow-slot-plus i,
+.shadow-slot-clear i {
+  display: block;
+  line-height: 1;
 }

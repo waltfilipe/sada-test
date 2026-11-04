@@ -19,6 +19,7 @@ import type { PositionFamily } from "@/lib/types";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { SiteLogo } from "@/components/SiteLogo";
 import { HubIntro } from "@/components/HubIntro";
+import { SadaWordmark } from "@/components/SadaWordmark";
 
 export type HubLeagueStats = {
   players: number;
@@ -255,7 +256,26 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
   const [live, setLive] = useState(false);
   const [countUp, setCountUp] = useState(false);
 
+  const forceIntro = searchParams.get("intro") != null;
+
   useEffect(() => {
+    if (forceIntro) {
+      // Logo da topbar: reabre o splash mesmo que já tenha sido visto nesta sessão.
+      document.documentElement.classList.remove("sada-intro-seen");
+      try {
+        sessionStorage.removeItem(INTRO_STORAGE_KEY);
+      } catch {
+        /* ignore */
+      }
+      setLive(false);
+      setCountUp(false);
+      setIntro("intro");
+      window.scrollTo(0, 0);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("intro");
+      window.history.replaceState(null, "", url.pathname + url.search);
+      return;
+    }
     let seen = false;
     try {
       seen = Boolean(sessionStorage.getItem(INTRO_STORAGE_KEY));
@@ -266,7 +286,7 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
       setIntro("gone");
       setLive(true);
     }
-  }, []);
+  }, [forceIntro]);
 
   useReveal(rootRef, live);
 
@@ -381,12 +401,8 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
           </a>
 
           <div className="hb-hero-word" aria-hidden>
-            {"sada".split("").map((letter, i) => (
-              <span key={i} className="hb-hero-letter" style={vars({ "--i": i })}>
-                <span>{letter}</span>
-              </span>
-            ))}
             <img src="/brand/sada-icon.png" alt="" className="hb-hero-icon" />
+            <SadaWordmark className="hb-hero-mark" letterClassName="hb-hero-letter" />
           </div>
 
           <div className="hb-hero-foot">

@@ -106,7 +106,7 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
   return (
     <div className="scout-topbar-wrap">
       <header className="scout-topbar scout-topbar-compact">
-        <Link href="/" className="scout-brand" aria-label="SADA | Scout — Início">
+        <Link href="/?intro=1" className="scout-brand" aria-label="SADA | Scout — abertura">
           <SiteLogo variant="stacked" className="scout-header-logo scout-header-logo-stacked" height={40} />
         </Link>
 
