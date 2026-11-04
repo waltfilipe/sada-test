@@ -10,28 +10,19 @@ import {
   BRASILEIRAO_SEASONS,
   CURRENT_SEASON,
   HUB_SEASON_STORAGE_KEY,
+  INTRO_STORAGE_KEY,
   parseSeasonParam,
   withSeasonQuery,
   type BrasileiraoSeason,
 } from "@/lib/seasons";
 import type { PositionFamily } from "@/lib/types";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
-import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { SiteLogo } from "@/components/SiteLogo";
+import { HubIntro } from "@/components/HubIntro";
 
 export type HubLeagueStats = {
   players: number;
   families: Partial<Record<PositionFamily, number>>;
-};
-
-export type HubAthlete = {
-  id: string;
-  name: string;
-  club: string;
-  position: string;
-  family: PositionFamily;
-  rating: number;
-  photo: string;
 };
 
 export type HubData = {
@@ -40,7 +31,6 @@ export type HubData = {
     {
       leagues: Partial<Record<LeagueId, HubLeagueStats>>;
       players: number;
-      featured: Partial<Record<LeagueId, HubAthlete[]>>;
     }
   >;
 };
@@ -75,8 +65,10 @@ const FEATURES: Feature[] = [
   { path: "/time-sombra", icon: "fa-chess-board", title: "Time sombra", category: "Planejamento", fact: "Alvos por posição" },
 ];
 
+const ENTER_DELAY_MS = 350;
 const numberFormat = new Intl.NumberFormat("pt-BR");
 const fmt = (value: number | undefined) => (value == null ? "—" : numberFormat.format(value));
+const vars = (values: Record<string, string | number>) => values as React.CSSProperties;
 
 function useCarousel(count: number) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -114,11 +106,169 @@ function useCarousel(count: number) {
   return { trackRef, index: Math.min(index, maxIndex), maxIndex, goTo, onScroll: measure };
 }
 
+/** Marca `.is-in` nos blocos `.hb-reveal` quando entram na tela. */
+function useReveal(rootRef: React.RefObject<HTMLElement | null>, enabled: boolean) {
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || !enabled) return;
+    const targets = root.querySelectorAll<HTMLElement>(".hb-reveal:not(.is-in)");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add("is-in");
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.18, rootMargin: "0px 0px -8% 0px" },
+    );
+    targets.forEach((target) => observer.observe(target));
+    return () => observer.disconnect();
+  }, [rootRef, enabled]);
+}
+
+/** Número que sobe de 0 até o valor quando `run` liga. */
+function CountUp({ value, run }: { value: number; run: boolean }) {
+  const [shown, setShown] = useState(value);
+  useEffect(() => {
+    if (!run) {
+      setShown(value);
+      return;
+    }
+    const startedAt = performance.now();
+    const duration = 1400;
+    let frame = 0;
+    const step = (now: number) => {
+      const t = Math.min(1, (now - startedAt) / duration);
+      setShown(Math.round(value * (1 - Math.pow(1 - t, 4))));
+      if (t < 1) frame = requestAnimationFrame(step);
+    };
+    setShown(0);
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [value, run]);
+  return <>{fmt(shown)}</>;
+}
+
+/** Inclinação 3D da taça seguindo o ponteiro. */
+function tilt(event: React.PointerEvent<HTMLElement>) {
+  const card = event.currentTarget;
+  const rect = card.getBoundingClientRect();
+  const x = (event.clientX - rect.left) / rect.width - 0.5;
+  const y = (event.clientY - rect.top) / rect.height - 0.5;
+  card.style.setProperty("--ry", `${(x * 22).toFixed(2)}deg`);
+  card.style.setProperty("--rx", `${(-y * 14).toFixed(2)}deg`);
+}
+
+function untilt(event: React.PointerEvent<HTMLElement>) {
+  event.currentTarget.style.setProperty("--ry", "0deg");
+  event.currentTarget.style.setProperty("--rx", "0deg");
+}
+
+/* Campinho do time sombra: 4-3-3 com três alvos em destaque. */
+const PITCH_PLAYERS: Array<{ x: number; y: number; target?: string }> = [
+  { x: 46, y: 220 },
+  { x: 150, y: 74 },
+  { x: 136, y: 172, target: "ZAG · Série B" },
+  { x: 136, y: 268 },
+  { x: 150, y: 366 },
+  { x: 268, y: 120 },
+  { x: 250, y: 220 },
+  { x: 268, y: 320, target: "MEI · Série A" },
+  { x: 410, y: 84 },
+  { x: 440, y: 220, target: "ATA · Série C" },
+  { x: 410, y: 356 },
+];
+
+const PITCH_LINKS: Array<[number, number]> = [
+  [0, 2], [0, 3], [1, 2], [2, 3], [3, 4], [1, 5], [2, 6], [3, 6], [4, 7],
+  [5, 6], [6, 7], [5, 8], [6, 9], [7, 10], [8, 9], [9, 10],
+];
+
+function ShadowPitch() {
+  const targets = PITCH_PLAYERS.map((player, index) => ({ ...player, index })).filter((player) => player.target);
+  return (
+    <svg className="hb-pitch" viewBox="0 0 680 440" aria-hidden>
+      {Array.from({ length: 8 }, (_, i) => (
+        <rect key={i} className={i % 2 ? "hb-pitch-stripe is-alt" : "hb-pitch-stripe"} x={i * 85} y="0" width="85" height="440" />
+      ))}
+      <g className="hb-pitch-lines">
+        <rect x="10" y="10" width="660" height="420" rx="4" />
+        <line x1="340" y1="10" x2="340" y2="430" />
+        <circle cx="340" cy="220" r="58" />
+        <circle cx="340" cy="220" r="3" className="is-fill" />
+        <rect x="10" y="110" width="100" height="220" />
+        <rect x="10" y="168" width="36" height="104" />
+        <rect x="570" y="110" width="100" height="220" />
+        <rect x="634" y="168" width="36" height="104" />
+        <path d="M110 178 A 58 58 0 0 1 110 262" />
+        <path d="M570 178 A 58 58 0 0 0 570 262" />
+      </g>
+      <g className="hb-pitch-net">
+        {PITCH_LINKS.map(([a, b], i) => (
+          <line
+            key={`${a}-${b}`}
+            x1={PITCH_PLAYERS[a].x}
+            y1={PITCH_PLAYERS[a].y}
+            x2={PITCH_PLAYERS[b].x}
+            y2={PITCH_PLAYERS[b].y}
+            pathLength={1}
+            style={vars({ "--i": i })}
+          />
+        ))}
+      </g>
+      <path
+        className="hb-pitch-route"
+        d={`M${targets[0].x} ${targets[0].y} Q 210 300 ${targets[1].x} ${targets[1].y} T ${targets[2].x} ${targets[2].y}`}
+        pathLength={1}
+      />
+      {PITCH_PLAYERS.map((player, i) =>
+        player.target ? null : (
+          <circle key={i} className="hb-pitch-dot" cx={player.x} cy={player.y} r="9" style={vars({ "--i": i })} />
+        ),
+      )}
+      {targets.map((player, t) => (
+        <g key={player.index} className="hb-pitch-target" style={vars({ "--i": player.index, "--t": t })}>
+          <circle className="hb-pitch-pulse" cx={player.x} cy={player.y} r="13" />
+          <circle className="hb-pitch-dot is-target" cx={player.x} cy={player.y} r="11" />
+          <g className="hb-pitch-tag" transform={`translate(${player.x + 18} ${player.y - 30})`}>
+            <rect width={player.target!.length * 7.4 + 18} height="24" rx="6" />
+            <text x="9" y="16.5">
+              {player.target}
+            </text>
+          </g>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 export function HubSeasonPicker({ data }: { data: HubData }) {
   const searchParams = useSearchParams();
   const fromUrl = parseSeasonParam(searchParams.get("temporada"));
   const [season, setSeason] = useState<BrasileiraoSeason>(fromUrl);
   const carousel = useCarousel(FEATURES.length);
+  const rootRef = useRef<HTMLDivElement>(null);
+  /** intro → splash na tela · gone → splash desmontado. */
+  const [intro, setIntro] = useState<"intro" | "gone">("intro");
+  /** live = capa liberada para animar; countUp só quando veio do splash. */
+  const [live, setLive] = useState(false);
+  const [countUp, setCountUp] = useState(false);
+
+  useEffect(() => {
+    let seen = false;
+    try {
+      seen = Boolean(sessionStorage.getItem(INTRO_STORAGE_KEY));
+    } catch {
+      /* ignore */
+    }
+    if (seen) {
+      setIntro("gone");
+      setLive(true);
+    }
+  }, []);
+
+  useReveal(rootRef, live);
 
   useEffect(() => {
     setSeason(fromUrl);
@@ -159,107 +309,167 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
   const available = (id: LeagueId) => Boolean(seasonData.leagues[id]);
   const leagueHref = (id: LeagueId, path = "/posicao/zagueiros") =>
     available(id) ? withSeasonQuery(`/${id}${path}`, season) : `/${id}${path}`;
-  const featuredOf = (id: LeagueId) => seasonData.featured[id] ?? current.featured[id] ?? [];
 
   const seriesCount = BRASILEIRAO_LEAGUES.filter((league) => available(league.id)).length;
   const competitions = seriesCount + (isArchiveHub ? 0 : ESTADUAIS_LEVELS.length);
   const estPlayers = ESTADUAIS_LEVELS.reduce((sum, level) => sum + (current.leagues[level.id]?.players ?? 0), 0);
 
-  const crowd = [featuredOf("serie-b")[1], featuredOf("serie-a")[2], featuredOf("serie-c")[1]].filter(
-    (athlete): athlete is HubAthlete => Boolean(athlete),
-  );
+  const stats = [
+    { label: "Atletas", value: seasonData.players },
+    { label: "Competições", value: competitions },
+    { label: "Posições", value: POSITION_FAMILIES.length },
+    { label: "Temporadas", value: BRASILEIRAO_SEASONS.length },
+  ];
 
   return (
-    <div className={`scout-root home-page hub-page hx hb${isArchiveHub ? " hub-page-archive is-archive" : ""}`}>
+    <div
+      ref={rootRef}
+      className={`scout-root home-page hub-page hx hb${live ? " is-live" : ""}${isArchiveHub ? " hub-page-archive is-archive" : ""}`}
+    >
+      {intro !== "gone" ? (
+        <HubIntro
+          onEnter={() => {
+            // A capa entra enquanto o círculo do splash se fecha, não escondida atrás dele.
+            window.setTimeout(() => {
+              setCountUp(true);
+              setLive(true);
+            }, ENTER_DELAY_MS);
+          }}
+          onDone={() => setIntro("gone")}
+        />
+      ) : null}
+
       <ScoutTopbar active="inicio" hubMode />
       <main className="hb-main">
-        {/* 1 · Hero: marca SADA em destaque + chamada */}
-        <section className="hb-hero">
-          <div className="hb-hero-stage">
-            <span className="hb-stripe hb-stripe-1" aria-hidden />
-            <span className="hb-stripe hb-stripe-2" aria-hidden />
-            <span className="hb-stripe hb-stripe-3" aria-hidden />
-            <div className="hb-hero-brand" aria-hidden>
-              <SiteLogo variant="stacked" className="hb-hero-mark" alt="" />
+        {/* 1 · Hero editorial: "sada" gigante sobre papel */}
+        <section className="hb-hero hb-in hb-in-hero" aria-labelledby="hb-hero-title">
+          <div className="hb-hero-top hb-in" style={vars({ "--d": "520ms" })}>
+            <nav className="hb-hero-nav" aria-label="Atalhos da capa">
+              <a href="#competicoes">Competições</a>
+              <a href="#ferramentas">Ferramentas</a>
+              <a href="#time-sombra">Time sombra</a>
+            </nav>
+            <div className="hb-hero-seasons" role="group" aria-label="Temporada do hub">
+              <span className="hb-hero-seasons-label">Temporada</span>
+              {BRASILEIRAO_SEASONS.map((year) => (
+                <button
+                  key={year}
+                  type="button"
+                  className={season === year ? "is-active" : ""}
+                  aria-pressed={season === year}
+                  onClick={() => pick(year)}
+                >
+                  {year === CURRENT_SEASON ? <span className="hb-hero-live" aria-label="ao vivo" /> : null}
+                  {year}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="hb-hero-copy">
-            <p className="hx-status">
-              <span className="hx-status-dot" aria-hidden />
-              {isArchiveHub ? `Arquivo Wyscout · temporada ${season}` : `Temporada ${season} · scout ao vivo`}
-            </p>
-            <h1 className="hb-title">
-              conheça o<br />
-              <span>scout SADA</span>
-            </h1>
-            <p className="hb-lead">
-              Ratings, perfis e comparações de {fmt(seasonData.players)} atletas do futebol brasileiro. Cada posição é
-              medida só contra quem joga no mesmo grupo.
-            </p>
-            <a href="#competicoes" className="hb-more">
-              Ver todas as competições <i className="fa-solid fa-circle-chevron-right" aria-hidden="true" />
-            </a>
+          <a href="#competicoes" className="hb-hero-badge hb-in" style={vars({ "--d": "1200ms" })} aria-label="Ver competições">
+            <svg viewBox="0 0 124 124" aria-hidden>
+              <defs>
+                <path id="hb-badge-path" d="M62 62 m-48 0 a48 48 0 1 1 96 0 a48 48 0 1 1 -96 0" />
+              </defs>
+              <text>
+                <textPath href="#hb-badge-path" textLength="298" lengthAdjust="spacing">
+                  scout · dados · perfis · projeções ·
+                </textPath>
+              </text>
+            </svg>
+            <i className="fa-solid fa-arrow-down" aria-hidden />
+          </a>
 
-            <div className="hx-season hb-season" role="group" aria-label="Temporada do hub">
-              <span className="hx-season-label">Temporada</span>
-              <div className="hx-season-tabs">
-                {BRASILEIRAO_SEASONS.map((year) => (
-                  <button
-                    key={year}
-                    type="button"
-                    className={season === year ? "is-active" : ""}
-                    aria-pressed={season === year}
-                    onClick={() => pick(year)}
-                  >
-                    {year === CURRENT_SEASON ? <span className="hx-live-dot" aria-label="ao vivo" /> : null}
-                    {year}
-                  </button>
-                ))}
-              </div>
+          <div className="hb-hero-word" aria-hidden>
+            {"sada".split("").map((letter, i) => (
+              <span key={i} className="hb-hero-letter" style={vars({ "--i": i })}>
+                <span>{letter}</span>
+              </span>
+            ))}
+            <img src="/brand/sada-icon.png" alt="" className="hb-hero-icon" />
+          </div>
+
+          <div className="hb-hero-foot">
+            <div className="hb-hero-left hb-in" style={vars({ "--d": "900ms" })}>
+              <a href="#competicoes" className="hb-hero-link">
+                Ver todas as competições
+              </a>
+              <h1 id="hb-hero-title" className="hb-hero-title">
+                Conheça o
+                <br />
+                Scout SADA
+                <br />
+                {isArchiveHub ? `Arquivo ${season}` : season}
+                <sup>©</sup>
+              </h1>
             </div>
 
-            <dl className="hb-stats">
-              <div>
-                <dt>Atletas</dt>
-                <dd>{fmt(seasonData.players)}</dd>
-              </div>
-              <div>
-                <dt>Competições</dt>
-                <dd>{competitions}</dd>
-              </div>
-              <div>
-                <dt>Posições</dt>
-                <dd>{POSITION_FAMILIES.length}</dd>
-              </div>
-              <div>
-                <dt>Temporadas</dt>
-                <dd>{BRASILEIRAO_SEASONS.length}</dd>
-              </div>
-            </dl>
+            <div className="hb-hero-right hb-in" style={vars({ "--d": "1040ms" })}>
+              <p className="hb-hero-tag">* (sistema de análise de dados de atletas)</p>
+              <p className="hb-hero-lead">
+                Ratings, perfis e comparações de {fmt(seasonData.players)} atletas do futebol brasileiro. Cada posição é
+                medida só contra quem joga no mesmo grupo.
+              </p>
+              <dl className="hb-hero-stats">
+                {stats.map((stat) => (
+                  <div key={stat.label}>
+                    <dt>{stat.label}</dt>
+                    <dd>
+                      <CountUp value={stat.value} run={countUp} />
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
           </div>
         </section>
 
-        {/* 2 · Competições: um atleta por competição, em painéis inclinados */}
+        {/* 2 · Competições: taças em painéis inclinados */}
         <section id="competicoes" className="hb-comps" aria-labelledby="hb-comps-title">
-          <h2 id="hb-comps-title" className="hb-sr">
-            Competições
-          </h2>
+          <header className="hb-comps-head hb-in" style={vars({ "--d": "1150ms" })}>
+            <h2 id="hb-comps-title">
+              competições <span>nacionais</span>
+            </h2>
+            <span>Escolha a taça · temporada {season}</span>
+          </header>
           <div className="hb-comp-row">
             {BRASILEIRAO_LEAGUES.map((league, index) => {
               const onlyCurrent = !available(league.id);
-              const stats = seasonData.leagues[league.id] ?? current.leagues[league.id];
+              const leagueStats = seasonData.leagues[league.id] ?? current.leagues[league.id];
               return (
                 <Link
                   key={league.id}
                   href={leagueHref(league.id)}
-                  className={`hb-comp ${index % 2 ? "is-accent" : "is-dark"}${onlyCurrent ? " is-unavailable" : ""}`}
+                  className={`hb-comp hb-in ${index % 2 ? "is-accent" : "is-dark"}${onlyCurrent ? " is-unavailable" : ""}`}
+                  style={vars({ "--d": `${1250 + index * 130}ms`, "--i": index })}
                   aria-label={onlyCurrent ? `${league.name}: sem dados em ${season}` : undefined}
                   title={onlyCurrent ? `${league.name} · sem arquivo ${season}, abre ${CURRENT_SEASON}` : league.name}
+                  onPointerMove={tilt}
+                  onPointerLeave={untilt}
                 >
                   <span className="hb-comp-panel" aria-hidden />
+                  <span className="hb-comp-letter" aria-hidden>
+                    {league.name.slice(-1)}
+                  </span>
                   {!onlyCurrent ? (
-                    <img src={`/trophies/${league.id}.png`} alt="" className="hb-comp-trophy" loading="lazy" />
+                    <>
+                      <span className="hb-comp-rays" aria-hidden />
+                      <span className="hb-comp-floor" aria-hidden />
+                      <span className="hb-comp-cup" aria-hidden>
+                        <span className="hb-comp-tilt">
+                          <img src={`/trophies/${league.id}.png`} alt="" className="hb-comp-trophy" loading="lazy" />
+                          <span
+                            className="hb-comp-shine"
+                            style={vars({ "--cup": `url(/trophies/${league.id}.png)` })}
+                          />
+                        </span>
+                      </span>
+                      <span className="hb-comp-sparks" aria-hidden>
+                        <i />
+                        <i />
+                        <i />
+                      </span>
+                    </>
                   ) : (
                     <span className="hb-comp-empty" aria-hidden>
                       <SiteLogo variant="mark" alt="" />
@@ -273,7 +483,7 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
                     <em>
                       {onlyCurrent
                         ? `Sem dados em ${season} · abre ${CURRENT_SEASON}`
-                        : `${TIER_LABEL[league.id]} · ${fmt(stats?.players)} atletas`}
+                        : `${TIER_LABEL[league.id]} · ${fmt(leagueStats?.players)} atletas`}
                     </em>
                     {!onlyCurrent ? (
                       <small className="hb-comp-cta">
@@ -286,14 +496,14 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
             })}
           </div>
 
-          <div className="hb-estaduais" aria-label="Estaduais por nível">
+          <div className="hb-estaduais hb-reveal" aria-label="Estaduais por nível">
             <span className="hb-estaduais-title">
               Estaduais {CURRENT_SEASON}
               <em>{fmt(estPlayers)} atletas</em>
             </span>
             <ul>
               {ESTADUAIS_LEVELS.map((level, index) => (
-                <li key={level.id}>
+                <li key={level.id} style={vars({ "--i": index })}>
                   <Link href={`/${level.id}/posicao/zagueiros`} className="hb-level" title={level.members.map((m) => m.name).join(" · ")}>
                     <span className="hb-level-n">N{index + 1}</span>
                     <span className="hb-level-name">{level.name}</span>
@@ -310,7 +520,7 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
         </section>
 
         {/* 3 · Vitrine: as ferramentas do site como produtos */}
-        <section className="hb-shop" aria-labelledby="hb-shop-title">
+        <section id="ferramentas" className="hb-shop hb-reveal" aria-labelledby="hb-shop-title">
           <header className="hb-shop-head">
             <h2 id="hb-shop-title">
               <SiteLogo variant="mark" className="hb-shop-mark" alt="" />
@@ -319,8 +529,13 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
             <span className="hb-shop-meta">Abrem na Série A {season}</span>
           </header>
           <div className="hb-shop-track" ref={carousel.trackRef} onScroll={carousel.onScroll}>
-            {FEATURES.map((feature) => (
-              <Link key={feature.title} href={leagueHref("serie-a", feature.path)} className="hb-product">
+            {FEATURES.map((feature, index) => (
+              <Link
+                key={feature.title}
+                href={leagueHref("serie-a", feature.path)}
+                className="hb-product"
+                style={vars({ "--i": index })}
+              >
                 {feature.isNew ? <span className="hb-product-tag">novo</span> : null}
                 <span className="hb-product-art" aria-hidden>
                   <i className={`fa-solid ${feature.icon}`} />
@@ -359,12 +574,10 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
         </section>
       </main>
 
-      {/* 4 · Faixa escura: chamada para o time sombra */}
-      <section className="hb-custom" aria-labelledby="hb-custom-title">
-        <div className="hb-custom-crowd" aria-hidden>
-          {crowd.map((athlete, i) => (
-            <PlayerPhoto key={athlete.id} src={athlete.photo} alt="" className={`hb-crowd-photo hb-crowd-${i}`} loading="lazy" />
-          ))}
+      {/* 4 · Faixa escura: chamada para o time sombra, com campinho animado */}
+      <section id="time-sombra" className="hb-custom hb-reveal" aria-labelledby="hb-custom-title">
+        <div className="hb-pitch-wrap" aria-hidden>
+          <ShadowPitch />
         </div>
         <SiteLogo variant="stacked" className="hb-custom-watermark" alt="" />
         <div className="hb-custom-copy">

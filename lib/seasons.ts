@@ -47,3 +47,5 @@ export function parseFichaOrigemParam(value: string | null | undefined): Brasile
 }
 
 export const HUB_SEASON_STORAGE_KEY = "sada-hub-season";
+/** Marca da sessão: o splash da capa aparece uma vez por sessão do navegador. */
+export const INTRO_STORAGE_KEY = "sada-intro-seen";
