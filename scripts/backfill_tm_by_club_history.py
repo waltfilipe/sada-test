@@ -275,6 +275,7 @@ def save_dirty_players(rows: list[dict]) -> None:
 
 
 def main() -> int:
+    sys.stdout.reconfigure(errors="replace")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--audit", action="store_true", help="only report suspect stored TM data")

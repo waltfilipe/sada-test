@@ -55,8 +55,8 @@ LEAGUES: dict[str, LeagueConfig] = {
         "defensive_csv": ROOT / "BRB26_defensive.csv",
         "heatmaps": True,
         "heatmaps_dir": ROOT / "HeatmapsBRB26",
-        "physical_run": False,
-        "run_csv": None,
+        "physical_run": True,
+        "run_csv": ROOT / "BRB26_run.csv",
     },
     "serie-c": {
         "id": "serie-c",

@@ -82,6 +82,7 @@ def attach_physical_run_to_players(
     *,
     defensive_csv: Path,
     run_csv: Path | None = None,
+    competition: str = "Brasileirão Série A",
 ) -> int:
     """Merge run/GPS stats + position percentiles into each player dict. Returns match count."""
     run_path = run_csv or RUN_PATH
@@ -165,7 +166,7 @@ def attach_physical_run_to_players(
 
         player["physical_run"] = {
             "source": "sofascore_run",
-            "competition": "Brasileirão Série A",
+            "competition": competition,
             "position_pool": position,
             "position_pool_size": pool_size,
             "matches": int(row["matches"]),

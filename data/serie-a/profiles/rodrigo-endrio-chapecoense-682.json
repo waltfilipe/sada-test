@@ -3,84 +3,64 @@
   "name": "Rodrigo Endrio",
   "club": "Chapecoense",
   "label": "Rodrigo Endrio (Chapecoense)",
-  "position": "Meia Ofensivo",
-  "position_family": "extremos",
+  "position": "Atacante",
+  "position_family": "atacantes",
   "nationality": "Brazil",
   "birth_year": 2007,
   "height": 0,
-  "foot": null,
-  "minutes": 25,
-  "minutes_pct": 0.8,
+  "foot": "Canhoto",
+  "minutes": 59,
+  "minutes_pct": 1.7,
   "goals": 0,
   "assists": 0,
-  "rating": 6.3,
+  "rating": 6.5,
   "ratings": {
-    "geral": 6.3,
-    "driblador": 6.4,
-    "meia_ponta": 6.4,
-    "ruptura": 6.4
+    "geral": 6.5,
+    "finalizador": 6.3,
+    "alvo": 6.3,
+    "movel": 6.4
   },
   "ranks": {
-    "geral": 130,
-    "driblador": 97,
-    "meia_ponta": 66,
-    "ruptura": 71
+    "geral": 55,
+    "finalizador": 52,
+    "alvo": 47,
+    "movel": 39
   },
-  "profile": "Ruptura",
+  "profile": "Móvel",
   "profile_shares": {
-    "driblador": 18.0,
-    "meia_ponta": 18.0,
-    "ruptura": 63.0
+    "finalizador": 28.0,
+    "alvo": 20.0,
+    "movel": 52.0
   },
   "tendencies": {
     "construcao": 0.0,
-    "ofensividade": 0.0,
-    "def1v1": 0.0,
-    "contencao": 0.0,
+    "ofensividade": 68.0,
+    "def1v1": 100.0,
+    "contencao": 100.0,
     "duelo_aereo": 0.0
   },
   "aspects": {
-    "defensivos": [
-      {
-        "label": "Duelos Vencidos",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0",
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%"
-      },
-      {
-        "label": "Ações Defensivas",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0"
-      }
-    ],
     "construcao": [
       {
         "label": "Passes Progressivos",
         "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 0.0,
-        "display_value": "0,0",
-        "percentile": 0.0,
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%",
+        "grade": "A",
+        "certos_per90": 3.05,
+        "display_value": "3,0",
+        "percentile": 87.8,
+        "efficiency_pct": 2.5,
+        "efficiency_value": "50%",
         "stats": []
       },
       {
         "label": "Passes para Terço Final",
         "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 0.0,
-        "display_value": "0,0",
-        "percentile": 0.0,
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%",
+        "grade": "A",
+        "certos_per90": 4.58,
+        "display_value": "4,6",
+        "percentile": 97.7,
+        "efficiency_pct": 45.2,
+        "efficiency_value": "67%",
         "stats": []
       },
       {
@@ -97,18 +77,18 @@
       {
         "label": "Distribuição",
         "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
+        "grade": "C-",
+        "percentile": 33.3,
         "sub_metrics": [
           {
             "label": "Passes",
-            "percentile": 0.0,
-            "display_value": "0,0"
+            "percentile": 33.3,
+            "display_value": "13,7"
           },
           {
             "label": "Passes Recebidos",
-            "percentile": 0.0,
-            "display_value": "0,0"
+            "percentile": 20.5,
+            "display_value": "9,2"
           }
         ],
         "stats": []
@@ -182,7 +162,7 @@
         "stats": [],
         "display_value": "0,0",
         "efficiency_pct": 0.0,
-        "efficiency_value": "0%"
+        "efficiency_value": "28%"
       }
     ],
     "finalizacao": [
@@ -204,7 +184,7 @@
           },
           {
             "label": "Eficiência de finalização",
-            "percentile": 50.6,
+            "percentile": 70.5,
             "display_value": "-0,0"
           }
         ],
@@ -214,12 +194,12 @@
         "label": "Finalizações",
         "kind": "metric_group",
         "grade": "D",
-        "percentile": 0.0,
+        "percentile": 10.5,
         "sub_metrics": [
           {
             "label": "Finalizações",
-            "percentile": 0.0,
-            "display_value": "0,0"
+            "percentile": 10.5,
+            "display_value": "1,5"
           },
           {
             "label": "Finalizações certas",
@@ -230,28 +210,47 @@
         "stats": [],
         "efficiency_pct": 0.0,
         "efficiency_value": "0%"
+      },
+      {
+        "label": "Efetividade",
+        "kind": "metric_group",
+        "grade": "D",
+        "percentile": 0.0,
+        "sub_metrics": [
+          {
+            "label": "Finalizações certas / passe recebido",
+            "percentile": 0.0,
+            "display_value": "0,00"
+          },
+          {
+            "label": "Gols / toques na área",
+            "percentile": 0.0,
+            "display_value": "0,00"
+          }
+        ],
+        "stats": []
       }
     ],
     "conducao_drible": [
       {
         "label": "Disputas com Bola",
         "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
+        "grade": "A",
+        "percentile": 100.0,
         "stats": [],
-        "display_value": "0,0",
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%"
+        "display_value": "12,2",
+        "efficiency_pct": 23.3,
+        "efficiency_value": "36%"
       },
       {
         "label": "1v1 - Ofensivo",
         "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
+        "grade": "A",
+        "percentile": 100.0,
         "stats": [],
-        "display_value": "0,0",
+        "display_value": "9,2",
         "efficiency_pct": 0.0,
-        "efficiency_value": "0%"
+        "efficiency_value": "17%"
       },
       {
         "label": "Progressão",
@@ -277,18 +276,18 @@
       {
         "label": "Ações Terminais",
         "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
+        "grade": "C",
+        "percentile": 35.9,
         "sub_metrics": [
           {
             "label": "Toques na Área",
-            "percentile": 0.0,
-            "display_value": "0,0"
+            "percentile": 35.9,
+            "display_value": "3,0"
           },
           {
             "label": "Ações Ofensivas",
-            "percentile": 0.0,
-            "display_value": "0,0"
+            "percentile": 33.3,
+            "display_value": "1,5"
           }
         ],
         "stats": []
@@ -296,13 +295,13 @@
       {
         "label": "Verticalidade",
         "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
+        "grade": "B",
+        "percentile": 68.9,
         "sub_metrics": [
           {
             "label": "% Toque na Área",
-            "percentile": 0.0,
-            "display_value": "0%"
+            "percentile": 68.9,
+            "display_value": "33%"
           },
           {
             "label": "Recepção de Passes Longos",
@@ -312,37 +311,73 @@
         ],
         "stats": []
       }
+    ],
+    "aereo": [
+      {
+        "label": "Duelos Aéreos",
+        "kind": "metric",
+        "grade": "D",
+        "percentile": 4.4,
+        "stats": [],
+        "display_value": "1,5",
+        "efficiency_pct": 0.0,
+        "efficiency_value": "0%"
+      }
     ]
   },
   "profiles_available": [
-    "Driblador",
-    "Meia Ponta",
-    "Ruptura",
+    "Finalizador",
+    "Alvo",
+    "Móvel",
     "Híbrido"
   ],
   "scatter": {
-    "dribles": 0.0,
-    "xa": 0.0,
-    "progressao": 0.0,
-    "cruzamentos": 0.0,
-    "toques_area": 0.0
+    "gols": 0.0,
+    "finalizacao": 1.53,
+    "toques_area": 3.05,
+    "progressao": 0.0
   },
   "cluster": {
-    "family": "extremos",
-    "archetype": "Ruptura",
-    "archetype_label": "Ruptura",
+    "family": "atacantes",
+    "archetype": "Móvel",
+    "archetype_label": "Móvel",
     "hybrid_badge": null,
     "hybrid_badge_short": null,
     "shares": {
-      "driblador": 18.2,
-      "meia_ponta": 18.5,
-      "ruptura": 63.3
+      "finalizador": 27.646772242712764,
+      "alvo": 20.313345489372594,
+      "movel": 52.03988226791464
     },
     "ratings": {
-      "driblador": 6.4,
-      "meia_ponta": 6.4,
-      "ruptura": 6.4
+      "finalizador": 6.3,
+      "alvo": 6.3,
+      "movel": 6.5
     }
   },
-  "transfermarkt": null
+  "transfermarkt": {
+    "id": "1220397",
+    "photo": "https://img.a.transfermarkt.technology/portrait/header/default.jpg?lm=4711",
+    "market_value": "-",
+    "market_value_eur": null,
+    "contract_until": "2028-12-15",
+    "contract_remaining": "2 anos e 1 mes",
+    "on_loan_from": null,
+    "club": "Chapecoense U20",
+    "profile_url": "https://www.transfermarkt.com.br/rodrigo/profil/spieler/1220397",
+    "foot": "Canhoto",
+    "height": null
+  },
+  "discipline": {
+    "fouls_per90": 4.58,
+    "fouls_total": 3,
+    "yellow_per90": 0.0,
+    "yellow_total": 0,
+    "red_per90": 0.0,
+    "red_total": 0,
+    "pool": {
+      "fouls_per90": 1.51,
+      "yellow_per90": 0.16,
+      "red_per90": 0.02
+    }
+  }
 }

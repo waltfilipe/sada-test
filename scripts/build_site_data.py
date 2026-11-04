@@ -41,6 +41,13 @@ DATA_DIR = ROOT / "data"
 REFERENCE_DIR = ROOT / "reference"
 
 
+def _run_competition_name(league: dict) -> str:
+    label = str(league.get("label") or "")
+    if label.startswith("Série"):
+        return f"Brasileirão {label}"
+    return label or "Brasileirão Série A"
+
+
 def build_league(
     league_id: str,
     *,
@@ -130,6 +137,7 @@ def build_league(
             raw_df,
             defensive_csv=def_csv,
             run_csv=league["run_csv"],
+            competition=_run_competition_name(league),
         )
         print(f"  GPS/Run anexado: {run_attached}/{len(all_players)}")
     else:

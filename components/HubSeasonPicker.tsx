@@ -160,14 +160,11 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
   const leagueHref = (id: LeagueId, path = "/posicao/zagueiros") =>
     available(id) ? withSeasonQuery(`/${id}${path}`, season) : `/${id}${path}`;
   const featuredOf = (id: LeagueId) => seasonData.featured[id] ?? current.featured[id] ?? [];
-  const athleteHref = (id: LeagueId, athlete: HubAthlete) =>
-    leagueHref(id, `/posicao/${athlete.family}?atleta=${encodeURIComponent(athlete.id)}`);
 
   const seriesCount = BRASILEIRAO_LEAGUES.filter((league) => available(league.id)).length;
   const competitions = seriesCount + (isArchiveHub ? 0 : ESTADUAIS_LEVELS.length);
   const estPlayers = ESTADUAIS_LEVELS.reduce((sum, level) => sum + (current.leagues[level.id]?.players ?? 0), 0);
 
-  const heroAthlete = featuredOf("serie-a")[0];
   const crowd = [featuredOf("serie-b")[1], featuredOf("serie-a")[2], featuredOf("serie-c")[1]].filter(
     (athlete): athlete is HubAthlete => Boolean(athlete),
   );
@@ -176,22 +173,15 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
     <div className={`scout-root home-page hub-page hx hb${isArchiveHub ? " hub-page-archive is-archive" : ""}`}>
       <ScoutTopbar active="inicio" hubMode />
       <main className="hb-main">
-        {/* 1 · Hero: atleta em destaque + chamada */}
+        {/* 1 · Hero: marca SADA em destaque + chamada */}
         <section className="hb-hero">
-          <div className="hb-hero-stage" aria-hidden={!heroAthlete}>
+          <div className="hb-hero-stage">
             <span className="hb-stripe hb-stripe-1" aria-hidden />
             <span className="hb-stripe hb-stripe-2" aria-hidden />
             <span className="hb-stripe hb-stripe-3" aria-hidden />
-            {heroAthlete ? (
-              <Link href={athleteHref("serie-a", heroAthlete)} className="hb-hero-athlete">
-                <PlayerPhoto src={heroAthlete.photo} alt={heroAthlete.name} className="hb-hero-photo" />
-                <span className="hb-hero-caption">
-                  <em>Destaque · Série A {season}</em>
-                  <strong>{heroAthlete.name}</strong>
-                  <span>{heroAthlete.club}</span>
-                </span>
-              </Link>
-            ) : null}
+            <div className="hb-hero-brand" aria-hidden>
+              <SiteLogo variant="stacked" className="hb-hero-mark" alt="" />
+            </div>
           </div>
 
           <div className="hb-hero-copy">
@@ -257,7 +247,6 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
           </h2>
           <div className="hb-comp-row">
             {BRASILEIRAO_LEAGUES.map((league, index) => {
-              const athlete = featuredOf(league.id)[league.id === "serie-a" ? 1 : 0] ?? featuredOf(league.id)[0];
               const onlyCurrent = !available(league.id);
               const stats = seasonData.leagues[league.id] ?? current.leagues[league.id];
               return (
@@ -269,17 +258,13 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
                   title={onlyCurrent ? `${league.name} · sem arquivo ${season}, abre ${CURRENT_SEASON}` : league.name}
                 >
                   <span className="hb-comp-panel" aria-hidden />
-                  {athlete && !onlyCurrent ? (
-                    <>
-                      <PlayerPhoto src={athlete.photo} alt="" className="hb-comp-photo" loading="lazy" />
-                      <span className="hb-comp-name">{athlete.name}</span>
-                    </>
-                  ) : null}
-                  {onlyCurrent ? (
+                  {!onlyCurrent ? (
+                    <img src={`/trophies/${league.id}.png`} alt="" className="hb-comp-trophy" loading="lazy" />
+                  ) : (
                     <span className="hb-comp-empty" aria-hidden>
                       <SiteLogo variant="mark" alt="" />
                     </span>
-                  ) : null}
+                  )}
                   <span className="hb-comp-logo">
                     <img src={league.logo} alt="" />
                   </span>

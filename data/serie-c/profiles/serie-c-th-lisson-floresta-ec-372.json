@@ -7,7 +7,7 @@
   "position_family": "meio-campistas",
   "nationality": "Brazil",
   "birth_year": 2003,
-  "height": 0,
+  "height": 175,
   "foot": "Destro",
   "minutes": 438,
   "minutes_pct": 17.6,
@@ -16,15 +16,15 @@
   "rating": 6.6,
   "ratings": {
     "geral": 6.6,
-    "contencao": 6.0,
+    "contencao": 6.3,
     "construtor": 5.8,
-    "boxtobox": 6.9
+    "boxtobox": 6.8
   },
   "ranks": {
-    "geral": 67,
-    "contencao": 113,
+    "geral": 65,
+    "contencao": 86,
     "construtor": 127,
-    "boxtobox": 25
+    "boxtobox": 29
   },
   "profile": "Box-to-box",
   "profile_shares": {
@@ -35,7 +35,7 @@
   "tendencies": {
     "construcao": 0.0,
     "ofensividade": 98.0,
-    "def1v1": 16.0,
+    "def1v1": 20.0,
     "contencao": 97.0,
     "duelo_aereo": 80.0
   },
@@ -65,16 +65,16 @@
         "label": "Ações Defensivas",
         "kind": "metric_group",
         "grade": "D",
-        "percentile": 22.0,
+        "percentile": 22.7,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 21.7,
+            "percentile": 22.4,
             "display_value": "0,7"
           },
           {
             "label": "Interceptações",
-            "percentile": 44.3,
+            "percentile": 45.8,
             "display_value": "1,4"
           },
           {
@@ -88,11 +88,11 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "C-",
-        "percentile": 32.8,
+        "grade": "B-",
+        "percentile": 63.9,
         "pair_badge": [
           100.0,
-          32.8
+          63.9
         ],
         "sub_metrics": [
           {
@@ -102,8 +102,8 @@
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 32.8,
-            "display_value": "-0,5"
+            "percentile": 63.9,
+            "display_value": "+0,3"
           }
         ],
         "stats": []
@@ -211,8 +211,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "C-",
-        "percentile": 32.8,
+        "grade": "B-",
+        "percentile": 63.9,
         "display_value": "11%",
         "share_pct": 11.1,
         "pool_avg_pct": 1.7,
@@ -366,26 +366,27 @@
     "hybrid_badge": null,
     "hybrid_badge_short": null,
     "shares": {
-      "contencao": 6.0,
-      "construtor": 1.2,
-      "boxtobox": 92.8
+      "contencao": 6.2,
+      "construtor": 1.1,
+      "boxtobox": 92.6
     },
     "ratings": {
-      "contencao": 6.0,
+      "contencao": 6.3,
       "construtor": 5.8,
-      "boxtobox": 6.9
+      "boxtobox": 6.8
     }
   },
   "transfermarkt": {
     "id": "1095706",
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/default.jpg?lm=4711",
+    "photo": "/photos/1590490.webp",
     "market_value": "-",
     "market_value_eur": null,
     "contract_until": null,
     "contract_remaining": null,
     "on_loan_from": "Ferroviário AC",
     "club": "Floresta EC",
-    "profile_url": "https://www.transfermarkt.com.br/thalisson/profil/spieler/1095706"
+    "profile_url": "https://www.transfermarkt.com.br/thalisson/profil/spieler/1095706",
+    "sofascore_player_id": "1590490"
   },
   "heatmap": {
     "tournament_id": 1281,
@@ -1288,6 +1289,107 @@
       "fouls_per90": 1.92,
       "yellow_per90": 0.35,
       "red_per90": 0.01
+    }
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2023",
+        "league": "serie-a",
+        "minutes": 1062,
+        "club": "Coritiba"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 1033,
+        "club": "Coritiba"
+      },
+      {
+        "year": "2025",
+        "league": "serie-b",
+        "minutes": 2039,
+        "club": "Paysandu"
+      }
+    ],
+    "metrics": {
+      "Duelos Defensivos": {
+        "predicted": 4.6514,
+        "resid_sd": 1.1828,
+        "train_n90": 20.79
+      },
+      "Duelos Defensivos::Eficiência": {
+        "predicted": 58.8484,
+        "resid_sd": 5.4132,
+        "train_n90": 20.79
+      },
+      "Ações Defensivas::Rebatidas": {
+        "predicted": 3.8475,
+        "role_change_flag": true,
+        "resid_sd": 0.683,
+        "train_n90": 20.79
+      },
+      "Ações Defensivas::Interceptações": {
+        "predicted": 2.1962,
+        "resid_sd": 0.8593,
+        "train_n90": 20.79
+      },
+      "Ações Defensivas::Chutes Bloqueados": {
+        "predicted": 0.4351,
+        "resid_sd": 0.1924,
+        "train_n90": 20.79
+      },
+      "Eficiência Defensiva::Erros Totais": {
+        "predicted": 0.0293,
+        "resid_sd": 0.0563,
+        "train_n90": 20.79
+      },
+      "Passes Progressivos": {
+        "predicted": 5.9536,
+        "resid_sd": 1.3163,
+        "train_n90": 20.81
+      },
+      "Passes Progressivos::Eficiência": {
+        "predicted": 71.2867,
+        "resid_sd": 6.6991,
+        "train_n90": 20.81
+      },
+      "Passes para Terço Final": {
+        "predicted": 5.0674,
+        "resid_sd": 1.5516,
+        "train_n90": 20.81
+      },
+      "Passes para Terço Final::Eficiência": {
+        "predicted": 72.0849,
+        "resid_sd": 5.7922,
+        "train_n90": 20.81
+      },
+      "Passes Longos": {
+        "predicted": 3.7706,
+        "resid_sd": 0.9922,
+        "train_n90": 20.81
+      },
+      "Passes Longos::Eficiência": {
+        "predicted": 51.9621,
+        "role_change_flag": true,
+        "resid_sd": 8.0347,
+        "train_n90": 20.81
+      },
+      "Disputas com Bola": {
+        "predicted": 1.616,
+        "resid_sd": 0.9071,
+        "train_n90": 20.81
+      },
+      "Disputas com Bola::Eficiência": {
+        "predicted": 48.2898,
+        "resid_sd": 7.459,
+        "train_n90": 20.81
+      },
+      "Conduções Progressivas": {
+        "predicted": 0.8619,
+        "resid_sd": 0.3984,
+        "train_n90": 20.75
+      }
     }
   }
 }

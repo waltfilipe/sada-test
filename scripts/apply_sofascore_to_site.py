@@ -25,7 +25,10 @@ PHOTO_EXTENSIONS = (".jpg", ".jpeg", ".png", ".webp")
 
 
 def log(msg: str) -> None:
-    print(msg, flush=True)
+    try:
+        print(msg, flush=True)
+    except UnicodeEncodeError:
+        print(msg.encode("ascii", "replace").decode("ascii"), flush=True)
 
 
 def needs_photo(tm: dict[str, Any] | None) -> bool:

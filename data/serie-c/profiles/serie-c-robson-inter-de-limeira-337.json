@@ -13,9 +13,9 @@
   "minutes_pct": 30.8,
   "goals": 1,
   "assists": 0,
-  "rating": 5.9,
+  "rating": 6.0,
   "ratings": {
-    "geral": 5.9,
+    "geral": 6.0,
     "construcao": 6.0,
     "defesa": 6.2,
     "perfil": 6.2
@@ -78,10 +78,10 @@
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
         "grade": "D",
-        "percentile": 1.4,
+        "percentile": 4.2,
         "pair_badge": [
           100.0,
-          1.4
+          4.2
         ],
         "sub_metrics": [
           {
@@ -91,8 +91,8 @@
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 1.4,
-            "display_value": "-2,4"
+            "percentile": 4.2,
+            "display_value": "-2,0"
           }
         ],
         "stats": []
@@ -182,7 +182,7 @@
         "label": "Disciplina defensiva",
         "kind": "construction_share",
         "grade": "D",
-        "percentile": 1.4,
+        "percentile": 4.2,
         "display_value": "86%",
         "share_pct": 85.9,
         "pool_avg_pct": 1.1,
@@ -278,28 +278,126 @@
     "construtor_badge": null,
     "construtor_badge_short": null,
     "shares": {
-      "defensor_area": 54.0,
-      "construtor": 35.0,
-      "combativo": 11.0
+      "defensor_area": 53.4,
+      "construtor": 35.3,
+      "combativo": 11.3
     },
     "ratings": {
       "defensor_area": 6.2,
       "construtor": 5.7,
-      "combativo": 5.4
+      "combativo": 5.5
     }
   },
   "transfermarkt": {
     "id": "101382",
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/s_101382_123_2012_1.jpg?lm=4711",
+    "photo": "/photos/1048607.jpg",
     "market_value": "-",
     "market_value_eur": null,
     "contract_until": null,
     "contract_remaining": null,
     "on_loan_from": null,
     "club": "Fim de carreira",
-    "profile_url": "https://www.transfermarkt.com.br/bryan-robson/profil/spieler/101382"
+    "profile_url": "https://www.transfermarkt.com.br/bryan-robson/profil/spieler/101382",
+    "sofascore_player_id": "1048607"
   },
-  "heatmap": null,
+  "heatmap": {
+    "tournament_id": 1281,
+    "season_id": 90642,
+    "scope": "overall",
+    "competition": "Brasileirão Série C",
+    "points": [
+      {
+        "x": 29.0,
+        "y": 34.0
+      },
+      {
+        "x": 40.0,
+        "y": 31.0
+      },
+      {
+        "x": 40.0,
+        "y": 36.0
+      },
+      {
+        "x": 21.0,
+        "y": 49.0
+      },
+      {
+        "x": 52.0,
+        "y": 25.0
+      },
+      {
+        "x": 64.0,
+        "y": 75.0
+      },
+      {
+        "x": 64.0,
+        "y": 76.0
+      },
+      {
+        "x": 62.0,
+        "y": 77.0
+      },
+      {
+        "x": 62.0,
+        "y": 28.0
+      },
+      {
+        "x": 62.0,
+        "y": 12.0
+      },
+      {
+        "x": 61.0,
+        "y": 79.0
+      },
+      {
+        "x": 7.0,
+        "y": 40.0
+      },
+      {
+        "x": 38.0,
+        "y": 51.0
+      },
+      {
+        "x": 38.0,
+        "y": 24.0
+      },
+      {
+        "x": 44.0,
+        "y": 35.0
+      },
+      {
+        "x": 53.0,
+        "y": 16.0
+      },
+      {
+        "x": 24.0,
+        "y": 74.0
+      },
+      {
+        "x": 20.0,
+        "y": 14.0
+      },
+      {
+        "x": 60.0,
+        "y": 20.0
+      },
+      {
+        "x": 41.0,
+        "y": 19.0
+      },
+      {
+        "x": 33.0,
+        "y": 35.0
+      },
+      {
+        "x": 39.0,
+        "y": 25.0
+      }
+    ],
+    "point_count": 22,
+    "image_url": null
+  },
   "discipline": {
     "fouls_per90": 1.53,
     "fouls_total": 13,
@@ -336,85 +434,84 @@
     ],
     "metrics": {
       "Duelos Defensivos": {
-        "predicted": 6.9579,
-        "resid_sd": 0.9969,
-        "train_n90": 22.48
+        "predicted": 6.9425,
+        "resid_sd": 0.9907,
+        "train_n90": 22.49
       },
       "Duelos Defensivos::Eficiência": {
-        "predicted": 64.644,
-        "resid_sd": 6.0998,
-        "train_n90": 22.48
+        "predicted": 64.9804,
+        "resid_sd": 6.0571,
+        "train_n90": 22.49
       },
       "Ações Defensivas::Rebatidas": {
-        "predicted": 2.7472,
-        "resid_sd": 1.554,
-        "train_n90": 22.48
+        "predicted": 2.7842,
+        "resid_sd": 1.5346,
+        "train_n90": 22.49
       },
       "Ações Defensivas::Interceptações": {
-        "predicted": 2.6862,
-        "resid_sd": 1.0286,
-        "train_n90": 22.48
+        "predicted": 2.6746,
+        "resid_sd": 1.0324,
+        "train_n90": 22.49
       },
       "Ações Defensivas::Chutes Bloqueados": {
-        "predicted": 0.6696,
-        "resid_sd": 0.2769,
-        "train_n90": 22.48
+        "predicted": 0.6759,
+        "resid_sd": 0.2747,
+        "train_n90": 22.49
       },
       "Eficiência Defensiva::Erros Totais": {
-        "predicted": 0.0479,
-        "resid_sd": 0.0654,
-        "train_n90": 22.48
+        "predicted": 0.0469,
+        "resid_sd": 0.0658,
+        "train_n90": 22.49
       },
       "Eficiência Defensiva::Eficiência Defensiva": {
-        "predicted": -0.7176,
-        "role_change_flag": true,
-        "resid_sd": 0.7444,
-        "train_n90": 21.39
+        "predicted": -0.7294,
+        "resid_sd": 0.7079,
+        "train_n90": 21.83
       },
       "Passes Progressivos": {
-        "predicted": 5.5602,
-        "resid_sd": 1.4706,
-        "train_n90": 22.44
+        "predicted": 5.6764,
+        "resid_sd": 1.4911,
+        "train_n90": 22.45
       },
       "Passes Progressivos::Eficiência": {
-        "predicted": 67.0717,
-        "resid_sd": 6.4595,
-        "train_n90": 22.44
+        "predicted": 67.4229,
+        "resid_sd": 6.5696,
+        "train_n90": 22.45
       },
       "Passes para Terço Final": {
-        "predicted": 4.9411,
-        "resid_sd": 1.4853,
-        "train_n90": 22.44
+        "predicted": 5.0335,
+        "resid_sd": 1.4925,
+        "train_n90": 22.45
       },
       "Passes para Terço Final::Eficiência": {
-        "predicted": 59.8816,
-        "resid_sd": 8.0446,
-        "train_n90": 22.44
+        "predicted": 59.9415,
+        "resid_sd": 7.8798,
+        "train_n90": 22.45
       },
       "Passes Longos": {
-        "predicted": 3.635,
-        "resid_sd": 1.2336,
-        "train_n90": 22.44
+        "predicted": 3.7361,
+        "resid_sd": 1.2452,
+        "train_n90": 22.45
       },
       "Passes Longos::Eficiência": {
-        "predicted": 54.2719,
-        "resid_sd": 7.107,
-        "train_n90": 22.44
+        "predicted": 53.6967,
+        "resid_sd": 7.0227,
+        "train_n90": 22.45
       },
       "Disputas com Bola": {
-        "predicted": 1.0543,
-        "resid_sd": 0.495,
-        "train_n90": 22.44
+        "predicted": 1.0549,
+        "resid_sd": 0.4993,
+        "train_n90": 22.45
       },
       "Disputas com Bola::Eficiência": {
-        "predicted": 50.9107,
-        "resid_sd": 13.7768,
-        "train_n90": 22.44
+        "predicted": 51.6297,
+        "resid_sd": 13.6306,
+        "train_n90": 22.45
       },
       "Conduções Progressivas": {
-        "predicted": 0.7724,
-        "resid_sd": 0.4652,
-        "train_n90": 22.41
+        "predicted": 0.7627,
+        "resid_sd": 0.4648,
+        "train_n90": 22.44
       }
     }
   }

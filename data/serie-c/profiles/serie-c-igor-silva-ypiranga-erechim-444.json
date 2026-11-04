@@ -16,25 +16,25 @@
   "rating": 6.9,
   "ratings": {
     "geral": 6.9,
-    "contencao": 6.8,
+    "contencao": 6.9,
     "construtor": 6.2,
-    "boxtobox": 6.6
+    "boxtobox": 6.7
   },
   "ranks": {
-    "geral": 22,
-    "contencao": 25,
+    "geral": 20,
+    "contencao": 16,
     "construtor": 97,
-    "boxtobox": 46
+    "boxtobox": 36
   },
   "profile": "Contenção",
   "profile_shares": {
     "contencao": 93.0,
     "construtor": 2.0,
-    "boxtobox": 6.0
+    "boxtobox": 5.0
   },
   "tendencies": {
     "construcao": 8.0,
-    "ofensividade": 52.0,
+    "ofensividade": 51.0,
     "def1v1": 100.0,
     "contencao": 10.0,
     "duelo_aereo": 87.0
@@ -74,7 +74,7 @@
           },
           {
             "label": "Interceptações",
-            "percentile": 96.7,
+            "percentile": 96.6,
             "display_value": "2,6"
           },
           {
@@ -88,11 +88,11 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "C",
-        "percentile": 42.6,
+        "grade": "C+",
+        "percentile": 54.1,
         "pair_badge": [
           37.5,
-          42.6
+          54.1
         ],
         "sub_metrics": [
           {
@@ -102,8 +102,8 @@
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 42.6,
-            "display_value": "-0,2"
+            "percentile": 54.1,
+            "display_value": "+0,1"
           }
         ],
         "stats": []
@@ -211,8 +211,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "C",
-        "percentile": 42.6,
+        "grade": "C+",
+        "percentile": 54.1,
         "display_value": "54%",
         "share_pct": 53.7,
         "pool_avg_pct": 1.7,
@@ -366,17 +366,25 @@
     "hybrid_badge": null,
     "hybrid_badge_short": null,
     "shares": {
-      "contencao": 92.6,
-      "construtor": 2.0,
-      "boxtobox": 5.5
+      "contencao": 92.8,
+      "construtor": 1.9,
+      "boxtobox": 5.3
     },
     "ratings": {
-      "contencao": 6.8,
+      "contencao": 6.9,
       "construtor": 6.2,
-      "boxtobox": 6.5
+      "boxtobox": 6.7
     }
   },
-  "transfermarkt": null,
+  "transfermarkt": {
+    "photo": "/photos/1175615.jpg",
+    "id": null,
+    "contract_until": null,
+    "contract_remaining": null,
+    "club": null,
+    "profile_url": null,
+    "sofascore_player_id": "1175615"
+  },
   "heatmap": {
     "tournament_id": 1281,
     "season_id": 90642,
@@ -1083,90 +1091,85 @@
     ],
     "metrics": {
       "Duelos Defensivos": {
-        "predicted": 3.3795,
+        "predicted": 3.237,
         "role_change_flag": true,
-        "resid_sd": 1.1753,
-        "train_n90": 20.76
+        "resid_sd": 1.1828,
+        "train_n90": 20.79
       },
       "Duelos Defensivos::Eficiência": {
-        "predicted": 58.2401,
-        "resid_sd": 5.3712,
-        "train_n90": 20.76
+        "predicted": 58.2374,
+        "resid_sd": 5.4132,
+        "train_n90": 20.79
       },
       "Ações Defensivas::Rebatidas": {
-        "predicted": 2.7855,
-        "resid_sd": 0.6754,
-        "train_n90": 20.76
+        "predicted": 2.6603,
+        "resid_sd": 0.683,
+        "train_n90": 20.79
       },
       "Ações Defensivas::Interceptações": {
-        "predicted": 2.0499,
-        "resid_sd": 0.861,
-        "train_n90": 20.76
+        "predicted": 2.0422,
+        "resid_sd": 0.8593,
+        "train_n90": 20.79
       },
       "Ações Defensivas::Chutes Bloqueados": {
-        "predicted": 0.5315,
+        "predicted": 0.5313,
         "role_change_flag": true,
-        "resid_sd": 0.1902,
-        "train_n90": 20.76
+        "resid_sd": 0.1924,
+        "train_n90": 20.79
       },
       "Eficiência Defensiva::Erros Totais": {
-        "predicted": 0.0588,
+        "predicted": 0.0505,
         "role_change_flag": true,
-        "resid_sd": 0.0609,
-        "train_n90": 20.76
-      },
-      "Eficiência Defensiva::Eficiência Defensiva": {
-        "predicted": -0.6383,
-        "resid_sd": 0.5718,
-        "train_n90": 20.87
+        "resid_sd": 0.0563,
+        "train_n90": 20.79
       },
       "Passes Progressivos": {
-        "predicted": 6.7721,
-        "resid_sd": 1.3125,
-        "train_n90": 20.77
+        "predicted": 6.843,
+        "resid_sd": 1.3163,
+        "train_n90": 20.81
       },
       "Passes Progressivos::Eficiência": {
-        "predicted": 69.3065,
-        "resid_sd": 6.6766,
-        "train_n90": 20.77
+        "predicted": 69.265,
+        "resid_sd": 6.6991,
+        "train_n90": 20.81
       },
       "Passes para Terço Final": {
-        "predicted": 5.279,
-        "resid_sd": 1.5296,
-        "train_n90": 20.77
+        "predicted": 5.4084,
+        "resid_sd": 1.5516,
+        "train_n90": 20.81
       },
       "Passes para Terço Final::Eficiência": {
-        "predicted": 67.496,
-        "resid_sd": 5.8343,
-        "train_n90": 20.77
+        "predicted": 67.3639,
+        "resid_sd": 5.7922,
+        "train_n90": 20.81
       },
       "Passes Longos": {
-        "predicted": 4.9851,
+        "predicted": 5.0545,
         "role_change_flag": true,
-        "resid_sd": 0.9874,
-        "train_n90": 20.77
+        "resid_sd": 0.9922,
+        "train_n90": 20.81
       },
       "Passes Longos::Eficiência": {
-        "predicted": 59.8527,
-        "resid_sd": 8.0045,
-        "train_n90": 20.77
+        "predicted": 60.0063,
+        "resid_sd": 8.0347,
+        "train_n90": 20.81
       },
       "Disputas com Bola": {
-        "predicted": 2.3231,
+        "predicted": 2.3184,
         "role_change_flag": true,
-        "resid_sd": 0.885,
-        "train_n90": 20.77
+        "resid_sd": 0.9071,
+        "train_n90": 20.81
       },
       "Disputas com Bola::Eficiência": {
-        "predicted": 48.5324,
+        "predicted": 48.8241,
         "role_change_flag": true,
-        "resid_sd": 7.5701,
-        "train_n90": 20.77
+        "resid_sd": 7.459,
+        "train_n90": 20.81
       },
       "Conduções Progressivas": {
-        "predicted": 0.9426,
-        "resid_sd": 0.3951,
-        "train_n90": 20.68
+        "predicted": 0.9647,
+        "resid_sd": 0.3984,
+        "train_n90": 20.75
       }
     }
   }

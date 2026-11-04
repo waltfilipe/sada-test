@@ -24,7 +24,7 @@
     "geral": 21,
     "construcao": 7,
     "defesa": 101,
-    "perfil": 32
+    "perfil": 29
   },
   "profile": "Construtor",
   "profile_shares": {
@@ -54,21 +54,21 @@
         "label": "Ações Defensivas",
         "kind": "metric_group",
         "grade": "C-",
-        "percentile": 32.6,
+        "percentile": 31.4,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 27.1,
+            "percentile": 25.7,
             "display_value": "2,9"
           },
           {
             "label": "Interceptações",
-            "percentile": 28.2,
+            "percentile": 27.1,
             "display_value": "1,4"
           },
           {
             "label": "Chutes Bloqueados",
-            "percentile": 42.4,
+            "percentile": 41.5,
             "display_value": "0,6"
           }
         ],
@@ -78,10 +78,10 @@
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
         "grade": "D",
-        "percentile": 2.8,
+        "percentile": 6.9,
         "pair_badge": [
           72.7,
-          2.8
+          6.9
         ],
         "sub_metrics": [
           {
@@ -91,8 +91,8 @@
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 2.8,
-            "display_value": "-2,3"
+            "percentile": 6.9,
+            "display_value": "-1,7"
           }
         ],
         "stats": []
@@ -182,7 +182,7 @@
         "label": "Disciplina defensiva",
         "kind": "construction_share",
         "grade": "D",
-        "percentile": 2.8,
+        "percentile": 6.9,
         "display_value": "53%",
         "share_pct": 53.1,
         "pool_avg_pct": 1.1,
@@ -290,9 +290,9 @@
   },
   "transfermarkt": {
     "id": "350396",
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/350396-1563989348.jpg?lm=4711",
-    "market_value": null,
-    "market_value_eur": null,
+    "photo": "/photos/794910.jpg",
+    "market_value": "€ 165 mil",
+    "market_value_eur": 165000,
     "contract_until": null,
     "contract_remaining": null,
     "on_loan_from": null,
@@ -301,7 +301,8 @@
     "foot": "Canhoto",
     "height": 177,
     "matched_name": "Rafael Furlan",
-    "match_via": "Amazonas 2026"
+    "match_via": "Amazonas 2026",
+    "sofascore_player_id": "794910"
   },
   "heatmap": {
     "tournament_id": 1281,
@@ -1379,84 +1380,89 @@
     ],
     "metrics": {
       "Duelos Defensivos": {
-        "predicted": 4.7376,
-        "resid_sd": 0.9969,
-        "train_n90": 22.48
+        "predicted": 4.7563,
+        "resid_sd": 0.9907,
+        "train_n90": 22.49
       },
       "Duelos Defensivos::Eficiência": {
-        "predicted": 64.4605,
-        "resid_sd": 6.0998,
-        "train_n90": 22.48
+        "predicted": 64.2786,
+        "resid_sd": 6.0571,
+        "train_n90": 22.49
       },
       "Ações Defensivas::Rebatidas": {
-        "predicted": 3.4572,
-        "resid_sd": 1.554,
-        "train_n90": 22.48
+        "predicted": 3.4683,
+        "resid_sd": 1.5346,
+        "train_n90": 22.49
       },
       "Ações Defensivas::Interceptações": {
-        "predicted": 2.4317,
-        "resid_sd": 1.0286,
-        "train_n90": 22.48
+        "predicted": 2.3805,
+        "resid_sd": 1.0324,
+        "train_n90": 22.49
       },
       "Ações Defensivas::Chutes Bloqueados": {
-        "predicted": 0.6264,
-        "resid_sd": 0.2769,
-        "train_n90": 22.48
+        "predicted": 0.6287,
+        "resid_sd": 0.2747,
+        "train_n90": 22.49
       },
       "Eficiência Defensiva::Erros Totais": {
-        "predicted": 0.0509,
-        "resid_sd": 0.0654,
-        "train_n90": 22.48
+        "predicted": 0.05,
+        "resid_sd": 0.0658,
+        "train_n90": 22.49
+      },
+      "Eficiência Defensiva::Eficiência Defensiva": {
+        "predicted": -0.737,
+        "resid_sd": 0.7079,
+        "train_n90": 21.83
       },
       "Passes Progressivos": {
-        "predicted": 7.245,
-        "resid_sd": 1.4706,
-        "train_n90": 22.44
+        "predicted": 7.2938,
+        "resid_sd": 1.4911,
+        "train_n90": 22.45
       },
       "Passes Progressivos::Eficiência": {
-        "predicted": 69.4359,
-        "resid_sd": 6.4595,
-        "train_n90": 22.44
+        "predicted": 69.3553,
+        "resid_sd": 6.5696,
+        "train_n90": 22.45
       },
       "Passes para Terço Final": {
-        "predicted": 4.4711,
-        "resid_sd": 1.4853,
-        "train_n90": 22.44
+        "predicted": 4.4765,
+        "resid_sd": 1.4925,
+        "train_n90": 22.45
       },
       "Passes para Terço Final::Eficiência": {
-        "predicted": 60.0793,
-        "resid_sd": 8.0446,
-        "train_n90": 22.44
+        "predicted": 60.0038,
+        "resid_sd": 7.8798,
+        "train_n90": 22.45
       },
       "Passes Longos": {
-        "predicted": 4.6663,
-        "resid_sd": 1.2336,
-        "train_n90": 22.44
+        "predicted": 4.7053,
+        "resid_sd": 1.2452,
+        "train_n90": 22.45
       },
       "Passes Longos::Eficiência": {
-        "predicted": 48.4849,
-        "resid_sd": 7.107,
-        "train_n90": 22.44
+        "predicted": 47.8857,
+        "resid_sd": 7.0227,
+        "train_n90": 22.45
       },
       "Disputas com Bola": {
-        "predicted": 1.4381,
-        "resid_sd": 0.495,
-        "train_n90": 22.44
+        "predicted": 1.4079,
+        "resid_sd": 0.4993,
+        "train_n90": 22.45
       },
       "Disputas com Bola::Eficiência": {
-        "predicted": 50.2512,
-        "resid_sd": 13.7768,
-        "train_n90": 22.44
+        "predicted": 51.2762,
+        "resid_sd": 13.6306,
+        "train_n90": 22.45
       },
       "Gols e xG::Gols": {
-        "predicted": 0.0458,
-        "resid_sd": 0.0469,
-        "train_n90": 22.36
+        "predicted": 0.0437,
+        "resid_sd": 0.0464,
+        "train_n90": 22.37
       },
       "Gols e xG::xG": {
-        "predicted": 0.0499,
-        "resid_sd": 0.0321,
-        "train_n90": 22.36
+        "predicted": 0.0482,
+        "resid_sd": 0.0316,
+        "train_n90": 22.37
       }
     }
   }

@@ -8,7 +8,7 @@
   "nationality": "Brazil",
   "birth_year": 2000,
   "height": 188,
-  "foot": null,
+  "foot": "Destro",
   "minutes": 965,
   "minutes_pct": 38.9,
   "goals": 0,
@@ -18,13 +18,13 @@
     "geral": 7.1,
     "construcao": 7.3,
     "defesa": 8.1,
-    "perfil": 7.7
+    "perfil": 7.8
   },
   "ranks": {
-    "geral": 10,
+    "geral": 9,
     "construcao": 30,
     "defesa": 4,
-    "perfil": 7
+    "perfil": 3
   },
   "profile": "Combativo",
   "profile_shares": {
@@ -54,7 +54,7 @@
         "label": "Ações Defensivas",
         "kind": "metric_group",
         "grade": "B-",
-        "percentile": 64.4,
+        "percentile": 64.0,
         "sub_metrics": [
           {
             "label": "Rebatidas",
@@ -63,12 +63,12 @@
           },
           {
             "label": "Interceptações",
-            "percentile": 94.4,
+            "percentile": 94.3,
             "display_value": "2,8"
           },
           {
             "label": "Chutes Bloqueados",
-            "percentile": 30.3,
+            "percentile": 29.2,
             "display_value": "0,5"
           }
         ],
@@ -77,11 +77,11 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "A",
-        "percentile": 86.1,
+        "grade": "B",
+        "percentile": 66.7,
         "pair_badge": [
           72.7,
-          86.1
+          66.7
         ],
         "sub_metrics": [
           {
@@ -91,8 +91,8 @@
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 86.1,
-            "display_value": "+0,9"
+            "percentile": 66.7,
+            "display_value": "+0,5"
           }
         ],
         "stats": []
@@ -181,8 +181,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "A",
-        "percentile": 86.1,
+        "grade": "B",
+        "percentile": 66.7,
         "display_value": "89%",
         "share_pct": 89.1,
         "pool_avg_pct": 1.1,
@@ -278,26 +278,31 @@
     "construtor_badge": null,
     "construtor_badge_short": null,
     "shares": {
-      "defensor_area": 8.0,
+      "defensor_area": 7.9,
       "construtor": 7.7,
-      "combativo": 84.3
+      "combativo": 84.4
     },
     "ratings": {
-      "defensor_area": 6.9,
+      "defensor_area": 6.7,
       "construtor": 7.1,
-      "combativo": 7.7
+      "combativo": 7.8
     }
   },
   "transfermarkt": {
     "id": "812937",
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/812937-1663777615.jpg?lm=4711",
-    "market_value": "-",
-    "market_value_eur": null,
+    "photo": "/photos/1066226.jpg",
+    "market_value": "€ 140 mil",
+    "market_value_eur": 140000,
     "contract_until": null,
     "contract_remaining": null,
     "on_loan_from": null,
     "club": "Maringá FC",
-    "profile_url": "https://www.transfermarkt.com.br/ronald-carvalho/profil/spieler/812937"
+    "profile_url": "https://www.transfermarkt.com.br/ronald-carvalho/profil/spieler/812937",
+    "foot": "Destro",
+    "height": 184,
+    "matched_name": "Ronald Carvalho",
+    "match_via": "Maringá 2026",
+    "sofascore_player_id": "1066226"
   },
   "heatmap": {
     "tournament_id": 1281,
@@ -3217,79 +3222,79 @@
     ],
     "metrics": {
       "Duelos Defensivos": {
-        "predicted": 5.9046,
-        "resid_sd": 0.9969,
-        "train_n90": 22.48
+        "predicted": 5.9063,
+        "resid_sd": 0.9907,
+        "train_n90": 22.49
       },
       "Duelos Defensivos::Eficiência": {
-        "predicted": 67.2501,
-        "resid_sd": 6.0998,
-        "train_n90": 22.48
+        "predicted": 67.3284,
+        "resid_sd": 6.0571,
+        "train_n90": 22.49
       },
       "Ações Defensivas::Rebatidas": {
-        "predicted": 3.4874,
-        "resid_sd": 1.554,
-        "train_n90": 22.48
+        "predicted": 3.3985,
+        "resid_sd": 1.5346,
+        "train_n90": 22.49
       },
       "Ações Defensivas::Interceptações": {
-        "predicted": 2.6303,
-        "resid_sd": 1.0286,
-        "train_n90": 22.48
+        "predicted": 2.6484,
+        "resid_sd": 1.0324,
+        "train_n90": 22.49
       },
       "Ações Defensivas::Chutes Bloqueados": {
-        "predicted": 0.6679,
-        "resid_sd": 0.2769,
-        "train_n90": 22.48
+        "predicted": 0.6675,
+        "resid_sd": 0.2747,
+        "train_n90": 22.49
       },
       "Eficiência Defensiva::Erros Totais": {
-        "predicted": 0.0799,
-        "resid_sd": 0.0654,
-        "train_n90": 22.48
+        "predicted": 0.0759,
+        "resid_sd": 0.0658,
+        "train_n90": 22.49
       },
       "Passes Progressivos": {
-        "predicted": 9.2708,
-        "resid_sd": 1.4706,
-        "train_n90": 22.44
+        "predicted": 9.3186,
+        "resid_sd": 1.4911,
+        "train_n90": 22.45
       },
       "Passes Progressivos::Eficiência": {
-        "predicted": 73.1705,
-        "resid_sd": 6.4595,
-        "train_n90": 22.44
+        "predicted": 73.0675,
+        "resid_sd": 6.5696,
+        "train_n90": 22.45
       },
       "Passes para Terço Final": {
-        "predicted": 7.9058,
-        "resid_sd": 1.4853,
-        "train_n90": 22.44
+        "predicted": 7.9611,
+        "resid_sd": 1.4925,
+        "train_n90": 22.45
       },
       "Passes para Terço Final::Eficiência": {
-        "predicted": 69.5222,
-        "resid_sd": 8.0446,
-        "train_n90": 22.44
+        "predicted": 69.4494,
+        "resid_sd": 7.8798,
+        "train_n90": 22.45
       },
       "Passes Longos": {
-        "predicted": 7.6741,
-        "resid_sd": 1.2336,
-        "train_n90": 22.44
+        "predicted": 7.6938,
+        "resid_sd": 1.2452,
+        "train_n90": 22.45
       },
       "Passes Longos::Eficiência": {
-        "predicted": 54.2535,
-        "resid_sd": 7.107,
-        "train_n90": 22.44
+        "predicted": 54.2405,
+        "resid_sd": 7.0227,
+        "train_n90": 22.45
       },
       "Disputas com Bola": {
-        "predicted": 0.9314,
-        "resid_sd": 0.495,
-        "train_n90": 22.44
+        "predicted": 0.9218,
+        "resid_sd": 0.4993,
+        "train_n90": 22.45
       },
       "Disputas com Bola::Eficiência": {
-        "predicted": 49.4029,
-        "resid_sd": 13.7768,
-        "train_n90": 22.44
+        "predicted": 50.5084,
+        "resid_sd": 13.6306,
+        "train_n90": 22.45
       },
       "Conduções Progressivas": {
-        "predicted": 0.583,
-        "resid_sd": 0.4652,
-        "train_n90": 22.41
+        "predicted": 0.5693,
+        "resid_sd": 0.4648,
+        "train_n90": 22.44
       }
     }
   }

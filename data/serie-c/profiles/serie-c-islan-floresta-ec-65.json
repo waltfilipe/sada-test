@@ -7,8 +7,8 @@
   "position_family": "zagueiros",
   "nationality": "Brazil",
   "birth_year": 1997,
-  "height": 0,
-  "foot": null,
+  "height": 180,
+  "foot": "Destro",
   "minutes": 1934,
   "minutes_pct": 77.9,
   "goals": 1,
@@ -22,7 +22,7 @@
   },
   "ranks": {
     "geral": 1,
-    "construcao": 63,
+    "construcao": 62,
     "defesa": 4,
     "perfil": 1
   },
@@ -54,7 +54,7 @@
         "label": "Ações Defensivas",
         "kind": "metric_group",
         "grade": "B+",
-        "percentile": 82.3,
+        "percentile": 82.1,
         "sub_metrics": [
           {
             "label": "Rebatidas",
@@ -63,12 +63,12 @@
           },
           {
             "label": "Interceptações",
-            "percentile": 81.7,
+            "percentile": 81.4,
             "display_value": "2,2"
           },
           {
             "label": "Chutes Bloqueados",
-            "percentile": 66.7,
+            "percentile": 66.2,
             "display_value": "0,8"
           }
         ],
@@ -92,7 +92,7 @@
           {
             "label": "Eficiência Defensiva",
             "percentile": 100.0,
-            "display_value": "+1,8"
+            "display_value": "+2,4"
           }
         ],
         "stats": []
@@ -278,26 +278,27 @@
     "construtor_badge": null,
     "construtor_badge_short": null,
     "shares": {
-      "defensor_area": 86.3,
-      "construtor": 8.4,
-      "combativo": 5.3
+      "defensor_area": 86.5,
+      "construtor": 8.3,
+      "combativo": 5.2
     },
     "ratings": {
       "defensor_area": 8.0,
       "construtor": 5.5,
-      "combativo": 6.3
+      "combativo": 6.6
     }
   },
   "transfermarkt": {
     "id": "1082706",
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/1082706-1744745354.jpg?lm=4711",
+    "photo": "/photos/1175622.jpg",
     "market_value": "-",
     "market_value_eur": null,
     "contract_until": null,
     "contract_remaining": null,
     "on_loan_from": null,
     "club": "Piauí EC",
-    "profile_url": "https://www.transfermarkt.com.br/islan/profil/spieler/1082706"
+    "profile_url": "https://www.transfermarkt.com.br/islan/profil/spieler/1082706",
+    "sofascore_player_id": "1175622"
   },
   "heatmap": {
     "tournament_id": 1281,
@@ -3909,104 +3910,104 @@
     ],
     "metrics": {
       "Duelos Defensivos": {
-        "predicted": 4.2988,
-        "resid_sd": 0.9969,
-        "train_n90": 22.48
+        "predicted": 4.3043,
+        "resid_sd": 0.9907,
+        "train_n90": 22.49
       },
       "Duelos Defensivos::Eficiência": {
-        "predicted": 66.7799,
-        "resid_sd": 6.0998,
-        "train_n90": 22.48
+        "predicted": 66.9184,
+        "resid_sd": 6.0571,
+        "train_n90": 22.49
       },
       "Ações Defensivas::Rebatidas": {
-        "predicted": 4.5881,
-        "resid_sd": 1.554,
-        "train_n90": 22.48
+        "predicted": 4.6329,
+        "resid_sd": 1.5346,
+        "train_n90": 22.49
       },
       "Ações Defensivas::Interceptações": {
-        "predicted": 2.4276,
-        "resid_sd": 1.0286,
-        "train_n90": 22.48
+        "predicted": 2.3816,
+        "resid_sd": 1.0324,
+        "train_n90": 22.49
       },
       "Ações Defensivas::Chutes Bloqueados": {
-        "predicted": 0.6914,
-        "resid_sd": 0.2769,
-        "train_n90": 22.48
+        "predicted": 0.688,
+        "resid_sd": 0.2747,
+        "train_n90": 22.49
       },
       "Eficiência Defensiva::Erros Totais": {
-        "predicted": 0.0619,
-        "resid_sd": 0.0654,
-        "train_n90": 22.48
+        "predicted": 0.0611,
+        "resid_sd": 0.0658,
+        "train_n90": 22.49
       },
       "Passes Progressivos": {
-        "predicted": 6.9808,
-        "resid_sd": 1.4706,
-        "train_n90": 22.44
+        "predicted": 7.0305,
+        "resid_sd": 1.4911,
+        "train_n90": 22.45
       },
       "Passes Progressivos::Eficiência": {
-        "predicted": 70.8484,
-        "resid_sd": 6.4595,
-        "train_n90": 22.44
+        "predicted": 70.7633,
+        "resid_sd": 6.5696,
+        "train_n90": 22.45
       },
       "Passes para Terço Final": {
-        "predicted": 4.9347,
-        "resid_sd": 1.4853,
-        "train_n90": 22.44
+        "predicted": 4.938,
+        "resid_sd": 1.4925,
+        "train_n90": 22.45
       },
       "Passes para Terço Final::Eficiência": {
-        "predicted": 62.2175,
-        "resid_sd": 8.0446,
-        "train_n90": 22.44
+        "predicted": 62.6793,
+        "resid_sd": 7.8798,
+        "train_n90": 22.45
       },
       "Passes Longos": {
-        "predicted": 5.344,
-        "resid_sd": 1.2336,
-        "train_n90": 22.44
+        "predicted": 5.2814,
+        "resid_sd": 1.2452,
+        "train_n90": 22.45
       },
       "Passes Longos::Eficiência": {
-        "predicted": 52.3051,
-        "resid_sd": 7.107,
-        "train_n90": 22.44
+        "predicted": 51.5791,
+        "resid_sd": 7.0227,
+        "train_n90": 22.45
       },
       "Disputas com Bola": {
-        "predicted": 0.8657,
-        "resid_sd": 0.495,
-        "train_n90": 22.44
+        "predicted": 0.8476,
+        "resid_sd": 0.4993,
+        "train_n90": 22.45
       },
       "Disputas com Bola::Eficiência": {
-        "predicted": 49.6683,
-        "resid_sd": 13.7768,
-        "train_n90": 22.44
+        "predicted": 50.7516,
+        "resid_sd": 13.6306,
+        "train_n90": 22.45
       },
       "Conduções Progressivas": {
-        "predicted": 0.5317,
-        "resid_sd": 0.4652,
-        "train_n90": 22.41
+        "predicted": 0.5211,
+        "resid_sd": 0.4648,
+        "train_n90": 22.44
       },
       "Gols e xG::Gols": {
-        "predicted": 0.0436,
-        "resid_sd": 0.0469,
-        "train_n90": 22.36
+        "predicted": 0.0413,
+        "resid_sd": 0.0464,
+        "train_n90": 22.37
       },
       "Gols e xG::xG": {
-        "predicted": 0.0563,
-        "resid_sd": 0.0321,
-        "train_n90": 22.36
+        "predicted": 0.0544,
+        "resid_sd": 0.0316,
+        "train_n90": 22.37
       },
       "Gols e xG::xA": {
-        "predicted": 0.0096,
-        "resid_sd": 0.0118,
-        "train_n90": 22.31
+        "predicted": 0.0097,
+        "resid_sd": 0.0119,
+        "train_n90": 22.33
       },
       "Aéreo": {
-        "predicted": 5.7536,
-        "resid_sd": 0.8442,
-        "train_n90": 22.31
+        "predicted": 5.7364,
+        "resid_sd": 0.8482,
+        "train_n90": 22.33
       },
       "Aéreo::Eficiência": {
-        "predicted": 65.5803,
-        "resid_sd": 7.7887,
-        "train_n90": 22.31
+        "predicted": 65.419,
+        "resid_sd": 7.9094,
+        "train_n90": 22.33
       }
     }
   }

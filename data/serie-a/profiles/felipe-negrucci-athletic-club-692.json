@@ -22,9 +22,9 @@
   },
   "ranks": {
     "geral": 96,
-    "contencao": 57,
-    "construtor": 61,
-    "boxtobox": 63
+    "contencao": 55,
+    "construtor": 67,
+    "boxtobox": 62
   },
   "profile": "Contenção",
   "profile_shares": {
@@ -35,7 +35,7 @@
   "tendencies": {
     "construcao": 0.0,
     "ofensividade": 0.0,
-    "def1v1": 63.0,
+    "def1v1": 65.0,
     "contencao": 100.0,
     "duelo_aereo": 0.0
   },
@@ -88,11 +88,11 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "A",
-        "percentile": 100.0,
+        "grade": "B",
+        "percentile": 67.1,
         "pair_badge": [
           100.0,
-          100.0
+          67.1
         ],
         "sub_metrics": [
           {
@@ -102,8 +102,8 @@
           },
           {
             "label": "Eficiência Defensiva",
-            "percentile": 100.0,
-            "display_value": "+2,9"
+            "percentile": 67.1,
+            "display_value": "+0,3"
           }
         ],
         "stats": []
@@ -171,7 +171,7 @@
         "percentile": 0.0,
         "display_value": "0%",
         "share_pct": 0.0,
-        "pool_avg_pct": 7.2,
+        "pool_avg_pct": 7.1,
         "scale_max_pct": 30.0,
         "stats": [],
         "bar_key": "pass_tendency",
@@ -185,7 +185,7 @@
         "percentile": 0.0,
         "display_value": "0%",
         "share_pct": 0.0,
-        "pool_avg_pct": 13.1,
+        "pool_avg_pct": 13.0,
         "scale_max_pct": 30.0,
         "stats": [],
         "bar_key": "progressive_share",
@@ -201,7 +201,7 @@
         "percentile": 0.0,
         "display_value": "0,00",
         "share_pct": 0.0,
-        "pool_avg_pct": 2.7,
+        "pool_avg_pct": 2.6,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -211,8 +211,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "A",
-        "percentile": 100.0,
+        "grade": "B",
+        "percentile": 67.1,
         "display_value": "0%",
         "share_pct": 0.0,
         "pool_avg_pct": 1.5,
@@ -238,7 +238,7 @@
         "label": "Conduções Progressivas",
         "kind": "metric",
         "grade": "D",
-        "percentile": 1.5,
+        "percentile": 0.0,
         "stats": [],
         "display_value": "0,0"
       },
@@ -366,9 +366,9 @@
     "hybrid_badge": null,
     "hybrid_badge_short": null,
     "shares": {
-      "contencao": 94.0,
-      "construtor": 1.9,
-      "boxtobox": 4.1
+      "contencao": 94.1,
+      "construtor": 1.7,
+      "boxtobox": 4.2
     },
     "ratings": {
       "contencao": 6.5,
@@ -460,86 +460,86 @@
     ],
     "metrics": {
       "Duelos Defensivos": {
-        "predicted": 6.4023,
+        "predicted": 6.4443,
         "role_change_flag": true,
-        "resid_sd": 1.1753,
-        "train_n90": 20.76
+        "resid_sd": 1.1828,
+        "train_n90": 20.79
       },
       "Duelos Defensivos::Eficiência": {
-        "predicted": 59.7421,
+        "predicted": 59.6493,
         "role_change_flag": true,
-        "resid_sd": 5.3712,
-        "train_n90": 20.76
+        "resid_sd": 5.4132,
+        "train_n90": 20.79
       },
       "Ações Defensivas::Rebatidas": {
-        "predicted": 3.4269,
+        "predicted": 3.3313,
         "role_change_flag": true,
-        "resid_sd": 0.6754,
-        "train_n90": 20.76
+        "resid_sd": 0.683,
+        "train_n90": 20.79
       },
       "Ações Defensivas::Interceptações": {
-        "predicted": 0.5704,
-        "resid_sd": 0.861,
-        "train_n90": 20.76
+        "predicted": 0.5653,
+        "resid_sd": 0.8593,
+        "train_n90": 20.79
       },
       "Eficiência Defensiva::Erros Totais": {
-        "predicted": 0.0206,
-        "resid_sd": 0.0609,
-        "train_n90": 20.76
+        "predicted": 0.0212,
+        "resid_sd": 0.0563,
+        "train_n90": 20.79
       },
       "Passes Progressivos": {
-        "predicted": 5.4624,
+        "predicted": 5.44,
         "role_change_flag": true,
-        "resid_sd": 1.3125,
-        "train_n90": 20.77
+        "resid_sd": 1.3163,
+        "train_n90": 20.81
       },
       "Passes Progressivos::Eficiência": {
-        "predicted": 74.7045,
+        "predicted": 74.4364,
         "role_change_flag": true,
-        "resid_sd": 6.6766,
-        "train_n90": 20.77
+        "resid_sd": 6.6991,
+        "train_n90": 20.81
       },
       "Passes para Terço Final": {
-        "predicted": 5.7189,
+        "predicted": 5.7052,
         "role_change_flag": true,
-        "resid_sd": 1.5296,
-        "train_n90": 20.77
+        "resid_sd": 1.5516,
+        "train_n90": 20.81
       },
       "Passes para Terço Final::Eficiência": {
-        "predicted": 70.2757,
+        "predicted": 70.0776,
         "role_change_flag": true,
-        "resid_sd": 5.8343,
-        "train_n90": 20.77
+        "resid_sd": 5.7922,
+        "train_n90": 20.81
       },
       "Passes Longos": {
-        "predicted": 3.6081,
+        "predicted": 3.622,
         "role_change_flag": true,
-        "resid_sd": 0.9874,
-        "train_n90": 20.77
+        "resid_sd": 0.9922,
+        "train_n90": 20.81
       },
       "Passes Longos::Eficiência": {
-        "predicted": 53.5488,
+        "predicted": 53.1528,
         "role_change_flag": true,
-        "resid_sd": 8.0045,
-        "train_n90": 20.77
+        "resid_sd": 8.0347,
+        "train_n90": 20.81
       },
       "Disputas com Bola": {
-        "predicted": 2.9129,
+        "predicted": 2.9264,
         "role_change_flag": true,
-        "resid_sd": 0.885,
-        "train_n90": 20.77
+        "resid_sd": 0.9071,
+        "train_n90": 20.81
       },
       "Disputas com Bola::Eficiência": {
-        "predicted": 36.3193,
+        "predicted": 35.9343,
         "role_change_flag": true,
-        "resid_sd": 7.5701,
-        "train_n90": 20.77
+        "resid_sd": 7.459,
+        "train_n90": 20.81
       },
       "Conduções Progressivas": {
-        "predicted": 0.8172,
+        "predicted": 0.8126,
         "role_change_flag": true,
-        "resid_sd": 0.3951,
-        "train_n90": 20.68
+        "resid_sd": 0.3984,
+        "train_n90": 20.75
       }
     }
   }
