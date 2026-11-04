@@ -3421,6 +3421,21 @@
   opacity: 1;
 }
 
+.similar-metric-extra {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.6rem;
+  margin-top: 0.55rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed rgba(148, 163, 184, 0.18);
+}
+
+.similar-metric-extra-hint {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
 .similar-calc-btn {
   width: 100%;
   margin-top: 0.9rem;

@@ -1,8 +1,11 @@
 import { Suspense } from "react";
+import fs from "node:fs";
+import path from "node:path";
 import { ScatterWithQuery } from "@/app/scatter/ScatterClient";
 import { getFamilyPlayers, getMeta } from "@/lib/data.server";
 import { isLeagueId } from "@/lib/leagues";
 import { familyBySlug } from "@/lib/positions";
+import { BRASILEIRAO_SEASONS, CURRENT_SEASON } from "@/lib/seasons";
 import { leagueFamilyStaticParams } from "@/lib/staticParams";
 import { notFound } from "next/navigation";
 import type { PositionFamily } from "@/lib/types";
@@ -29,6 +32,15 @@ export default async function ScatterPage({ params }: Props) {
   });
   const meta = getMeta(league);
 
+  // Temporadas arquivadas com dados desta família — alimentam o "somar temporadas".
+  const extraSeasons = BRASILEIRAO_SEASONS.filter(
+    (year) =>
+      year !== CURRENT_SEASON &&
+      fs.existsSync(
+        path.join(process.cwd(), "data", league, "seasons", year, `family-${family.key}.json`),
+      ),
+  );
+
   return (
     <Suspense fallback={<div className="scout-root" />}>
       <ScatterWithQuery
@@ -36,6 +48,7 @@ export default async function ScatterPage({ params }: Props) {
         family={family.key as PositionFamily}
         players={players}
         metrics={meta.scatter_metrics[family.key] ?? []}
+        extraSeasons={extraSeasons}
       />
     </Suspense>
   );

@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { rankCrossLeagueSimilarity, type SimilarPlayerHit } from "@/lib/crossLeagueSimilarity";
+import {
+  PASS_DISTANCE_LABEL,
+  rankCrossLeagueSimilarity,
+  type SimilarPlayerHit,
+} from "@/lib/crossLeagueSimilarity";
 import { BRASILEIRAO_LEAGUES, LEAGUES, leaguePath, type LeagueId } from "@/lib/leagues";
 import { ESTADUAIS_LEAGUE_IDS } from "@/lib/estaduaisHub";
 import { CURRENT_SEASON } from "@/lib/seasons";
@@ -135,6 +139,8 @@ export function SimilarCrossLeagueModal({
     [positionSections],
   );
   const [pickedMetrics, setPickedMetrics] = useState<ReadonlySet<string>>(() => new Set(allMetricLabels));
+  /** Opt-in: comprimento médio de passes entra como bloco extra no modelo. */
+  const [usePassDistance, setUsePassDistance] = useState(false);
   const allPicked = pickedMetrics.size === allMetricLabels.length;
   const toggleMetric = useCallback(
     (label: string) => {
@@ -202,7 +208,10 @@ export function SimilarCrossLeagueModal({
 
   const computeSimilar = useCallback(
     (to: SimilarTarget) => {
-      const metricLabels = pickedMetrics.size === allMetricLabels.length ? undefined : [...pickedMetrics];
+      const metricLabels =
+        pickedMetrics.size === allMetricLabels.length && !usePassDistance
+          ? undefined
+          : [...pickedMetrics, ...(usePassDistance ? [PASS_DISTANCE_LABEL] : [])];
       if (to === currentLeagueId && sourceSeason === CURRENT_SEASON && isCurrentSeason) {
         setMatches(
           withPhotos(
@@ -218,7 +227,7 @@ export function SimilarCrossLeagueModal({
       }
       void fetchSimilar(to, metricLabels);
     },
-    [currentLeagueId, sourceSeason, isCurrentSeason, fetchSimilar, player, players, pickedMetrics, allMetricLabels.length],
+    [currentLeagueId, sourceSeason, isCurrentSeason, fetchSimilar, player, players, pickedMetrics, allMetricLabels.length, usePassDistance],
   );
 
   useEffect(() => {
@@ -336,6 +345,23 @@ export function SimilarCrossLeagueModal({
                     );
                   })}
                 </div>
+                <div className="similar-metric-extra">
+                  <button
+                    type="button"
+                    className={`similar-metric-chip${usePassDistance ? " is-on" : ""}`}
+                    aria-pressed={usePassDistance}
+                    onClick={() => setUsePassDistance((value) => !value)}
+                  >
+                    <i
+                      className={`fa-solid ${usePassDistance ? "fa-square-check" : "fa-square"}`}
+                      aria-hidden
+                    />
+                    Distância de passe
+                  </button>
+                  <span className="similar-metric-extra-hint">
+                    opcional · compara o comprimento médio dos passes (m)
+                  </span>
+                </div>
               </div>
 
               <button
@@ -345,6 +371,7 @@ export function SimilarCrossLeagueModal({
                 onClick={() => targetLeague && computeSimilar(targetLeague)}
               >
                 {allPicked ? "Calcular com todos os stats" : `Calcular com ${pickedMetrics.size} stats`}
+                {usePassDistance ? " + dist. passe" : ""}
                 <i className="fa-solid fa-circle-chevron-right" aria-hidden />
               </button>
             </div>
@@ -379,6 +406,7 @@ export function SimilarCrossLeagueModal({
                     : LEAGUES.find((l) => l.id === targetLeague)?.name}
                   {" · "}
                   {allPicked ? "todos os stats" : `${pickedMetrics.size} stats`}
+                  {usePassDistance ? " + dist. passe" : ""}
                 </span>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => setStep("config")}>
                   Ajustar busca

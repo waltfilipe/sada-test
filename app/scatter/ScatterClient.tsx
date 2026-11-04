@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ClubLogo } from "@/components/ClubLogo";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { MetricAxisPicker } from "@/components/scatter/MetricAxisPicker";
@@ -16,6 +16,8 @@ import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import { isProjectionEligible, realisticProjection } from "@/lib/minuteProjection";
 import { familyBySlug } from "@/lib/positions";
 import { resolveSeasonPlayerId } from "@/lib/seasonRosterMatch";
+import { leaguePath } from "@/lib/leagues";
+import { BRASILEIRAO_SEASONS, CURRENT_SEASON, isBrasileiraoLeague, withSeasonQuery } from "@/lib/seasons";
 import { scatterAxis, scatterAxisLabel } from "@/lib/scatterAxis";
 import {
   newSavedChartId,
@@ -187,10 +189,27 @@ function ScatterSlotCard({ tone, ordinal, player, dossierHref, xShort, yShort, x
   );
 }
 
+/** Linha do atleta numa temporada somada — guarda as passagens para a média ponderada. */
+type MergedPlayer = PlayerProfile & {
+  __rows: { player: PlayerProfile; season: string }[];
+  __repSeason: string;
+  /** Id real do perfil da temporada exibida (links/API) — `player_id` pode ter sufixo anti-colisão. */
+  __repId: string;
+  __merged: boolean;
+};
+
+function personKey(player: { name: string; birth_year?: number | null }): string {
+  return `${normName(player.name)}|${player.birth_year ?? 0}`;
+}
+
 type Props = {
   family: PositionFamily;
   players: PlayerProfile[];
   metrics: Metric[];
+  /** Temporadas arquivadas com dados desta família nesta liga (ex.: ["2025","2024"]). */
+  extraSeasons?: string[];
+  /** Temporadas pré-selecionadas vindas da URL (`?temporadas=2026,2025`). */
+  initialSeasons?: string[];
   initialA?: string;
   initialB?: string;
   initialC?: string;
@@ -223,6 +242,8 @@ export function ScatterClient({
   family,
   players: initialPlayers,
   metrics,
+  extraSeasons = [],
+  initialSeasons,
   initialA,
   initialB,
   initialC,
@@ -245,6 +266,141 @@ export function ScatterClient({
       resource: `families/${family}`,
     });
   const rootRef = useRef<HTMLDivElement>(null);
+
+  // — Somar temporadas: pool une as temporadas marcadas; quem está em mais de
+  // uma entra com a média ponderada pelos minutos de cada ano. —
+  const seasonOptions = useMemo(() => {
+    if (!isBrasileiraoLeague(leagueId)) return [] as string[];
+    return [...new Set([CURRENT_SEASON, season, ...extraSeasons])].sort((a, b) => Number(b) - Number(a));
+  }, [leagueId, season, extraSeasons]);
+  const [pickedSeasons, setPickedSeasons] = useState<ReadonlySet<string>>(
+    () => new Set(initialSeasons?.length ? initialSeasons : [season]),
+  );
+  const [extraRosters, setExtraRosters] = useState<Record<string, PlayerProfile[]>>({});
+  const [rosterStatus, setRosterStatus] = useState<Record<string, "loading" | "error" | "ok">>({});
+  const seasonRef = useRef(season);
+  /** Dedupe de fetch por ano — resposta atrasada é idempotente, não precisa cancelar. */
+  const requestedRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (seasonRef.current === season) return;
+    seasonRef.current = season;
+    setPickedSeasons(new Set(initialSeasons?.length ? initialSeasons : [season]));
+    setExtraRosters({});
+    setRosterStatus({});
+    requestedRef.current = new Set();
+  }, [season, initialSeasons]);
+
+  useEffect(() => {
+    for (const year of pickedSeasons) {
+      if (year === season || requestedRef.current.has(year)) continue;
+      requestedRef.current.add(year);
+      setRosterStatus((s) => ({ ...s, [year]: "loading" }));
+      fetch(`/api/families/${family}?league=${leagueId}&season=${year}`)
+        .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
+        .then((payload: { players?: PlayerProfile[] }) => {
+          setExtraRosters((map) => ({ ...map, [year]: payload.players ?? [] }));
+          setRosterStatus((s) => ({ ...s, [year]: "ok" }));
+        })
+        .catch(() => {
+          requestedRef.current.delete(year);
+          setRosterStatus((s) => ({ ...s, [year]: "error" }));
+        });
+    }
+  }, [pickedSeasons, season, family, leagueId]);
+
+  const toggleSeason = useCallback(
+    (year: string) => {
+      setPickedSeasons((prev) => {
+        if (prev.has(year)) {
+          if (prev.size === 1) return prev;
+          const next = new Set(prev);
+          next.delete(year);
+          return next;
+        }
+        const next = new Set(prev);
+        next.add(year);
+        return next;
+      });
+    },
+    [],
+  );
+
+  const retrySeason = useCallback((year: string) => {
+    requestedRef.current.delete(year);
+    setExtraRosters((map) => {
+      const next = { ...map };
+      delete next[year];
+      return next;
+    });
+    setRosterStatus((s) => {
+      const next = { ...s };
+      delete next[year];
+      return next;
+    });
+  }, []);
+
+  const multiSeason = pickedSeasons.size > 1;
+
+  const poolPlayers = useMemo<MergedPlayer[]>(() => {
+    const groups = new Map<string, { player: PlayerProfile; season: string }[]>();
+    const push = (roster: PlayerProfile[], year: string) => {
+      for (const player of roster) {
+        const key = personKey(player);
+        const group = groups.get(key) ?? [];
+        group.push({ player, season: year });
+        groups.set(key, group);
+      }
+    };
+    if (pickedSeasons.has(season)) push(players, season);
+    for (const year of pickedSeasons) {
+      if (year === season) continue;
+      const roster = extraRosters[year];
+      if (roster) push(roster, year);
+    }
+    const merged: MergedPlayer[] = [];
+    const usedIds = new Set<string>();
+    for (const rows of groups.values()) {
+      rows.sort((a, b) => Number(b.season) - Number(a.season));
+      const rep = rows[0]!;
+      // ids são por temporada (slug posicional): a mesma string pode ser pessoas
+      // diferentes em anos distintos — sufixa colisões para não repetir key/id.
+      let displayId = rep.player.player_id;
+      if (usedIds.has(displayId)) displayId = `${rep.player.player_id}#${rep.season}`;
+      usedIds.add(displayId);
+      merged.push({
+        ...rep.player,
+        player_id: displayId,
+        minutes: rows.reduce((sum, row) => sum + (row.player.minutes || 0), 0),
+        __rows: rows,
+        __repSeason: rep.season,
+        __repId: rep.player.player_id,
+        __merged: rows.length > 1,
+      });
+    }
+    return merged;
+  }, [players, season, pickedSeasons, extraRosters]);
+
+  /** Eixo somado: média dos valores por-90 de cada temporada, peso = minutos daquele ano. */
+  const axisValueOf = useCallback((merged: MergedPlayer, key: string): number => {
+    if (!merged.__merged) return scatterAxis(merged, key).value;
+    let num = 0;
+    let den = 0;
+    for (const row of merged.__rows) {
+      const weight = Math.max(0, row.player.minutes || 0);
+      num += scatterAxis(row.player, key).value * weight;
+      den += weight;
+    }
+    return den > 0 ? num / den : scatterAxis(merged, key).value;
+  }, []);
+
+  const dossierHrefFor = useCallback(
+    (merged: MergedPlayer) =>
+      isBrasileiraoLeague(leagueId)
+        ? withSeasonQuery(leaguePath(leagueId, `/posicao/${family}?atleta=${merged.__repId}`), merged.__repSeason)
+        : href(`/posicao/${family}?atleta=${merged.__repId}`),
+    [leagueId, family, href],
+  );
   const familyMeta = familyBySlug(family);
   const axisMetrics = useMemo(() => {
     const fromPosition = positionMetrics(family);
@@ -259,32 +415,32 @@ export function ScatterClient({
   const [idC, setIdC] = useState("");
 
   useEffect(() => {
-    if (!players.length) return;
+    if (!poolPlayers.length) return;
     const reference = initialPlayers;
     const a =
       initialA === ""
         ? ""
-        : (resolveSeasonPlayerId(players, initialA, {
+        : (resolveSeasonPlayerId(poolPlayers, initialA, {
             name: initialAName,
             birthYear: initialANasc,
             reference,
           }) ??
-          players[0]?.player_id ??
+          poolPlayers[0]?.player_id ??
           "");
     let b = "";
     if (initialB !== "") {
       b =
-        resolveSeasonPlayerId(players, initialB, {
+        resolveSeasonPlayerId(poolPlayers, initialB, {
           name: initialBName,
           birthYear: initialBNasc,
           reference,
         }) ??
-        players[1]?.player_id ??
+        poolPlayers[1]?.player_id ??
         "";
-      if (b === a) b = players.find((player) => player.player_id !== a)?.player_id ?? "";
+      if (b === a) b = poolPlayers.find((player) => player.player_id !== a)?.player_id ?? "";
     }
     const c = initialC
-      ? resolveSeasonPlayerId(players, initialC, {
+      ? resolveSeasonPlayerId(poolPlayers, initialC, {
           name: initialCName,
           birthYear: initialCNasc,
           reference,
@@ -294,7 +450,7 @@ export function ScatterClient({
     setIdB(b);
     setIdC(c);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [players]);
+  }, [poolPlayers]);
   const [xKey, setXKey] = useState(() => {
     if (initialX && axisMetrics.some((metric) => metric.key === initialX && metric.key !== initialY)) {
       return initialX;
@@ -319,54 +475,57 @@ export function ScatterClient({
   const athleteIds = useMemo(() => [idA, idB, idC] as [string, string, string], [idA, idB, idC]);
   const selected = useMemo(() => {
     const seen = new Set<string>();
-    const rows: { id: string; tone: Tone; player: PlayerProfile }[] = [];
+    const rows: { id: string; tone: Tone; player: MergedPlayer }[] = [];
     [idA, idB, idC].forEach((id, index) => {
       if (!id || seen.has(id)) return;
-      const player = players.find((item) => item.player_id === id);
+      const player = poolPlayers.find((item) => item.player_id === id);
       if (!player) return;
       seen.add(id);
       rows.push({ id, tone: TONES[index], player });
     });
     return rows;
-  }, [idA, idB, idC, players]);
+  }, [idA, idB, idC, poolPlayers]);
 
   const maxMinutes = useMemo(
-    () => Math.max(90, ...players.map((player) => player.minutes)),
-    [players],
+    () => Math.max(90, ...poolPlayers.map((player) => player.minutes)),
+    [poolPlayers],
   );
 
   const visiblePlayers = useMemo(
-    () => players.filter((player) => player.minutes >= minMinutes),
-    [players, minMinutes],
+    () => poolPlayers.filter((player) => player.minutes >= minMinutes),
+    [poolPlayers, minMinutes],
   );
 
-  const projectedCount = useMemo(() => players.filter(isProjectionEligible).length, [players]);
+  const projectedCount = useMemo(
+    () => (multiSeason ? 0 : poolPlayers.filter(isProjectionEligible).length),
+    [poolPlayers, multiSeason],
+  );
 
   const projectionById = useMemo(() => {
     const map = new Map<string, PlayerProfile>();
-    if (!useProjection) return map;
-    for (const player of players) {
-      map.set(player.player_id, realisticProjection(player, players)?.profile ?? player);
+    if (!useProjection || multiSeason) return map;
+    for (const player of poolPlayers) {
+      map.set(player.player_id, realisticProjection(player, poolPlayers)?.profile ?? player);
     }
     return map;
-  }, [players, useProjection]);
+  }, [poolPlayers, useProjection, multiSeason]);
 
   const points = useMemo(
     () =>
       visiblePlayers.map((player) => {
-        const source = projectionById.get(player.player_id) ?? player;
+        const source = projectionById.get(player.player_id);
         return {
           player_id: player.player_id,
           label: player.name,
           name: player.name,
           club: player.club,
-          href: href(`/posicao/${family}?atleta=${player.player_id}`),
-          x: scatterAxis(source, xKey).value,
-          y: scatterAxis(source, yKey).value,
+          href: dossierHrefFor(player),
+          x: source ? scatterAxis(source, xKey).value : axisValueOf(player, xKey),
+          y: source ? scatterAxis(source, yKey).value : axisValueOf(player, yKey),
           minutes: player.minutes,
         };
       }),
-    [visiblePlayers, projectionById, xKey, yKey, href, family],
+    [visiblePlayers, projectionById, xKey, yKey, dossierHrefFor, axisValueOf],
   );
 
   const avgX = useMemo(
@@ -378,8 +537,8 @@ export function ScatterClient({
     [points],
   );
 
-  const xLabel = scatterAxisLabel(players, xKey);
-  const yLabel = scatterAxisLabel(players, yKey);
+  const xLabel = scatterAxisLabel(poolPlayers, xKey);
+  const yLabel = scatterAxisLabel(poolPlayers, yKey);
   const highlights = selected.map((slot) => ({ id: slot.id, tone: slot.tone }));
 
   const quickRead = useMemo(() => {
@@ -419,8 +578,18 @@ export function ScatterClient({
 
   const optionsFor = (current: string) => {
     const taken = new Set(slotIds.filter((id) => id && id !== current));
-    return players.filter((player) => !taken.has(player.player_id));
+    return poolPlayers.filter((player) => !taken.has(player.player_id));
   };
+
+  const pickedSeasonsLabel = useMemo(
+    () => [...pickedSeasons].sort((a, b) => Number(b) - Number(a)).join(" + "),
+    [pickedSeasons],
+  );
+
+  // Projeção EB é um modelo de temporada única — não se aplica ao pool somado.
+  useEffect(() => {
+    if (multiSeason) setUseProjection(false);
+  }, [multiSeason]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -429,10 +598,11 @@ export function ScatterClient({
     params.set("c", idC);
     params.set("x", xKey);
     params.set("y", yKey);
+    if (multiSeason) params.set("temporadas", [...pickedSeasons].sort((a, b) => Number(b) - Number(a)).join(","));
     const next = href(`/scatter/${family}?${params.toString()}`);
     const current = `${window.location.pathname}${window.location.search}`;
     if (current !== next) window.history.replaceState(window.history.state, "", next);
-  }, [family, idA, idB, idC, xKey, yKey, href]);
+  }, [family, idA, idB, idC, xKey, yKey, href, multiSeason, pickedSeasons]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -484,7 +654,7 @@ export function ScatterClient({
     );
   }
 
-  if (!players.length) {
+  if (!poolPlayers.length) {
     return (
       <div className="scout-root scatter-root" ref={rootRef}>
         <ScoutTopbar active="scatter" subnav={positionTabs} />
@@ -507,11 +677,15 @@ export function ScatterClient({
             {familyMeta.label} <i aria-hidden>|</i> {leagueName} {season}
           </h1>
           <div className="scatter-context-chips">
-            <span className="sc-chip">Temporada {season}</span>
+            {multiSeason ? (
+              <span className="sc-chip">Temporadas {pickedSeasonsLabel}</span>
+            ) : (
+              <span className="sc-chip">Temporada {season}</span>
+            )}
             <span className="sc-chip">{leagueName}</span>
             <span className="sc-chip">{familyMeta.label}</span>
             <span className="sc-chip is-count">
-              {visiblePlayers.length} de {players.length} atletas
+              {visiblePlayers.length} de {poolPlayers.length} atletas
             </span>
             {minMinutes > 0 ? <span className="sc-chip">Mín. {minMinutes} min</span> : null}
           </div>
@@ -519,7 +693,7 @@ export function ScatterClient({
 
         <ScatterSavedChartsBar
           family={family}
-          players={players}
+          players={poolPlayers}
           savedCharts={savedCharts}
           xKey={xKey}
           yKey={yKey}
@@ -537,7 +711,7 @@ export function ScatterClient({
                   <h2>Pool do gráfico</h2>
                 </div>
                 <p className="sc-note">
-                  {visiblePlayers.length} de {players.length}
+                  {visiblePlayers.length} de {poolPlayers.length}
                 </p>
               </header>
 
@@ -556,20 +730,63 @@ export function ScatterClient({
                     aria-label="Filtro de minutos mínimos"
                   />
                 </label>
-                <button
-                  type="button"
-                  className={`scatter-proj-toggle${useProjection ? " on" : ""}`}
-                  onClick={() => setUseProjection((value) => !value)}
-                  aria-pressed={useProjection}
-                >
-                  <i className="fa-solid fa-chart-line" aria-hidden />{" "}
-                  {useProjection ? "Projeção EB ativa" : "Projetar reservas (EB)"}
-                </button>
-                {useProjection ? (
-                  <p className="scatter-proj-note">
-                    {projectedCount} reserva(s) projetados por EB + histórico; titulares mantêm o
-                    valor atual.
-                  </p>
+                {seasonOptions.length > 1 ? (
+                  <div className="scatter-seasons">
+                    <span className="scatter-seasons-label">Somar temporadas</span>
+                    <div className="scatter-season-chips" role="group" aria-label="Temporadas somadas">
+                      {seasonOptions.map((year) => {
+                        const on = pickedSeasons.has(year);
+                        const loading = rosterStatus[year] === "loading";
+                        const failed = rosterStatus[year] === "error";
+                        const lastOn = on && pickedSeasons.size === 1;
+                        return (
+                          <button
+                            key={year}
+                            type="button"
+                            className={`scatter-season-chip${on ? " is-on" : ""}${failed ? " is-error" : ""}`}
+                            aria-pressed={on}
+                            disabled={lastOn || loading}
+                            title={
+                              failed
+                                ? "Falha ao carregar — clique para tentar de novo"
+                                : lastOn
+                                  ? "Ao menos uma temporada fica marcada"
+                                  : undefined
+                            }
+                            onClick={() => (failed ? retrySeason(year) : toggleSeason(year))}
+                          >
+                            {year}
+                            {loading ? "…" : ""}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {multiSeason ? (
+                      <p className="scatter-seasons-note">
+                        Quem jogou em mais de uma temporada entra com a média ponderada pelos
+                        minutos de cada ano.
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+                {!multiSeason ? (
+                  <>
+                    <button
+                      type="button"
+                      className={`scatter-proj-toggle${useProjection ? " on" : ""}`}
+                      onClick={() => setUseProjection((value) => !value)}
+                      aria-pressed={useProjection}
+                    >
+                      <i className="fa-solid fa-chart-line" aria-hidden />{" "}
+                      {useProjection ? "Projeção EB ativa" : "Projetar reservas (EB)"}
+                    </button>
+                    {useProjection ? (
+                      <p className="scatter-proj-note">
+                        {projectedCount} reserva(s) projetados por EB + histórico; titulares mantêm
+                        o valor atual.
+                      </p>
+                    ) : null}
+                  </>
                 ) : null}
               </div>
             </section>
@@ -584,7 +801,7 @@ export function ScatterClient({
               <div className="sc-card-list">
                 {([idA, idB, idC] as const).map((id, index) => {
                   const tone = TONES[index]!;
-                  const player = players.find((item) => item.player_id === id) ?? null;
+                  const player = poolPlayers.find((item) => item.player_id === id) ?? null;
                   const point = id ? points.find((item) => item.player_id === id) : undefined;
                   const setId = index === 0 ? setIdA : index === 1 ? setIdB : setIdC;
                   return (
@@ -593,9 +810,7 @@ export function ScatterClient({
                       tone={tone}
                       ordinal={`${index + 1}º`}
                       player={player}
-                      dossierHref={
-                        player ? href(`/posicao/${family}?atleta=${player.player_id}`) : undefined
-                      }
+                      dossierHref={player ? dossierHrefFor(player) : undefined}
                       xShort={shortLabel(xLabel)}
                       yShort={shortLabel(yLabel)}
                       xVal={point?.x}
@@ -691,6 +906,9 @@ export function ScatterClient({
             Passe o mouse em um ponto para ver jogador, clube, valores e percentil. Clique para abrir o
             dossiê. Até três atletas podem ser destacados; cada cartão usa a mesma cor e forma (losango,
             círculo ou quadrado) do marcador no gráfico. As linhas tracejadas marcam a média do grupo.
+            {multiSeason
+              ? " Com temporadas somadas, o ponto reúne os anos marcados: atleta em mais de uma temporada entra com a média ponderada pelos minutos de cada ano."
+              : ""}
           </p>
           <div className="scatter-links">
             <Link href={href(`/comparar/${family}?${compareQuery.toString()}`)}>Comparar atletas</Link>
@@ -712,6 +930,7 @@ export function ScatterWithQuery(
     | "initialA"
     | "initialB"
     | "initialC"
+    | "initialSeasons"
     | "initialAName"
     | "initialANasc"
     | "initialBName"
@@ -730,6 +949,13 @@ export function ScatterWithQuery(
   return (
     <ScatterClient
       {...props}
+      initialSeasons={
+        search
+          .get("temporadas")
+          ?.split(",")
+          .map((value) => value.trim())
+          .filter((value) => (BRASILEIRAO_SEASONS as readonly string[]).includes(value))
+      }
       initialA={search.get("a") ?? undefined}
       initialB={search.get("b") ?? undefined}
       initialC={search.get("c") ?? undefined}

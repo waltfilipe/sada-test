@@ -25,6 +25,13 @@ export type SimilarPlayerHit = {
 
 const NEUTRAL_PERCENTILE = 50;
 
+/**
+ * Opt-in extra (toggle no modal): não é um card do dossiê, entra como bloco
+ * próprio no modelo quando presente em `metricLabels`.
+ */
+export const PASS_DISTANCE_LABEL = "Distância de Passe";
+const PASS_DISTANCE_BLOCK_TITLE = "Distância de passe";
+
 function normName(value: string): string {
   return value
     .normalize("NFD")
@@ -78,6 +85,9 @@ function certosFeaturesForLabel(
   player: PlayerProfile,
   label: string,
 ): { key: string; value: number }[] {
+  if (label === PASS_DISTANCE_LABEL) {
+    return player.pass_distance_m != null ? [{ key: "m/passe", value: player.pass_distance_m }] : [];
+  }
   const item = findAspect(flattenAspects(player), label);
   if (!item) return [];
 
@@ -179,6 +189,20 @@ function buildCertosModel(
     if (!entry) continue;
     blocks.push({ title: section.title, tone: entry.tone, featureIds: entry.featureIds });
     featureIds.push(...entry.featureIds);
+  }
+
+  if (metricLabels?.has(PASS_DISTANCE_LABEL)) {
+    const passFeatures = new Set<string>();
+    for (const player of pool) {
+      for (const f of certosFeaturesForLabel(player, PASS_DISTANCE_LABEL)) {
+        passFeatures.add(`${PASS_DISTANCE_LABEL} · ${f.key}`);
+      }
+    }
+    if (passFeatures.size) {
+      const ids = [...passFeatures].sort();
+      blocks.push({ title: PASS_DISTANCE_BLOCK_TITLE, tone: "passes", featureIds: ids });
+      featureIds.push(...ids);
+    }
   }
   return { blocks, featureIds: [...new Set(featureIds)] };
 }

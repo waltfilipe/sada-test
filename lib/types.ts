@@ -228,6 +228,8 @@ export type DisciplineInfo = {
 
 export type PlayerProfile = PlayerSummary & {
   cross_season?: CrossSeasonProjection;
+  /** Comprimento médio de passes (m) — entrada opcional de similaridade, fora dos cards do dossiê. */
+  pass_distance_m?: number | null;
   /** Clube real do atleta nesta liga quando a linha usa clube-artefato do export (ex.: "Grêmio" na B-2026 → exibe CRB). */
   display_club?: string | null;
   /** Presente quando esta linha é a última passagem do atleta pelo clube (ele saiu). */
