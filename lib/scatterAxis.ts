@@ -199,3 +199,64 @@ export function scatterAxisLabel(players: PlayerProfile[], key: string): string 
   const sample = players.find((player) => findAspect(flattenAspects(player), key)) ?? players[0];
   return sample ? scatterAxis(sample, key).label : volumeLabel(key);
 }
+
+/**
+ * Flattens a profile's aspects into numeric stats for per-stat filtering.
+ * Keys are self-describing: "Duelos Defensivos/90", "Eficiência Passes
+ * Progressivos" (0–100), "Eficiência Defensiva" (signed score). Metric groups
+ * emit each numeric sub-metric; %-subs roll up to the group's efficiency stat.
+ */
+export function aspectFilterStats(player: PlayerProfile): Record<string, number> {
+  const out: Record<string, number> = {};
+  const minutes = player.minutes ?? 0;
+
+  const setOnce = (key: string, value: number) => {
+    if (!(key in out)) out[key] = value;
+  };
+
+  for (const item of flattenAspects(player)) {
+    if (item.kind === "construction_share") continue;
+
+    if (item.kind === "def_efficiency_group" || item.label === "Eficiência Defensiva") {
+      for (const sub of item.sub_metrics ?? []) {
+        const numeric = parseNumber(sub.display_value);
+        if (numeric != null) {
+          setOnce(volumeLabel(sub.label), per90(numeric, sub.label, minutes));
+          continue;
+        }
+        const signed = parseSigned(sub.display_value);
+        if (signed != null && /^[+\-−]/.test((sub.display_value ?? "").trim())) {
+          setOnce(sub.label, signed);
+        }
+      }
+      continue;
+    }
+
+    const direct = parseNumber(item.display_value) ?? item.certos_per90 ?? null;
+    if (direct != null) setOnce(volumeLabel(item.label), per90(direct, item.label, minutes));
+
+    const directRate =
+      parseSuccessRate(item.efficiency_value) ?? parseSuccessRate(item.display_value);
+    if (directRate != null) setOnce(`Eficiência ${item.label}`, directRate * 100);
+
+    for (const sub of item.sub_metrics ?? []) {
+      const subRate = parseSuccessRate(sub.display_value);
+      if (subRate != null) {
+        const key = /^%|^efici[eê]ncia/i.test(sub.label) ? sub.label : `Eficiência ${item.label}`;
+        setOnce(key, subRate * 100);
+        continue;
+      }
+      const numeric = parseNumber(sub.display_value);
+      if (numeric != null) {
+        setOnce(volumeLabel(sub.label), per90(numeric, sub.label, minutes));
+        continue;
+      }
+      const signed = parseSigned(sub.display_value);
+      if (signed != null && /^[+\-−]/.test((sub.display_value ?? "").trim())) {
+        setOnce(sub.label, signed);
+      }
+    }
+  }
+
+  return out;
+}

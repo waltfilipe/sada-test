@@ -1264,9 +1264,9 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter {
 
 .hb-estaduais {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.9rem 1.6rem;
+  gap: 0.9rem 1.1rem;
   margin-top: 2rem;
   padding: 1.15rem 1.35rem;
   border-radius: 16px;
@@ -1277,7 +1277,8 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter {
 .hb-estaduais-title {
   display: flex;
   flex-direction: column;
-  font-size: 0.85rem;
+  flex-shrink: 0;
+  font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1295,14 +1296,17 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter {
 .hb-estaduais ul {
   display: flex;
   flex: 1;
-  flex-wrap: wrap;
-  gap: 0.65rem;
+  flex-wrap: nowrap;
+  min-width: 0;
+  gap: 0.55rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .hb-estaduais li {
+  flex: 1 1 0;
+  min-width: 0;
   opacity: 0;
   translate: 0 16px;
   transition:
@@ -1317,16 +1321,24 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter {
 }
 
 .hb-level {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.55rem 1rem 0.55rem 0.55rem;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.45rem 0.7rem 0.45rem 0.45rem;
   border-radius: 12px;
   border: 1px solid var(--hb-line);
   background: rgba(255, 255, 255, 0.02);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 700;
   transition: border-color 0.16s ease, background 0.16s ease;
+}
+
+.hb-level-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .hb-level:hover,
@@ -1338,24 +1350,27 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter {
 .hb-level-n {
   display: grid;
   place-items: center;
-  width: 2.05rem;
-  height: 2.05rem;
+  flex-shrink: 0;
+  width: 1.8rem;
+  height: 1.8rem;
   border-radius: 8px;
   background: var(--hx-accent);
   color: var(--hb-ink);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 900;
   font-style: italic;
 }
 
 .hb-level-logos {
   display: inline-flex;
-  gap: 0.25rem;
+  flex-shrink: 0;
+  margin-left: auto;
+  gap: 0.2rem;
 }
 
 .hb-level-logos img {
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 1.1rem;
+  height: 1.1rem;
   object-fit: contain;
 }
 
@@ -1889,6 +1904,14 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter {
 
   .hb-comp.is-accent {
     transform: none;
+  }
+
+  .hb-estaduais {
+    flex-wrap: wrap;
+  }
+
+  .hb-estaduais li {
+    flex: 1 1 45%;
   }
 
   .hb-pitch-wrap {

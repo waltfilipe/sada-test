@@ -824,6 +824,51 @@
   background: #1be7ff;
 }
 
+.stat-filter-box {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.stat-filter-box summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.stat-filter-box summary::-webkit-details-marker {
+  display: none;
+}
+
+.stat-filter-box summary em {
+  font-style: normal;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.stat-filter-list {
+  display: grid;
+  gap: 0.9rem;
+  padding: 0.15rem 0.7rem 0.8rem;
+  max-height: 19rem;
+  overflow-y: auto;
+}
+
+.stat-filter-list .range-slider {
+  margin: 0;
+}
+
+.stat-filter-list .range-slider-head span {
+  font-size: 0.72rem;
+}
+
 .badge-filter-box + .filter-block-note,
 .zag-v2-note {
   margin-top: 0.4rem;

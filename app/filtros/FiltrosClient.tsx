@@ -5,6 +5,7 @@ import { useSeasonRoster } from "@/hooks/useSeasonRoster";
 import { BadgeFilterBox } from "@/components/filters/BadgeFilterBox";
 import { PlayerResultRow } from "@/components/filters/PlayerResultRow";
 import { RangeSlider } from "@/components/filters/RangeSlider";
+import { StatFilterBox, type StatFilterSpec } from "@/components/filters/StatFilterBox";
 import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { formatFoot } from "@/lib/feet";
@@ -184,6 +185,7 @@ export function FiltrosClient({ meta, players: initialPlayers }: Props) {
   const [minutes, setMinutes] = useState<Range>(bounds.minutes);
   const [contract, setContract] = useState<ContractFilter>("all");
   const [market, setMarket] = useState<MarketFilter>("all");
+  const [statRanges, setStatRanges] = useState<Record<string, Range>>({});
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -202,6 +204,7 @@ export function FiltrosClient({ meta, players: initialPlayers }: Props) {
       if (saved.minutes) setMinutes(saved.minutes);
       if (isContractFilter(saved.contract)) setContract(saved.contract);
       if (isMarketFilter(saved.market)) setMarket(saved.market);
+      if (saved.stats) setStatRanges(saved.stats);
     }
     setReady(true);
   }, [leagueId]);
@@ -218,6 +221,7 @@ export function FiltrosClient({ meta, players: initialPlayers }: Props) {
       setAge(bounds.age);
       setHeight(bounds.height);
       setMinutes(bounds.minutes);
+      setStatRanges({});
       return;
     }
     const fix = (current: Range, range: Range): Range => {
@@ -257,12 +261,50 @@ export function FiltrosClient({ meta, players: initialPlayers }: Props) {
       minutes,
       contract,
       market,
+      stats: statRanges,
     });
-  }, [ready, leagueId, family, query, club, origin, foot, profiles, badges, sort, age, height, minutes, contract, market]);
+  }, [ready, leagueId, family, query, club, origin, foot, profiles, badges, sort, age, height, minutes, contract, market, statRanges]);
 
   const familyMeta = meta.families.find((item) => item.key === family)!;
   const profileOptions = useMemo(() => archetypesForFamily(family), [family]);
   const badgeOptions = useMemo(() => badgeCatalogForFamily(family), [family]);
+
+  // Stat catalog for the family pool (bounds ignore other filters so sliders
+  // stay stable while results narrow). Keys keep dossier (aspect) order.
+  const statCatalog = useMemo<StatFilterSpec[]>(() => {
+    const order: string[] = [];
+    const boundsMap = new Map<string, Range>();
+    for (const player of players) {
+      if (player.position_family !== family || !player.stats) continue;
+      for (const [key, value] of Object.entries(player.stats)) {
+        const current = boundsMap.get(key);
+        if (!current) {
+          boundsMap.set(key, [value, value]);
+          order.push(key);
+        } else {
+          current[0] = Math.min(current[0], value);
+          current[1] = Math.max(current[1], value);
+        }
+      }
+    }
+    return order
+      .map((key) => ({ key, min: boundsMap.get(key)![0], max: boundsMap.get(key)![1] }))
+      .filter((stat) => stat.max > stat.min);
+  }, [players, family]);
+
+  const statBounds = useMemo(
+    () => new Map(statCatalog.map((stat) => [stat.key, [stat.min, stat.max] as Range])),
+    [statCatalog],
+  );
+
+  const setStatRange = (key: string, value: Range | null) => {
+    setStatRanges((current) => {
+      const next = { ...current };
+      if (value == null) delete next[key];
+      else next[key] = value;
+      return next;
+    });
+  };
 
   const clubs = useMemo(() => {
     const set = new Set<string>();
@@ -284,6 +326,7 @@ export function FiltrosClient({ meta, players: initialPlayers }: Props) {
     setMinutes(bounds.minutes);
     setContract("all");
     setMarket("all");
+    setStatRanges({});
   };
 
   const toggleProfile = (profile: string) => {
@@ -324,6 +367,12 @@ export function FiltrosClient({ meta, players: initialPlayers }: Props) {
       if (!matchesContract(player.transfermarkt?.contract_until, contract)) return false;
       if (!matchesMarket(player.transfermarkt?.market_value_eur, market)) return false;
 
+      for (const [key, range] of Object.entries(statRanges)) {
+        if (!statBounds.has(key)) continue;
+        const value = player.stats?.[key];
+        if (value == null || value < range[0] || value > range[1]) return false;
+      }
+
       return true;
     });
 
@@ -334,7 +383,7 @@ export function FiltrosClient({ meta, players: initialPlayers }: Props) {
       if (sort.startsWith("stat:")) return statSortValue(b, sort.slice(5)) - statSortValue(a, sort.slice(5));
       return positionRating(b) - positionRating(a);
     });
-  }, [players, family, club, origin, foot, profiles, profileOptions, badges, query, minutes, height, age, contract, market, sort]);
+  }, [players, family, club, origin, foot, profiles, profileOptions, badges, query, minutes, height, age, contract, market, statRanges, statBounds, sort]);
 
   const chips = useMemo(() => {
     const list: { key: string; label: string; clear: () => void }[] = [];
@@ -375,6 +424,15 @@ export function FiltrosClient({ meta, players: initialPlayers }: Props) {
         clear: () => setMinutes(bounds.minutes),
       });
     }
+    for (const [key, range] of Object.entries(statRanges)) {
+      if (!statBounds.has(key)) continue;
+      const short = key.length > 34 ? `${key.slice(0, 32)}…` : key;
+      list.push({
+        key: `s-${key}`,
+        label: `${short}: ${range[0].toLocaleString("pt-BR", { maximumFractionDigits: 1 })}–${range[1].toLocaleString("pt-BR", { maximumFractionDigits: 1 })}`,
+        clear: () => setStatRange(key, null),
+      });
+    }
     if (contract !== "all") {
       const label = CONTRACT_BANDS.find((item) => item.key === contract)?.label ?? contract;
       list.push({ key: "contract", label, clear: () => setContract("all") });
@@ -385,7 +443,7 @@ export function FiltrosClient({ meta, players: initialPlayers }: Props) {
     }
 
     return list;
-  }, [query, club, origin, foot, profiles, badges, age, height, minutes, contract, market, bounds, ageBounds, badgeOptions]);
+  }, [query, club, origin, foot, profiles, badges, age, height, minutes, contract, market, bounds, ageBounds, badgeOptions, statRanges, statBounds]);
 
   return (
     <div className="scout-root filters-root">
@@ -417,6 +475,7 @@ export function FiltrosClient({ meta, players: initialPlayers }: Props) {
                       setProfiles([]);
                       setBadges([]);
                       setClub("all");
+                      setStatRanges({});
                     }}
                   >
                     {item.label}
@@ -463,6 +522,11 @@ export function FiltrosClient({ meta, players: initialPlayers }: Props) {
             <section className="filter-block">
               <BadgeFilterBox options={badgeOptions} selected={badges} onToggle={toggleBadge} />
               <p className="filter-block-note">Mostra quem conquistou todos os badges marcados.</p>
+            </section>
+
+            <section className="filter-block">
+              <StatFilterBox stats={statCatalog} ranges={statRanges} onChange={setStatRange} />
+              <p className="filter-block-note">Restringe cada estatística dentro do intervalo da posição.</p>
             </section>
 
             <section className="filter-block">

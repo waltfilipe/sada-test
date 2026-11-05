@@ -7,6 +7,7 @@ import { CURRENT_SEASON, parseSeasonParam } from "./seasons";
 import { DEFAULT_LEAGUE, isLeagueId, type LeagueId } from "./leagues";
 import { POSITION_FAMILIES } from "./positions";
 import { playerStatBadges } from "./statBadges";
+import { aspectFilterStats } from "./scatterAxis";
 import { withResolvedSeasonPhoto, withResolvedSeasonPhotos } from "./playerPhotoLookup.server";
 import { withPlayersDepartures } from "./transfersLookup.server";
 import type { PlayerHeatmapData, PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
@@ -126,6 +127,7 @@ export function getSearchRows(league?: string, season?: string): PlayerSearchRow
           },
           badges: profile ? playerStatBadges(profile).map((badge) => badge.key) : [],
           scatter: profile?.scatter,
+          stats: profile ? aspectFilterStats(profile) : {},
           heatmap: compactHeatmap(heatmap),
         };
       }),

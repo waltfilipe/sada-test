@@ -17,6 +17,8 @@ export type SavedFilters = {
   minutes: [number, number];
   contract?: ContractFilter;
   market?: MarketFilter;
+  /** Active per-stat ranges ("Duelos Defensivos/90" → [min, max]). */
+  stats?: Record<string, [number, number]>;
 };
 
 const CONTRACT_FILTERS: ContractFilter[] = ["all", "lt6", "lt12", "gte12", "none"];
