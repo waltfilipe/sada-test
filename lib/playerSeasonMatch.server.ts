@@ -44,12 +44,21 @@ export function findPlayerInSeason(
   name: string,
   birthYear: number | null | undefined,
   club?: string | null,
+  identity?: { athleteId?: string | null; personKey?: string | null },
 ): PlayerProfile | null {
   const norm = normPlayerName(name);
   let best: { player: PlayerProfile; pool: PlayerProfile[]; family: PositionFamily; score: number } | null = null;
   for (const family of POSITION_FAMILIES) {
     const pool = getFamilyPlayers(family.key, league, season) as PlayerProfile[];
     for (const player of pool) {
+      // athlete_id/person_key identificam a pessoa diretamente — resolve exato
+      // mesmo com divergência de ano de nascimento entre arquivos Wyscout.
+      if (identity?.athleteId && player.athlete_id === identity.athleteId) {
+        return withSeasonMeta(league, season, player, pool, family.key);
+      }
+      if (identity?.personKey && player.person_key === identity.personKey) {
+        return withSeasonMeta(league, season, player, pool, family.key);
+      }
       if (normPlayerName(player.name) !== norm) continue;
       const pb = player.birth_year ?? null;
       if (birthYear == null || pb == null) continue;

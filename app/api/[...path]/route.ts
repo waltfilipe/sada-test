@@ -131,6 +131,10 @@ export async function GET(request: Request, { params }: Params) {
       name,
       Number.isFinite(birth) ? birth : null,
       url.searchParams.get("club"),
+      {
+        athleteId: url.searchParams.get("athlete_id"),
+        personKey: url.searchParams.get("person_key"),
+      },
     );
     if (!hit) return NextResponse.json({ error: "not_found" }, { status: 404 });
     return NextResponse.json(hit, { headers: archiveCacheHeaders(season) });

@@ -55,6 +55,10 @@ export function usePlayerArchiveProfile(basePlayer: PlayerProfile, _family: Posi
       name: basePlayer.name,
       birth_year: String(basePlayer.birth_year ?? ""),
     });
+    // Identidade persistente resolve exatamente a linha da temporada alvo —
+    // cobre divergências de ano de nascimento (±2) entre arquivos Wyscout.
+    if (basePlayer.athlete_id) qs.set("athlete_id", basePlayer.athlete_id);
+    if (basePlayer.person_key) qs.set("person_key", basePlayer.person_key);
     const expectedClub =
       basePlayer.cross_season?.seasons.find((s) => s.year === fichaSeason && s.league === league)?.club ??
       basePlayer.club;
