@@ -2,22 +2,51 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLeague } from "@/components/LeagueProvider";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
+import { getLeague } from "@/lib/leagues";
 import { REPORT_COPY, type ReportLang } from "@/lib/reportI18n";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile } from "@/lib/types";
 
+export type ExportSeasonPick = { league: string; season: string };
+
 type Props = {
   athletes: PlayerProfile[];
   onClose: () => void;
-  onExport: (playerId: string, lang: ReportLang) => void;
+  onExport: (playerId: string, lang: ReportLang, seasons: ExportSeasonPick[]) => void;
 };
 
 export function ScatterExportModal({ athletes, onClose, onExport }: Props) {
+  const { season: viewedSeason } = useLeague();
   const [mounted, setMounted] = useState(false);
   const [pickedId, setPickedId] = useState(athletes[0]?.player_id ?? "");
+  const [rowsById, setRowsById] = useState<Record<string, ExportSeasonPick[]>>({});
+  const [pickedSeasons, setPickedSeasons] = useState<Set<string>>(new Set());
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+
+  // Anos disponíveis do atleta no registro (cross-liga) para fichas extras no PDF.
+  useEffect(() => {
+    const player = athletes.find((item) => item.player_id === pickedId);
+    if (!player || (!player.athlete_id && !player.person_key) || rowsById[pickedId]) return;
+    const qs = new URLSearchParams();
+    if (player.athlete_id) qs.set("athlete_id", player.athlete_id);
+    else qs.set("person_key", player.person_key!);
+    let cancelled = false;
+    fetch(`/api/athlete-rows?${qs}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { rows?: ExportSeasonPick[] } | null) => {
+        if (!cancelled && data?.rows) setRowsById((map) => ({ ...map, [pickedId]: data.rows! }));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [pickedId, athletes, rowsById]);
+
+  const otherSeasons = (rowsById[pickedId] ?? []).filter((row) => row.season !== viewedSeason);
+  const picked = otherSeasons.filter((row) => pickedSeasons.has(row.season));
 
   useEffect(() => {
     setMounted(true);
@@ -90,6 +119,33 @@ export function ScatterExportModal({ athletes, onClose, onExport }: Props) {
           </ul>
         </fieldset>
 
+        {otherSeasons.length ? (
+          <fieldset className="scatter-export-pick">
+            <legend>Incluir fichas de arquivo</legend>
+            <div className="player-report-archive-picks" role="group" aria-label="Temporadas no PDF">
+              {otherSeasons.map((row) => (
+                <label key={row.season} className="player-report-archive-pick">
+                  <input
+                    type="checkbox"
+                    checked={pickedSeasons.has(row.season)}
+                    onChange={(event) =>
+                      setPickedSeasons((current) => {
+                        const next = new Set(current);
+                        if (event.target.checked) next.add(row.season);
+                        else next.delete(row.season);
+                        return next;
+                      })
+                    }
+                  />
+                  <span>
+                    Wyscout {row.season} · {getLeague(row.league)?.name ?? row.league}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ) : null}
+
         <div className="scatter-export-lang">
           <p className="scatter-export-lang-label">Idioma do relatório</p>
           <div className="scatter-export-lang-actions">
@@ -97,7 +153,7 @@ export function ScatterExportModal({ athletes, onClose, onExport }: Props) {
               type="button"
               className="btn btn-ghost btn-sm"
               disabled={!pickedId}
-              onClick={() => pickedId && onExport(pickedId, "pt")}
+              onClick={() => pickedId && onExport(pickedId, "pt", picked)}
             >
               <i className="fa-solid fa-file-pdf" aria-hidden="true" /> {REPORT_COPY.pt.portuguese}
             </button>
@@ -105,7 +161,7 @@ export function ScatterExportModal({ athletes, onClose, onExport }: Props) {
               type="button"
               className="btn btn-ghost btn-sm"
               disabled={!pickedId}
-              onClick={() => pickedId && onExport(pickedId, "en")}
+              onClick={() => pickedId && onExport(pickedId, "en", picked)}
             >
               <i className="fa-solid fa-file-pdf" aria-hidden="true" /> {REPORT_COPY.en.english}
             </button>

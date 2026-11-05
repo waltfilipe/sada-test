@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLoading } from "@/components/LoadingProvider";
-import { ScatterExportModal } from "@/components/scatter/ScatterExportModal";
-import { ScatterExportSheet } from "@/components/scatter/ScatterExportSheet";
+import { useLeague } from "@/components/LeagueProvider";
+import { ScatterExportModal, type ExportSeasonPick } from "@/components/scatter/ScatterExportModal";
+import { ScatterExportSheet, type ScatterExtraSheet } from "@/components/scatter/ScatterExportSheet";
+import { getLeague } from "@/lib/leagues";
 import { highlightedAthleteIds, type SavedScatterChart } from "@/lib/scatterSavedCharts";
 import { REPORT_COPY, type ReportLang } from "@/lib/reportI18n";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -16,12 +18,17 @@ type Props = {
 
 export function ScatterExportButton({ family, players, savedCharts }: Props) {
   const { beginLoad, endLoad } = useLoading();
+  const { leagueId, season: viewedSeason } = useLeague();
   const [modalOpen, setModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [sheetUrl, setSheetUrl] = useState("");
   const [exportPlayerId, setExportPlayerId] = useState<string | null>(null);
   const [lang, setLang] = useState<ReportLang>("pt");
   const [printRequest, setPrintRequest] = useState(0);
+  // Perfil completo via API — a página remove heatmap do payload; as fichas de
+  // arquivo marcam temporadas extras do registro.
+  const [mainProfile, setMainProfile] = useState<PlayerProfile | null>(null);
+  const [extraSheets, setExtraSheets] = useState<ScatterExtraSheet[]>([]);
 
   const athleteIds = useMemo(() => highlightedAthleteIds(savedCharts), [savedCharts]);
   const exportAthletes = useMemo(
@@ -31,10 +38,10 @@ export function ScatterExportButton({ family, players, savedCharts }: Props) {
         .filter((player): player is PlayerProfile => Boolean(player)),
     [athleteIds, players],
   );
-  const focusPlayer = useMemo(
-    () => (exportPlayerId ? players.find((player) => player.player_id === exportPlayerId) : null),
-    [exportPlayerId, players],
-  );
+  const focusPlayer = useMemo(() => {
+    const base = exportPlayerId ? players.find((player) => player.player_id === exportPlayerId) : null;
+    return mainProfile ?? base;
+  }, [exportPlayerId, players, mainProfile]);
 
   useEffect(() => {
     setMounted(true);
@@ -53,6 +60,8 @@ export function ScatterExportButton({ family, players, savedCharts }: Props) {
       document.title = previousTitle;
       endLoad();
       setExportPlayerId(null);
+      setMainProfile(null);
+      setExtraSheets([]);
       window.removeEventListener("afterprint", cleanup);
     };
     window.addEventListener("afterprint", cleanup);
@@ -63,11 +72,38 @@ export function ScatterExportButton({ family, players, savedCharts }: Props) {
     return () => window.cancelAnimationFrame(frame);
   }, [printRequest, focusPlayer, lang, beginLoad, endLoad]);
 
-  function startExport(playerId: string, nextLang: ReportLang) {
+  async function startExport(playerId: string, nextLang: ReportLang, seasons: ExportSeasonPick[]) {
     setModalOpen(false);
     setLang(nextLang);
+    beginLoad();
+    const target = players.find((player) => player.player_id === playerId) ?? null;
+    const fetchSeason = async (league: string, season: string): Promise<PlayerProfile | null> => {
+      if (!target) return null;
+      const qs = new URLSearchParams({
+        league,
+        season,
+        name: target.name,
+        birth_year: String(target.birth_year ?? ""),
+      });
+      if (target.athlete_id) qs.set("athlete_id", target.athlete_id);
+      if (target.person_key) qs.set("person_key", target.person_key);
+      const res = await fetch(`/api/player-season?${qs}`).catch(() => null);
+      return res?.ok ? ((await res.json()) as PlayerProfile) : null;
+    };
+    const [main, ...extras] = await Promise.all([
+      fetchSeason(leagueId, viewedSeason),
+      ...seasons.map(async (row) => {
+        const profile = await fetchSeason(row.league, row.season);
+        return profile
+          ? { player: profile, year: row.season, leagueName: getLeague(row.league)?.name ?? row.league }
+          : null;
+      }),
+    ]);
+    setMainProfile(main);
+    setExtraSheets(extras.filter((item): item is ScatterExtraSheet => Boolean(item)));
     setExportPlayerId(playerId);
     setPrintRequest((value) => value + 1);
+    endLoad();
   }
 
   if (!savedCharts.length) return null;
@@ -93,6 +129,7 @@ export function ScatterExportButton({ family, players, savedCharts }: Props) {
               players={players}
               savedCharts={savedCharts}
               focusPlayer={focusPlayer}
+              extraSheets={extraSheets}
               lang={lang}
               sheetUrl={sheetUrl}
             />,

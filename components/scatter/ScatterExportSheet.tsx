@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { ScatterPlot } from "@/components/scatter/ScatterPlot";
-import { ReportSheet } from "@/components/position/profile/PlayerReport";
+import { ReportSheet, SeasonSummarySheet } from "@/components/position/profile/PlayerReport";
 import { useLeague } from "@/components/LeagueProvider";
 import { buildScatterChartView } from "@/lib/scatterChartBuild";
 import { familyBySlug } from "@/lib/positions";
@@ -10,11 +10,14 @@ import { REPORT_COPY, reportLocale, type ReportLang } from "@/lib/reportI18n";
 import type { SavedScatterChart } from "@/lib/scatterSavedCharts";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
+export type ScatterExtraSheet = { player: PlayerProfile; year: string; leagueName: string };
+
 type Props = {
   family: PositionFamily;
   players: PlayerProfile[];
   savedCharts: SavedScatterChart[];
   focusPlayer: PlayerProfile;
+  extraSheets?: ScatterExtraSheet[];
   lang: ReportLang;
   sheetUrl: string;
 };
@@ -23,7 +26,7 @@ type Props = {
 const CHARTS_PER_PAGE = 1;
 const PLOT_SIZE = { width: 1040, height: 560 };
 
-export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, lang, sheetUrl }: Props) {
+export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, extraSheets, lang, sheetUrl }: Props) {
   const league = useLeague();
   const { href } = league;
   const copy = REPORT_COPY[lang];
@@ -46,7 +49,9 @@ export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, 
     return pages;
   }, [built]);
 
-  const totalPages = 2 + chartPages.length;
+  const extras = extraSheets ?? [];
+  const dossierPages = 2 + extras.length * 2;
+  const totalPages = dossierPages + chartPages.length + (extras.length ? 1 : 0);
 
   return (
     <div className="scout-print-export" lang={lang === "en" ? "en" : "pt-BR"}>
@@ -58,6 +63,21 @@ export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, 
         sheetUrl={sheetUrl}
         totalPages={totalPages}
       />
+      {extras.map((extra, index) => (
+        <ReportSheet
+          key={`extra-${extra.year}`}
+          player={extra.player}
+          family={family}
+          players={players}
+          lang={lang}
+          sheetUrl={sheetUrl}
+          archiveSeasonLabel={extra.year}
+          leagueName={extra.leagueName}
+          skipProjection
+          pageOffset={2 * (index + 1)}
+          totalPages={totalPages}
+        />
+      ))}
       {chartPages.map((charts, pageIndex) => (
         <div key={pageIndex} className="player-report-page scatter-report-page scatter-report-landscape">
           <header className="player-report-banner">
@@ -122,12 +142,24 @@ export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, 
               <p className="player-report-colophon">
                 <span>SADA | Scout</span>
                 <span>{generated}</span>
-                <span>{copy.page(3 + pageIndex, totalPages)}</span>
+                <span>{copy.page(dossierPages + 1 + pageIndex, totalPages)}</span>
               </p>
             </footer>
           </div>
         </div>
       ))}
+      {extras.length ? (
+        <SeasonSummarySheet
+          rows={[
+            { player: focusPlayer, year: league.season, leagueName: league.name },
+            ...extras.map((extra) => ({ player: extra.player, year: extra.year, leagueName: extra.leagueName })),
+          ]}
+          family={family}
+          lang={lang}
+          pageNumber={totalPages}
+          totalPages={totalPages}
+        />
+      ) : null}
     </div>
   );
 }

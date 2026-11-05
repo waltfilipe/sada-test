@@ -1632,13 +1632,40 @@ export function PlayerReportButton({
     { player, seasonYear: "", leagueName: "", skipProjection: false },
   ]);
   const [includeArchive, setIncludeArchive] = useState<Record<string, boolean>>({});
+  const [registryRows, setRegistryRows] = useState<{ league: string; season: string }[] | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
+  // Registro de identidade dá TODOS os anos disponíveis (cross_season está
+  // vazio em linhas de arquivo e não cobre quem saiu da base corrente).
+  useEffect(() => {
+    if (!scout.athlete_id && !scout.person_key) {
+      setRegistryRows(null);
+      return;
+    }
+    const qs = new URLSearchParams();
+    if (scout.athlete_id) qs.set("athlete_id", scout.athlete_id);
+    else qs.set("person_key", scout.person_key!);
+    let cancelled = false;
+    fetch(`/api/athlete-rows?${qs}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { rows?: { league: string; season: string }[] } | null) => {
+        if (!cancelled) setRegistryRows(data?.rows ?? null);
+      })
+      .catch(() => {
+        if (!cancelled) setRegistryRows(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [scout.athlete_id, scout.person_key]);
+
   const archiveYears = useMemo(() => {
-    const rows = scout.cross_season?.seasons ?? [];
-    const years = [...new Set(rows.map((r) => r.year))].filter(Boolean).sort((a, b) => b.localeCompare(a));
-    return years;
-  }, [scout.cross_season]);
+    const viewedYear = primaryArchiveLabel ?? currentSeason;
+    const years = new Set<string>();
+    for (const row of registryRows ?? []) if (row.season) years.add(row.season);
+    for (const row of scout.cross_season?.seasons ?? []) years.add(row.year);
+    return [...years].filter((year) => year !== viewedYear).sort((a, b) => b.localeCompare(a));
+  }, [registryRows, scout.cross_season, primaryArchiveLabel, currentSeason]);
 
   useEffect(() => {
     setMounted(true);
@@ -1688,14 +1715,18 @@ export function PlayerReportButton({
   }
 
   async function fetchArchiveProfile(year: string): Promise<{ profile: PlayerProfile; league: string } | null> {
-    const row = scout.cross_season?.seasons.find((s) => s.year === year);
-    const league = row?.league ?? leagueId;
+    const league =
+      registryRows?.find((row) => row.season === year)?.league ??
+      scout.cross_season?.seasons.find((s) => s.year === year)?.league ??
+      leagueId;
     const qs = new URLSearchParams({
       league,
       season: year,
       name: scout.name,
       birth_year: String(scout.birth_year ?? ""),
     });
+    if (scout.athlete_id) qs.set("athlete_id", scout.athlete_id);
+    if (scout.person_key) qs.set("person_key", scout.person_key);
     const res = await fetch(`/api/player-season?${qs}`);
     if (!res.ok) return null;
     return { profile: (await res.json()) as PlayerProfile, league };
@@ -1764,7 +1795,12 @@ export function PlayerReportButton({
                         setIncludeArchive((current) => ({ ...current, [year]: event.target.checked }))
                       }
                     />
-                    <span>Wyscout {year}</span>
+                    <span>
+                      Wyscout {year}
+                      {registryRows?.find((row) => row.season === year)?.league
+                        ? ` · ${leagueNameFor(registryRows.find((row) => row.season === year)!.league)}`
+                        : ""}
+                    </span>
                   </label>
                 ))}
               </div>
