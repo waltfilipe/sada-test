@@ -30,6 +30,18 @@ splits de linha). O registro sempre respeita overrides.
 
 `athletes.json` nunca reutiliza ids: pessoas desaparecidas ficam `active:false`.
 
+## Heatmaps por temporada (SofaScore)
+
+- Temporada corrente: `apply_heatmaps_to_site.py` (CSV defensivo BR26).
+- Temporadas arquivadas: `apply_heatmaps_season.py --league X --season Y
+  --source <dir>` — resolve identidade por `sofascore_player_id` do registro
+  (fallback: nome único dentro da temporada; homônimos ambíguos são pulados),
+  embute `heatmap` na linha de `players.json` + `family-*.json`, grava storage
+  em `data/heatmaps/seasons/{liga}-{temp}/` e estampa a âncora
+  `sofascore["{liga}/{temp}"]` em `people.json`/`athletes.json`
+  (`build_people.py` relê esse diretório em rebuilds).
+- Exibição é gated por `meta.heatmaps_enabled` da temporada.
+
 ## Verificação
 
 - `npx tsc --noEmit` — typecheck

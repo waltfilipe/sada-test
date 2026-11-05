@@ -66,9 +66,12 @@ def load_all_rows() -> dict[tuple[str, str, str], dict]:
     return rows
 
 
-def load_sofascore_ids() -> dict[str, dict]:
-    """player_id → {id, name, team} from heatmap payloads."""
-    out: dict[str, dict] = {}
+def load_sofascore_ids() -> tuple[dict[str, dict], dict[str, dict]]:
+    """player_id → {id, name, team} from heatmap payloads, plus a
+    season-scoped variant "league/season/player_id" from
+    data/heatmaps/seasons/{league}-{season}/."""
+    by_pid: dict[str, dict] = {}
+    by_row: dict[str, dict] = {}
     for path in (DATA / "heatmaps").glob("*.json"):
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
@@ -76,12 +79,30 @@ def load_sofascore_ids() -> dict[str, dict]:
             continue
         ss_id = payload.get("sofascore_player_id")
         if ss_id:
-            out[path.stem] = {
+            by_pid[path.stem] = {
                 "id": str(ss_id),
                 "name": payload.get("sofascore_name"),
                 "team": payload.get("sofascore_team"),
             }
-    return out
+    seasons_root = DATA / "heatmaps" / "seasons"
+    if seasons_root.is_dir():
+        for league_dir in seasons_root.iterdir():
+            if not league_dir.is_dir() or "-" not in league_dir.name:
+                continue
+            league, season = league_dir.name.rsplit("-", 1)
+            for path in league_dir.glob("*.json"):
+                try:
+                    payload = json.loads(path.read_text(encoding="utf-8"))
+                except (OSError, json.JSONDecodeError):
+                    continue
+                ss_id = payload.get("sofascore_player_id")
+                if ss_id:
+                    by_row[f"{league}/{season}/{path.stem}"] = {
+                        "id": str(ss_id),
+                        "name": payload.get("sofascore_name"),
+                        "team": payload.get("sofascore_team"),
+                    }
+    return by_pid, by_row
 
 
 def main() -> int:
@@ -89,7 +110,7 @@ def main() -> int:
     transfers_path = DATA / "cross-season" / "transfers.json"
     transfers = json.loads(transfers_path.read_text(encoding="utf-8")) if transfers_path.exists() else {}
     all_rows = load_all_rows()
-    ss_by_pid = load_sofascore_ids()
+    ss_by_pid, ss_by_row = load_sofascore_ids()
 
     people: dict[str, dict] = {}
     conflicts: list[dict] = []
@@ -128,7 +149,7 @@ def main() -> int:
                 tm_id = str(tm.get("id")) if tm.get("id") else None
                 if tm_id:
                     rec.setdefault("_tm_ids", []).append((tm_id, season, tm))
-                ss = ss_by_pid.get(player_id)
+                ss = ss_by_row.get(f"{league}/{season}/{player_id}") or ss_by_pid.get(player_id)
                 if ss:
                     rec["sofascore"][f"{league}/{season}"] = ss["id"]
                     if ss.get("team"):
