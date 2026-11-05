@@ -198,8 +198,14 @@ type MergedPlayer = PlayerProfile & {
   __merged: boolean;
 };
 
-function personKey(player: { name: string; birth_year?: number | null }): string {
-  return `${normName(player.name)}|${player.birth_year ?? 0}`;
+function personKey(player: {
+  name: string;
+  birth_year?: number | null;
+  athlete_id?: string | null;
+}): string {
+  // athlete_id é o join canônico do registro (athletes.json); sem ele, cai no
+  // heurístico local de nome+ano — linhas fora do grafo não têm id garantido.
+  return player.athlete_id ?? `${normName(player.name)}|${player.birth_year ?? 0}`;
 }
 
 type Props = {

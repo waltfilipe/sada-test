@@ -69,6 +69,10 @@ export type { PositionCluster, ZagArchetype, ZagCluster, ZagClusterShares, ZagAr
 
 export type PlayerSummary = {
   player_id: string;
+  /** Id estável do registro cross-temporada (ath-XXXXXX) — join canônico entre ligas/anos. */
+  athlete_id?: string | null;
+  /** Chave derivada da resolução de identidade (debug/rastreio). */
+  person_key?: string | null;
   name: string;
   club: string;
   label: string;
