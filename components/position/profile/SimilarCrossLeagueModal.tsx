@@ -281,7 +281,10 @@ export function SimilarCrossLeagueModal({
                 {player.club} · {player.profile}
               </p>
               <p className="similar-cross-intro-note">
-                100% = mesmos percentis de ações certas por 90 · métricas do perfil pesam mais · total e por bloco ({positionSections.map((s) => s.title).join(" · ")})
+                100% = mesmos percentis de ações certas por 90 · métricas do perfil pesam mais ·{" "}
+                {allPicked
+                  ? `total e por bloco (${positionSections.map((s) => s.title).join(" · ")})`
+                  : "total e por stat selecionado"}
               </p>
             </div>
           </div>

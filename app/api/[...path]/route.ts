@@ -230,6 +230,7 @@ function similarPayload(url: URL) {
   const matches = rankCrossLeagueSimilarity(source, targetPool, {
     limit,
     leagueOf: (p) => leagueByPlayer.get(p),
+    sourcePool: getFamilyPlayers(positionFamily, fromLeague, parseSeasonParam(season)),
     debug: url.searchParams.get("debug") === "1",
     metricLabels: metricLabels?.length ? metricLabels : undefined,
   }).map((hit) => ({

@@ -126,12 +126,15 @@ function certosFeaturesForLabel(
     "1v1 - Ofensivo",
   ]);
   if (duelLike.has(label) || label.includes("Duelo")) {
+    // O dossiê exibe DOIS percentis (volume e eficiência) — o modelo usa os
+    // mesmos dois como features separadas; um produto vencidos/90 esconderia
+    // divergências fortes (vol mediano × eficiência p10 ≈ vol alto × eff alta).
     const vol = parseDisplayNumber(item.display_value);
     const eff = parseEffPct(item);
-    if (vol != null && eff != null) {
-      return [{ key: "vencidos/90", value: (vol * eff) / 100 }];
-    }
-    return [];
+    const features: { key: string; value: number }[] = [];
+    if (vol != null) features.push({ key: "volume/90", value: vol });
+    if (eff != null) features.push({ key: "eficiência", value: eff });
+    return features;
   }
 
   if (item.certos_per90 != null) {
@@ -162,33 +165,44 @@ function buildCertosModel(
   metricLabels?: ReadonlySet<string>,
 ): BlockModel {
   const sections = statSectionsForFamily(family);
-  const blockMap = new Map<string, { tone: StatSectionTone; featureIds: string[] }>();
-
-  for (const section of sections) {
-    const collected = new Set<string>();
-    for (const label of section.labels) {
-      if (label === "Eficiência Defensiva") continue;
-      if (metricLabels && !metricLabels.has(label)) continue;
-      for (const player of pool) {
-        for (const f of certosFeaturesForLabel(player, label)) {
-          collected.add(`${label} · ${f.key}`);
-        }
-      }
-    }
-    if (!collected.size) continue;
-    blockMap.set(section.title, {
-      tone: section.tone,
-      featureIds: [...collected].sort(),
-    });
-  }
-
   const blocks: BlockModel["blocks"] = [];
   const featureIds: string[] = [];
-  for (const section of sections) {
-    const entry = blockMap.get(section.title);
-    if (!entry) continue;
-    blocks.push({ title: section.title, tone: entry.tone, featureIds: entry.featureIds });
-    featureIds.push(...entry.featureIds);
+
+  if (metricLabels) {
+    // Seleção manual: um bloco por stat, com o próprio nome — o usuário quer
+    // a % daquele stat, não uma média do bloco inteiro.
+    for (const section of sections) {
+      for (const label of section.labels) {
+        if (label === "Eficiência Defensiva") continue;
+        if (!metricLabels.has(label)) continue;
+        const collected = new Set<string>();
+        for (const player of pool) {
+          for (const f of certosFeaturesForLabel(player, label)) {
+            collected.add(`${label} · ${f.key}`);
+          }
+        }
+        if (!collected.size) continue;
+        const ids = [...collected].sort();
+        blocks.push({ title: label, tone: section.tone, featureIds: ids });
+        featureIds.push(...ids);
+      }
+    }
+  } else {
+    for (const section of sections) {
+      const collected = new Set<string>();
+      for (const label of section.labels) {
+        if (label === "Eficiência Defensiva") continue;
+        for (const player of pool) {
+          for (const f of certosFeaturesForLabel(player, label)) {
+            collected.add(`${label} · ${f.key}`);
+          }
+        }
+      }
+      if (!collected.size) continue;
+      const ids = [...collected].sort();
+      blocks.push({ title: section.title, tone: section.tone, featureIds: ids });
+      featureIds.push(...ids);
+    }
   }
 
   if (metricLabels?.has(PASS_DISTANCE_LABEL)) {
@@ -423,6 +437,10 @@ export function rankCrossLeagueSimilarity(
     limit?: number;
     minMinutes?: number;
     leagueOf?: (p: PlayerProfile) => LeagueId | undefined;
+    /** Pool da liga do atleta de referência — percentis do source são
+     *  calculados no próprio contexto dele (mesma régua do dossiê), não na
+     *  pool alvo; sem isso, ligas com níveis diferentes fabricam concordância. */
+    sourcePool?: PlayerProfile[];
     debug?: boolean;
     /** Restrict the distance model to these dossier aspect labels (e.g. "Duelos Defensivos"). */
     metricLabels?: string[];
@@ -451,9 +469,22 @@ export function rankCrossLeagueSimilarity(
       .filter((index) => index >= 0),
   }));
 
-  const sourceRaw = featureVector(source, sameFamily, featureIds);
+  // Percentis na liga de origem de cada atleta — a régua que o dossiê mostra.
+  // Candidatos agrupados por liga (pool único ⇒ uma liga só).
+  const poolByLeague = new Map<LeagueId | undefined, PlayerProfile[]>();
+  for (const p of sameFamily) {
+    const lg = options.leagueOf?.(p);
+    const arr = poolByLeague.get(lg) ?? [];
+    arr.push(p);
+    poolByLeague.set(lg, arr);
+  }
+  const ownPool = (p: PlayerProfile): PlayerProfile[] =>
+    poolByLeague.get(options.leagueOf?.(p)) ?? sameFamily;
+  const sourcePool = options.sourcePool?.length ? options.sourcePool : sameFamily;
+
+  const sourceRaw = featureVector(source, sourcePool, featureIds);
   const sourceVec = shrinkVector(sourceRaw.vec, source.minutes);
-  const rawRows = new Map(sameFamily.map((p) => [p.player_id, featureVector(p, sameFamily, featureIds)]));
+  const rawRows = new Map(sameFamily.map((p) => [p.player_id, featureVector(p, ownPool(p), featureIds)]));
   const vectors = new Map(
     sameFamily.map((p) => [p.player_id, shrinkVector(rawRows.get(p.player_id)!.vec, p.minutes)]),
   );
