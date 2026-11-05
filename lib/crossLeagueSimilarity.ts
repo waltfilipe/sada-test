@@ -252,9 +252,24 @@ function featureVector(
 const SHRINK_FULL_MINUTES = 900;
 const SHRINK_FLOOR = 0.35;
 
+function shrinkFactor(minutes: number): number {
+  return Math.min(1, Math.max(SHRINK_FLOOR, minutes / SHRINK_FULL_MINUTES));
+}
+
 function shrinkVector(vec: number[], minutes: number): number[] {
-  const s = Math.min(1, Math.max(SHRINK_FLOOR, minutes / SHRINK_FULL_MINUTES));
+  const s = shrinkFactor(minutes);
   return vec.map((v) => 0.5 + (v - 0.5) * s);
+}
+
+/**
+ * Posterior uncertainty of a shrunken percentile estimate, per feature.
+ * A 300-minute player's regressed value is a point estimate over a wide
+ * band — the distance must price that band, otherwise the shrunken mean
+ * can coincide with the reference and fake a near-perfect match.
+ */
+function uncertaintyVec(minutes: number, sigma: number[]): number[] {
+  const u = 1 - shrinkFactor(minutes);
+  return sigma.map((s) => u * s);
 }
 
 /**
@@ -333,22 +348,36 @@ function whitenedDistance2(
   inv: Matrix | null,
   indices: number[],
   diagVar: number[],
+  unc2?: number[],
+  srcMask?: boolean[],
+  candMask?: boolean[],
 ): number {
   const wDiff = indices.map((i) => weights[i]! * (a[i]! - b[i]!));
+  let s: number;
   if (!inv) {
-    let s = 0;
+    s = 0;
     for (let k = 0; k < indices.length; k++) {
       s += (wDiff[k]! * wDiff[k]!) / Math.max(diagVar[k]!, 1e-4);
     }
-    return s;
+  } else {
+    s = 0;
+    for (let i = 0; i < indices.length; i++) {
+      for (let j = 0; j < indices.length; j++) {
+        s += wDiff[i]! * inv[i]![j]! * wDiff[j]!;
+      }
+    }
+    s = Math.max(0, s);
   }
-  let s = 0;
-  for (let i = 0; i < indices.length; i++) {
-    for (let j = 0; j < indices.length; j++) {
-      s += wDiff[i]! * inv[i]![j]! * wDiff[j]!;
+  // tr(Σ⁻¹ · Σ_unc): distância esperada sob a incerteza da amostra encolhida.
+  if (unc2) {
+    for (let k = 0; k < indices.length; k++) {
+      const fid = indices[k]!;
+      if (!srcMask?.[fid] && !candMask?.[fid]) continue;
+      const u2 = weights[fid]! * weights[fid]! * unc2[fid]!;
+      s += inv ? u2 * inv[k]![k]! : u2 / Math.max(diagVar[k]!, 1e-4);
     }
   }
-  return Math.max(0, s);
+  return s;
 }
 
 /**
@@ -382,8 +411,10 @@ function round1(n: number) {
  * Similarity from **successful actions per 90** (certos / vencidos) as percentiles in the
  * target pool, grouped by dossier stat blocks. Distances use a whitened (Mahalanobis)
  * metric over the pool covariance so correlated metrics don't double-count; vectors are
- * shrunk toward the median by minutes played; the score is a Gaussian kernel on the
- * squared distance (profile-defining metrics weigh more, coverage-scaled).
+ * shrunk toward the median by minutes played and the distance adds the posterior
+ * variance of that shrinkage (tr Σ⁻¹Σ_unc), so thin samples can't fake agreement —
+ * the score is a Gaussian kernel on the squared distance (profile-defining metrics
+ * weigh more, coverage-scaled).
  */
 export function rankCrossLeagueSimilarity(
   source: PlayerProfile,
@@ -437,6 +468,9 @@ export function rankCrossLeagueSimilarity(
     indices.length ? invertMatrix(sampleCovariance(allRows, indices)) : null,
   );
 
+  const sigma = allIdx.map((i) => Math.sqrt(Math.max(globalCov[i]![i]!, 1e-6)));
+  const srcUnc = uncertaintyVec(source.minutes, sigma);
+
   const scored: SimilarPlayerHit[] = [];
 
   for (const candidate of sameFamily) {
@@ -445,14 +479,36 @@ export function rankCrossLeagueSimilarity(
     const candVec = vectors.get(candidate.player_id)!;
     const candMask = rawRows.get(candidate.player_id)!.mask;
     const covered = allIdx.filter((i) => sourceRaw.mask[i] || candMask[i]);
-    const totalD2 = whitenedDistance2(sourceVec, candVec, weights, globalInv, allIdx, globalDiag);
+    const candUnc = uncertaintyVec(candidate.minutes, sigma);
+    const unc2 = allIdx.map((i) => srcUnc[i]! * srcUnc[i]! + candUnc[i]! * candUnc[i]!);
+    const totalD2 = whitenedDistance2(
+      sourceVec,
+      candVec,
+      weights,
+      globalInv,
+      allIdx,
+      globalDiag,
+      unc2,
+      sourceRaw.mask,
+      candMask,
+    );
     const total = distanceToSimilarity(totalD2, Math.max(1, covered.length));
 
     const blockScores: SimilarBlockScore[] = blockRanges.map(({ title, tone, indices }, bi) => {
       const blockCovered = indices.filter((i) => sourceRaw.mask[i] || candMask[i]);
       if (!indices.length || !blockCovered.length) return { title, tone, similarity: NEUTRAL_PERCENTILE };
       const blockDiag = indices.map((i) => globalCov[i]![i]!);
-      const d2 = whitenedDistance2(sourceVec, candVec, weights, blockInv[bi]!, indices, blockDiag);
+      const d2 = whitenedDistance2(
+        sourceVec,
+        candVec,
+        weights,
+        blockInv[bi]!,
+        indices,
+        blockDiag,
+        unc2,
+        sourceRaw.mask,
+        candMask,
+      );
       return { title, tone, similarity: round1(distanceToSimilarity(d2, blockCovered.length)) };
     });
 
