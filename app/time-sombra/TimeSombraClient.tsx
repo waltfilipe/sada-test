@@ -242,15 +242,16 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
 
   // Overrides manuais do campo automático (elenco e prévios): por quadro,
   // série, temporada, clube e formação. Trocar de formação zera o override.
-  const overrideKey = activeClubKey
-    ? elencoOverrideKey(
-        viewBoard,
-        isPrevios ? prevLeague : leagueId,
-        isPrevios ? prevSeason : CURRENT_SEASON,
-        activeClubKey,
-        state?.formationId ?? "4-3-3",
-      )
-    : null;
+  // Sem clube selecionado o campo permite montar escalação livre — a chave
+  // "sem-clube" mantém os overrides por quadro/série/temporada/formação em
+  // vez de descartar o clique do "+".
+  const overrideKey = elencoOverrideKey(
+    viewBoard,
+    isPrevios ? prevLeague : leagueId,
+    isPrevios ? prevSeason : CURRENT_SEASON,
+    activeClubKey ?? "sem-clube",
+    state?.formationId ?? "4-3-3",
+  );
   useEffect(() => {
     setElencoOverride(overrideKey ? loadElencoOverrides(overrideKey) : null);
   }, [overrideKey]);

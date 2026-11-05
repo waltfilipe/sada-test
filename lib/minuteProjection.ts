@@ -52,10 +52,11 @@ const MIN_GROUP = 8;
 const MIN_METRICS = 3;
 const FALLBACK_N0 = 4;
 /** Prior strength k = σ²/τ² is kept inside this range of nineties. */
-const K_FLOOR = 4;
-const K_MAX = 40;
+const K_FLOOR = 8;
+/** Priors cap at ~20 games of evidence, so a regular's own season outweighs history. */
+const K_MAX = 20;
 const N0_FLOOR = 8;
-const N0_MAX = 45;
+const N0_MAX = 20;
 /** The ridge prior can never claim to know the true level better than this share of its LOO variance. */
 const TAU_CS_FLOOR_FRAC = 0.25;
 const STARTER_MINUTES_PCT = 50;
@@ -558,7 +559,7 @@ function projectRate(
 ): { value: number; weight: number } {
   const k = prior.kEb;
   let n90 = Math.max(exposure, 0);
-  if (roleChangeFlag) n90 = Math.max(n90 * 0.22, 0.35);
+  if (roleChangeFlag) n90 = Math.max(n90 * 0.5, 0.35);
   const posteriorMean = ebShrink(y, n90, prior.mu, k);
   const weight = n90 / (n90 + k);
   if (scenario === "realista") return { value: posteriorMean, weight };

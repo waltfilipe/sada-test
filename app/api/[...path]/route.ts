@@ -9,6 +9,7 @@ import {
   getStandings,
 } from "@/lib/data.server";
 import { getAveragePlayers } from "@/lib/avgPlayer.server";
+import { athleteSeasonRows } from "@/lib/athleteRows.server";
 import { findPlayerInSeason } from "@/lib/playerSeasonMatch.server";
 import { rankCrossLeagueSimilarity } from "@/lib/crossLeagueSimilarity";
 import { isLeagueId, type LeagueId } from "@/lib/leagues";
@@ -138,6 +139,16 @@ export async function GET(request: Request, { params }: Params) {
     );
     if (!hit) return NextResponse.json({ error: "not_found" }, { status: 404 });
     return NextResponse.json(hit, { headers: archiveCacheHeaders(season) });
+  }
+
+  if (resource === "athlete-rows" && path.length === 1) {
+    const athleteId = url.searchParams.get("athlete_id");
+    const personKey = url.searchParams.get("person_key");
+    if (!athleteId && !personKey) {
+      return NextResponse.json({ error: "missing_params" }, { status: 400 });
+    }
+    const rows = athleteSeasonRows({ athleteId, personKey });
+    return NextResponse.json({ rows });
   }
 
   return NextResponse.json({ error: "not_found" }, { status: 404 });

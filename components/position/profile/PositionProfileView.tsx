@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLeague } from "@/components/LeagueProvider";
 import { usePlayerArchiveProfile } from "@/hooks/usePlayerArchiveProfile";
+import type { AthleteSeasonRow } from "@/lib/athleteRows.server";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import {
   BRASILEIRAO_SEASONS,
@@ -35,8 +36,57 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
   const { displayPlayer, isArchiveView, loading, setFichaSeason, goBackFicha, fichaSeason, fichaOrigem, basePlayer, archiveYears } =
     archive;
 
+  // Linhas do atleta no registro de identidade — cobre temporadas em outras
+  // ligas e atletas sem linha na temporada corrente (o fallback por
+  // equivalente em currentPlayers não enxerga nenhum dos dois casos).
+  const [athleteRows, setAthleteRows] = useState<AthleteSeasonRow[] | null>(null);
+  useEffect(() => {
+    if (isCurrentSeason || (!player.athlete_id && !player.person_key)) {
+      setAthleteRows(null);
+      return;
+    }
+    const qs = new URLSearchParams();
+    if (player.athlete_id) qs.set("athlete_id", player.athlete_id);
+    else qs.set("person_key", player.person_key!);
+    let cancelled = false;
+    fetch(`/api/athlete-rows?${qs}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { rows?: AthleteSeasonRow[] } | null) => {
+        if (!cancelled) setAthleteRows(data?.rows ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setAthleteRows([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isCurrentSeason, player.athlete_id, player.person_key]);
+
   const archiveHubSlicer = useMemo(() => {
     if (isCurrentSeason) return undefined;
+
+    if (athleteRows?.length) {
+      const rowFor = (year: string) =>
+        athleteRows.find((row) => row.season === year && row.league === leagueId) ??
+        athleteRows.find((row) => row.season === year);
+      const years = BRASILEIRAO_SEASONS.filter((year) => rowFor(year));
+      if (years.length) {
+        return {
+          active: hubSeason as string,
+          years,
+          onSelect: (year: BrasileiraoSeason) => {
+            if (year === hubSeason) return;
+            const row = rowFor(year);
+            if (!row) return;
+            const qs = row.season === CURRENT_SEASON ? "" : `&temporada=${row.season}`;
+            router.push(
+              `/${row.league}/posicao/${row.family ?? family}?atleta=${row.player_id}${qs}`,
+            );
+          },
+        };
+      }
+    }
+
     const counterpart = currentPlayers?.find(
       (item) =>
         item.name === player.name &&
@@ -74,7 +124,7 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
         router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
       },
     };
-  }, [isCurrentSeason, currentPlayers, player, hubSeason, leagueId, searchParams, pathname, router]);
+  }, [isCurrentSeason, currentPlayers, player, hubSeason, leagueId, searchParams, pathname, router, athleteRows, family]);
 
   const showHeatmap =
     heatmapsEnabled && ((isCurrentSeason && !isArchiveView) || Boolean(displayPlayer?.heatmap));
