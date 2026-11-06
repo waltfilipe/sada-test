@@ -18,7 +18,7 @@ import { familyBySlug } from "@/lib/positions";
 import { resolveSeasonPlayerId } from "@/lib/seasonRosterMatch";
 import { leaguePath } from "@/lib/leagues";
 import { BRASILEIRAO_SEASONS, CURRENT_SEASON, isBrasileiraoLeague, withSeasonQuery } from "@/lib/seasons";
-import { scatterAxis, scatterAxisLabel } from "@/lib/scatterAxis";
+import { familySectionStats, scatterAxis, scatterAxisLabel } from "@/lib/scatterAxis";
 import {
   newSavedChartId,
   readSavedScatterCharts,
@@ -28,7 +28,7 @@ import {
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
-type Metric = { key: string; label: string };
+type Metric = { key: string; label: string; section?: string };
 type Tone = ScatterHighlight["tone"];
 
 function normName(value: string): string {
@@ -408,10 +408,19 @@ export function ScatterClient({
     [leagueId, family, href],
   );
   const familyMeta = familyBySlug(family);
+  // Eixos = mesmas stats permenorizadas das seções da página de posição
+  // (certos/90; gols/assist/xG/xA como totais). Deriva do pool → sempre o
+  // conjunto exato que a página mostra para aquela posição.
   const axisMetrics = useMemo(() => {
-    const fromPosition = positionMetrics(family);
-    return fromPosition.length ? fromPosition : metrics;
-  }, [family, metrics]);
+    const map = new Map<string, Metric>();
+    for (const player of poolPlayers) {
+      for (const stat of familySectionStats(player, family)) {
+        if (!map.has(stat.key)) map.set(stat.key, { key: stat.key, label: stat.label, section: stat.section });
+      }
+    }
+    const list = [...map.values()];
+    return list.length ? list : positionMetrics(family);
+  }, [poolPlayers, family]);
 
   const defaultX = axisMetrics[0]?.key ?? "intervencoes";
   const defaultY = axisMetrics[1]?.key ?? axisMetrics[0]?.key ?? "confrontos_of";
@@ -457,18 +466,16 @@ export function ScatterClient({
     setIdC(c);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poolPlayers]);
-  const [xKey, setXKey] = useState(() => {
-    if (initialX && axisMetrics.some((metric) => metric.key === initialX && metric.key !== initialY)) {
-      return initialX;
-    }
-    return defaultX;
-  });
-  const [yKey, setYKey] = useState(() => {
-    if (initialY && axisMetrics.some((metric) => metric.key === initialY && metric.key !== initialX)) {
-      return initialY;
-    }
-    return axisMetrics.find((metric) => metric.key !== defaultX)?.key ?? defaultY;
-  });
+  const axisKeyValid = (key: string | undefined, other?: string) =>
+    Boolean(key) &&
+    key !== other &&
+    key!
+      .split("||")
+      .every((part) => axisMetrics.some((metric) => metric.key === part));
+  const [xKey, setXKey] = useState(() => (axisKeyValid(initialX, initialY) ? initialX! : defaultX));
+  const [yKey, setYKey] = useState(() =>
+    axisKeyValid(initialY, initialX) ? initialY! : (axisMetrics.find((metric) => metric.key !== defaultX)?.key ?? defaultY),
+  );
   const [savedCharts, setSavedCharts] = useState<SavedScatterChart[]>([]);
   const [minMinutes, setMinMinutes] = useState(0); // minutos absolutos (ex.: 450 min)
   const [useProjection, setUseProjection] = useState(false);

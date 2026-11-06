@@ -5,6 +5,7 @@ import { useLeague } from "@/components/LeagueProvider";
 import { ClubLogo } from "@/components/ClubLogo";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { ShadowPlayerTooltip } from "@/components/shadow/ShadowPlayerMiniReport";
+import { writeShadowDrag } from "@/components/shadow/drag";
 import { gradeTier, playerInitials, ratingToLetterGrade, tierVars } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
 
@@ -73,10 +74,13 @@ export function ShadowPlayerRow({
   player,
   profileLabel,
   onRemove,
+  draggable = false,
 }: {
   player: PlayerSearchRow;
   profileLabel?: string | null;
   onRemove?: () => void;
+  /** Permite arrastar o atleta para um slot do campo. */
+  draggable?: boolean;
 }) {
   const { href } = useLeague();
   const letter = ratingToLetterGrade(player.rating);
@@ -84,7 +88,11 @@ export function ShadowPlayerRow({
   const photo = player.transfermarkt?.photo;
 
   return (
-    <div className="shadow-player-row">
+    <div
+      className="shadow-player-row"
+      draggable={draggable}
+      onDragStart={draggable ? (event) => writeShadowDrag(event.dataTransfer, player.player_id, null) : undefined}
+    >
       <ShadowPlayerTooltip player={player} profileLeague={player.sourceLeague} block>
         <Link
           href={

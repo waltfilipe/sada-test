@@ -7,6 +7,7 @@ import { findAspect, flattenAspects } from "@/lib/aspectLookup";
 import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
 import { isProjectionEligible, realisticProjection } from "@/lib/minuteProjection";
 import { statRowLabel } from "@/lib/seasonTotals";
+import { STAT_TOOLTIPS } from "@/lib/statTooltips";
 import { earnedStatBadges, statBadgeForMetric } from "@/lib/statBadges";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 import { PlayerBadgesSection, StatBadgeChip, StatMedalCount, type TonedStatBadge } from "./StatBadgeStrip";
@@ -32,12 +33,18 @@ function StatEdgeMark({ edge }: { edge?: StatEdge }) {
   );
 }
 
-const STAT_TOOLTIPS: Record<string, string> = {
-  "Eficiência Defensiva":
-    "Medida do impacto defensivo do atleta: a taxa de eventos defensivos por 90 é modelada com shrinkage por minutagem (poucos minutos puxam para a média da posição) e z-scores winsorizados. Positivo = acima da média; negativo = abaixo.",
-  "Passes Criativos":
-    "Soma de Passes em Profundidade/90 + Passes Inteligentes/90 (through balls e smart passes do Wyscout): bolas que quebram linhas e criam chances de finalização.",
-};
+function StatInfoTip({ label }: { label: string }) {
+  const tip = STAT_TOOLTIPS[label];
+  if (!tip) return null;
+  return (
+    <span className="stat-info" tabIndex={0} aria-label={tip}>
+      <i className="fa-solid fa-circle-info" aria-hidden="true" />
+      <span className="stat-info-bubble" role="tooltip">
+        {tip}
+      </span>
+    </span>
+  );
+}
 
 function StatMetricRow({
   label,
@@ -91,14 +98,8 @@ function StatAspectBlock({
       <div className="stat-aspect-group-head">
         <span className="stat-aspect-group-title">
           {title}
-          {STAT_TOOLTIPS[item.label] ?? STAT_TOOLTIPS[title] ? (
-            <span className="stat-info" tabIndex={0} aria-label={STAT_TOOLTIPS[item.label] ?? STAT_TOOLTIPS[title]}>
-              <i className="fa-solid fa-circle-info" aria-hidden="true" />
-              <span className="stat-info-bubble" role="tooltip">
-                {STAT_TOOLTIPS[item.label] ?? STAT_TOOLTIPS[title]}
-              </span>
-            </span>
-          ) : null}
+          <StatInfoTip label={item.label} />
+          <StatInfoTip label={title} />
           {badge ? <StatBadgeChip badge={badge} tone={tone} /> : null}
         </span>
       </div>
@@ -166,7 +167,7 @@ function totalDefensiveActionsItem(all: AspectItem[]): AspectItem | null {
   if (duelsVal == null && actionsVal == null) return null;
   const total = (duelsVal ?? 0) + (actionsVal ?? 0);
   return {
-    label: "Ações Defensivas Totais",
+    label: "Ações Defensivas",
     grade: "",
     stats: [],
     display_value: String(Math.round(total * 10) / 10).replace(".", ","),
@@ -176,7 +177,7 @@ function totalDefensiveActionsItem(all: AspectItem[]): AspectItem | null {
 function sectionEntries(player: PlayerProfile, family: PositionFamily): SectionEntry[] {
   const all = flattenAspects(player);
   const sections = statSectionsForFamily(family);
-  const meiasOfensivos = family === "meio-campistas" || family === "extremos";
+  const meiasOfensivos = family === "extremos";
   const list: SectionEntry[] = [];
   for (const section of sections) {
     const metrics: SectionEntry["metrics"] = [];
@@ -186,9 +187,14 @@ function sectionEntries(player: PlayerProfile, family: PositionFamily): SectionE
       if (!item) continue;
       // Meias ofensivos: "Ações Defensivas" vira o total (inclui duelos).
       if (meiasOfensivos && section.tone === "defensivos" && item.label === "Ações Defensivas") continue;
-      const groupTitle = label === "Conduções Progressivas" ? "Progressão" : undefined;
+      let displayItem = item;
+      let groupTitle = label === "Conduções Progressivas" ? "Progressão" : undefined;
+      // Meias ofensivos: o bloco defensivo mostra "Duelos Defensivos".
+      if (meiasOfensivos && section.tone === "defensivos" && item.label === "Duelos Vencidos") {
+        displayItem = { ...item, label: "Duelos Defensivos" };
+      }
       if (groupTitle) titleByItem.set(item.label, groupTitle);
-      metrics.push({ item, groupTitle });
+      metrics.push({ item: displayItem, groupTitle });
     }
     if (meiasOfensivos && section.tone === "defensivos") {
       const totalItem = totalDefensiveActionsItem(all);

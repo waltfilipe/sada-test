@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 
 import { resolveAspectBadge } from "@/lib/aspectBadges";
 import { clampPercent, percentileBarFillStyle, statValueStyle } from "@/lib/scoutTheme";
+import { STAT_TOOLTIPS } from "@/lib/statTooltips";
 import type { AspectItem } from "@/lib/types";
 import { AccuracyBadge } from "./AccuracyBadge";
 
@@ -113,7 +114,24 @@ export function ExpandableAspectCard({ item, defaultOpen = false }: { item: Aspe
         aria-controls={panelId}
         onClick={() => setOpen((current) => !current)}
       >
-        <span className="aspect-name">{item.label}</span>
+        <span className="aspect-name">
+          {item.label}
+          {STAT_TOOLTIPS[item.label] ? (
+            <span
+              className="stat-info"
+              tabIndex={0}
+              role="button"
+              aria-label={STAT_TOOLTIPS[item.label]}
+              onClick={(event) => event.stopPropagation()}
+              onKeyDown={(event) => event.stopPropagation()}
+            >
+              <i className="fa-solid fa-circle-info" aria-hidden="true" />
+              <span className="stat-info-bubble" role="tooltip">
+                {STAT_TOOLTIPS[item.label]}
+              </span>
+            </span>
+          ) : null}
+        </span>
         <span className="aspect-row-end">
           <HeaderBadge item={item} />
           <Chevron />

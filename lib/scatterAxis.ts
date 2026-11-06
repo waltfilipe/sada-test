@@ -1,5 +1,6 @@
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
-import type { AspectItem, AspectSubMetric, PlayerProfile } from "@/lib/types";
+import { statSectionsForFamily } from "@/lib/aspectStatSections";
+import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 
 /**
  * Aspect `efficiency_pct` is a pool percentile. The success rate lives in
@@ -63,9 +64,30 @@ function statLabel(label: string): string {
 
 /** Finds a numeric sub-metric by label (e.g. "Passes", "Rebatidas", "Toques na área"). */
 function findSubMetric(items: AspectItem[], label: string): AspectSubMetric | undefined {
+  const clean = label.replace(/\/90$/, "");
   for (const item of items) {
     for (const sub of item.sub_metrics ?? []) {
-      if (sub.label === label && parseNumber(sub.display_value) != null) return sub;
+      if ((sub.label === clean || statLabel(sub.label) === clean) && parseNumber(sub.display_value) != null) return sub;
+    }
+  }
+  return undefined;
+}
+
+/** Sub-metric carrying a rate ("Finalizações certas / passe recebido" → "11%"). */
+function findRateSubMetric(items: AspectItem[], label: string): AspectSubMetric | undefined {
+  for (const item of items) {
+    for (const sub of item.sub_metrics ?? []) {
+      if (sub.label === label && parseSuccessRate(sub.display_value) != null) return sub;
+    }
+  }
+  return undefined;
+}
+
+/** Sub-metric carrying a signed value ("Gols - xG" → "+0,4"). */
+function findSignedSubMetric(items: AspectItem[], label: string): AspectSubMetric | undefined {
+  for (const item of items) {
+    for (const sub of item.sub_metrics ?? []) {
+      if (sub.label === label && parseSigned(sub.display_value) != null) return sub;
     }
   }
   return undefined;
@@ -105,6 +127,7 @@ function per90(value: number, label: string, minutes: number): number {
 function volumeLabel(label: string): string {
   if (label.includes("/") || label.includes("%") || /\/90$/.test(label)) return label;
   if (/^efici[eê]ncia/i.test(label)) return label;
+  if (SEASON_TOTALS.has(label.trim().toLowerCase())) return label;
   return `${label}/90`;
 }
 
@@ -150,6 +173,8 @@ function chosenSub(item: AspectItem, subs: AspectSubMetric[]): AspectSubMetric |
 }
 
 function volumeOnlyLabel(parent: string, subLabel: string): string {
+  // Totais de temporada não levam sufixo /90 (o valor é o acumulado do ano).
+  if (SEASON_TOTALS.has(subLabel.trim().toLowerCase())) return statLabel(subLabel);
   if (parent === "Progressão") return "Conduções Progressivas/90";
   if (parent === "Pré Assistências e xA") return "Pré Assistências/90";
   if (parent === "Distribuição") return "Passes/90";
@@ -172,6 +197,32 @@ export function scatterAxis(player: PlayerProfile, key: string): ScatterAxis {
   const items = flattenAspects(player);
   const minutes = player.minutes ?? 0;
 
+  // Eixo composto: "Stat A||Stat B" soma os valores resolvidos de cada parte.
+  if (key.includes("||")) {
+    const parts = key.split("||");
+    const axes = parts.map((part) => scatterAxis(player, part));
+    return {
+      value: axes.reduce((sum, axis) => sum + axis.value, 0),
+      label: axes.map((axis) => axis.label).join(" + "),
+    };
+  }
+
+  // Assistências = total da temporada (fora dos aspectos).
+  if (key === "Assistências") return { value: player.assists ?? 0, label: "Assistências" };
+
+  // Meias ofensivos: total defensivo virtual = duelos + ações defensivas.
+  if (key === "Ações Defensivas Totais") {
+    const duels = findAspect(items, "Duelos Vencidos") ?? findAspect(items, "Duelos Defensivos");
+    const actions = findAspect(items, "Ações Defensivas");
+    const duelsVal = parseNumber(duels?.display_value);
+    const subs = actions?.sub_metrics ?? [];
+    const actionsVal = subs.length
+      ? subs.reduce((sum, sub) => sum + (parseNumber(sub.display_value) ?? 0), 0)
+      : parseNumber(actions?.display_value);
+    if (duelsVal == null && actionsVal == null) return { value: 0, label: "Ações Defensivas/90" };
+    return { value: (duelsVal ?? 0) + (actionsVal ?? 0), label: "Ações Defensivas/90" };
+  }
+
   // Sub-metric axes resolve first so "Passes" hits Distribuição→Passes and not
   // the "Passes Progressivos" item via prefix match.
   const subHit = findSubMetric(items, key);
@@ -181,7 +232,24 @@ export function scatterAxis(player: PlayerProfile, key: string): ScatterAxis {
   }
 
   const item = findAspect(items, key);
-  if (!item) return { value: player.scatter[key] ?? 0, label: volumeLabel(key) };
+  if (!item) {
+    // "Eficiência <aspecto>" → taxa de sucesso do aspecto (0–100).
+    const effMatch = key.match(/^Eficiência (.+)$/);
+    if (effMatch) {
+      const effItem = findAspect(items, effMatch[1]);
+      if (effItem) {
+        const rate = successRate(effItem);
+        if (rate != null) return { value: rate * 100, label: key };
+      }
+    }
+    // Sub-métrica percentual ("Finalizações certas / passe recebido").
+    const rateSub = findRateSubMetric(items, key);
+    if (rateSub) return { value: parseSuccessRate(rateSub.display_value)! * 100, label: statLabel(rateSub.label) };
+    // Sub-métrica assinada ("Gols - xG").
+    const signedSub = findSignedSubMetric(items, key);
+    if (signedSub) return { value: parseSigned(signedSub.display_value)!, label: statLabel(signedSub.label) };
+    return { value: player.scatter[key] ?? 0, label: volumeLabel(key) };
+  }
 
   if (item.kind === "def_efficiency_group" || item.label === "Eficiência Defensiva") {
     const score = item.sub_metrics?.find((sub) => /efici[eê]ncia defensiva/i.test(sub.label));
@@ -226,6 +294,113 @@ export function scatterAxisLabel(players: PlayerProfile[], key: string): string 
   }
   const sample = players.find((player) => findAspect(flattenAspects(player), key)) ?? players[0];
   return sample ? scatterAxis(sample, key).label : volumeLabel(key);
+}
+
+export type FamilyStat = {
+  /** Chave resolvível por scatterAxis (label bruto do aspecto/sub ou chave virtual). */
+  key: string;
+  /** Rótulo exibido (auto-descritivo: "Passes Progressivos Certos/90", "Gols"). */
+  label: string;
+  value: number | null;
+  kind: "stat" | "efficiency" | "score" | "total";
+  /** Título da seção da página de posição (agrupa o picker do scatter). */
+  section: string;
+};
+
+/**
+ * Stats da posição: mesmas métricas que as seções da página de posição
+ * (statSectionsForFamily), desagrupadas — volumes em certos/90 (via scatterAxis),
+ * eficiências em 0–100, scores assinados e totais de temporada (Gols, xG, xA,
+ * Assistências, Pré Assistências). Fonte única para sliders de filtros e eixos
+ * do scatter — garante coerência página ↔ scatter ↔ filtros.
+ */
+export function familySectionStats(player: PlayerProfile, family: PositionFamily): FamilyStat[] {
+  const items = flattenAspects(player);
+  const minutes = player.minutes ?? 0;
+  const stats: FamilyStat[] = [];
+  const seen = new Set<string>();
+  const push = (entry: FamilyStat) => {
+    if (entry.value == null || seen.has(entry.key)) return;
+    seen.add(entry.key);
+    stats.push(entry);
+  };
+  const isExtremos = family === "extremos";
+
+  for (const section of statSectionsForFamily(family)) {
+    // Assistências vivem fora dos aspectos (total da temporada) — entram como
+    // stat de criação nas famílias que exibem o bloco de passes finais.
+    if (section.tone === "finais" || section.tone === "finalizacao") {
+      push({
+        key: "Assistências",
+        label: "Assistências",
+        value: player.assists ?? null,
+        kind: "total",
+        section: section.title,
+      });
+    }
+    for (const label of section.labels) {
+      const item = findAspect(items, label);
+      if (!item) continue;
+
+      // Meias ofensivos: "Ações Defensivas" vira o total (duelos + rebatidas +
+      // interceptações + chutes bloqueados) — chave virtual resolvida em scatterAxis.
+      if (isExtremos && section.tone === "defensivos" && item.label === "Ações Defensivas") {
+        const axis = scatterAxis(player, "Ações Defensivas Totais");
+        push({ key: "Ações Defensivas Totais", label: axis.label, value: axis.value, kind: "stat", section: section.title });
+        continue;
+      }
+
+      // Meias ofensivos: duelos defensivos vencidos exibidos como "Duelos Defensivos".
+      const displayLabel = isExtremos && item.label === "Duelos Vencidos" ? "Duelos Defensivos" : item.label;
+
+      const isDefScore = item.kind === "def_efficiency_group" || item.label === "Eficiência Defensiva";
+      const axis = scatterAxis(player, item.label);
+      const isTotal = SEASON_TOTALS.has(item.label.trim().toLowerCase());
+      push({
+        key: item.label,
+        label: isExtremos && item.label === "Duelos Vencidos" ? "Duelos Defensivos/90" : axis.label,
+        value: axis.value,
+        kind: isDefScore ? "score" : isTotal ? "total" : "stat",
+        section: section.title,
+      });
+
+      const rate = successRate(item);
+      if (rate != null && item.efficiency_pct != null && !isDefScore) {
+        push({
+          key: `Eficiência ${item.label}`,
+          label: `Eficiência ${displayLabel}`,
+          value: rate * 100,
+          kind: "efficiency",
+          section: section.title,
+        });
+      }
+
+      for (const sub of item.sub_metrics ?? []) {
+        const subRate = parseSuccessRate(sub.display_value);
+        if (subRate != null) {
+          push({ key: sub.label, label: statLabel(sub.label), value: subRate * 100, kind: "efficiency", section: section.title });
+          continue;
+        }
+        const numeric = parseNumber(sub.display_value);
+        if (numeric != null) {
+          const subIsTotal = SEASON_TOTALS.has(sub.label.trim().toLowerCase());
+          push({
+            key: sub.label,
+            label: subIsTotal ? statLabel(sub.label) : volumeLabel(statLabel(sub.label)),
+            value: per90(numeric, sub.label, minutes),
+            kind: subIsTotal ? "total" : "stat",
+            section: section.title,
+          });
+          continue;
+        }
+        const signed = parseSigned(sub.display_value);
+        if (signed != null && /^[+\-−]/.test((sub.display_value ?? "").trim())) {
+          push({ key: sub.label, label: statLabel(sub.label), value: signed, kind: "score", section: section.title });
+        }
+      }
+    }
+  }
+  return stats;
 }
 
 /**

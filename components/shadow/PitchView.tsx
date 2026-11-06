@@ -4,29 +4,12 @@ import { useMemo, useState } from "react";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { ShadowPlayerChip } from "@/components/shadow/ShadowPlayerChip";
 import { ShadowPlayerTooltip } from "@/components/shadow/ShadowPlayerMiniReport";
+import { parseShadowDrag, writeShadowDrag } from "@/components/shadow/drag";
 import { fieldSlots, formationById, type FormationSlot } from "@/lib/formations";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { PlayerSearchRow } from "@/lib/types";
 
-const DRAG_MIME = "application/x-shadow-player";
-
-type DragPayload = { playerId: string; sourceSlotId: string | null };
-
-export function writeShadowDrag(data: DataTransfer, playerId: string, sourceSlotId: string | null) {
-  const payload: DragPayload = { playerId, sourceSlotId };
-  data.setData(DRAG_MIME, JSON.stringify(payload));
-  data.effectAllowed = "move";
-}
-
-function parseDrag(data: DataTransfer): DragPayload | null {
-  const raw = data.getData(DRAG_MIME);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as DragPayload;
-  } catch {
-    return null;
-  }
-}
+export { writeShadowDrag };
 
 function PitchToken({ player }: { player: PlayerSearchRow }) {
   const initials = <span className="shadow-pitch-token-initials">{playerInitials(player.name)}</span>;
@@ -98,7 +81,7 @@ export function PitchView({
     e.preventDefault();
     setDragOverSlotId(null);
     if (!editable) return;
-    const payload = parseDrag(e.dataTransfer);
+    const payload = parseShadowDrag(e.dataTransfer);
     if (!payload) return;
     onDrop(payload.sourceSlotId, slot.id, payload.playerId);
   }
@@ -243,9 +226,7 @@ export function BenchStrip({
               className="shadow-bench-draggable"
               draggable
               onDragStart={(e) => {
-                const payload: DragPayload = { playerId: id, sourceSlotId: null };
-                e.dataTransfer.setData(DRAG_MIME, JSON.stringify(payload));
-                e.dataTransfer.effectAllowed = "move";
+                writeShadowDrag(e.dataTransfer, id, null);
                 onDropStart?.(id);
               }}
             >

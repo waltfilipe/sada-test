@@ -826,7 +826,7 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
               />
             </div>
 
-            {mode === "elenco" && !selectedClub ? null : (
+            {(
               <ReserveBench
                 playerIds={reserveIds}
                 playersById={lookupById}
@@ -1051,6 +1051,7 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                           <ShadowPlayerRow
                             player={player}
                             profileLabel={player.profile}
+                            draggable={editable}
                             onRemove={editable ? () => removeFromSquad(player.player_id, board) : undefined}
                           />
                         </li>
