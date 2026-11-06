@@ -3974,6 +3974,46 @@
   color: #fed766;
 }
 
+.stat-info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-3);
+  font-size: 0.62rem;
+  cursor: help;
+}
+
+.stat-info-bubble {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 6px);
+  z-index: 60;
+  width: max-content;
+  max-width: 240px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: var(--ink, #0f1b2d);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: normal;
+  text-align: left;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(3px);
+  transition: opacity 0.12s ease, transform 0.12s ease, visibility 0.12s;
+  pointer-events: none;
+}
+
+.stat-info:hover .stat-info-bubble,
+.stat-info:focus-visible .stat-info-bubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
 /* Stats accordion */
 .report-pass-accordion {
   display: flex;

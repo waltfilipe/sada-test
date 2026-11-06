@@ -1580,7 +1580,7 @@ def _passes_criativos_aspect(row: pd.Series) -> dict[str, Any]:
     eff_pi = float(row.get("_asp_passes_criativos_eff", 0) or 0)
     eff_pp = float(row.get("_asp_passes_prof_eff", 0) or 0)
     eff_avg = (eff_pi + eff_pp) / 2
-    return _metric_aspect(
+    aspect = _metric_aspect(
         "Passes Criativos",
         percentile=row.get("_asp_passes_criativos_combined_vol", 0),
         display_value=_fmt_per90(vol_combined),
@@ -1593,6 +1593,13 @@ def _passes_criativos_aspect(row: pd.Series) -> dict[str, Any]:
             "%EffPassesProf",
         ),
     )
+    # Composição visível nos filtros/detalhes — o total continua sendo a soma.
+    aspect["sub_metrics"] = [
+        _sub_metric("Passes Criativos", percentile=row.get("_asp_passes_criativos_combined_vol", 0), display_value=_fmt_per90(vol_combined)),
+        _sub_metric("Passes Inteligentes", percentile=row.get("_asp_passes_criativos_vol", 0), display_value=_fmt_per90(criativos)),
+        _sub_metric("Passes em Profundidade", percentile=row.get("_asp_passes_prof_vol", 0), display_value=_fmt_per90(prof)),
+    ]
+    return aspect
 
 
 def _passes_criacao_extras(row: pd.Series) -> list[dict[str, Any]]:
