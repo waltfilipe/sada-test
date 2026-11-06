@@ -70,10 +70,10 @@ def _ax(key: str, label: str | None = None, field: str = "") -> dict:
     return {"key": key, "label": label or key, "field": field}
 
 
-_DEF_SUBS = [_ax("Rebatidas"), _ax("Interceptações"), _ax("Chutes Bloqueados")]
+_DEF_SUBS = [_ax("Rebatidas"), _ax("Interceptações"), _ax("Chutes Bloqueados"), _ax("Recuperações")]
 _DEF_BLOCK = [
     _ax("duelos_def", "Duelos Defensivos", "DuelosDef"),
-    _ax("Ações Defensivas", "Ações Defensivas (total)"),
+    _ax("Ações Defensivas e Recuperações", "Ações Def e Recup. (total)"),
     *_DEF_SUBS,
     _ax("Aéreo", "Duelos Aéreos"),
 ]
@@ -125,6 +125,7 @@ SCATTER_METRICS = {
     "extremos": [
         _ax("Duelos Vencidos"),
         _ax("Ações Defensivas"),
+        _ax("Recuperações"),
         *_PASSES,
         *_CRIACAO,
         _ax("Cruzamentos"),
@@ -1156,23 +1157,29 @@ def _duelos_net_p90(pool: pd.DataFrame, noventas: pd.Series) -> pd.Series:
 
 
 def _def_efficiency_z_scores(pool: pd.DataFrame) -> tuple[pd.Series, float, float]:
-    """Component shrinkage + winsorized z's; blocks re-standardized apart.
+    """Saldo de duelos defensivos: vencidos vs perdidos (ex-falta), shrunk + winsorized.
 
-    Action block (mean of winsorized component z's): net duels won,
+    Action block (mean of winsorized component z's): defensive duels WON,
     interceptions, clearances, blocked shots — each rate Gamma–Poisson
-    shrunk toward the qualified pool (duels get piecewise shrinkage of
-    volume and win share).
-    Cost block: fouls, capital errors (shot = 2.5, goal = 10 shot-equiv).
+    shrunk toward the qualified pool.
+    Cost block: fouls + defensive duels LOST excluding duel losses that were
+    fouls (lost = attempted − won; clean = max(0, lost − fouls/90)) — a foul
+    committed in a duel is already penalized by the fouls component, so it
+    does not also count as a lost duel (no double counting).
 
     Each block is re-standardized on its own so the noisier side cannot
     dominate the saldo; the saldo is then standardized once more. Component
     z's are winsorized at +-3 so one rare event cannot carry the metric.
     """
     n90 = _noventas(pool)
+    d_p90 = _num_col(pool, "DuelosDef")
+    won_p90 = d_p90 * _num_col(pool, "%DuelosDefW")
+    clean_lost_p90 = (d_p90 - won_p90 - _num_col(pool, "Faltas/90")).clip(lower=0.0)
+
     action_z = (
         pd.concat(
             [
-                _pool_z(_duelos_net_p90(pool, n90)),
+                _pool_z(_shrink_count_rate(won_p90, n90)),
                 _pool_z(_shrink_count_rate(_ss_inter_col(pool), n90)),
                 _pool_z(_shrink_count_rate(_ss_clearance_col(pool), n90)),
                 _pool_z(_shrink_count_rate(_num_col(pool, "outfielder_block_p90"), n90)),
@@ -1186,7 +1193,7 @@ def _def_efficiency_z_scores(pool: pd.DataFrame) -> tuple[pd.Series, float, floa
         pd.concat(
             [
                 _pool_z(_shrink_count_rate(_num_col(pool, "Faltas/90"), n90)),
-                _pool_z(_shrink_count_rate(_capital_errors_p90(pool), n90)),
+                _pool_z(_shrink_count_rate(clean_lost_p90, n90)),
             ],
             axis=1,
         )
@@ -1264,6 +1271,16 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     out["_asp_def_style"] = percentile_rank(m4_ratio, ascending=True)
     out["_asp_faltas_vol"] = percentile_rank(faltas, ascending=True)
     out["_pool_avg_faltas"] = float(distribution(faltas).mean())
+
+    # Recuperações (SofaScore ball_recovery) + Ações sem Bola/90 =
+    # duelos defensivos ganhos + recuperações + interceptações + rebatidas +
+    # chutes bloqueados — novo sub do grupo Eficiência Defensiva.
+    recovery_vol = numeric_col(out, "ball_recovery_p90")
+    block_vol = numeric_col(out, "outfielder_block_p90")
+    out["_asp_recovery_vol"] = percentile_rank(recovery_vol, ascending=True)
+    acoes_sem_bola = dd_won + recovery_vol + inter_vol + clear_vol + block_vol
+    out["_acoes_sem_bola_vol"] = acoes_sem_bola.astype(float)
+    out["_asp_acoes_sem_bola"] = percentile_rank(acoes_sem_bola, ascending=True)
 
     mappings: dict[str, pd.Series] = {
         "duelos_def_vol": _pool_percentile(out, "Duelos defensivos/90", "DuelosDef"),
@@ -1512,21 +1529,30 @@ def _def_actions_group_aspect(
     inter: float,
     cortes: float,
     blocks: float,
+    recovery: float | None = None,
 ) -> dict[str, Any]:
     inter_pct = round(float(row.get("_asp_inter_vol", 0) or 0), 1)
     cortes_pct = round(float(row.get("_asp_cortes_vol", 0) or 0), 1)
     block_pct = round(float(row.get("_asp_block_vol", 0) or 0), 1)
-    header_pct = round((inter_pct + cortes_pct + block_pct) / 3.0, 1)
+    subs = [
+        _sub_metric("Rebatidas", percentile=cortes_pct, display_value=_fmt_num(cortes)),
+        _sub_metric("Interceptações", percentile=inter_pct, display_value=_fmt_num(inter)),
+        _sub_metric("Chutes Bloqueados", percentile=block_pct, display_value=_fmt_num(blocks)),
+    ]
+    pcts = [inter_pct, cortes_pct, block_pct]
+    if recovery is not None:
+        recovery_pct = round(float(row.get("_asp_recovery_vol", 0) or 0), 1)
+        subs.append(
+            _sub_metric("Recuperações", percentile=recovery_pct, display_value=_fmt_num(recovery))
+        )
+        pcts.append(recovery_pct)
+    header_pct = round(sum(pcts) / len(pcts), 1)
     return {
-        "label": "Ações Defensivas",
+        "label": "Ações Defensivas e Recuperações" if recovery is not None else "Ações Defensivas",
         "kind": "metric_group",
         "grade": _grade_from_pct(header_pct),
         "percentile": header_pct,
-        "sub_metrics": [
-            _sub_metric("Rebatidas", percentile=cortes_pct, display_value=_fmt_num(cortes)),
-            _sub_metric("Interceptações", percentile=inter_pct, display_value=_fmt_num(inter)),
-            _sub_metric("Chutes Bloqueados", percentile=block_pct, display_value=_fmt_num(blocks)),
-        ],
+        "sub_metrics": subs,
         "stats": [],
     }
 
@@ -1543,20 +1569,33 @@ def _def_efficiency_group_aspect(row: pd.Series) -> dict[str, Any]:
         float(row.get("_asp_error_def_inv", row.get("_asp_error_shot_inv", 0)) or 0),
         1,
     )
+    acoes_pct = round(float(row.get("_asp_acoes_sem_bola", 0) or 0), 1)
+    acoes_vol = float(row.get("_acoes_sem_bola_vol", 0) or 0)
+    has_recovery = pd.notna(row.get("ball_recovery_p90"))
+    subs = [_sub_metric("Erros Totais", percentile=err_pct, display_value=str(err_total))]
+    if has_recovery:
+        subs.append(
+            _sub_metric(
+                "Ações sem Bola/90",
+                percentile=acoes_pct,
+                display_value=_fmt_num(acoes_vol),
+            )
+        )
+    subs.append(
+        _sub_metric(
+            "Índice de Eficiência",
+            percentile=eff_pct,
+            display_value=_fmt_z_score(z),
+        )
+    )
+    pair_badge = [err_pct, acoes_pct, eff_pct] if has_recovery else [err_pct, eff_pct]
     return {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
         "grade": _grade_from_pct(eff_pct),
         "percentile": eff_pct,
-        "pair_badge": [err_pct, eff_pct],
-        "sub_metrics": [
-            _sub_metric("Erros Totais", percentile=err_pct, display_value=str(err_total)),
-            _sub_metric(
-                "Eficiência Defensiva",
-                percentile=eff_pct,
-                display_value=_fmt_z_score(z),
-            ),
-        ],
+        "pair_badge": pair_badge,
+        "sub_metrics": subs,
         "stats": [],
     }
 
@@ -1676,6 +1715,17 @@ def _build_ex_aspects(row: pd.Series) -> dict[str, list[dict[str, Any]]]:
             "Ações Defensivas",
             percentile=row.get("_asp_def_actions_vol", 0),
             display_value=_fmt_per90(def_actions),
+        ),
+        *(
+            [
+                _metric_aspect(
+                    "Recuperações",
+                    percentile=row.get("_asp_recovery_vol", 0),
+                    display_value=_fmt_per90(float(row["ball_recovery_p90"])),
+                )
+            ]
+            if pd.notna(row.get("ball_recovery_p90"))
+            else []
         ),
     ]
 
@@ -2049,7 +2099,13 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
                 if family_key != "zagueiros"
                 else []
             ),
-            _def_actions_group_aspect(row, inter=inter, cortes=cortes, blocks=blocks),
+            _def_actions_group_aspect(
+                row,
+                inter=inter,
+                cortes=cortes,
+                blocks=blocks,
+                recovery=float(row["ball_recovery_p90"]) if pd.notna(row.get("ball_recovery_p90")) else None,
+            ),
             *(
                 [_def_efficiency_group_aspect(row)]
                 if family_key in ("zagueiros", "laterais", "meio-campistas")
@@ -2161,7 +2217,22 @@ def _build_aspects(row: pd.Series, family_key: str = "zagueiros") -> dict[str, l
     elif family_key == "meio-campistas":
         fin_vol = _row_vol(row, "Finalizações", "Remates/90")
         npxg = _row_vol(row, "npxG", "Golos esperados/90")
+        cruz_vol = _row_vol(row, "Cruz.", "Cruzamentos/90")
         aspects["passes_finais"] = [
+            _metric_group_aspect(
+                "Cruzamentos",
+                percentile=row.get("_asp_cruz_vol", 0),
+                eff_pct=row.get("_asp_cruz_eff", 0),
+                eff_display=_raw_eff_display(row, "Cruzamentos certos, %", "%EffCruz."),
+                sub_metrics=[
+                    _sub_metric("Cruzamentos", percentile=row.get("_asp_cruz_vol", 0), display_value=_fmt_per90(cruz_vol)),
+                    _sub_metric(
+                        "Eficiência",
+                        percentile=row.get("_asp_cruz_eff", 0),
+                        display_value=_raw_eff_display(row, "Cruzamentos certos, %", "%EffCruz."),
+                    ),
+                ],
+            ),
             _passes_chave_area_group(row),
             *_passes_criacao_extras(row),
         ]

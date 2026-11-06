@@ -19,7 +19,7 @@ const ZAG_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Defensivos",
     tone: "defensivos",
-    labels: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva"],
+    labels: ["Duelos Defensivos", "Ações Defensivas e Recuperações", "Eficiência Defensiva"],
   },
   {
     title: "Aéreo",
@@ -42,7 +42,7 @@ const LAT_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Defensivos",
     tone: "defensivos",
-    labels: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
+    labels: ["Duelos Defensivos", "Ações Defensivas e Recuperações", "Eficiência Defensiva", "Duelos Aéreos"],
   },
   {
     title: "Passes",
@@ -70,7 +70,7 @@ const MC_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Defensivos",
     tone: "defensivos",
-    labels: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
+    labels: ["Duelos Defensivos", "Ações Defensivas e Recuperações", "Eficiência Defensiva", "Duelos Aéreos"],
   },
   {
     title: "Passes",
@@ -123,7 +123,7 @@ const EX_STAT_SECTIONS: StatSectionSpec[] = [
   {
     title: "Defensivos",
     tone: "defensivos",
-    labels: ["Duelos Vencidos", "Ações Defensivas"],
+    labels: ["Duelos Vencidos", "Ações Defensivas", "Recuperações"],
   },
 ];
 

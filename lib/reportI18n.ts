@@ -49,6 +49,10 @@ export const REPORT_COPY = {
     shortPass: "Passe curto",
     progressivePass: "Passe progressivo",
     crosses: "Cruzamentos",
+    gpsTitle: "Dados de GPS",
+    gpsMeta: (competition: string, matches: number, minutes: number) =>
+      `${competition} · ${matches} jogos · ${minutes.toLocaleString("pt-BR")} min`,
+    gpsAvgTitle: (count: number) => `Dados de GPS · média de ${count} temporada${count > 1 ? "s" : ""}`,
     pdfTitle: "Exportar PDF",
     portuguese: "Português",
     english: "English",
@@ -138,6 +142,10 @@ export const REPORT_COPY = {
     shortPass: "Short passing",
     progressivePass: "Progressive passing",
     crosses: "Crosses",
+    gpsTitle: "GPS data",
+    gpsMeta: (competition: string, matches: number, minutes: number) =>
+      `${competition} · ${matches} matches · ${minutes.toLocaleString("en-US")} min`,
+    gpsAvgTitle: (count: number) => `GPS data · ${count}-season average`,
     pdfTitle: "Export PDF",
     portuguese: "Português",
     english: "English",
@@ -199,6 +207,10 @@ const EN_LABELS: Record<string, string> = {
   // Stat blocks and badges
   "1v1 - Ofensivo": "Attacking 1v1",
   "Ações Defensivas": "Defensive Actions",
+  "Ações Defensivas e Recuperações": "Defensive Actions & Recoveries",
+  "Recuperações": "Recoveries",
+  "Ações sem Bola/90": "Off-Ball Actions/90",
+  "Índice de Eficiência": "Efficiency Index",
   "Ações Terminais": "Final Actions",
   Aéreo: "Aerial",
   "Conduções Progressivas": "Progressive Carries",

@@ -1,613 +1,466 @@
 {
-  "player_id": "edson-fernando-remo-690",
-  "name": "Edson Fernando",
-  "club": "Remo",
-  "label": "Edson Fernando (Remo)",
-  "position": "Meio-campista",
-  "position_family": "meio-campistas",
-  "nationality": "Brazil",
-  "birth_year": 1998,
-  "height": 178,
-  "foot": "Destro",
-  "minutes": 45,
-  "minutes_pct": 1.3,
-  "goals": 0,
-  "assists": 0,
-  "rating": 6.6,
-  "ratings": {
-    "geral": 6.6,
-    "contencao": 6.6,
-    "construtor": 6.5,
-    "boxtobox": 6.4
-  },
-  "ranks": {
-    "geral": 72,
-    "contencao": 44,
-    "construtor": 51,
-    "boxtobox": 62
-  },
-  "profile": "Contenção",
-  "profile_shares": {
-    "contencao": 99.0,
-    "construtor": 1.0,
-    "boxtobox": 0.0
-  },
-  "tendencies": {
-    "construcao": 48.0,
-    "ofensividade": 28.0,
-    "def1v1": 100.0,
-    "contencao": 16.0,
-    "duelo_aereo": 0.0
-  },
-  "aspects": {
-    "defensivos": [
-      {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
-        "grade": "A",
-        "percentile": 100.0,
-        "stats": [],
-        "display_value": "10,0",
-        "efficiency_pct": 77.6,
-        "efficiency_value": "60%"
-      },
-      {
-        "label": "Duelos Aéreos",
-        "kind": "metric",
-        "grade": "B",
-        "percentile": 71.2,
-        "stats": [],
-        "display_value": "2,0",
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%"
-      },
-      {
-        "label": "Ações Defensivas",
-        "kind": "metric_group",
-        "grade": "C-",
-        "percentile": 33.3,
-        "sub_metrics": [
-          {
-            "label": "Rebatidas",
-            "percentile": 100.0,
-            "display_value": "16,4"
-          },
-          {
-            "label": "Interceptações",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          },
-          {
-            "label": "Chutes Bloqueados",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Eficiência Defensiva",
-        "kind": "def_efficiency_group",
-        "grade": "B+",
-        "percentile": 82.9,
-        "pair_badge": [
-          100.0,
-          82.9
-        ],
-        "sub_metrics": [
-          {
-            "label": "Erros Totais",
-            "percentile": 100.0,
-            "display_value": "0"
-          },
-          {
-            "label": "Eficiência Defensiva",
-            "percentile": 82.9,
-            "display_value": "+0,7"
-          }
-        ],
-        "stats": []
-      }
+ "player_id": "edson-fernando-remo-690",
+ "name": "Edson Fernando",
+ "club": "Remo",
+ "label": "Edson Fernando (Remo)",
+ "position": "Meio-campista",
+ "position_family": "meio-campistas",
+ "nationality": "Brazil",
+ "birth_year": 1998,
+ "height": 178,
+ "foot": "Destro",
+ "minutes": 45,
+ "minutes_pct": 1.3,
+ "goals": 0,
+ "assists": 0,
+ "rating": 6.6,
+ "ratings": {
+  "geral": 6.6,
+  "contencao": 6.6,
+  "construtor": 6.5,
+  "boxtobox": 6.4
+ },
+ "ranks": {
+  "geral": 72,
+  "contencao": 44,
+  "construtor": 51,
+  "boxtobox": 62
+ },
+ "profile": "Contenção",
+ "profile_shares": {
+  "contencao": 99.0,
+  "construtor": 1.0,
+  "boxtobox": 0.0
+ },
+ "tendencies": {
+  "construcao": 48.0,
+  "ofensividade": 28.0,
+  "def1v1": 100.0,
+  "contencao": 16.0,
+  "duelo_aereo": 0.0
+ },
+ "aspects": {
+  "defensivos": [
+   {
+    "label": "Duelos Defensivos",
+    "kind": "metric",
+    "grade": "A",
+    "percentile": 100.0,
+    "stats": [],
+    "display_value": "10,0",
+    "efficiency_pct": 77.6,
+    "efficiency_value": "60%"
+   },
+   {
+    "label": "Duelos Aéreos",
+    "kind": "metric",
+    "grade": "B",
+    "percentile": 71.2,
+    "stats": [],
+    "display_value": "2,0",
+    "efficiency_pct": 0.0,
+    "efficiency_value": "0%"
+   },
+   {
+    "label": "Ações Defensivas e Recuperações",
+    "kind": "metric_group",
+    "grade": "C-",
+    "percentile": 25.0,
+    "sub_metrics": [
+     {
+      "label": "Rebatidas",
+      "percentile": 100.0,
+      "display_value": "16,4"
+     },
+     {
+      "label": "Interceptações",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Chutes Bloqueados",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Recuperações",
+      "percentile": 0,
+      "display_value": "0,0"
+     }
     ],
-    "construcao": [
-      {
-        "label": "Passes Progressivos",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 4.0,
-        "display_value": "4,0",
-        "percentile": 19.2,
-        "efficiency_pct": 1.2,
-        "efficiency_value": "50%",
-        "stats": []
-      },
-      {
-        "label": "Passes para Terço Final",
-        "kind": "pass_certos",
-        "grade": "C+",
-        "certos_per90": 6.0,
-        "display_value": "6,0",
-        "percentile": 51.2,
-        "efficiency_pct": 2.5,
-        "efficiency_value": "67%",
-        "stats": []
-      },
-      {
-        "label": "Passes Longos",
-        "kind": "pass_certos",
-        "grade": "B+",
-        "certos_per90": 4.0,
-        "display_value": "4,0",
-        "percentile": 78.1,
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%",
-        "stats": []
-      },
-      {
-        "label": "Distribuição",
-        "kind": "metric_group",
-        "grade": "C+",
-        "percentile": 48.8,
-        "sub_metrics": [
-          {
-            "label": "Passes",
-            "percentile": 48.8,
-            "display_value": "40,0"
-          },
-          {
-            "label": "Passes Recebidos",
-            "percentile": 46.3,
-            "display_value": "28,0"
-          }
-        ],
-        "stats": []
-      }
+    "stats": []
+   },
+   {
+    "label": "Eficiência Defensiva",
+    "kind": "def_efficiency_group",
+    "grade": "A",
+    "percentile": 91.3,
+    "pair_badge": [
+     100.0,
+     20.8,
+     91.3
     ],
-    "perfil_construcao": [
-      {
-        "label": "Tendência de Passe",
-        "kind": "construction_share",
-        "grade": "A",
-        "percentile": 90.2,
-        "display_value": "10%",
-        "share_pct": 10.0,
-        "pool_avg_pct": 7.1,
-        "scale_max_pct": 30.0,
-        "stats": [],
-        "bar_key": "pass_tendency",
-        "axis_left": "Curto",
-        "axis_right": "Longo"
-      },
-      {
-        "label": "Passes Progressivos",
-        "kind": "construction_share",
-        "grade": "D",
-        "percentile": 6.1,
-        "display_value": "10%",
-        "share_pct": 10.0,
-        "pool_avg_pct": 13.0,
-        "scale_max_pct": 30.0,
-        "stats": [],
-        "bar_key": "progressive_share",
-        "axis_left": "Baixo",
-        "axis_right": "Alto"
-      }
+    "sub_metrics": [
+     {
+      "label": "Erros Totais",
+      "percentile": 100.0,
+      "display_value": "0"
+     },
+     {
+      "label": "Ações sem Bola/90",
+      "percentile": 20.8,
+      "display_value": "22,4"
+     },
+     {
+      "label": "Índice de Eficiência",
+      "percentile": 91.3,
+      "display_value": "+1,3"
+     }
     ],
-    "perfil_defensivo": [
-      {
-        "label": "Estilo de defesa",
-        "kind": "construction_share",
-        "grade": "D",
-        "percentile": 0.0,
-        "display_value": "0,54",
-        "share_pct": 0.0,
-        "pool_avg_pct": 2.6,
-        "scale_max_pct": 100.0,
-        "stats": [],
-        "bar_key": "def_contact_style",
-        "axis_left": "Cobertura",
-        "axis_right": "Agressivo"
-      },
-      {
-        "label": "Disciplina defensiva",
-        "kind": "construction_share",
-        "grade": "B+",
-        "percentile": 82.9,
-        "display_value": "100%",
-        "share_pct": 100.0,
-        "pool_avg_pct": 1.5,
-        "scale_max_pct": 100.0,
-        "stats": [],
-        "bar_key": "def_foul_style",
-        "axis_left": "Disciplinado",
-        "axis_right": "Faltoso"
-      }
-    ],
-    "ofensivos": [
-      {
-        "label": "Disputas com Bola",
-        "kind": "metric",
-        "grade": "B-",
-        "percentile": 57.9,
-        "stats": [],
-        "display_value": "2,0",
-        "efficiency_pct": 66.2,
-        "efficiency_value": "50%"
-      },
-      {
-        "label": "Conduções Progressivas",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0"
-      },
-      {
-        "label": "1v1 - Ofensivo",
-        "kind": "metric",
-        "grade": "A",
-        "percentile": 98.3,
-        "stats": [],
-        "display_value": "2,0",
-        "efficiency_pct": 100.0,
-        "efficiency_value": "100%"
-      }
-    ],
-    "passes_finais": [
-      {
-        "label": "Passes Chave e Área",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
-        "sub_metrics": [
-          {
-            "label": "Assistências para remate",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          },
-          {
-            "label": "Passes para Área",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Pré Assistências e xA",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
-        "sub_metrics": [
-          {
-            "label": "Pré Assistências",
-            "percentile": 0.0,
-            "display_value": "0"
-          },
-          {
-            "label": "xA",
-            "percentile": 0.0,
-            "display_value": "0,00"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Passes Criativos",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0",
-        "efficiency_pct": 11.2,
-        "efficiency_value": "42%"
-      }
-    ],
-    "ofensividade": [
-      {
-        "label": "Finalizações",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
-        "sub_metrics": [
-          {
-            "label": "Finalizações",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          },
-          {
-            "label": "xG",
-            "percentile": 0.0,
-            "display_value": "0,00"
-          }
-        ],
-        "stats": [],
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0,00"
-      },
-      {
-        "label": "Ofensividade",
-        "kind": "metric_group",
-        "grade": "A",
-        "percentile": 93.7,
-        "sub_metrics": [
-          {
-            "label": "Ações Ofensivas",
-            "percentile": 93.7,
-            "display_value": "2,0"
-          },
-          {
-            "label": "Toques na Área",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          }
-        ],
-        "stats": []
-      }
-    ]
-  },
-  "profiles_available": [
-    "Contenção",
-    "Construtor",
-    "Box-to-box",
-    "Híbrido"
+    "stats": []
+   }
   ],
-  "scatter": {
-    "finalizacao": 0.0,
-    "progressao": 0.0,
-    "xa": 0.0,
-    "construcao": 47.5609756097561,
-    "duelos_def": 10.0
-  },
-  "cluster": {
-    "family": "meio-campistas",
-    "archetype": "Contenção",
-    "archetype_label": "Contenção",
-    "hybrid_badge": null,
-    "hybrid_badge_short": null,
-    "shares": {
-      "contencao": 98.9,
-      "construtor": 0.6,
-      "boxtobox": 0.5
-    },
-    "ratings": {
-      "contencao": 6.6,
-      "construtor": 6.5,
-      "boxtobox": 6.4
-    }
-  },
-  "transfermarkt": {
-    "id": "686332",
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/686332-1643300126.png?lm=4711",
-    "market_value": "€ 400 mil",
-    "market_value_eur": 400000,
-    "contract_until": "2026-12-31",
-    "contract_remaining": "1 mes",
-    "on_loan_from": "Karpaty Lviv",
-    "club": "Clube do Remo",
-    "profile_url": "https://www.transfermarkt.com.br/edson-fernando/profil/spieler/686332",
-    "foot": "Destro",
-    "height": 178
-  },
-  "heatmap": {
-    "tournament_id": 325,
-    "season_id": 87678,
-    "scope": "overall",
-    "competition": "Brasileirão Série A",
-    "points": [
-      {
-        "x": 61.0,
-        "y": 33.0
-      },
-      {
-        "x": 6.0,
-        "y": 56.0
-      },
-      {
-        "x": 3.0,
-        "y": 71.0
-      },
-      {
-        "x": 11.0,
-        "y": 49.0
-      },
-      {
-        "x": 53.0,
-        "y": 70.0
-      }
+  "construcao": [
+   {
+    "label": "Passes Progressivos",
+    "kind": "pass_certos",
+    "grade": "D",
+    "certos_per90": 4.0,
+    "display_value": "4,0",
+    "percentile": 19.2,
+    "efficiency_pct": 1.2,
+    "efficiency_value": "50%",
+    "stats": []
+   },
+   {
+    "label": "Passes para Terço Final",
+    "kind": "pass_certos",
+    "grade": "C+",
+    "certos_per90": 6.0,
+    "display_value": "6,0",
+    "percentile": 51.2,
+    "efficiency_pct": 2.5,
+    "efficiency_value": "67%",
+    "stats": []
+   },
+   {
+    "label": "Passes Longos",
+    "kind": "pass_certos",
+    "grade": "B+",
+    "certos_per90": 4.0,
+    "display_value": "4,0",
+    "percentile": 78.1,
+    "efficiency_pct": 0.0,
+    "efficiency_value": "0%",
+    "stats": []
+   },
+   {
+    "label": "Distribuição",
+    "kind": "metric_group",
+    "grade": "C+",
+    "percentile": 48.8,
+    "sub_metrics": [
+     {
+      "label": "Passes",
+      "percentile": 48.8,
+      "display_value": "40,0"
+     },
+     {
+      "label": "Passes Recebidos",
+      "percentile": 46.3,
+      "display_value": "28,0"
+     }
     ],
-    "point_count": 5,
-    "image_url": "/heatmaps/edson-fernando-remo-690.png"
-  },
-  "physical_run": {
-    "source": "sofascore_run",
-    "competition": "Brasileirão Série A",
-    "position_pool": "Meio-campista",
-    "position_pool_size": 109,
-    "matches": 2,
-    "minutes": 22,
-    "kilometers_p90": 8.47,
-    "top_speed": 29.64,
-    "sprints_p90": 4.09,
-    "running_km_p90": 1.35,
-    "high_speed_km_p90": 0.29,
-    "sprinting_km_p90": 0.08,
-    "percentiles": {},
-    "ranks": {}
-  },
-  "discipline": {
-    "fouls_per90": 4.0,
-    "fouls_total": 2,
-    "yellow_per90": 0.0,
-    "yellow_total": 0,
-    "red_per90": 2.0,
-    "red_total": 1,
-    "pool": {
-      "fouls_per90": 1.58,
-      "yellow_per90": 0.24,
-      "red_per90": 0.03
-    }
-  },
-  "cross_season": {
-    "seasons": [
-      {
-        "year": "2022",
-        "league": "serie-a",
-        "minutes": 942,
-        "club": "Atlético GO"
-      }
+    "stats": []
+   }
+  ],
+  "perfil_construcao": [
+   {
+    "label": "Tendência de Passe",
+    "kind": "construction_share",
+    "grade": "A",
+    "percentile": 90.2,
+    "display_value": "10%",
+    "share_pct": 10.0,
+    "pool_avg_pct": 7.1,
+    "scale_max_pct": 30.0,
+    "stats": [],
+    "bar_key": "pass_tendency",
+    "axis_left": "Curto",
+    "axis_right": "Longo"
+   },
+   {
+    "label": "Passes Progressivos",
+    "kind": "construction_share",
+    "grade": "D",
+    "percentile": 6.1,
+    "display_value": "10%",
+    "share_pct": 10.0,
+    "pool_avg_pct": 13.0,
+    "scale_max_pct": 30.0,
+    "stats": [],
+    "bar_key": "progressive_share",
+    "axis_left": "Baixo",
+    "axis_right": "Alto"
+   }
+  ],
+  "perfil_defensivo": [
+   {
+    "label": "Estilo de defesa",
+    "kind": "construction_share",
+    "grade": "D",
+    "percentile": 0.0,
+    "display_value": "0,54",
+    "share_pct": 0.0,
+    "pool_avg_pct": 2.6,
+    "scale_max_pct": 100.0,
+    "stats": [],
+    "bar_key": "def_contact_style",
+    "axis_left": "Cobertura",
+    "axis_right": "Agressivo"
+   },
+   {
+    "label": "Disciplina defensiva",
+    "kind": "construction_share",
+    "grade": "B+",
+    "percentile": 82.9,
+    "display_value": "100%",
+    "share_pct": 100.0,
+    "pool_avg_pct": 1.5,
+    "scale_max_pct": 100.0,
+    "stats": [],
+    "bar_key": "def_foul_style",
+    "axis_left": "Disciplinado",
+    "axis_right": "Faltoso"
+   }
+  ],
+  "ofensivos": [
+   {
+    "label": "Disputas com Bola",
+    "kind": "metric",
+    "grade": "B-",
+    "percentile": 57.9,
+    "stats": [],
+    "display_value": "2,0",
+    "efficiency_pct": 66.2,
+    "efficiency_value": "50%"
+   },
+   {
+    "label": "Conduções Progressivas",
+    "kind": "metric",
+    "grade": "D",
+    "percentile": 0.0,
+    "stats": [],
+    "display_value": "0,0"
+   },
+   {
+    "label": "1v1 - Ofensivo",
+    "kind": "metric",
+    "grade": "A",
+    "percentile": 98.3,
+    "stats": [],
+    "display_value": "2,0",
+    "efficiency_pct": 100.0,
+    "efficiency_value": "100%"
+   }
+  ],
+  "passes_finais": [
+   {
+    "label": "Passes Chave e Área",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 0.0,
+    "sub_metrics": [
+     {
+      "label": "Assistências para remate",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Passes para Área",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     }
     ],
-    "metrics": {
-      "Duelos Defensivos": {
-        "predicted": 6.4651,
-        "role_change_flag": true,
-        "resid_sd": 1.1828,
-        "train_n90": 20.79
-      },
-      "Duelos Defensivos::Eficiência": {
-        "predicted": 58.9888,
-        "resid_sd": 5.4132,
-        "train_n90": 20.79
-      },
-      "Duelos Aéreos": {
-        "predicted": 2.1052,
-        "resid_sd": 0.7267,
-        "train_n90": 20.79
-      },
-      "Duelos Aéreos::Eficiência": {
-        "predicted": 39.003,
-        "role_change_flag": true,
-        "resid_sd": 11.0907,
-        "train_n90": 20.79
-      },
-      "Ações Defensivas::Rebatidas": {
-        "predicted": 1.7306,
-        "role_change_flag": true,
-        "resid_sd": 0.683,
-        "train_n90": 20.79
-      },
-      "Ações Defensivas::Interceptações": {
-        "predicted": 0.7643,
-        "resid_sd": 0.8593,
-        "train_n90": 20.79
-      },
-      "Ações Defensivas::Chutes Bloqueados": {
-        "predicted": 0.4966,
-        "resid_sd": 0.1924,
-        "train_n90": 20.79
-      },
-      "Eficiência Defensiva::Erros Totais": {
-        "predicted": 0.0229,
-        "resid_sd": 0.0563,
-        "train_n90": 20.79
-      },
-      "Passes Progressivos": {
-        "predicted": 6.5343,
-        "resid_sd": 1.3163,
-        "train_n90": 20.81
-      },
-      "Passes Progressivos::Eficiência": {
-        "predicted": 77.5667,
-        "resid_sd": 6.6991,
-        "train_n90": 20.81
-      },
-      "Passes para Terço Final": {
-        "predicted": 5.8171,
-        "resid_sd": 1.5516,
-        "train_n90": 20.81
-      },
-      "Passes para Terço Final::Eficiência": {
-        "predicted": 84.1285,
-        "resid_sd": 5.7922,
-        "train_n90": 20.81
-      },
-      "Passes Longos": {
-        "predicted": 2.7281,
-        "resid_sd": 0.9922,
-        "train_n90": 20.81
-      },
-      "Passes Longos::Eficiência": {
-        "predicted": 66.0611,
-        "role_change_flag": true,
-        "resid_sd": 8.0347,
-        "train_n90": 20.81
-      },
-      "Distribuição::Passes": {
-        "predicted": 39.0795,
-        "resid_sd": 6.5607,
-        "train_n90": 20.82
-      },
-      "Distribuição::Passes Recebidos": {
-        "predicted": 27.9034,
-        "resid_sd": 5.6925,
-        "train_n90": 20.82
-      },
-      "Disputas com Bola": {
-        "predicted": 3.3732,
-        "resid_sd": 0.9071,
-        "train_n90": 20.81
-      },
-      "Disputas com Bola::Eficiência": {
-        "predicted": 48.8837,
-        "resid_sd": 7.459,
-        "train_n90": 20.81
-      },
-      "1v1 - Ofensivo": {
-        "predicted": 1.7409,
-        "resid_sd": 0.5762,
-        "train_n90": 20.82
-      },
-      "1v1 - Ofensivo::Eficiência": {
-        "predicted": 58.1601,
-        "role_change_flag": true,
-        "resid_sd": 13.5736,
-        "train_n90": 20.82
-      },
-      "Passes Chave e Área::Assistências para remate": {
-        "predicted": 0.3861,
-        "resid_sd": 0.3299,
-        "train_n90": 20.82
-      },
-      "Passes Chave e Área::Passes para Área": {
-        "predicted": 0.8361,
-        "role_change_flag": true,
-        "resid_sd": 0.3224,
-        "train_n90": 20.82
-      },
-      "Pré Assistências e xA::Pré Assistências": {
-        "predicted": 0.0519,
-        "resid_sd": 0.0574,
-        "train_n90": 20.82
-      },
-      "Pré Assistências e xA::xA": {
-        "predicted": 0.0557,
-        "resid_sd": 0.0374,
-        "train_n90": 20.82
-      },
-      "Passes Criativos": {
-        "predicted": 0.4198,
-        "resid_sd": 0.345,
-        "train_n90": 20.82
-      },
-      "Passes Criativos::Eficiência": {
-        "predicted": 60.143,
-        "resid_sd": 11.6803,
-        "train_n90": 20.82
-      },
-      "Ofensividade::Ações Ofensivas": {
-        "predicted": 1.6646,
-        "resid_sd": 0.4941,
-        "train_n90": 20.81
-      },
-      "Ofensividade::Toques na Área": {
-        "predicted": 0.8336,
-        "role_change_flag": true,
-        "resid_sd": 0.3845,
-        "train_n90": 20.81
-      }
-    }
+    "stats": []
+   },
+   {
+    "label": "Pré Assistências e xA",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 0.0,
+    "sub_metrics": [
+     {
+      "label": "Pré Assistências",
+      "percentile": 0.0,
+      "display_value": "0"
+     },
+     {
+      "label": "xA",
+      "percentile": 0.0,
+      "display_value": "0,00"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Passes Criativos",
+    "kind": "metric",
+    "grade": "D",
+    "percentile": 0.0,
+    "stats": [],
+    "display_value": "0,0",
+    "efficiency_pct": 11.2,
+    "efficiency_value": "42%",
+    "sub_metrics": [
+     {
+      "label": "Passes Criativos",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Passes Inteligentes",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Passes em Profundidade",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     }
+    ]
+   }
+  ],
+  "ofensividade": [
+   {
+    "label": "Finalizações",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 0.0,
+    "sub_metrics": [
+     {
+      "label": "Finalizações",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "xG",
+      "percentile": 0.0,
+      "display_value": "0,00"
+     }
+    ],
+    "stats": [],
+    "efficiency_pct": 0.0,
+    "efficiency_value": "0,00"
+   },
+   {
+    "label": "Ofensividade",
+    "kind": "metric_group",
+    "grade": "A",
+    "percentile": 93.7,
+    "sub_metrics": [
+     {
+      "label": "Ações Ofensivas",
+      "percentile": 93.7,
+      "display_value": "2,0"
+     },
+     {
+      "label": "Toques na Área",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     }
+    ],
+    "stats": []
+   }
+  ]
+ },
+ "profiles_available": [
+  "Contenção",
+  "Construtor",
+  "Box-to-box",
+  "Híbrido"
+ ],
+ "scatter": {
+  "duelos_def": 10.0,
+  "finalizacao": 0.0,
+  "progressao": 0.0,
+  "xa": 0.0,
+  "construcao": 47.5609756097561
+ },
+ "cluster": {
+  "family": "meio-campistas",
+  "archetype": "Contenção",
+  "archetype_label": "Contenção",
+  "hybrid_badge": null,
+  "hybrid_badge_short": null,
+  "shares": {
+   "contencao": 98.9,
+   "construtor": 0.6,
+   "boxtobox": 0.5
   },
-  "pass_distance_m": 22.79,
-  "athlete_id": "ath-000936",
-  "person_key": "name:edson fernando|1998|0"
+  "ratings": {
+   "contencao": 6.6,
+   "construtor": 6.5,
+   "boxtobox": 6.4
+  }
+ },
+ "transfermarkt": {
+  "id": "686332",
+  "photo": "https://img.a.transfermarkt.technology/portrait/header/686332-1643300126.png?lm=4711",
+  "market_value": "€ 400 mil",
+  "market_value_eur": 400000,
+  "contract_until": "2026-12-31",
+  "contract_remaining": "1 mes",
+  "on_loan_from": "Karpaty Lviv",
+  "club": "Clube do Remo",
+  "profile_url": "https://www.transfermarkt.com.br/edson-fernando/profil/spieler/686332",
+  "foot": "Destro",
+  "height": 178
+ },
+ "heatmap": {
+  "tournament_id": 325,
+  "season_id": 87678,
+  "scope": "overall",
+  "competition": "Brasileirão Série A",
+  "points": [
+   {
+    "x": 61.0,
+    "y": 33.0
+   },
+   {
+    "x": 6.0,
+    "y": 56.0
+   },
+   {
+    "x": 3.0,
+    "y": 71.0
+   },
+   {
+    "x": 11.0,
+    "y": 49.0
+   },
+   {
+    "x": 53.0,
+    "y": 70.0
+   }
+  ],
+  "point_count": 5,
+  "image_url": "/heatmaps/edson-fernando-remo-690.png"
+ },
+ "physical_run": {
+  "source": "sofascore_run",
+  "competition": "Brasileirão Série A",
+  "position_pool": "Meio-campista",
+  "position_pool_size": 109,
+  "matches": 2,
+  "minutes": 22,
+  "kilometers_p90": 8.47,
+  "top_speed": 29.64,
+  "sprints_p90": 4.09,
+  "running_km_p90": 1.35,
+  "high_speed_km_p90": 0.29,
+  "sprinting_km_p90": 0.08,
+  "percentiles": {},
+  "ranks": {}
+ }
 }

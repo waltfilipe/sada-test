@@ -48,7 +48,7 @@ export type AspectItem = {
   /** Nested rows for Eficiência Defensiva group. */
   sub_metrics?: AspectSubMetric[];
   /** Header badge pair: ações c/ êxito × eficiência def. */
-  pair_badge?: [number, number] | null;
+  pair_badge?: number[] | null;
 };
 
 export type TransfermarktInfo = {

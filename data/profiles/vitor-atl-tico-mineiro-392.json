@@ -1,335 +1,345 @@
 {
-  "player_id": "vitor-atl-tico-mineiro-392",
-  "name": "Vitor",
-  "club": "Atlético Mineiro",
-  "label": "Vitor (Atlético Mineiro)",
-  "position": "Zagueiro",
-  "position_family": "zagueiros",
-  "nationality": "Brazil",
-  "birth_year": 2008,
-  "height": 0,
-  "foot": null,
-  "minutes": 600,
-  "minutes_pct": 19.4,
-  "goals": 1,
-  "assists": 0,
-  "rating": 6.8,
+ "player_id": "vitor-atl-tico-mineiro-392",
+ "name": "Vitor",
+ "club": "Atlético Mineiro",
+ "label": "Vitor (Atlético Mineiro)",
+ "position": "Zagueiro",
+ "position_family": "zagueiros",
+ "nationality": "Brazil",
+ "birth_year": 2008,
+ "height": 0,
+ "foot": null,
+ "minutes": 766,
+ "minutes_pct": 22.5,
+ "goals": 1,
+ "assists": 0,
+ "rating": 6.7,
+ "ratings": {
+  "geral": 6.7,
+  "construcao": 6.2,
+  "defesa": 7.7,
+  "perfil": 6.6
+ },
+ "ranks": {
+  "geral": 46,
+  "construcao": 86,
+  "defesa": 23,
+  "perfil": 59
+ },
+ "profile": "Combativo",
+ "profile_shares": {
+  "construcao": 33.0,
+  "defesa": 67.0
+ },
+ "tendencies": {
+  "construcao": 39.0,
+  "ofensividade": 26.0,
+  "def1v1": 46.0,
+  "contencao": 97.0,
+  "duelo_aereo": 86.0
+ },
+ "aspects": {
+  "defensivos": [
+   {
+    "label": "Duelos Defensivos",
+    "kind": "metric",
+    "grade": "B+",
+    "percentile": 83.3,
+    "stats": [],
+    "display_value": "5,2",
+    "efficiency_pct": 2.9,
+    "efficiency_value": "45%"
+   },
+   {
+    "label": "Ações Defensivas e Recuperações",
+    "kind": "metric_group",
+    "grade": "B-",
+    "percentile": 61.3,
+    "sub_metrics": [
+     {
+      "label": "Rebatidas",
+      "percentile": 72.2,
+      "display_value": "6,0"
+     },
+     {
+      "label": "Interceptações",
+      "percentile": 94.4,
+      "display_value": "1,6"
+     },
+     {
+      "label": "Chutes Bloqueados",
+      "percentile": 61.4,
+      "display_value": "0,8"
+     },
+     {
+      "label": "Recuperações",
+      "percentile": 17.3,
+      "display_value": "2,2"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Eficiência Defensiva",
+    "kind": "def_efficiency_group",
+    "grade": "D",
+    "percentile": 22.9,
+    "pair_badge": [
+     100.0,
+     78.6,
+     22.9
+    ],
+    "sub_metrics": [
+     {
+      "label": "Erros Totais",
+      "percentile": 100.0,
+      "display_value": "0"
+     },
+     {
+      "label": "Ações sem Bola/90",
+      "percentile": 78.6,
+      "display_value": "12,9"
+     },
+     {
+      "label": "Índice de Eficiência",
+      "percentile": 22.9,
+      "display_value": "-0,8"
+     }
+    ],
+    "stats": []
+   }
+  ],
+  "construcao": [
+   {
+    "label": "Passes Progressivos",
+    "kind": "pass_certos",
+    "grade": "B-",
+    "certos_per90": 7.4,
+    "display_value": "7,4",
+    "percentile": 61.4,
+    "efficiency_pct": 23.3,
+    "efficiency_value": "62%",
+    "stats": []
+   },
+   {
+    "label": "Passes para Terço Final",
+    "kind": "pass_certos",
+    "grade": "D",
+    "certos_per90": 3.41,
+    "display_value": "3,4",
+    "percentile": 20.5,
+    "efficiency_pct": 14.7,
+    "efficiency_value": "59%",
+    "stats": []
+   },
+   {
+    "label": "Passes Longos",
+    "kind": "pass_certos",
+    "grade": "C+",
+    "certos_per90": 4.23,
+    "display_value": "4,2",
+    "percentile": 46.4,
+    "efficiency_pct": 62.5,
+    "efficiency_value": "56%",
+    "stats": []
+   }
+  ],
+  "perfil_construcao": [
+   {
+    "label": "Tendência de Passe",
+    "kind": "construction_share",
+    "grade": "C-",
+    "percentile": 30.7,
+    "display_value": "9%",
+    "share_pct": 9.1,
+    "pool_avg_pct": 10.9,
+    "scale_max_pct": 24.0,
+    "stats": [],
+    "bar_key": "pass_tendency",
+    "axis_left": "Curto",
+    "axis_right": "Longo"
+   },
+   {
+    "label": "Passes Progressivos",
+    "kind": "construction_share",
+    "grade": "C+",
+    "percentile": 49.3,
+    "display_value": "16%",
+    "share_pct": 16.0,
+    "pool_avg_pct": 15.9,
+    "scale_max_pct": 31.7,
+    "stats": [],
+    "bar_key": "progressive_share",
+    "axis_left": "Baixo",
+    "axis_right": "Alto"
+   }
+  ],
+  "perfil_defensivo": [
+   {
+    "label": "Estilo de defesa",
+    "kind": "construction_share",
+    "grade": "B",
+    "percentile": 68.0,
+    "display_value": "0,69",
+    "share_pct": 68.0,
+    "pool_avg_pct": 0.7,
+    "scale_max_pct": 100.0,
+    "stats": [],
+    "bar_key": "def_contact_style",
+    "axis_left": "Cobertura",
+    "axis_right": "Agressivo"
+   },
+   {
+    "label": "Disciplina defensiva",
+    "kind": "construction_share",
+    "grade": "B+",
+    "percentile": 80.0,
+    "display_value": "24%",
+    "share_pct": 24.1,
+    "pool_avg_pct": 0.9,
+    "scale_max_pct": 100.0,
+    "stats": [],
+    "bar_key": "def_foul_style",
+    "axis_left": "Disciplinado",
+    "axis_right": "Faltoso"
+   }
+  ],
+  "ofensivos": [
+   {
+    "label": "Disputas com Bola",
+    "kind": "metric",
+    "grade": "D",
+    "percentile": 9.5,
+    "stats": [],
+    "display_value": "0,5",
+    "efficiency_pct": 5.3,
+    "efficiency_value": "25%"
+   },
+   {
+    "label": "Conduções Progressivas",
+    "kind": "metric",
+    "grade": "C-",
+    "percentile": 29.8,
+    "stats": [],
+    "display_value": "0,3"
+   },
+   {
+    "label": "Gols e xG",
+    "kind": "metric_group",
+    "grade": "B-",
+    "percentile": 57.6,
+    "sub_metrics": [
+     {
+      "label": "Gols",
+      "percentile": 25.0,
+      "display_value": "1"
+     },
+     {
+      "label": "xG",
+      "percentile": 57.6,
+      "display_value": "1,14"
+     },
+     {
+      "label": "Eficiência de finalização",
+      "percentile": 57.4,
+      "display_value": "-0,1"
+     },
+     {
+      "label": "xA",
+      "percentile": 9.3,
+      "display_value": "0,04"
+     }
+    ],
+    "stats": []
+   }
+  ],
+  "aereo": [
+   {
+    "label": "Aéreo",
+    "kind": "metric",
+    "grade": "B",
+    "percentile": 73.4,
+    "stats": [],
+    "display_value": "3,9",
+    "efficiency_pct": 80.3,
+    "efficiency_value": "70%"
+   }
+  ]
+ },
+ "profiles_available": [
+  "Construtor",
+  "Defensivo",
+  "Híbrido"
+ ],
+ "scatter": {
+  "duelos_def": 5.17,
+  "confrontos_of": 0.47,
+  "intervencoes": 1.6314199395770395,
+  "construcao": 38.666666666666664,
+  "duelo_ar": 86.3013698630137,
+  "contencao": 97.10144927536231,
+  "ofensividade": 25.675675675675674,
+  "passes_prog": 7.4
+ },
+ "hybrid_lean": null,
+ "cluster": {
+  "family": "zagueiros",
+  "archetype": "Combativo",
+  "archetype_label": "Combativo",
+  "construtor_badge": null,
+  "construtor_badge_short": null,
+  "shares": {
+   "defensor_area": 19.0,
+   "construtor": 7.9,
+   "combativo": 73.1
+  },
   "ratings": {
-    "geral": 6.8,
-    "construcao": 6.3,
-    "defesa": 7.4,
-    "perfil": 7.1
+   "defensor_area": 7.1,
+   "construtor": 6.0,
+   "combativo": 6.5
+  }
+ },
+ "transfermarkt": {
+  "id": "149752",
+  "photo": "https://img.a.transfermarkt.technology/portrait/header/149752-1630527249.png?lm=4711",
+  "market_value": "€ 500 mil",
+  "market_value_eur": 500000,
+  "contract_until": "2028-12-31",
+  "contract_remaining": "2 anos e 2 meses",
+  "on_loan_from": null,
+  "club": "Atlético Mineiro",
+  "profile_url": "https://www.transfermarkt.com.br/vitor-hugo/profil/spieler/149752",
+  "foot": "Canhoto",
+  "height": 187
+ },
+ "physical_run": {
+  "source": "sofascore_run",
+  "competition": "Brasileirão Série A",
+  "position_pool": "Zagueiro",
+  "position_pool_size": 97,
+  "matches": 17,
+  "minutes": 1115,
+  "kilometers_p90": 8.78,
+  "top_speed": 34.49,
+  "sprints_p90": 8.48,
+  "running_km_p90": 1.03,
+  "high_speed_km_p90": 0.32,
+  "sprinting_km_p90": 0.11,
+  "percentiles": {
+   "kilometers_p90": 77.7,
+   "top_speed": 52.3,
+   "sprints_p90": 59.6,
+   "running_km_p90": 87.2,
+   "high_speed_km_p90": 63.8,
+   "sprinting_km_p90": 57.4
   },
   "ranks": {
-    "geral": 30,
-    "construcao": 80,
-    "defesa": 32,
-    "perfil": 20
-  },
-  "profile": "Defensor de Área",
-  "profile_shares": {
-    "construcao": 28.0,
-    "defesa": 72.0
-  },
-  "tendencies": {
-    "construcao": 35.0,
-    "ofensividade": 11.0,
-    "def1v1": 32.0,
-    "contencao": 97.0,
-    "duelo_aereo": 86.0
-  },
-  "aspects": {
-    "defensivos": [
-      {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
-        "grade": "C+",
-        "percentile": 54.4,
-        "stats": [],
-        "display_value": "4,2",
-        "efficiency_pct": 8.6,
-        "efficiency_value": "50%"
-      },
-      {
-        "label": "Ações Defensivas",
-        "kind": "metric_group",
-        "grade": "B+",
-        "percentile": 75.5,
-        "sub_metrics": [
-          {
-            "label": "Rebatidas",
-            "percentile": 72.9,
-            "display_value": "6,0"
-          },
-          {
-            "label": "Interceptações",
-            "percentile": 94.3,
-            "display_value": "1,6"
-          },
-          {
-            "label": "Chutes Bloqueados",
-            "percentile": 59.4,
-            "display_value": "0,8"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Eficiência Defensiva",
-        "kind": "def_efficiency_group",
-        "grade": "B+",
-        "percentile": 81.9,
-        "pair_badge": [
-          100.0,
-          81.9
-        ],
-        "sub_metrics": [
-          {
-            "label": "Erros Totais",
-            "percentile": 100.0,
-            "display_value": "0"
-          },
-          {
-            "label": "Eficiência Defensiva",
-            "percentile": 81.9,
-            "display_value": "+0,9"
-          }
-        ],
-        "stats": []
-      }
-    ],
-    "construcao": [
-      {
-        "label": "Passes Progressivos",
-        "kind": "pass_certos",
-        "grade": "C+",
-        "certos_per90": 6.75,
-        "display_value": "6,8",
-        "percentile": 52.9,
-        "efficiency_pct": 49.3,
-        "efficiency_value": "69%",
-        "stats": []
-      },
-      {
-        "label": "Passes para Terço Final",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 3.45,
-        "display_value": "3,5",
-        "percentile": 22.4,
-        "efficiency_pct": 24.6,
-        "efficiency_value": "65%",
-        "stats": []
-      },
-      {
-        "label": "Passes Longos",
-        "kind": "pass_certos",
-        "grade": "C-",
-        "certos_per90": 3.3,
-        "display_value": "3,3",
-        "percentile": 29.2,
-        "efficiency_pct": 94.1,
-        "efficiency_value": "64%",
-        "stats": []
-      }
-    ],
-    "perfil_construcao": [
-      {
-        "label": "Tendência de Passe",
-        "kind": "construction_share",
-        "grade": "D",
-        "percentile": 16.7,
-        "display_value": "7%",
-        "share_pct": 6.7,
-        "pool_avg_pct": 10.8,
-        "scale_max_pct": 24.0,
-        "stats": [],
-        "bar_key": "pass_tendency",
-        "axis_left": "Curto",
-        "axis_right": "Longo"
-      },
-      {
-        "label": "Passes Progressivos",
-        "kind": "construction_share",
-        "grade": "C-",
-        "percentile": 34.7,
-        "display_value": "14%",
-        "share_pct": 13.8,
-        "pool_avg_pct": 15.8,
-        "scale_max_pct": 31.6,
-        "stats": [],
-        "bar_key": "progressive_share",
-        "axis_left": "Baixo",
-        "axis_right": "Alto"
-      }
-    ],
-    "perfil_defensivo": [
-      {
-        "label": "Estilo de defesa",
-        "kind": "construction_share",
-        "grade": "C",
-        "percentile": 43.1,
-        "display_value": "0,57",
-        "share_pct": 43.1,
-        "pool_avg_pct": 0.6,
-        "scale_max_pct": 100.0,
-        "stats": [],
-        "bar_key": "def_contact_style",
-        "axis_left": "Cobertura",
-        "axis_right": "Agressivo"
-      },
-      {
-        "label": "Disciplina defensiva",
-        "kind": "construction_share",
-        "grade": "B+",
-        "percentile": 81.9,
-        "display_value": "22%",
-        "share_pct": 21.8,
-        "pool_avg_pct": 0.9,
-        "scale_max_pct": 100.0,
-        "stats": [],
-        "bar_key": "def_foul_style",
-        "axis_left": "Disciplinado",
-        "axis_right": "Faltoso"
-      }
-    ],
-    "ofensivos": [
-      {
-        "label": "Disputas com Bola",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 14.8,
-        "stats": [],
-        "display_value": "0,5",
-        "efficiency_pct": 13.7,
-        "efficiency_value": "33%"
-      },
-      {
-        "label": "Conduções Progressivas",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 8.3,
-        "stats": [],
-        "display_value": "0,1"
-      },
-      {
-        "label": "Gols e xG",
-        "kind": "metric_group",
-        "grade": "B",
-        "percentile": 66.1,
-        "sub_metrics": [
-          {
-            "label": "Gols",
-            "percentile": 25.0,
-            "display_value": "1"
-          },
-          {
-            "label": "xG",
-            "percentile": 66.1,
-            "display_value": "1,14"
-          },
-          {
-            "label": "Eficiência de finalização",
-            "percentile": 51.6,
-            "display_value": "-0,1"
-          },
-          {
-            "label": "xA",
-            "percentile": 10.5,
-            "display_value": "0,04"
-          }
-        ],
-        "stats": []
-      }
-    ],
-    "aereo": [
-      {
-        "label": "Aéreo",
-        "kind": "metric",
-        "grade": "B+",
-        "percentile": 84.4,
-        "stats": [],
-        "display_value": "4,2",
-        "efficiency_pct": 68.7,
-        "efficiency_value": "68%"
-      }
-    ]
-  },
-  "profiles_available": [
-    "Construtor",
-    "Defensivo",
-    "Híbrido"
-  ],
-  "scatter": {
-    "intervencoes": 1.6314199395770395,
-    "confrontos_of": 0.45,
-    "construcao": 34.72222222222222,
-    "duelo_ar": 85.71428571428571,
-    "contencao": 97.05882352941177,
-    "ofensividade": 11.11111111111111,
-    "passes_prog": 6.75,
-    "duelos_def": 4.2
-  },
-  "hybrid_lean": null,
-  "cluster": {
-    "family": "zagueiros",
-    "archetype": "Defensor de Área",
-    "archetype_label": "Defensor de Área",
-    "construtor_badge": null,
-    "construtor_badge_short": null,
-    "shares": {
-      "defensor_area": 70.5,
-      "construtor": 7.1,
-      "combativo": 22.4
-    },
-    "ratings": {
-      "defensor_area": 7.1,
-      "construtor": 6.1,
-      "combativo": 6.3
-    }
-  },
-  "transfermarkt": {
-    "id": "149752",
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/149752-1630527249.png?lm=4711",
-    "market_value": "€ 500 mil",
-    "market_value_eur": 500000,
-    "contract_until": "2028-12-31",
-    "contract_remaining": "2 anos e 2 meses",
-    "on_loan_from": null,
-    "club": "Atlético Mineiro",
-    "profile_url": "https://www.transfermarkt.com.br/vitor-hugo/profil/spieler/149752",
-    "foot": "Canhoto",
-    "height": 187
-  },
-  "physical_run": {
-    "source": "sofascore_run",
-    "competition": "Brasileirão Série A",
-    "position_pool": "Zagueiro",
-    "position_pool_size": 94,
-    "matches": 17,
-    "minutes": 1115,
-    "kilometers_p90": 8.78,
-    "top_speed": 34.49,
-    "sprints_p90": 8.48,
-    "running_km_p90": 1.03,
-    "high_speed_km_p90": 0.32,
-    "sprinting_km_p90": 0.11,
-    "percentiles": {
-      "kilometers_p90": 78.0,
-      "top_speed": 50.6,
-      "sprints_p90": 59.3,
-      "running_km_p90": 89.0,
-      "high_speed_km_p90": 64.8,
-      "sprinting_km_p90": 57.1
-    },
-    "ranks": {
-      "kilometers_p90": 21,
-      "top_speed": 47,
-      "sprints_p90": 38,
-      "running_km_p90": 11,
-      "high_speed_km_p90": 33,
-      "sprinting_km_p90": 40
-    }
-  },
-  "athlete_id": "ath-004167"
+   "kilometers_p90": 22,
+   "top_speed": 47,
+   "sprints_p90": 39,
+   "running_km_p90": 13,
+   "high_speed_km_p90": 35,
+   "sprinting_km_p90": 41
+  }
+ }
 }

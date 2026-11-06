@@ -1,1308 +1,1119 @@
 {
-  "player_id": "mateusinho-vit-ria-369",
-  "name": "Mateusinho",
-  "club": "Vitória",
-  "label": "Mateusinho (Vitória)",
-  "position": "Lateral Direito",
-  "position_family": "laterais",
-  "nationality": "Brazil",
-  "birth_year": 1998,
-  "height": 175,
-  "foot": "Destro",
-  "minutes": 844,
-  "minutes_pct": 24.8,
-  "goals": 0,
-  "assists": 2,
-  "rating": 6.9,
+ "player_id": "mateusinho-vit-ria-369",
+ "name": "Mateusinho",
+ "club": "Vitória",
+ "label": "Mateusinho (Vitória)",
+ "position": "Lateral Direito",
+ "position_family": "laterais",
+ "nationality": "Brazil",
+ "birth_year": 1998,
+ "height": 175,
+ "foot": "Destro",
+ "minutes": 844,
+ "minutes_pct": 24.8,
+ "goals": 0,
+ "assists": 2,
+ "rating": 6.9,
+ "ratings": {
+  "geral": 6.9,
+  "defensivo": 7.2,
+  "construtor": 5.7,
+  "ofensivo": 6.2
+ },
+ "ranks": {
+  "geral": 29,
+  "defensivo": 11,
+  "construtor": 124,
+  "ofensivo": 95
+ },
+ "profile": "Defensivo",
+ "profile_shares": {
+  "defensivo": 86.0,
+  "construtor": 7.0,
+  "ofensivo": 6.0
+ },
+ "tendencies": {
+  "construcao": 25.0,
+  "ofensividade": 21.0,
+  "def1v1": 92.0,
+  "contencao": 43.0,
+  "duelo_aereo": 87.0
+ },
+ "aspects": {
+  "defensivos": [
+   {
+    "label": "Duelos Defensivos",
+    "kind": "metric",
+    "grade": "B",
+    "percentile": 74.6,
+    "stats": [],
+    "display_value": "7,0",
+    "efficiency_pct": 59.5,
+    "efficiency_value": "58%"
+   },
+   {
+    "label": "Duelos Aéreos",
+    "kind": "metric",
+    "grade": "B+",
+    "percentile": 80.0,
+    "stats": [],
+    "display_value": "2,9",
+    "efficiency_pct": 80.0,
+    "efficiency_value": "63%"
+   },
+   {
+    "label": "Ações Defensivas e Recuperações",
+    "kind": "metric_group",
+    "grade": "B",
+    "percentile": 66.5,
+    "sub_metrics": [
+     {
+      "label": "Rebatidas",
+      "percentile": 81.7,
+      "display_value": "3,8"
+     },
+     {
+      "label": "Interceptações",
+      "percentile": 91.5,
+      "display_value": "1,9"
+     },
+     {
+      "label": "Chutes Bloqueados",
+      "percentile": 0.0,
+      "display_value": "0,3"
+     },
+     {
+      "label": "Recuperações",
+      "percentile": 92.9,
+      "display_value": "5,6"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Eficiência Defensiva",
+    "kind": "def_efficiency_group",
+    "grade": "A",
+    "percentile": 85.7,
+    "pair_badge": [
+     100.0,
+     99.2,
+     85.7
+    ],
+    "sub_metrics": [
+     {
+      "label": "Erros Totais",
+      "percentile": 100.0,
+      "display_value": "0"
+     },
+     {
+      "label": "Ações sem Bola/90",
+      "percentile": 99.2,
+      "display_value": "15,7"
+     },
+     {
+      "label": "Índice de Eficiência",
+      "percentile": 85.7,
+      "display_value": "+1,0"
+     }
+    ],
+    "stats": []
+   }
+  ],
+  "construcao": [
+   {
+    "label": "Passes Progressivos",
+    "kind": "pass_certos",
+    "grade": "B",
+    "certos_per90": 7.78,
+    "display_value": "7,8",
+    "percentile": 72.2,
+    "efficiency_pct": 12.0,
+    "efficiency_value": "62%",
+    "stats": []
+   },
+   {
+    "label": "Passes para Terço Final",
+    "kind": "pass_certos",
+    "grade": "D",
+    "certos_per90": 2.77,
+    "display_value": "2,8",
+    "percentile": 7.0,
+    "efficiency_pct": 23.3,
+    "efficiency_value": "65%",
+    "stats": []
+   },
+   {
+    "label": "Passes Longos",
+    "kind": "pass_certos",
+    "grade": "C",
+    "certos_per90": 3.09,
+    "display_value": "3,1",
+    "percentile": 42.9,
+    "efficiency_pct": 1.4,
+    "efficiency_value": "28%",
+    "stats": []
+   },
+   {
+    "label": "Distribuição",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 21.3,
+    "sub_metrics": [
+     {
+      "label": "Passes",
+      "percentile": 21.3,
+      "display_value": "32,7"
+     },
+     {
+      "label": "Passes Recebidos",
+      "percentile": 16.2,
+      "display_value": "22,8"
+     }
+    ],
+    "stats": []
+   }
+  ],
+  "perfil_construcao": [
+   {
+    "label": "Tendência de Passe",
+    "kind": "construction_share",
+    "grade": "C+",
+    "percentile": 54.7,
+    "display_value": "9%",
+    "share_pct": 9.4,
+    "pool_avg_pct": 9.0,
+    "scale_max_pct": 30.0,
+    "stats": [],
+    "bar_key": "pass_tendency",
+    "axis_left": "Curto",
+    "axis_right": "Longo"
+   },
+   {
+    "label": "Passes Progressivos",
+    "kind": "construction_share",
+    "grade": "A",
+    "percentile": 96.0,
+    "display_value": "24%",
+    "share_pct": 23.8,
+    "pool_avg_pct": 18.4,
+    "scale_max_pct": 36.8,
+    "stats": [],
+    "bar_key": "progressive_share",
+    "axis_left": "Baixo",
+    "axis_right": "Alto"
+   }
+  ],
+  "perfil_defensivo": [
+   {
+    "label": "Estilo de defesa",
+    "kind": "construction_share",
+    "grade": "C",
+    "percentile": 37.3,
+    "display_value": "1,34",
+    "share_pct": 37.3,
+    "pool_avg_pct": 1.6,
+    "scale_max_pct": 100.0,
+    "stats": [],
+    "bar_key": "def_contact_style",
+    "axis_left": "Cobertura",
+    "axis_right": "Agressivo"
+   },
+   {
+    "label": "Disciplina defensiva",
+    "kind": "construction_share",
+    "grade": "B+",
+    "percentile": 81.3,
+    "display_value": "51%",
+    "share_pct": 50.8,
+    "pool_avg_pct": 1.1,
+    "scale_max_pct": 100.0,
+    "stats": [],
+    "bar_key": "def_foul_style",
+    "axis_left": "Disciplinado",
+    "axis_right": "Faltoso"
+   }
+  ],
+  "ofensivos": [
+   {
+    "label": "Disputas com Bola",
+    "kind": "metric",
+    "grade": "D",
+    "percentile": 23.2,
+    "stats": [],
+    "display_value": "2,3",
+    "efficiency_pct": 84.8,
+    "efficiency_value": "58%"
+   },
+   {
+    "label": "1v1 - Ofensivo",
+    "kind": "metric",
+    "grade": "D",
+    "percentile": 7.2,
+    "stats": [],
+    "display_value": "0,4",
+    "efficiency_pct": 77.6,
+    "efficiency_value": "75%"
+   },
+   {
+    "label": "Progressão",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 22.9,
+    "sub_metrics": [
+     {
+      "label": "Conduções Progressivas",
+      "percentile": 1.6,
+      "display_value": "0,2"
+     },
+     {
+      "label": "Acelerações",
+      "percentile": 22.9,
+      "display_value": "0,1"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Gols e xG",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 16.1,
+    "sub_metrics": [
+     {
+      "label": "Gols",
+      "percentile": 0.0,
+      "display_value": "0"
+     },
+     {
+      "label": "xG",
+      "percentile": 16.1,
+      "display_value": "0,24"
+     },
+     {
+      "label": "Eficiência de finalização",
+      "percentile": 44.6,
+      "display_value": "-0,2"
+     }
+    ],
+    "stats": []
+   }
+  ],
+  "passes_finais": [
+   {
+    "label": "Cruzamentos",
+    "kind": "metric_group",
+    "grade": "B+",
+    "percentile": 76.1,
+    "sub_metrics": [
+     {
+      "label": "Cruzamentos",
+      "percentile": 76.1,
+      "display_value": "3,3"
+     },
+     {
+      "label": "Eficiência",
+      "percentile": 44.3,
+      "display_value": "32%"
+     }
+    ],
+    "stats": [],
+    "efficiency_pct": 44.3,
+    "efficiency_value": "32%"
+   },
+   {
+    "label": "Passes Chave e Área",
+    "kind": "metric_group",
+    "grade": "A",
+    "percentile": 95.0,
+    "sub_metrics": [
+     {
+      "label": "Assistências para remate",
+      "percentile": 95.0,
+      "display_value": "1,6"
+     },
+     {
+      "label": "Passes para Área",
+      "percentile": 74.7,
+      "display_value": "1,4"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Pré Assistências e xA",
+    "kind": "metric_group",
+    "grade": "A",
+    "percentile": 85.7,
+    "sub_metrics": [
+     {
+      "label": "Pré Assistências",
+      "percentile": 85.7,
+      "display_value": "3"
+     },
+     {
+      "label": "xA",
+      "percentile": 83.1,
+      "display_value": "2,36"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Passes Criativos",
+    "kind": "metric",
+    "grade": "D",
+    "percentile": 0.0,
+    "stats": [],
+    "display_value": "0,0",
+    "efficiency_pct": 6.0,
+    "efficiency_value": "37%",
+    "sub_metrics": [
+     {
+      "label": "Passes Criativos",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Passes Inteligentes",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Passes em Profundidade",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     }
+    ]
+   }
+  ],
+  "ofensividade": [
+   {
+    "label": "Ofensividade",
+    "kind": "metric_group",
+    "grade": "C+",
+    "percentile": 46.9,
+    "sub_metrics": [
+     {
+      "label": "Ações Ofensivas",
+      "percentile": 45.9,
+      "display_value": "1,7"
+     },
+     {
+      "label": "Toques na Área",
+      "percentile": 46.9,
+      "display_value": "1,1"
+     }
+    ],
+    "stats": []
+   }
+  ]
+ },
+ "profiles_available": [
+  "Defensivo",
+  "Construtor",
+  "Ofensivo",
+  "Híbrido"
+ ],
+ "scatter": {
+  "duelos_def": 7.04,
+  "cruzamentos": 3.31,
+  "progressao": 0.21000000000000002,
+  "xa": 2.36,
+  "construcao": 25.333333333333336
+ },
+ "cluster": {
+  "family": "laterais",
+  "archetype": "Defensivo",
+  "archetype_label": "Defensivo",
+  "hybrid_badge": null,
+  "hybrid_badge_short": null,
+  "shares": {
+   "defensivo": 86.5,
+   "construtor": 7.2,
+   "ofensivo": 6.3
+  },
   "ratings": {
-    "geral": 6.9,
-    "defensivo": 7.2,
-    "construtor": 5.7,
-    "ofensivo": 6.2
+   "defensivo": 7.2,
+   "construtor": 5.7,
+   "ofensivo": 6.2
+  }
+ },
+ "transfermarkt": {
+  "id": "870778",
+  "photo": "https://img.a.transfermarkt.technology/portrait/header/870778-1685711841.jpg?lm=4711",
+  "market_value": "€ 800 mil",
+  "market_value_eur": 800000,
+  "contract_until": "2028-12-31",
+  "contract_remaining": "2 anos e 2 meses",
+  "on_loan_from": null,
+  "club": "EC Vitória",
+  "profile_url": "https://www.transfermarkt.com.br/mateus-silva/profil/spieler/870778",
+  "foot": "Destro",
+  "height": 175
+ },
+ "heatmap": {
+  "tournament_id": 325,
+  "season_id": 87678,
+  "scope": "overall",
+  "competition": "Brasileirão Série A",
+  "points": [
+   {
+    "x": 34.0,
+    "y": 17.0
+   },
+   {
+    "x": 42.0,
+    "y": 8.0
+   },
+   {
+    "x": 78.0,
+    "y": 7.0
+   },
+   {
+    "x": 78.0,
+    "y": 23.0
+   },
+   {
+    "x": 78.0,
+    "y": 1.0
+   },
+   {
+    "x": 54.0,
+    "y": 37.0
+   },
+   {
+    "x": 54.0,
+    "y": 31.0
+   },
+   {
+    "x": 54.0,
+    "y": 0.0
+   },
+   {
+    "x": 8.0,
+    "y": 4.0
+   },
+   {
+    "x": 8.0,
+    "y": 7.0
+   },
+   {
+    "x": 8.0,
+    "y": 42.0
+   },
+   {
+    "x": 40.0,
+    "y": 0.0
+   },
+   {
+    "x": 40.0,
+    "y": 13.0
+   },
+   {
+    "x": 40.0,
+    "y": 9.0
+   },
+   {
+    "x": 40.0,
+    "y": 33.0
+   },
+   {
+    "x": 66.0,
+    "y": 7.0
+   },
+   {
+    "x": 66.0,
+    "y": 9.0
+   },
+   {
+    "x": 99.0,
+    "y": 99.0
+   },
+   {
+    "x": 86.0,
+    "y": 84.0
+   },
+   {
+    "x": 86.0,
+    "y": 9.0
+   },
+   {
+    "x": 83.0,
+    "y": 85.0
+   },
+   {
+    "x": 1.0,
+    "y": 13.0
+   },
+   {
+    "x": 10.0,
+    "y": 7.0
+   },
+   {
+    "x": 10.0,
+    "y": 29.0
+   },
+   {
+    "x": 10.0,
+    "y": 20.0
+   },
+   {
+    "x": 32.0,
+    "y": 10.0
+   },
+   {
+    "x": 32.0,
+    "y": 30.0
+   },
+   {
+    "x": 32.0,
+    "y": 5.0
+   },
+   {
+    "x": 32.0,
+    "y": 34.0
+   },
+   {
+    "x": 14.0,
+    "y": 35.0
+   },
+   {
+    "x": 14.0,
+    "y": 32.0
+   },
+   {
+    "x": 13.0,
+    "y": 49.0
+   },
+   {
+    "x": 13.0,
+    "y": 0.0
+   },
+   {
+    "x": 33.0,
+    "y": 22.0
+   },
+   {
+    "x": 33.0,
+    "y": 6.0
+   },
+   {
+    "x": 58.0,
+    "y": 7.0
+   },
+   {
+    "x": 57.0,
+    "y": 0.0
+   },
+   {
+    "x": 57.0,
+    "y": 22.0
+   },
+   {
+    "x": 97.0,
+    "y": 54.0
+   },
+   {
+    "x": 97.0,
+    "y": 67.0
+   },
+   {
+    "x": 24.0,
+    "y": 31.0
+   },
+   {
+    "x": 24.0,
+    "y": 26.0
+   },
+   {
+    "x": 24.0,
+    "y": 0.0
+   },
+   {
+    "x": 44.0,
+    "y": 17.0
+   },
+   {
+    "x": 45.0,
+    "y": 15.0
+   },
+   {
+    "x": 45.0,
+    "y": 9.0
+   },
+   {
+    "x": 52.0,
+    "y": 25.0
+   },
+   {
+    "x": 61.0,
+    "y": 33.0
+   },
+   {
+    "x": 61.0,
+    "y": 5.0
+   },
+   {
+    "x": 61.0,
+    "y": 4.0
+   },
+   {
+    "x": 75.0,
+    "y": 0.0
+   },
+   {
+    "x": 75.0,
+    "y": 15.0
+   },
+   {
+    "x": 75.0,
+    "y": 21.0
+   },
+   {
+    "x": 28.0,
+    "y": 16.0
+   },
+   {
+    "x": 64.0,
+    "y": 9.0
+   },
+   {
+    "x": 64.0,
+    "y": 43.0
+   },
+   {
+    "x": 64.0,
+    "y": 3.0
+   },
+   {
+    "x": 73.0,
+    "y": 5.0
+   },
+   {
+    "x": 73.0,
+    "y": 6.0
+   },
+   {
+    "x": 89.0,
+    "y": 23.0
+   },
+   {
+    "x": 6.0,
+    "y": 35.0
+   },
+   {
+    "x": 38.0,
+    "y": 5.0
+   },
+   {
+    "x": 59.0,
+    "y": 13.0
+   },
+   {
+    "x": 59.0,
+    "y": 17.0
+   },
+   {
+    "x": 37.0,
+    "y": 26.0
+   },
+   {
+    "x": 37.0,
+    "y": 10.0
+   },
+   {
+    "x": 37.0,
+    "y": 11.0
+   },
+   {
+    "x": 36.0,
+    "y": 6.0
+   },
+   {
+    "x": 36.0,
+    "y": 47.0
+   },
+   {
+    "x": 36.0,
+    "y": 13.0
+   },
+   {
+    "x": 36.0,
+    "y": 43.0
+   },
+   {
+    "x": 36.0,
+    "y": 25.0
+   },
+   {
+    "x": 36.0,
+    "y": 28.0
+   },
+   {
+    "x": 36.0,
+    "y": 22.0
+   },
+   {
+    "x": 36.0,
+    "y": 18.0
+   },
+   {
+    "x": 90.0,
+    "y": 21.0
+   },
+   {
+    "x": 92.0,
+    "y": 14.0
+   },
+   {
+    "x": 92.0,
+    "y": 24.0
+   },
+   {
+    "x": 29.0,
+    "y": 24.0
+   },
+   {
+    "x": 29.0,
+    "y": 29.0
+   },
+   {
+    "x": 29.0,
+    "y": 11.0
+   },
+   {
+    "x": 29.0,
+    "y": 17.0
+   },
+   {
+    "x": 29.0,
+    "y": 41.0
+   },
+   {
+    "x": 60.0,
+    "y": 5.0
+   },
+   {
+    "x": 60.0,
+    "y": 28.0
+   },
+   {
+    "x": 85.0,
+    "y": 11.0
+   },
+   {
+    "x": 85.0,
+    "y": 47.0
+   },
+   {
+    "x": 7.0,
+    "y": 44.0
+   },
+   {
+    "x": 7.0,
+    "y": 52.0
+   },
+   {
+    "x": 7.0,
+    "y": 12.0
+   },
+   {
+    "x": 7.0,
+    "y": 16.0
+   },
+   {
+    "x": 30.0,
+    "y": 15.0
+   },
+   {
+    "x": 53.0,
+    "y": 0.0
+   },
+   {
+    "x": 53.0,
+    "y": 15.0
+   },
+   {
+    "x": 69.0,
+    "y": 0.0
+   },
+   {
+    "x": 69.0,
+    "y": 61.0
+   },
+   {
+    "x": 46.0,
+    "y": 8.0
+   },
+   {
+    "x": 46.0,
+    "y": 0.0
+   },
+   {
+    "x": 41.0,
+    "y": 7.0
+   },
+   {
+    "x": 41.0,
+    "y": 12.0
+   },
+   {
+    "x": 41.0,
+    "y": 11.0
+   },
+   {
+    "x": 41.0,
+    "y": 26.0
+   },
+   {
+    "x": 27.0,
+    "y": 8.0
+   },
+   {
+    "x": 72.0,
+    "y": 10.0
+   },
+   {
+    "x": 35.0,
+    "y": 2.0
+   },
+   {
+    "x": 35.0,
+    "y": 22.0
+   },
+   {
+    "x": 50.0,
+    "y": 22.0
+   },
+   {
+    "x": 55.0,
+    "y": 28.0
+   },
+   {
+    "x": 55.0,
+    "y": 5.0
+   },
+   {
+    "x": 55.0,
+    "y": 6.0
+   },
+   {
+    "x": 9.0,
+    "y": 29.0
+   },
+   {
+    "x": 68.0,
+    "y": 9.0
+   },
+   {
+    "x": 68.0,
+    "y": 27.0
+   },
+   {
+    "x": 76.0,
+    "y": 7.0
+   },
+   {
+    "x": 76.0,
+    "y": 3.0
+   },
+   {
+    "x": 26.0,
+    "y": 39.0
+   },
+   {
+    "x": 39.0,
+    "y": 13.0
+   },
+   {
+    "x": 71.0,
+    "y": 9.0
+   },
+   {
+    "x": 71.0,
+    "y": 59.0
+   },
+   {
+    "x": 71.0,
+    "y": 4.0
+   },
+   {
+    "x": 23.0,
+    "y": 5.0
+   },
+   {
+    "x": 67.0,
+    "y": 8.0
+   },
+   {
+    "x": 67.0,
+    "y": 40.0
+   },
+   {
+    "x": 11.0,
+    "y": 39.0
+   },
+   {
+    "x": 12.0,
+    "y": 36.0
+   },
+   {
+    "x": 12.0,
+    "y": 10.0
+   },
+   {
+    "x": 56.0,
+    "y": 4.0
+   },
+   {
+    "x": 56.0,
+    "y": 0.0
+   },
+   {
+    "x": 87.0,
+    "y": 8.0
+   },
+   {
+    "x": 87.0,
+    "y": 41.0
+   },
+   {
+    "x": 87.0,
+    "y": 2.0
+   },
+   {
+    "x": 18.0,
+    "y": 14.0
+   },
+   {
+    "x": 17.0,
+    "y": 7.0
+   },
+   {
+    "x": 17.0,
+    "y": 8.0
+   },
+   {
+    "x": 17.0,
+    "y": 12.0
+   },
+   {
+    "x": 25.0,
+    "y": 6.0
+   },
+   {
+    "x": 15.0,
+    "y": 14.0
+   },
+   {
+    "x": 16.0,
+    "y": 11.0
+   },
+   {
+    "x": 4.0,
+    "y": 28.0
+   },
+   {
+    "x": 22.0,
+    "y": 2.0
+   },
+   {
+    "x": 22.0,
+    "y": 36.0
+   },
+   {
+    "x": 62.0,
+    "y": 5.0
+   },
+   {
+    "x": 62.0,
+    "y": 3.0
+   },
+   {
+    "x": 62.0,
+    "y": 49.0
+   },
+   {
+    "x": 81.0,
+    "y": 28.0
+   },
+   {
+    "x": 65.0,
+    "y": 28.0
+   },
+   {
+    "x": 65.0,
+    "y": 32.0
+   },
+   {
+    "x": 48.0,
+    "y": 0.0
+   },
+   {
+    "x": 74.0,
+    "y": 24.0
+   },
+   {
+    "x": 74.0,
+    "y": 7.0
+   },
+   {
+    "x": 47.0,
+    "y": 20.0
+   },
+   {
+    "x": 63.0,
+    "y": 4.0
+   },
+   {
+    "x": 43.0,
+    "y": 23.0
+   },
+   {
+    "x": 49.0,
+    "y": 0.0
+   },
+   {
+    "x": 91.0,
+    "y": 22.0
+   },
+   {
+    "x": 88.0,
+    "y": 18.0
+   }
+  ],
+  "point_count": 156,
+  "image_url": "/heatmaps/mateusinho-vit-ria-369.png"
+ },
+ "physical_run": {
+  "source": "sofascore_run",
+  "competition": "Brasileirão Série A",
+  "position_pool": "Lateral Direito",
+  "position_pool_size": 52,
+  "matches": 11,
+  "minutes": 697,
+  "kilometers_p90": 7.99,
+  "top_speed": 34.55,
+  "sprints_p90": 8.65,
+  "running_km_p90": 0.94,
+  "high_speed_km_p90": 0.35,
+  "sprinting_km_p90": 0.13,
+  "percentiles": {
+   "kilometers_p90": 24.0,
+   "top_speed": 45.7,
+   "sprints_p90": 8.0,
+   "running_km_p90": 18.0,
+   "high_speed_km_p90": 10.0,
+   "sprinting_km_p90": 18.0
   },
   "ranks": {
-    "geral": 29,
-    "defensivo": 11,
-    "construtor": 124,
-    "ofensivo": 95
-  },
-  "profile": "Defensivo",
-  "profile_shares": {
-    "defensivo": 86.0,
-    "construtor": 7.0,
-    "ofensivo": 6.0
-  },
-  "tendencies": {
-    "construcao": 25.0,
-    "ofensividade": 21.0,
-    "def1v1": 92.0,
-    "contencao": 43.0,
-    "duelo_aereo": 87.0
-  },
-  "aspects": {
-    "defensivos": [
-      {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
-        "grade": "B",
-        "percentile": 74.6,
-        "stats": [],
-        "display_value": "7,0",
-        "efficiency_pct": 59.5,
-        "efficiency_value": "58%"
-      },
-      {
-        "label": "Duelos Aéreos",
-        "kind": "metric",
-        "grade": "B+",
-        "percentile": 80.0,
-        "stats": [],
-        "display_value": "2,9",
-        "efficiency_pct": 80.0,
-        "efficiency_value": "63%"
-      },
-      {
-        "label": "Ações Defensivas",
-        "kind": "metric_group",
-        "grade": "B-",
-        "percentile": 57.7,
-        "sub_metrics": [
-          {
-            "label": "Rebatidas",
-            "percentile": 81.7,
-            "display_value": "3,8"
-          },
-          {
-            "label": "Interceptações",
-            "percentile": 91.5,
-            "display_value": "1,9"
-          },
-          {
-            "label": "Chutes Bloqueados",
-            "percentile": 0.0,
-            "display_value": "0,3"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Eficiência Defensiva",
-        "kind": "def_efficiency_group",
-        "grade": "B+",
-        "percentile": 81.3,
-        "pair_badge": [
-          100.0,
-          81.3
-        ],
-        "sub_metrics": [
-          {
-            "label": "Erros Totais",
-            "percentile": 100.0,
-            "display_value": "0"
-          },
-          {
-            "label": "Eficiência Defensiva",
-            "percentile": 81.3,
-            "display_value": "+0,8"
-          }
-        ],
-        "stats": []
-      }
-    ],
-    "construcao": [
-      {
-        "label": "Passes Progressivos",
-        "kind": "pass_certos",
-        "grade": "B",
-        "certos_per90": 7.78,
-        "display_value": "7,8",
-        "percentile": 72.2,
-        "efficiency_pct": 12.0,
-        "efficiency_value": "62%",
-        "stats": []
-      },
-      {
-        "label": "Passes para Terço Final",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 2.77,
-        "display_value": "2,8",
-        "percentile": 7.0,
-        "efficiency_pct": 23.3,
-        "efficiency_value": "65%",
-        "stats": []
-      },
-      {
-        "label": "Passes Longos",
-        "kind": "pass_certos",
-        "grade": "C",
-        "certos_per90": 3.09,
-        "display_value": "3,1",
-        "percentile": 42.9,
-        "efficiency_pct": 1.4,
-        "efficiency_value": "28%",
-        "stats": []
-      },
-      {
-        "label": "Distribuição",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 21.3,
-        "sub_metrics": [
-          {
-            "label": "Passes",
-            "percentile": 21.3,
-            "display_value": "32,7"
-          },
-          {
-            "label": "Passes Recebidos",
-            "percentile": 16.2,
-            "display_value": "22,8"
-          }
-        ],
-        "stats": []
-      }
-    ],
-    "perfil_construcao": [
-      {
-        "label": "Tendência de Passe",
-        "kind": "construction_share",
-        "grade": "C+",
-        "percentile": 54.7,
-        "display_value": "9%",
-        "share_pct": 9.4,
-        "pool_avg_pct": 9.0,
-        "scale_max_pct": 30.0,
-        "stats": [],
-        "bar_key": "pass_tendency",
-        "axis_left": "Curto",
-        "axis_right": "Longo"
-      },
-      {
-        "label": "Passes Progressivos",
-        "kind": "construction_share",
-        "grade": "A",
-        "percentile": 96.0,
-        "display_value": "24%",
-        "share_pct": 23.8,
-        "pool_avg_pct": 18.4,
-        "scale_max_pct": 36.8,
-        "stats": [],
-        "bar_key": "progressive_share",
-        "axis_left": "Baixo",
-        "axis_right": "Alto"
-      }
-    ],
-    "perfil_defensivo": [
-      {
-        "label": "Estilo de defesa",
-        "kind": "construction_share",
-        "grade": "C",
-        "percentile": 37.3,
-        "display_value": "1,34",
-        "share_pct": 37.3,
-        "pool_avg_pct": 1.6,
-        "scale_max_pct": 100.0,
-        "stats": [],
-        "bar_key": "def_contact_style",
-        "axis_left": "Cobertura",
-        "axis_right": "Agressivo"
-      },
-      {
-        "label": "Disciplina defensiva",
-        "kind": "construction_share",
-        "grade": "B+",
-        "percentile": 81.3,
-        "display_value": "51%",
-        "share_pct": 50.8,
-        "pool_avg_pct": 1.1,
-        "scale_max_pct": 100.0,
-        "stats": [],
-        "bar_key": "def_foul_style",
-        "axis_left": "Disciplinado",
-        "axis_right": "Faltoso"
-      }
-    ],
-    "ofensivos": [
-      {
-        "label": "Disputas com Bola",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 23.2,
-        "stats": [],
-        "display_value": "2,3",
-        "efficiency_pct": 84.8,
-        "efficiency_value": "58%"
-      },
-      {
-        "label": "1v1 - Ofensivo",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 7.2,
-        "stats": [],
-        "display_value": "0,4",
-        "efficiency_pct": 77.6,
-        "efficiency_value": "75%"
-      },
-      {
-        "label": "Progressão",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 22.9,
-        "sub_metrics": [
-          {
-            "label": "Conduções Progressivas",
-            "percentile": 1.6,
-            "display_value": "0,2"
-          },
-          {
-            "label": "Acelerações",
-            "percentile": 22.9,
-            "display_value": "0,1"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Gols e xG",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 16.1,
-        "sub_metrics": [
-          {
-            "label": "Gols",
-            "percentile": 0.0,
-            "display_value": "0"
-          },
-          {
-            "label": "xG",
-            "percentile": 16.1,
-            "display_value": "0,24"
-          },
-          {
-            "label": "Eficiência de finalização",
-            "percentile": 44.6,
-            "display_value": "-0,2"
-          }
-        ],
-        "stats": []
-      }
-    ],
-    "passes_finais": [
-      {
-        "label": "Cruzamentos",
-        "kind": "metric_group",
-        "grade": "B+",
-        "percentile": 76.1,
-        "sub_metrics": [
-          {
-            "label": "Cruzamentos",
-            "percentile": 76.1,
-            "display_value": "3,3"
-          },
-          {
-            "label": "Eficiência",
-            "percentile": 44.3,
-            "display_value": "32%"
-          }
-        ],
-        "stats": [],
-        "efficiency_pct": 44.3,
-        "efficiency_value": "32%"
-      },
-      {
-        "label": "Passes Chave e Área",
-        "kind": "metric_group",
-        "grade": "A",
-        "percentile": 95.0,
-        "sub_metrics": [
-          {
-            "label": "Assistências para remate",
-            "percentile": 95.0,
-            "display_value": "1,6"
-          },
-          {
-            "label": "Passes para Área",
-            "percentile": 74.7,
-            "display_value": "1,4"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Pré Assistências e xA",
-        "kind": "metric_group",
-        "grade": "A",
-        "percentile": 85.7,
-        "sub_metrics": [
-          {
-            "label": "Pré Assistências",
-            "percentile": 85.7,
-            "display_value": "3"
-          },
-          {
-            "label": "xA",
-            "percentile": 83.1,
-            "display_value": "2,36"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Passes Criativos",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0",
-        "efficiency_pct": 6.0,
-        "efficiency_value": "37%"
-      }
-    ],
-    "ofensividade": [
-      {
-        "label": "Ofensividade",
-        "kind": "metric_group",
-        "grade": "C+",
-        "percentile": 46.9,
-        "sub_metrics": [
-          {
-            "label": "Ações Ofensivas",
-            "percentile": 45.9,
-            "display_value": "1,7"
-          },
-          {
-            "label": "Toques na Área",
-            "percentile": 46.9,
-            "display_value": "1,1"
-          }
-        ],
-        "stats": []
-      }
-    ]
-  },
-  "profiles_available": [
-    "Defensivo",
-    "Construtor",
-    "Ofensivo",
-    "Híbrido"
-  ],
-  "scatter": {
-    "cruzamentos": 3.31,
-    "progressao": 0.21000000000000002,
-    "xa": 2.36,
-    "construcao": 25.333333333333336,
-    "duelos_def": 7.04
-  },
-  "cluster": {
-    "family": "laterais",
-    "archetype": "Defensivo",
-    "archetype_label": "Defensivo",
-    "hybrid_badge": null,
-    "hybrid_badge_short": null,
-    "shares": {
-      "defensivo": 86.5,
-      "construtor": 7.2,
-      "ofensivo": 6.3
-    },
-    "ratings": {
-      "defensivo": 7.2,
-      "construtor": 5.7,
-      "ofensivo": 6.2
-    }
-  },
-  "transfermarkt": {
-    "id": "870778",
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/870778-1685711841.jpg?lm=4711",
-    "market_value": "€ 800 mil",
-    "market_value_eur": 800000,
-    "contract_until": "2028-12-31",
-    "contract_remaining": "2 anos e 2 meses",
-    "on_loan_from": null,
-    "club": "EC Vitória",
-    "profile_url": "https://www.transfermarkt.com.br/mateus-silva/profil/spieler/870778",
-    "foot": "Destro",
-    "height": 175
-  },
-  "heatmap": {
-    "tournament_id": 325,
-    "season_id": 87678,
-    "scope": "overall",
-    "competition": "Brasileirão Série A",
-    "points": [
-      {
-        "x": 34.0,
-        "y": 17.0
-      },
-      {
-        "x": 42.0,
-        "y": 8.0
-      },
-      {
-        "x": 78.0,
-        "y": 7.0
-      },
-      {
-        "x": 78.0,
-        "y": 23.0
-      },
-      {
-        "x": 78.0,
-        "y": 1.0
-      },
-      {
-        "x": 54.0,
-        "y": 37.0
-      },
-      {
-        "x": 54.0,
-        "y": 31.0
-      },
-      {
-        "x": 54.0,
-        "y": 0.0
-      },
-      {
-        "x": 8.0,
-        "y": 4.0
-      },
-      {
-        "x": 8.0,
-        "y": 7.0
-      },
-      {
-        "x": 8.0,
-        "y": 42.0
-      },
-      {
-        "x": 40.0,
-        "y": 0.0
-      },
-      {
-        "x": 40.0,
-        "y": 13.0
-      },
-      {
-        "x": 40.0,
-        "y": 9.0
-      },
-      {
-        "x": 40.0,
-        "y": 33.0
-      },
-      {
-        "x": 66.0,
-        "y": 7.0
-      },
-      {
-        "x": 66.0,
-        "y": 9.0
-      },
-      {
-        "x": 99.0,
-        "y": 99.0
-      },
-      {
-        "x": 86.0,
-        "y": 84.0
-      },
-      {
-        "x": 86.0,
-        "y": 9.0
-      },
-      {
-        "x": 83.0,
-        "y": 85.0
-      },
-      {
-        "x": 1.0,
-        "y": 13.0
-      },
-      {
-        "x": 10.0,
-        "y": 7.0
-      },
-      {
-        "x": 10.0,
-        "y": 29.0
-      },
-      {
-        "x": 10.0,
-        "y": 20.0
-      },
-      {
-        "x": 32.0,
-        "y": 10.0
-      },
-      {
-        "x": 32.0,
-        "y": 30.0
-      },
-      {
-        "x": 32.0,
-        "y": 5.0
-      },
-      {
-        "x": 32.0,
-        "y": 34.0
-      },
-      {
-        "x": 14.0,
-        "y": 35.0
-      },
-      {
-        "x": 14.0,
-        "y": 32.0
-      },
-      {
-        "x": 13.0,
-        "y": 49.0
-      },
-      {
-        "x": 13.0,
-        "y": 0.0
-      },
-      {
-        "x": 33.0,
-        "y": 22.0
-      },
-      {
-        "x": 33.0,
-        "y": 6.0
-      },
-      {
-        "x": 58.0,
-        "y": 7.0
-      },
-      {
-        "x": 57.0,
-        "y": 0.0
-      },
-      {
-        "x": 57.0,
-        "y": 22.0
-      },
-      {
-        "x": 97.0,
-        "y": 54.0
-      },
-      {
-        "x": 97.0,
-        "y": 67.0
-      },
-      {
-        "x": 24.0,
-        "y": 31.0
-      },
-      {
-        "x": 24.0,
-        "y": 26.0
-      },
-      {
-        "x": 24.0,
-        "y": 0.0
-      },
-      {
-        "x": 44.0,
-        "y": 17.0
-      },
-      {
-        "x": 45.0,
-        "y": 15.0
-      },
-      {
-        "x": 45.0,
-        "y": 9.0
-      },
-      {
-        "x": 52.0,
-        "y": 25.0
-      },
-      {
-        "x": 61.0,
-        "y": 33.0
-      },
-      {
-        "x": 61.0,
-        "y": 5.0
-      },
-      {
-        "x": 61.0,
-        "y": 4.0
-      },
-      {
-        "x": 75.0,
-        "y": 0.0
-      },
-      {
-        "x": 75.0,
-        "y": 15.0
-      },
-      {
-        "x": 75.0,
-        "y": 21.0
-      },
-      {
-        "x": 28.0,
-        "y": 16.0
-      },
-      {
-        "x": 64.0,
-        "y": 9.0
-      },
-      {
-        "x": 64.0,
-        "y": 43.0
-      },
-      {
-        "x": 64.0,
-        "y": 3.0
-      },
-      {
-        "x": 73.0,
-        "y": 5.0
-      },
-      {
-        "x": 73.0,
-        "y": 6.0
-      },
-      {
-        "x": 89.0,
-        "y": 23.0
-      },
-      {
-        "x": 6.0,
-        "y": 35.0
-      },
-      {
-        "x": 38.0,
-        "y": 5.0
-      },
-      {
-        "x": 59.0,
-        "y": 13.0
-      },
-      {
-        "x": 59.0,
-        "y": 17.0
-      },
-      {
-        "x": 37.0,
-        "y": 26.0
-      },
-      {
-        "x": 37.0,
-        "y": 10.0
-      },
-      {
-        "x": 37.0,
-        "y": 11.0
-      },
-      {
-        "x": 36.0,
-        "y": 6.0
-      },
-      {
-        "x": 36.0,
-        "y": 47.0
-      },
-      {
-        "x": 36.0,
-        "y": 13.0
-      },
-      {
-        "x": 36.0,
-        "y": 43.0
-      },
-      {
-        "x": 36.0,
-        "y": 25.0
-      },
-      {
-        "x": 36.0,
-        "y": 28.0
-      },
-      {
-        "x": 36.0,
-        "y": 22.0
-      },
-      {
-        "x": 36.0,
-        "y": 18.0
-      },
-      {
-        "x": 90.0,
-        "y": 21.0
-      },
-      {
-        "x": 92.0,
-        "y": 14.0
-      },
-      {
-        "x": 92.0,
-        "y": 24.0
-      },
-      {
-        "x": 29.0,
-        "y": 24.0
-      },
-      {
-        "x": 29.0,
-        "y": 29.0
-      },
-      {
-        "x": 29.0,
-        "y": 11.0
-      },
-      {
-        "x": 29.0,
-        "y": 17.0
-      },
-      {
-        "x": 29.0,
-        "y": 41.0
-      },
-      {
-        "x": 60.0,
-        "y": 5.0
-      },
-      {
-        "x": 60.0,
-        "y": 28.0
-      },
-      {
-        "x": 85.0,
-        "y": 11.0
-      },
-      {
-        "x": 85.0,
-        "y": 47.0
-      },
-      {
-        "x": 7.0,
-        "y": 44.0
-      },
-      {
-        "x": 7.0,
-        "y": 52.0
-      },
-      {
-        "x": 7.0,
-        "y": 12.0
-      },
-      {
-        "x": 7.0,
-        "y": 16.0
-      },
-      {
-        "x": 30.0,
-        "y": 15.0
-      },
-      {
-        "x": 53.0,
-        "y": 0.0
-      },
-      {
-        "x": 53.0,
-        "y": 15.0
-      },
-      {
-        "x": 69.0,
-        "y": 0.0
-      },
-      {
-        "x": 69.0,
-        "y": 61.0
-      },
-      {
-        "x": 46.0,
-        "y": 8.0
-      },
-      {
-        "x": 46.0,
-        "y": 0.0
-      },
-      {
-        "x": 41.0,
-        "y": 7.0
-      },
-      {
-        "x": 41.0,
-        "y": 12.0
-      },
-      {
-        "x": 41.0,
-        "y": 11.0
-      },
-      {
-        "x": 41.0,
-        "y": 26.0
-      },
-      {
-        "x": 27.0,
-        "y": 8.0
-      },
-      {
-        "x": 72.0,
-        "y": 10.0
-      },
-      {
-        "x": 35.0,
-        "y": 2.0
-      },
-      {
-        "x": 35.0,
-        "y": 22.0
-      },
-      {
-        "x": 50.0,
-        "y": 22.0
-      },
-      {
-        "x": 55.0,
-        "y": 28.0
-      },
-      {
-        "x": 55.0,
-        "y": 5.0
-      },
-      {
-        "x": 55.0,
-        "y": 6.0
-      },
-      {
-        "x": 9.0,
-        "y": 29.0
-      },
-      {
-        "x": 68.0,
-        "y": 9.0
-      },
-      {
-        "x": 68.0,
-        "y": 27.0
-      },
-      {
-        "x": 76.0,
-        "y": 7.0
-      },
-      {
-        "x": 76.0,
-        "y": 3.0
-      },
-      {
-        "x": 26.0,
-        "y": 39.0
-      },
-      {
-        "x": 39.0,
-        "y": 13.0
-      },
-      {
-        "x": 71.0,
-        "y": 9.0
-      },
-      {
-        "x": 71.0,
-        "y": 59.0
-      },
-      {
-        "x": 71.0,
-        "y": 4.0
-      },
-      {
-        "x": 23.0,
-        "y": 5.0
-      },
-      {
-        "x": 67.0,
-        "y": 8.0
-      },
-      {
-        "x": 67.0,
-        "y": 40.0
-      },
-      {
-        "x": 11.0,
-        "y": 39.0
-      },
-      {
-        "x": 12.0,
-        "y": 36.0
-      },
-      {
-        "x": 12.0,
-        "y": 10.0
-      },
-      {
-        "x": 56.0,
-        "y": 4.0
-      },
-      {
-        "x": 56.0,
-        "y": 0.0
-      },
-      {
-        "x": 87.0,
-        "y": 8.0
-      },
-      {
-        "x": 87.0,
-        "y": 41.0
-      },
-      {
-        "x": 87.0,
-        "y": 2.0
-      },
-      {
-        "x": 18.0,
-        "y": 14.0
-      },
-      {
-        "x": 17.0,
-        "y": 7.0
-      },
-      {
-        "x": 17.0,
-        "y": 8.0
-      },
-      {
-        "x": 17.0,
-        "y": 12.0
-      },
-      {
-        "x": 25.0,
-        "y": 6.0
-      },
-      {
-        "x": 15.0,
-        "y": 14.0
-      },
-      {
-        "x": 16.0,
-        "y": 11.0
-      },
-      {
-        "x": 4.0,
-        "y": 28.0
-      },
-      {
-        "x": 22.0,
-        "y": 2.0
-      },
-      {
-        "x": 22.0,
-        "y": 36.0
-      },
-      {
-        "x": 62.0,
-        "y": 5.0
-      },
-      {
-        "x": 62.0,
-        "y": 3.0
-      },
-      {
-        "x": 62.0,
-        "y": 49.0
-      },
-      {
-        "x": 81.0,
-        "y": 28.0
-      },
-      {
-        "x": 65.0,
-        "y": 28.0
-      },
-      {
-        "x": 65.0,
-        "y": 32.0
-      },
-      {
-        "x": 48.0,
-        "y": 0.0
-      },
-      {
-        "x": 74.0,
-        "y": 24.0
-      },
-      {
-        "x": 74.0,
-        "y": 7.0
-      },
-      {
-        "x": 47.0,
-        "y": 20.0
-      },
-      {
-        "x": 63.0,
-        "y": 4.0
-      },
-      {
-        "x": 43.0,
-        "y": 23.0
-      },
-      {
-        "x": 49.0,
-        "y": 0.0
-      },
-      {
-        "x": 91.0,
-        "y": 22.0
-      },
-      {
-        "x": 88.0,
-        "y": 18.0
-      }
-    ],
-    "point_count": 156,
-    "image_url": "/heatmaps/mateusinho-vit-ria-369.png"
-  },
-  "physical_run": {
-    "source": "sofascore_run",
-    "competition": "Brasileirão Série A",
-    "position_pool": "Lateral Direito",
-    "position_pool_size": 52,
-    "matches": 11,
-    "minutes": 697,
-    "kilometers_p90": 7.99,
-    "top_speed": 34.55,
-    "sprints_p90": 8.65,
-    "running_km_p90": 0.94,
-    "high_speed_km_p90": 0.35,
-    "sprinting_km_p90": 0.13,
-    "percentiles": {
-      "kilometers_p90": 24.0,
-      "top_speed": 45.7,
-      "sprints_p90": 8.0,
-      "running_km_p90": 18.0,
-      "high_speed_km_p90": 10.0,
-      "sprinting_km_p90": 18.0
-    },
-    "ranks": {
-      "kilometers_p90": 40,
-      "top_speed": 29,
-      "sprints_p90": 48,
-      "running_km_p90": 43,
-      "high_speed_km_p90": 46,
-      "sprinting_km_p90": 43
-    }
-  },
-  "discipline": {
-    "fouls_per90": 1.07,
-    "fouls_total": 10,
-    "yellow_per90": 0.11,
-    "yellow_total": 1,
-    "red_per90": 0.0,
-    "red_total": 0,
-    "pool": {
-      "fouls_per90": 1.13,
-      "yellow_per90": 0.19,
-      "red_per90": 0.01
-    }
-  },
-  "cross_season": {
-    "seasons": [
-      {
-        "year": "2022",
-        "league": "serie-b",
-        "minutes": 3143,
-        "club": "Sampaio Corrêa"
-      },
-      {
-        "year": "2022",
-        "league": "serie-c",
-        "minutes": 476,
-        "club": "Brasil de Pelotas"
-      },
-      {
-        "year": "2023",
-        "league": "serie-a",
-        "minutes": 508,
-        "club": "Cuiabá"
-      },
-      {
-        "year": "2025",
-        "league": "serie-b",
-        "minutes": 2859,
-        "club": "Cuiabá"
-      }
-    ],
-    "metrics": {
-      "Duelos Defensivos": {
-        "predicted": 6.8408,
-        "resid_sd": 1.1811,
-        "train_n90": 21.19
-      },
-      "Duelos Defensivos::Eficiência": {
-        "predicted": 60.5831,
-        "resid_sd": 5.8229,
-        "train_n90": 21.19
-      },
-      "Duelos Aéreos": {
-        "predicted": 3.6387,
-        "resid_sd": 0.7678,
-        "train_n90": 21.17
-      },
-      "Duelos Aéreos::Eficiência": {
-        "predicted": 52.2286,
-        "resid_sd": 9.2381,
-        "train_n90": 21.17
-      },
-      "Ações Defensivas::Rebatidas": {
-        "predicted": 3.694,
-        "resid_sd": 1.1156,
-        "train_n90": 21.19
-      },
-      "Ações Defensivas::Interceptações": {
-        "predicted": 0.3109,
-        "resid_sd": 0.8873,
-        "train_n90": 21.19
-      },
-      "Ações Defensivas::Chutes Bloqueados": {
-        "predicted": 0.3086,
-        "resid_sd": 0.1688,
-        "train_n90": 21.19
-      },
-      "Eficiência Defensiva::Erros Totais": {
-        "predicted": 0.0228,
-        "resid_sd": 0.0604,
-        "train_n90": 21.19
-      },
-      "Passes Progressivos": {
-        "predicted": 8.294,
-        "resid_sd": 1.4898,
-        "train_n90": 21.12
-      },
-      "Passes Progressivos::Eficiência": {
-        "predicted": 72.4459,
-        "resid_sd": 5.4351,
-        "train_n90": 21.12
-      },
-      "Passes para Terço Final": {
-        "predicted": 5.1054,
-        "resid_sd": 1.3234,
-        "train_n90": 21.12
-      },
-      "Passes para Terço Final::Eficiência": {
-        "predicted": 69.8532,
-        "resid_sd": 7.5615,
-        "train_n90": 21.12
-      },
-      "Passes Longos": {
-        "predicted": 4.3192,
-        "resid_sd": 1.0858,
-        "train_n90": 21.12
-      },
-      "Passes Longos::Eficiência": {
-        "predicted": 49.7805,
-        "resid_sd": 7.7543,
-        "train_n90": 21.12
-      },
-      "Distribuição::Passes": {
-        "predicted": 35.2916,
-        "resid_sd": 5.6544,
-        "train_n90": 21.1
-      },
-      "Distribuição::Passes Recebidos": {
-        "predicted": 25.2056,
-        "resid_sd": 5.0027,
-        "train_n90": 21.1
-      },
-      "Disputas com Bola": {
-        "predicted": 2.4995,
-        "resid_sd": 0.8007,
-        "train_n90": 21.12
-      },
-      "Disputas com Bola::Eficiência": {
-        "predicted": 47.5544,
-        "resid_sd": 7.4529,
-        "train_n90": 21.12
-      },
-      "1v1 - Ofensivo": {
-        "predicted": 1.832,
-        "role_change_flag": true,
-        "resid_sd": 0.6641,
-        "train_n90": 21.1
-      },
-      "1v1 - Ofensivo::Eficiência": {
-        "predicted": 59.297,
-        "resid_sd": 11.179,
-        "train_n90": 21.1
-      },
-      "Progressão::Conduções Progressivas": {
-        "predicted": 1.0691,
-        "resid_sd": 0.502,
-        "train_n90": 21.1
-      },
-      "Progressão::Acelerações": {
-        "predicted": 0.3041,
-        "resid_sd": 0.2465,
-        "train_n90": 21.1
-      },
-      "Gols e xG::Gols": {
-        "predicted": 0.0563,
-        "resid_sd": 0.0494,
-        "train_n90": 21.11
-      },
-      "Gols e xG::xG": {
-        "predicted": 0.0531,
-        "resid_sd": 0.0357,
-        "train_n90": 21.11
-      },
-      "Cruzamentos::Cruzamentos": {
-        "predicted": 3.2431,
-        "resid_sd": 0.8183,
-        "train_n90": 21.1
-      },
-      "Cruzamentos::Eficiência": {
-        "predicted": 35.3238,
-        "resid_sd": 7.9284,
-        "train_n90": 21.1
-      },
-      "Passes Chave e Área::Assistências para remate": {
-        "predicted": 0.8975,
-        "resid_sd": 0.3528,
-        "train_n90": 21.1
-      },
-      "Passes Chave e Área::Passes para Área": {
-        "predicted": 1.2848,
-        "resid_sd": 0.4266,
-        "train_n90": 21.1
-      },
-      "Pré Assistências e xA::Pré Assistências": {
-        "predicted": 0.0494,
-        "resid_sd": 0.0541,
-        "train_n90": 21.1
-      },
-      "Pré Assistências e xA::xA": {
-        "predicted": 0.0944,
-        "resid_sd": 0.0441,
-        "train_n90": 21.1
-      },
-      "Passes Criativos": {
-        "predicted": 0.5345,
-        "resid_sd": 0.3235,
-        "train_n90": 21.1
-      },
-      "Passes Criativos::Eficiência": {
-        "predicted": 54.9674,
-        "resid_sd": 11.4476,
-        "train_n90": 21.1
-      },
-      "Ofensividade::Ações Ofensivas": {
-        "predicted": 2.596,
-        "resid_sd": 0.6323,
-        "train_n90": 21.17
-      },
-      "Ofensividade::Toques na Área": {
-        "predicted": 0.9439,
-        "resid_sd": 0.375,
-        "train_n90": 21.17
-      }
-    }
-  },
-  "pass_distance_m": 18.5,
-  "athlete_id": "ath-002906",
-  "person_key": "name:mateusinho|1998|0"
+   "kilometers_p90": 40,
+   "top_speed": 29,
+   "sprints_p90": 48,
+   "running_km_p90": 43,
+   "high_speed_km_p90": 46,
+   "sprinting_km_p90": 43
+  }
+ }
 }

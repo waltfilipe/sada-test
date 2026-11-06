@@ -228,7 +228,9 @@ export function scatterAxis(player: PlayerProfile, key: string): ScatterAxis {
   }
 
   if (item.kind === "def_efficiency_group" || item.label === "Eficiência Defensiva") {
-    const score = item.sub_metrics?.find((sub) => /efici[eê]ncia defensiva/i.test(sub.label));
+    const score = item.sub_metrics?.find((sub) =>
+      /efici[eê]ncia defensiva|[íi]ndice de efici[eê]ncia/i.test(sub.label),
+    );
     return { value: parseSigned(score?.display_value) ?? 0, label: "Eficiência Defensiva" };
   }
 
@@ -248,8 +250,8 @@ export function scatterAxis(player: PlayerProfile, key: string): ScatterAxis {
     return { value: base, label: volumeLabel(item.label) };
   }
 
-  if (item.label === "Ações Defensivas") {
-    return { value: sumPer90(subs, minutes), label: "Ações Defensivas/90" };
+  if (item.label.startsWith("Ações Defensivas")) {
+    return { value: sumPer90(subs, minutes), label: volumeLabel(item.label) };
   }
 
   if (item.label === "Passes Chave e Área") {

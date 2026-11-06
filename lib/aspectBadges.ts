@@ -32,7 +32,7 @@ export function volumeBadge(volumePct: number): AccuracyBadgeKind | null {
 
 function metricGroupBadge(item: {
   sub_metrics?: { label: string; percentile: number }[];
-  pair_badge?: [number, number] | null;
+  pair_badge?: number[] | null;
 }): AccuracyBadgeKind | null {
   if (item.pair_badge) {
     return pairBadge(item.pair_badge[0], item.pair_badge[1]);
@@ -58,13 +58,18 @@ export function resolveAspectBadge(item: {
   kind?: string;
   percentile?: number;
   efficiency_pct?: number;
-  pair_badge?: [number, number] | null;
+  pair_badge?: number[] | null;
   sub_metrics?: { label: string; percentile: number }[];
 }): AccuracyBadgeKind | null {
-  if (item.kind === "def_efficiency_group" && item.pair_badge) {
-    const [errorsPct, efficiencyPct] = item.pair_badge;
-    if (errorsPct <= P50 || efficiencyPct <= P50) return null;
-    return pairBadge(errorsPct, efficiencyPct);
+  if (item.kind === "def_efficiency_group" && item.pair_badge?.length) {
+    // Eficiência Defensiva: selo só quando TODOS os componentes (erros,
+    // ações sem bola e índice) ficam acima da mediana do pool.
+    const parts = item.pair_badge;
+    if (parts.some((p) => p <= P50)) return null;
+    const floor = Math.min(...parts);
+    if (floor > P90) return "gold";
+    if (floor > P75) return "silver";
+    return "bronze";
   }
   if (item.kind === "metric_group") {
     const groupBadge = metricGroupBadge(item);

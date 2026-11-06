@@ -1,517 +1,405 @@
 {
-  "player_id": "serie-b-wenderson-ava-312",
-  "name": "Wenderson",
-  "club": "Avaí",
-  "label": "Wenderson (Avaí)",
-  "position": "Meia Ofensivo",
-  "position_family": "extremos",
-  "nationality": "Brazil",
-  "birth_year": 1999,
-  "height": 174,
-  "foot": "Destro",
-  "minutes": 1055,
-  "minutes_pct": 28.9,
-  "goals": 1,
-  "assists": 0,
-  "rating": 6.0,
+ "player_id": "serie-b-wenderson-ava-312",
+ "name": "Wenderson",
+ "club": "Avaí",
+ "label": "Wenderson (Avaí)",
+ "position": "Meia Ofensivo",
+ "position_family": "extremos",
+ "nationality": "Brazil",
+ "birth_year": 1999,
+ "height": 174,
+ "foot": "Destro",
+ "minutes": 1055,
+ "minutes_pct": 28.9,
+ "goals": 1,
+ "assists": 0,
+ "rating": 6.0,
+ "ratings": {
+  "geral": 6.0,
+  "driblador": 6.0,
+  "meia_ponta": 6.6,
+  "ruptura": 5.7
+ },
+ "ranks": {
+  "geral": 191,
+  "driblador": 167,
+  "meia_ponta": 41,
+  "ruptura": 179
+ },
+ "profile": "Driblador",
+ "profile_shares": {
+  "driblador": 56.0,
+  "meia_ponta": 27.0,
+  "ruptura": 17.0
+ },
+ "tendencies": {
+  "construcao": 36.0,
+  "ofensividade": 12.0,
+  "def1v1": 26.0,
+  "contencao": 0.0,
+  "duelo_aereo": 0.0
+ },
+ "aspects": {
+  "defensivos": [
+   {
+    "label": "Duelos Vencidos",
+    "kind": "metric",
+    "grade": "B+",
+    "percentile": 77.9,
+    "stats": [],
+    "display_value": "2,7",
+    "efficiency_pct": 76.9,
+    "efficiency_value": "55%"
+   },
+   {
+    "label": "Ações Defensivas",
+    "kind": "metric",
+    "grade": "A",
+    "percentile": 95.2,
+    "stats": [],
+    "display_value": "2,5"
+   }
+  ],
+  "construcao": [
+   {
+    "label": "Passes Progressivos",
+    "kind": "pass_certos",
+    "grade": "D",
+    "certos_per90": 3.07,
+    "display_value": "3,1",
+    "percentile": 24.4,
+    "efficiency_pct": 2.6,
+    "efficiency_value": "53%",
+    "stats": []
+   },
+   {
+    "label": "Passes para Terço Final",
+    "kind": "pass_certos",
+    "grade": "C+",
+    "certos_per90": 2.82,
+    "display_value": "2,8",
+    "percentile": 53.9,
+    "efficiency_pct": 29.6,
+    "efficiency_value": "64%",
+    "stats": []
+   },
+   {
+    "label": "Passes Longos",
+    "kind": "pass_certos",
+    "grade": "D",
+    "certos_per90": 1.02,
+    "display_value": "1,0",
+    "percentile": 15.6,
+    "efficiency_pct": 60.7,
+    "efficiency_value": "58%",
+    "stats": []
+   },
+   {
+    "label": "Distribuição",
+    "kind": "metric_group",
+    "grade": "B",
+    "percentile": 65.1,
+    "sub_metrics": [
+     {
+      "label": "Passes",
+      "percentile": 65.1,
+      "display_value": "27,8"
+     },
+     {
+      "label": "Passes Recebidos",
+      "percentile": 57.8,
+      "display_value": "21,3"
+     }
+    ],
+    "stats": []
+   }
+  ],
+  "passes_finais": [
+   {
+    "label": "Passes Chave e Área",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 10.8,
+    "sub_metrics": [
+     {
+      "label": "Assistências para remate",
+      "percentile": 10.8,
+      "display_value": "0,5"
+     },
+     {
+      "label": "Passes para Área",
+      "percentile": 2.3,
+      "display_value": "0,4"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Cruzamentos",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 20.0,
+    "sub_metrics": [
+     {
+      "label": "Cruzamentos",
+      "percentile": 20.0,
+      "display_value": "1,2"
+     },
+     {
+      "label": "Eficiência",
+      "percentile": 35.8,
+      "display_value": "29%"
+     }
+    ],
+    "stats": [],
+    "efficiency_pct": 35.8,
+    "efficiency_value": "29%"
+   },
+   {
+    "label": "Pré Assistências e xA",
+    "kind": "metric_group",
+    "grade": "C",
+    "percentile": 43.9,
+    "sub_metrics": [
+     {
+      "label": "Pré Assistências",
+      "percentile": 43.9,
+      "display_value": "1"
+     },
+     {
+      "label": "xA",
+      "percentile": 2.7,
+      "display_value": "0,24"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Passes Criativos",
+    "kind": "metric",
+    "grade": "C",
+    "percentile": 39.6,
+    "stats": [],
+    "display_value": "0,3",
+    "efficiency_pct": 39.9,
+    "efficiency_value": "41%",
+    "sub_metrics": [
+     {
+      "label": "Passes Criativos",
+      "percentile": 39.6,
+      "display_value": "0,3"
+     },
+     {
+      "label": "Passes Inteligentes",
+      "percentile": 26.9,
+      "display_value": "0,1"
+     },
+     {
+      "label": "Passes em Profundidade",
+      "percentile": 35.7,
+      "display_value": "0,2"
+     }
+    ]
+   }
+  ],
+  "finalizacao": [
+   {
+    "label": "Gols e xG",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 8.3,
+    "sub_metrics": [
+     {
+      "label": "Gols",
+      "percentile": 8.3,
+      "display_value": "1"
+     },
+     {
+      "label": "xG",
+      "percentile": 7.6,
+      "display_value": "1,04"
+     },
+     {
+      "label": "Eficiência de finalização",
+      "percentile": 61.7,
+      "display_value": "-0,0"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Finalizações",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 8.3,
+    "sub_metrics": [
+     {
+      "label": "Finalizações",
+      "percentile": 8.3,
+      "display_value": "1,2"
+     },
+     {
+      "label": "Finalizações certas",
+      "percentile": 2.9,
+      "display_value": "14%"
+     }
+    ],
+    "stats": [],
+    "efficiency_pct": 2.9,
+    "efficiency_value": "14%"
+   }
+  ],
+  "conducao_drible": [
+   {
+    "label": "Disputas com Bola",
+    "kind": "metric",
+    "grade": "C-",
+    "percentile": 28.9,
+    "stats": [],
+    "display_value": "4,9",
+    "efficiency_pct": 44.3,
+    "efficiency_value": "46%"
+   },
+   {
+    "label": "1v1 - Ofensivo",
+    "kind": "metric",
+    "grade": "C-",
+    "percentile": 26.8,
+    "stats": [],
+    "display_value": "1,6",
+    "efficiency_pct": 68.1,
+    "efficiency_value": "63%"
+   },
+   {
+    "label": "Progressão",
+    "kind": "metric_group",
+    "grade": "C-",
+    "percentile": 32.5,
+    "sub_metrics": [
+     {
+      "label": "Conduções Progressivas",
+      "percentile": 20.5,
+      "display_value": "0,9"
+     },
+     {
+      "label": "Acelerações",
+      "percentile": 32.5,
+      "display_value": "0,2"
+     }
+    ],
+    "stats": []
+   }
+  ],
+  "ofensividade": [
+   {
+    "label": "Ações Terminais",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 8.1,
+    "sub_metrics": [
+     {
+      "label": "Toques na Área",
+      "percentile": 2.7,
+      "display_value": "0,8"
+     },
+     {
+      "label": "Ações Ofensivas",
+      "percentile": 8.1,
+      "display_value": "1,5"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Verticalidade",
+    "kind": "metric_group",
+    "grade": "C-",
+    "percentile": 31.0,
+    "sub_metrics": [
+     {
+      "label": "% Toque na Área",
+      "percentile": 7.0,
+      "display_value": "4%"
+     },
+     {
+      "label": "Recepção de Passes Longos",
+      "percentile": 31.0,
+      "display_value": "1,3"
+     }
+    ],
+    "stats": []
+   }
+  ]
+ },
+ "profiles_available": [
+  "Driblador",
+  "Meia Ponta",
+  "Ruptura",
+  "Híbrido"
+ ],
+ "scatter": {
+  "dribles": 1.62,
+  "xa": 0.24,
+  "progressao": 0.9400000000000001,
+  "cruzamentos": 1.19,
+  "toques_area": 0.85
+ },
+ "cluster": {
+  "family": "extremos",
+  "archetype": "Driblador",
+  "archetype_label": "Driblador",
+  "hybrid_badge": null,
+  "hybrid_badge_short": null,
+  "shares": {
+   "driblador": 55.8,
+   "meia_ponta": 26.8,
+   "ruptura": 17.4
+  },
   "ratings": {
-    "geral": 6.0,
-    "driblador": 6.0,
-    "meia_ponta": 6.6,
-    "ruptura": 5.7
+   "driblador": 6.0,
+   "meia_ponta": 6.6,
+   "ruptura": 5.7
+  }
+ },
+ "transfermarkt": {
+  "id": "681501",
+  "photo": "https://img.a.transfermarkt.technology/portrait/header/681501-1708484102.jpg?lm=4711",
+  "market_value": "€ 800 mil",
+  "market_value_eur": 800000,
+  "contract_until": "2026-12-31",
+  "contract_remaining": "2 meses",
+  "on_loan_from": "IF Elfsborg",
+  "club": "Avaí FC",
+  "profile_url": "https://www.transfermarkt.com.br/wenderson/profil/spieler/681501"
+ },
+ "physical_run": {
+  "source": "sofascore_run",
+  "competition": "Brasileirão Série B",
+  "position_pool": "Meia Ofensivo",
+  "position_pool_size": 35,
+  "matches": 34,
+  "minutes": 2941,
+  "kilometers_p90": 7.8,
+  "top_speed": 35.52,
+  "sprints_p90": 6.49,
+  "running_km_p90": 1.06,
+  "high_speed_km_p90": 0.31,
+  "sprinting_km_p90": 0.08,
+  "percentiles": {
+   "kilometers_p90": 43.3,
+   "top_speed": 85.2,
+   "sprints_p90": 26.7,
+   "running_km_p90": 43.3,
+   "high_speed_km_p90": 23.3,
+   "sprinting_km_p90": 26.7
   },
   "ranks": {
-    "geral": 191,
-    "driblador": 167,
-    "meia_ponta": 41,
-    "ruptura": 179
-  },
-  "profile": "Driblador",
-  "profile_shares": {
-    "driblador": 56.0,
-    "meia_ponta": 27.0,
-    "ruptura": 17.0
-  },
-  "tendencies": {
-    "construcao": 36.0,
-    "ofensividade": 12.0,
-    "def1v1": 26.0,
-    "contencao": 0.0,
-    "duelo_aereo": 0.0
-  },
-  "aspects": {
-    "defensivos": [
-      {
-        "label": "Duelos Vencidos",
-        "kind": "metric",
-        "grade": "B+",
-        "percentile": 77.9,
-        "stats": [],
-        "display_value": "2,7",
-        "efficiency_pct": 76.9,
-        "efficiency_value": "55%"
-      },
-      {
-        "label": "Ações Defensivas",
-        "kind": "metric",
-        "grade": "A",
-        "percentile": 95.2,
-        "stats": [],
-        "display_value": "2,5"
-      }
-    ],
-    "construcao": [
-      {
-        "label": "Passes Progressivos",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 3.07,
-        "display_value": "3,1",
-        "percentile": 24.4,
-        "efficiency_pct": 2.6,
-        "efficiency_value": "53%",
-        "stats": []
-      },
-      {
-        "label": "Passes para Terço Final",
-        "kind": "pass_certos",
-        "grade": "C+",
-        "certos_per90": 2.82,
-        "display_value": "2,8",
-        "percentile": 53.9,
-        "efficiency_pct": 29.6,
-        "efficiency_value": "64%",
-        "stats": []
-      },
-      {
-        "label": "Passes Longos",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 1.02,
-        "display_value": "1,0",
-        "percentile": 15.6,
-        "efficiency_pct": 60.7,
-        "efficiency_value": "58%",
-        "stats": []
-      },
-      {
-        "label": "Distribuição",
-        "kind": "metric_group",
-        "grade": "B",
-        "percentile": 65.1,
-        "sub_metrics": [
-          {
-            "label": "Passes",
-            "percentile": 65.1,
-            "display_value": "27,8"
-          },
-          {
-            "label": "Passes Recebidos",
-            "percentile": 57.8,
-            "display_value": "21,3"
-          }
-        ],
-        "stats": []
-      }
-    ],
-    "passes_finais": [
-      {
-        "label": "Passes Chave e Área",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 10.8,
-        "sub_metrics": [
-          {
-            "label": "Assistências para remate",
-            "percentile": 10.8,
-            "display_value": "0,5"
-          },
-          {
-            "label": "Passes para Área",
-            "percentile": 2.3,
-            "display_value": "0,4"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Cruzamentos",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 20.0,
-        "sub_metrics": [
-          {
-            "label": "Cruzamentos",
-            "percentile": 20.0,
-            "display_value": "1,2"
-          },
-          {
-            "label": "Eficiência",
-            "percentile": 35.8,
-            "display_value": "29%"
-          }
-        ],
-        "stats": [],
-        "efficiency_pct": 35.8,
-        "efficiency_value": "29%"
-      },
-      {
-        "label": "Pré Assistências e xA",
-        "kind": "metric_group",
-        "grade": "C",
-        "percentile": 43.9,
-        "sub_metrics": [
-          {
-            "label": "Pré Assistências",
-            "percentile": 43.9,
-            "display_value": "1"
-          },
-          {
-            "label": "xA",
-            "percentile": 2.7,
-            "display_value": "0,24"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Passes Criativos",
-        "kind": "metric",
-        "grade": "C",
-        "percentile": 39.6,
-        "stats": [],
-        "display_value": "0,3",
-        "efficiency_pct": 39.9,
-        "efficiency_value": "41%"
-      }
-    ],
-    "finalizacao": [
-      {
-        "label": "Gols e xG",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 8.3,
-        "sub_metrics": [
-          {
-            "label": "Gols",
-            "percentile": 8.3,
-            "display_value": "1"
-          },
-          {
-            "label": "xG",
-            "percentile": 7.6,
-            "display_value": "1,04"
-          },
-          {
-            "label": "Eficiência de finalização",
-            "percentile": 61.7,
-            "display_value": "-0,0"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Finalizações",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 8.3,
-        "sub_metrics": [
-          {
-            "label": "Finalizações",
-            "percentile": 8.3,
-            "display_value": "1,2"
-          },
-          {
-            "label": "Finalizações certas",
-            "percentile": 2.9,
-            "display_value": "14%"
-          }
-        ],
-        "stats": [],
-        "efficiency_pct": 2.9,
-        "efficiency_value": "14%"
-      }
-    ],
-    "conducao_drible": [
-      {
-        "label": "Disputas com Bola",
-        "kind": "metric",
-        "grade": "C-",
-        "percentile": 28.9,
-        "stats": [],
-        "display_value": "4,9",
-        "efficiency_pct": 44.3,
-        "efficiency_value": "46%"
-      },
-      {
-        "label": "1v1 - Ofensivo",
-        "kind": "metric",
-        "grade": "C-",
-        "percentile": 26.8,
-        "stats": [],
-        "display_value": "1,6",
-        "efficiency_pct": 68.1,
-        "efficiency_value": "63%"
-      },
-      {
-        "label": "Progressão",
-        "kind": "metric_group",
-        "grade": "C-",
-        "percentile": 32.5,
-        "sub_metrics": [
-          {
-            "label": "Conduções Progressivas",
-            "percentile": 20.5,
-            "display_value": "0,9"
-          },
-          {
-            "label": "Acelerações",
-            "percentile": 32.5,
-            "display_value": "0,2"
-          }
-        ],
-        "stats": []
-      }
-    ],
-    "ofensividade": [
-      {
-        "label": "Ações Terminais",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 8.1,
-        "sub_metrics": [
-          {
-            "label": "Toques na Área",
-            "percentile": 2.7,
-            "display_value": "0,8"
-          },
-          {
-            "label": "Ações Ofensivas",
-            "percentile": 8.1,
-            "display_value": "1,5"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Verticalidade",
-        "kind": "metric_group",
-        "grade": "C-",
-        "percentile": 31.0,
-        "sub_metrics": [
-          {
-            "label": "% Toque na Área",
-            "percentile": 7.0,
-            "display_value": "4%"
-          },
-          {
-            "label": "Recepção de Passes Longos",
-            "percentile": 31.0,
-            "display_value": "1,3"
-          }
-        ],
-        "stats": []
-      }
-    ]
-  },
-  "profiles_available": [
-    "Driblador",
-    "Meia Ponta",
-    "Ruptura",
-    "Híbrido"
-  ],
-  "scatter": {
-    "dribles": 1.62,
-    "xa": 0.24,
-    "progressao": 0.9400000000000001,
-    "cruzamentos": 1.19,
-    "toques_area": 0.85
-  },
-  "cluster": {
-    "family": "extremos",
-    "archetype": "Driblador",
-    "archetype_label": "Driblador",
-    "hybrid_badge": null,
-    "hybrid_badge_short": null,
-    "shares": {
-      "driblador": 55.8,
-      "meia_ponta": 26.8,
-      "ruptura": 17.4
-    },
-    "ratings": {
-      "driblador": 6.0,
-      "meia_ponta": 6.6,
-      "ruptura": 5.7
-    }
-  },
-  "transfermarkt": {
-    "id": "681501",
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/681501-1708484102.jpg?lm=4711",
-    "market_value": "€ 800 mil",
-    "market_value_eur": 800000,
-    "contract_until": "2026-12-31",
-    "contract_remaining": "2 meses",
-    "on_loan_from": "IF Elfsborg",
-    "club": "Avaí FC",
-    "profile_url": "https://www.transfermarkt.com.br/wenderson/profil/spieler/681501"
-  },
-  "physical_run": {
-    "source": "sofascore_run",
-    "competition": "Brasileirão Série B",
-    "position_pool": "Meia Ofensivo",
-    "position_pool_size": 35,
-    "matches": 34,
-    "minutes": 2941,
-    "kilometers_p90": 7.8,
-    "top_speed": 35.52,
-    "sprints_p90": 6.49,
-    "running_km_p90": 1.06,
-    "high_speed_km_p90": 0.31,
-    "sprinting_km_p90": 0.08,
-    "percentiles": {
-      "kilometers_p90": 43.3,
-      "top_speed": 85.2,
-      "sprints_p90": 26.7,
-      "running_km_p90": 43.3,
-      "high_speed_km_p90": 23.3,
-      "sprinting_km_p90": 26.7
-    },
-    "ranks": {
-      "kilometers_p90": 19,
-      "top_speed": 6,
-      "sprints_p90": 25,
-      "running_km_p90": 18,
-      "high_speed_km_p90": 25,
-      "sprinting_km_p90": 25
-    }
-  },
-  "discipline": {
-    "fouls_per90": 0.94,
-    "fouls_total": 11,
-    "yellow_per90": 0.26,
-    "yellow_total": 3,
-    "red_per90": 0.0,
-    "red_total": 0,
-    "pool": {
-      "fouls_per90": 1.38,
-      "yellow_per90": 0.2,
-      "red_per90": 0.01
-    }
-  },
-  "cross_season": {
-    "seasons": [
-      {
-        "year": "2023",
-        "league": "serie-b",
-        "minutes": 1138,
-        "club": "Guarani"
-      },
-      {
-        "year": "2025",
-        "league": "serie-c",
-        "minutes": 703,
-        "club": "Náutico"
-      }
-    ],
-    "metrics": {
-      "Passes Progressivos": {
-        "predicted": 4.3868,
-        "resid_sd": 1.1225,
-        "train_n90": 19.53
-      },
-      "Passes Progressivos::Eficiência": {
-        "predicted": 72.1616,
-        "resid_sd": 7.2942,
-        "train_n90": 19.53
-      },
-      "Passes para Terço Final": {
-        "predicted": 4.8389,
-        "resid_sd": 1.0778,
-        "train_n90": 19.53
-      },
-      "Passes para Terço Final::Eficiência": {
-        "predicted": 71.9536,
-        "resid_sd": 9.042,
-        "train_n90": 19.53
-      },
-      "Passes Longos": {
-        "predicted": 1.95,
-        "resid_sd": 0.8211,
-        "train_n90": 19.53
-      },
-      "Passes Longos::Eficiência": {
-        "predicted": 54.0463,
-        "resid_sd": 11.297,
-        "train_n90": 19.53
-      },
-      "Distribuição::Passes": {
-        "predicted": 34.9246,
-        "resid_sd": 4.6427,
-        "train_n90": 19.53
-      },
-      "Distribuição::Passes Recebidos": {
-        "predicted": 23.3484,
-        "resid_sd": 3.9417,
-        "train_n90": 19.53
-      },
-      "Passes Chave e Área::Assistências para remate": {
-        "predicted": 0.7887,
-        "resid_sd": 0.4355,
-        "train_n90": 19.53
-      },
-      "Passes Chave e Área::Passes para Área": {
-        "predicted": 1.0254,
-        "resid_sd": 0.4596,
-        "train_n90": 19.53
-      },
-      "Pré Assistências e xA::Pré Assistências": {
-        "predicted": 0.0653,
-        "resid_sd": 0.0712,
-        "train_n90": 19.53
-      },
-      "Pré Assistências e xA::xA": {
-        "predicted": 0.0797,
-        "resid_sd": 0.0556,
-        "train_n90": 19.53
-      },
-      "Passes Criativos": {
-        "predicted": 0.4516,
-        "resid_sd": 0.4467,
-        "train_n90": 19.53
-      },
-      "Passes Criativos::Eficiência": {
-        "predicted": 55.6796,
-        "resid_sd": 11.5087,
-        "train_n90": 19.53
-      },
-      "Finalizações::Finalizações": {
-        "predicted": 1.3451,
-        "resid_sd": 0.4902,
-        "train_n90": 19.51
-      },
-      "Disputas com Bola": {
-        "predicted": 4.0838,
-        "resid_sd": 1.4313,
-        "train_n90": 19.53
-      },
-      "Disputas com Bola::Eficiência": {
-        "predicted": 44.3803,
-        "resid_sd": 6.1284,
-        "train_n90": 19.53
-      },
-      "1v1 - Ofensivo": {
-        "predicted": 1.6778,
-        "resid_sd": 1.1907,
-        "train_n90": 19.53
-      },
-      "1v1 - Ofensivo::Eficiência": {
-        "predicted": 55.6749,
-        "resid_sd": 8.582,
-        "train_n90": 19.53
-      }
-    }
-  },
-  "pass_distance_m": 14.88,
-  "athlete_id": "ath-004252",
-  "person_key": "name:wenderson|1998|0"
+   "kilometers_p90": 19,
+   "top_speed": 6,
+   "sprints_p90": 25,
+   "running_km_p90": 18,
+   "high_speed_km_p90": 25,
+   "sprinting_km_p90": 25
+  }
+ }
 }

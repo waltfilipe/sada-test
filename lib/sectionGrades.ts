@@ -32,17 +32,18 @@ function volEffScore(item: AspectItem): number | undefined {
 
 function defActionsGroupScore(item: AspectItem): number | undefined {
   const subs = item.sub_metrics ?? [];
-  const cortes = subs.find((row) => row.label === "Rebatidas");
-  const inter = subs.find((row) => row.label === "Interceptações");
-  const blocks = subs.find((row) => row.label === "Chutes Bloqueados");
-  return averageDefined([num(cortes?.percentile), num(inter?.percentile), num(blocks?.percentile)]);
+  const pick = (label: string) => num(subs.find((row) => row.label === label)?.percentile);
+  return averageDefined([pick("Rebatidas"), pick("Interceptações"), pick("Chutes Bloqueados"), pick("Recuperações")]);
 }
 
 function defEfficiencyGroupScore(item: AspectItem): number | undefined {
   const subs = item.sub_metrics ?? [];
-  const erros = subs.find((row) => row.label === "Erros Totais");
-  const eff = subs.find((row) => row.label === "Eficiência Defensiva");
-  return blendVolEff(num(erros?.percentile), num(eff?.percentile));
+  const pick = (...labels: string[]) => num(subs.find((row) => labels.includes(row.label))?.percentile);
+  return averageDefined([
+    pick("Erros Totais"),
+    pick("Ações sem Bola/90"),
+    pick("Índice de Eficiência", "Eficiência Defensiva"),
+  ]);
 }
 
 function metricGroupScore(item: AspectItem): number | undefined {
@@ -82,7 +83,7 @@ function blockScore(item: AspectItem | undefined): number | undefined {
   if (!item) return undefined;
   if (item.kind === "def_efficiency_group") return defEfficiencyGroupScore(item);
   if (item.kind === "metric_group") {
-    if (item.label === "Ações Defensivas") return defActionsGroupScore(item);
+    if (item.label.startsWith("Ações Defensivas")) return defActionsGroupScore(item);
     return metricGroupScore(item);
   }
   if (item.kind === "pass_certos" || item.kind === "metric" || !item.kind) return volEffScore(item);
@@ -113,20 +114,20 @@ const SECTION_BLOCK_WEIGHTS: Partial<
 /** Block labels per section — used for composite section score. */
 const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string[]>>> = {
   zagueiros: {
-    Defensivos: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva"],
+    Defensivos: ["Duelos Defensivos", "Ações Defensivas e Recuperações", "Eficiência Defensiva"],
     Aéreo: ["Aéreo"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos"],
     "Dribles e Condução": ["Disputas com Bola", "Conduções Progressivas"],
   },
   laterais: {
-    Defensivos: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
+    Defensivos: ["Duelos Defensivos", "Ações Defensivas e Recuperações", "Eficiência Defensiva", "Duelos Aéreos"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
     "Dribles e Condução": ["Disputas com Bola", "1v1 - Ofensivo", "Progressão"],
     "Passes Finais": ["Cruzamentos", "Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
     Ofensividade: ["Ofensividade"],
   },
   "meio-campistas": {
-    Defensivos: ["Duelos Defensivos", "Ações Defensivas", "Eficiência Defensiva", "Duelos Aéreos"],
+    Defensivos: ["Duelos Defensivos", "Ações Defensivas e Recuperações", "Eficiência Defensiva", "Duelos Aéreos"],
     Passes: ["Passes Progressivos", "Passes para Terço Final", "Passes Longos", "Distribuição"],
     "Dribles e Condução": ["Disputas com Bola", "1v1 - Ofensivo", "Conduções Progressivas"],
     "Passes Finais": ["Passes Chave e Área", "Pré Assistências e xA", "Passes Criativos"],
@@ -138,7 +139,7 @@ const SECTION_BLOCK_LABELS: Partial<Record<PositionFamily, Record<string, string
     "Condução e Drible": ["Disputas com Bola", "1v1 - Ofensivo", "Progressão"],
     Finalização: ["Gols e xG", "Finalizações"],
     Ofensividade: ["Ações Terminais", "Verticalidade"],
-    Defensivos: ["Duelos Vencidos", "Ações Defensivas"],
+    Defensivos: ["Duelos Vencidos", "Ações Defensivas", "Recuperações"],
   },
   atacantes: {
     "Duelos Aéreos": ["Duelos Aéreos"],

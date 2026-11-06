@@ -6,7 +6,7 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { useLeague } from "@/components/LeagueProvider";
 import { findAspect, flattenAspects } from "@/lib/aspectLookup";
-import { crossingReading, formatPer90 } from "@/lib/crossingTendency";
+import { crossingReading, crossingVolumePer90, formatPer90 } from "@/lib/crossingTendency";
 import { statRowLabel } from "@/lib/seasonTotals";
 import { centeredTendencyPosition } from "@/lib/tendencyScale";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
@@ -32,7 +32,7 @@ import {
 } from "@/lib/reportI18n";
 import { useLoading } from "@/components/LoadingProvider";
 import { PlayerHeatmap } from "./PlayerHeatmap";
-import type { AspectItem, PlayerHeatmapData, PlayerProfile, PositionFamily } from "@/lib/types";
+import type { AspectItem, PlayerHeatmapData, PlayerPhysicalRun, PlayerProfile, PositionFamily } from "@/lib/types";
 
 type ReportCopy = (typeof REPORT_COPY)[ReportLang];
 
@@ -338,6 +338,71 @@ function reportTendencies(player: PlayerProfile, players: PlayerProfile[], lang:
   }
 
   return rows;
+}
+
+type RunMetricKey =
+  | "kilometers_p90"
+  | "top_speed"
+  | "sprints_p90"
+  | "running_km_p90"
+  | "high_speed_km_p90"
+  | "sprinting_km_p90";
+
+const RUN_METRICS: { key: RunMetricKey; pt: string; en: string; unit: string; digits: number }[] = [
+  { key: "kilometers_p90", pt: "Distância total", en: "Distance", unit: "km/90", digits: 2 },
+  { key: "top_speed", pt: "Velocidade máxima", en: "Top speed", unit: "km/h", digits: 1 },
+  { key: "sprints_p90", pt: "Sprints", en: "Sprints", unit: "/90", digits: 1 },
+  { key: "running_km_p90", pt: "Corrida", en: "Running", unit: "km/90", digits: 2 },
+  { key: "high_speed_km_p90", pt: "Alta intensidade", en: "High intensity", unit: "km/90", digits: 2 },
+  { key: "sprinting_km_p90", pt: "Sprint (distância)", en: "Sprint distance", unit: "km/90", digits: 2 },
+];
+
+function reportRunRows(run: PlayerPhysicalRun, lang: ReportLang) {
+  return RUN_METRICS.map((metric) => {
+    const value = run[metric.key];
+    return {
+      key: metric.key,
+      label: lang === "en" ? metric.en : metric.pt,
+      value: `${localizeValue(value.toFixed(metric.digits).replace(".", ","), lang)} ${metric.unit}`,
+      pct: run.percentiles?.[metric.key] ?? null,
+    };
+  });
+}
+
+/** Média ponderada por minutos de GPS entre temporadas (resumo multi-ano). */
+function averagePhysicalRun(rows: SummarySheetRow[]): PlayerPhysicalRun | null {
+  const entries = rows
+    .map((row) => row.player.physical_run)
+    .filter((run): run is PlayerPhysicalRun => Boolean(run?.minutes));
+  if (!entries.length) return null;
+  const weightSum = entries.reduce((sum, run) => sum + run.minutes, 0) || 1;
+  const avg = (key: RunMetricKey) =>
+    entries.reduce((sum, run) => sum + (run[key] ?? 0) * run.minutes, 0) / weightSum;
+  const avgPct = (key: RunMetricKey) => {
+    const parts = entries
+      .map((run) => ({ value: run.percentiles?.[key], weight: run.minutes }))
+      .filter((part): part is { value: number; weight: number } => part.value != null);
+    if (!parts.length) return undefined;
+    const w = parts.reduce((sum, part) => sum + part.weight, 0) || 1;
+    return parts.reduce((sum, part) => sum + part.value * part.weight, 0) / w;
+  };
+  const first = entries[0];
+  const percentiles = Object.fromEntries(
+    RUN_METRICS.map((metric) => [metric.key, avgPct(metric.key)]).filter(([, v]) => v != null),
+  ) as PlayerPhysicalRun["percentiles"];
+  return {
+    ...first,
+    matches: entries.reduce((sum, run) => sum + run.matches, 0),
+    minutes: Math.round(weightSum),
+    kilometers_p90: avg("kilometers_p90"),
+    top_speed: avg("top_speed"),
+    sprints_p90: avg("sprints_p90"),
+    running_km_p90: avg("running_km_p90"),
+    high_speed_km_p90: avg("high_speed_km_p90"),
+    sprinting_km_p90: avg("sprinting_km_p90"),
+    percentiles,
+    ranks: {},
+  };
 }
 
 /** Brighter block colors for the dark on-screen radar. */
@@ -747,21 +812,17 @@ export function ReportSheet({
 
   const bio = reportBio(player, lang);
 
+  const run = player.physical_run;
+  const errosLabel = translateLabel("Erros Totais", lang);
   const ranked = [...metrics].sort((a, b) => b.percentile - a.percentile);
-  const strengths = ranked.filter((metric) => metric.percentile >= 50).slice(0, 6);
+  // Erros Totais pode aparecer em pontos a desenvolver, nunca em pontos fortes.
+  const strengths = ranked
+    .filter((metric) => metric.percentile >= 50 && metric.name !== errosLabel)
+    .slice(0, 6);
   const weaknesses = [...ranked]
     .reverse()
     .filter((metric) => metric.percentile < 50)
     .slice(0, 6);
-  const distribution = {
-    above: metrics.filter((metric) => metric.percentile >= 70).length,
-    below: metrics.filter((metric) => metric.percentile <= 30).length,
-  };
-  const distMid = metrics.length - distribution.above - distribution.below;
-  const best = scores.length ? scores.reduce((a, b) => (b.score > a.score ? b : a)) : null;
-  const worst = scores.length ? scores.reduce((a, b) => (b.score < a.score ? b : a)) : null;
-  const aboveMedian = scores.filter((item) => item.score >= 50).length;
-  const share = (n: number) => (metrics.length ? (n / metrics.length) * 100 : 0);
 
   const facts = [
     {
@@ -1003,29 +1064,6 @@ export function ReportSheet({
             </div>
           </section>
 
-          {best && worst ? (
-            <section className="player-report-card player-report-overview">
-              <div>
-                <p className="player-report-label">{copy.overview}</p>
-                <p className="player-report-overview-text">
-                  {copy.summaryLine(aboveMedian, scores.length, best.title, best.score, worst.title, worst.score)}
-                </p>
-              </div>
-              <div className="player-report-dist">
-                <div className="player-report-dist-bar" aria-hidden="true">
-                  <span className="is-high" style={{ width: `${share(distribution.above)}%` }} />
-                  <span className="is-mid" style={{ width: `${share(distMid)}%` }} />
-                  <span className="is-low" style={{ width: `${share(distribution.below)}%` }} />
-                </div>
-                <ul>
-                  <li className="is-high">{copy.distAbove(distribution.above)}</li>
-                  <li className="is-mid">{copy.distMid(distMid)}</li>
-                  <li className="is-low">{copy.distBelow(distribution.below)}</li>
-                </ul>
-              </div>
-            </section>
-          ) : null}
-
           {scores.length ? (
             <div className="player-report-charts">
               <section className="player-report-card">
@@ -1090,6 +1128,28 @@ export function ReportSheet({
               tone="is-weak"
             />
           </div>
+
+          {run ? (
+            <section className="player-report-card" aria-label={copy.gpsTitle}>
+              <header className="player-report-card-head">
+                <h2>{copy.gpsTitle}</h2>
+                <span>{copy.gpsMeta(run.competition ?? "", run.matches, run.minutes)}</span>
+              </header>
+              <ul className="player-report-run-grid">
+                {reportRunRows(run, lang).map((metric) => (
+                  <li key={metric.key}>
+                    <span className="player-report-run-label">{metric.label}</span>
+                    <strong className="player-report-run-value">{metric.value}</strong>
+                    {metric.pct != null ? (
+                      <span className="player-report-run-bar" aria-hidden="true">
+                        <i style={{ width: `${clampPct(metric.pct)}%` }} />
+                      </span>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
 
           {tendencies.length || badges.length ? (
             <div className="player-report-extras">
@@ -1195,9 +1255,12 @@ function mergedSummaryHeatmap(rows: SummarySheetRow[]): PlayerHeatmapData | null
   return points.length ? { points } : null;
 }
 
+const SUMMARY_CROSSING_FAMILIES = new Set<PositionFamily>(["laterais", "meio-campistas", "extremos"]);
+
 /** Minutes-weighted pass tendencies across the picked seasons (short↔long and progressive share). */
-function summaryTendencies(detail: SummaryDetail[], lang: ReportLang): ReportTendency[] {
+function summaryTendencies(detail: SummaryDetail[], lang: ReportLang, family: PositionFamily): ReportTendency[] {
   const copy = REPORT_COPY[lang];
+  const per90 = (value: number) => localizeValue(formatPer90(value), lang);
   const rows: ReportTendency[] = [];
 
   const aggregate = (barKey: "pass_tendency" | "progressive_share") => {
@@ -1266,6 +1329,26 @@ function summaryTendencies(detail: SummaryDetail[], lang: ReportLang): ReportTen
       left: translateLabel(progressivo.left || "Baixo", lang),
       right: translateLabel(progressivo.right || "Alto", lang),
     });
+  }
+
+  // Média de tendência a cruzamentos entre as temporadas (lat/mc/extremos).
+  if (SUMMARY_CROSSING_FAMILIES.has(family)) {
+    const volumes = detail
+      .map((item) => ({ value: crossingVolumePer90(item.row.player), weight: item.weight }))
+      .filter((entry): entry is { value: number; weight: number } => entry.value != null);
+    const volume = weightedMean(volumes);
+    if (volume != null) {
+      const peak = Math.max(volume, ...volumes.map((entry) => entry.value), 1);
+      rows.push({
+        key: "cruzamentos",
+        label: copy.crosses,
+        detail: `${per90(volume)}/90`,
+        fill: clampPct((volume / (peak * 1.15)) * 100),
+        averageFill: null,
+        left: translateLabel("Baixo", lang),
+        right: translateLabel("Alto", lang),
+      });
+    }
   }
 
   return rows;
@@ -1368,16 +1451,20 @@ export function SeasonSummarySheet({
     }));
   }, [detail]);
 
+  const errosLabel = translateLabel("Erros Totais", lang);
   const ranked = [...avgMetrics].sort((a, b) => b.percentile - a.percentile);
-  const strengths = ranked.filter((metric) => metric.percentile >= 50).slice(0, 6);
+  const strengths = ranked
+    .filter((metric) => metric.percentile >= 50 && metric.name !== errosLabel)
+    .slice(0, 6);
   const weaknesses = [...ranked]
     .reverse()
     .filter((metric) => metric.percentile < 50)
     .slice(0, 6);
 
-  const tendencies = useMemo(() => summaryTendencies(detail, lang), [detail, lang]);
+  const tendencies = useMemo(() => summaryTendencies(detail, lang, family), [detail, lang, family]);
   const bio = useMemo(() => reportBio(main, lang), [main, lang]);
   const heatmap = useMemo(() => mergedSummaryHeatmap(ordered), [ordered]);
+  const avgRun = useMemo(() => averagePhysicalRun(ordered), [ordered]);
 
   return (
     <article className="player-report player-report-summary" lang={lang === "en" ? "en" : "pt-BR"}>
@@ -1566,6 +1653,28 @@ export function SeasonSummarySheet({
                 </div>
               ))}
             </div>
+          </section>
+        ) : null}
+
+        {avgRun ? (
+          <section className="player-report-card" aria-label={copy.gpsAvgTitle(ordered.length)}>
+            <header className="player-report-card-head">
+              <h2>{copy.gpsAvgTitle(ordered.length)}</h2>
+              <span>{copy.avgTendenciesHint}</span>
+            </header>
+            <ul className="player-report-run-grid">
+              {reportRunRows(avgRun, lang).map((metric) => (
+                <li key={metric.key}>
+                  <span className="player-report-run-label">{metric.label}</span>
+                  <strong className="player-report-run-value">{metric.value}</strong>
+                  {metric.pct != null ? (
+                    <span className="player-report-run-bar" aria-hidden="true">
+                      <i style={{ width: `${clampPct(metric.pct)}%` }} />
+                    </span>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
           </section>
         ) : null}
 

@@ -13,6 +13,7 @@ const SEASON_TOTALS = new Set([
 const PLAIN_LABELS = new Set([
   "eficiência",
   "eficiência defensiva",
+  "índice de eficiência",
   "erros totais",
   "eficiência de finalização",
 ]);

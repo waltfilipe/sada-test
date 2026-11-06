@@ -1,2165 +1,2181 @@
 {
-  "player_id": "david-vasco-da-gama-226",
-  "name": "David",
-  "club": "Vasco da Gama",
-  "label": "David (Vasco da Gama)",
-  "position": "Atacante",
-  "position_family": "atacantes",
-  "nationality": "Brazil",
-  "birth_year": 1996,
-  "height": 180,
-  "foot": "Destro",
-  "minutes": 1235,
-  "minutes_pct": 39.9,
-  "goals": 4,
-  "assists": 1,
-  "rating": 6.7,
+ "player_id": "david-vasco-da-gama-226",
+ "name": "David",
+ "club": "Vasco da Gama",
+ "label": "David (Vasco da Gama)",
+ "position": "Atacante",
+ "position_family": "atacantes",
+ "nationality": "Brazil",
+ "birth_year": 1995,
+ "height": 180,
+ "foot": "Destro",
+ "minutes": 1281,
+ "minutes_pct": 37.7,
+ "goals": 4,
+ "assists": 2,
+ "rating": 6.6,
+ "ratings": {
+  "geral": 6.6,
+  "finalizador": 6.7,
+  "alvo": 7.0,
+  "movel": 6.6
+ },
+ "ranks": {
+  "geral": 39,
+  "finalizador": 17,
+  "alvo": 14,
+  "movel": 27
+ },
+ "profile": "Alvo",
+ "profile_shares": {
+  "finalizador": 27.0,
+  "alvo": 39.0,
+  "movel": 34.0
+ },
+ "tendencies": {
+  "construcao": 56.0,
+  "ofensividade": 57.0,
+  "def1v1": 47.0,
+  "contencao": 69.0,
+  "duelo_aereo": 76.0
+ },
+ "aspects": {
+  "construcao": [
+   {
+    "label": "Passes Progressivos",
+    "kind": "pass_certos",
+    "grade": "D",
+    "certos_per90": 1.19,
+    "display_value": "1,2",
+    "percentile": 22.0,
+    "efficiency_pct": 52.5,
+    "efficiency_value": "71%",
+    "stats": []
+   },
+   {
+    "label": "Passes para Terço Final",
+    "kind": "pass_certos",
+    "grade": "C+",
+    "certos_per90": 1.33,
+    "display_value": "1,3",
+    "percentile": 47.7,
+    "efficiency_pct": 35.7,
+    "efficiency_value": "63%",
+    "stats": []
+   },
+   {
+    "label": "Passes Longos",
+    "kind": "pass_certos",
+    "grade": "D",
+    "certos_per90": 0.35,
+    "display_value": "0,3",
+    "percentile": 22.0,
+    "efficiency_pct": 46.4,
+    "efficiency_value": "60%",
+    "stats": []
+   },
+   {
+    "label": "Distribuição",
+    "kind": "metric_group",
+    "grade": "B",
+    "percentile": 68.9,
+    "sub_metrics": [
+     {
+      "label": "Passes",
+      "percentile": 68.9,
+      "display_value": "20,2"
+     },
+     {
+      "label": "Passes Recebidos",
+      "percentile": 59.1,
+      "display_value": "13,6"
+     }
+    ],
+    "stats": []
+   }
+  ],
+  "passes_finais": [
+   {
+    "label": "Passes Chave e Área",
+    "kind": "metric_group",
+    "grade": "B",
+    "percentile": 71.1,
+    "sub_metrics": [
+     {
+      "label": "Assistências para remate",
+      "percentile": 71.1,
+      "display_value": "1,0"
+     },
+     {
+      "label": "Passes para Área",
+      "percentile": 43.2,
+      "display_value": "0,5"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Cruzamentos",
+    "kind": "metric_group",
+    "grade": "C",
+    "percentile": 42.9,
+    "sub_metrics": [
+     {
+      "label": "Cruzamentos",
+      "percentile": 42.9,
+      "display_value": "0,6"
+     },
+     {
+      "label": "Eficiência",
+      "percentile": 25.0,
+      "display_value": "22%"
+     }
+    ],
+    "stats": [],
+    "efficiency_pct": 25.0,
+    "efficiency_value": "22%"
+   },
+   {
+    "label": "Pré Assistências e xA",
+    "kind": "metric_group",
+    "grade": "C+",
+    "percentile": 52.3,
+    "sub_metrics": [
+     {
+      "label": "Pré Assistências",
+      "percentile": 0.0,
+      "display_value": "0"
+     },
+     {
+      "label": "xA",
+      "percentile": 52.3,
+      "display_value": "1,02"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Passes Criativos",
+    "kind": "metric",
+    "grade": "D",
+    "percentile": 0.0,
+    "stats": [],
+    "display_value": "0,0",
+    "efficiency_pct": 36.7,
+    "efficiency_value": "40%",
+    "sub_metrics": [
+     {
+      "label": "Passes Criativos",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Passes Inteligentes",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Passes em Profundidade",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     }
+    ]
+   }
+  ],
+  "finalizacao": [
+   {
+    "label": "Gols e xG",
+    "kind": "metric_group",
+    "grade": "C-",
+    "percentile": 28.6,
+    "sub_metrics": [
+     {
+      "label": "Gols",
+      "percentile": 28.6,
+      "display_value": "4"
+     },
+     {
+      "label": "xG",
+      "percentile": 17.8,
+      "display_value": "3,25"
+     },
+     {
+      "label": "Eficiência de finalização",
+      "percentile": 79.5,
+      "display_value": "+0,8"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Finalizações",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 15.8,
+    "sub_metrics": [
+     {
+      "label": "Finalizações",
+      "percentile": 15.8,
+      "display_value": "1,7"
+     },
+     {
+      "label": "Finalizações certas",
+      "percentile": 85.7,
+      "display_value": "50%"
+     }
+    ],
+    "stats": [],
+    "efficiency_pct": 85.7,
+    "efficiency_value": "50%"
+   },
+   {
+    "label": "Efetividade",
+    "kind": "metric_group",
+    "grade": "C+",
+    "percentile": 48.9,
+    "sub_metrics": [
+     {
+      "label": "Finalizações certas / passe recebido",
+      "percentile": 48.9,
+      "display_value": "0,06"
+     },
+     {
+      "label": "Gols / toques na área",
+      "percentile": 45.5,
+      "display_value": "0,08"
+     }
+    ],
+    "stats": []
+   }
+  ],
+  "conducao_drible": [
+   {
+    "label": "Disputas com Bola",
+    "kind": "metric",
+    "grade": "C+",
+    "percentile": 51.2,
+    "stats": [],
+    "display_value": "5,6",
+    "efficiency_pct": 37.2,
+    "efficiency_value": "39%"
+   },
+   {
+    "label": "1v1 - Ofensivo",
+    "kind": "metric",
+    "grade": "C-",
+    "percentile": 34.9,
+    "stats": [],
+    "display_value": "1,0",
+    "efficiency_pct": 34.3,
+    "efficiency_value": "50%"
+   },
+   {
+    "label": "Progressão",
+    "kind": "metric_group",
+    "grade": "B",
+    "percentile": 70.7,
+    "sub_metrics": [
+     {
+      "label": "Conduções Progressivas",
+      "percentile": 70.7,
+      "display_value": "1,0"
+     },
+     {
+      "label": "Acelerações",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     }
+    ],
+    "stats": []
+   }
+  ],
+  "ofensividade": [
+   {
+    "label": "Ações Terminais",
+    "kind": "metric_group",
+    "grade": "B",
+    "percentile": 71.8,
+    "sub_metrics": [
+     {
+      "label": "Toques na Área",
+      "percentile": 71.8,
+      "display_value": "3,7"
+     },
+     {
+      "label": "Ações Ofensivas",
+      "percentile": 31.0,
+      "display_value": "1,5"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Verticalidade",
+    "kind": "metric_group",
+    "grade": "B+",
+    "percentile": 81.0,
+    "sub_metrics": [
+     {
+      "label": "% Toque na Área",
+      "percentile": 55.6,
+      "display_value": "27%"
+     },
+     {
+      "label": "Recepção de Passes Longos",
+      "percentile": 81.0,
+      "display_value": "2,0"
+     }
+    ],
+    "stats": []
+   }
+  ],
+  "aereo": [
+   {
+    "label": "Duelos Aéreos",
+    "kind": "metric",
+    "grade": "B",
+    "percentile": 66.7,
+    "stats": [],
+    "display_value": "4,8",
+    "efficiency_pct": 77.5,
+    "efficiency_value": "43%"
+   }
+  ]
+ },
+ "profiles_available": [
+  "Finalizador",
+  "Alvo",
+  "Móvel",
+  "Híbrido"
+ ],
+ "scatter": {
+  "gols": 4.0,
+  "finalizacao": 1.69,
+  "toques_area": 3.72,
+  "progressao": 0.98
+ },
+ "cluster": {
+  "family": "atacantes",
+  "archetype": "Alvo",
+  "archetype_label": "Alvo",
+  "hybrid_badge": null,
+  "hybrid_badge_short": null,
+  "shares": {
+   "finalizador": 27.141818529610774,
+   "alvo": 38.85961578387453,
+   "movel": 33.998565686514695
+  },
   "ratings": {
-    "geral": 6.7,
-    "finalizador": 6.6,
-    "alvo": 7.0,
-    "movel": 6.6
+   "finalizador": 6.7,
+   "alvo": 7.0,
+   "movel": 6.6
+  }
+ },
+ "transfermarkt": {
+  "id": "373189",
+  "photo": "https://img.a.transfermarkt.technology/portrait/header/373189-1597912752.jpg?lm=4711",
+  "market_value": "€ 1.50 mi",
+  "market_value_eur": 1500000,
+  "contract_until": "2027-12-31",
+  "contract_remaining": "1 ano e 1 mes",
+  "on_loan_from": null,
+  "club": "CR Vasco da Gama",
+  "profile_url": "https://www.transfermarkt.com.br/david/profil/spieler/373189",
+  "foot": "Destro",
+  "height": 179,
+  "matched_name": "David",
+  "match_via": "Vasco da Gama 2025"
+ },
+ "heatmap": {
+  "tournament_id": 325,
+  "season_id": 87678,
+  "scope": "overall",
+  "competition": "Brasileirão Série A",
+  "points": [
+   {
+    "x": 46.0,
+    "y": 16.0
+   },
+   {
+    "x": 46.0,
+    "y": 42.0
+   },
+   {
+    "x": 46.0,
+    "y": 24.0
+   },
+   {
+    "x": 46.0,
+    "y": 72.0
+   },
+   {
+    "x": 64.0,
+    "y": 5.0
+   },
+   {
+    "x": 64.0,
+    "y": 96.0
+   },
+   {
+    "x": 64.0,
+    "y": 77.0
+   },
+   {
+    "x": 64.0,
+    "y": 79.0
+   },
+   {
+    "x": 64.0,
+    "y": 28.0
+   },
+   {
+    "x": 64.0,
+    "y": 93.0
+   },
+   {
+    "x": 64.0,
+    "y": 67.0
+   },
+   {
+    "x": 64.0,
+    "y": 84.0
+   },
+   {
+    "x": 64.0,
+    "y": 97.0
+   },
+   {
+    "x": 64.0,
+    "y": 59.0
+   },
+   {
+    "x": 89.0,
+    "y": 6.0
+   },
+   {
+    "x": 89.0,
+    "y": 55.0
+   },
+   {
+    "x": 89.0,
+    "y": 4.0
+   },
+   {
+    "x": 89.0,
+    "y": 45.0
+   },
+   {
+    "x": 89.0,
+    "y": 43.0
+   },
+   {
+    "x": 69.0,
+    "y": 40.0
+   },
+   {
+    "x": 69.0,
+    "y": 49.0
+   },
+   {
+    "x": 69.0,
+    "y": 59.0
+   },
+   {
+    "x": 69.0,
+    "y": 68.0
+   },
+   {
+    "x": 69.0,
+    "y": 63.0
+   },
+   {
+    "x": 69.0,
+    "y": 96.0
+   },
+   {
+    "x": 69.0,
+    "y": 66.0
+   },
+   {
+    "x": 69.0,
+    "y": 93.0
+   },
+   {
+    "x": 69.0,
+    "y": 90.0
+   },
+   {
+    "x": 69.0,
+    "y": 84.0
+   },
+   {
+    "x": 69.0,
+    "y": 13.0
+   },
+   {
+    "x": 73.0,
+    "y": 25.0
+   },
+   {
+    "x": 73.0,
+    "y": 93.0
+   },
+   {
+    "x": 73.0,
+    "y": 66.0
+   },
+   {
+    "x": 73.0,
+    "y": 68.0
+   },
+   {
+    "x": 73.0,
+    "y": 85.0
+   },
+   {
+    "x": 73.0,
+    "y": 29.0
+   },
+   {
+    "x": 73.0,
+    "y": 57.0
+   },
+   {
+    "x": 73.0,
+    "y": 96.0
+   },
+   {
+    "x": 52.0,
+    "y": 56.0
+   },
+   {
+    "x": 52.0,
+    "y": 97.0
+   },
+   {
+    "x": 52.0,
+    "y": 27.0
+   },
+   {
+    "x": 52.0,
+    "y": 37.0
+   },
+   {
+    "x": 52.0,
+    "y": 73.0
+   },
+   {
+    "x": 52.0,
+    "y": 92.0
+   },
+   {
+    "x": 52.0,
+    "y": 55.0
+   },
+   {
+    "x": 53.0,
+    "y": 40.0
+   },
+   {
+    "x": 53.0,
+    "y": 49.0
+   },
+   {
+    "x": 53.0,
+    "y": 65.0
+   },
+   {
+    "x": 53.0,
+    "y": 86.0
+   },
+   {
+    "x": 53.0,
+    "y": 90.0
+   },
+   {
+    "x": 53.0,
+    "y": 35.0
+   },
+   {
+    "x": 51.0,
+    "y": 57.0
+   },
+   {
+    "x": 51.0,
+    "y": 49.0
+   },
+   {
+    "x": 51.0,
+    "y": 55.0
+   },
+   {
+    "x": 93.0,
+    "y": 49.0
+   },
+   {
+    "x": 93.0,
+    "y": 11.0
+   },
+   {
+    "x": 93.0,
+    "y": 25.0
+   },
+   {
+    "x": 93.0,
+    "y": 23.0
+   },
+   {
+    "x": 93.0,
+    "y": 42.0
+   },
+   {
+    "x": 93.0,
+    "y": 46.0
+   },
+   {
+    "x": 80.0,
+    "y": 10.0
+   },
+   {
+    "x": 80.0,
+    "y": 60.0
+   },
+   {
+    "x": 80.0,
+    "y": 97.0
+   },
+   {
+    "x": 80.0,
+    "y": 9.0
+   },
+   {
+    "x": 80.0,
+    "y": 52.0
+   },
+   {
+    "x": 80.0,
+    "y": 84.0
+   },
+   {
+    "x": 80.0,
+    "y": 63.0
+   },
+   {
+    "x": 80.0,
+    "y": 28.0
+   },
+   {
+    "x": 60.0,
+    "y": 49.0
+   },
+   {
+    "x": 60.0,
+    "y": 34.0
+   },
+   {
+    "x": 60.0,
+    "y": 73.0
+   },
+   {
+    "x": 60.0,
+    "y": 96.0
+   },
+   {
+    "x": 60.0,
+    "y": 87.0
+   },
+   {
+    "x": 71.0,
+    "y": 67.0
+   },
+   {
+    "x": 71.0,
+    "y": 6.0
+   },
+   {
+    "x": 71.0,
+    "y": 4.0
+   },
+   {
+    "x": 71.0,
+    "y": 65.0
+   },
+   {
+    "x": 71.0,
+    "y": 14.0
+   },
+   {
+    "x": 71.0,
+    "y": 19.0
+   },
+   {
+    "x": 71.0,
+    "y": 96.0
+   },
+   {
+    "x": 71.0,
+    "y": 91.0
+   },
+   {
+    "x": 71.0,
+    "y": 18.0
+   },
+   {
+    "x": 67.0,
+    "y": 54.0
+   },
+   {
+    "x": 67.0,
+    "y": 51.0
+   },
+   {
+    "x": 67.0,
+    "y": 63.0
+   },
+   {
+    "x": 67.0,
+    "y": 31.0
+   },
+   {
+    "x": 67.0,
+    "y": 78.0
+   },
+   {
+    "x": 67.0,
+    "y": 8.0
+   },
+   {
+    "x": 67.0,
+    "y": 24.0
+   },
+   {
+    "x": 67.0,
+    "y": 45.0
+   },
+   {
+    "x": 67.0,
+    "y": 82.0
+   },
+   {
+    "x": 67.0,
+    "y": 84.0
+   },
+   {
+    "x": 67.0,
+    "y": 67.0
+   },
+   {
+    "x": 67.0,
+    "y": 10.0
+   },
+   {
+    "x": 83.0,
+    "y": 84.0
+   },
+   {
+    "x": 83.0,
+    "y": 90.0
+   },
+   {
+    "x": 83.0,
+    "y": 38.0
+   },
+   {
+    "x": 83.0,
+    "y": 62.0
+   },
+   {
+    "x": 94.0,
+    "y": 75.0
+   },
+   {
+    "x": 94.0,
+    "y": 100.0
+   },
+   {
+    "x": 94.0,
+    "y": 31.0
+   },
+   {
+    "x": 94.0,
+    "y": 20.0
+   },
+   {
+    "x": 43.0,
+    "y": 92.0
+   },
+   {
+    "x": 43.0,
+    "y": 66.0
+   },
+   {
+    "x": 43.0,
+    "y": 51.0
+   },
+   {
+    "x": 43.0,
+    "y": 27.0
+   },
+   {
+    "x": 43.0,
+    "y": 11.0
+   },
+   {
+    "x": 43.0,
+    "y": 53.0
+   },
+   {
+    "x": 79.0,
+    "y": 87.0
+   },
+   {
+    "x": 79.0,
+    "y": 88.0
+   },
+   {
+    "x": 79.0,
+    "y": 94.0
+   },
+   {
+    "x": 79.0,
+    "y": 32.0
+   },
+   {
+    "x": 79.0,
+    "y": 97.0
+   },
+   {
+    "x": 79.0,
+    "y": 21.0
+   },
+   {
+    "x": 45.0,
+    "y": 75.0
+   },
+   {
+    "x": 45.0,
+    "y": 50.0
+   },
+   {
+    "x": 45.0,
+    "y": 57.0
+   },
+   {
+    "x": 45.0,
+    "y": 69.0
+   },
+   {
+    "x": 45.0,
+    "y": 72.0
+   },
+   {
+    "x": 45.0,
+    "y": 87.0
+   },
+   {
+    "x": 45.0,
+    "y": 76.0
+   },
+   {
+    "x": 45.0,
+    "y": 82.0
+   },
+   {
+    "x": 45.0,
+    "y": 81.0
+   },
+   {
+    "x": 45.0,
+    "y": 64.0
+   },
+   {
+    "x": 72.0,
+    "y": 78.0
+   },
+   {
+    "x": 72.0,
+    "y": 40.0
+   },
+   {
+    "x": 72.0,
+    "y": 5.0
+   },
+   {
+    "x": 72.0,
+    "y": 10.0
+   },
+   {
+    "x": 72.0,
+    "y": 84.0
+   },
+   {
+    "x": 72.0,
+    "y": 76.0
+   },
+   {
+    "x": 72.0,
+    "y": 17.0
+   },
+   {
+    "x": 72.0,
+    "y": 41.0
+   },
+   {
+    "x": 72.0,
+    "y": 70.0
+   },
+   {
+    "x": 72.0,
+    "y": 82.0
+   },
+   {
+    "x": 72.0,
+    "y": 88.0
+   },
+   {
+    "x": 74.0,
+    "y": 82.0
+   },
+   {
+    "x": 74.0,
+    "y": 72.0
+   },
+   {
+    "x": 74.0,
+    "y": 61.0
+   },
+   {
+    "x": 85.0,
+    "y": 88.0
+   },
+   {
+    "x": 85.0,
+    "y": 6.0
+   },
+   {
+    "x": 85.0,
+    "y": 47.0
+   },
+   {
+    "x": 85.0,
+    "y": 8.0
+   },
+   {
+    "x": 85.0,
+    "y": 7.0
+   },
+   {
+    "x": 85.0,
+    "y": 100.0
+   },
+   {
+    "x": 85.0,
+    "y": 38.0
+   },
+   {
+    "x": 85.0,
+    "y": 13.0
+   },
+   {
+    "x": 85.0,
+    "y": 83.0
+   },
+   {
+    "x": 85.0,
+    "y": 52.0
+   },
+   {
+    "x": 85.0,
+    "y": 85.0
+   },
+   {
+    "x": 47.0,
+    "y": 100.0
+   },
+   {
+    "x": 47.0,
+    "y": 50.0
+   },
+   {
+    "x": 47.0,
+    "y": 16.0
+   },
+   {
+    "x": 47.0,
+    "y": 21.0
+   },
+   {
+    "x": 47.0,
+    "y": 60.0
+   },
+   {
+    "x": 39.0,
+    "y": 70.0
+   },
+   {
+    "x": 39.0,
+    "y": 24.0
+   },
+   {
+    "x": 39.0,
+    "y": 58.0
+   },
+   {
+    "x": 76.0,
+    "y": 77.0
+   },
+   {
+    "x": 76.0,
+    "y": 67.0
+   },
+   {
+    "x": 76.0,
+    "y": 52.0
+   },
+   {
+    "x": 76.0,
+    "y": 74.0
+   },
+   {
+    "x": 76.0,
+    "y": 70.0
+   },
+   {
+    "x": 76.0,
+    "y": 84.0
+   },
+   {
+    "x": 76.0,
+    "y": 95.0
+   },
+   {
+    "x": 75.0,
+    "y": 74.0
+   },
+   {
+    "x": 75.0,
+    "y": 81.0
+   },
+   {
+    "x": 75.0,
+    "y": 5.0
+   },
+   {
+    "x": 75.0,
+    "y": 37.0
+   },
+   {
+    "x": 75.0,
+    "y": 70.0
+   },
+   {
+    "x": 75.0,
+    "y": 68.0
+   },
+   {
+    "x": 75.0,
+    "y": 64.0
+   },
+   {
+    "x": 75.0,
+    "y": 78.0
+   },
+   {
+    "x": 75.0,
+    "y": 98.0
+   },
+   {
+    "x": 75.0,
+    "y": 40.0
+   },
+   {
+    "x": 66.0,
+    "y": 18.0
+   },
+   {
+    "x": 66.0,
+    "y": 32.0
+   },
+   {
+    "x": 66.0,
+    "y": 89.0
+   },
+   {
+    "x": 66.0,
+    "y": 63.0
+   },
+   {
+    "x": 66.0,
+    "y": 27.0
+   },
+   {
+    "x": 66.0,
+    "y": 66.0
+   },
+   {
+    "x": 66.0,
+    "y": 22.0
+   },
+   {
+    "x": 66.0,
+    "y": 43.0
+   },
+   {
+    "x": 66.0,
+    "y": 58.0
+   },
+   {
+    "x": 66.0,
+    "y": 93.0
+   },
+   {
+    "x": 66.0,
+    "y": 82.0
+   },
+   {
+    "x": 66.0,
+    "y": 90.0
+   },
+   {
+    "x": 66.0,
+    "y": 73.0
+   },
+   {
+    "x": 66.0,
+    "y": 92.0
+   },
+   {
+    "x": 66.0,
+    "y": 78.0
+   },
+   {
+    "x": 66.0,
+    "y": 68.0
+   },
+   {
+    "x": 63.0,
+    "y": 8.0
+   },
+   {
+    "x": 63.0,
+    "y": 85.0
+   },
+   {
+    "x": 63.0,
+    "y": 95.0
+   },
+   {
+    "x": 63.0,
+    "y": 96.0
+   },
+   {
+    "x": 63.0,
+    "y": 83.0
+   },
+   {
+    "x": 63.0,
+    "y": 90.0
+   },
+   {
+    "x": 63.0,
+    "y": 18.0
+   },
+   {
+    "x": 63.0,
+    "y": 45.0
+   },
+   {
+    "x": 63.0,
+    "y": 63.0
+   },
+   {
+    "x": 63.0,
+    "y": 93.0
+   },
+   {
+    "x": 63.0,
+    "y": 69.0
+   },
+   {
+    "x": 63.0,
+    "y": 84.0
+   },
+   {
+    "x": 63.0,
+    "y": 65.0
+   },
+   {
+    "x": 56.0,
+    "y": 6.0
+   },
+   {
+    "x": 56.0,
+    "y": 26.0
+   },
+   {
+    "x": 56.0,
+    "y": 31.0
+   },
+   {
+    "x": 56.0,
+    "y": 52.0
+   },
+   {
+    "x": 56.0,
+    "y": 54.0
+   },
+   {
+    "x": 56.0,
+    "y": 82.0
+   },
+   {
+    "x": 56.0,
+    "y": 92.0
+   },
+   {
+    "x": 56.0,
+    "y": 91.0
+   },
+   {
+    "x": 56.0,
+    "y": 93.0
+   },
+   {
+    "x": 56.0,
+    "y": 79.0
+   },
+   {
+    "x": 5.0,
+    "y": 61.0
+   },
+   {
+    "x": 36.0,
+    "y": 68.0
+   },
+   {
+    "x": 36.0,
+    "y": 72.0
+   },
+   {
+    "x": 36.0,
+    "y": 85.0
+   },
+   {
+    "x": 36.0,
+    "y": 69.0
+   },
+   {
+    "x": 36.0,
+    "y": 92.0
+   },
+   {
+    "x": 40.0,
+    "y": 63.0
+   },
+   {
+    "x": 40.0,
+    "y": 38.0
+   },
+   {
+    "x": 40.0,
+    "y": 64.0
+   },
+   {
+    "x": 40.0,
+    "y": 91.0
+   },
+   {
+    "x": 30.0,
+    "y": 73.0
+   },
+   {
+    "x": 30.0,
+    "y": 86.0
+   },
+   {
+    "x": 84.0,
+    "y": 57.0
+   },
+   {
+    "x": 84.0,
+    "y": 76.0
+   },
+   {
+    "x": 84.0,
+    "y": 26.0
+   },
+   {
+    "x": 84.0,
+    "y": 52.0
+   },
+   {
+    "x": 84.0,
+    "y": 93.0
+   },
+   {
+    "x": 70.0,
+    "y": 44.0
+   },
+   {
+    "x": 70.0,
+    "y": 21.0
+   },
+   {
+    "x": 70.0,
+    "y": 37.0
+   },
+   {
+    "x": 70.0,
+    "y": 88.0
+   },
+   {
+    "x": 70.0,
+    "y": 76.0
+   },
+   {
+    "x": 70.0,
+    "y": 66.0
+   },
+   {
+    "x": 70.0,
+    "y": 95.0
+   },
+   {
+    "x": 70.0,
+    "y": 77.0
+   },
+   {
+    "x": 70.0,
+    "y": 47.0
+   },
+   {
+    "x": 70.0,
+    "y": 97.0
+   },
+   {
+    "x": 50.0,
+    "y": 50.0
+   },
+   {
+    "x": 50.0,
+    "y": 49.0
+   },
+   {
+    "x": 78.0,
+    "y": 22.0
+   },
+   {
+    "x": 78.0,
+    "y": 74.0
+   },
+   {
+    "x": 78.0,
+    "y": 61.0
+   },
+   {
+    "x": 78.0,
+    "y": 11.0
+   },
+   {
+    "x": 78.0,
+    "y": 7.0
+   },
+   {
+    "x": 78.0,
+    "y": 88.0
+   },
+   {
+    "x": 78.0,
+    "y": 73.0
+   },
+   {
+    "x": 78.0,
+    "y": 49.0
+   },
+   {
+    "x": 78.0,
+    "y": 71.0
+   },
+   {
+    "x": 78.0,
+    "y": 84.0
+   },
+   {
+    "x": 78.0,
+    "y": 93.0
+   },
+   {
+    "x": 88.0,
+    "y": 8.0
+   },
+   {
+    "x": 88.0,
+    "y": 89.0
+   },
+   {
+    "x": 88.0,
+    "y": 75.0
+   },
+   {
+    "x": 88.0,
+    "y": 86.0
+   },
+   {
+    "x": 88.0,
+    "y": 18.0
+   },
+   {
+    "x": 97.0,
+    "y": 76.0
+   },
+   {
+    "x": 97.0,
+    "y": 95.0
+   },
+   {
+    "x": 81.0,
+    "y": 50.0
+   },
+   {
+    "x": 81.0,
+    "y": 46.0
+   },
+   {
+    "x": 81.0,
+    "y": 44.0
+   },
+   {
+    "x": 87.0,
+    "y": 57.0
+   },
+   {
+    "x": 87.0,
+    "y": 3.0
+   },
+   {
+    "x": 87.0,
+    "y": 97.0
+   },
+   {
+    "x": 87.0,
+    "y": 69.0
+   },
+   {
+    "x": 87.0,
+    "y": 37.0
+   },
+   {
+    "x": 87.0,
+    "y": 67.0
+   },
+   {
+    "x": 87.0,
+    "y": 64.0
+   },
+   {
+    "x": 62.0,
+    "y": 85.0
+   },
+   {
+    "x": 62.0,
+    "y": 82.0
+   },
+   {
+    "x": 62.0,
+    "y": 86.0
+   },
+   {
+    "x": 62.0,
+    "y": 23.0
+   },
+   {
+    "x": 62.0,
+    "y": 80.0
+   },
+   {
+    "x": 62.0,
+    "y": 20.0
+   },
+   {
+    "x": 62.0,
+    "y": 74.0
+   },
+   {
+    "x": 44.0,
+    "y": 87.0
+   },
+   {
+    "x": 44.0,
+    "y": 42.0
+   },
+   {
+    "x": 44.0,
+    "y": 36.0
+   },
+   {
+    "x": 44.0,
+    "y": 43.0
+   },
+   {
+    "x": 44.0,
+    "y": 57.0
+   },
+   {
+    "x": 44.0,
+    "y": 18.0
+   },
+   {
+    "x": 44.0,
+    "y": 92.0
+   },
+   {
+    "x": 44.0,
+    "y": 77.0
+   },
+   {
+    "x": 44.0,
+    "y": 63.0
+   },
+   {
+    "x": 44.0,
+    "y": 74.0
+   },
+   {
+    "x": 65.0,
+    "y": 74.0
+   },
+   {
+    "x": 65.0,
+    "y": 86.0
+   },
+   {
+    "x": 65.0,
+    "y": 68.0
+   },
+   {
+    "x": 65.0,
+    "y": 34.0
+   },
+   {
+    "x": 65.0,
+    "y": 4.0
+   },
+   {
+    "x": 65.0,
+    "y": 58.0
+   },
+   {
+    "x": 65.0,
+    "y": 69.0
+   },
+   {
+    "x": 68.0,
+    "y": 92.0
+   },
+   {
+    "x": 68.0,
+    "y": 16.0
+   },
+   {
+    "x": 68.0,
+    "y": 23.0
+   },
+   {
+    "x": 68.0,
+    "y": 29.0
+   },
+   {
+    "x": 68.0,
+    "y": 22.0
+   },
+   {
+    "x": 68.0,
+    "y": 28.0
+   },
+   {
+    "x": 68.0,
+    "y": 90.0
+   },
+   {
+    "x": 68.0,
+    "y": 17.0
+   },
+   {
+    "x": 68.0,
+    "y": 76.0
+   },
+   {
+    "x": 68.0,
+    "y": 18.0
+   },
+   {
+    "x": 91.0,
+    "y": 43.0
+   },
+   {
+    "x": 91.0,
+    "y": 65.0
+   },
+   {
+    "x": 91.0,
+    "y": 52.0
+   },
+   {
+    "x": 91.0,
+    "y": 46.0
+   },
+   {
+    "x": 91.0,
+    "y": 80.0
+   },
+   {
+    "x": 91.0,
+    "y": 18.0
+   },
+   {
+    "x": 91.0,
+    "y": 86.0
+   },
+   {
+    "x": 49.0,
+    "y": 50.0
+   },
+   {
+    "x": 49.0,
+    "y": 49.0
+   },
+   {
+    "x": 8.0,
+    "y": 59.0
+   },
+   {
+    "x": 8.0,
+    "y": 71.0
+   },
+   {
+    "x": 82.0,
+    "y": 94.0
+   },
+   {
+    "x": 82.0,
+    "y": 63.0
+   },
+   {
+    "x": 82.0,
+    "y": 85.0
+   },
+   {
+    "x": 77.0,
+    "y": 95.0
+   },
+   {
+    "x": 77.0,
+    "y": 86.0
+   },
+   {
+    "x": 77.0,
+    "y": 82.0
+   },
+   {
+    "x": 77.0,
+    "y": 81.0
+   },
+   {
+    "x": 77.0,
+    "y": 77.0
+   },
+   {
+    "x": 38.0,
+    "y": 60.0
+   },
+   {
+    "x": 38.0,
+    "y": 41.0
+   },
+   {
+    "x": 92.0,
+    "y": 52.0
+   },
+   {
+    "x": 92.0,
+    "y": 51.0
+   },
+   {
+    "x": 92.0,
+    "y": 22.0
+   },
+   {
+    "x": 92.0,
+    "y": 21.0
+   },
+   {
+    "x": 92.0,
+    "y": 93.0
+   },
+   {
+    "x": 92.0,
+    "y": 92.0
+   },
+   {
+    "x": 57.0,
+    "y": 25.0
+   },
+   {
+    "x": 57.0,
+    "y": 66.0
+   },
+   {
+    "x": 57.0,
+    "y": 84.0
+   },
+   {
+    "x": 57.0,
+    "y": 95.0
+   },
+   {
+    "x": 57.0,
+    "y": 92.0
+   },
+   {
+    "x": 57.0,
+    "y": 91.0
+   },
+   {
+    "x": 35.0,
+    "y": 70.0
+   },
+   {
+    "x": 35.0,
+    "y": 93.0
+   },
+   {
+    "x": 35.0,
+    "y": 92.0
+   },
+   {
+    "x": 35.0,
+    "y": 39.0
+   },
+   {
+    "x": 35.0,
+    "y": 67.0
+   },
+   {
+    "x": 26.0,
+    "y": 59.0
+   },
+   {
+    "x": 26.0,
+    "y": 38.0
+   },
+   {
+    "x": 26.0,
+    "y": 23.0
+   },
+   {
+    "x": 26.0,
+    "y": 32.0
+   },
+   {
+    "x": 27.0,
+    "y": 39.0
+   },
+   {
+    "x": 27.0,
+    "y": 41.0
+   },
+   {
+    "x": 27.0,
+    "y": 52.0
+   },
+   {
+    "x": 95.0,
+    "y": 53.0
+   },
+   {
+    "x": 37.0,
+    "y": 34.0
+   },
+   {
+    "x": 37.0,
+    "y": 84.0
+   },
+   {
+    "x": 37.0,
+    "y": 94.0
+   },
+   {
+    "x": 37.0,
+    "y": 83.0
+   },
+   {
+    "x": 61.0,
+    "y": 27.0
+   },
+   {
+    "x": 61.0,
+    "y": 25.0
+   },
+   {
+    "x": 61.0,
+    "y": 83.0
+   },
+   {
+    "x": 61.0,
+    "y": 65.0
+   },
+   {
+    "x": 61.0,
+    "y": 36.0
+   },
+   {
+    "x": 61.0,
+    "y": 88.0
+   },
+   {
+    "x": 61.0,
+    "y": 75.0
+   },
+   {
+    "x": 58.0,
+    "y": 23.0
+   },
+   {
+    "x": 58.0,
+    "y": 93.0
+   },
+   {
+    "x": 58.0,
+    "y": 79.0
+   },
+   {
+    "x": 58.0,
+    "y": 69.0
+   },
+   {
+    "x": 58.0,
+    "y": 83.0
+   },
+   {
+    "x": 90.0,
+    "y": 83.0
+   },
+   {
+    "x": 90.0,
+    "y": 54.0
+   },
+   {
+    "x": 90.0,
+    "y": 56.0
+   },
+   {
+    "x": 90.0,
+    "y": 49.0
+   },
+   {
+    "x": 90.0,
+    "y": 82.0
+   },
+   {
+    "x": 90.0,
+    "y": 91.0
+   },
+   {
+    "x": 90.0,
+    "y": 15.0
+   },
+   {
+    "x": 90.0,
+    "y": 64.0
+   },
+   {
+    "x": 90.0,
+    "y": 76.0
+   },
+   {
+    "x": 96.0,
+    "y": 73.0
+   },
+   {
+    "x": 96.0,
+    "y": 24.0
+   },
+   {
+    "x": 96.0,
+    "y": 58.0
+   },
+   {
+    "x": 48.0,
+    "y": 45.0
+   },
+   {
+    "x": 48.0,
+    "y": 64.0
+   },
+   {
+    "x": 48.0,
+    "y": 57.0
+   },
+   {
+    "x": 32.0,
+    "y": 63.0
+   },
+   {
+    "x": 32.0,
+    "y": 62.0
+   },
+   {
+    "x": 32.0,
+    "y": 90.0
+   },
+   {
+    "x": 32.0,
+    "y": 74.0
+   },
+   {
+    "x": 32.0,
+    "y": 80.0
+   },
+   {
+    "x": 54.0,
+    "y": 14.0
+   },
+   {
+    "x": 54.0,
+    "y": 100.0
+   },
+   {
+    "x": 54.0,
+    "y": 85.0
+   },
+   {
+    "x": 54.0,
+    "y": 78.0
+   },
+   {
+    "x": 54.0,
+    "y": 92.0
+   },
+   {
+    "x": 54.0,
+    "y": 54.0
+   },
+   {
+    "x": 55.0,
+    "y": 30.0
+   },
+   {
+    "x": 55.0,
+    "y": 28.0
+   },
+   {
+    "x": 55.0,
+    "y": 95.0
+   },
+   {
+    "x": 55.0,
+    "y": 8.0
+   },
+   {
+    "x": 7.0,
+    "y": 40.0
+   },
+   {
+    "x": 34.0,
+    "y": 44.0
+   },
+   {
+    "x": 34.0,
+    "y": 29.0
+   },
+   {
+    "x": 34.0,
+    "y": 95.0
+   },
+   {
+    "x": 15.0,
+    "y": 57.0
+   },
+   {
+    "x": 15.0,
+    "y": 64.0
+   },
+   {
+    "x": 15.0,
+    "y": 90.0
+   },
+   {
+    "x": 18.0,
+    "y": 72.0
+   },
+   {
+    "x": 18.0,
+    "y": 91.0
+   },
+   {
+    "x": 59.0,
+    "y": 69.0
+   },
+   {
+    "x": 59.0,
+    "y": 85.0
+   },
+   {
+    "x": 59.0,
+    "y": 72.0
+   },
+   {
+    "x": 59.0,
+    "y": 73.0
+   },
+   {
+    "x": 33.0,
+    "y": 21.0
+   },
+   {
+    "x": 33.0,
+    "y": 93.0
+   },
+   {
+    "x": 31.0,
+    "y": 57.0
+   },
+   {
+    "x": 31.0,
+    "y": 87.0
+   },
+   {
+    "x": 31.0,
+    "y": 79.0
+   },
+   {
+    "x": 25.0,
+    "y": 21.0
+   },
+   {
+    "x": 28.0,
+    "y": 21.0
+   },
+   {
+    "x": 9.0,
+    "y": 39.0
+   },
+   {
+    "x": 9.0,
+    "y": 69.0
+   },
+   {
+    "x": 10.0,
+    "y": 68.0
+   },
+   {
+    "x": 24.0,
+    "y": 90.0
+   },
+   {
+    "x": 24.0,
+    "y": 93.0
+   },
+   {
+    "x": 41.0,
+    "y": 68.0
+   },
+   {
+    "x": 41.0,
+    "y": 91.0
+   },
+   {
+    "x": 41.0,
+    "y": 47.0
+   },
+   {
+    "x": 86.0,
+    "y": 71.0
+   },
+   {
+    "x": 86.0,
+    "y": 94.0
+   },
+   {
+    "x": 86.0,
+    "y": 77.0
+   },
+   {
+    "x": 42.0,
+    "y": 75.0
+   },
+   {
+    "x": 42.0,
+    "y": 89.0
+   },
+   {
+    "x": 11.0,
+    "y": 49.0
+   },
+   {
+    "x": 11.0,
+    "y": 62.0
+   },
+   {
+    "x": 23.0,
+    "y": 4.0
+   },
+   {
+    "x": 16.0,
+    "y": 63.0
+   },
+   {
+    "x": 12.0,
+    "y": 38.0
+   },
+   {
+    "x": 4.0,
+    "y": 41.0
+   },
+   {
+    "x": 4.0,
+    "y": 52.0
+   },
+   {
+    "x": 99.0,
+    "y": 78.0
+   },
+   {
+    "x": 21.0,
+    "y": 89.0
+   }
+  ],
+  "point_count": 438,
+  "image_url": "/heatmaps/david-vasco-da-gama-226.png"
+ },
+ "physical_run": {
+  "source": "sofascore_run",
+  "competition": "Brasileirão Série A",
+  "position_pool": "Atacante",
+  "position_pool_size": 57,
+  "matches": 24,
+  "minutes": 1107,
+  "kilometers_p90": 7.96,
+  "top_speed": 33.66,
+  "sprints_p90": 11.95,
+  "running_km_p90": 1.07,
+  "high_speed_km_p90": 0.44,
+  "sprinting_km_p90": 0.19,
+  "percentiles": {
+   "kilometers_p90": 34.5,
+   "top_speed": 23.6,
+   "sprints_p90": 50.9,
+   "running_km_p90": 40.0,
+   "high_speed_km_p90": 60.0,
+   "sprinting_km_p90": 70.9
   },
   "ranks": {
-    "geral": 30,
-    "finalizador": 29,
-    "alvo": 12,
-    "movel": 27
-  },
-  "profile": "Alvo",
-  "profile_shares": {
-    "finalizador": 26.0,
-    "alvo": 42.0,
-    "movel": 32.0
-  },
-  "tendencies": {
-    "construcao": 42.0,
-    "ofensividade": 55.0,
-    "def1v1": 38.0,
-    "contencao": 62.0,
-    "duelo_aereo": 80.0
-  },
-  "aspects": {
-    "construcao": [
-      {
-        "label": "Passes Progressivos",
-        "kind": "pass_certos",
-        "grade": "C-",
-        "certos_per90": 1.24,
-        "display_value": "1,2",
-        "percentile": 27.9,
-        "efficiency_pct": 54.1,
-        "efficiency_value": "71%",
-        "stats": []
-      },
-      {
-        "label": "Passes para Terço Final",
-        "kind": "pass_certos",
-        "grade": "C+",
-        "certos_per90": 1.38,
-        "display_value": "1,4",
-        "percentile": 45.2,
-        "efficiency_pct": 40.0,
-        "efficiency_value": "63%",
-        "stats": []
-      },
-      {
-        "label": "Passes Longos",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 0.29,
-        "display_value": "0,3",
-        "percentile": 20.0,
-        "efficiency_pct": 25.0,
-        "efficiency_value": "50%",
-        "stats": []
-      },
-      {
-        "label": "Distribuição",
-        "kind": "metric_group",
-        "grade": "B",
-        "percentile": 70.5,
-        "sub_metrics": [
-          {
-            "label": "Passes",
-            "percentile": 70.5,
-            "display_value": "20,3"
-          },
-          {
-            "label": "Passes Recebidos",
-            "percentile": 59.5,
-            "display_value": "13,6"
-          }
-        ],
-        "stats": []
-      }
-    ],
-    "passes_finais": [
-      {
-        "label": "Passes Chave e Área",
-        "kind": "metric_group",
-        "grade": "B-",
-        "percentile": 59.5,
-        "sub_metrics": [
-          {
-            "label": "Assistências para remate",
-            "percentile": 59.5,
-            "display_value": "0,7"
-          },
-          {
-            "label": "Passes para Área",
-            "percentile": 26.7,
-            "display_value": "0,4"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Cruzamentos",
-        "kind": "metric_group",
-        "grade": "C+",
-        "percentile": 45.2,
-        "sub_metrics": [
-          {
-            "label": "Cruzamentos",
-            "percentile": 45.2,
-            "display_value": "0,7"
-          },
-          {
-            "label": "Eficiência",
-            "percentile": 25.9,
-            "display_value": "22%"
-          }
-        ],
-        "stats": [],
-        "efficiency_pct": 25.9,
-        "efficiency_value": "22%"
-      },
-      {
-        "label": "Pré Assistências e xA",
-        "kind": "metric_group",
-        "grade": "C",
-        "percentile": 37.8,
-        "sub_metrics": [
-          {
-            "label": "Pré Assistências",
-            "percentile": 0.0,
-            "display_value": "0"
-          },
-          {
-            "label": "xA",
-            "percentile": 37.8,
-            "display_value": "0,60"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Passes Criativos",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0",
-        "efficiency_pct": 36.7,
-        "efficiency_value": "40%"
-      }
-    ],
-    "finalizacao": [
-      {
-        "label": "Gols e xG",
-        "kind": "metric_group",
-        "grade": "C-",
-        "percentile": 30.8,
-        "sub_metrics": [
-          {
-            "label": "Gols",
-            "percentile": 30.8,
-            "display_value": "4"
-          },
-          {
-            "label": "xG",
-            "percentile": 20.5,
-            "display_value": "2,83"
-          },
-          {
-            "label": "Eficiência de finalização",
-            "percentile": 81.8,
-            "display_value": "+1,2"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Finalizações",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 15.4,
-        "sub_metrics": [
-          {
-            "label": "Finalizações",
-            "percentile": 15.4,
-            "display_value": "1,6"
-          },
-          {
-            "label": "Finalizações certas",
-            "percentile": 80.6,
-            "display_value": "50%"
-          }
-        ],
-        "stats": [],
-        "efficiency_pct": 80.6,
-        "efficiency_value": "50%"
-      },
-      {
-        "label": "Efetividade",
-        "kind": "metric_group",
-        "grade": "C+",
-        "percentile": 48.9,
-        "sub_metrics": [
-          {
-            "label": "Finalizações certas / passe recebido",
-            "percentile": 48.9,
-            "display_value": "0,06"
-          },
-          {
-            "label": "Gols / toques na área",
-            "percentile": 40.9,
-            "display_value": "0,08"
-          }
-        ],
-        "stats": []
-      }
-    ],
-    "conducao_drible": [
-      {
-        "label": "Disputas com Bola",
-        "kind": "metric",
-        "grade": "C+",
-        "percentile": 46.5,
-        "stats": [],
-        "display_value": "5,6",
-        "efficiency_pct": 44.4,
-        "efficiency_value": "38%"
-      },
-      {
-        "label": "1v1 - Ofensivo",
-        "kind": "metric",
-        "grade": "C-",
-        "percentile": 27.9,
-        "stats": [],
-        "display_value": "0,9",
-        "efficiency_pct": 36.4,
-        "efficiency_value": "50%"
-      },
-      {
-        "label": "Progressão",
-        "kind": "metric_group",
-        "grade": "B",
-        "percentile": 72.5,
-        "sub_metrics": [
-          {
-            "label": "Conduções Progressivas",
-            "percentile": 72.5,
-            "display_value": "1,0"
-          },
-          {
-            "label": "Acelerações",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          }
-        ],
-        "stats": []
-      }
-    ],
-    "ofensividade": [
-      {
-        "label": "Ações Terminais",
-        "kind": "metric_group",
-        "grade": "B-",
-        "percentile": 58.1,
-        "sub_metrics": [
-          {
-            "label": "Toques na Área",
-            "percentile": 58.1,
-            "display_value": "3,4"
-          },
-          {
-            "label": "Ações Ofensivas",
-            "percentile": 27.9,
-            "display_value": "1,4"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Verticalidade",
-        "kind": "metric_group",
-        "grade": "B+",
-        "percentile": 82.9,
-        "sub_metrics": [
-          {
-            "label": "% Toque na Área",
-            "percentile": 46.7,
-            "display_value": "25%"
-          },
-          {
-            "label": "Recepção de Passes Longos",
-            "percentile": 82.9,
-            "display_value": "2,0"
-          }
-        ],
-        "stats": []
-      }
-    ],
-    "aereo": [
-      {
-        "label": "Duelos Aéreos",
-        "kind": "metric",
-        "grade": "B-",
-        "percentile": 62.2,
-        "stats": [],
-        "display_value": "4,9",
-        "efficiency_pct": 76.2,
-        "efficiency_value": "42%"
-      }
-    ]
-  },
-  "profiles_available": [
-    "Finalizador",
-    "Alvo",
-    "Móvel",
-    "Híbrido"
-  ],
-  "scatter": {
-    "gols": 4.0,
-    "finalizacao": 1.6,
-    "toques_area": 3.43,
-    "progressao": 1.02
-  },
-  "cluster": {
-    "family": "atacantes",
-    "archetype": "Alvo",
-    "archetype_label": "Alvo",
-    "hybrid_badge": null,
-    "hybrid_badge_short": null,
-    "shares": {
-      "finalizador": 26.1275072647356,
-      "alvo": 41.71295992109833,
-      "movel": 32.15953281416606
-    },
-    "ratings": {
-      "finalizador": 6.5,
-      "alvo": 7.0,
-      "movel": 6.6
-    }
-  },
-  "transfermarkt": {
-    "id": "373189",
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/373189-1597912752.jpg?lm=4711",
-    "market_value": "€ 1.50 mi",
-    "market_value_eur": 1500000,
-    "contract_until": "2027-12-31",
-    "contract_remaining": "1 ano e 1 mes",
-    "on_loan_from": null,
-    "club": "CR Vasco da Gama",
-    "profile_url": "https://www.transfermarkt.com.br/david/profil/spieler/373189",
-    "foot": "Destro",
-    "height": 179,
-    "matched_name": "David",
-    "match_via": "Vasco da Gama 2025"
-  },
-  "heatmap": {
-    "tournament_id": 325,
-    "season_id": 87678,
-    "scope": "overall",
-    "competition": "Brasileirão Série A",
-    "points": [
-      {
-        "x": 46.0,
-        "y": 16.0
-      },
-      {
-        "x": 46.0,
-        "y": 42.0
-      },
-      {
-        "x": 46.0,
-        "y": 24.0
-      },
-      {
-        "x": 46.0,
-        "y": 72.0
-      },
-      {
-        "x": 64.0,
-        "y": 5.0
-      },
-      {
-        "x": 64.0,
-        "y": 96.0
-      },
-      {
-        "x": 64.0,
-        "y": 77.0
-      },
-      {
-        "x": 64.0,
-        "y": 79.0
-      },
-      {
-        "x": 64.0,
-        "y": 28.0
-      },
-      {
-        "x": 64.0,
-        "y": 93.0
-      },
-      {
-        "x": 64.0,
-        "y": 67.0
-      },
-      {
-        "x": 64.0,
-        "y": 84.0
-      },
-      {
-        "x": 64.0,
-        "y": 97.0
-      },
-      {
-        "x": 64.0,
-        "y": 59.0
-      },
-      {
-        "x": 89.0,
-        "y": 6.0
-      },
-      {
-        "x": 89.0,
-        "y": 55.0
-      },
-      {
-        "x": 89.0,
-        "y": 4.0
-      },
-      {
-        "x": 89.0,
-        "y": 45.0
-      },
-      {
-        "x": 89.0,
-        "y": 43.0
-      },
-      {
-        "x": 69.0,
-        "y": 40.0
-      },
-      {
-        "x": 69.0,
-        "y": 49.0
-      },
-      {
-        "x": 69.0,
-        "y": 59.0
-      },
-      {
-        "x": 69.0,
-        "y": 68.0
-      },
-      {
-        "x": 69.0,
-        "y": 63.0
-      },
-      {
-        "x": 69.0,
-        "y": 96.0
-      },
-      {
-        "x": 69.0,
-        "y": 66.0
-      },
-      {
-        "x": 69.0,
-        "y": 93.0
-      },
-      {
-        "x": 69.0,
-        "y": 90.0
-      },
-      {
-        "x": 69.0,
-        "y": 84.0
-      },
-      {
-        "x": 69.0,
-        "y": 13.0
-      },
-      {
-        "x": 73.0,
-        "y": 25.0
-      },
-      {
-        "x": 73.0,
-        "y": 93.0
-      },
-      {
-        "x": 73.0,
-        "y": 66.0
-      },
-      {
-        "x": 73.0,
-        "y": 68.0
-      },
-      {
-        "x": 73.0,
-        "y": 85.0
-      },
-      {
-        "x": 73.0,
-        "y": 29.0
-      },
-      {
-        "x": 73.0,
-        "y": 57.0
-      },
-      {
-        "x": 73.0,
-        "y": 96.0
-      },
-      {
-        "x": 52.0,
-        "y": 56.0
-      },
-      {
-        "x": 52.0,
-        "y": 97.0
-      },
-      {
-        "x": 52.0,
-        "y": 27.0
-      },
-      {
-        "x": 52.0,
-        "y": 37.0
-      },
-      {
-        "x": 52.0,
-        "y": 73.0
-      },
-      {
-        "x": 52.0,
-        "y": 92.0
-      },
-      {
-        "x": 52.0,
-        "y": 55.0
-      },
-      {
-        "x": 53.0,
-        "y": 40.0
-      },
-      {
-        "x": 53.0,
-        "y": 49.0
-      },
-      {
-        "x": 53.0,
-        "y": 65.0
-      },
-      {
-        "x": 53.0,
-        "y": 86.0
-      },
-      {
-        "x": 53.0,
-        "y": 90.0
-      },
-      {
-        "x": 53.0,
-        "y": 35.0
-      },
-      {
-        "x": 51.0,
-        "y": 57.0
-      },
-      {
-        "x": 51.0,
-        "y": 49.0
-      },
-      {
-        "x": 51.0,
-        "y": 55.0
-      },
-      {
-        "x": 93.0,
-        "y": 49.0
-      },
-      {
-        "x": 93.0,
-        "y": 11.0
-      },
-      {
-        "x": 93.0,
-        "y": 25.0
-      },
-      {
-        "x": 93.0,
-        "y": 23.0
-      },
-      {
-        "x": 93.0,
-        "y": 42.0
-      },
-      {
-        "x": 93.0,
-        "y": 46.0
-      },
-      {
-        "x": 80.0,
-        "y": 10.0
-      },
-      {
-        "x": 80.0,
-        "y": 60.0
-      },
-      {
-        "x": 80.0,
-        "y": 97.0
-      },
-      {
-        "x": 80.0,
-        "y": 9.0
-      },
-      {
-        "x": 80.0,
-        "y": 52.0
-      },
-      {
-        "x": 80.0,
-        "y": 84.0
-      },
-      {
-        "x": 80.0,
-        "y": 63.0
-      },
-      {
-        "x": 80.0,
-        "y": 28.0
-      },
-      {
-        "x": 60.0,
-        "y": 49.0
-      },
-      {
-        "x": 60.0,
-        "y": 34.0
-      },
-      {
-        "x": 60.0,
-        "y": 73.0
-      },
-      {
-        "x": 60.0,
-        "y": 96.0
-      },
-      {
-        "x": 60.0,
-        "y": 87.0
-      },
-      {
-        "x": 71.0,
-        "y": 67.0
-      },
-      {
-        "x": 71.0,
-        "y": 6.0
-      },
-      {
-        "x": 71.0,
-        "y": 4.0
-      },
-      {
-        "x": 71.0,
-        "y": 65.0
-      },
-      {
-        "x": 71.0,
-        "y": 14.0
-      },
-      {
-        "x": 71.0,
-        "y": 19.0
-      },
-      {
-        "x": 71.0,
-        "y": 96.0
-      },
-      {
-        "x": 71.0,
-        "y": 91.0
-      },
-      {
-        "x": 71.0,
-        "y": 18.0
-      },
-      {
-        "x": 67.0,
-        "y": 54.0
-      },
-      {
-        "x": 67.0,
-        "y": 51.0
-      },
-      {
-        "x": 67.0,
-        "y": 63.0
-      },
-      {
-        "x": 67.0,
-        "y": 31.0
-      },
-      {
-        "x": 67.0,
-        "y": 78.0
-      },
-      {
-        "x": 67.0,
-        "y": 8.0
-      },
-      {
-        "x": 67.0,
-        "y": 24.0
-      },
-      {
-        "x": 67.0,
-        "y": 45.0
-      },
-      {
-        "x": 67.0,
-        "y": 82.0
-      },
-      {
-        "x": 67.0,
-        "y": 84.0
-      },
-      {
-        "x": 67.0,
-        "y": 67.0
-      },
-      {
-        "x": 67.0,
-        "y": 10.0
-      },
-      {
-        "x": 83.0,
-        "y": 84.0
-      },
-      {
-        "x": 83.0,
-        "y": 90.0
-      },
-      {
-        "x": 83.0,
-        "y": 38.0
-      },
-      {
-        "x": 83.0,
-        "y": 62.0
-      },
-      {
-        "x": 94.0,
-        "y": 75.0
-      },
-      {
-        "x": 94.0,
-        "y": 100.0
-      },
-      {
-        "x": 94.0,
-        "y": 31.0
-      },
-      {
-        "x": 94.0,
-        "y": 20.0
-      },
-      {
-        "x": 43.0,
-        "y": 92.0
-      },
-      {
-        "x": 43.0,
-        "y": 66.0
-      },
-      {
-        "x": 43.0,
-        "y": 51.0
-      },
-      {
-        "x": 43.0,
-        "y": 27.0
-      },
-      {
-        "x": 43.0,
-        "y": 11.0
-      },
-      {
-        "x": 43.0,
-        "y": 53.0
-      },
-      {
-        "x": 79.0,
-        "y": 87.0
-      },
-      {
-        "x": 79.0,
-        "y": 88.0
-      },
-      {
-        "x": 79.0,
-        "y": 94.0
-      },
-      {
-        "x": 79.0,
-        "y": 32.0
-      },
-      {
-        "x": 79.0,
-        "y": 97.0
-      },
-      {
-        "x": 79.0,
-        "y": 21.0
-      },
-      {
-        "x": 45.0,
-        "y": 75.0
-      },
-      {
-        "x": 45.0,
-        "y": 50.0
-      },
-      {
-        "x": 45.0,
-        "y": 57.0
-      },
-      {
-        "x": 45.0,
-        "y": 69.0
-      },
-      {
-        "x": 45.0,
-        "y": 72.0
-      },
-      {
-        "x": 45.0,
-        "y": 87.0
-      },
-      {
-        "x": 45.0,
-        "y": 76.0
-      },
-      {
-        "x": 45.0,
-        "y": 82.0
-      },
-      {
-        "x": 45.0,
-        "y": 81.0
-      },
-      {
-        "x": 45.0,
-        "y": 64.0
-      },
-      {
-        "x": 72.0,
-        "y": 78.0
-      },
-      {
-        "x": 72.0,
-        "y": 40.0
-      },
-      {
-        "x": 72.0,
-        "y": 5.0
-      },
-      {
-        "x": 72.0,
-        "y": 10.0
-      },
-      {
-        "x": 72.0,
-        "y": 84.0
-      },
-      {
-        "x": 72.0,
-        "y": 76.0
-      },
-      {
-        "x": 72.0,
-        "y": 17.0
-      },
-      {
-        "x": 72.0,
-        "y": 41.0
-      },
-      {
-        "x": 72.0,
-        "y": 70.0
-      },
-      {
-        "x": 72.0,
-        "y": 82.0
-      },
-      {
-        "x": 72.0,
-        "y": 88.0
-      },
-      {
-        "x": 74.0,
-        "y": 82.0
-      },
-      {
-        "x": 74.0,
-        "y": 72.0
-      },
-      {
-        "x": 74.0,
-        "y": 61.0
-      },
-      {
-        "x": 85.0,
-        "y": 88.0
-      },
-      {
-        "x": 85.0,
-        "y": 6.0
-      },
-      {
-        "x": 85.0,
-        "y": 47.0
-      },
-      {
-        "x": 85.0,
-        "y": 8.0
-      },
-      {
-        "x": 85.0,
-        "y": 7.0
-      },
-      {
-        "x": 85.0,
-        "y": 100.0
-      },
-      {
-        "x": 85.0,
-        "y": 38.0
-      },
-      {
-        "x": 85.0,
-        "y": 13.0
-      },
-      {
-        "x": 85.0,
-        "y": 83.0
-      },
-      {
-        "x": 85.0,
-        "y": 52.0
-      },
-      {
-        "x": 85.0,
-        "y": 85.0
-      },
-      {
-        "x": 47.0,
-        "y": 100.0
-      },
-      {
-        "x": 47.0,
-        "y": 50.0
-      },
-      {
-        "x": 47.0,
-        "y": 16.0
-      },
-      {
-        "x": 47.0,
-        "y": 21.0
-      },
-      {
-        "x": 47.0,
-        "y": 60.0
-      },
-      {
-        "x": 39.0,
-        "y": 70.0
-      },
-      {
-        "x": 39.0,
-        "y": 24.0
-      },
-      {
-        "x": 39.0,
-        "y": 58.0
-      },
-      {
-        "x": 76.0,
-        "y": 77.0
-      },
-      {
-        "x": 76.0,
-        "y": 67.0
-      },
-      {
-        "x": 76.0,
-        "y": 52.0
-      },
-      {
-        "x": 76.0,
-        "y": 74.0
-      },
-      {
-        "x": 76.0,
-        "y": 70.0
-      },
-      {
-        "x": 76.0,
-        "y": 84.0
-      },
-      {
-        "x": 76.0,
-        "y": 95.0
-      },
-      {
-        "x": 75.0,
-        "y": 74.0
-      },
-      {
-        "x": 75.0,
-        "y": 81.0
-      },
-      {
-        "x": 75.0,
-        "y": 5.0
-      },
-      {
-        "x": 75.0,
-        "y": 37.0
-      },
-      {
-        "x": 75.0,
-        "y": 70.0
-      },
-      {
-        "x": 75.0,
-        "y": 68.0
-      },
-      {
-        "x": 75.0,
-        "y": 64.0
-      },
-      {
-        "x": 75.0,
-        "y": 78.0
-      },
-      {
-        "x": 75.0,
-        "y": 98.0
-      },
-      {
-        "x": 75.0,
-        "y": 40.0
-      },
-      {
-        "x": 66.0,
-        "y": 18.0
-      },
-      {
-        "x": 66.0,
-        "y": 32.0
-      },
-      {
-        "x": 66.0,
-        "y": 89.0
-      },
-      {
-        "x": 66.0,
-        "y": 63.0
-      },
-      {
-        "x": 66.0,
-        "y": 27.0
-      },
-      {
-        "x": 66.0,
-        "y": 66.0
-      },
-      {
-        "x": 66.0,
-        "y": 22.0
-      },
-      {
-        "x": 66.0,
-        "y": 43.0
-      },
-      {
-        "x": 66.0,
-        "y": 58.0
-      },
-      {
-        "x": 66.0,
-        "y": 93.0
-      },
-      {
-        "x": 66.0,
-        "y": 82.0
-      },
-      {
-        "x": 66.0,
-        "y": 90.0
-      },
-      {
-        "x": 66.0,
-        "y": 73.0
-      },
-      {
-        "x": 66.0,
-        "y": 92.0
-      },
-      {
-        "x": 66.0,
-        "y": 78.0
-      },
-      {
-        "x": 66.0,
-        "y": 68.0
-      },
-      {
-        "x": 63.0,
-        "y": 8.0
-      },
-      {
-        "x": 63.0,
-        "y": 85.0
-      },
-      {
-        "x": 63.0,
-        "y": 95.0
-      },
-      {
-        "x": 63.0,
-        "y": 96.0
-      },
-      {
-        "x": 63.0,
-        "y": 83.0
-      },
-      {
-        "x": 63.0,
-        "y": 90.0
-      },
-      {
-        "x": 63.0,
-        "y": 18.0
-      },
-      {
-        "x": 63.0,
-        "y": 45.0
-      },
-      {
-        "x": 63.0,
-        "y": 63.0
-      },
-      {
-        "x": 63.0,
-        "y": 93.0
-      },
-      {
-        "x": 63.0,
-        "y": 69.0
-      },
-      {
-        "x": 63.0,
-        "y": 84.0
-      },
-      {
-        "x": 63.0,
-        "y": 65.0
-      },
-      {
-        "x": 56.0,
-        "y": 6.0
-      },
-      {
-        "x": 56.0,
-        "y": 26.0
-      },
-      {
-        "x": 56.0,
-        "y": 31.0
-      },
-      {
-        "x": 56.0,
-        "y": 52.0
-      },
-      {
-        "x": 56.0,
-        "y": 54.0
-      },
-      {
-        "x": 56.0,
-        "y": 82.0
-      },
-      {
-        "x": 56.0,
-        "y": 92.0
-      },
-      {
-        "x": 56.0,
-        "y": 91.0
-      },
-      {
-        "x": 56.0,
-        "y": 93.0
-      },
-      {
-        "x": 56.0,
-        "y": 79.0
-      },
-      {
-        "x": 5.0,
-        "y": 61.0
-      },
-      {
-        "x": 36.0,
-        "y": 68.0
-      },
-      {
-        "x": 36.0,
-        "y": 72.0
-      },
-      {
-        "x": 36.0,
-        "y": 85.0
-      },
-      {
-        "x": 36.0,
-        "y": 69.0
-      },
-      {
-        "x": 36.0,
-        "y": 92.0
-      },
-      {
-        "x": 40.0,
-        "y": 63.0
-      },
-      {
-        "x": 40.0,
-        "y": 38.0
-      },
-      {
-        "x": 40.0,
-        "y": 64.0
-      },
-      {
-        "x": 40.0,
-        "y": 91.0
-      },
-      {
-        "x": 30.0,
-        "y": 73.0
-      },
-      {
-        "x": 30.0,
-        "y": 86.0
-      },
-      {
-        "x": 84.0,
-        "y": 57.0
-      },
-      {
-        "x": 84.0,
-        "y": 76.0
-      },
-      {
-        "x": 84.0,
-        "y": 26.0
-      },
-      {
-        "x": 84.0,
-        "y": 52.0
-      },
-      {
-        "x": 84.0,
-        "y": 93.0
-      },
-      {
-        "x": 70.0,
-        "y": 44.0
-      },
-      {
-        "x": 70.0,
-        "y": 21.0
-      },
-      {
-        "x": 70.0,
-        "y": 37.0
-      },
-      {
-        "x": 70.0,
-        "y": 88.0
-      },
-      {
-        "x": 70.0,
-        "y": 76.0
-      },
-      {
-        "x": 70.0,
-        "y": 66.0
-      },
-      {
-        "x": 70.0,
-        "y": 95.0
-      },
-      {
-        "x": 70.0,
-        "y": 77.0
-      },
-      {
-        "x": 70.0,
-        "y": 47.0
-      },
-      {
-        "x": 70.0,
-        "y": 97.0
-      },
-      {
-        "x": 50.0,
-        "y": 50.0
-      },
-      {
-        "x": 50.0,
-        "y": 49.0
-      },
-      {
-        "x": 78.0,
-        "y": 22.0
-      },
-      {
-        "x": 78.0,
-        "y": 74.0
-      },
-      {
-        "x": 78.0,
-        "y": 61.0
-      },
-      {
-        "x": 78.0,
-        "y": 11.0
-      },
-      {
-        "x": 78.0,
-        "y": 7.0
-      },
-      {
-        "x": 78.0,
-        "y": 88.0
-      },
-      {
-        "x": 78.0,
-        "y": 73.0
-      },
-      {
-        "x": 78.0,
-        "y": 49.0
-      },
-      {
-        "x": 78.0,
-        "y": 71.0
-      },
-      {
-        "x": 78.0,
-        "y": 84.0
-      },
-      {
-        "x": 78.0,
-        "y": 93.0
-      },
-      {
-        "x": 88.0,
-        "y": 8.0
-      },
-      {
-        "x": 88.0,
-        "y": 89.0
-      },
-      {
-        "x": 88.0,
-        "y": 75.0
-      },
-      {
-        "x": 88.0,
-        "y": 86.0
-      },
-      {
-        "x": 88.0,
-        "y": 18.0
-      },
-      {
-        "x": 97.0,
-        "y": 76.0
-      },
-      {
-        "x": 97.0,
-        "y": 95.0
-      },
-      {
-        "x": 81.0,
-        "y": 50.0
-      },
-      {
-        "x": 81.0,
-        "y": 46.0
-      },
-      {
-        "x": 81.0,
-        "y": 44.0
-      },
-      {
-        "x": 87.0,
-        "y": 57.0
-      },
-      {
-        "x": 87.0,
-        "y": 3.0
-      },
-      {
-        "x": 87.0,
-        "y": 97.0
-      },
-      {
-        "x": 87.0,
-        "y": 69.0
-      },
-      {
-        "x": 87.0,
-        "y": 37.0
-      },
-      {
-        "x": 87.0,
-        "y": 67.0
-      },
-      {
-        "x": 87.0,
-        "y": 64.0
-      },
-      {
-        "x": 62.0,
-        "y": 85.0
-      },
-      {
-        "x": 62.0,
-        "y": 82.0
-      },
-      {
-        "x": 62.0,
-        "y": 86.0
-      },
-      {
-        "x": 62.0,
-        "y": 23.0
-      },
-      {
-        "x": 62.0,
-        "y": 80.0
-      },
-      {
-        "x": 62.0,
-        "y": 20.0
-      },
-      {
-        "x": 62.0,
-        "y": 74.0
-      },
-      {
-        "x": 44.0,
-        "y": 87.0
-      },
-      {
-        "x": 44.0,
-        "y": 42.0
-      },
-      {
-        "x": 44.0,
-        "y": 36.0
-      },
-      {
-        "x": 44.0,
-        "y": 43.0
-      },
-      {
-        "x": 44.0,
-        "y": 57.0
-      },
-      {
-        "x": 44.0,
-        "y": 18.0
-      },
-      {
-        "x": 44.0,
-        "y": 92.0
-      },
-      {
-        "x": 44.0,
-        "y": 77.0
-      },
-      {
-        "x": 44.0,
-        "y": 63.0
-      },
-      {
-        "x": 44.0,
-        "y": 74.0
-      },
-      {
-        "x": 65.0,
-        "y": 74.0
-      },
-      {
-        "x": 65.0,
-        "y": 86.0
-      },
-      {
-        "x": 65.0,
-        "y": 68.0
-      },
-      {
-        "x": 65.0,
-        "y": 34.0
-      },
-      {
-        "x": 65.0,
-        "y": 4.0
-      },
-      {
-        "x": 65.0,
-        "y": 58.0
-      },
-      {
-        "x": 65.0,
-        "y": 69.0
-      },
-      {
-        "x": 68.0,
-        "y": 92.0
-      },
-      {
-        "x": 68.0,
-        "y": 16.0
-      },
-      {
-        "x": 68.0,
-        "y": 23.0
-      },
-      {
-        "x": 68.0,
-        "y": 29.0
-      },
-      {
-        "x": 68.0,
-        "y": 22.0
-      },
-      {
-        "x": 68.0,
-        "y": 28.0
-      },
-      {
-        "x": 68.0,
-        "y": 90.0
-      },
-      {
-        "x": 68.0,
-        "y": 17.0
-      },
-      {
-        "x": 68.0,
-        "y": 76.0
-      },
-      {
-        "x": 68.0,
-        "y": 18.0
-      },
-      {
-        "x": 91.0,
-        "y": 43.0
-      },
-      {
-        "x": 91.0,
-        "y": 65.0
-      },
-      {
-        "x": 91.0,
-        "y": 52.0
-      },
-      {
-        "x": 91.0,
-        "y": 46.0
-      },
-      {
-        "x": 91.0,
-        "y": 80.0
-      },
-      {
-        "x": 91.0,
-        "y": 18.0
-      },
-      {
-        "x": 91.0,
-        "y": 86.0
-      },
-      {
-        "x": 49.0,
-        "y": 50.0
-      },
-      {
-        "x": 49.0,
-        "y": 49.0
-      },
-      {
-        "x": 8.0,
-        "y": 59.0
-      },
-      {
-        "x": 8.0,
-        "y": 71.0
-      },
-      {
-        "x": 82.0,
-        "y": 94.0
-      },
-      {
-        "x": 82.0,
-        "y": 63.0
-      },
-      {
-        "x": 82.0,
-        "y": 85.0
-      },
-      {
-        "x": 77.0,
-        "y": 95.0
-      },
-      {
-        "x": 77.0,
-        "y": 86.0
-      },
-      {
-        "x": 77.0,
-        "y": 82.0
-      },
-      {
-        "x": 77.0,
-        "y": 81.0
-      },
-      {
-        "x": 77.0,
-        "y": 77.0
-      },
-      {
-        "x": 38.0,
-        "y": 60.0
-      },
-      {
-        "x": 38.0,
-        "y": 41.0
-      },
-      {
-        "x": 92.0,
-        "y": 52.0
-      },
-      {
-        "x": 92.0,
-        "y": 51.0
-      },
-      {
-        "x": 92.0,
-        "y": 22.0
-      },
-      {
-        "x": 92.0,
-        "y": 21.0
-      },
-      {
-        "x": 92.0,
-        "y": 93.0
-      },
-      {
-        "x": 92.0,
-        "y": 92.0
-      },
-      {
-        "x": 57.0,
-        "y": 25.0
-      },
-      {
-        "x": 57.0,
-        "y": 66.0
-      },
-      {
-        "x": 57.0,
-        "y": 84.0
-      },
-      {
-        "x": 57.0,
-        "y": 95.0
-      },
-      {
-        "x": 57.0,
-        "y": 92.0
-      },
-      {
-        "x": 57.0,
-        "y": 91.0
-      },
-      {
-        "x": 35.0,
-        "y": 70.0
-      },
-      {
-        "x": 35.0,
-        "y": 93.0
-      },
-      {
-        "x": 35.0,
-        "y": 92.0
-      },
-      {
-        "x": 35.0,
-        "y": 39.0
-      },
-      {
-        "x": 35.0,
-        "y": 67.0
-      },
-      {
-        "x": 26.0,
-        "y": 59.0
-      },
-      {
-        "x": 26.0,
-        "y": 38.0
-      },
-      {
-        "x": 26.0,
-        "y": 23.0
-      },
-      {
-        "x": 26.0,
-        "y": 32.0
-      },
-      {
-        "x": 27.0,
-        "y": 39.0
-      },
-      {
-        "x": 27.0,
-        "y": 41.0
-      },
-      {
-        "x": 27.0,
-        "y": 52.0
-      },
-      {
-        "x": 95.0,
-        "y": 53.0
-      },
-      {
-        "x": 37.0,
-        "y": 34.0
-      },
-      {
-        "x": 37.0,
-        "y": 84.0
-      },
-      {
-        "x": 37.0,
-        "y": 94.0
-      },
-      {
-        "x": 37.0,
-        "y": 83.0
-      },
-      {
-        "x": 61.0,
-        "y": 27.0
-      },
-      {
-        "x": 61.0,
-        "y": 25.0
-      },
-      {
-        "x": 61.0,
-        "y": 83.0
-      },
-      {
-        "x": 61.0,
-        "y": 65.0
-      },
-      {
-        "x": 61.0,
-        "y": 36.0
-      },
-      {
-        "x": 61.0,
-        "y": 88.0
-      },
-      {
-        "x": 61.0,
-        "y": 75.0
-      },
-      {
-        "x": 58.0,
-        "y": 23.0
-      },
-      {
-        "x": 58.0,
-        "y": 93.0
-      },
-      {
-        "x": 58.0,
-        "y": 79.0
-      },
-      {
-        "x": 58.0,
-        "y": 69.0
-      },
-      {
-        "x": 58.0,
-        "y": 83.0
-      },
-      {
-        "x": 90.0,
-        "y": 83.0
-      },
-      {
-        "x": 90.0,
-        "y": 54.0
-      },
-      {
-        "x": 90.0,
-        "y": 56.0
-      },
-      {
-        "x": 90.0,
-        "y": 49.0
-      },
-      {
-        "x": 90.0,
-        "y": 82.0
-      },
-      {
-        "x": 90.0,
-        "y": 91.0
-      },
-      {
-        "x": 90.0,
-        "y": 15.0
-      },
-      {
-        "x": 90.0,
-        "y": 64.0
-      },
-      {
-        "x": 90.0,
-        "y": 76.0
-      },
-      {
-        "x": 96.0,
-        "y": 73.0
-      },
-      {
-        "x": 96.0,
-        "y": 24.0
-      },
-      {
-        "x": 96.0,
-        "y": 58.0
-      },
-      {
-        "x": 48.0,
-        "y": 45.0
-      },
-      {
-        "x": 48.0,
-        "y": 64.0
-      },
-      {
-        "x": 48.0,
-        "y": 57.0
-      },
-      {
-        "x": 32.0,
-        "y": 63.0
-      },
-      {
-        "x": 32.0,
-        "y": 62.0
-      },
-      {
-        "x": 32.0,
-        "y": 90.0
-      },
-      {
-        "x": 32.0,
-        "y": 74.0
-      },
-      {
-        "x": 32.0,
-        "y": 80.0
-      },
-      {
-        "x": 54.0,
-        "y": 14.0
-      },
-      {
-        "x": 54.0,
-        "y": 100.0
-      },
-      {
-        "x": 54.0,
-        "y": 85.0
-      },
-      {
-        "x": 54.0,
-        "y": 78.0
-      },
-      {
-        "x": 54.0,
-        "y": 92.0
-      },
-      {
-        "x": 54.0,
-        "y": 54.0
-      },
-      {
-        "x": 55.0,
-        "y": 30.0
-      },
-      {
-        "x": 55.0,
-        "y": 28.0
-      },
-      {
-        "x": 55.0,
-        "y": 95.0
-      },
-      {
-        "x": 55.0,
-        "y": 8.0
-      },
-      {
-        "x": 7.0,
-        "y": 40.0
-      },
-      {
-        "x": 34.0,
-        "y": 44.0
-      },
-      {
-        "x": 34.0,
-        "y": 29.0
-      },
-      {
-        "x": 34.0,
-        "y": 95.0
-      },
-      {
-        "x": 15.0,
-        "y": 57.0
-      },
-      {
-        "x": 15.0,
-        "y": 64.0
-      },
-      {
-        "x": 15.0,
-        "y": 90.0
-      },
-      {
-        "x": 18.0,
-        "y": 72.0
-      },
-      {
-        "x": 18.0,
-        "y": 91.0
-      },
-      {
-        "x": 59.0,
-        "y": 69.0
-      },
-      {
-        "x": 59.0,
-        "y": 85.0
-      },
-      {
-        "x": 59.0,
-        "y": 72.0
-      },
-      {
-        "x": 59.0,
-        "y": 73.0
-      },
-      {
-        "x": 33.0,
-        "y": 21.0
-      },
-      {
-        "x": 33.0,
-        "y": 93.0
-      },
-      {
-        "x": 31.0,
-        "y": 57.0
-      },
-      {
-        "x": 31.0,
-        "y": 87.0
-      },
-      {
-        "x": 31.0,
-        "y": 79.0
-      },
-      {
-        "x": 25.0,
-        "y": 21.0
-      },
-      {
-        "x": 28.0,
-        "y": 21.0
-      },
-      {
-        "x": 9.0,
-        "y": 39.0
-      },
-      {
-        "x": 9.0,
-        "y": 69.0
-      },
-      {
-        "x": 10.0,
-        "y": 68.0
-      },
-      {
-        "x": 24.0,
-        "y": 90.0
-      },
-      {
-        "x": 24.0,
-        "y": 93.0
-      },
-      {
-        "x": 41.0,
-        "y": 68.0
-      },
-      {
-        "x": 41.0,
-        "y": 91.0
-      },
-      {
-        "x": 41.0,
-        "y": 47.0
-      },
-      {
-        "x": 86.0,
-        "y": 71.0
-      },
-      {
-        "x": 86.0,
-        "y": 94.0
-      },
-      {
-        "x": 86.0,
-        "y": 77.0
-      },
-      {
-        "x": 42.0,
-        "y": 75.0
-      },
-      {
-        "x": 42.0,
-        "y": 89.0
-      },
-      {
-        "x": 11.0,
-        "y": 49.0
-      },
-      {
-        "x": 11.0,
-        "y": 62.0
-      },
-      {
-        "x": 23.0,
-        "y": 4.0
-      },
-      {
-        "x": 16.0,
-        "y": 63.0
-      },
-      {
-        "x": 12.0,
-        "y": 38.0
-      },
-      {
-        "x": 4.0,
-        "y": 41.0
-      },
-      {
-        "x": 4.0,
-        "y": 52.0
-      },
-      {
-        "x": 99.0,
-        "y": 78.0
-      },
-      {
-        "x": 21.0,
-        "y": 89.0
-      }
-    ],
-    "point_count": 438,
-    "image_url": "/heatmaps/david-vasco-da-gama-226.png"
-  },
-  "physical_run": {
-    "source": "sofascore_run",
-    "competition": "Brasileirão Série A",
-    "position_pool": "Atacante",
-    "position_pool_size": 59,
-    "matches": 24,
-    "minutes": 1107,
-    "kilometers_p90": 7.96,
-    "top_speed": 33.66,
-    "sprints_p90": 11.95,
-    "running_km_p90": 1.07,
-    "high_speed_km_p90": 0.44,
-    "sprinting_km_p90": 0.19,
-    "percentiles": {
-      "kilometers_p90": 35.1,
-      "top_speed": 21.1,
-      "sprints_p90": 54.4,
-      "running_km_p90": 40.4,
-      "high_speed_km_p90": 63.2,
-      "sprinting_km_p90": 70.2
-    },
-    "ranks": {
-      "kilometers_p90": 39,
-      "top_speed": 47,
-      "sprints_p90": 27,
-      "running_km_p90": 36,
-      "high_speed_km_p90": 23,
-      "sprinting_km_p90": 18
-    }
-  },
-  "athlete_id": "ath-000738"
+   "kilometers_p90": 38,
+   "top_speed": 44,
+   "sprints_p90": 28,
+   "running_km_p90": 35,
+   "high_speed_km_p90": 24,
+   "sprinting_km_p90": 17
+  }
+ }
 }

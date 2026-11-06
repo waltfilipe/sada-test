@@ -1,8 +1,8 @@
 import { flattenAspects } from "@/lib/aspectLookup";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
-/** Laterais and the family the product labels Meias Ofensivos (`extremos`). */
-const CROSSING_FAMILIES = new Set<PositionFamily>(["laterais", "extremos"]);
+/** Laterais, meio-campistas e a família rotulada Meias Ofensivos (`extremos`). */
+const CROSSING_FAMILIES = new Set<PositionFamily>(["laterais", "meio-campistas", "extremos"]);
 
 export function showsCrossingTendency(player: Pick<PlayerProfile, "position_family">): boolean {
   return CROSSING_FAMILIES.has(player.position_family);

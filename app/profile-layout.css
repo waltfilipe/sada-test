@@ -6343,6 +6343,55 @@
     transform: translateX(-50%);
   }
 
+  .player-report-run-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3.5mm 4mm;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .player-report-run-grid li {
+    display: flex;
+    flex-direction: column;
+    gap: 1mm;
+    padding: 2.2mm 2.6mm;
+    border: 1px solid var(--r-hair);
+    border-radius: 1.6mm;
+    background: var(--r-soft);
+  }
+
+  .player-report-run-label {
+    color: var(--r-muted);
+    font-size: 7.6px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .player-report-run-value {
+    color: var(--r-ink);
+    font-size: 11px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .player-report-run-bar {
+    display: block;
+    height: 1.4mm;
+    border-radius: 0.8mm;
+    background: var(--r-hair);
+    overflow: hidden;
+  }
+
+  .player-report-run-bar i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--r-high);
+  }
+
   .player-report-diverging b,
   .player-report-metrics b {
     color: var(--r-muted);

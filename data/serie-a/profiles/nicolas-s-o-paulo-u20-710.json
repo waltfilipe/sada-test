@@ -1,474 +1,499 @@
 {
-  "player_id": "nicolas-s-o-paulo-u20-710",
-  "name": "Nicolas",
-  "club": "São Paulo U20",
-  "label": "Nicolas (São Paulo U20)",
-  "position": "Lateral Esquerdo",
-  "position_family": "laterais",
-  "nationality": "Brazil",
-  "birth_year": 2007,
-  "height": 176,
-  "foot": "Canhoto",
-  "minutes": 7,
-  "minutes_pct": 0.2,
-  "goals": 0,
-  "assists": 0,
-  "rating": 6.5,
-  "ratings": {
-    "geral": 6.5,
-    "defensivo": 6.5,
-    "construtor": 6.5,
-    "ofensivo": 6.5
-  },
-  "ranks": {
-    "geral": 88,
-    "defensivo": 58,
-    "construtor": 42,
-    "ofensivo": 57
-  },
-  "profile": "Defensivo",
-  "profile_shares": {
-    "defensivo": 100.0,
-    "construtor": 0.0,
-    "ofensivo": 0.0
-  },
-  "tendencies": {
-    "construcao": 0.0,
-    "ofensividade": 0.0,
-    "def1v1": 100.0,
-    "contencao": 100.0,
-    "duelo_aereo": 0.0
-  },
-  "aspects": {
-    "defensivos": [
-      {
-        "label": "Duelos Defensivos",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0",
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%"
-      },
-      {
-        "label": "Duelos Aéreos",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0",
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%"
-      },
-      {
-        "label": "Ações Defensivas",
-        "kind": "metric_group",
-        "grade": "C-",
-        "percentile": 33.3,
-        "sub_metrics": [
-          {
-            "label": "Rebatidas",
-            "percentile": 100.0,
-            "display_value": "90,0"
-          },
-          {
-            "label": "Interceptações",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          },
-          {
-            "label": "Chutes Bloqueados",
-            "percentile": 0.0,
-            "display_value": "nan"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Eficiência Defensiva",
-        "kind": "def_efficiency_group",
-        "grade": "B+",
-        "percentile": 81.3,
-        "pair_badge": [
-          100.0,
-          81.3
-        ],
-        "sub_metrics": [
-          {
-            "label": "Erros Totais",
-            "percentile": 100.0,
-            "display_value": "0"
-          },
-          {
-            "label": "Eficiência Defensiva",
-            "percentile": 81.3,
-            "display_value": "+0,8"
-          }
-        ],
-        "stats": []
-      }
+ "player_id": "nicolas-s-o-paulo-u20-710",
+ "name": "Nicolas",
+ "club": "São Paulo U20",
+ "label": "Nicolas (São Paulo U20)",
+ "position": "Lateral Esquerdo",
+ "position_family": "laterais",
+ "nationality": "Brazil",
+ "birth_year": 2007,
+ "height": 176,
+ "foot": null,
+ "minutes": 7,
+ "minutes_pct": 0.2,
+ "goals": 0,
+ "assists": 0,
+ "rating": 6.5,
+ "ratings": {
+  "geral": 6.5,
+  "defensivo": 6.5,
+  "construtor": 6.5,
+  "ofensivo": 6.5
+ },
+ "ranks": {
+  "geral": 88,
+  "defensivo": 58,
+  "construtor": 42,
+  "ofensivo": 57
+ },
+ "profile": "Defensivo",
+ "profile_shares": {
+  "defensivo": 100.0,
+  "construtor": 0.0,
+  "ofensivo": 0.0
+ },
+ "tendencies": {
+  "construcao": 0.0,
+  "ofensividade": 0.0,
+  "def1v1": 100.0,
+  "contencao": 100.0,
+  "duelo_aereo": 0.0
+ },
+ "aspects": {
+  "defensivos": [
+   {
+    "label": "Duelos Defensivos",
+    "kind": "metric",
+    "grade": "D",
+    "percentile": 0.0,
+    "stats": [],
+    "display_value": "0,0",
+    "efficiency_pct": 0.0,
+    "efficiency_value": "0%"
+   },
+   {
+    "label": "Duelos Aéreos",
+    "kind": "metric",
+    "grade": "D",
+    "percentile": 0.0,
+    "stats": [],
+    "display_value": "0,0",
+    "efficiency_pct": 0.0,
+    "efficiency_value": "0%"
+   },
+   {
+    "label": "Ações Defensivas e Recuperações",
+    "kind": "metric_group",
+    "grade": "C-",
+    "percentile": 25.0,
+    "sub_metrics": [
+     {
+      "label": "Rebatidas",
+      "percentile": 100.0,
+      "display_value": "90,0"
+     },
+     {
+      "label": "Interceptações",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Chutes Bloqueados",
+      "percentile": 0.0,
+      "display_value": "nan"
+     },
+     {
+      "label": "Recuperações",
+      "percentile": 0,
+      "display_value": "0,0"
+     }
     ],
-    "construcao": [
-      {
-        "label": "Passes Progressivos",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 0.0,
-        "display_value": "0,0",
-        "percentile": 0.0,
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%",
-        "stats": []
-      },
-      {
-        "label": "Passes para Terço Final",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 0.0,
-        "display_value": "0,0",
-        "percentile": 0.0,
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%",
-        "stats": []
-      },
-      {
-        "label": "Passes Longos",
-        "kind": "pass_certos",
-        "grade": "D",
-        "certos_per90": 0.0,
-        "display_value": "0,0",
-        "percentile": 0.0,
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%",
-        "stats": []
-      },
-      {
-        "label": "Distribuição",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
-        "sub_metrics": [
-          {
-            "label": "Passes",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          },
-          {
-            "label": "Passes Recebidos",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          }
-        ],
-        "stats": []
-      }
+    "stats": []
+   },
+   {
+    "label": "Eficiência Defensiva",
+    "kind": "def_efficiency_group",
+    "grade": "A",
+    "percentile": 91.0,
+    "pair_badge": [
+     100.0,
+     59.4,
+     91.0
     ],
-    "perfil_construcao": [
-      {
-        "label": "Tendência de Passe",
-        "kind": "construction_share",
-        "grade": "D",
-        "percentile": 0.0,
-        "display_value": "0%",
-        "share_pct": 0.0,
-        "pool_avg_pct": 9.0,
-        "scale_max_pct": 30.0,
-        "stats": [],
-        "bar_key": "pass_tendency",
-        "axis_left": "Curto",
-        "axis_right": "Longo"
-      },
-      {
-        "label": "Passes Progressivos",
-        "kind": "construction_share",
-        "grade": "D",
-        "percentile": 0.0,
-        "display_value": "0%",
-        "share_pct": 0.0,
-        "pool_avg_pct": 18.4,
-        "scale_max_pct": 36.8,
-        "stats": [],
-        "bar_key": "progressive_share",
-        "axis_left": "Baixo",
-        "axis_right": "Alto"
-      }
+    "sub_metrics": [
+     {
+      "label": "Erros Totais",
+      "percentile": 100.0,
+      "display_value": "0"
+     },
+     {
+      "label": "Ações sem Bola/90",
+      "percentile": 59.4,
+      "display_value": "nan"
+     },
+     {
+      "label": "Índice de Eficiência",
+      "percentile": 91.0,
+      "display_value": "+1,4"
+     }
     ],
-    "perfil_defensivo": [
-      {
-        "label": "Estilo de defesa",
-        "kind": "construction_share",
-        "grade": "D",
-        "percentile": 0.0,
-        "display_value": "0,00",
-        "share_pct": 0.0,
-        "pool_avg_pct": 1.6,
-        "scale_max_pct": 100.0,
-        "stats": [],
-        "bar_key": "def_contact_style",
-        "axis_left": "Cobertura",
-        "axis_right": "Agressivo"
-      },
-      {
-        "label": "Disciplina defensiva",
-        "kind": "construction_share",
-        "grade": "B+",
-        "percentile": 81.3,
-        "display_value": "0%",
-        "share_pct": 0.0,
-        "pool_avg_pct": 1.1,
-        "scale_max_pct": 100.0,
-        "stats": [],
-        "bar_key": "def_foul_style",
-        "axis_left": "Disciplinado",
-        "axis_right": "Faltoso"
-      }
-    ],
-    "ofensivos": [
-      {
-        "label": "Disputas com Bola",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0",
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%"
-      },
-      {
-        "label": "1v1 - Ofensivo",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0",
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%"
-      },
-      {
-        "label": "Progressão",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
-        "sub_metrics": [
-          {
-            "label": "Conduções Progressivas",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          },
-          {
-            "label": "Acelerações",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Gols e xG",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
-        "sub_metrics": [
-          {
-            "label": "Gols",
-            "percentile": 0.0,
-            "display_value": "0"
-          },
-          {
-            "label": "xG",
-            "percentile": 0.0,
-            "display_value": "0,00"
-          },
-          {
-            "label": "Eficiência de finalização",
-            "percentile": 66.2,
-            "display_value": "+0,0"
-          }
-        ],
-        "stats": []
-      }
-    ],
-    "passes_finais": [
-      {
-        "label": "Cruzamentos",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
-        "sub_metrics": [
-          {
-            "label": "Cruzamentos",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          },
-          {
-            "label": "Eficiência",
-            "percentile": 0.0,
-            "display_value": "0%"
-          }
-        ],
-        "stats": [],
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%"
-      },
-      {
-        "label": "Passes Chave e Área",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
-        "sub_metrics": [
-          {
-            "label": "Assistências para remate",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          },
-          {
-            "label": "Passes para Área",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Pré Assistências e xA",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
-        "sub_metrics": [
-          {
-            "label": "Pré Assistências",
-            "percentile": 0.0,
-            "display_value": "0"
-          },
-          {
-            "label": "xA",
-            "percentile": 0.0,
-            "display_value": "0,00"
-          }
-        ],
-        "stats": []
-      },
-      {
-        "label": "Passes Criativos",
-        "kind": "metric",
-        "grade": "D",
-        "percentile": 0.0,
-        "stats": [],
-        "display_value": "0,0",
-        "efficiency_pct": 0.0,
-        "efficiency_value": "0%"
-      }
-    ],
-    "ofensividade": [
-      {
-        "label": "Ofensividade",
-        "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.0,
-        "sub_metrics": [
-          {
-            "label": "Ações Ofensivas",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          },
-          {
-            "label": "Toques na Área",
-            "percentile": 0.0,
-            "display_value": "0,0"
-          }
-        ],
-        "stats": []
-      }
-    ]
-  },
-  "profiles_available": [
-    "Defensivo",
-    "Construtor",
-    "Ofensivo",
-    "Híbrido"
+    "stats": []
+   }
   ],
-  "scatter": {
-    "cruzamentos": 0.0,
-    "progressao": 0.0,
-    "xa": 0.0,
-    "construcao": 0.0,
-    "duelos_def": 0.0
-  },
-  "cluster": {
-    "family": "laterais",
-    "archetype": "Defensivo",
-    "archetype_label": "Defensivo",
-    "hybrid_badge": null,
-    "hybrid_badge_short": null,
-    "shares": {
-      "defensivo": 100.0,
-      "construtor": 0.0,
-      "ofensivo": 0.0
-    },
-    "ratings": {
-      "defensivo": 6.5,
-      "construtor": 6.5,
-      "ofensivo": 6.5
-    }
-  },
-  "transfermarkt": {
-    "id": "1283868",
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/1283868-1769189867.png?lm=4711",
-    "market_value": null,
-    "market_value_eur": null,
-    "contract_until": null,
-    "contract_remaining": null,
-    "on_loan_from": null,
-    "club": "São Paulo FC U20",
-    "profile_url": "https://www.transfermarkt.com.br/nicolas-borges/profil/spieler/1283868",
-    "foot": "Canhoto",
-    "height": 178,
-    "matched_name": "Nicolas Borges",
-    "match_via": "São Paulo U20 2026"
-  },
-  "heatmap": {
-    "tournament_id": 325,
-    "season_id": 87678,
-    "scope": "overall",
-    "competition": "Brasileirão Série A",
-    "points": [
-      {
-        "x": 52.0,
-        "y": 90.0
-      },
-      {
-        "x": 43.0,
-        "y": 82.0
-      },
-      {
-        "x": 31.0,
-        "y": 78.0
-      },
-      {
-        "x": 21.0,
-        "y": 55.0
-      }
+  "construcao": [
+   {
+    "label": "Passes Progressivos",
+    "kind": "pass_certos",
+    "grade": "D",
+    "certos_per90": 0.0,
+    "display_value": "0,0",
+    "percentile": 0.0,
+    "efficiency_pct": 0.0,
+    "efficiency_value": "0%",
+    "stats": []
+   },
+   {
+    "label": "Passes para Terço Final",
+    "kind": "pass_certos",
+    "grade": "D",
+    "certos_per90": 0.0,
+    "display_value": "0,0",
+    "percentile": 0.0,
+    "efficiency_pct": 0.0,
+    "efficiency_value": "0%",
+    "stats": []
+   },
+   {
+    "label": "Passes Longos",
+    "kind": "pass_certos",
+    "grade": "D",
+    "certos_per90": 0.0,
+    "display_value": "0,0",
+    "percentile": 0.0,
+    "efficiency_pct": 0.0,
+    "efficiency_value": "0%",
+    "stats": []
+   },
+   {
+    "label": "Distribuição",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 0.0,
+    "sub_metrics": [
+     {
+      "label": "Passes",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Passes Recebidos",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     }
     ],
-    "point_count": 4,
-    "image_url": "/heatmaps/nicolas-s-o-paulo-u20-710.png"
+    "stats": []
+   }
+  ],
+  "perfil_construcao": [
+   {
+    "label": "Tendência de Passe",
+    "kind": "construction_share",
+    "grade": "D",
+    "percentile": 0.0,
+    "display_value": "0%",
+    "share_pct": 0.0,
+    "pool_avg_pct": 9.0,
+    "scale_max_pct": 30.0,
+    "stats": [],
+    "bar_key": "pass_tendency",
+    "axis_left": "Curto",
+    "axis_right": "Longo"
+   },
+   {
+    "label": "Passes Progressivos",
+    "kind": "construction_share",
+    "grade": "D",
+    "percentile": 0.0,
+    "display_value": "0%",
+    "share_pct": 0.0,
+    "pool_avg_pct": 18.4,
+    "scale_max_pct": 36.8,
+    "stats": [],
+    "bar_key": "progressive_share",
+    "axis_left": "Baixo",
+    "axis_right": "Alto"
+   }
+  ],
+  "perfil_defensivo": [
+   {
+    "label": "Estilo de defesa",
+    "kind": "construction_share",
+    "grade": "D",
+    "percentile": 0.0,
+    "display_value": "0,00",
+    "share_pct": 0.0,
+    "pool_avg_pct": 1.6,
+    "scale_max_pct": 100.0,
+    "stats": [],
+    "bar_key": "def_contact_style",
+    "axis_left": "Cobertura",
+    "axis_right": "Agressivo"
+   },
+   {
+    "label": "Disciplina defensiva",
+    "kind": "construction_share",
+    "grade": "B+",
+    "percentile": 81.3,
+    "display_value": "0%",
+    "share_pct": 0.0,
+    "pool_avg_pct": 1.1,
+    "scale_max_pct": 100.0,
+    "stats": [],
+    "bar_key": "def_foul_style",
+    "axis_left": "Disciplinado",
+    "axis_right": "Faltoso"
+   }
+  ],
+  "ofensivos": [
+   {
+    "label": "Disputas com Bola",
+    "kind": "metric",
+    "grade": "D",
+    "percentile": 0.0,
+    "stats": [],
+    "display_value": "0,0",
+    "efficiency_pct": 0.0,
+    "efficiency_value": "0%"
+   },
+   {
+    "label": "1v1 - Ofensivo",
+    "kind": "metric",
+    "grade": "D",
+    "percentile": 0.0,
+    "stats": [],
+    "display_value": "0,0",
+    "efficiency_pct": 0.0,
+    "efficiency_value": "0%"
+   },
+   {
+    "label": "Progressão",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 0.0,
+    "sub_metrics": [
+     {
+      "label": "Conduções Progressivas",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Acelerações",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Gols e xG",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 0.0,
+    "sub_metrics": [
+     {
+      "label": "Gols",
+      "percentile": 0.0,
+      "display_value": "0"
+     },
+     {
+      "label": "xG",
+      "percentile": 0.0,
+      "display_value": "0,00"
+     },
+     {
+      "label": "Eficiência de finalização",
+      "percentile": 66.2,
+      "display_value": "+0,0"
+     }
+    ],
+    "stats": []
+   }
+  ],
+  "passes_finais": [
+   {
+    "label": "Cruzamentos",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 0.0,
+    "sub_metrics": [
+     {
+      "label": "Cruzamentos",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Eficiência",
+      "percentile": 0.0,
+      "display_value": "0%"
+     }
+    ],
+    "stats": [],
+    "efficiency_pct": 0.0,
+    "efficiency_value": "0%"
+   },
+   {
+    "label": "Passes Chave e Área",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 0.0,
+    "sub_metrics": [
+     {
+      "label": "Assistências para remate",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Passes para Área",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Pré Assistências e xA",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 0.0,
+    "sub_metrics": [
+     {
+      "label": "Pré Assistências",
+      "percentile": 0.0,
+      "display_value": "0"
+     },
+     {
+      "label": "xA",
+      "percentile": 0.0,
+      "display_value": "0,00"
+     }
+    ],
+    "stats": []
+   },
+   {
+    "label": "Passes Criativos",
+    "kind": "metric",
+    "grade": "D",
+    "percentile": 0.0,
+    "stats": [],
+    "display_value": "0,0",
+    "efficiency_pct": 0.0,
+    "efficiency_value": "0%",
+    "sub_metrics": [
+     {
+      "label": "Passes Criativos",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Passes Inteligentes",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Passes em Profundidade",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     }
+    ]
+   }
+  ],
+  "ofensividade": [
+   {
+    "label": "Ofensividade",
+    "kind": "metric_group",
+    "grade": "D",
+    "percentile": 0.0,
+    "sub_metrics": [
+     {
+      "label": "Ações Ofensivas",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     },
+     {
+      "label": "Toques na Área",
+      "percentile": 0.0,
+      "display_value": "0,0"
+     }
+    ],
+    "stats": []
+   }
+  ]
+ },
+ "profiles_available": [
+  "Defensivo",
+  "Construtor",
+  "Ofensivo",
+  "Híbrido"
+ ],
+ "scatter": {
+  "duelos_def": 0.0,
+  "cruzamentos": 0.0,
+  "progressao": 0.0,
+  "xa": 0.0,
+  "construcao": 0.0
+ },
+ "cluster": {
+  "family": "laterais",
+  "archetype": "Defensivo",
+  "archetype_label": "Defensivo",
+  "hybrid_badge": null,
+  "hybrid_badge_short": null,
+  "shares": {
+   "defensivo": 100.0,
+   "construtor": 0.0,
+   "ofensivo": 0.0
   },
-  "physical_run": {
-    "source": "sofascore_run",
-    "competition": "Brasileirão Série A",
-    "position_pool": "Lateral Esquerdo",
-    "position_pool_size": 41,
-    "matches": 1,
-    "minutes": 1,
-    "kilometers_p90": 0.0,
-    "top_speed": 0.0,
-    "sprints_p90": 0.0,
-    "running_km_p90": 0.0,
-    "high_speed_km_p90": 0.0,
-    "sprinting_km_p90": 0.0,
-    "percentiles": {},
-    "ranks": {}
-  },
-  "pass_distance_m": 17.69,
-  "athlete_id": "ath-003172",
-  "person_key": "name:nicolas|2007|0"
+  "ratings": {
+   "defensivo": 6.5,
+   "construtor": 6.5,
+   "ofensivo": 6.5
+  }
+ },
+ "transfermarkt": {
+  "id": "1283868",
+  "photo": "https://img.a.transfermarkt.technology/portrait/header/1283868-1769189867.png?lm=4711",
+  "market_value": null,
+  "market_value_eur": null,
+  "contract_until": null,
+  "contract_remaining": null,
+  "on_loan_from": null,
+  "club": "São Paulo FC U20",
+  "profile_url": "https://www.transfermarkt.com.br/nicolas-borges/profil/spieler/1283868",
+  "foot": "Canhoto",
+  "height": 178,
+  "matched_name": "Nicolas Borges",
+  "match_via": "São Paulo U20 2026"
+ },
+ "heatmap": {
+  "tournament_id": 325,
+  "season_id": 87678,
+  "scope": "overall",
+  "competition": "Brasileirão Série A",
+  "points": [
+   {
+    "x": 52.0,
+    "y": 90.0
+   },
+   {
+    "x": 43.0,
+    "y": 82.0
+   },
+   {
+    "x": 31.0,
+    "y": 78.0
+   },
+   {
+    "x": 21.0,
+    "y": 55.0
+   }
+  ],
+  "point_count": 4,
+  "image_url": "/heatmaps/nicolas-s-o-paulo-u20-710.png"
+ },
+ "physical_run": {
+  "source": "sofascore_run",
+  "competition": "Brasileirão Série A",
+  "position_pool": "Lateral Esquerdo",
+  "position_pool_size": 41,
+  "matches": 1,
+  "minutes": 1,
+  "kilometers_p90": 0.0,
+  "top_speed": 0.0,
+  "sprints_p90": 0.0,
+  "running_km_p90": 0.0,
+  "high_speed_km_p90": 0.0,
+  "sprinting_km_p90": 0.0,
+  "percentiles": {},
+  "ranks": {}
+ }
 }

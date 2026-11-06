@@ -23,6 +23,16 @@ export const METRIC_BADGE_CATALOG: Record<string, Omit<StatMetricBadge, "key">> 
     icon: "fa-shield",
     title: "Ações defensivas — rebatidas, interceptações e bloqueios acima de P50",
   },
+  "Ações Defensivas e Recuperações": {
+    label: "Ações Def. e Recuperações",
+    icon: "fa-shield",
+    title: "Ações defensivas e recuperações — rebatidas, interceptações, bloqueios e bolas recuperadas acima de P50",
+  },
+  "Recuperações": {
+    label: "Recuperações",
+    icon: "fa-rotate-left",
+    title: "Bolas recuperadas por 90 acima de P50",
+  },
   "Eficiência Defensiva": {
     label: "Eficiência Defensiva",
     icon: "fa-shield-virus",
