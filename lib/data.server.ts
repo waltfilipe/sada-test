@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import { formatFoot } from "./feet";
 import { CURRENT_SEASON, parseSeasonParam } from "./seasons";
-import { DEFAULT_LEAGUE, isLeagueId, type LeagueId } from "./leagues";
+import { DEFAULT_LEAGUE, isLeagueId, LEAGUES, type LeagueId } from "./leagues";
 import { POSITION_FAMILIES } from "./positions";
 import { playerStatBadges } from "./statBadges";
 import { familySectionStats } from "./scatterAxis";
@@ -140,6 +140,49 @@ export function getSearchRows(league?: string, season?: string): PlayerSearchRow
     );
   }
   return searchRowsCache.get(key)!;
+}
+
+/** Campos que os quadros de escalação (elenco/prévios/time sombra) não consomem. */
+const SQUAD_ROW_OMIT = new Set([
+  "stats",
+  "scatter",
+  "heatmap",
+  "cluster",
+  "discipline",
+  "hybrid_lean",
+  "minutes_pct",
+  "athlete_id",
+  "person_key",
+]);
+
+/** Search rows enxutos para os boards — sem aspectos achatados nem clusters. */
+export function getSquadRows(league?: string, season?: string): PlayerSearchRow[] {
+  return getSearchRows(league, season).map(
+    (row) =>
+      Object.fromEntries(Object.entries(row).filter(([key]) => !SQUAD_ROW_OMIT.has(key))) as PlayerSearchRow,
+  );
+}
+
+/** Índice clube → contagem de atletas por liga (alimenta o picker sem serializar linhas). */
+export function getClubIndex(): { leagueId: LeagueId; club: string; count: number }[] {
+  const index: { leagueId: LeagueId; club: string; count: number }[] = [];
+  for (const league of LEAGUES) {
+    let players: PlayerSummary[];
+    try {
+      players = getPlayers(league.id);
+    } catch {
+      continue;
+    }
+    const counts = new Map<string, number>();
+    for (const player of players) {
+      if (!player.club) continue;
+      counts.set(player.club, (counts.get(player.club) ?? 0) + 1);
+    }
+    for (const [club, count] of counts) {
+      index.push({ leagueId: league.id, club, count });
+    }
+  }
+  return index;
 }
 
 /**

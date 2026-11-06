@@ -6,6 +6,7 @@ import {
   getPlayerProfile,
   getPlayers,
   getSearchRows,
+  getSquadRows,
   getStandings,
 } from "@/lib/data.server";
 import { getAveragePlayers } from "@/lib/avgPlayer.server";
@@ -66,7 +67,7 @@ export async function GET(request: Request, { params }: Params) {
     const league = url.searchParams.get("league") ?? undefined;
     const season = url.searchParams.get("season") ?? url.searchParams.get("temporada") ?? undefined;
     try {
-      const players = getSearchRows(league, season);
+      const players = url.searchParams.get("slim") ? getSquadRows(league, season) : getSearchRows(league, season);
       return NextResponse.json(
         { players, total: players.length },
         { headers: archiveCacheHeaders(season) },

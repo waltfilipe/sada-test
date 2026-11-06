@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useLeague } from "@/components/LeagueProvider";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
@@ -59,12 +59,15 @@ function readSombraLeague(fallback: LeagueId | "estaduais"): LeagueId | "estadua
 }
 
 type Props = {
-  playersByLeague: Record<LeagueId, PlayerSearchRow[]>;
+  /** Só a liga da página vem no payload — as demais chegam por /api/search-rows sob demanda. */
+  playersByLeague: Partial<Record<LeagueId, PlayerSearchRow[]>>;
+  /** Índice clube → contagem por liga: alimenta o picker sem serializar todas as linhas. */
+  clubIndex: { leagueId: LeagueId; club: string; count: number }[];
   /** elenco = escalacao do clube real | previos = elencos de temporadas anteriores | sombra = times sombra. */
   board: "elenco" | "sombra" | "previos";
 };
 
-export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
+export function TimeSombraClient({ playersByLeague, clubIndex, board: viewBoard }: Props) {
   const { href, leagueId } = useLeague();
   const isPrevios = viewBoard === "previos";
   const [savedMode, setSavedMode] = useState<SquadSource>("elenco");
@@ -102,15 +105,48 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
   const [picker, setPicker] = useState<{ slot: FormationSlot; mode: "starter" | "reserve" } | null>(null);
   const [elencoOverride, setElencoOverride] = useState<ElencoOverrides | null>(null);
 
+  // Ligas fora da página chegam por fetch único (/api/search-rows?slim=1) —
+  // o corpo ISR ficaria acima de 20 MB com todas serializadas.
+  const [remoteLeagues, setRemoteLeagues] = useState<Partial<Record<LeagueId, PlayerSearchRow[]>>>({});
+  const requestedRef = useRef(new Set<LeagueId>());
+  const retryRef = useRef(new Map<LeagueId, number>());
+  const [pendingCount, setPendingCount] = useState(0);
+
+  const ensureLeague = useCallback(
+    (id: LeagueId) => {
+      if (playersByLeague[id] || requestedRef.current.has(id)) return;
+      requestedRef.current.add(id);
+      setPendingCount((n) => n + 1);
+      fetch(`/api/search-rows?league=${id}&slim=1`)
+        .then((res) => (res.ok ? res.json() : Promise.reject(new Error("squad_rows_failed"))))
+        .then((data: { players?: PlayerSearchRow[] }) => {
+          setRemoteLeagues((prev) => ({ ...prev, [id]: data.players ?? [] }));
+        })
+        .catch(() => {
+          requestedRef.current.delete(id);
+          const tries = (retryRef.current.get(id) ?? 0) + 1;
+          retryRef.current.set(id, tries);
+          if (tries <= 3) setTimeout(() => ensureLeague(id), 700 * tries);
+        })
+        .finally(() => setPendingCount((n) => Math.max(0, n - 1)));
+    },
+    [playersByLeague],
+  );
+
+  const mergedByLeague = useMemo<Partial<Record<LeagueId, PlayerSearchRow[]>>>(
+    () => ({ ...remoteLeagues, ...playersByLeague }),
+    [remoteLeagues, playersByLeague],
+  );
+
   const taggedPlayers = useMemo(() => {
     const rows: SquadPlayer[] = [];
     for (const league of LEAGUES) {
-      for (const player of playersByLeague[league.id] ?? []) {
+      for (const player of mergedByLeague[league.id] ?? []) {
         rows.push({ ...player, sourceLeague: league.id });
       }
     }
     return rows;
-  }, [playersByLeague]);
+  }, [mergedByLeague]);
 
   const pickerPool = useMemo(() => {
     if (mode === "sombra-todas") return taggedPlayers;
@@ -137,7 +173,7 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
     setPrevRows(null);
     setPrevLoading(true);
     setPrevFailed(false);
-    fetch(`/api/search-rows?league=${prevLeague}&season=${prevSeason}`)
+    fetch(`/api/search-rows?league=${prevLeague}&season=${prevSeason}&slim=1`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error("previos_fetch_failed"))))
       .then((data: { players?: PlayerSearchRow[] }) => {
         if (cancelled) return;
@@ -190,9 +226,26 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
   );
   const lookupById = isPrevios ? elencoById : playersById;
 
+  const indexOptions = useMemo<ClubOption[]>(
+    () =>
+      clubIndex
+        .map((entry) => ({
+          ...entry,
+          leagueName: LEAGUES.find((league) => league.id === entry.leagueId)?.name ?? entry.leagueId,
+        }))
+        .sort((a, b) => a.leagueId.localeCompare(b.leagueId) || a.club.localeCompare(b.club, "pt")),
+    [clubIndex],
+  );
+
+  // Elenco atual cobre todas as ligas via índice (linhas sob demanda). Prévios
+  // de temporada antiga seguem contando dos rows baixados por fetch.
   const clubOptions = useMemo<ClubOption[]>(() => {
+    if (!isPrevios) return indexOptions;
+    if (prevSeason === CURRENT_SEASON) {
+      return indexOptions.filter((option) => option.leagueId === prevLeague);
+    }
     const counts = new Map<string, ClubOption>();
-    for (const player of elencoPool) {
+    for (const player of prevPool) {
       if (!player.club) continue;
       const key = `${player.sourceLeague}::${player.club}`;
       const current = counts.get(key);
@@ -209,10 +262,30 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
     return [...counts.values()].sort(
       (a, b) => a.leagueId.localeCompare(b.leagueId) || a.club.localeCompare(b.club, "pt"),
     );
-  }, [elencoPool]);
+  }, [isPrevios, prevSeason, prevLeague, indexOptions, prevPool]);
 
   const activeClubKey = isPrevios ? prevClubKey : clubKey;
   const selectedClub = clubOptions.find((option) => `${option.leagueId}::${option.club}` === activeClubKey) ?? null;
+
+  // Busca do picker varre toda a base (qualquer liga/posição) — dispara carga
+  // de todas as ligas sob demanda.
+  const searching = Boolean(picker) && fold(slotQuery.trim()).length >= 2;
+
+  // Linhas de ligas fora da página chegam por fetch sob demanda: clube
+  // escolhido, série do sombra, "todas" e a busca global do picker.
+  useEffect(() => {
+    const needed: LeagueId[] = [];
+    if (searching || mode === "sombra-todas") {
+      needed.push(...LEAGUES.map((league) => league.id));
+    } else if (isPrevios) {
+      if (prevSeason === CURRENT_SEASON) needed.push(prevLeague);
+    } else if (mode === "sombra") {
+      needed.push(...(sombraLeague === "estaduais" ? [...ESTADUAIS_LEAGUE_IDS] : [sombraLeague]));
+    } else if (selectedClub) {
+      needed.push(selectedClub.leagueId);
+    }
+    needed.forEach(ensureLeague);
+  }, [searching, mode, isPrevios, prevSeason, prevLeague, sombraLeague, selectedClub, ensureLeague]);
 
   // Elencos prévios: só clubes que disputaram a competição. Com tabela oficial,
   // filtra pelos participantes (remove artefatos de saída no meio da temporada);
@@ -279,7 +352,6 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
     if (picker.mode === "starter" && occupantId) return [];
     const query = fold(slotQuery.trim());
     // Com texto digitado, a busca varre toda a base do site (todas as séries e posições).
-    const searching = query.length >= 2;
     const taken = new Set(
       picker.mode === "starter"
         ? (Object.values(assignments).filter((id): id is string => Boolean(id)))
@@ -954,9 +1026,11 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                   </ul>
                 ) : (
                   <p className="shadow-roster-empty">
-                    {slotQuery.trim().length >= 2
-                      ? "Nenhum atleta encontrado na base."
-                      : "Nenhum atleta disponível para esta posição."}
+                    {pendingCount > 0
+                      ? "Carregando base de atletas…"
+                      : slotQuery.trim().length >= 2
+                        ? "Nenhum atleta encontrado na base."
+                        : "Nenhum atleta disponível para esta posição."}
                   </p>
                 )}
               </article>
@@ -1065,8 +1139,10 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                     </ul>
                   ) : (
                     <p className="shadow-roster-empty">
-                      {mode === "elenco"
-                        ? "Busque um clube para ver o elenco completo, já escalado por posição."
+                      {pendingCount > 0
+                        ? "Carregando atletas…"
+                        : mode === "elenco"
+                          ? "Busque um clube para ver o elenco completo, já escalado por posição."
                         : (
                           <>
                             Nenhum atleta neste time. Clique numa vaga do campo ou abra{" "}
