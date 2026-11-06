@@ -78,10 +78,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "A",
-    "percentile": 86.8,
+    "percentile": 88.4,
     "pair_badge": [
      75.0,
-     86.8
+     88.4
     ],
     "sub_metrics": [
      {
@@ -91,8 +91,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 86.8,
-      "display_value": "+1,1"
+      "percentile": 88.4,
+      "display_value": "+1,2"
      }
     ],
     "stats": []
@@ -5506,5 +5506,145 @@
    "high_speed_km_p90": 77,
    "sprinting_km_p90": 71
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.98,
+  "fouls_total": 22,
+  "yellow_per90": 0.13,
+  "yellow_total": 3,
+  "red_per90": 0.04,
+  "red_total": 1,
+  "pool": {
+   "fouls_per90": 1.13,
+   "yellow_per90": 0.2,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 20.5,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 1905,
+    "club": "Ceará"
+   },
+   {
+    "year": "2024",
+    "league": "serie-b",
+    "minutes": 3296,
+    "club": "Avaí"
+   },
+   {
+    "year": "2025",
+    "league": "serie-b",
+    "minutes": 3022,
+    "club": "Vila Nova"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 4.1922,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 66.8725,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 6.3138,
+    "resid_sd": 1.5346,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.5396,
+    "resid_sd": 1.0324,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.7455,
+    "resid_sd": 0.2747,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0406,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 7.4732,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 68.1259,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.0883,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 64.6167,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 5.8766,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 54.448,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.7376,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 50.9881,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.6276,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.052,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0548,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0103,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 5.0092,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 63.4031,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-004012",
+ "person_key": "name:tiago pagnussat|1990|0"
 }

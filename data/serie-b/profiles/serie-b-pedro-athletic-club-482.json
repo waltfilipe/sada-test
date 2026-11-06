@@ -88,11 +88,11 @@
    {
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
-    "grade": "C-",
-    "percentile": 34.9,
+    "grade": "C",
+    "percentile": 43.4,
     "pair_badge": [
      100.0,
-     34.9
+     43.4
     ],
     "sub_metrics": [
      {
@@ -102,8 +102,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 34.9,
-      "display_value": "-0,2"
+      "percentile": 43.4,
+      "display_value": "-0,1"
      }
     ],
     "stats": []
@@ -1107,5 +1107,169 @@
    "high_speed_km_p90": 17,
    "sprinting_km_p90": 23
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.67,
+  "fouls_total": 9,
+  "yellow_per90": 0.0,
+  "yellow_total": 0,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.68,
+   "yellow_per90": 0.26,
+   "red_per90": 0.02
+  }
+ },
+ "pass_distance_m": 17.6,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 1316,
+    "club": "Flamengo"
+   },
+   {
+    "year": "2022",
+    "league": "serie-c",
+    "minutes": 704,
+    "club": "Confiança"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 2404,
+    "club": "Flamengo"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 1860,
+    "club": "Flamengo"
+   },
+   {
+    "year": "2024",
+    "league": "serie-c",
+    "minutes": 799,
+    "club": "Tombense"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 1127,
+    "club": "Flamengo"
+   },
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 698,
+    "club": "Tombense"
+   }
+  ],
+  "metrics": {
+   "Duelos Aéreos": {
+    "predicted": 2.491,
+    "resid_sd": 0.7267,
+    "train_n90": 20.79
+   },
+   "Duelos Aéreos::Eficiência": {
+    "predicted": 41.1314,
+    "resid_sd": 11.0907,
+    "train_n90": 20.79
+   },
+   "Passes Progressivos": {
+    "predicted": 3.6234,
+    "resid_sd": 1.3163,
+    "train_n90": 20.81
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 70.3181,
+    "resid_sd": 6.6991,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final": {
+    "predicted": 3.5947,
+    "resid_sd": 1.5516,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 72.3112,
+    "resid_sd": 5.7922,
+    "train_n90": 20.81
+   },
+   "Passes Longos": {
+    "predicted": 2.259,
+    "resid_sd": 0.9922,
+    "train_n90": 20.81
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 60.192,
+    "resid_sd": 8.0347,
+    "train_n90": 20.81
+   },
+   "Distribuição::Passes": {
+    "predicted": 24.721,
+    "resid_sd": 6.5607,
+    "train_n90": 20.82
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 17.9855,
+    "resid_sd": 5.6925,
+    "train_n90": 20.82
+   },
+   "Disputas com Bola": {
+    "predicted": 4.5876,
+    "resid_sd": 0.9071,
+    "train_n90": 20.81
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 40.8807,
+    "resid_sd": 7.459,
+    "train_n90": 20.81
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 1.9083,
+    "resid_sd": 0.5762,
+    "train_n90": 20.82
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 54.3385,
+    "resid_sd": 13.5736,
+    "train_n90": 20.82
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.8236,
+    "resid_sd": 0.3299,
+    "train_n90": 20.82
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 0.6205,
+    "resid_sd": 0.3224,
+    "train_n90": 20.82
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.05,
+    "resid_sd": 0.0574,
+    "train_n90": 20.82
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.067,
+    "resid_sd": 0.0374,
+    "train_n90": 20.82
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 57.8971,
+    "resid_sd": 11.6803,
+    "train_n90": 20.82
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 2.0556,
+    "resid_sd": 0.3791,
+    "train_n90": 20.81
+   }
+  }
+ },
+ "athlete_id": "ath-003367",
+ "person_key": "name:pedro|1997|0"
 }

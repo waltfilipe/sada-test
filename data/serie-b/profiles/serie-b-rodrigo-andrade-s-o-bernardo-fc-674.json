@@ -88,11 +88,11 @@
    {
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
-    "grade": "B-",
-    "percentile": 55.9,
+    "grade": "C+",
+    "percentile": 54.6,
     "pair_badge": [
      100.0,
-     55.9
+     54.6
     ],
     "sub_metrics": [
      {
@@ -102,7 +102,7 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 55.9,
+      "percentile": 54.6,
       "display_value": "+0,1"
      }
     ],
@@ -557,5 +557,205 @@
   "sprinting_km_p90": 0.15,
   "percentiles": {},
   "ranks": {}
- }
+ },
+ "pass_distance_m": 20.26,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-b",
+    "minutes": 1906,
+    "club": "Guarani"
+   },
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 2208,
+    "club": "Vitória"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 426,
+    "club": "Vitória"
+   },
+   {
+    "year": "2024",
+    "league": "serie-b",
+    "minutes": 474,
+    "club": "Mirassol"
+   },
+   {
+    "year": "2025",
+    "league": "serie-b",
+    "minutes": 911,
+    "club": "Goiás"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 6.6777,
+    "role_change_flag": true,
+    "resid_sd": 1.1828,
+    "train_n90": 20.79
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 58.7468,
+    "resid_sd": 5.4132,
+    "train_n90": 20.79
+   },
+   "Duelos Aéreos": {
+    "predicted": 1.6678,
+    "role_change_flag": true,
+    "resid_sd": 0.7267,
+    "train_n90": 20.79
+   },
+   "Duelos Aéreos::Eficiência": {
+    "predicted": 47.2185,
+    "role_change_flag": true,
+    "resid_sd": 11.0907,
+    "train_n90": 20.79
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 1.2827,
+    "resid_sd": 0.683,
+    "train_n90": 20.79
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.1762,
+    "resid_sd": 0.8593,
+    "train_n90": 20.79
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0293,
+    "resid_sd": 0.0563,
+    "train_n90": 20.79
+   },
+   "Passes Progressivos": {
+    "predicted": 5.4741,
+    "role_change_flag": true,
+    "resid_sd": 1.3163,
+    "train_n90": 20.81
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 72.4691,
+    "role_change_flag": true,
+    "resid_sd": 6.6991,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.763,
+    "role_change_flag": true,
+    "resid_sd": 1.5516,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 76.7767,
+    "resid_sd": 5.7922,
+    "train_n90": 20.81
+   },
+   "Passes Longos": {
+    "predicted": 3.1689,
+    "role_change_flag": true,
+    "resid_sd": 0.9922,
+    "train_n90": 20.81
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 57.6293,
+    "role_change_flag": true,
+    "resid_sd": 8.0347,
+    "train_n90": 20.81
+   },
+   "Distribuição::Passes": {
+    "predicted": 39.3064,
+    "resid_sd": 6.5607,
+    "train_n90": 20.82
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 26.7168,
+    "role_change_flag": true,
+    "resid_sd": 5.6925,
+    "train_n90": 20.82
+   },
+   "Disputas com Bola": {
+    "predicted": 4.9132,
+    "role_change_flag": true,
+    "resid_sd": 0.9071,
+    "train_n90": 20.81
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 46.7829,
+    "resid_sd": 7.459,
+    "train_n90": 20.81
+   },
+   "Conduções Progressivas": {
+    "predicted": 1.0672,
+    "role_change_flag": true,
+    "resid_sd": 0.3984,
+    "train_n90": 20.75
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 1.2402,
+    "role_change_flag": true,
+    "resid_sd": 0.5762,
+    "train_n90": 20.82
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 59.8315,
+    "role_change_flag": true,
+    "resid_sd": 13.5736,
+    "train_n90": 20.82
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.5132,
+    "resid_sd": 0.3299,
+    "train_n90": 20.82
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 0.4462,
+    "resid_sd": 0.3224,
+    "train_n90": 20.82
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0429,
+    "resid_sd": 0.0574,
+    "train_n90": 20.82
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.0262,
+    "resid_sd": 0.0374,
+    "train_n90": 20.82
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 59.3985,
+    "role_change_flag": true,
+    "resid_sd": 11.6803,
+    "train_n90": 20.82
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 0.9043,
+    "role_change_flag": true,
+    "resid_sd": 0.3791,
+    "train_n90": 20.81
+   },
+   "Finalizações::xG": {
+    "predicted": 0.0034,
+    "resid_sd": 0.0026,
+    "train_n90": 20.79
+   },
+   "Ofensividade::Ações Ofensivas": {
+    "predicted": 1.1706,
+    "role_change_flag": true,
+    "resid_sd": 0.4941,
+    "train_n90": 20.81
+   },
+   "Ofensividade::Toques na Área": {
+    "predicted": 0.6686,
+    "resid_sd": 0.3845,
+    "train_n90": 20.81
+   }
+  }
+ },
+ "athlete_id": "ath-003697",
+ "person_key": "name:rodrigo andrade|1997|0"
 }

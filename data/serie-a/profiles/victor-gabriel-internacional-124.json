@@ -73,7 +73,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 55.2,
+      "percentile": 55.1,
       "display_value": "3,1"
      }
     ],
@@ -86,7 +86,7 @@
     "percentile": 73.7,
     "pair_badge": [
      66.7,
-     98.3,
+     97.4,
      73.7
     ],
     "sub_metrics": [
@@ -97,7 +97,7 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 98.3,
+      "percentile": 97.4,
       "display_value": "14,8"
      },
      {
@@ -3665,5 +3665,119 @@
    "high_speed_km_p90": 18,
    "sprinting_km_p90": 19
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.51,
+  "fouls_total": 23,
+  "yellow_per90": 0.46,
+  "yellow_total": 7,
+  "red_per90": 0.07,
+  "red_total": 1,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 19.22,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 1229,
+    "club": "Internacional"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 5.1884,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 64.2383,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0498,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 7.9598,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 67.1187,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.5638,
+    "role_change_flag": true,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 72.0287,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 5.4195,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 54.6782,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.9989,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 48.5024,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.7001,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0381,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0501,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0077,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 3.9002,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 61.5208,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-004083",
+ "person_key": "name:victor gabriel|2004|0"
 }

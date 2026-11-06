@@ -78,11 +78,11 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "D",
-    "percentile": 11.0,
+    "percentile": 16.1,
     "pair_badge": [
      100.0,
-     9.4,
-     11.0
+     8.5,
+     16.1
     ],
     "sub_metrics": [
      {
@@ -92,13 +92,13 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 9.4,
+      "percentile": 8.5,
       "display_value": "6,5"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 11.0,
-      "display_value": "-1,2"
+      "percentile": 16.1,
+      "display_value": "-1,0"
      }
     ],
     "stats": []
@@ -338,5 +338,135 @@
    "high_speed_km_p90": 1,
    "sprinting_km_p90": 13
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.06,
+  "fouls_total": 6,
+  "yellow_per90": 0.35,
+  "yellow_total": 2,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 21.25,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2025",
+    "league": "serie-b",
+    "minutes": 2445,
+    "club": "Grêmio Novorizontino"
+   },
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 520,
+    "club": "Londrina"
+   },
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 309,
+    "club": "Tombense"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 5.2346,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 67.2186,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0617,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -0.0317,
+    "resid_sd": 0.7483,
+    "train_n90": 20.4
+   },
+   "Passes Progressivos": {
+    "predicted": 6.2506,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 66.6405,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.6631,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 74.631,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 4.8442,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 55.6242,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 1.3588,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.285,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.7028,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0305,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0486,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0084,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 3.3712,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 60.969,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-002047",
+ "person_key": "name:joao vitor|2001|0"
 }

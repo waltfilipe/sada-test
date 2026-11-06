@@ -89,10 +89,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "C",
-    "percentile": 42.6,
+    "percentile": 38.9,
     "pair_badge": [
      81.8,
-     42.6
+     38.9
     ],
     "sub_metrics": [
      {
@@ -102,8 +102,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 42.6,
-      "display_value": "-0,1"
+      "percentile": 38.9,
+      "display_value": "-0,2"
      }
     ],
     "stats": []
@@ -442,5 +442,229 @@
   "height": 170,
   "matched_name": "Ryan",
   "match_via": "Corinthians 2024"
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.98,
+  "fouls_total": 5,
+  "yellow_per90": 0.2,
+  "yellow_total": 1,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.36,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 21.26,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-c",
+    "minutes": 1345,
+    "club": "Atlético Cearense"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 682,
+    "club": "Bahia"
+   },
+   {
+    "year": "2023",
+    "league": "serie-c",
+    "minutes": 1169,
+    "club": "EC São José"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 610,
+    "club": "Corinthians"
+   },
+   {
+    "year": "2024",
+    "league": "serie-b",
+    "minutes": 1278,
+    "club": "CRB"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 6.8783,
+    "resid_sd": 1.1811,
+    "train_n90": 21.19
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 61.818,
+    "resid_sd": 5.8229,
+    "train_n90": 21.19
+   },
+   "Duelos Aéreos": {
+    "predicted": 2.5682,
+    "resid_sd": 0.7678,
+    "train_n90": 21.17
+   },
+   "Duelos Aéreos::Eficiência": {
+    "predicted": 47.9524,
+    "resid_sd": 9.2381,
+    "train_n90": 21.17
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 1.3934,
+    "resid_sd": 1.1156,
+    "train_n90": 21.19
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.8123,
+    "resid_sd": 0.8873,
+    "train_n90": 21.19
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.2682,
+    "resid_sd": 0.1688,
+    "train_n90": 21.19
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0348,
+    "resid_sd": 0.0604,
+    "train_n90": 21.19
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -0.8852,
+    "resid_sd": 0.6461,
+    "train_n90": 20.13
+   },
+   "Passes Progressivos": {
+    "predicted": 7.9066,
+    "resid_sd": 1.4898,
+    "train_n90": 21.12
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 73.1815,
+    "resid_sd": 5.4351,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.0582,
+    "resid_sd": 1.3234,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 66.3138,
+    "resid_sd": 7.5615,
+    "train_n90": 21.12
+   },
+   "Passes Longos": {
+    "predicted": 4.3188,
+    "role_change_flag": true,
+    "resid_sd": 1.0858,
+    "train_n90": 21.12
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 49.7083,
+    "resid_sd": 7.7543,
+    "train_n90": 21.12
+   },
+   "Distribuição::Passes": {
+    "predicted": 35.8952,
+    "resid_sd": 5.6544,
+    "train_n90": 21.1
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 25.8954,
+    "resid_sd": 5.0027,
+    "train_n90": 21.1
+   },
+   "Disputas com Bola": {
+    "predicted": 2.3798,
+    "resid_sd": 0.8007,
+    "train_n90": 21.12
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 45.7554,
+    "resid_sd": 7.4529,
+    "train_n90": 21.12
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 1.2829,
+    "resid_sd": 0.6641,
+    "train_n90": 21.1
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 59.6566,
+    "resid_sd": 11.179,
+    "train_n90": 21.1
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 1.5853,
+    "resid_sd": 0.502,
+    "train_n90": 21.1
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.3733,
+    "resid_sd": 0.2465,
+    "train_n90": 21.1
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0292,
+    "resid_sd": 0.0494,
+    "train_n90": 21.11
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0359,
+    "resid_sd": 0.0357,
+    "train_n90": 21.11
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 3.3961,
+    "resid_sd": 0.8183,
+    "train_n90": 21.1
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 35.747,
+    "resid_sd": 7.9284,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.7339,
+    "role_change_flag": true,
+    "resid_sd": 0.3528,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.4047,
+    "resid_sd": 0.4266,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0459,
+    "resid_sd": 0.0541,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.0789,
+    "resid_sd": 0.0441,
+    "train_n90": 21.1
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 53.1649,
+    "resid_sd": 11.4476,
+    "train_n90": 21.1
+   },
+   "Ofensividade::Ações Ofensivas": {
+    "predicted": 1.925,
+    "resid_sd": 0.6323,
+    "train_n90": 21.17
+   },
+   "Ofensividade::Toques na Área": {
+    "predicted": 0.6428,
+    "resid_sd": 0.375,
+    "train_n90": 21.17
+   }
+  }
+ },
+ "athlete_id": "ath-003825",
+ "person_key": "name:ryan|2002|2"
 }

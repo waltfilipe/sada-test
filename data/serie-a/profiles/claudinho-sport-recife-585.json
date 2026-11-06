@@ -88,12 +88,12 @@
    {
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
-    "grade": "B-",
-    "percentile": 57.1,
+    "grade": "C+",
+    "percentile": 54.9,
     "pair_badge": [
      100.0,
-     69.9,
-     57.1
+     24.1,
+     54.9
     ],
     "sub_metrics": [
      {
@@ -103,13 +103,13 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 69.9,
+      "percentile": 24.1,
       "display_value": "8,2"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 57.1,
-      "display_value": "+0,2"
+      "percentile": 54.9,
+      "display_value": "+0,1"
      }
     ],
     "stats": []
@@ -462,5 +462,209 @@
   "sprinting_km_p90": 0.28,
   "percentiles": {},
   "ranks": {}
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.0,
+  "fouls_total": 0,
+  "yellow_per90": 0.0,
+  "yellow_total": 0,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.13,
+   "yellow_per90": 0.19,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 17.64,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-b",
+    "minutes": 1280,
+    "club": "Criciúma"
+   },
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 2074,
+    "club": "Criciúma"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 2286,
+    "club": "Criciúma"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 1027,
+    "club": "Vitória"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 6.8575,
+    "resid_sd": 1.1811,
+    "train_n90": 21.19
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 61.0727,
+    "resid_sd": 5.8229,
+    "train_n90": 21.19
+   },
+   "Duelos Aéreos": {
+    "predicted": 2.1095,
+    "resid_sd": 0.7678,
+    "train_n90": 21.17
+   },
+   "Duelos Aéreos::Eficiência": {
+    "predicted": 45.3342,
+    "role_change_flag": true,
+    "resid_sd": 9.2381,
+    "train_n90": 21.17
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0217,
+    "resid_sd": 0.0604,
+    "train_n90": 21.19
+   },
+   "Passes Progressivos": {
+    "predicted": 8.0808,
+    "resid_sd": 1.4898,
+    "train_n90": 21.12
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 72.5713,
+    "resid_sd": 5.4351,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.1544,
+    "resid_sd": 1.3234,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 71.0282,
+    "resid_sd": 7.5615,
+    "train_n90": 21.12
+   },
+   "Passes Longos": {
+    "predicted": 4.2439,
+    "resid_sd": 1.0858,
+    "train_n90": 21.12
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 50.3605,
+    "resid_sd": 7.7543,
+    "train_n90": 21.12
+   },
+   "Distribuição::Passes": {
+    "predicted": 38.1767,
+    "resid_sd": 5.6544,
+    "train_n90": 21.1
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 27.7108,
+    "resid_sd": 5.0027,
+    "train_n90": 21.1
+   },
+   "Disputas com Bola": {
+    "predicted": 2.4306,
+    "role_change_flag": true,
+    "resid_sd": 0.8007,
+    "train_n90": 21.12
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 45.9224,
+    "resid_sd": 7.4529,
+    "train_n90": 21.12
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 1.137,
+    "resid_sd": 0.6641,
+    "train_n90": 21.1
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 60.1735,
+    "role_change_flag": true,
+    "resid_sd": 11.179,
+    "train_n90": 21.1
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 1.5556,
+    "role_change_flag": true,
+    "resid_sd": 0.502,
+    "train_n90": 21.1
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.3667,
+    "resid_sd": 0.2465,
+    "train_n90": 21.1
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0427,
+    "resid_sd": 0.0494,
+    "train_n90": 21.11
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0475,
+    "resid_sd": 0.0357,
+    "train_n90": 21.11
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 2.9005,
+    "resid_sd": 0.8183,
+    "train_n90": 21.1
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 35.8713,
+    "resid_sd": 7.9284,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.8378,
+    "role_change_flag": true,
+    "resid_sd": 0.3528,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.2763,
+    "role_change_flag": true,
+    "resid_sd": 0.4266,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0518,
+    "resid_sd": 0.0541,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.0957,
+    "resid_sd": 0.0441,
+    "train_n90": 21.1
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 56.217,
+    "resid_sd": 11.4476,
+    "train_n90": 21.1
+   },
+   "Ofensividade::Ações Ofensivas": {
+    "predicted": 2.0976,
+    "role_change_flag": true,
+    "resid_sd": 0.6323,
+    "train_n90": 21.17
+   },
+   "Ofensividade::Toques na Área": {
+    "predicted": 1.053,
+    "role_change_flag": true,
+    "resid_sd": 0.375,
+    "train_n90": 21.17
+   }
+  }
+ },
+ "athlete_id": "ath-000603",
+ "person_key": "name:claudinho|2000|1"
 }

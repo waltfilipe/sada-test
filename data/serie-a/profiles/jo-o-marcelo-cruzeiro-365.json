@@ -54,7 +54,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "C+",
-    "percentile": 52.5,
+    "percentile": 52.4,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -73,7 +73,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 22.9,
+      "percentile": 22.4,
       "display_value": "2,3"
      }
     ],
@@ -86,7 +86,7 @@
     "percentile": 22.0,
     "pair_badge": [
      100.0,
-     60.7,
+     59.0,
      22.0
     ],
     "sub_metrics": [
@@ -97,7 +97,7 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 60.7,
+      "percentile": 59.0,
       "display_value": "13,3"
      },
      {
@@ -2657,5 +2657,131 @@
    "high_speed_km_p90": 65,
    "sprinting_km_p90": 55
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.94,
+  "fouls_total": 15,
+  "yellow_per90": 0.19,
+  "yellow_total": 3,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 19.85,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 194,
+    "club": "Cruzeiro"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 3023,
+    "club": "Cruzeiro"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 255,
+    "club": "Cruzeiro"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 4.2989,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 62.9926,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0327,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 6.7486,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 68.4635,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.9934,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 74.6708,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 3.957,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 57.866,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.8382,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 47.8662,
+    "role_change_flag": true,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 1.2862,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0327,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0484,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0103,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 4.3073,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 60.7924,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-002002",
+ "person_key": "name:joao marcelo|2000|0"
 }

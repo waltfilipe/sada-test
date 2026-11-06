@@ -54,7 +54,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "C+",
-    "percentile": 46.7,
+    "percentile": 46.5,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -73,7 +73,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 97.9,
+      "percentile": 96.9,
       "display_value": "5,5"
      }
     ],
@@ -82,12 +82,12 @@
    {
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
-    "grade": "C-",
-    "percentile": 30.5,
+    "grade": "C",
+    "percentile": 35.6,
     "pair_badge": [
      100.0,
-     78.6,
-     30.5
+     77.8,
+     35.6
     ],
     "sub_metrics": [
      {
@@ -97,13 +97,13 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 78.6,
+      "percentile": 77.8,
       "display_value": "14,3"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 30.5,
-      "display_value": "-0,4"
+      "percentile": 35.6,
+      "display_value": "-0,3"
      }
     ],
     "stats": []
@@ -785,5 +785,142 @@
    "high_speed_km_p90": 96,
    "sprinting_km_p90": 96
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.21,
+  "fouls_total": 4,
+  "yellow_per90": 0.91,
+  "yellow_total": 3,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 19.13,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 1960,
+    "club": "Athletico Paranaense"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 594,
+    "club": "Athletico Paranaense"
+   },
+   {
+    "year": "2024",
+    "league": "serie-b",
+    "minutes": 1983,
+    "club": "Ceará"
+   },
+   {
+    "year": "2025",
+    "league": "serie-b",
+    "minutes": 1155,
+    "club": "Atlético GO"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 4.464,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 65.619,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0345,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -0.5252,
+    "resid_sd": 0.7483,
+    "train_n90": 20.4
+   },
+   "Passes Progressivos": {
+    "predicted": 6.454,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 71.5023,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.5982,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 73.6624,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 4.2428,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 56.403,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.7974,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.5641,
+    "role_change_flag": true,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.8403,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0316,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0472,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0092,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 3.3518,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 58.7213,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-002934",
+ "person_key": "name:matheus felipe|1999|0"
 }

@@ -54,7 +54,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "B-",
-    "percentile": 56.2,
+    "percentile": 56.1,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -73,7 +73,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 20.8,
+      "percentile": 20.4,
       "display_value": "2,3"
      }
     ],
@@ -83,11 +83,11 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "B+",
-    "percentile": 80.5,
+    "percentile": 78.8,
     "pair_badge": [
      100.0,
-     47.9,
-     80.5
+     47.0,
+     78.8
     ],
     "sub_metrics": [
      {
@@ -97,13 +97,13 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 47.9,
+      "percentile": 47.0,
       "display_value": "12,5"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 80.5,
-      "display_value": "+0,9"
+      "percentile": 78.8,
+      "display_value": "+0,8"
      }
     ],
     "stats": []
@@ -2181,5 +2181,136 @@
    "high_speed_km_p90": 83,
    "sprinting_km_p90": 50
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.41,
+  "fouls_total": 6,
+  "yellow_per90": 0.41,
+  "yellow_total": 6,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 23.19,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-b",
+    "minutes": 2702,
+    "club": "Cruzeiro"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 1170,
+    "club": "Athletico Paranaense"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 2655,
+    "club": "Cruzeiro"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 1984,
+    "club": "Santos"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 4.6607,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 64.198,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0404,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 7.9558,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 71.019,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.6115,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 69.207,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 6.5863,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 54.5055,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.9971,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.4866,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.751,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0391,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0503,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0094,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 3.5426,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 61.6406,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-004396",
+ "person_key": "name:ze ivaldo|1997|0"
 }

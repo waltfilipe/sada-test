@@ -89,10 +89,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "A",
-    "percentile": 100.0,
+    "percentile": 99.3,
     "pair_badge": [
      12.5,
-     100.0
+     99.3
     ],
     "sub_metrics": [
      {
@@ -102,8 +102,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 100.0,
-      "display_value": "+3,0"
+      "percentile": 99.3,
+      "display_value": "+2,7"
      }
     ],
     "stats": []
@@ -4081,5 +4081,108 @@
   ],
   "point_count": 916,
   "image_url": null
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.07,
+  "fouls_total": 19,
+  "yellow_per90": 0.17,
+  "yellow_total": 3,
+  "red_per90": 0.06,
+  "red_total": 1,
+  "pool": {
+   "fouls_per90": 1.92,
+   "yellow_per90": 0.35,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 18.92,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 967,
+    "club": "Confiança"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 5.5429,
+    "resid_sd": 1.1828,
+    "train_n90": 20.79
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 58.6129,
+    "resid_sd": 5.4132,
+    "train_n90": 20.79
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 1.8671,
+    "resid_sd": 0.683,
+    "train_n90": 20.79
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 2.073,
+    "resid_sd": 0.8593,
+    "train_n90": 20.79
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.7646,
+    "resid_sd": 0.1924,
+    "train_n90": 20.79
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0348,
+    "resid_sd": 0.0563,
+    "train_n90": 20.79
+   },
+   "Passes Progressivos": {
+    "predicted": 5.4694,
+    "resid_sd": 1.3163,
+    "train_n90": 20.81
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 75.7351,
+    "resid_sd": 6.6991,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.1814,
+    "resid_sd": 1.5516,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 72.0722,
+    "resid_sd": 5.7922,
+    "train_n90": 20.81
+   },
+   "Passes Longos": {
+    "predicted": 3.5532,
+    "resid_sd": 0.9922,
+    "train_n90": 20.81
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 55.4448,
+    "resid_sd": 8.0347,
+    "train_n90": 20.81
+   },
+   "Disputas com Bola": {
+    "predicted": 1.353,
+    "resid_sd": 0.9071,
+    "train_n90": 20.81
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 48.5014,
+    "resid_sd": 7.459,
+    "train_n90": 20.81
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.3775,
+    "resid_sd": 0.3984,
+    "train_n90": 20.75
+   }
+  }
+ },
+ "athlete_id": "ath-003594",
+ "person_key": "name:renilson|1999|0"
 }

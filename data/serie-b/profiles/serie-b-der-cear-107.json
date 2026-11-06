@@ -78,10 +78,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "D",
-    "percentile": 3.3,
+    "percentile": 2.5,
     "pair_badge": [
      50.0,
-     3.3
+     2.5
     ],
     "sub_metrics": [
      {
@@ -91,8 +91,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 3.3,
-      "display_value": "-2,1"
+      "percentile": 2.5,
+      "display_value": "-2,0"
      }
     ],
     "stats": []
@@ -5018,5 +5018,156 @@
    "high_speed_km_p90": 48,
    "sprinting_km_p90": 46
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.53,
+  "fouls_total": 38,
+  "yellow_per90": 0.36,
+  "yellow_total": 9,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.13,
+   "yellow_per90": 0.2,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 20.29,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 3223,
+    "club": "América Mineiro"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 1812,
+    "club": "América Mineiro"
+   },
+   {
+    "year": "2024",
+    "league": "serie-b",
+    "minutes": 2507,
+    "club": "América Mineiro"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 305,
+    "club": "Ceará"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 3.613,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 65.9797,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 5.1837,
+    "resid_sd": 1.5346,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.5063,
+    "resid_sd": 1.0324,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.713,
+    "resid_sd": 0.2747,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0332,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -1.036,
+    "resid_sd": 0.7483,
+    "train_n90": 20.4
+   },
+   "Passes Progressivos": {
+    "predicted": 7.6722,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 67.1771,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.9987,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 66.9358,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 6.5142,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 53.9852,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.7359,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.264,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.6169,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0426,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0519,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0096,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 3.9968,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 64.3133,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-000922",
+ "person_key": "name:eder|1995|0"
 }

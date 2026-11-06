@@ -78,10 +78,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "A",
-    "percentile": 95.0,
+    "percentile": 95.9,
     "pair_badge": [
      75.0,
-     95.0
+     95.9
     ],
     "sub_metrics": [
      {
@@ -91,8 +91,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 95.0,
-      "display_value": "+1,5"
+      "percentile": 95.9,
+      "display_value": "+1,6"
      }
     ],
     "stats": []
@@ -3054,5 +3054,151 @@
    "high_speed_km_p90": 86,
    "sprinting_km_p90": 58
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.67,
+  "fouls_total": 14,
+  "yellow_per90": 0.24,
+  "yellow_total": 5,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.13,
+   "yellow_per90": 0.2,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 20.26,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-b",
+    "minutes": 2921,
+    "club": "Brusque"
+   },
+   {
+    "year": "2023",
+    "league": "serie-c",
+    "minutes": 2299,
+    "club": "Brusque"
+   },
+   {
+    "year": "2024",
+    "league": "serie-b",
+    "minutes": 3333,
+    "club": "Brusque"
+   },
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 2191,
+    "club": "Londrina"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 3.9536,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 68.4153,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 4.0111,
+    "resid_sd": 1.5346,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.0048,
+    "resid_sd": 1.0324,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.7517,
+    "resid_sd": 0.2747,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0443,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 7.9284,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 68.2293,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 3.9247,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 70.8363,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 4.1887,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 53.1515,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.95,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 52.0605,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.9973,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0442,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0464,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.011,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 4.1559,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 59.9077,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-004203",
+ "person_key": "name:wallace|1988|0"
 }

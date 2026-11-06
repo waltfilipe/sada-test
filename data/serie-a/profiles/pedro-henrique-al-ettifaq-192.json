@@ -54,7 +54,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "B-",
-    "percentile": 60.5,
+    "percentile": 60.4,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -73,7 +73,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 61.5,
+      "percentile": 61.2,
       "display_value": "3,3"
      }
     ],
@@ -86,7 +86,7 @@
     "percentile": 94.9,
     "pair_badge": [
      33.3,
-     69.2,
+     67.5,
      94.9
     ],
     "sub_metrics": [
@@ -97,7 +97,7 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 69.2,
+      "percentile": 67.5,
       "display_value": "13,8"
      },
      {
@@ -3863,5 +3863,124 @@
    "high_speed_km_p90": 37,
    "sprinting_km_p90": 16
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.56,
+  "fouls_total": 9,
+  "yellow_per90": 0.25,
+  "yellow_total": 4,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 21.43,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 2538,
+    "club": "Athletico Paranaense"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 2967,
+    "club": "Red Bull Bragantino"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 4.6874,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 65.1156,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0331,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 8.3418,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 70.014,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.7816,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 67.1811,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 7.691,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 56.0154,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.8404,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 50.1047,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.7024,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0392,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0515,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0095,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 3.9498,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 61.2896,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-003339",
+ "person_key": "name:pedro henrique|1994|0"
 }

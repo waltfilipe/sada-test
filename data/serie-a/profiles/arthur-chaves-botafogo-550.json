@@ -73,7 +73,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 5.2,
+      "percentile": 5.1,
       "display_value": "1,7"
      }
     ],
@@ -83,11 +83,11 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "C-",
-    "percentile": 33.1,
+    "percentile": 25.4,
     "pair_badge": [
      66.7,
-     7.7,
-     33.1
+     6.8,
+     25.4
     ],
     "sub_metrics": [
      {
@@ -97,13 +97,13 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 7.7,
+      "percentile": 6.8,
       "display_value": "5,1"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 33.1,
-      "display_value": "-0,3"
+      "percentile": 25.4,
+      "display_value": "-0,6"
      }
     ],
     "stats": []
@@ -341,5 +341,120 @@
    "high_speed_km_p90": 7,
    "sprinting_km_p90": 6
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.0,
+  "fouls_total": 0,
+  "yellow_per90": 0.0,
+  "yellow_total": 0,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 18.8,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 1648,
+    "club": "Avaí"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 4.7058,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 66.4516,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0368,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 5.7059,
+    "role_change_flag": true,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 67.245,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 3.7409,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 67.1273,
+    "role_change_flag": true,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 4.1798,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 54.775,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.9037,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 48.7167,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.5433,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0353,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0482,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.008,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 3.6274,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 57.4803,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-000244",
+ "person_key": "name:arthur chaves|2001|0"
 }

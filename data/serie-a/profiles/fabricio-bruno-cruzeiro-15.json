@@ -54,7 +54,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "C-",
-    "percentile": 34.0,
+    "percentile": 33.8,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -73,7 +73,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 41.7,
+      "percentile": 40.8,
       "display_value": "2,8"
      }
     ],
@@ -82,12 +82,12 @@
    {
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
-    "grade": "C",
-    "percentile": 44.1,
+    "grade": "C+",
+    "percentile": 47.5,
     "pair_badge": [
      100.0,
-     29.9,
-     44.1
+     29.1,
+     47.5
     ],
     "sub_metrics": [
      {
@@ -97,13 +97,13 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 29.9,
+      "percentile": 29.1,
       "display_value": "11,6"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 44.1,
-      "display_value": "-0,1"
+      "percentile": 47.5,
+      "display_value": "+0,0"
      }
     ],
     "stats": []
@@ -5393,5 +5393,136 @@
    "high_speed_km_p90": 31,
    "sprinting_km_p90": 24
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.61,
+  "fouls_total": 17,
+  "yellow_per90": 0.29,
+  "yellow_total": 8,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 21.21,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 1279,
+    "club": "Flamengo"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 3463,
+    "club": "Flamengo"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 2601,
+    "club": "Flamengo"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 3277,
+    "club": "Cruzeiro"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 3.911,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 67.0951,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0314,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 8.2246,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 70.6459,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.6493,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 73.2122,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 5.6438,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 58.0239,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.8249,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.7641,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.6725,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0405,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0502,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0089,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 3.4365,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 61.7779,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-001131",
+ "person_key": "name:fabricio bruno|1996|0"
 }

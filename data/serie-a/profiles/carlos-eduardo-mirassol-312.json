@@ -63,7 +63,7 @@
     "label": "Recuperações",
     "kind": "metric",
     "grade": "C",
-    "percentile": 40.9,
+    "percentile": 39.7,
     "display_value": "3,6",
     "stats": []
    }
@@ -1719,5 +1719,210 @@
    "high_speed_km_p90": 31,
    "sprinting_km_p90": 13
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.0,
+  "fouls_total": 10,
+  "yellow_per90": 0.2,
+  "yellow_total": 2,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.24,
+   "yellow_per90": 0.19,
+   "red_per90": 0.0
+  }
+ },
+ "pass_distance_m": 18.08,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 1022,
+    "club": "Red Bull Bragantino"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 986,
+    "club": "Vitória"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 927,
+    "club": "Mirassol"
+   }
+  ],
+  "metrics": {
+   "Duelos Vencidos": {
+    "predicted": 2.8823,
+    "resid_sd": 0.7035,
+    "train_n90": 19.61
+   },
+   "Duelos Vencidos::Eficiência": {
+    "predicted": 55.7389,
+    "resid_sd": 6.6015,
+    "train_n90": 19.61
+   },
+   "Ações Defensivas": {
+    "predicted": 1.487,
+    "resid_sd": 0.6853,
+    "train_n90": 19.61
+   },
+   "Passes Progressivos": {
+    "predicted": 3.4569,
+    "resid_sd": 1.1225,
+    "train_n90": 19.53
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 75.5567,
+    "resid_sd": 7.2942,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final": {
+    "predicted": 2.0962,
+    "resid_sd": 1.0778,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 71.6467,
+    "resid_sd": 9.042,
+    "train_n90": 19.53
+   },
+   "Passes Longos": {
+    "predicted": 1.6757,
+    "resid_sd": 0.8211,
+    "train_n90": 19.53
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 56.861,
+    "resid_sd": 11.297,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes": {
+    "predicted": 20.3236,
+    "resid_sd": 4.6427,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 16.2116,
+    "resid_sd": 3.9417,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 1.0931,
+    "resid_sd": 0.4355,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.2314,
+    "resid_sd": 0.4596,
+    "train_n90": 19.53
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 2.3813,
+    "resid_sd": 0.7912,
+    "train_n90": 19.5
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 32.7691,
+    "resid_sd": 10.3125,
+    "train_n90": 19.5
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0762,
+    "resid_sd": 0.0712,
+    "train_n90": 19.53
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.1438,
+    "resid_sd": 0.0556,
+    "train_n90": 19.53
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 57.9384,
+    "resid_sd": 11.5087,
+    "train_n90": 19.53
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.1645,
+    "resid_sd": 0.1084,
+    "train_n90": 19.5
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.1907,
+    "resid_sd": 0.0689,
+    "train_n90": 19.5
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 1.7549,
+    "resid_sd": 0.4902,
+    "train_n90": 19.51
+   },
+   "Finalizações::Finalizações certas": {
+    "predicted": 36.0702,
+    "resid_sd": 9.09,
+    "train_n90": 19.51
+   },
+   "Finalizações::Eficiência": {
+    "predicted": 36.0702,
+    "resid_sd": 9.09,
+    "train_n90": 19.51
+   },
+   "Disputas com Bola": {
+    "predicted": 6.19,
+    "resid_sd": 1.4313,
+    "train_n90": 19.53
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 41.4176,
+    "resid_sd": 6.1284,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 3.7309,
+    "resid_sd": 1.1907,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 53.9716,
+    "resid_sd": 8.582,
+    "train_n90": 19.53
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 1.528,
+    "resid_sd": 0.6531,
+    "train_n90": 19.5
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.2806,
+    "resid_sd": 0.3241,
+    "train_n90": 19.5
+   },
+   "Ações Terminais::Toques na Área": {
+    "predicted": 2.4285,
+    "resid_sd": 0.6914,
+    "train_n90": 19.51
+   },
+   "Ações Terminais::Ações Ofensivas": {
+    "predicted": 3.3898,
+    "resid_sd": 1.0181,
+    "train_n90": 19.51
+   },
+   "Verticalidade::% Toque na Área": {
+    "predicted": 16.2102,
+    "resid_sd": 4.3906,
+    "train_n90": 19.51
+   },
+   "Verticalidade::Recepção de Passes Longos": {
+    "predicted": 1.8499,
+    "resid_sd": 0.526,
+    "train_n90": 19.51
+   }
+  }
+ },
+ "athlete_id": "ath-000534",
+ "person_key": "name:carlos eduardo|1996|0"
 }

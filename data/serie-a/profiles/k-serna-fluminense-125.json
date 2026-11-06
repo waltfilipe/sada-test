@@ -62,8 +62,8 @@
    {
     "label": "Recuperações",
     "kind": "metric",
-    "grade": "C+",
-    "percentile": 45.5,
+    "grade": "C",
+    "percentile": 44.0,
     "display_value": "3,7",
     "stats": []
    }
@@ -3483,5 +3483,204 @@
    "high_speed_km_p90": 18,
    "sprinting_km_p90": 4
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.13,
+  "fouls_total": 24,
+  "yellow_per90": 0.05,
+  "yellow_total": 1,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.24,
+   "yellow_per90": 0.19,
+   "red_per90": 0.0
+  }
+ },
+ "pass_distance_m": 16.27,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 962,
+    "club": "Fluminense"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 2279,
+    "club": "Fluminense"
+   }
+  ],
+  "metrics": {
+   "Duelos Vencidos": {
+    "predicted": 2.8774,
+    "resid_sd": 0.7035,
+    "train_n90": 19.61
+   },
+   "Duelos Vencidos::Eficiência": {
+    "predicted": 57.1265,
+    "resid_sd": 6.6015,
+    "train_n90": 19.61
+   },
+   "Ações Defensivas": {
+    "predicted": 1.108,
+    "resid_sd": 0.6853,
+    "train_n90": 19.61
+   },
+   "Passes Progressivos": {
+    "predicted": 3.5184,
+    "resid_sd": 1.1225,
+    "train_n90": 19.53
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 75.7772,
+    "resid_sd": 7.2942,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final": {
+    "predicted": 2.0497,
+    "resid_sd": 1.0778,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 70.6709,
+    "resid_sd": 9.042,
+    "train_n90": 19.53
+   },
+   "Passes Longos": {
+    "predicted": 1.4388,
+    "resid_sd": 0.8211,
+    "train_n90": 19.53
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 56.116,
+    "resid_sd": 11.297,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes": {
+    "predicted": 25.8599,
+    "resid_sd": 4.6427,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 19.7171,
+    "resid_sd": 3.9417,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 1.1995,
+    "resid_sd": 0.4355,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.207,
+    "resid_sd": 0.4596,
+    "train_n90": 19.53
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 3.0759,
+    "resid_sd": 0.7912,
+    "train_n90": 19.5
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 33.6374,
+    "resid_sd": 10.3125,
+    "train_n90": 19.5
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0812,
+    "resid_sd": 0.0712,
+    "train_n90": 19.53
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.1453,
+    "resid_sd": 0.0556,
+    "train_n90": 19.53
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 57.5485,
+    "resid_sd": 11.5087,
+    "train_n90": 19.53
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.181,
+    "resid_sd": 0.1084,
+    "train_n90": 19.5
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.1952,
+    "resid_sd": 0.0689,
+    "train_n90": 19.5
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 1.6313,
+    "resid_sd": 0.4902,
+    "train_n90": 19.51
+   },
+   "Finalizações::Finalizações certas": {
+    "predicted": 36.2615,
+    "resid_sd": 9.09,
+    "train_n90": 19.51
+   },
+   "Finalizações::Eficiência": {
+    "predicted": 36.2615,
+    "resid_sd": 9.09,
+    "train_n90": 19.51
+   },
+   "Disputas com Bola": {
+    "predicted": 5.8627,
+    "resid_sd": 1.4313,
+    "train_n90": 19.53
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 41.1274,
+    "resid_sd": 6.1284,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 4.7087,
+    "resid_sd": 1.1907,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 53.5935,
+    "resid_sd": 8.582,
+    "train_n90": 19.53
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 2.1506,
+    "resid_sd": 0.6531,
+    "train_n90": 19.5
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.4507,
+    "resid_sd": 0.3241,
+    "train_n90": 19.5
+   },
+   "Ações Terminais::Toques na Área": {
+    "predicted": 2.8265,
+    "resid_sd": 0.6914,
+    "train_n90": 19.51
+   },
+   "Ações Terminais::Ações Ofensivas": {
+    "predicted": 4.0514,
+    "resid_sd": 1.0181,
+    "train_n90": 19.51
+   },
+   "Verticalidade::% Toque na Área": {
+    "predicted": 15.8863,
+    "resid_sd": 4.3906,
+    "train_n90": 19.51
+   },
+   "Verticalidade::Recepção de Passes Longos": {
+    "predicted": 1.9178,
+    "resid_sd": 0.526,
+    "train_n90": 19.51
+   }
+  }
+ },
+ "athlete_id": "ath-002182",
+ "person_key": "name:k serna|1998|0"
 }

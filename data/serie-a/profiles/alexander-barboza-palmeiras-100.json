@@ -54,7 +54,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "C+",
-    "percentile": 52.3,
+    "percentile": 52.0,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -73,7 +73,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 52.1,
+      "percentile": 51.0,
       "display_value": "3,1"
      }
     ],
@@ -82,12 +82,12 @@
    {
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
-    "grade": "C",
-    "percentile": 41.5,
+    "grade": "C-",
+    "percentile": 31.4,
     "pair_badge": [
      66.7,
-     86.3,
-     41.5
+     85.5,
+     31.4
     ],
     "sub_metrics": [
      {
@@ -97,13 +97,13 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 86.3,
+      "percentile": 85.5,
       "display_value": "14,7"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 41.5,
-      "display_value": "-0,2"
+      "percentile": 31.4,
+      "display_value": "-0,4"
      }
     ],
     "stats": []
@@ -4501,5 +4501,129 @@
    "high_speed_km_p90": 29,
    "sprinting_km_p90": 29
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.62,
+  "fouls_total": 39,
+  "yellow_per90": 0.37,
+  "yellow_total": 9,
+  "red_per90": 0.08,
+  "red_total": 2,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 22.77,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 2307,
+    "club": "Botafogo"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 2377,
+    "club": "Botafogo"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 4.7192,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 65.5581,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0324,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -0.8635,
+    "resid_sd": 0.7483,
+    "train_n90": 20.4
+   },
+   "Passes Progressivos": {
+    "predicted": 8.7125,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 70.3814,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 6.7453,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 68.7361,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 6.7885,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 54.5089,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.8988,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.0128,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.7576,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0392,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0525,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0095,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 4.3943,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 61.5164,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-000131",
+ "person_key": "name:alexander barboza|1995|0"
 }

@@ -78,10 +78,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "A",
-    "percentile": 96.2,
+    "percentile": 98.1,
     "pair_badge": [
      90.9,
-     96.2
+     98.1
     ],
     "sub_metrics": [
      {
@@ -91,8 +91,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 96.2,
-      "display_value": "+1,8"
+      "percentile": 98.1,
+      "display_value": "+1,9"
      }
     ],
     "stats": []
@@ -4450,5 +4450,157 @@
   ],
   "point_count": 1035,
   "image_url": null
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.96,
+  "fouls_total": 17,
+  "yellow_per90": 0.17,
+  "yellow_total": 3,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.11,
+   "yellow_per90": 0.23,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 23.4,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-c",
+    "minutes": 2152,
+    "club": "ABC"
+   },
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 998,
+    "club": "Sampaio Corrêa"
+   },
+   {
+    "year": "2023",
+    "league": "serie-c",
+    "minutes": 599,
+    "club": "Remo"
+   },
+   {
+    "year": "2024",
+    "league": "serie-c",
+    "minutes": 1122,
+    "club": "Floresta EC"
+   },
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 1936,
+    "club": "Floresta EC"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 3.9212,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 67.3516,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 3.9382,
+    "resid_sd": 1.5346,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 2.4545,
+    "resid_sd": 1.0324,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.6265,
+    "resid_sd": 0.2747,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0544,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 7.687,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 68.9291,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.8273,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 62.7455,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 6.0235,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 53.0884,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.6816,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 52.3002,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.6101,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.045,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0587,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0105,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 4.2363,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 60.7682,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-001708",
+ "person_key": "name:icaro|1993|0"
 }

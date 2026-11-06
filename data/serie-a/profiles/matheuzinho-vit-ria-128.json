@@ -63,7 +63,7 @@
     "label": "Recuperações",
     "kind": "metric",
     "grade": "C-",
-    "percentile": 28.0,
+    "percentile": 27.7,
     "display_value": "3,2",
     "stats": []
    }
@@ -413,5 +413,234 @@
    "high_speed_km_p90": 38,
    "sprinting_km_p90": 34
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.7,
+  "fouls_total": 16,
+  "yellow_per90": 0.22,
+  "yellow_total": 5,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.24,
+   "yellow_per90": 0.19,
+   "red_per90": 0.0
+  }
+ },
+ "pass_distance_m": 15.08,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-b",
+    "minutes": 1911,
+    "club": "Vila Nova"
+   },
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 2009,
+    "club": "Vitória"
+   },
+   {
+    "year": "2023",
+    "league": "serie-c",
+    "minutes": 465,
+    "club": "América RN"
+   },
+   {
+    "year": "2023",
+    "league": "serie-c",
+    "minutes": 814,
+    "club": "EC São José"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 2755,
+    "club": "Vitória"
+   },
+   {
+    "year": "2024",
+    "league": "serie-c",
+    "minutes": 877,
+    "club": "EC São José"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 1951,
+    "club": "Vitória"
+   }
+  ],
+  "metrics": {
+   "Duelos Vencidos": {
+    "predicted": 2.3423,
+    "resid_sd": 0.7035,
+    "train_n90": 19.61
+   },
+   "Duelos Vencidos::Eficiência": {
+    "predicted": 56.535,
+    "resid_sd": 6.6015,
+    "train_n90": 19.61
+   },
+   "Ações Defensivas": {
+    "predicted": 1.0995,
+    "resid_sd": 0.6853,
+    "train_n90": 19.61
+   },
+   "Passes Progressivos": {
+    "predicted": 4.9382,
+    "resid_sd": 1.1225,
+    "train_n90": 19.53
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 77.9536,
+    "resid_sd": 7.2942,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final": {
+    "predicted": 3.9049,
+    "resid_sd": 1.0778,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 69.9836,
+    "resid_sd": 9.042,
+    "train_n90": 19.53
+   },
+   "Passes Longos": {
+    "predicted": 2.9882,
+    "resid_sd": 0.8211,
+    "train_n90": 19.53
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 55.7128,
+    "resid_sd": 11.297,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes": {
+    "predicted": 28.602,
+    "resid_sd": 4.6427,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 20.8029,
+    "resid_sd": 3.9417,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 1.1274,
+    "resid_sd": 0.4355,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.2114,
+    "resid_sd": 0.4596,
+    "train_n90": 19.53
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 2.2567,
+    "resid_sd": 0.7912,
+    "train_n90": 19.5
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 34.2838,
+    "resid_sd": 10.3125,
+    "train_n90": 19.5
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0783,
+    "resid_sd": 0.0712,
+    "train_n90": 19.53
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.1293,
+    "resid_sd": 0.0556,
+    "train_n90": 19.53
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 58.9573,
+    "resid_sd": 11.5087,
+    "train_n90": 19.53
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.1662,
+    "resid_sd": 0.1084,
+    "train_n90": 19.5
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.1702,
+    "resid_sd": 0.0689,
+    "train_n90": 19.5
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 1.6029,
+    "resid_sd": 0.4902,
+    "train_n90": 19.51
+   },
+   "Finalizações::Finalizações certas": {
+    "predicted": 36.118,
+    "resid_sd": 9.09,
+    "train_n90": 19.51
+   },
+   "Finalizações::Eficiência": {
+    "predicted": 36.118,
+    "resid_sd": 9.09,
+    "train_n90": 19.51
+   },
+   "Disputas com Bola": {
+    "predicted": 5.301,
+    "resid_sd": 1.4313,
+    "train_n90": 19.53
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 43.8111,
+    "resid_sd": 6.1284,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 2.8122,
+    "resid_sd": 1.1907,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 54.6938,
+    "resid_sd": 8.582,
+    "train_n90": 19.53
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 1.6977,
+    "resid_sd": 0.6531,
+    "train_n90": 19.5
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.3571,
+    "resid_sd": 0.3241,
+    "train_n90": 19.5
+   },
+   "Ações Terminais::Toques na Área": {
+    "predicted": 1.9499,
+    "resid_sd": 0.6914,
+    "train_n90": 19.51
+   },
+   "Ações Terminais::Ações Ofensivas": {
+    "predicted": 3.2551,
+    "resid_sd": 1.0181,
+    "train_n90": 19.51
+   },
+   "Verticalidade::% Toque na Área": {
+    "predicted": 8.936,
+    "resid_sd": 4.3906,
+    "train_n90": 19.51
+   },
+   "Verticalidade::Recepção de Passes Longos": {
+    "predicted": 1.3628,
+    "resid_sd": 0.526,
+    "train_n90": 19.51
+   }
+  }
+ },
+ "athlete_id": "ath-002999",
+ "person_key": "name:matheuzinho|1994|1"
 }

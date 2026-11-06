@@ -84,7 +84,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 95.9,
+      "percentile": 96.3,
       "display_value": "6,0"
      }
     ],
@@ -94,11 +94,11 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "A",
-    "percentile": 92.5,
+    "percentile": 94.7,
     "pair_badge": [
      33.3,
-     38.3,
-     92.5
+     73.7,
+     94.7
     ],
     "sub_metrics": [
      {
@@ -108,13 +108,13 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 38.3,
+      "percentile": 73.7,
       "display_value": "13,0"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 92.5,
-      "display_value": "+1,5"
+      "percentile": 94.7,
+      "display_value": "+1,6"
      }
     ],
     "stats": []
@@ -5333,5 +5333,166 @@
    "high_speed_km_p90": 33,
    "sprinting_km_p90": 27
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.67,
+  "fouls_total": 18,
+  "yellow_per90": 0.26,
+  "yellow_total": 7,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.13,
+   "yellow_per90": 0.19,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 19.94,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 786,
+    "club": "Atlético Mineiro"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 2211,
+    "club": "Atlético Mineiro"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 1194,
+    "club": "Grêmio"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 1548,
+    "club": "Grêmio"
+   }
+  ],
+  "metrics": {
+   "Passes Progressivos": {
+    "predicted": 6.9021,
+    "resid_sd": 1.4898,
+    "train_n90": 21.12
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 71.9597,
+    "resid_sd": 5.4351,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.1455,
+    "resid_sd": 1.3234,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 69.3405,
+    "resid_sd": 7.5615,
+    "train_n90": 21.12
+   },
+   "Passes Longos": {
+    "predicted": 3.4432,
+    "resid_sd": 1.0858,
+    "train_n90": 21.12
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 50.8101,
+    "resid_sd": 7.7543,
+    "train_n90": 21.12
+   },
+   "Distribuição::Passes": {
+    "predicted": 37.3235,
+    "resid_sd": 5.6544,
+    "train_n90": 21.1
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 28.1103,
+    "resid_sd": 5.0027,
+    "train_n90": 21.1
+   },
+   "Disputas com Bola": {
+    "predicted": 3.9228,
+    "resid_sd": 0.8007,
+    "train_n90": 21.12
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 47.3721,
+    "resid_sd": 7.4529,
+    "train_n90": 21.12
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 3.2819,
+    "resid_sd": 0.6641,
+    "train_n90": 21.1
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 59.3814,
+    "resid_sd": 11.179,
+    "train_n90": 21.1
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 1.4459,
+    "resid_sd": 0.502,
+    "train_n90": 21.1
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.2702,
+    "resid_sd": 0.2465,
+    "train_n90": 21.1
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0411,
+    "resid_sd": 0.0494,
+    "train_n90": 21.11
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0859,
+    "resid_sd": 0.0357,
+    "train_n90": 21.11
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 3.3647,
+    "resid_sd": 0.8183,
+    "train_n90": 21.1
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 34.9478,
+    "resid_sd": 7.9284,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.9822,
+    "resid_sd": 0.3528,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.3142,
+    "resid_sd": 0.4266,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0541,
+    "resid_sd": 0.0541,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.1153,
+    "resid_sd": 0.0441,
+    "train_n90": 21.1
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 57.1688,
+    "resid_sd": 11.4476,
+    "train_n90": 21.1
+   }
+  }
+ },
+ "athlete_id": "ath-000626",
+ "person_key": "name:cristian pavon|1996|0"
 }

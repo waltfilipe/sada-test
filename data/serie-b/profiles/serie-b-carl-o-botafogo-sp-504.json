@@ -78,10 +78,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "D",
-    "percentile": 20.7,
+    "percentile": 19.8,
     "pair_badge": [
      100.0,
-     20.7
+     19.8
     ],
     "sub_metrics": [
      {
@@ -91,7 +91,7 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 20.7,
+      "percentile": 19.8,
       "display_value": "-0,7"
      }
     ],
@@ -332,5 +332,137 @@
    "high_speed_km_p90": 14,
    "sprinting_km_p90": 40
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.43,
+  "fouls_total": 6,
+  "yellow_per90": 0.24,
+  "yellow_total": 1,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.13,
+   "yellow_per90": 0.2,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 25.02,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 308,
+    "club": "Ituano"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 4.6957,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 70.5522,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 7.6764,
+    "role_change_flag": true,
+    "resid_sd": 1.5346,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.5471,
+    "resid_sd": 1.0324,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.8044,
+    "role_change_flag": true,
+    "resid_sd": 0.2747,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0429,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 5.6904,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 58.8769,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 2.7204,
+    "role_change_flag": true,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 64.8613,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 2.9067,
+    "role_change_flag": true,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 54.9847,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.9972,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 48.3752,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.761,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0276,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0546,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0086,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 6.874,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 58.2327,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-000522",
+ "person_key": "name:carlao|2000|1"
 }

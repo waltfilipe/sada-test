@@ -89,10 +89,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "D",
-    "percentile": 15.1,
+    "percentile": 7.9,
     "pair_badge": [
      100.0,
-     15.1
+     7.9
     ],
     "sub_metrics": [
      {
@@ -102,8 +102,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 15.1,
-      "display_value": "-0,9"
+      "percentile": 7.9,
+      "display_value": "-1,3"
      }
     ],
     "stats": []
@@ -7031,5 +7031,200 @@
    "high_speed_km_p90": 54,
    "sprinting_km_p90": 59
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.94,
+  "fouls_total": 32,
+  "yellow_per90": 0.06,
+  "yellow_total": 2,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.68,
+   "yellow_per90": 0.26,
+   "red_per90": 0.02
+  }
+ },
+ "pass_distance_m": 17.25,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-c",
+    "minutes": 1400,
+    "club": "EC São José"
+   },
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 566,
+    "club": "Criciúma"
+   },
+   {
+    "year": "2025",
+    "league": "serie-b",
+    "minutes": 1704,
+    "club": "CRB"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 5.5404,
+    "resid_sd": 1.1828,
+    "train_n90": 20.79
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 58.5087,
+    "resid_sd": 5.4132,
+    "train_n90": 20.79
+   },
+   "Duelos Aéreos": {
+    "predicted": 1.8904,
+    "resid_sd": 0.7267,
+    "train_n90": 20.79
+   },
+   "Duelos Aéreos::Eficiência": {
+    "predicted": 41.5111,
+    "resid_sd": 11.0907,
+    "train_n90": 20.79
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 1.0952,
+    "resid_sd": 0.683,
+    "train_n90": 20.79
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.2824,
+    "resid_sd": 0.8593,
+    "train_n90": 20.79
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.2854,
+    "resid_sd": 0.1924,
+    "train_n90": 20.79
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.029,
+    "resid_sd": 0.0563,
+    "train_n90": 20.79
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -0.9553,
+    "resid_sd": 0.7532,
+    "train_n90": 21.12
+   },
+   "Passes Progressivos": {
+    "predicted": 7.343,
+    "resid_sd": 1.3163,
+    "train_n90": 20.81
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 72.2093,
+    "resid_sd": 6.6991,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final": {
+    "predicted": 8.2543,
+    "resid_sd": 1.5516,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 74.3282,
+    "resid_sd": 5.7922,
+    "train_n90": 20.81
+   },
+   "Passes Longos": {
+    "predicted": 4.1802,
+    "resid_sd": 0.9922,
+    "train_n90": 20.81
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 56.2037,
+    "resid_sd": 8.0347,
+    "train_n90": 20.81
+   },
+   "Distribuição::Passes": {
+    "predicted": 45.8866,
+    "resid_sd": 6.5607,
+    "train_n90": 20.82
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 33.8131,
+    "resid_sd": 5.6925,
+    "train_n90": 20.82
+   },
+   "Disputas com Bola": {
+    "predicted": 3.518,
+    "resid_sd": 0.9071,
+    "train_n90": 20.81
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 46.9037,
+    "resid_sd": 7.459,
+    "train_n90": 20.81
+   },
+   "Conduções Progressivas": {
+    "predicted": 1.4338,
+    "resid_sd": 0.3984,
+    "train_n90": 20.75
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 1.1251,
+    "resid_sd": 0.5762,
+    "train_n90": 20.82
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 59.306,
+    "resid_sd": 13.5736,
+    "train_n90": 20.82
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.8723,
+    "resid_sd": 0.3299,
+    "train_n90": 20.82
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 0.9926,
+    "resid_sd": 0.3224,
+    "train_n90": 20.82
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0733,
+    "resid_sd": 0.0574,
+    "train_n90": 20.82
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.0588,
+    "resid_sd": 0.0374,
+    "train_n90": 20.82
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 59.3528,
+    "resid_sd": 11.6803,
+    "train_n90": 20.82
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 1.4901,
+    "resid_sd": 0.3791,
+    "train_n90": 20.81
+   },
+   "Finalizações::xG": {
+    "predicted": 0.0035,
+    "resid_sd": 0.0026,
+    "train_n90": 20.79
+   },
+   "Ofensividade::Ações Ofensivas": {
+    "predicted": 1.5066,
+    "resid_sd": 0.4941,
+    "train_n90": 20.81
+   },
+   "Ofensividade::Toques na Área": {
+    "predicted": 0.9379,
+    "resid_sd": 0.3845,
+    "train_n90": 20.81
+   }
+  }
+ },
+ "athlete_id": "ath-000633",
+ "person_key": "name:crystopher|1998|0"
 }

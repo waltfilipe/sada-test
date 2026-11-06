@@ -78,10 +78,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "B",
-    "percentile": 72.7,
+    "percentile": 68.6,
     "pair_badge": [
      100.0,
-     72.7
+     68.6
     ],
     "sub_metrics": [
      {
@@ -91,7 +91,7 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 72.7,
+      "percentile": 68.6,
       "display_value": "+0,5"
      }
     ],
@@ -4130,5 +4130,151 @@
    "high_speed_km_p90": 32,
    "sprinting_km_p90": 36
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.51,
+  "fouls_total": 31,
+  "yellow_per90": 0.1,
+  "yellow_total": 2,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.13,
+   "yellow_per90": 0.2,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 22.81,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2023",
+    "league": "serie-c",
+    "minutes": 536,
+    "club": "Ypiranga Erechim"
+   },
+   {
+    "year": "2024",
+    "league": "serie-c",
+    "minutes": 236,
+    "club": "Figueirense"
+   },
+   {
+    "year": "2025",
+    "league": "serie-b",
+    "minutes": 1399,
+    "club": "Atlético GO"
+   },
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 1407,
+    "club": "Maringá"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 7.0465,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 66.864,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 6.2105,
+    "resid_sd": 1.5346,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.4538,
+    "resid_sd": 1.0324,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.7156,
+    "resid_sd": 0.2747,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0561,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 7.8694,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 66.1822,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.6625,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 66.7303,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 5.5587,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 51.7621,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.9715,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.8854,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.5618,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.029,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0511,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0101,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 5.239,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 59.6292,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-004031",
+ "person_key": "name:tito|1997|0"
 }

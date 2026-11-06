@@ -65,7 +65,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "C-",
-    "percentile": 34.5,
+    "percentile": 34.4,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -84,7 +84,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 4.1,
+      "percentile": 3.7,
       "display_value": "1,5"
      }
     ],
@@ -94,11 +94,11 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "C-",
-    "percentile": 28.6,
+    "percentile": 27.1,
     "pair_badge": [
      100.0,
-     7.5,
-     28.6
+     11.3,
+     27.1
     ],
     "sub_metrics": [
      {
@@ -108,12 +108,12 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 7.5,
+      "percentile": 11.3,
       "display_value": "6,6"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 28.6,
+      "percentile": 27.1,
       "display_value": "-0,5"
      }
     ],
@@ -993,5 +993,197 @@
   "sprinting_km_p90": 0.21,
   "percentiles": {},
   "ranks": {}
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.86,
+  "fouls_total": 2,
+  "yellow_per90": 0.43,
+  "yellow_total": 1,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.13,
+   "yellow_per90": 0.19,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 15.53,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-c",
+    "minutes": 547,
+    "club": "EC São José"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 3228,
+    "club": "Ceará"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 6.7138,
+    "resid_sd": 1.1811,
+    "train_n90": 21.19
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 60.9094,
+    "resid_sd": 5.8229,
+    "train_n90": 21.19
+   },
+   "Duelos Aéreos": {
+    "predicted": 2.0736,
+    "resid_sd": 0.7678,
+    "train_n90": 21.17
+   },
+   "Duelos Aéreos::Eficiência": {
+    "predicted": 45.8811,
+    "resid_sd": 9.2381,
+    "train_n90": 21.17
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0205,
+    "resid_sd": 0.0604,
+    "train_n90": 21.19
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -0.9237,
+    "resid_sd": 0.6461,
+    "train_n90": 20.13
+   },
+   "Passes Progressivos": {
+    "predicted": 7.6166,
+    "resid_sd": 1.4898,
+    "train_n90": 21.12
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 71.1425,
+    "resid_sd": 5.4351,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.8485,
+    "resid_sd": 1.3234,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 69.5944,
+    "resid_sd": 7.5615,
+    "train_n90": 21.12
+   },
+   "Passes Longos": {
+    "predicted": 4.8408,
+    "resid_sd": 1.0858,
+    "train_n90": 21.12
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 51.97,
+    "resid_sd": 7.7543,
+    "train_n90": 21.12
+   },
+   "Distribuição::Passes": {
+    "predicted": 37.3784,
+    "resid_sd": 5.6544,
+    "train_n90": 21.1
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 26.362,
+    "resid_sd": 5.0027,
+    "train_n90": 21.1
+   },
+   "Disputas com Bola": {
+    "predicted": 3.4756,
+    "resid_sd": 0.8007,
+    "train_n90": 21.12
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 46.4588,
+    "resid_sd": 7.4529,
+    "train_n90": 21.12
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 1.3004,
+    "resid_sd": 0.6641,
+    "train_n90": 21.1
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 57.2071,
+    "resid_sd": 11.179,
+    "train_n90": 21.1
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 1.1323,
+    "role_change_flag": true,
+    "resid_sd": 0.502,
+    "train_n90": 21.1
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.2246,
+    "resid_sd": 0.2465,
+    "train_n90": 21.1
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0306,
+    "resid_sd": 0.0494,
+    "train_n90": 21.11
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0318,
+    "resid_sd": 0.0357,
+    "train_n90": 21.11
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 2.2087,
+    "resid_sd": 0.8183,
+    "train_n90": 21.1
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 36.046,
+    "role_change_flag": true,
+    "resid_sd": 7.9284,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.5738,
+    "resid_sd": 0.3528,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.0587,
+    "role_change_flag": true,
+    "resid_sd": 0.4266,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0584,
+    "resid_sd": 0.0541,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.061,
+    "resid_sd": 0.0441,
+    "train_n90": 21.1
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 56.1832,
+    "resid_sd": 11.4476,
+    "train_n90": 21.1
+   },
+   "Ofensividade::Ações Ofensivas": {
+    "predicted": 1.6707,
+    "resid_sd": 0.6323,
+    "train_n90": 21.17
+   },
+   "Ofensividade::Toques na Área": {
+    "predicted": 0.5989,
+    "resid_sd": 0.375,
+    "train_n90": 21.17
+   }
+  }
+ },
+ "athlete_id": "ath-001109",
+ "person_key": "name:fabiano|2000|0"
 }

@@ -88,11 +88,11 @@
    {
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
-    "grade": "B-",
-    "percentile": 55.6,
+    "grade": "C+",
+    "percentile": 53.7,
     "pair_badge": [
      100.0,
-     55.6
+     53.7
     ],
     "sub_metrics": [
      {
@@ -102,7 +102,7 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 55.6,
+      "percentile": 53.7,
       "display_value": "+0,1"
      }
     ],
@@ -500,5 +500,107 @@
   ],
   "point_count": 12,
   "image_url": null
- }
+ },
+ "pass_distance_m": 21.33,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 1356,
+    "club": "Ponte Preta"
+   },
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 195,
+    "club": "Ponte Preta"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 4.8021,
+    "resid_sd": 1.1811,
+    "train_n90": 21.19
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 61.9809,
+    "role_change_flag": true,
+    "resid_sd": 5.8229,
+    "train_n90": 21.19
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 2.69,
+    "role_change_flag": true,
+    "resid_sd": 1.1156,
+    "train_n90": 21.19
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.9548,
+    "resid_sd": 0.8873,
+    "train_n90": 21.19
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0556,
+    "resid_sd": 0.0604,
+    "train_n90": 21.19
+   },
+   "Passes Progressivos": {
+    "predicted": 7.2016,
+    "resid_sd": 1.4898,
+    "train_n90": 21.12
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 70.7528,
+    "resid_sd": 5.4351,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.3283,
+    "resid_sd": 1.3234,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 65.2766,
+    "role_change_flag": true,
+    "resid_sd": 7.5615,
+    "train_n90": 21.12
+   },
+   "Passes Longos": {
+    "predicted": 5.1716,
+    "role_change_flag": true,
+    "resid_sd": 1.0858,
+    "train_n90": 21.12
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 49.0702,
+    "resid_sd": 7.7543,
+    "train_n90": 21.12
+   },
+   "Disputas com Bola": {
+    "predicted": 1.899,
+    "role_change_flag": true,
+    "resid_sd": 0.8007,
+    "train_n90": 21.12
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 45.0447,
+    "role_change_flag": true,
+    "resid_sd": 7.4529,
+    "train_n90": 21.12
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0262,
+    "resid_sd": 0.0494,
+    "train_n90": 21.11
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0267,
+    "resid_sd": 0.0357,
+    "train_n90": 21.11
+   }
+  }
+ },
+ "athlete_id": "ath-000941",
+ "person_key": "name:edson|2003|0"
 }

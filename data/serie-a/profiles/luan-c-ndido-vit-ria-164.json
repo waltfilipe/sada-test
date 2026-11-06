@@ -54,7 +54,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "C",
-    "percentile": 44.1,
+    "percentile": 44.0,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -73,7 +73,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 9.4,
+      "percentile": 9.2,
       "display_value": "1,8"
      }
     ],
@@ -83,11 +83,11 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "B",
-    "percentile": 68.6,
+    "percentile": 69.5,
     "pair_badge": [
      100.0,
-     30.8,
-     68.6
+     29.9,
+     69.5
     ],
     "sub_metrics": [
      {
@@ -97,12 +97,12 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 30.8,
+      "percentile": 29.9,
       "display_value": "11,7"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 68.6,
+      "percentile": 69.5,
       "display_value": "+0,6"
      }
     ],
@@ -3277,5 +3277,136 @@
    "high_speed_km_p90": 87,
    "sprinting_km_p90": 89
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.72,
+  "fouls_total": 18,
+  "yellow_per90": 0.12,
+  "yellow_total": 3,
+  "red_per90": 0.04,
+  "red_total": 1,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 21.91,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 2883,
+    "club": "Red Bull Bragantino"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 1263,
+    "club": "Red Bull Bragantino"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 2218,
+    "club": "Red Bull Bragantino"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 1462,
+    "club": "Sport Recife"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 4.9436,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 63.1179,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0328,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 6.0101,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 66.9315,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.5461,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 71.9937,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 3.5062,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 55.3965,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 1.0584,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 48.1666,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.501,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0332,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0549,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0086,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 3.8291,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 61.5775,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-002458",
+ "person_key": "name:luan candido|2001|0"
 }

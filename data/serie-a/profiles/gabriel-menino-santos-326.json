@@ -63,7 +63,7 @@
     "label": "Recuperações",
     "kind": "metric",
     "grade": "B-",
-    "percentile": 57.6,
+    "percentile": 55.3,
     "display_value": "4,0",
     "stats": []
    }
@@ -2395,5 +2395,151 @@
    "high_speed_km_p90": 12,
    "sprinting_km_p90": 25
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.33,
+  "fouls_total": 10,
+  "yellow_per90": 0.27,
+  "yellow_total": 2,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.24,
+   "yellow_per90": 0.19,
+   "red_per90": 0.0
+  }
+ },
+ "pass_distance_m": 16.89,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 1048,
+    "club": "Palmeiras"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 1753,
+    "club": "Palmeiras"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 1228,
+    "club": "Palmeiras"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 1028,
+    "club": "Atlético Mineiro"
+   }
+  ],
+  "metrics": {
+   "Passes Progressivos": {
+    "predicted": 6.368,
+    "resid_sd": 1.1225,
+    "train_n90": 19.53
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 78.4002,
+    "resid_sd": 7.2942,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final": {
+    "predicted": 6.3622,
+    "resid_sd": 1.0778,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 74.5019,
+    "resid_sd": 9.042,
+    "train_n90": 19.53
+   },
+   "Passes Longos": {
+    "predicted": 4.4193,
+    "resid_sd": 0.8211,
+    "train_n90": 19.53
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 56.9143,
+    "resid_sd": 11.297,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes": {
+    "predicted": 40.608,
+    "resid_sd": 4.6427,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 30.6114,
+    "resid_sd": 3.9417,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 1.3139,
+    "resid_sd": 0.4355,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.3191,
+    "resid_sd": 0.4596,
+    "train_n90": 19.53
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 1.6774,
+    "resid_sd": 0.7912,
+    "train_n90": 19.5
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 34.039,
+    "resid_sd": 10.3125,
+    "train_n90": 19.5
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0833,
+    "resid_sd": 0.0712,
+    "train_n90": 19.53
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.135,
+    "resid_sd": 0.0556,
+    "train_n90": 19.53
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 59.0419,
+    "resid_sd": 11.5087,
+    "train_n90": 19.53
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 1.6128,
+    "resid_sd": 0.4902,
+    "train_n90": 19.51
+   },
+   "Disputas com Bola": {
+    "predicted": 4.5251,
+    "resid_sd": 1.4313,
+    "train_n90": 19.53
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 43.1785,
+    "resid_sd": 6.1284,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 2.4113,
+    "resid_sd": 1.1907,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 54.3098,
+    "resid_sd": 8.582,
+    "train_n90": 19.53
+   }
+  }
+ },
+ "athlete_id": "ath-001335",
+ "person_key": "name:gabriel menino|2000|0"
 }

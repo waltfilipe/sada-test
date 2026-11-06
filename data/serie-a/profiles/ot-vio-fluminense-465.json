@@ -65,7 +65,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "C+",
-    "percentile": 48.8,
+    "percentile": 49.2,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -84,7 +84,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 44.1,
+      "percentile": 46.0,
       "display_value": "4,2"
      }
     ],
@@ -97,7 +97,7 @@
     "percentile": 59.3,
     "pair_badge": [
      66.7,
-     87.2,
+     69.3,
      59.3
     ],
     "sub_metrics": [
@@ -108,7 +108,7 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 87.2,
+      "percentile": 69.3,
       "display_value": "11,3"
      },
      {
@@ -1522,5 +1522,181 @@
    "high_speed_km_p90": 76,
    "sprinting_km_p90": 71
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.54,
+  "fouls_total": 7,
+  "yellow_per90": 0.44,
+  "yellow_total": 2,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.58,
+   "yellow_per90": 0.24,
+   "red_per90": 0.03
+  }
+ },
+ "pass_distance_m": 17.36,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 1302,
+    "club": "Atlético Mineiro"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 2640,
+    "club": "Atlético Mineiro"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 2160,
+    "club": "Atlético Mineiro"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 264,
+    "club": "Fluminense"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 6.7573,
+    "resid_sd": 1.1828,
+    "train_n90": 20.79
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 59.2598,
+    "resid_sd": 5.4132,
+    "train_n90": 20.79
+   },
+   "Duelos Aéreos": {
+    "predicted": 2.0184,
+    "resid_sd": 0.7267,
+    "train_n90": 20.79
+   },
+   "Duelos Aéreos::Eficiência": {
+    "predicted": 45.9955,
+    "resid_sd": 11.0907,
+    "train_n90": 20.79
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0242,
+    "resid_sd": 0.0563,
+    "train_n90": 20.79
+   },
+   "Passes Progressivos": {
+    "predicted": 5.8156,
+    "resid_sd": 1.3163,
+    "train_n90": 20.81
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 73.4235,
+    "resid_sd": 6.6991,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final": {
+    "predicted": 6.6373,
+    "resid_sd": 1.5516,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 79.3339,
+    "resid_sd": 5.7922,
+    "train_n90": 20.81
+   },
+   "Passes Longos": {
+    "predicted": 3.679,
+    "resid_sd": 0.9922,
+    "train_n90": 20.81
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 64.8929,
+    "resid_sd": 8.0347,
+    "train_n90": 20.81
+   },
+   "Distribuição::Passes": {
+    "predicted": 48.424,
+    "resid_sd": 6.5607,
+    "train_n90": 20.82
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 35.8815,
+    "resid_sd": 5.6925,
+    "train_n90": 20.82
+   },
+   "Disputas com Bola": {
+    "predicted": 2.2827,
+    "resid_sd": 0.9071,
+    "train_n90": 20.81
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 41.4739,
+    "resid_sd": 7.459,
+    "train_n90": 20.81
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 0.5768,
+    "resid_sd": 0.5762,
+    "train_n90": 20.82
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 42.8799,
+    "resid_sd": 13.5736,
+    "train_n90": 20.82
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.3288,
+    "resid_sd": 0.3299,
+    "train_n90": 20.82
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 0.3482,
+    "resid_sd": 0.3224,
+    "train_n90": 20.82
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.053,
+    "resid_sd": 0.0574,
+    "train_n90": 20.82
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.0113,
+    "resid_sd": 0.0374,
+    "train_n90": 20.82
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 59.596,
+    "resid_sd": 11.6803,
+    "train_n90": 20.82
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 0.3883,
+    "resid_sd": 0.3791,
+    "train_n90": 20.81
+   },
+   "Finalizações::xG": {
+    "predicted": 0.0028,
+    "resid_sd": 0.0026,
+    "train_n90": 20.79
+   },
+   "Ofensividade::Ações Ofensivas": {
+    "predicted": 0.5577,
+    "resid_sd": 0.4941,
+    "train_n90": 20.81
+   },
+   "Ofensividade::Toques na Área": {
+    "predicted": 0.4085,
+    "resid_sd": 0.3845,
+    "train_n90": 20.81
+   }
+  }
+ },
+ "athlete_id": "ath-003204",
+ "person_key": "name:otavio|1994|0"
 }

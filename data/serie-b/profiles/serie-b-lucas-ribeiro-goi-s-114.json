@@ -77,11 +77,11 @@
    {
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
-    "grade": "D",
-    "percentile": 24.0,
+    "grade": "C-",
+    "percentile": 28.1,
     "pair_badge": [
      100.0,
-     24.0
+     28.1
     ],
     "sub_metrics": [
      {
@@ -91,7 +91,7 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 24.0,
+      "percentile": 28.1,
       "display_value": "-0,5"
      }
     ],
@@ -5338,5 +5338,156 @@
    "high_speed_km_p90": 24,
    "sprinting_km_p90": 17
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.12,
+  "fouls_total": 28,
+  "yellow_per90": 0.24,
+  "yellow_total": 6,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.13,
+   "yellow_per90": 0.2,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 21.61,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 575,
+    "club": "Ceará"
+   },
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 450,
+    "club": "Ceará"
+   },
+   {
+    "year": "2024",
+    "league": "serie-b",
+    "minutes": 2850,
+    "club": "Goiás"
+   },
+   {
+    "year": "2025",
+    "league": "serie-b",
+    "minutes": 2165,
+    "club": "Goiás"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 4.6728,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 65.1566,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 4.3332,
+    "resid_sd": 1.5346,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.4766,
+    "resid_sd": 1.0324,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.7504,
+    "resid_sd": 0.2747,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0389,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -1.0322,
+    "resid_sd": 0.7483,
+    "train_n90": 20.4
+   },
+   "Passes Progressivos": {
+    "predicted": 6.9736,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 73.645,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.1849,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 73.2107,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 4.9734,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 57.1783,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 1.0459,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.9621,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.8905,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0392,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0506,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0089,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 3.5167,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 58.1001,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-002576",
+ "person_key": "name:lucas ribeiro|1999|0"
 }

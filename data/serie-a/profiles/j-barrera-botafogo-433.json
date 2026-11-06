@@ -62,8 +62,8 @@
    {
     "label": "Recuperações",
     "kind": "metric",
-    "grade": "C-",
-    "percentile": 25.0,
+    "grade": "D",
+    "percentile": 24.8,
     "display_value": "3,2",
     "stats": []
    }
@@ -1323,5 +1323,204 @@
    "high_speed_km_p90": 11,
    "sprinting_km_p90": 5
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.52,
+  "fouls_total": 8,
+  "yellow_per90": 0.0,
+  "yellow_total": 0,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.24,
+   "yellow_per90": 0.19,
+   "red_per90": 0.0
+  }
+ },
+ "pass_distance_m": 15.64,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 347,
+    "club": "Botafogo"
+   }
+  ],
+  "metrics": {
+   "Duelos Vencidos": {
+    "predicted": 3.2797,
+    "resid_sd": 0.7035,
+    "train_n90": 19.61
+   },
+   "Duelos Vencidos::Eficiência": {
+    "predicted": 58.8776,
+    "resid_sd": 6.6015,
+    "train_n90": 19.61
+   },
+   "Ações Defensivas": {
+    "predicted": 0.9398,
+    "resid_sd": 0.6853,
+    "train_n90": 19.61
+   },
+   "Passes Progressivos": {
+    "predicted": 3.1194,
+    "resid_sd": 1.1225,
+    "train_n90": 19.53
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 79.9868,
+    "resid_sd": 7.2942,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final": {
+    "predicted": 1.9738,
+    "resid_sd": 1.0778,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 75.5802,
+    "resid_sd": 9.042,
+    "train_n90": 19.53
+   },
+   "Passes Longos": {
+    "predicted": 1.1457,
+    "resid_sd": 0.8211,
+    "train_n90": 19.53
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 53.8286,
+    "role_change_flag": true,
+    "resid_sd": 11.297,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes": {
+    "predicted": 24.3898,
+    "resid_sd": 4.6427,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 19.3329,
+    "resid_sd": 3.9417,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 1.2618,
+    "role_change_flag": true,
+    "resid_sd": 0.4355,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.3583,
+    "resid_sd": 0.4596,
+    "train_n90": 19.53
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 2.0787,
+    "resid_sd": 0.7912,
+    "train_n90": 19.5
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 36.7671,
+    "resid_sd": 10.3125,
+    "train_n90": 19.5
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0892,
+    "resid_sd": 0.0712,
+    "train_n90": 19.53
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.1435,
+    "resid_sd": 0.0556,
+    "train_n90": 19.53
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 58.0233,
+    "resid_sd": 11.5087,
+    "train_n90": 19.53
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.1831,
+    "resid_sd": 0.1084,
+    "train_n90": 19.5
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.1935,
+    "resid_sd": 0.0689,
+    "train_n90": 19.5
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 2.0408,
+    "resid_sd": 0.4902,
+    "train_n90": 19.51
+   },
+   "Finalizações::Finalizações certas": {
+    "predicted": 35.8608,
+    "role_change_flag": true,
+    "resid_sd": 9.09,
+    "train_n90": 19.51
+   },
+   "Finalizações::Eficiência": {
+    "predicted": 35.8608,
+    "role_change_flag": true,
+    "resid_sd": 9.09,
+    "train_n90": 19.51
+   },
+   "Disputas com Bola": {
+    "predicted": 7.3131,
+    "resid_sd": 1.4313,
+    "train_n90": 19.53
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 41.7666,
+    "resid_sd": 6.1284,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 3.3739,
+    "resid_sd": 1.1907,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 52.6274,
+    "resid_sd": 8.582,
+    "train_n90": 19.53
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 2.6715,
+    "role_change_flag": true,
+    "resid_sd": 0.6531,
+    "train_n90": 19.5
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.234,
+    "resid_sd": 0.3241,
+    "train_n90": 19.5
+   },
+   "Ações Terminais::Toques na Área": {
+    "predicted": 2.8363,
+    "resid_sd": 0.6914,
+    "train_n90": 19.51
+   },
+   "Ações Terminais::Ações Ofensivas": {
+    "predicted": 3.4813,
+    "resid_sd": 1.0181,
+    "train_n90": 19.51
+   },
+   "Verticalidade::% Toque na Área": {
+    "predicted": 15.6857,
+    "resid_sd": 4.3906,
+    "train_n90": 19.51
+   },
+   "Verticalidade::Recepção de Passes Longos": {
+    "predicted": 2.3687,
+    "role_change_flag": true,
+    "resid_sd": 0.526,
+    "train_n90": 19.51
+   }
+  }
+ },
+ "athlete_id": "ath-001783",
+ "person_key": "name:j barrera|2006|0"
 }

@@ -54,7 +54,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "B",
-    "percentile": 67.2,
+    "percentile": 67.0,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -73,7 +73,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 80.2,
+      "percentile": 79.6,
       "display_value": "3,9"
      }
     ],
@@ -83,11 +83,11 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "A",
-    "percentile": 97.5,
+    "percentile": 98.3,
     "pair_badge": [
      100.0,
-     93.2,
-     97.5
+     91.5,
+     98.3
     ],
     "sub_metrics": [
      {
@@ -97,12 +97,12 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 93.2,
+      "percentile": 91.5,
       "display_value": "15,9"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 97.5,
+      "percentile": 98.3,
       "display_value": "+1,6"
      }
     ],
@@ -4093,5 +4093,130 @@
    "high_speed_km_p90": 68,
    "sprinting_km_p90": 22
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.93,
+  "fouls_total": 22,
+  "yellow_per90": 0.21,
+  "yellow_total": 5,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 20.91,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 384,
+    "club": "Cruzeiro"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 901,
+    "club": "Cruzeiro"
+   },
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 427,
+    "club": "Maringá"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 5.7173,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 63.659,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0448,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 5.6768,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 64.9173,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 3.0649,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 74.8151,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 3.4202,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 55.3191,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.908,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.197,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.7793,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0229,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0425,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0088,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 3.7598,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 57.5977,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-002082",
+ "person_key": "name:jonathan|2002|1"
 }

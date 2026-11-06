@@ -53,8 +53,8 @@
    {
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
-    "grade": "B+",
-    "percentile": 79.7,
+    "grade": "B",
+    "percentile": 72.8,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -70,6 +70,11 @@
       "label": "Chutes Bloqueados",
       "percentile": 54.3,
       "display_value": "0,8"
+     },
+     {
+      "label": "Recuperações",
+      "percentile": 52.0,
+      "display_value": "3,1"
      }
     ],
     "stats": []
@@ -78,11 +83,11 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "A",
-    "percentile": 90.7,
+    "percentile": 89.8,
     "pair_badge": [
      66.7,
-     59.0,
-     90.7
+     92.3,
+     89.8
     ],
     "sub_metrics": [
      {
@@ -92,12 +97,12 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 59.0,
-      "display_value": "13,2"
+      "percentile": 92.3,
+      "display_value": "16,3"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 90.7,
+      "percentile": 89.8,
       "display_value": "+1,1"
      }
     ],
@@ -934,5 +939,21 @@
   "sprinting_km_p90": 0.14,
   "percentiles": {},
   "ranks": {}
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.94,
+  "fouls_total": 3,
+  "yellow_per90": 0.31,
+  "yellow_total": 1,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 17.68,
+ "athlete_id": "ath-000852",
+ "person_key": "name:doria|1995|0"
 }

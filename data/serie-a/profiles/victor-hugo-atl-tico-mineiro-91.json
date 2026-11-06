@@ -63,7 +63,7 @@
     "label": "Recuperações",
     "kind": "metric",
     "grade": "D",
-    "percentile": 13.6,
+    "percentile": 14.2,
     "display_value": "2,8",
     "stats": []
    }
@@ -3743,5 +3743,222 @@
    "high_speed_km_p90": 15,
    "sprinting_km_p90": 24
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.27,
+  "fouls_total": 6,
+  "yellow_per90": 0.04,
+  "yellow_total": 1,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.24,
+   "yellow_per90": 0.19,
+   "red_per90": 0.0
+  }
+ },
+ "pass_distance_m": 18.02,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 1340,
+    "club": "Flamengo"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 1485,
+    "club": "Flamengo"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 326,
+    "club": "Flamengo"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 497,
+    "club": "Santos"
+   },
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 994,
+    "club": "Londrina"
+   }
+  ],
+  "metrics": {
+   "Duelos Vencidos": {
+    "predicted": 3.1297,
+    "resid_sd": 0.7035,
+    "train_n90": 19.61
+   },
+   "Duelos Vencidos::Eficiência": {
+    "predicted": 57.1246,
+    "resid_sd": 6.6015,
+    "train_n90": 19.61
+   },
+   "Ações Defensivas": {
+    "predicted": 1.2348,
+    "resid_sd": 0.6853,
+    "train_n90": 19.61
+   },
+   "Passes Progressivos": {
+    "predicted": 3.9586,
+    "resid_sd": 1.1225,
+    "train_n90": 19.53
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 75.3189,
+    "resid_sd": 7.2942,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final": {
+    "predicted": 3.903,
+    "resid_sd": 1.0778,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 75.1431,
+    "resid_sd": 9.042,
+    "train_n90": 19.53
+   },
+   "Passes Longos": {
+    "predicted": 1.6353,
+    "resid_sd": 0.8211,
+    "train_n90": 19.53
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 56.2463,
+    "resid_sd": 11.297,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes": {
+    "predicted": 29.1332,
+    "resid_sd": 4.6427,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 21.1155,
+    "resid_sd": 3.9417,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.8097,
+    "resid_sd": 0.4355,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.0611,
+    "resid_sd": 0.4596,
+    "train_n90": 19.53
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 2.2135,
+    "resid_sd": 0.7912,
+    "train_n90": 19.5
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 31.9555,
+    "resid_sd": 10.3125,
+    "train_n90": 19.5
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0704,
+    "resid_sd": 0.0712,
+    "train_n90": 19.53
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.1087,
+    "resid_sd": 0.0556,
+    "train_n90": 19.53
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 58.0221,
+    "resid_sd": 11.5087,
+    "train_n90": 19.53
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.1627,
+    "resid_sd": 0.1084,
+    "train_n90": 19.5
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.1447,
+    "resid_sd": 0.0689,
+    "train_n90": 19.5
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 1.4696,
+    "resid_sd": 0.4902,
+    "train_n90": 19.51
+   },
+   "Finalizações::Finalizações certas": {
+    "predicted": 35.7188,
+    "resid_sd": 9.09,
+    "train_n90": 19.51
+   },
+   "Finalizações::Eficiência": {
+    "predicted": 35.7188,
+    "resid_sd": 9.09,
+    "train_n90": 19.51
+   },
+   "Disputas com Bola": {
+    "predicted": 5.7612,
+    "resid_sd": 1.4313,
+    "train_n90": 19.53
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 40.9915,
+    "resid_sd": 6.1284,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 3.5576,
+    "resid_sd": 1.1907,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 54.3102,
+    "resid_sd": 8.582,
+    "train_n90": 19.53
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 1.9376,
+    "resid_sd": 0.6531,
+    "train_n90": 19.5
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.4178,
+    "resid_sd": 0.3241,
+    "train_n90": 19.5
+   },
+   "Ações Terminais::Toques na Área": {
+    "predicted": 2.2576,
+    "resid_sd": 0.6914,
+    "train_n90": 19.51
+   },
+   "Ações Terminais::Ações Ofensivas": {
+    "predicted": 3.2384,
+    "resid_sd": 1.0181,
+    "train_n90": 19.51
+   },
+   "Verticalidade::% Toque na Área": {
+    "predicted": 11.8154,
+    "resid_sd": 4.3906,
+    "train_n90": 19.51
+   },
+   "Verticalidade::Recepção de Passes Longos": {
+    "predicted": 1.5552,
+    "resid_sd": 0.526,
+    "train_n90": 19.51
+   }
+  }
+ },
+ "athlete_id": "ath-004085",
+ "person_key": "name:victor hugo|2003|0"
 }

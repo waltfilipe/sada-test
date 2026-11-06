@@ -65,7 +65,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "B+",
-    "percentile": 78.0,
+    "percentile": 77.9,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -84,7 +84,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 78.8,
+      "percentile": 78.6,
       "display_value": "5,3"
      }
     ],
@@ -94,11 +94,11 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "A",
-    "percentile": 97.3,
+    "percentile": 98.0,
     "pair_badge": [
      66.7,
-     17.4,
-     97.3
+     94.0,
+     98.0
     ],
     "sub_metrics": [
      {
@@ -108,12 +108,12 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 17.4,
+      "percentile": 94.0,
       "display_value": "14,5"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 97.3,
+      "percentile": 98.0,
       "display_value": "+2,2"
      }
     ],
@@ -4254,5 +4254,186 @@
    "high_speed_km_p90": 103,
    "sprinting_km_p90": 79
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.69,
+  "fouls_total": 38,
+  "yellow_per90": 0.27,
+  "yellow_total": 6,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.58,
+   "yellow_per90": 0.24,
+   "red_per90": 0.03
+  }
+ },
+ "pass_distance_m": 19.57,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 1930,
+    "club": "Fortaleza"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 1902,
+    "club": "Fortaleza"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 1013,
+    "club": "Fortaleza"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 500,
+    "club": "Fortaleza"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 6.8282,
+    "resid_sd": 1.1828,
+    "train_n90": 20.79
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 59.5932,
+    "resid_sd": 5.4132,
+    "train_n90": 20.79
+   },
+   "Duelos Aéreos": {
+    "predicted": 2.3117,
+    "resid_sd": 0.7267,
+    "train_n90": 20.79
+   },
+   "Duelos Aéreos::Eficiência": {
+    "predicted": 48.575,
+    "resid_sd": 11.0907,
+    "train_n90": 20.79
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0195,
+    "resid_sd": 0.0563,
+    "train_n90": 20.79
+   },
+   "Passes Progressivos": {
+    "predicted": 5.7236,
+    "resid_sd": 1.3163,
+    "train_n90": 20.81
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 76.7777,
+    "resid_sd": 6.6991,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final": {
+    "predicted": 6.1916,
+    "resid_sd": 1.5516,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 79.2281,
+    "resid_sd": 5.7922,
+    "train_n90": 20.81
+   },
+   "Passes Longos": {
+    "predicted": 4.0588,
+    "resid_sd": 0.9922,
+    "train_n90": 20.81
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 60.9196,
+    "resid_sd": 8.0347,
+    "train_n90": 20.81
+   },
+   "Distribuição::Passes": {
+    "predicted": 38.4695,
+    "resid_sd": 6.5607,
+    "train_n90": 20.82
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 25.6958,
+    "resid_sd": 5.6925,
+    "train_n90": 20.82
+   },
+   "Disputas com Bola": {
+    "predicted": 3.163,
+    "resid_sd": 0.9071,
+    "train_n90": 20.81
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 44.0958,
+    "resid_sd": 7.459,
+    "train_n90": 20.81
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.6569,
+    "resid_sd": 0.3984,
+    "train_n90": 20.75
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 0.7342,
+    "resid_sd": 0.5762,
+    "train_n90": 20.82
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 59.0215,
+    "resid_sd": 13.5736,
+    "train_n90": 20.82
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.4578,
+    "resid_sd": 0.3299,
+    "train_n90": 20.82
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 0.5323,
+    "resid_sd": 0.3224,
+    "train_n90": 20.82
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0573,
+    "resid_sd": 0.0574,
+    "train_n90": 20.82
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.0325,
+    "resid_sd": 0.0374,
+    "train_n90": 20.82
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 59.8816,
+    "resid_sd": 11.6803,
+    "train_n90": 20.82
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 0.8972,
+    "resid_sd": 0.3791,
+    "train_n90": 20.81
+   },
+   "Finalizações::xG": {
+    "predicted": 0.0028,
+    "resid_sd": 0.0026,
+    "train_n90": 20.79
+   },
+   "Ofensividade::Ações Ofensivas": {
+    "predicted": 0.846,
+    "resid_sd": 0.4941,
+    "train_n90": 20.81
+   },
+   "Ofensividade::Toques na Área": {
+    "predicted": 0.4388,
+    "resid_sd": 0.3845,
+    "train_n90": 20.81
+   }
+  }
+ },
+ "athlete_id": "ath-004411",
+ "person_key": "name:ze welison|1995|0"
 }

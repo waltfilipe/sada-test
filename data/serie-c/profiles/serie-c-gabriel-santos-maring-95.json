@@ -92,7 +92,7 @@
      {
       "label": "Índice de Eficiência",
       "percentile": 0.0,
-      "display_value": "-2,6"
+      "display_value": "-2,5"
      }
     ],
     "stats": []
@@ -2858,5 +2858,89 @@
   ],
   "point_count": 637,
   "image_url": null
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.52,
+  "fouls_total": 23,
+  "yellow_per90": 0.13,
+  "yellow_total": 2,
+  "red_per90": 0.07,
+  "red_total": 1,
+  "pool": {
+   "fouls_per90": 1.11,
+   "yellow_per90": 0.23,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 25.28,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-b",
+    "minutes": 1566,
+    "club": "Londrina"
+   },
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 317,
+    "club": "Sport Recife"
+   }
+  ],
+  "metrics": {
+   "Passes Progressivos": {
+    "predicted": 4.3758,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 66.8633,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 3.5566,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 65.7658,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 2.881,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 49.1872,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 2.0935,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.5014,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0464,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0609,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   }
+  }
+ },
+ "athlete_id": "ath-001364",
+ "person_key": "name:gabriel santos|2000|0"
 }

@@ -78,11 +78,11 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "D",
-    "percentile": 23.7,
+    "percentile": 18.6,
     "pair_badge": [
      66.7,
      4.3,
-     23.7
+     18.6
     ],
     "sub_metrics": [
      {
@@ -97,8 +97,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 23.7,
-      "display_value": "-0,7"
+      "percentile": 18.6,
+      "display_value": "-0,9"
      }
     ],
     "stats": []
@@ -338,5 +338,110 @@
    "high_speed_km_p90": 11,
    "sprinting_km_p90": 68
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.28,
+  "fouls_total": 1,
+  "yellow_per90": 0.0,
+  "yellow_total": 0,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 21.42,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 2038,
+    "club": "Avaí"
+   },
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 1546,
+    "club": "Avaí"
+   },
+   {
+    "year": "2024",
+    "league": "serie-b",
+    "minutes": 2371,
+    "club": "Grêmio Novorizontino"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 6.5826,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 64.7869,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0346,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -0.6331,
+    "resid_sd": 0.7483,
+    "train_n90": 20.4
+   },
+   "Passes Progressivos": {
+    "predicted": 5.5599,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 69.9607,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.4104,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 71.4551,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 2.9717,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 57.4948,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 1.573,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.6928,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.6329,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   }
+  }
+ },
+ "athlete_id": "ath-000966",
+ "person_key": "name:eduardo|1997|0"
 }

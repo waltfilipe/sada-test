@@ -89,10 +89,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "A",
-    "percentile": 91.4,
+    "percentile": 86.8,
     "pair_badge": [
      80.0,
-     91.4
+     86.8
     ],
     "sub_metrics": [
      {
@@ -102,8 +102,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 91.4,
-      "display_value": "+1,1"
+      "percentile": 86.8,
+      "display_value": "+0,9"
      }
     ],
     "stats": []
@@ -4379,5 +4379,201 @@
    "high_speed_km_p90": 26,
    "sprinting_km_p90": 27
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.1,
+  "fouls_total": 22,
+  "yellow_per90": 0.15,
+  "yellow_total": 3,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.68,
+   "yellow_per90": 0.26,
+   "red_per90": 0.02
+  }
+ },
+ "pass_distance_m": 18.88,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-b",
+    "minutes": 2358,
+    "club": "Ponte Preta"
+   },
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 2215,
+    "club": "Ponte Preta"
+   },
+   {
+    "year": "2024",
+    "league": "serie-b",
+    "minutes": 1017,
+    "club": "América Mineiro"
+   },
+   {
+    "year": "2025",
+    "league": "serie-b",
+    "minutes": 1533,
+    "club": "América Mineiro"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 6.8175,
+    "resid_sd": 1.1828,
+    "train_n90": 20.79
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 58.7996,
+    "resid_sd": 5.4132,
+    "train_n90": 20.79
+   },
+   "Duelos Aéreos": {
+    "predicted": 2.1722,
+    "resid_sd": 0.7267,
+    "train_n90": 20.79
+   },
+   "Duelos Aéreos::Eficiência": {
+    "predicted": 42.6609,
+    "resid_sd": 11.0907,
+    "train_n90": 20.79
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 1.1759,
+    "resid_sd": 0.683,
+    "train_n90": 20.79
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.3003,
+    "resid_sd": 0.8593,
+    "train_n90": 20.79
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.3764,
+    "resid_sd": 0.1924,
+    "train_n90": 20.79
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0249,
+    "resid_sd": 0.0563,
+    "train_n90": 20.79
+   },
+   "Passes Progressivos": {
+    "predicted": 5.588,
+    "resid_sd": 1.3163,
+    "train_n90": 20.81
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 73.3382,
+    "resid_sd": 6.6991,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final": {
+    "predicted": 6.212,
+    "resid_sd": 1.5516,
+    "train_n90": 20.81
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 74.4256,
+    "resid_sd": 5.7922,
+    "train_n90": 20.81
+   },
+   "Passes Longos": {
+    "predicted": 4.0242,
+    "resid_sd": 0.9922,
+    "train_n90": 20.81
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 56.986,
+    "resid_sd": 8.0347,
+    "train_n90": 20.81
+   },
+   "Distribuição::Passes": {
+    "predicted": 35.7151,
+    "resid_sd": 6.5607,
+    "train_n90": 20.82
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 23.9514,
+    "resid_sd": 5.6925,
+    "train_n90": 20.82
+   },
+   "Disputas com Bola": {
+    "predicted": 2.7813,
+    "resid_sd": 0.9071,
+    "train_n90": 20.81
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 45.2701,
+    "resid_sd": 7.459,
+    "train_n90": 20.81
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.796,
+    "resid_sd": 0.3984,
+    "train_n90": 20.75
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 1.0766,
+    "resid_sd": 0.5762,
+    "train_n90": 20.82
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 56.7654,
+    "resid_sd": 13.5736,
+    "train_n90": 20.82
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.6132,
+    "resid_sd": 0.3299,
+    "train_n90": 20.82
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 0.5989,
+    "resid_sd": 0.3224,
+    "train_n90": 20.82
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.043,
+    "resid_sd": 0.0574,
+    "train_n90": 20.82
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.035,
+    "resid_sd": 0.0374,
+    "train_n90": 20.82
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 58.5394,
+    "resid_sd": 11.6803,
+    "train_n90": 20.82
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 1.1234,
+    "resid_sd": 0.3791,
+    "train_n90": 20.81
+   },
+   "Finalizações::xG": {
+    "predicted": 0.0034,
+    "resid_sd": 0.0026,
+    "train_n90": 20.79
+   },
+   "Ofensividade::Ações Ofensivas": {
+    "predicted": 1.0422,
+    "resid_sd": 0.4941,
+    "train_n90": 20.81
+   },
+   "Ofensividade::Toques na Área": {
+    "predicted": 0.6335,
+    "resid_sd": 0.3845,
+    "train_n90": 20.81
+   }
+  }
+ },
+ "athlete_id": "ath-001149",
+ "person_key": "name:felipe amaral|2003|0"
 }

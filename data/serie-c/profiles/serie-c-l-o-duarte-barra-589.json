@@ -89,10 +89,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "D",
-    "percentile": 7.4,
+    "percentile": 13.9,
     "pair_badge": [
      100.0,
-     7.4
+     13.9
     ],
     "sub_metrics": [
      {
@@ -102,8 +102,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 7.4,
-      "display_value": "-1,6"
+      "percentile": 13.9,
+      "display_value": "-1,0"
      }
     ],
     "stats": []
@@ -702,5 +702,231 @@
   ],
   "point_count": 63,
   "image_url": null
- }
+ },
+ "discipline": {
+  "fouls_per90": 6.16,
+  "fouls_total": 5,
+  "yellow_per90": 1.23,
+  "yellow_total": 1,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.36,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 20.13,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-c",
+    "minutes": 1904,
+    "club": "Mirassol"
+   },
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 2313,
+    "club": "Vila Nova"
+   },
+   {
+    "year": "2024",
+    "league": "serie-b",
+    "minutes": 741,
+    "club": "Ituano"
+   },
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 233,
+    "club": "São Bernardo FC"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 7.0244,
+    "role_change_flag": true,
+    "resid_sd": 1.1811,
+    "train_n90": 21.19
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 61.0543,
+    "resid_sd": 5.8229,
+    "train_n90": 21.19
+   },
+   "Duelos Aéreos": {
+    "predicted": 3.4636,
+    "resid_sd": 0.7678,
+    "train_n90": 21.17
+   },
+   "Duelos Aéreos::Eficiência": {
+    "predicted": 47.2246,
+    "resid_sd": 9.2381,
+    "train_n90": 21.17
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 2.515,
+    "role_change_flag": true,
+    "resid_sd": 1.1156,
+    "train_n90": 21.19
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.9674,
+    "resid_sd": 0.8873,
+    "train_n90": 21.19
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.2666,
+    "resid_sd": 0.1688,
+    "train_n90": 21.19
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0553,
+    "resid_sd": 0.0604,
+    "train_n90": 21.19
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -0.885,
+    "resid_sd": 0.6461,
+    "train_n90": 20.13
+   },
+   "Passes Progressivos": {
+    "predicted": 8.6051,
+    "resid_sd": 1.4898,
+    "train_n90": 21.12
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 72.7425,
+    "resid_sd": 5.4351,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.2425,
+    "resid_sd": 1.3234,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 65.9222,
+    "resid_sd": 7.5615,
+    "train_n90": 21.12
+   },
+   "Passes Longos": {
+    "predicted": 5.2002,
+    "role_change_flag": true,
+    "resid_sd": 1.0858,
+    "train_n90": 21.12
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 48.587,
+    "role_change_flag": true,
+    "resid_sd": 7.7543,
+    "train_n90": 21.12
+   },
+   "Distribuição::Passes": {
+    "predicted": 35.3364,
+    "resid_sd": 5.6544,
+    "train_n90": 21.1
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 26.0776,
+    "resid_sd": 5.0027,
+    "train_n90": 21.1
+   },
+   "Disputas com Bola": {
+    "predicted": 1.997,
+    "role_change_flag": true,
+    "resid_sd": 0.8007,
+    "train_n90": 21.12
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 47.1344,
+    "role_change_flag": true,
+    "resid_sd": 7.4529,
+    "train_n90": 21.12
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 0.9744,
+    "role_change_flag": true,
+    "resid_sd": 0.6641,
+    "train_n90": 21.1
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 54.2435,
+    "role_change_flag": true,
+    "resid_sd": 11.179,
+    "train_n90": 21.1
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 0.9221,
+    "resid_sd": 0.502,
+    "train_n90": 21.1
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.1824,
+    "resid_sd": 0.2465,
+    "train_n90": 21.1
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0267,
+    "resid_sd": 0.0494,
+    "train_n90": 21.11
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0301,
+    "resid_sd": 0.0357,
+    "train_n90": 21.11
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 2.6814,
+    "resid_sd": 0.8183,
+    "train_n90": 21.1
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 35.9894,
+    "role_change_flag": true,
+    "resid_sd": 7.9284,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.7079,
+    "resid_sd": 0.3528,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.1716,
+    "role_change_flag": true,
+    "resid_sd": 0.4266,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0446,
+    "resid_sd": 0.0541,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.0707,
+    "resid_sd": 0.0441,
+    "train_n90": 21.1
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 51.7352,
+    "resid_sd": 11.4476,
+    "train_n90": 21.1
+   },
+   "Ofensividade::Ações Ofensivas": {
+    "predicted": 1.7462,
+    "resid_sd": 0.6323,
+    "train_n90": 21.17
+   },
+   "Ofensividade::Toques na Área": {
+    "predicted": 0.6335,
+    "resid_sd": 0.375,
+    "train_n90": 21.17
+   }
+  }
+ },
+ "athlete_id": "ath-002388",
+ "person_key": "name:leo duarte|1999|0"
 }

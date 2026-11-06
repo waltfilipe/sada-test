@@ -78,10 +78,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "C+",
-    "percentile": 48.1,
+    "percentile": 51.0,
     "pair_badge": [
      81.8,
-     48.1
+     51.0
     ],
     "sub_metrics": [
      {
@@ -91,7 +91,7 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 48.1,
+      "percentile": 51.0,
       "display_value": "+0,0"
      }
     ],
@@ -4796,5 +4796,151 @@
   ],
   "point_count": 1121,
   "image_url": null
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.0,
+  "fouls_total": 17,
+  "yellow_per90": 0.29,
+  "yellow_total": 5,
+  "red_per90": 0.06,
+  "red_total": 1,
+  "pool": {
+   "fouls_per90": 1.11,
+   "yellow_per90": 0.23,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 23.59,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 1400,
+    "club": "Botafogo SP"
+   },
+   {
+    "year": "2024",
+    "league": "serie-b",
+    "minutes": 1386,
+    "club": "Botafogo SP"
+   },
+   {
+    "year": "2025",
+    "league": "serie-b",
+    "minutes": 452,
+    "club": "Criciúma"
+   },
+   {
+    "year": "2025",
+    "league": "serie-c",
+    "minutes": 1817,
+    "club": "Figueirense"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 4.8143,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 66.7589,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 4.5175,
+    "resid_sd": 1.5346,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 2.6338,
+    "resid_sd": 1.0324,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.6931,
+    "resid_sd": 0.2747,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0506,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 7.2082,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 65.3161,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.2885,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 57.6461,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 6.7931,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 48.7252,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.824,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 51.9861,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.7027,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0362,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0498,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0101,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 4.8517,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 58.3179,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-002513",
+ "person_key": "name:lucas dias|1995|1"
 }

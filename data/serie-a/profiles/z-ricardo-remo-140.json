@@ -62,8 +62,8 @@
    {
     "label": "Recuperações",
     "kind": "metric",
-    "grade": "C+",
-    "percentile": 46.2,
+    "grade": "C",
+    "percentile": 44.7,
     "display_value": "3,8",
     "stats": []
    }
@@ -4159,5 +4159,135 @@
    "high_speed_km_p90": 45,
    "sprinting_km_p90": 42
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.98,
+  "fouls_total": 47,
+  "yellow_per90": 0.21,
+  "yellow_total": 5,
+  "red_per90": 0.04,
+  "red_total": 1,
+  "pool": {
+   "fouls_per90": 1.24,
+   "yellow_per90": 0.19,
+   "red_per90": 0.0
+  }
+ },
+ "pass_distance_m": 16.8,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-b",
+    "minutes": 2696,
+    "club": "Tombense"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 1199,
+    "club": "Goiás"
+   },
+   {
+    "year": "2023",
+    "league": "serie-b",
+    "minutes": 362,
+    "club": "Tombense"
+   }
+  ],
+  "metrics": {
+   "Passes Progressivos": {
+    "predicted": 6.9095,
+    "resid_sd": 1.1225,
+    "train_n90": 19.53
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 75.4648,
+    "resid_sd": 7.2942,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final": {
+    "predicted": 6.8307,
+    "resid_sd": 1.0778,
+    "train_n90": 19.53
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 74.0318,
+    "resid_sd": 9.042,
+    "train_n90": 19.53
+   },
+   "Passes Longos": {
+    "predicted": 4.4362,
+    "resid_sd": 0.8211,
+    "train_n90": 19.53
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 56.5538,
+    "resid_sd": 11.297,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes": {
+    "predicted": 38.3698,
+    "resid_sd": 4.6427,
+    "train_n90": 19.53
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 26.9245,
+    "resid_sd": 3.9417,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.855,
+    "resid_sd": 0.4355,
+    "train_n90": 19.53
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 0.9494,
+    "resid_sd": 0.4596,
+    "train_n90": 19.53
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0782,
+    "resid_sd": 0.0712,
+    "train_n90": 19.53
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.0888,
+    "resid_sd": 0.0556,
+    "train_n90": 19.53
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 57.2896,
+    "resid_sd": 11.5087,
+    "train_n90": 19.53
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 1.251,
+    "resid_sd": 0.4902,
+    "train_n90": 19.51
+   },
+   "Disputas com Bola": {
+    "predicted": 4.799,
+    "resid_sd": 1.4313,
+    "train_n90": 19.53
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 46.3699,
+    "resid_sd": 6.1284,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 2.5329,
+    "resid_sd": 1.1907,
+    "train_n90": 19.53
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 55.5033,
+    "resid_sd": 8.582,
+    "train_n90": 19.53
+   }
+  }
+ },
+ "athlete_id": "ath-004404",
+ "person_key": "name:ze ricardo|1999|0"
 }

@@ -65,7 +65,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "C-",
-    "percentile": 29.3,
+    "percentile": 29.4,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -84,7 +84,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 33.7,
+      "percentile": 34.3,
       "display_value": "3,0"
      }
     ],
@@ -93,12 +93,12 @@
    {
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
-    "grade": "C-",
-    "percentile": 34.6,
+    "grade": "C+",
+    "percentile": 51.1,
     "pair_badge": [
      66.7,
-     12.0,
-     34.6
+     21.8,
+     51.1
     ],
     "sub_metrics": [
      {
@@ -108,13 +108,13 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 12.0,
+      "percentile": 21.8,
       "display_value": "8,0"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 34.6,
-      "display_value": "-0,3"
+      "percentile": 51.1,
+      "display_value": "+0,1"
      }
     ],
     "stats": []
@@ -4789,5 +4789,206 @@
    "high_speed_km_p90": 28,
    "sprinting_km_p90": 32
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.54,
+  "fouls_total": 18,
+  "yellow_per90": 0.12,
+  "yellow_total": 4,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.13,
+   "yellow_per90": 0.19,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 20.39,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 1602,
+    "club": "São Paulo"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 3036,
+    "club": "Grêmio"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 2851,
+    "club": "Grêmio"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 3250,
+    "club": "Mirassol"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 5.6457,
+    "resid_sd": 1.1811,
+    "train_n90": 21.19
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 61.5573,
+    "resid_sd": 5.8229,
+    "train_n90": 21.19
+   },
+   "Duelos Aéreos": {
+    "predicted": 1.6601,
+    "resid_sd": 0.7678,
+    "train_n90": 21.17
+   },
+   "Duelos Aéreos::Eficiência": {
+    "predicted": 40.2077,
+    "resid_sd": 9.2381,
+    "train_n90": 21.17
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0292,
+    "resid_sd": 0.0604,
+    "train_n90": 21.19
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -0.8804,
+    "resid_sd": 0.6461,
+    "train_n90": 20.13
+   },
+   "Passes Progressivos": {
+    "predicted": 9.1131,
+    "resid_sd": 1.4898,
+    "train_n90": 21.12
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 74.5234,
+    "resid_sd": 5.4351,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.9748,
+    "resid_sd": 1.3234,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 70.727,
+    "resid_sd": 7.5615,
+    "train_n90": 21.12
+   },
+   "Passes Longos": {
+    "predicted": 4.456,
+    "resid_sd": 1.0858,
+    "train_n90": 21.12
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 50.5187,
+    "resid_sd": 7.7543,
+    "train_n90": 21.12
+   },
+   "Distribuição::Passes": {
+    "predicted": 38.5859,
+    "resid_sd": 5.6544,
+    "train_n90": 21.1
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 28.8651,
+    "resid_sd": 5.0027,
+    "train_n90": 21.1
+   },
+   "Disputas com Bola": {
+    "predicted": 2.3394,
+    "resid_sd": 0.8007,
+    "train_n90": 21.12
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.9307,
+    "resid_sd": 7.4529,
+    "train_n90": 21.12
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 1.4901,
+    "resid_sd": 0.6641,
+    "train_n90": 21.1
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 61.9795,
+    "resid_sd": 11.179,
+    "train_n90": 21.1
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 1.2289,
+    "resid_sd": 0.502,
+    "train_n90": 21.1
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.2116,
+    "resid_sd": 0.2465,
+    "train_n90": 21.1
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0778,
+    "resid_sd": 0.0494,
+    "train_n90": 21.11
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0855,
+    "resid_sd": 0.0357,
+    "train_n90": 21.11
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 2.4343,
+    "resid_sd": 0.8183,
+    "train_n90": 21.1
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 35.854,
+    "resid_sd": 7.9284,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.9724,
+    "resid_sd": 0.3528,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.1529,
+    "resid_sd": 0.4266,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0539,
+    "resid_sd": 0.0541,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.107,
+    "resid_sd": 0.0441,
+    "train_n90": 21.1
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 57.8299,
+    "resid_sd": 11.4476,
+    "train_n90": 21.1
+   },
+   "Ofensividade::Ações Ofensivas": {
+    "predicted": 2.1258,
+    "resid_sd": 0.6323,
+    "train_n90": 21.17
+   },
+   "Ofensividade::Toques na Área": {
+    "predicted": 0.8848,
+    "resid_sd": 0.375,
+    "train_n90": 21.17
+   }
+  }
+ },
+ "athlete_id": "ath-003560",
+ "person_key": "name:reinaldo|1989|0"
 }

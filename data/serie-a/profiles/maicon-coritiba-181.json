@@ -73,7 +73,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 11.5,
+      "percentile": 11.2,
       "display_value": "1,9"
      }
     ],
@@ -86,7 +86,7 @@
     "percentile": 50.8,
     "pair_badge": [
      66.7,
-     23.9,
+     23.1,
      50.8
     ],
     "sub_metrics": [
@@ -97,13 +97,13 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 23.9,
+      "percentile": 23.1,
       "display_value": "11,3"
      },
      {
       "label": "Índice de Eficiência",
       "percentile": 50.8,
-      "display_value": "+0,2"
+      "display_value": "+0,1"
      }
     ],
     "stats": []
@@ -2113,5 +2113,142 @@
    "high_speed_km_p90": 44,
    "sprinting_km_p90": 57
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.45,
+  "fouls_total": 6,
+  "yellow_per90": 0.0,
+  "yellow_total": 0,
+  "red_per90": 0.08,
+  "red_total": 1,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 22.18,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 2117,
+    "club": "Santos"
+   },
+   {
+    "year": "2022",
+    "league": "serie-b",
+    "minutes": 320,
+    "club": "CRB"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 1493,
+    "club": "Vasco da Gama"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 2632,
+    "club": "Vasco da Gama"
+   },
+   {
+    "year": "2025",
+    "league": "serie-b",
+    "minutes": 3021,
+    "club": "Coritiba"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 3.5641,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 66.8319,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.038,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 8.0637,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 71.1214,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.4427,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 70.1592,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 6.8252,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 60.2523,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 0.7445,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 51.2737,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.433,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0486,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0476,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xA": {
+    "predicted": 0.0106,
+    "resid_sd": 0.0119,
+    "train_n90": 22.33
+   },
+   "Aéreo": {
+    "predicted": 4.0092,
+    "resid_sd": 0.8482,
+    "train_n90": 22.33
+   },
+   "Aéreo::Eficiência": {
+    "predicted": 61.2407,
+    "resid_sd": 7.9094,
+    "train_n90": 22.33
+   }
+  }
+ },
+ "athlete_id": "ath-002748",
+ "person_key": "name:maicon|1987|0"
 }

@@ -152,11 +152,8 @@ function aspectNumber(raw?: string | null): number | null {
   return Number.isFinite(value) ? value : null;
 }
 
-/**
- * Ações Defensivas Totais/90 = duelos defensivos + rebatidas + interceptações
- * + chutes bloqueados. Sintetizado por render — os aspectos só trazem as partes.
- */
-function totalDefensiveActionsItem(all: AspectItem[]): AspectItem | null {
+/** Soma duelos + rebatidas + interceptações + chutes bloqueados de uma linha. */
+function totalDefensiveActionsValue(all: AspectItem[]): number | null {
   const duels = findAspect(all, "Duelos Defensivos") ?? findAspect(all, "Duelos Vencidos");
   const actions = findAspect(all, "Ações Defensivas");
   const duelsVal = aspectNumber(duels?.display_value);
@@ -165,16 +162,42 @@ function totalDefensiveActionsItem(all: AspectItem[]): AspectItem | null {
     ? subs.reduce((sum, sub) => sum + (aspectNumber(sub.display_value) ?? 0), 0)
     : aspectNumber(actions?.display_value);
   if (duelsVal == null && actionsVal == null) return null;
-  const total = (duelsVal ?? 0) + (actionsVal ?? 0);
-  return {
+  return (duelsVal ?? 0) + (actionsVal ?? 0);
+}
+
+/** Percentil denso no pool (empates dividem a posição média). */
+function densePoolPercentile(values: number[], value: number): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  const n = sorted.length;
+  if (n <= 1) return 50;
+  const less = sorted.filter((v) => v < value).length;
+  const equal = sorted.filter((v) => v === value).length;
+  return ((less + (equal - 1) / 2) / (n - 1)) * 100;
+}
+
+/**
+ * Ações Defensivas Totais/90 = duelos defensivos + rebatidas + interceptações
+ * + chutes bloqueados. Sintetizado por render — os aspectos só trazem as partes.
+ */
+function totalDefensiveActionsItem(all: AspectItem[], pool?: PlayerProfile[]): AspectItem | null {
+  const total = totalDefensiveActionsValue(all);
+  if (total == null) return null;
+  const item: AspectItem = {
     label: "Ações Defensivas",
     grade: "",
     stats: [],
     display_value: String(Math.round(total * 10) / 10).replace(".", ","),
   };
+  const poolTotals = pool
+    ?.map((peer) => totalDefensiveActionsValue(flattenAspects(peer)))
+    .filter((value): value is number => value != null);
+  if (poolTotals && poolTotals.length > 1) {
+    item.percentile = Math.round(densePoolPercentile(poolTotals, total) * 10) / 10;
+  }
+  return item;
 }
 
-function sectionEntries(player: PlayerProfile, family: PositionFamily): SectionEntry[] {
+function sectionEntries(player: PlayerProfile, family: PositionFamily, pool?: PlayerProfile[]): SectionEntry[] {
   const all = flattenAspects(player);
   const sections = statSectionsForFamily(family);
   const meiasOfensivos = family === "extremos";
@@ -197,7 +220,7 @@ function sectionEntries(player: PlayerProfile, family: PositionFamily): SectionE
       metrics.push({ item: displayItem, groupTitle });
     }
     if (meiasOfensivos && section.tone === "defensivos") {
-      const totalItem = totalDefensiveActionsItem(all);
+      const totalItem = totalDefensiveActionsItem(all, pool);
       const duelsIndex = metrics.findIndex((metric) => !/efici[eê]ncia/i.test(metric.item.label));
       const insertAt = duelsIndex >= 0 ? duelsIndex + 1 : metrics.length;
       if (totalItem) metrics.splice(insertAt, 0, { item: totalItem });
@@ -278,8 +301,8 @@ export function StatSectionPanel({
   heading?: string;
 }) {
   const entry = useMemo(
-    () => sectionEntries(player, family).find((item) => item.title === title) ?? null,
-    [player, family, title],
+    () => sectionEntries(player, family, peers).find((item) => item.title === title) ?? null,
+    [player, family, title, peers],
   );
   const peerAspects = useMemo(() => peers.map((peer) => flattenAspects(peer)), [peers]);
 
@@ -336,13 +359,15 @@ function edgeAgainst(mine: number | null | undefined, others: Array<number | nul
 export function StatSectionsBoard({
   player,
   family,
+  pool,
   showBadges = true,
 }: {
   player: PlayerProfile;
   family: PositionFamily;
+  pool?: PlayerProfile[];
   showBadges?: boolean;
 }) {
-  const entries = useMemo(() => sectionEntries(player, family), [player, family]);
+  const entries = useMemo(() => sectionEntries(player, family, pool), [player, family, pool]);
   const [openTitles, setOpenTitles] = useState<Set<string>>(() => new Set());
   const allBadges = useMemo<TonedStatBadge[]>(
     () => entries.flatMap((entry) => entry.badges.map((badge) => ({ ...badge, tone: entry.tone }))),
@@ -435,7 +460,7 @@ export function ScoutStatsSections({
     [disableProjection, projectionSubject, players],
   );
   const shown = projectionOn && projection ? projection.profile : player;
-  const entries = useMemo(() => sectionEntries(shown, family), [shown, family]);
+  const entries = useMemo(() => sectionEntries(shown, family, players), [shown, family, players]);
   const allBadges = useMemo<TonedStatBadge[]>(
     () => entries.flatMap((entry) => entry.badges.map((badge) => ({ ...badge, tone: entry.tone }))),
     [entries],

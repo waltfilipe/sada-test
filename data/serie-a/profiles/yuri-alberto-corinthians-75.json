@@ -2517,5 +2517,211 @@
    "high_speed_km_p90": 18,
    "sprinting_km_p90": 2
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.25,
+  "fouls_total": 28,
+  "yellow_per90": 0.09,
+  "yellow_total": 2,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.51,
+   "yellow_per90": 0.16,
+   "red_per90": 0.02
+  }
+ },
+ "pass_distance_m": 13.62,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 1590,
+    "club": "Corinthians"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 3033,
+    "club": "Corinthians"
+   },
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 2497,
+    "club": "Corinthians"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 2229,
+    "club": "Corinthians"
+   }
+  ],
+  "metrics": {
+   "Passes Progressivos": {
+    "predicted": 1.1849,
+    "resid_sd": 0.8977,
+    "train_n90": 18.82
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 69.8487,
+    "resid_sd": 11.0471,
+    "train_n90": 18.82
+   },
+   "Passes para Terço Final": {
+    "predicted": 0.9564,
+    "resid_sd": 0.8441,
+    "train_n90": 18.82
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 65.4607,
+    "resid_sd": 12.1301,
+    "train_n90": 18.82
+   },
+   "Passes Longos": {
+    "predicted": 0.5202,
+    "resid_sd": 0.5923,
+    "train_n90": 18.82
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 55.089,
+    "resid_sd": 19.3797,
+    "train_n90": 18.82
+   },
+   "Distribuição::Passes": {
+    "predicted": 13.7201,
+    "resid_sd": 3.6278,
+    "train_n90": 18.85
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 10.4736,
+    "resid_sd": 2.9981,
+    "train_n90": 18.85
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.5703,
+    "resid_sd": 0.2974,
+    "train_n90": 18.85
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 0.3968,
+    "resid_sd": 0.2932,
+    "train_n90": 18.85
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 0.606,
+    "resid_sd": 0.4571,
+    "train_n90": 18.9
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 28.3625,
+    "resid_sd": 17.4515,
+    "train_n90": 18.9
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0488,
+    "resid_sd": 0.0554,
+    "train_n90": 18.85
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.0635,
+    "resid_sd": 0.0472,
+    "train_n90": 18.85
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 55.4117,
+    "resid_sd": 16.0098,
+    "train_n90": 18.85
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.3164,
+    "resid_sd": 0.1482,
+    "train_n90": 18.86
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.3426,
+    "resid_sd": 0.101,
+    "train_n90": 18.86
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 2.2222,
+    "resid_sd": 0.4657,
+    "train_n90": 18.83
+   },
+   "Finalizações::Finalizações certas": {
+    "predicted": 41.7522,
+    "resid_sd": 9.5437,
+    "train_n90": 18.88
+   },
+   "Finalizações::Eficiência": {
+    "predicted": 41.7522,
+    "resid_sd": 9.5437,
+    "train_n90": 18.88
+   },
+   "Disputas com Bola": {
+    "predicted": 5.8026,
+    "resid_sd": 1.3883,
+    "train_n90": 18.82
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 33.9845,
+    "resid_sd": 6.2104,
+    "train_n90": 18.82
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 1.6145,
+    "resid_sd": 0.8056,
+    "train_n90": 18.85
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 49.9001,
+    "resid_sd": 12.457,
+    "train_n90": 18.85
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 0.9189,
+    "resid_sd": 0.3995,
+    "train_n90": 18.92
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.2363,
+    "resid_sd": 0.2198,
+    "train_n90": 18.9
+   },
+   "Ações Terminais::Toques na Área": {
+    "predicted": 3.183,
+    "resid_sd": 0.6644,
+    "train_n90": 18.88
+   },
+   "Ações Terminais::Ações Ofensivas": {
+    "predicted": 1.9706,
+    "resid_sd": 0.6655,
+    "train_n90": 18.88
+   },
+   "Verticalidade::% Toque na Área": {
+    "predicted": 28.3922,
+    "resid_sd": 9.1255,
+    "train_n90": 18.88
+   },
+   "Verticalidade::Recepção de Passes Longos": {
+    "predicted": 1.5874,
+    "resid_sd": 0.4501,
+    "train_n90": 18.88
+   },
+   "Duelos Aéreos": {
+    "predicted": 4.3833,
+    "resid_sd": 1.5743,
+    "train_n90": 19.17
+   },
+   "Duelos Aéreos::Eficiência": {
+    "predicted": 33.751,
+    "resid_sd": 7.256,
+    "train_n90": 19.17
+   }
+  }
+ },
+ "athlete_id": "ath-004376",
+ "person_key": "name:yuri alberto|2001|0"
 }

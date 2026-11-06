@@ -78,10 +78,10 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "B-",
-    "percentile": 63.6,
+    "percentile": 64.5,
     "pair_badge": [
      100.0,
-     63.6
+     64.5
     ],
     "sub_metrics": [
      {
@@ -91,8 +91,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 63.6,
-      "display_value": "+0,3"
+      "percentile": 64.5,
+      "display_value": "+0,4"
      }
     ],
     "stats": []
@@ -352,5 +352,109 @@
   "sprinting_km_p90": 0.0,
   "percentiles": {},
   "ranks": {}
- }
+ },
+ "pass_distance_m": 0.0,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2023",
+    "league": "serie-c",
+    "minutes": 688,
+    "club": "Amazonas"
+   },
+   {
+    "year": "2023",
+    "league": "serie-c",
+    "minutes": 533,
+    "club": "Manaus"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 5.5731,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 63.8212,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 4.1741,
+    "role_change_flag": true,
+    "resid_sd": 1.5346,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.8014,
+    "resid_sd": 1.0324,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.6551,
+    "resid_sd": 0.2747,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0435,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Passes Progressivos": {
+    "predicted": 7.2698,
+    "role_change_flag": true,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 69.8289,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.9313,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 70.976,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 5.4134,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 54.2574,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 1.1732,
+    "role_change_flag": true,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 50.711,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0353,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0434,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   }
+  }
+ },
+ "athlete_id": "ath-000576",
+ "person_key": "name:charles|1995|1"
 }

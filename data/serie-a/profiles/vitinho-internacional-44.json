@@ -65,7 +65,7 @@
     "label": "Ações Defensivas e Recuperações",
     "kind": "metric_group",
     "grade": "D",
-    "percentile": 2.3,
+    "percentile": 3.8,
     "sub_metrics": [
      {
       "label": "Rebatidas",
@@ -81,6 +81,11 @@
       "label": "Chutes Bloqueados",
       "percentile": 0.0,
       "display_value": "0,2"
+     },
+     {
+      "label": "Recuperações",
+      "percentile": 8.3,
+      "display_value": "2,0"
      }
     ],
     "stats": []
@@ -89,11 +94,11 @@
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
     "grade": "D",
-    "percentile": 5.3,
+    "percentile": 0.8,
     "pair_badge": [
      100.0,
-     2.3,
-     5.3
+     10.5,
+     0.8
     ],
     "sub_metrics": [
      {
@@ -103,13 +108,13 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 2.3,
-      "display_value": "4,5"
+      "percentile": 10.5,
+      "display_value": "6,5"
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 5.3,
-      "display_value": "-1,6"
+      "percentile": 0.8,
+      "display_value": "-2,2"
      }
     ],
     "stats": []
@@ -1360,5 +1365,160 @@
    "high_speed_km_p90": 47,
    "sprinting_km_p90": 38
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 1.65,
+  "fouls_total": 51,
+  "yellow_per90": 0.23,
+  "yellow_total": 7,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.13,
+   "yellow_per90": 0.19,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 17.38,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2022",
+    "league": "serie-a",
+    "minutes": 1543,
+    "club": "Athletico Paranaense"
+   },
+   {
+    "year": "2023",
+    "league": "serie-a",
+    "minutes": 2291,
+    "club": "Red Bull Bragantino"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 1827,
+    "club": "Internacional"
+   }
+  ],
+  "metrics": {
+   "Passes Progressivos": {
+    "predicted": 5.875,
+    "resid_sd": 1.4898,
+    "train_n90": 21.12
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 72.3068,
+    "resid_sd": 5.4351,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final": {
+    "predicted": 3.4594,
+    "resid_sd": 1.3234,
+    "train_n90": 21.12
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 68.8903,
+    "resid_sd": 7.5615,
+    "train_n90": 21.12
+   },
+   "Passes Longos": {
+    "predicted": 2.2204,
+    "resid_sd": 1.0858,
+    "train_n90": 21.12
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 50.8886,
+    "resid_sd": 7.7543,
+    "train_n90": 21.12
+   },
+   "Distribuição::Passes": {
+    "predicted": 32.6529,
+    "resid_sd": 5.6544,
+    "train_n90": 21.1
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 24.845,
+    "resid_sd": 5.0027,
+    "train_n90": 21.1
+   },
+   "Disputas com Bola": {
+    "predicted": 4.4107,
+    "resid_sd": 0.8007,
+    "train_n90": 21.12
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 46.5828,
+    "resid_sd": 7.4529,
+    "train_n90": 21.12
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 2.3843,
+    "resid_sd": 0.6641,
+    "train_n90": 21.1
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 58.1428,
+    "resid_sd": 11.179,
+    "train_n90": 21.1
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 1.4964,
+    "resid_sd": 0.502,
+    "train_n90": 21.1
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.228,
+    "resid_sd": 0.2465,
+    "train_n90": 21.1
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0673,
+    "resid_sd": 0.0494,
+    "train_n90": 21.11
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.1143,
+    "resid_sd": 0.0357,
+    "train_n90": 21.11
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 2.1694,
+    "resid_sd": 0.8183,
+    "train_n90": 21.1
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 35.2336,
+    "resid_sd": 7.9284,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.7356,
+    "resid_sd": 0.3528,
+    "train_n90": 21.1
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.128,
+    "resid_sd": 0.4266,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0572,
+    "resid_sd": 0.0541,
+    "train_n90": 21.1
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.0842,
+    "resid_sd": 0.0441,
+    "train_n90": 21.1
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 56.3263,
+    "resid_sd": 11.4476,
+    "train_n90": 21.1
+   }
+  }
+ },
+ "athlete_id": "ath-004150",
+ "person_key": "name:vitinho|1999|0"
 }

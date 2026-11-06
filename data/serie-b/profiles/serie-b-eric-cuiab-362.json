@@ -77,11 +77,11 @@
    {
     "label": "Eficiência Defensiva",
     "kind": "def_efficiency_group",
-    "grade": "C-",
-    "percentile": 34.7,
+    "grade": "D",
+    "percentile": 24.8,
     "pair_badge": [
      100.0,
-     34.7
+     24.8
     ],
     "sub_metrics": [
      {
@@ -91,8 +91,8 @@
      },
      {
       "label": "Índice de Eficiência",
-      "percentile": 34.7,
-      "display_value": "-0,3"
+      "percentile": 24.8,
+      "display_value": "-0,7"
      }
     ],
     "stats": []
@@ -2460,5 +2460,124 @@
    "high_speed_km_p90": 34,
    "sprinting_km_p90": 33
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 2.26,
+  "fouls_total": 21,
+  "yellow_per90": 0.43,
+  "yellow_total": 4,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.13,
+   "yellow_per90": 0.2,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 19.5,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2024",
+    "league": "serie-b",
+    "minutes": 826,
+    "club": "Ceará"
+   },
+   {
+    "year": "2025",
+    "league": "serie-b",
+    "minutes": 1104,
+    "club": "Ferroviária"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 5.5538,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 65.1577,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Rebatidas": {
+    "predicted": 4.9129,
+    "resid_sd": 1.5346,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Interceptações": {
+    "predicted": 1.7057,
+    "resid_sd": 1.0324,
+    "train_n90": 22.49
+   },
+   "Ações Defensivas::Chutes Bloqueados": {
+    "predicted": 0.6581,
+    "resid_sd": 0.2747,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0409,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -0.9909,
+    "resid_sd": 0.7483,
+    "train_n90": 20.4
+   },
+   "Passes Progressivos": {
+    "predicted": 7.5654,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 70.7342,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 4.4186,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 71.3565,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 4.0154,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 52.5432,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 1.3408,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 49.9478,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.0311,
+    "resid_sd": 0.0464,
+    "train_n90": 22.37
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.0505,
+    "resid_sd": 0.0316,
+    "train_n90": 22.37
+   }
+  }
+ },
+ "athlete_id": "ath-001031",
+ "person_key": "name:eric|2000|0"
 }

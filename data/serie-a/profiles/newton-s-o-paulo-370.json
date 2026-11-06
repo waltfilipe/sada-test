@@ -73,7 +73,7 @@
      },
      {
       "label": "Recuperações",
-      "percentile": 65.6,
+      "percentile": 65.3,
       "display_value": "3,4"
      }
     ],
@@ -86,7 +86,7 @@
     "percentile": 45.8,
     "pair_badge": [
      100.0,
-     35.9,
+     35.0,
      45.8
     ],
     "sub_metrics": [
@@ -97,13 +97,13 @@
      },
      {
       "label": "Ações sem Bola/90",
-      "percentile": 35.9,
+      "percentile": 35.0,
       "display_value": "11,9"
      },
      {
       "label": "Índice de Eficiência",
       "percentile": 45.8,
-      "display_value": "-0,1"
+      "display_value": "-0,0"
      }
     ],
     "stats": []
@@ -1829,5 +1829,104 @@
    "high_speed_km_p90": 6,
    "sprinting_km_p90": 4
   }
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.94,
+  "fouls_total": 12,
+  "yellow_per90": 0.16,
+  "yellow_total": 2,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 0.95,
+   "yellow_per90": 0.22,
+   "red_per90": 0.01
+  }
+ },
+ "pass_distance_m": 17.11,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2024",
+    "league": "serie-a",
+    "minutes": 2566,
+    "club": "Criciúma"
+   },
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 1672,
+    "club": "Botafogo"
+   }
+  ],
+  "metrics": {
+   "Duelos Defensivos": {
+    "predicted": 5.4184,
+    "resid_sd": 0.9907,
+    "train_n90": 22.49
+   },
+   "Duelos Defensivos::Eficiência": {
+    "predicted": 62.6265,
+    "resid_sd": 6.0571,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Erros Totais": {
+    "predicted": 0.0329,
+    "resid_sd": 0.0658,
+    "train_n90": 22.49
+   },
+   "Eficiência Defensiva::Índice de Eficiência": {
+    "predicted": -0.9285,
+    "resid_sd": 0.7483,
+    "train_n90": 20.4
+   },
+   "Passes Progressivos": {
+    "predicted": 6.2097,
+    "resid_sd": 1.4911,
+    "train_n90": 22.45
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 66.4612,
+    "resid_sd": 6.5696,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final": {
+    "predicted": 5.6731,
+    "resid_sd": 1.4925,
+    "train_n90": 22.45
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 72.2282,
+    "resid_sd": 7.8798,
+    "train_n90": 22.45
+   },
+   "Passes Longos": {
+    "predicted": 4.32,
+    "resid_sd": 1.2452,
+    "train_n90": 22.45
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 54.9264,
+    "resid_sd": 7.0227,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola": {
+    "predicted": 1.2626,
+    "resid_sd": 0.4993,
+    "train_n90": 22.45
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 48.6441,
+    "resid_sd": 13.6306,
+    "train_n90": 22.45
+   },
+   "Conduções Progressivas": {
+    "predicted": 0.8936,
+    "resid_sd": 0.4648,
+    "train_n90": 22.44
+   }
+  }
+ },
+ "athlete_id": "ath-003160",
+ "person_key": "name:newton|2000|0"
 }

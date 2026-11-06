@@ -401,5 +401,188 @@
   "sprinting_km_p90": 0.25,
   "percentiles": {},
   "ranks": {}
- }
+ },
+ "discipline": {
+  "fouls_per90": 0.79,
+  "fouls_total": 2,
+  "yellow_per90": 1.19,
+  "yellow_total": 3,
+  "red_per90": 0.0,
+  "red_total": 0,
+  "pool": {
+   "fouls_per90": 1.51,
+   "yellow_per90": 0.16,
+   "red_per90": 0.02
+  }
+ },
+ "pass_distance_m": 17.3,
+ "cross_season": {
+  "seasons": [
+   {
+    "year": "2025",
+    "league": "serie-a",
+    "minutes": 990,
+    "club": "Botafogo"
+   }
+  ],
+  "metrics": {
+   "Passes Progressivos": {
+    "predicted": 3.0638,
+    "resid_sd": 0.8977,
+    "train_n90": 18.82
+   },
+   "Passes Progressivos::Eficiência": {
+    "predicted": 69.8695,
+    "resid_sd": 11.0471,
+    "train_n90": 18.82
+   },
+   "Passes para Terço Final": {
+    "predicted": 2.8887,
+    "resid_sd": 0.8441,
+    "train_n90": 18.82
+   },
+   "Passes para Terço Final::Eficiência": {
+    "predicted": 66.8847,
+    "resid_sd": 12.1301,
+    "train_n90": 18.82
+   },
+   "Passes Longos": {
+    "predicted": 1.1545,
+    "resid_sd": 0.5923,
+    "train_n90": 18.82
+   },
+   "Passes Longos::Eficiência": {
+    "predicted": 56.3402,
+    "resid_sd": 19.3797,
+    "train_n90": 18.82
+   },
+   "Distribuição::Passes": {
+    "predicted": 30.0794,
+    "resid_sd": 3.6278,
+    "train_n90": 18.85
+   },
+   "Distribuição::Passes Recebidos": {
+    "predicted": 24.6586,
+    "resid_sd": 2.9981,
+    "train_n90": 18.85
+   },
+   "Passes Chave e Área::Assistências para remate": {
+    "predicted": 0.9905,
+    "resid_sd": 0.2974,
+    "train_n90": 18.85
+   },
+   "Passes Chave e Área::Passes para Área": {
+    "predicted": 1.1795,
+    "resid_sd": 0.2932,
+    "train_n90": 18.85
+   },
+   "Cruzamentos::Cruzamentos": {
+    "predicted": 0.7898,
+    "resid_sd": 0.4571,
+    "train_n90": 18.9
+   },
+   "Cruzamentos::Eficiência": {
+    "predicted": 29.4182,
+    "resid_sd": 17.4515,
+    "train_n90": 18.9
+   },
+   "Pré Assistências e xA::Pré Assistências": {
+    "predicted": 0.0402,
+    "resid_sd": 0.0554,
+    "train_n90": 18.85
+   },
+   "Pré Assistências e xA::xA": {
+    "predicted": 0.0699,
+    "resid_sd": 0.0472,
+    "train_n90": 18.85
+   },
+   "Passes Criativos::Eficiência": {
+    "predicted": 54.5659,
+    "resid_sd": 16.0098,
+    "train_n90": 18.85
+   },
+   "Gols e xG::Gols": {
+    "predicted": 0.2807,
+    "resid_sd": 0.1482,
+    "train_n90": 18.86
+   },
+   "Gols e xG::xG": {
+    "predicted": 0.2925,
+    "resid_sd": 0.101,
+    "train_n90": 18.86
+   },
+   "Finalizações::Finalizações": {
+    "predicted": 1.9035,
+    "role_change_flag": true,
+    "resid_sd": 0.4657,
+    "train_n90": 18.83
+   },
+   "Finalizações::Finalizações certas": {
+    "predicted": 41.4958,
+    "role_change_flag": true,
+    "resid_sd": 9.5437,
+    "train_n90": 18.88
+   },
+   "Finalizações::Eficiência": {
+    "predicted": 41.4958,
+    "role_change_flag": true,
+    "resid_sd": 9.5437,
+    "train_n90": 18.88
+   },
+   "Disputas com Bola": {
+    "predicted": 4.7899,
+    "resid_sd": 1.3883,
+    "train_n90": 18.82
+   },
+   "Disputas com Bola::Eficiência": {
+    "predicted": 42.1996,
+    "resid_sd": 6.2104,
+    "train_n90": 18.82
+   },
+   "1v1 - Ofensivo": {
+    "predicted": 1.9547,
+    "resid_sd": 0.8056,
+    "train_n90": 18.85
+   },
+   "1v1 - Ofensivo::Eficiência": {
+    "predicted": 51.2092,
+    "role_change_flag": true,
+    "resid_sd": 12.457,
+    "train_n90": 18.85
+   },
+   "Progressão::Conduções Progressivas": {
+    "predicted": 2.1366,
+    "resid_sd": 0.3995,
+    "train_n90": 18.92
+   },
+   "Progressão::Acelerações": {
+    "predicted": 0.2122,
+    "resid_sd": 0.2198,
+    "train_n90": 18.9
+   },
+   "Ações Terminais::Toques na Área": {
+    "predicted": 2.8982,
+    "resid_sd": 0.6644,
+    "train_n90": 18.88
+   },
+   "Ações Terminais::Ações Ofensivas": {
+    "predicted": 2.4052,
+    "role_change_flag": true,
+    "resid_sd": 0.6655,
+    "train_n90": 18.88
+   },
+   "Verticalidade::% Toque na Área": {
+    "predicted": 16.5574,
+    "resid_sd": 9.1255,
+    "train_n90": 18.88
+   },
+   "Verticalidade::Recepção de Passes Longos": {
+    "predicted": 1.2256,
+    "resid_sd": 0.4501,
+    "train_n90": 18.88
+   }
+  }
+ },
+ "athlete_id": "ath-001799",
+ "person_key": "name:j correa|1994|0"
 }
