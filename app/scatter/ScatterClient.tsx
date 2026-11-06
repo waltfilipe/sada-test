@@ -413,11 +413,17 @@ export function ScatterClient({
   // conjunto exato que a página mostra para aquela posição.
   const axisMetrics = useMemo(() => {
     const map = new Map<string, Metric>();
+    const seenLabels = new Set<string>();
     for (const player of poolPlayers) {
       for (const stat of familySectionStats(player, family)) {
         // Scatter só plota volumes — eficiência/score não agrega ao gráfico.
         if (stat.kind === "efficiency" || stat.kind === "score") continue;
-        if (!map.has(stat.key)) map.set(stat.key, { key: stat.key, label: stat.label, section: stat.section });
+        // Dedupe pelo rótulo exibido: chaves distintas podem convergir para o
+        // mesmo label (ex.: "Duelos Defensivos/90" via item e sub-métrica).
+        const labelKey = stat.label.toLowerCase();
+        if (map.has(stat.key) || seenLabels.has(labelKey)) continue;
+        seenLabels.add(labelKey);
+        map.set(stat.key, { key: stat.key, label: stat.label, section: stat.section });
       }
     }
     const list = [...map.values()];

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import type { StatSectionSpec } from "@/lib/aspectStatSections";
 
@@ -38,14 +39,42 @@ export function MetricAxisPicker({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const [pos, setPos] = useState<{ left: number; top?: number; bottom?: number; width: number } | null>(null);
 
   const selectedKeys = value.split("||").filter(Boolean);
   const otherKeys = otherValue.split("||").filter(Boolean);
 
+  // O painel vai por portal ao <body>: a rail do scatter tem overflow:auto e
+  // cortaria um dropdown posicionado por absolute.
+  useEffect(() => {
+    if (!open) return;
+    const measure = () => {
+      const rect = wrapRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const spaceBelow = window.innerHeight - rect.bottom - 8;
+      const up = spaceBelow < 300 && rect.top > spaceBelow;
+      setPos(
+        up
+          ? { left: rect.left, bottom: window.innerHeight - rect.top + 6, width: Math.max(rect.width, 250) }
+          : { left: rect.left, top: rect.bottom + 6, width: Math.max(rect.width, 250) },
+      );
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    window.addEventListener("scroll", measure, true);
+    return () => {
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("scroll", measure, true);
+    };
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (event: PointerEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(event.target as Node)) setOpen(false);
+      const target = event.target as Node;
+      if (wrapRef.current?.contains(target) || panelRef.current?.contains(target)) return;
+      setOpen(false);
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
@@ -148,34 +177,47 @@ export function MetricAxisPicker({
         )}
         <i className={`fa-solid fa-chevron-${open ? "up" : "down"}`} aria-hidden="true" />
       </div>
-      {open ? (
-        <div className="axis-multiselect-panel" role="group" aria-label="Stats do eixo">
-          <input
-            type="search"
-            className="axis-ms-search"
-            placeholder="Buscar stat…"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            autoFocus
-          />
-          <div className="axis-ms-list">
-            {sections.map((section) => (
-              <div key={section.title} className="axis-multiselect-group">
-                <span className="axis-multiselect-group-title">{section.title}</span>
-                {section.options.map(renderOption)}
+      {open && pos
+        ? createPortal(
+            <div
+              ref={panelRef}
+              className="axis-multiselect-panel is-floating"
+              role="group"
+              aria-label="Stats do eixo"
+              style={{
+                left: pos.left,
+                width: pos.width,
+                ...(pos.top != null ? { top: pos.top } : { bottom: pos.bottom }),
+              }}
+            >
+              <input
+                type="search"
+                className="axis-ms-search"
+                placeholder="Buscar stat…"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                autoFocus
+              />
+              <div className="axis-ms-list">
+                {sections.map((section) => (
+                  <div key={section.title} className="axis-multiselect-group">
+                    <span className="axis-multiselect-group-title">{section.title}</span>
+                    {section.options.map(renderOption)}
+                  </div>
+                ))}
+                {extra.length ? (
+                  <div className="axis-multiselect-group">
+                    <span className="axis-multiselect-group-title">Outras métricas</span>
+                    {extra.map(renderOption)}
+                  </div>
+                ) : null}
+                {!hasAny ? <p className="axis-ms-empty">Nenhuma stat para “{query}”.</p> : null}
               </div>
-            ))}
-            {extra.length ? (
-              <div className="axis-multiselect-group">
-                <span className="axis-multiselect-group-title">Outras métricas</span>
-                {extra.map(renderOption)}
-              </div>
-            ) : null}
-            {!hasAny ? <p className="axis-ms-empty">Nenhuma stat para “{query}”.</p> : null}
-          </div>
-          <p className="axis-multiselect-hint">Clique troca a stat · <strong>+</strong> soma no eixo</p>
-        </div>
-      ) : null}
+              <p className="axis-multiselect-hint">Clique troca a stat · <strong>+</strong> soma no eixo</p>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 

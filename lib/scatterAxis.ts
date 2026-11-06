@@ -166,7 +166,11 @@ function volumeOnlyLabel(parent: string, subLabel: string): string {
 }
 
 function sumPer90(subs: AspectSubMetric[], minutes: number): number {
-  return subs.reduce((total, sub) => total + per90(parseNumber(sub.display_value) ?? 0, sub.label, minutes), 0);
+  return subs.reduce((total, sub) => {
+    const raw = parseNumber(sub.display_value) ?? 0;
+    // Totais de temporada somam o acumulado; volumes já chegam em /90.
+    return total + (SEASON_TOTALS.has(sub.label.trim().toLowerCase()) ? raw : per90(raw, sub.label, minutes));
+  }, 0);
 }
 
 export function scatterAxis(player: PlayerProfile, key: string): ScatterAxis {
@@ -203,7 +207,9 @@ export function scatterAxis(player: PlayerProfile, key: string): ScatterAxis {
   // the "Passes Progressivos" item via prefix match.
   const subHit = findSubMetric(items, key);
   if (subHit) {
-    const value = per90(parseNumber(subHit.display_value)!, subHit.label, minutes);
+    // Valor já vem na unidade do label: totais (xA, Gols…) exibem o acumulado,
+    // volumes exibem a taxa por 90 — sem dividir pela exposição.
+    const value = parseNumber(subHit.display_value)!;
     return { value, label: volumeLabel(statLabel(subHit.label)) };
   }
 
@@ -245,7 +251,7 @@ export function scatterAxis(player: PlayerProfile, key: string): ScatterAxis {
   if (!subs.length) {
     const raw = parseNumber(item.display_value) ?? item.certos_per90 ?? null;
     if (raw == null) return { value: 0, label: volumeLabel(item.label) };
-    const base = per90(raw, item.label, minutes);
+    const base = raw;
     if (rate != null) return { value: base * rate, label: successAxisLabel(item.label) };
     return { value: base, label: volumeLabel(item.label) };
   }
@@ -260,7 +266,9 @@ export function scatterAxis(player: PlayerProfile, key: string): ScatterAxis {
 
   const sub = chosenSub(item, subs);
   if (!sub) return { value: 0, label: volumeLabel(item.label) };
-  const base = per90(parseNumber(sub.display_value) ?? 0, sub.label, minutes);
+  // Totais de temporada (label sem /90) mantêm o acumulado; volumes viram taxa por 90.
+  const rawSub = parseNumber(sub.display_value) ?? 0;
+  const base = SEASON_TOTALS.has(sub.label.trim().toLowerCase()) ? rawSub : per90(rawSub, sub.label, minutes);
   if (rate != null) return { value: base * rate, label: successAxisLabel(item.label) };
   return { value: base, label: volumeOnlyLabel(item.label, sub.label) };
 }
@@ -294,7 +302,6 @@ export type FamilyStat = {
  */
 export function familySectionStats(player: PlayerProfile, family: PositionFamily): FamilyStat[] {
   const items = flattenAspects(player);
-  const minutes = player.minutes ?? 0;
   const stats: FamilyStat[] = [];
   const seen = new Set<string>();
   const push = (entry: FamilyStat) => {
@@ -365,7 +372,9 @@ export function familySectionStats(player: PlayerProfile, family: PositionFamily
           push({
             key: sub.label,
             label: subIsTotal ? statLabel(sub.label) : volumeLabel(statLabel(sub.label)),
-            value: per90(numeric, sub.label, minutes),
+            // Totais de temporada exibem o acumulado (label sem /90); os demais
+            // subs já vêm como taxa por 90 — sem dividir pela exposição.
+            value: numeric,
             kind: subIsTotal ? "total" : "stat",
             section: section.title,
           });
@@ -389,7 +398,6 @@ export function familySectionStats(player: PlayerProfile, family: PositionFamily
  */
 export function aspectFilterStats(player: PlayerProfile): Record<string, number> {
   const out: Record<string, number> = {};
-  const minutes = player.minutes ?? 0;
 
   const setOnce = (key: string, value: number) => {
     if (!(key in out)) out[key] = value;
@@ -402,7 +410,7 @@ export function aspectFilterStats(player: PlayerProfile): Record<string, number>
       for (const sub of item.sub_metrics ?? []) {
         const numeric = parseNumber(sub.display_value);
         if (numeric != null) {
-          setOnce(volumeLabel(sub.label), per90(numeric, sub.label, minutes));
+          setOnce(volumeLabel(sub.label), numeric);
           continue;
         }
         const signed = parseSigned(sub.display_value);
@@ -414,7 +422,7 @@ export function aspectFilterStats(player: PlayerProfile): Record<string, number>
     }
 
     const direct = parseNumber(item.display_value) ?? item.certos_per90 ?? null;
-    if (direct != null) setOnce(volumeLabel(item.label), per90(direct, item.label, minutes));
+    if (direct != null) setOnce(volumeLabel(item.label), direct);
 
     const directRate =
       parseSuccessRate(item.efficiency_value) ?? parseSuccessRate(item.display_value);
@@ -429,7 +437,7 @@ export function aspectFilterStats(player: PlayerProfile): Record<string, number>
       }
       const numeric = parseNumber(sub.display_value);
       if (numeric != null) {
-        setOnce(volumeLabel(statLabel(sub.label)), per90(numeric, sub.label, minutes));
+        setOnce(volumeLabel(statLabel(sub.label)), numeric);
         continue;
       }
       const signed = parseSigned(sub.display_value);
