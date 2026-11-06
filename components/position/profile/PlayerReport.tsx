@@ -670,17 +670,12 @@ export function SectionRadar({
   );
 }
 
-/** Cores das séries de temporada no radar multi-ano (a média usa o accent do relatório). */
-const SEASON_SERIES_COLORS = ["#0ea5e9", "#f59e0b", "#10b981", "#8b5cf6", "#ec4899", "#14b8a6"];
-
-/** Radar de blocos multi-temporada: um polígono vazado por ano + média preenchida. */
+/** Radar de blocos multi-temporada: um único polígono — a média ponderada. */
 function SeasonBlocksRadar({
   titles,
-  seasons,
   average,
 }: {
   titles: string[];
-  seasons: { label: string; color: string; values: (number | null)[] }[];
   average: (number | null)[];
 }) {
   const width = 340;
@@ -715,26 +710,6 @@ function SeasonBlocksRadar({
         const [x, y] = point(index, 100);
         return <line key={title} x1={cx} y1={cy} x2={x} y2={y} className="radar-axis" />;
       })}
-      {seasons.map((season) => (
-        <polygon
-          key={season.label}
-          points={shape(season.values)}
-          fill={season.color}
-          fillOpacity={0.07}
-          stroke={season.color}
-          strokeWidth={1.4}
-          strokeLinejoin="round"
-        />
-      ))}
-      {seasons.map((season) =>
-        season.values.map((value, index) => {
-          if (value == null) return null;
-          const [x, y] = point(index, Math.max(4, value));
-          return (
-            <circle key={`${season.label}-${index}`} cx={x} cy={y} r={2.1} fill={season.color} className="radar-dot" />
-          );
-        }),
-      )}
       {average.some((value) => value != null) ? <polygon points={shape(average)} className="radar-shape" /> : null}
       {titles.map((title, index) => {
         const a = angle(index);
@@ -1517,20 +1492,14 @@ export function SeasonSummarySheet({
       .filter((entry) => entry.avg != null);
   }, [detail]);
 
-  /** Polígonos do radar de blocos: uma série por temporada + a média ponderada. */
+  /** Radar de blocos: um único polígono — a média ponderada entre temporadas. */
   const blockRadar = useMemo(() => {
     if (!matrix.length) return null;
-    const titles = matrix.map((entry) => entry.title);
-    const seasons = ordered
-      .map((row, index) => ({
-        label: row.year,
-        color: SEASON_SERIES_COLORS[index % SEASON_SERIES_COLORS.length],
-        values: matrix.map((entry) => entry.cells[index]),
-      }))
-      .filter((season) => season.values.some((value) => value != null));
-    if (!seasons.length) return null;
-    return { titles, seasons, average: matrix.map((entry) => entry.avg) };
-  }, [matrix, ordered]);
+    return {
+      titles: matrix.map((entry) => entry.title),
+      average: matrix.map((entry) => entry.avg),
+    };
+  }, [matrix]);
 
   /** Metrics averaged across seasons for the strengths/areas lists. */
   const avgMetrics = useMemo(() => {
@@ -1671,19 +1640,7 @@ export function SeasonSummarySheet({
                 <h2>{copy.blocksRadarTitle}</h2>
                 <span>{copy.blocksRadarHint}</span>
               </header>
-              <SeasonBlocksRadar titles={blockRadar.titles} seasons={blockRadar.seasons} average={blockRadar.average} />
-              <p className="player-report-radar-legend" aria-hidden="true">
-                {blockRadar.seasons.map((season) => (
-                  <span key={season.label}>
-                    <i style={{ background: season.color }} />
-                    {season.label}
-                  </span>
-                ))}
-                <span className="is-avg">
-                  <i />
-                  {copy.avgCol}
-                </span>
-              </p>
+              <SeasonBlocksRadar titles={blockRadar.titles} average={blockRadar.average} />
             </section>
           ) : null}
 
