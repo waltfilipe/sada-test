@@ -587,8 +587,14 @@ export function ScatterClient({
       id: newSavedChartId(),
       xKey,
       yKey,
+      xLabel,
+      yLabel,
       athleteIds,
       savedAt: Date.now(),
+      // Snapshot: o PDF sai com o pool pós-filtro de minutos/projeção/temporadas.
+      points,
+      avgX,
+      avgY,
     };
     persistSaved([...savedCharts, entry]);
   };
@@ -719,6 +725,7 @@ export function ScatterClient({
           xKey={xKey}
           yKey={yKey}
           athleteIds={athleteIds}
+          pickedSeasons={[...pickedSeasons]}
           onSave={saveCurrentChart}
           onRemove={removeSavedChart}
         />

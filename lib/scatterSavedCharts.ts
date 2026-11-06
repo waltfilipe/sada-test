@@ -1,13 +1,26 @@
 import type { LeagueId } from "@/lib/leagues";
+import type { ScatterPoint } from "@/components/scatter/ScatterPlot";
 import type { PositionFamily } from "@/lib/types";
 
 export type SavedScatterChart = {
   id: string;
   xKey: string;
   yKey: string;
+  /** Rótulos resolvidos no momento do save (com sufixo /90 quando aplicável). */
+  xLabel?: string;
+  yLabel?: string;
   /** Slot A / B / C — empty string when unset. */
   athleteIds: [string, string, string];
   savedAt: number;
+  /**
+   * Snapshot dos pontos renderizados no save — o PDF reproduz exatamente o
+   * gráfico visto na tela (pool filtrado por minutos, projeção EB, média
+   * ponderada multi-temporada). Gráficos salvos antes deste campo caem no
+   * rebuild a partir do pool.
+   */
+  points?: ScatterPoint[];
+  avgX?: number;
+  avgY?: number;
 };
 
 const MAX_SAVED = 3;

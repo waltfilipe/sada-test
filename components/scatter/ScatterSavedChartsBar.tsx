@@ -17,6 +17,8 @@ type Props = {
   xKey: string;
   yKey: string;
   athleteIds: [string, string, string];
+  /** Anos marcados em "Somar temporadas" — o modal de export só oferece esses. */
+  pickedSeasons: string[];
   onSave: () => void;
   onRemove: (id: string) => void;
 };
@@ -37,6 +39,7 @@ export function ScatterSavedChartsBar({
   xKey,
   yKey,
   athleteIds,
+  pickedSeasons,
   onSave,
   onRemove,
 }: Props) {
@@ -70,7 +73,12 @@ export function ScatterSavedChartsBar({
           <button type="button" className="btn btn-ghost btn-sm" disabled={!canSave} onClick={onSave} title={saveHint}>
             <i className="fa-solid fa-bookmark" aria-hidden="true" /> Salvar gráfico
           </button>
-          <ScatterExportButton family={family} players={players} savedCharts={savedCharts} />
+          <ScatterExportButton
+            family={family}
+            players={players}
+            savedCharts={savedCharts}
+            pickedSeasons={pickedSeasons}
+          />
         </div>
       </div>
       <p className="scatter-saved-hint">{saveHint}</p>

@@ -14,9 +14,11 @@ type Props = {
   family: PositionFamily;
   players: PlayerProfile[];
   savedCharts: SavedScatterChart[];
+  /** Anos marcados em "Somar temporadas" — o modal só oferece fichas desses anos. */
+  pickedSeasons: string[];
 };
 
-export function ScatterExportButton({ family, players, savedCharts }: Props) {
+export function ScatterExportButton({ family, players, savedCharts, pickedSeasons }: Props) {
   const { beginLoad, endLoad } = useLoading();
   const { leagueId, season: viewedSeason } = useLeague();
   const [modalOpen, setModalOpen] = useState(false);
@@ -120,7 +122,12 @@ export function ScatterExportButton({ family, players, savedCharts }: Props) {
         <i className="fa-solid fa-file-pdf" aria-hidden="true" /> Exportar PDF
       </button>
       {modalOpen ? (
-        <ScatterExportModal athletes={exportAthletes} onClose={() => setModalOpen(false)} onExport={startExport} />
+        <ScatterExportModal
+          athletes={exportAthletes}
+          pickedSeasons={pickedSeasons}
+          onClose={() => setModalOpen(false)}
+          onExport={startExport}
+        />
       ) : null}
       {mounted && focusPlayer && exportPlayerId
         ? createPortal(

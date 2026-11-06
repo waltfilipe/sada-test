@@ -51,7 +51,9 @@ export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, 
 
   const extras = extraSheets ?? [];
   const dossierPages = 2 + extras.length * 2;
-  const totalPages = dossierPages + chartPages.length + (extras.length ? 1 : 0);
+  // Resumo multi-temporada vem antes dos mapas de dispersão (2 páginas).
+  const summaryPages = extras.length ? 2 : 0;
+  const totalPages = dossierPages + summaryPages + chartPages.length;
 
   return (
     <div className="scout-print-export" lang={lang === "en" ? "en" : "pt-BR"}>
@@ -78,6 +80,18 @@ export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, 
           totalPages={totalPages}
         />
       ))}
+      {extras.length ? (
+        <SeasonSummarySheet
+          rows={[
+            { player: focusPlayer, year: league.season, leagueName: league.name },
+            ...extras.map((extra) => ({ player: extra.player, year: extra.year, leagueName: extra.leagueName })),
+          ]}
+          family={family}
+          lang={lang}
+          pageNumber={dossierPages + 1}
+          totalPages={totalPages}
+        />
+      ) : null}
       {chartPages.map((charts, pageIndex) => (
         <div key={pageIndex} className="player-report-page scatter-report-page scatter-report-landscape">
           <header className="player-report-banner">
@@ -142,24 +156,12 @@ export function ScatterExportSheet({ family, players, savedCharts, focusPlayer, 
               <p className="player-report-colophon">
                 <span>SADA | Scout</span>
                 <span>{generated}</span>
-                <span>{copy.page(dossierPages + 1 + pageIndex, totalPages)}</span>
+                <span>{copy.page(dossierPages + summaryPages + 1 + pageIndex, totalPages)}</span>
               </p>
             </footer>
           </div>
         </div>
       ))}
-      {extras.length ? (
-        <SeasonSummarySheet
-          rows={[
-            { player: focusPlayer, year: league.season, leagueName: league.name },
-            ...extras.map((extra) => ({ player: extra.player, year: extra.year, leagueName: extra.leagueName })),
-          ]}
-          family={family}
-          lang={lang}
-          pageNumber={totalPages}
-          totalPages={totalPages}
-        />
-      ) : null}
     </div>
   );
 }

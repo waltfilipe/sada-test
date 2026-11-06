@@ -13,16 +13,18 @@ export type ExportSeasonPick = { league: string; season: string };
 
 type Props = {
   athletes: PlayerProfile[];
+  /** Anos marcados em "Somar temporadas" no scatter — limita as fichas de arquivo. */
+  pickedSeasons: string[];
   onClose: () => void;
   onExport: (playerId: string, lang: ReportLang, seasons: ExportSeasonPick[]) => void;
 };
 
-export function ScatterExportModal({ athletes, onClose, onExport }: Props) {
+export function ScatterExportModal({ athletes, pickedSeasons, onClose, onExport }: Props) {
   const { leagueId, season: viewedSeason } = useLeague();
   const [mounted, setMounted] = useState(false);
   const [pickedId, setPickedId] = useState(athletes[0]?.player_id ?? "");
   const [rowsById, setRowsById] = useState<Record<string, ExportSeasonPick[]>>({});
-  const [pickedSeasons, setPickedSeasons] = useState<Set<string>>(new Set());
+  const [pickedSeasonsSet, setPickedSeasonsSet] = useState<Set<string>>(new Set());
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
@@ -48,8 +50,12 @@ export function ScatterExportModal({ athletes, onClose, onExport }: Props) {
     };
   }, [pickedId, athletes, rowsById, leagueId, viewedSeason]);
 
-  const otherSeasons = (rowsById[pickedId] ?? []).filter((row) => row.season !== viewedSeason);
-  const picked = otherSeasons.filter((row) => pickedSeasons.has(row.season));
+  // Só oferece fichas dos anos marcados no scatter (a atual já é a ficha principal).
+  const scatterYears = new Set(pickedSeasons);
+  const otherSeasons = (rowsById[pickedId] ?? []).filter(
+    (row) => row.season !== viewedSeason && scatterYears.has(row.season),
+  );
+  const picked = otherSeasons.filter((row) => pickedSeasonsSet.has(row.season));
 
   useEffect(() => {
     setMounted(true);
@@ -130,9 +136,9 @@ export function ScatterExportModal({ athletes, onClose, onExport }: Props) {
                 <label key={row.season} className="player-report-archive-pick">
                   <input
                     type="checkbox"
-                    checked={pickedSeasons.has(row.season)}
+                    checked={pickedSeasonsSet.has(row.season)}
                     onChange={(event) =>
-                      setPickedSeasons((current) => {
+                      setPickedSeasonsSet((current) => {
                         const next = new Set(current);
                         if (event.target.checked) next.add(row.season);
                         else next.delete(row.season);
