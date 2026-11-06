@@ -4,13 +4,17 @@ import { useEffect, useRef, useState } from "react";
 
 import type { StatSectionSpec } from "@/lib/aspectStatSections";
 
+function fold(value: string): string {
+  return value.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
 type Metric = { key: string; label: string; section?: string };
 
 type Props = {
   axis: "x" | "y";
   metrics: Metric[];
   groups?: StatSectionSpec[];
-  /** Chave composta — stats somados separam por "||". */
+  /** Chave composta — stats somadas separam por "||". */
   value: string;
   otherValue: string;
   plottedLabel?: string;
@@ -32,6 +36,7 @@ export function MetricAxisPicker({
   onSwap,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
   const selectedKeys = value.split("||").filter(Boolean);
@@ -46,76 +51,129 @@ export function MetricAxisPicker({
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [open]);
 
-  function toggleKey(key: string) {
-    const next = selectedKeys.includes(key) ? selectedKeys.filter((item) => item !== key) : [...selectedKeys, key];
-    if (!next.length) return; // eixo precisa de ao menos uma stat
-    onChange(next.join("||"));
+  // Clique na linha troca a stat do eixo (caso comum) e fecha o painel.
+  function replaceWith(key: string) {
+    onChange(key);
+    setOpen(false);
+    setQuery("");
   }
 
-  const bySection = (title: string) => metrics.filter((metric) => metric.section === title);
-  const grouped = (groups ?? [])
-    .map((section) => {
-      const options = bySection(section.title);
-      return { title: section.title, options };
-    })
-    .filter((section) => section.options.length);
-  const sectioned = new Set(grouped.flatMap((section) => section.options.map((option) => option.key)));
-  const extra = metrics.filter((metric) => !sectioned.has(metric.key));
+  // "+" soma a stat ao eixo sem fechar o painel.
+  function addKey(key: string) {
+    if (selectedKeys.includes(key)) return;
+    onChange([...selectedKeys, key].join("||"));
+  }
 
-  const summary =
-    selectedKeys.length > 1
-      ? `${metricLabel(metrics, selectedKeys[0])} +${selectedKeys.length - 1}`
-      : metricLabel(metrics, value) || plottedLabel || "Escolher métricas";
+  function removeKey(key: string) {
+    const next = selectedKeys.filter((item) => item !== key);
+    if (next.length) onChange(next.join("||"));
+  }
+
+  const q = fold(query.trim());
+  const matches = (metric: Metric) => !q || fold(metric.label).includes(q);
+
+  const sections = (groups ?? [])
+    .map((section) => ({
+      title: section.title,
+      options: metrics.filter((metric) => metric.section === section.title && matches(metric)),
+    }))
+    .filter((section) => section.options.length);
+  const sectioned = new Set(sections.flatMap((section) => section.options.map((option) => option.key)));
+  const extra = metrics.filter((metric) => !sectioned.has(metric.key) && matches(metric));
+  const hasAny = sections.length > 0 || extra.length > 0;
+
+  const chips = selectedKeys.map((key) => ({ key, label: metricLabel(metrics, key) }));
+  const triggerLabel = chips[0]?.label ?? plottedLabel ?? "Escolher métricas";
+
+  const renderOption = (metric: Metric) => {
+    const isSelected = selectedKeys.includes(metric.key);
+    const isOther = otherKeys.includes(metric.key);
+    return (
+      <div key={metric.key} className={`axis-ms-option${isSelected ? " is-selected" : ""}`}>
+        <button type="button" className="axis-ms-option-main" onClick={() => replaceWith(metric.key)} title={metric.label}>
+          {isSelected ? <i className="fa-solid fa-check" aria-hidden="true" /> : null}
+          <span>{metric.label}</span>
+          {isOther ? <em className="axis-ms-other">no outro eixo</em> : null}
+        </button>
+        {!isSelected ? (
+          <button
+            type="button"
+            className="axis-ms-add"
+            onClick={() => addKey(metric.key)}
+            title={`Somar "${metric.label}" ao eixo`}
+            aria-label={`Somar ${metric.label} ao eixo`}
+          >
+            +
+          </button>
+        ) : null}
+      </div>
+    );
+  };
 
   const panel = (
     <div className="axis-multiselect" ref={wrapRef}>
-      <button
-        type="button"
-        className="axis-select axis-multiselect-trigger"
+      <div
+        className={`axis-multiselect-trigger${open ? " is-open" : ""}`}
+        role="button"
+        tabIndex={0}
         onClick={() => setOpen((current) => !current)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") setOpen((current) => !current);
+        }}
         aria-expanded={open}
         aria-label={axis === "x" ? "Métricas do eixo X" : "Métricas do eixo Y"}
-        title={selectedKeys.map((key) => metricLabel(metrics, key)).join(" + ")}
       >
-        <span className="axis-multiselect-label">{summary}</span>
-        {selectedKeys.length > 1 ? <span className="axis-multiselect-count">{selectedKeys.length}</span> : null}
+        {chips.length > 1 ? (
+          <span className="axis-ms-chips">
+            {chips.slice(0, 2).map((chip) => (
+              <span key={chip.key} className="axis-ms-chip">
+                {chip.label}
+                <span
+                  className="axis-ms-chip-x"
+                  role="button"
+                  aria-label={`Remover ${chip.label}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    removeKey(chip.key);
+                  }}
+                >
+                  ×
+                </span>
+              </span>
+            ))}
+            {chips.length > 2 ? <span className="axis-ms-chip axis-ms-chip-more">+{chips.length - 2}</span> : null}
+          </span>
+        ) : (
+          <span className="axis-multiselect-label">{triggerLabel}</span>
+        )}
         <i className={`fa-solid fa-chevron-${open ? "up" : "down"}`} aria-hidden="true" />
-      </button>
+      </div>
       {open ? (
         <div className="axis-multiselect-panel" role="group" aria-label="Stats do eixo">
-          {grouped.map((section) => (
-            <div key={section.title} className="axis-multiselect-group">
-              <span className="axis-multiselect-group-title">{section.title}</span>
-              {section.options.map((metric) => (
-                <label key={metric.key} className="axis-multiselect-option">
-                  <input
-                    type="checkbox"
-                    checked={selectedKeys.includes(metric.key)}
-                    onChange={() => toggleKey(metric.key)}
-                  />
-                  <span>{metric.label}</span>
-                  {otherKeys.includes(metric.key) ? <em className="axis-multiselect-other">no outro eixo</em> : null}
-                </label>
-              ))}
-            </div>
-          ))}
-          {extra.length ? (
-            <div className="axis-multiselect-group">
-              <span className="axis-multiselect-group-title">Outras métricas</span>
-              {extra.map((metric) => (
-                <label key={metric.key} className="axis-multiselect-option">
-                  <input
-                    type="checkbox"
-                    checked={selectedKeys.includes(metric.key)}
-                    onChange={() => toggleKey(metric.key)}
-                  />
-                  <span>{metric.label}</span>
-                  {otherKeys.includes(metric.key) ? <em className="axis-multiselect-other">no outro eixo</em> : null}
-                </label>
-              ))}
-            </div>
-          ) : null}
-          <p className="axis-multiselect-hint">Marque várias stats para somá-las no eixo.</p>
+          <input
+            type="search"
+            className="axis-ms-search"
+            placeholder="Buscar stat…"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            autoFocus
+          />
+          <div className="axis-ms-list">
+            {sections.map((section) => (
+              <div key={section.title} className="axis-multiselect-group">
+                <span className="axis-multiselect-group-title">{section.title}</span>
+                {section.options.map(renderOption)}
+              </div>
+            ))}
+            {extra.length ? (
+              <div className="axis-multiselect-group">
+                <span className="axis-multiselect-group-title">Outras métricas</span>
+                {extra.map(renderOption)}
+              </div>
+            ) : null}
+            {!hasAny ? <p className="axis-ms-empty">Nenhuma stat para “{query}”.</p> : null}
+          </div>
+          <p className="axis-multiselect-hint">Clique troca a stat · <strong>+</strong> soma no eixo</p>
         </div>
       ) : null}
     </div>

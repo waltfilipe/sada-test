@@ -13,7 +13,7 @@ const SECTIONS = [
   { path: "/elenco", kicker: "Escalação", title: "Elenco", text: "Escale o elenco de qualquer clube por posição e minutos jogados." },
   { path: "/elencos-previos", kicker: "Histórico", title: "Elencos Prévios", text: "O time mais usado de cada clube em temporadas anteriores, com similares de hoje." },
   { path: "/time-sombra", kicker: "Alvos", title: "Time Sombra", text: "Monte o time dos seus sonhos com atletas de uma liga ou de todas." },
-  { path: "/atletas", kicker: "Atletas", title: "Atletas", text: "Ficha resumida por jogador, com temporadas 2026 (scout) e 2025 (Wyscout)." },
+  { path: "/atletas", kicker: "Atletas", title: "Atletas", text: "Ficha resumida por jogador, com temporadas 2026 (scout) e 2025 (arquivo)." },
 ] as const;
 
 export function LeagueHomeMain({ leagueId }: { leagueId: LeagueId }) {

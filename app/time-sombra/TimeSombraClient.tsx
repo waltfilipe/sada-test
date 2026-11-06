@@ -1052,7 +1052,13 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                             player={player}
                             profileLabel={player.profile}
                             draggable={editable}
-                            onRemove={editable ? () => removeFromSquad(player.player_id, board) : undefined}
+                            onRemove={
+                              editable
+                                ? mode === "elenco"
+                                  ? () => setElencoHidden((prev) => new Set(prev).add(player.player_id))
+                                  : () => removeFromSquad(player.player_id, board)
+                                : undefined
+                            }
                           />
                         </li>
                       ))}

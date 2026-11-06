@@ -142,7 +142,7 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
       {isArchiveView ? (
         <div className="profile-archive-banner" role="status">
           <span>
-            Arquivo Wyscout · temporada {fichaSeason} · dados históricos (não é o scout {CURRENT_SEASON})
+            Temporada {fichaSeason} · dados históricos (não é o scout {CURRENT_SEASON})
           </span>
           <button type="button" className="profile-archive-back" onClick={goBackFicha}>
             <i className="fa-solid fa-arrow-left" aria-hidden="true" /> Voltar para {fichaOrigem}

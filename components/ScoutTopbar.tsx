@@ -125,7 +125,7 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
             title={
               league!.isCurrentSeason
                 ? `${league!.name} — temporada ${league!.season}`
-                : `Arquivo Wyscout ${league!.season}`
+                : `Arquivo ${league!.season}`
             }
           >
             {contextLogo ? (

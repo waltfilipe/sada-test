@@ -619,7 +619,7 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
           Sistema de Análise de Dados de Atletas
         </span>
         <span>
-          Dados Wyscout · Brasileirão {BRASILEIRAO_SEASONS[BRASILEIRAO_SEASONS.length - 1]}–{CURRENT_SEASON} · Estaduais{" "}
+          Dados · Brasileirão {BRASILEIRAO_SEASONS[BRASILEIRAO_SEASONS.length - 1]}–{CURRENT_SEASON} · Estaduais{" "}
           {CURRENT_SEASON}
         </span>
       </footer>

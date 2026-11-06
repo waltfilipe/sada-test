@@ -619,7 +619,7 @@ export function confidenceTier(sampleWeight: number): ProjectionReliability["tie
 export function confidenceTierLabel(tier: ProjectionReliability["tier"]): string {
   if (tier === "alta") return "Confiança alta na amostra";
   if (tier === "media") return "Confiança média — a regressão ainda puxa para o prior histórico/divisão";
-  return "Confiança baixa — poucos minutos; a leitura é dominada pelo prior (histórico Wyscout quando houver)";
+  return "Confiança baixa — poucos minutos; a leitura é dominada pelo prior (histórico de temporadas quando houver)";
 }
 
 function isVolumeLabel(label: string | undefined): boolean {

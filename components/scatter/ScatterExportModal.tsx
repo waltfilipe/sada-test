@@ -141,7 +141,7 @@ export function ScatterExportModal({ athletes, onClose, onExport }: Props) {
                     }
                   />
                   <span>
-                    Wyscout {row.season} · {getLeague(row.league)?.name ?? row.league}
+                    Temporada {row.season} · {getLeague(row.league)?.name ?? row.league}
                   </span>
                 </label>
               ))}

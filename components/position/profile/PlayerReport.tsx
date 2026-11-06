@@ -1797,7 +1797,7 @@ export function PlayerReportButton({
                       }
                     />
                     <span>
-                      Wyscout {year}
+                      Temporada {year}
                       {registryRows?.find((row) => row.season === year)?.league
                         ? ` · ${leagueNameFor(registryRows.find((row) => row.season === year)!.league)}`
                         : ""}

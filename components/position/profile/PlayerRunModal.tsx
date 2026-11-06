@@ -118,7 +118,7 @@ export function PlayerRunModal({ player, onClose }: Props) {
           })}
         </div>
 
-        <p className="run-modal-source">Fonte: aba Run do SofaScore · valores por 90 min quando aplicável</p>
+        <p className="run-modal-source">Dados de corrida da partida · valores por 90 min quando aplicável</p>
       </div>
     </StatWindow>
   );

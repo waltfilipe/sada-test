@@ -27,7 +27,7 @@ const SCENARIO_TABS: { key: ProjectionScenario; label: string; hint: string }[] 
   {
     key: "realista",
     label: "Esperado",
-    hint: "Regressão Bayesiana com k = variância de amostragem ÷ variância entre atletas; μ = previsão ridge por métrica (Wyscout 2022–25, validada leave-one-out) quando existir, senão titulares + perfil.",
+    hint: "Regressão Bayesiana com k = variância de amostragem ÷ variância entre atletas; μ = previsão ridge por métrica (temporadas 2022–25, validada leave-one-out) quando existir, senão titulares + perfil.",
   },
   {
     key: "positiva",
@@ -53,7 +53,7 @@ export function MinuteProjection({ player, family, players }: Props) {
 
   return (
     <>
-      <Tooltip content="Regressão empírica Bayesiana em direção ao patamar previsto entre temporadas (ridge por métrica, Wyscout). Não projeta ‘resto de 2026’.">
+      <Tooltip content="Regressão empírica Bayesiana em direção ao patamar previsto entre temporadas (ridge por métrica, histórico de temporadas). Não projeta ‘resto de 2026’.">
         <button
           type="button"
           className={`btn btn-ghost btn-sm${open ? " is-open" : ""}`}
@@ -65,7 +65,7 @@ export function MinuteProjection({ player, family, players }: Props) {
       </Tooltip>
 
       {open ? (
-        <StatWindow title="Projeção · histórico Wyscout" onClose={() => setOpen(false)}>
+        <StatWindow title="Projeção · histórico de temporadas" onClose={() => setOpen(false)}>
           {report && active && rel ? (
             <div className="projection-modal-copy">
               <p className="projection-reliability">
@@ -81,7 +81,7 @@ export function MinuteProjection({ player, family, players }: Props) {
                 {rel.crossSeasonSeasons > 0 ? (
                   <>
                     {" "}
-                    · histórico Wyscout ({rel.crossSeasonSeasons}{" "}
+                    · histórico ({rel.crossSeasonSeasons}{" "}
                     {rel.crossSeasonSeasons === 1 ? "temporada" : "temporadas"})
                   </>
                 ) : null}

@@ -31,23 +31,6 @@ const PREFERRED_SUB: Record<string, string> = {
   Cruzamentos: "Cruzamentos",
 };
 
-const SUCCESS_LABELS: Record<string, string> = {
-  "Duelos Defensivos": "Duelos Defensivos Vencidos/90",
-  "Duelos Aéreos": "Duelos Aéreos Vencidos/90",
-  Aéreo: "Duelos Aéreos Vencidos/90",
-  "Duelos Vencidos": "Duelos Vencidos/90",
-  "Disputas com Bola": "Disputas com Bola Vencidas/90",
-  "Duelos Ofensivos": "Duelos Ofensivos Vencidos/90",
-  "1v1 - Ofensivo": "Dribles com Sucesso/90",
-  Dribles: "Dribles com Sucesso/90",
-  "Passes Progressivos": "Passes Progressivos Certos/90",
-  "Passes para Terço Final": "Passes para Terço Final Certos/90",
-  "Passes Longos": "Passes Longos Certos/90",
-  "Passes Criativos": "Passes Criativos Certos/90",
-  Cruzamentos: "Cruzamentos Certos/90",
-  Finalizações: "Finalizações Certas/90",
-};
-
 export type ScatterAxis = {
   value: number;
   label: string;
@@ -131,16 +114,9 @@ function volumeLabel(label: string): string {
   return `${label}/90`;
 }
 
+/** Label de eixo para volumes de sucesso — "vencidos/certos" é subentendido. */
 export function successAxisLabel(label: string): string {
-  if (SUCCESS_LABELS[label]) return SUCCESS_LABELS[label];
-  if (/^finaliza/i.test(label)) return "Finalizações Certas/90";
-  if (/drib|1v1/i.test(label)) return "Dribles com Sucesso/90";
-  if (/a[eé]reo/i.test(label)) return "Duelos Aéreos Vencidos/90";
-  if (/disput/i.test(label)) return `${label} Vencidas/90`;
-  if (/duel/i.test(label)) return `${label} Vencidos/90`;
-  if (/cruzament/i.test(label)) return "Cruzamentos Certos/90";
-  if (/passe/i.test(label)) return `${label} Certos/90`;
-  return `${label} com Sucesso/90`;
+  return volumeLabel(label);
 }
 
 function alreadyWon(label: string): boolean {

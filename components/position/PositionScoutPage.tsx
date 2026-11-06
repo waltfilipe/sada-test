@@ -307,7 +307,7 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
             </h1>
             {!isCurrentSeason ? (
               <p className="zag-v2-archive-notice">
-                Arquivo Wyscout {season} · {leagueName}. Volte ao hub para scout {season === "2026" ? "" : "2026"}.
+                Arquivo {season} · {leagueName}. Volte ao hub para scout {season === "2026" ? "" : "2026"}.
               </p>
             ) : null}
           </div>
