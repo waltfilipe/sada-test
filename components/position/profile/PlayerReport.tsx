@@ -670,6 +670,95 @@ export function SectionRadar({
   );
 }
 
+/** Cores das séries de temporada no radar multi-ano (a média usa o accent do relatório). */
+const SEASON_SERIES_COLORS = ["#0ea5e9", "#f59e0b", "#10b981", "#8b5cf6", "#ec4899", "#14b8a6"];
+
+/** Radar de blocos multi-temporada: um polígono vazado por ano + média preenchida. */
+function SeasonBlocksRadar({
+  titles,
+  seasons,
+  average,
+}: {
+  titles: string[];
+  seasons: { label: string; color: string; values: (number | null)[] }[];
+  average: (number | null)[];
+}) {
+  const width = 340;
+  const height = 250;
+  const cx = width / 2;
+  const cy = height / 2 - 2;
+  const radius = 82;
+  const count = titles.length;
+  const angle = (index: number) => -Math.PI / 2 + (index / count) * Math.PI * 2;
+  const point = (index: number, value: number) => {
+    const r = (radius * value) / 100;
+    return [cx + r * Math.cos(angle(index)), cy + r * Math.sin(angle(index))] as const;
+  };
+  const ring = (value: number) =>
+    titles.map((_, index) => point(index, value).map((n) => n.toFixed(1)).join(",")).join(" ");
+  /** Polígono só nos eixos disponíveis — temporada sem o bloco não é puxada ao centro. */
+  const shape = (values: (number | null)[]) =>
+    titles
+      .flatMap((_, index) => {
+        const value = values[index];
+        return value == null ? [] : [point(index, Math.max(4, value)).map((n) => n.toFixed(1)).join(",")];
+      })
+      .join(" ");
+
+  return (
+    <svg className="player-report-radar player-report-radar-seasons" viewBox={`0 0 ${width} ${height}`} role="img" aria-hidden="true">
+      {[25, 75, 100].map((value) => (
+        <polygon key={value} points={ring(value)} className="radar-ring" />
+      ))}
+      <polygon points={ring(50)} className="radar-ring is-median" />
+      {titles.map((title, index) => {
+        const [x, y] = point(index, 100);
+        return <line key={title} x1={cx} y1={cy} x2={x} y2={y} className="radar-axis" />;
+      })}
+      {seasons.map((season) => (
+        <polygon
+          key={season.label}
+          points={shape(season.values)}
+          fill={season.color}
+          fillOpacity={0.07}
+          stroke={season.color}
+          strokeWidth={1.4}
+          strokeLinejoin="round"
+        />
+      ))}
+      {seasons.map((season) =>
+        season.values.map((value, index) => {
+          if (value == null) return null;
+          const [x, y] = point(index, Math.max(4, value));
+          return (
+            <circle key={`${season.label}-${index}`} cx={x} cy={y} r={2.1} fill={season.color} className="radar-dot" />
+          );
+        }),
+      )}
+      {average.some((value) => value != null) ? <polygon points={shape(average)} className="radar-shape" /> : null}
+      {titles.map((title, index) => {
+        const a = angle(index);
+        const x = cx + (radius + 13) * Math.cos(a);
+        const y = cy + (radius + 13) * Math.sin(a);
+        const cos = Math.cos(a);
+        const anchor = Math.abs(cos) < 0.2 ? "middle" : cos > 0 ? "start" : "end";
+        const dy = Math.sin(a) < -0.5 ? -4 : Math.sin(a) > 0.5 ? 10 : 0;
+        const avg = average[index];
+        return (
+          <text key={title} x={x} y={y + dy} textAnchor={anchor} className="radar-label">
+            {title}
+            {avg != null ? (
+              <tspan x={x} dy={11} className="radar-score">
+                {Math.round(avg)}
+              </tspan>
+            ) : null}
+          </text>
+        );
+      })}
+    </svg>
+  );
+}
+
 /** Scores (0–100, média dos percentis por bloco) do radar "Perfil estatístico". */
 export function statProfileScores(player: PlayerProfile): SectionScore[] {
   return sectionScores(reportSections(player, "pt"));
@@ -1428,6 +1517,21 @@ export function SeasonSummarySheet({
       .filter((entry) => entry.avg != null);
   }, [detail]);
 
+  /** Polígonos do radar de blocos: uma série por temporada + a média ponderada. */
+  const blockRadar = useMemo(() => {
+    if (!matrix.length) return null;
+    const titles = matrix.map((entry) => entry.title);
+    const seasons = ordered
+      .map((row, index) => ({
+        label: row.year,
+        color: SEASON_SERIES_COLORS[index % SEASON_SERIES_COLORS.length],
+        values: matrix.map((entry) => entry.cells[index]),
+      }))
+      .filter((season) => season.values.some((value) => value != null));
+    if (!seasons.length) return null;
+    return { titles, seasons, average: matrix.map((entry) => entry.avg) };
+  }, [matrix, ordered]);
+
   /** Metrics averaged across seasons for the strengths/areas lists. */
   const avgMetrics = useMemo(() => {
     type Agg = ReportMetric & { weighted: number; weight: number; per: (number | null)[] };
@@ -1482,12 +1586,12 @@ export function SeasonSummarySheet({
       />
 
       <div className="player-report-body">
-        <section className="player-report-mini">
+        <section className="player-report-mini player-report-hero">
           <PlayerPhoto
             src={main.transfermarkt?.photo}
             alt=""
-            className="player-report-mini-photo"
-            fallback={<span className="player-report-mini-photo player-report-photo-fallback">{playerInitials(main.name)}</span>}
+            className="player-report-hero-photo"
+            fallback={<span className="player-report-hero-photo player-report-photo-fallback">{playerInitials(main.name)}</span>}
           />
           <div>
             <h1>{main.name}</h1>
@@ -1561,28 +1665,25 @@ export function SeasonSummarySheet({
         </section>
 
         <div className="player-report-charts player-report-summary-charts">
-          {avgMix.length ? (
+          {blockRadar ? (
             <section className="player-report-card">
               <header className="player-report-card-head">
-                <h2>{copy.avgProfileTitle}</h2>
-                <span>{copy.avgProfileHint}</span>
+                <h2>{copy.blocksRadarTitle}</h2>
+                <span>{copy.blocksRadarHint}</span>
               </header>
-              <ul className="player-report-archetypes player-report-avg-mix">
-                {avgMix.map((item, index) => (
-                  <li key={item.label} className={index === 0 ? "is-active" : undefined}>
-                    <p className="player-report-archetype-name">
-                      <i style={{ background: profileAccent(item.label) }} aria-hidden="true" />
-                      <span>{translateLabel(item.label, lang)}</span>
-                    </p>
-                    <p className="player-report-archetype-share">
-                      <strong>{Math.round(item.share)}%</strong>
-                    </p>
-                    <span className="player-report-archetype-track" aria-hidden="true">
-                      <span style={{ width: `${Math.max(3, Math.round(item.share))}%`, background: profileAccent(item.label) }} />
-                    </span>
-                  </li>
+              <SeasonBlocksRadar titles={blockRadar.titles} seasons={blockRadar.seasons} average={blockRadar.average} />
+              <p className="player-report-radar-legend" aria-hidden="true">
+                {blockRadar.seasons.map((season) => (
+                  <span key={season.label}>
+                    <i style={{ background: season.color }} />
+                    {season.label}
+                  </span>
                 ))}
-              </ul>
+                <span className="is-avg">
+                  <i />
+                  {copy.avgCol}
+                </span>
+              </p>
             </section>
           ) : null}
 
@@ -1626,6 +1727,60 @@ export function SeasonSummarySheet({
             </section>
           ) : null}
         </div>
+
+        <footer className="player-report-foot">
+          <p className="player-report-avg-note">{copy.avgNote}</p>
+          <ReportColophon generated={generated} page={copy.page(pageNumber, totalPages)} />
+        </footer>
+      </div>
+      </div>
+
+      <div className="player-report-page">
+        <ReportBanner
+        kicker={copy.multiKicker}
+        league={familyLabel}
+        family={copy.multiSeasons(ordered.length)}
+        season={
+          ordered.length > 1
+            ? `${ordered[0].year}–${ordered[ordered.length - 1].year}`
+            : ordered[0].year
+        }
+        seasonTag={copy.multiTag}
+      />
+
+      <div className="player-report-body">
+        <header className="player-report-cont">
+          <strong>{main.name}</strong>
+          <span>
+            {familyLabel}
+            {ordered.length > 1 ? ` · ${ordered[0].year}–${ordered[ordered.length - 1].year}` : ` · ${ordered[0].year}`}
+          </span>
+        </header>
+
+        {avgMix.length ? (
+          <section className="player-report-card">
+            <header className="player-report-card-head">
+              <h2>{copy.avgProfileTitle}</h2>
+              <span>{copy.avgProfileHint}</span>
+            </header>
+            <ul className="player-report-archetypes player-report-avg-mix">
+              {avgMix.map((item, index) => (
+                <li key={item.label} className={index === 0 ? "is-active" : undefined}>
+                  <p className="player-report-archetype-name">
+                    <i style={{ background: profileAccent(item.label) }} aria-hidden="true" />
+                    <span>{translateLabel(item.label, lang)}</span>
+                  </p>
+                  <p className="player-report-archetype-share">
+                    <strong>{Math.round(item.share)}%</strong>
+                  </p>
+                  <span className="player-report-archetype-track" aria-hidden="true">
+                    <span style={{ width: `${Math.max(3, Math.round(item.share))}%`, background: profileAccent(item.label) }} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         {tendencies.length ? (
           <section className="player-report-tendencies player-report-summary-tendencies" aria-label={copy.tendencies}>
@@ -1697,7 +1852,7 @@ export function SeasonSummarySheet({
 
         <footer className="player-report-foot">
           <p className="player-report-avg-note">{copy.avgNote}</p>
-          <ReportColophon generated={generated} page={copy.page(pageNumber, totalPages)} />
+          <ReportColophon generated={generated} page={copy.page(pageNumber + 1, totalPages)} />
         </footer>
       </div>
       </div>
@@ -1947,7 +2102,7 @@ export function PlayerReportButton({
                   leagueName={sheet.leagueName}
                   skipProjection={sheet.skipProjection}
                   pageOffset={index * 2}
-                  totalPages={reportSheets.length * 2 + (reportSheets.length > 1 ? 1 : 0)}
+                  totalPages={reportSheets.length * 2 + (reportSheets.length > 1 ? 2 : 0)}
                 />
               ))}
               {reportSheets.length > 1 ? (
@@ -1960,7 +2115,7 @@ export function PlayerReportButton({
                   family={family}
                   lang={lang}
                   pageNumber={reportSheets.length * 2 + 1}
-                  totalPages={reportSheets.length * 2 + 1}
+                  totalPages={reportSheets.length * 2 + 2}
                 />
               ) : null}
             </>,

@@ -6107,6 +6107,83 @@
     background: var(--r-soft);
   }
 
+  /* Summary page hero: bigger portrait, same crop treatment as the ficha's. */
+  .player-report-hero-photo {
+    display: block;
+    width: 26mm;
+    height: 33mm;
+    flex: 0 0 26mm;
+    object-fit: cover;
+    object-position: center 30%;
+    border: 1px solid var(--r-line);
+    border-radius: var(--r-radius);
+    background: var(--r-soft);
+  }
+
+  .player-report-hero-photo.player-report-photo-fallback {
+    font-size: 22px;
+  }
+
+  .player-report-hero {
+    align-items: center;
+    gap: 6mm;
+  }
+
+  /* Continuation header on the summary's second page. */
+  .player-report-cont {
+    display: flex;
+    align-items: baseline;
+    gap: 3mm;
+    padding-bottom: 2.5mm;
+    border-bottom: 1px solid var(--r-line);
+  }
+
+  .player-report-cont strong {
+    color: var(--r-ink);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .player-report-cont span {
+    color: var(--r-faint);
+    font-size: 7.6px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Season legend under the multi-year blocks radar. */
+  .player-report-radar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2mm 4.5mm;
+    margin-top: 1.2mm;
+  }
+
+  .player-report-radar-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.4mm;
+    color: var(--r-text);
+    font-size: 7.6px;
+    font-weight: 700;
+  }
+
+  .player-report-radar-legend i {
+    display: inline-block;
+    width: 2.6mm;
+    height: 2.6mm;
+    border-radius: 99px;
+    background: var(--r-faint);
+  }
+
+  .player-report-radar-legend .is-avg i {
+    background: rgba(14, 116, 144, 0.16);
+    border: 1.5px solid var(--r-accent);
+    box-sizing: border-box;
+  }
+
   .player-report-mini h1 {
     color: var(--r-ink);
     font-size: 17px;
