@@ -66,44 +66,128 @@ POSITION_FAMILIES: dict[str, dict[str, Any]] = {
     },
 }
 
+def _ax(key: str, label: str | None = None, field: str = "") -> dict:
+    return {"key": key, "label": label or key, "field": field}
+
+
+_DEF_SUBS = [_ax("Rebatidas"), _ax("Interceptações"), _ax("Chutes Bloqueados")]
+_DEF_BLOCK = [
+    _ax("duelos_def", "Duelos Defensivos", "DuelosDef"),
+    _ax("Ações Defensivas", "Ações Defensivas (total)"),
+    *_DEF_SUBS,
+    _ax("Aéreo", "Duelos Aéreos"),
+]
+_PASSES = [
+    _ax("Passes"),
+    _ax("Passes Progressivos"),
+    _ax("Passes para Terço Final"),
+    _ax("Passes Longos"),
+    _ax("Passes Criativos"),
+]
+_CRIACAO = [
+    _ax("Assistências para remate", "Passes Chave"),
+    _ax("Passes para área", "Passes para Área"),
+    _ax("xA"),
+    _ax("Pré Assistências"),
+]
+_TERMINAL = [_ax("Ações Ofensivas"), _ax("Toques na área", "Toques na Área")]
+_FIN = [_ax("Gols"), _ax("xG"), _ax("Finalizações")]
+
 SCATTER_METRICS = {
     "zagueiros": [
-        {"key": "intervencoes", "label": "Intervenções", "field": "interception_won_p90"},
-        {"key": "confrontos_of", "label": "Confrontos Ofensivos", "field": "DuelosOf"},
-        {"key": "construcao", "label": "Construção", "field": "n_construcao"},
-        {"key": "duelo_ar", "label": "Duelo Aéreo", "field": "n_duelo_ar"},
-        {"key": "contencao", "label": "Contenção", "field": "n_contencao"},
-        {"key": "ofensividade", "label": "Ofensividade", "field": "n_conducao"},
-        {"key": "passes_prog", "label": "Passes Progressivos", "field": "PassesProg"},
-        {"key": "duelos_def", "label": "Duelos Defensivos", "field": "DuelosDef"},
+        *_DEF_BLOCK,
+        _ax("Passes Progressivos"),
+        _ax("Passes para Terço Final"),
+        _ax("confrontos_of", "Disputas com Bola", "DuelosOf"),
+        _ax("Conduções Progressivas"),
     ],
     "laterais": [
-        {"key": "cruzamentos", "label": "Cruzamentos", "field": "Cruz."},
-        {"key": "progressao", "label": "Progressão", "field": "Cond.Prog"},
-        {"key": "xa", "label": "xA", "field": "xA"},
-        {"key": "construcao", "label": "Construção", "field": "n_construcao"},
-        {"key": "duelos_def", "label": "Duelos Defensivos", "field": "DuelosDef"},
+        *_DEF_BLOCK,
+        _ax("Passes"),
+        _ax("Passes Progressivos"),
+        _ax("Passes para Terço Final"),
+        _ax("Conduções Progressivas"),
+        _ax("1v1 - Ofensivo", "Dribles (1v1)"),
+        _ax("Cruzamentos"),
+        *_CRIACAO,
+        *_TERMINAL,
     ],
     "meio-campistas": [
-        {"key": "finalizacao", "label": "Finalizações", "field": "Finalizações"},
-        {"key": "progressao", "label": "Progressão", "field": "Cond.Prog"},
-        {"key": "xa", "label": "xA", "field": "xA"},
-        {"key": "construcao", "label": "Construção", "field": "n_construcao"},
-        {"key": "duelos_def", "label": "Duelos Defensivos", "field": "DuelosDef"},
+        *_DEF_BLOCK,
+        *_PASSES,
+        _ax("Conduções Progressivas"),
+        _ax("1v1 - Ofensivo", "Dribles (1v1)"),
+        *_CRIACAO,
+        _ax("Finalizações"),
+        _ax("xG"),
+        *_TERMINAL,
     ],
     "extremos": [
-        {"key": "dribles", "label": "Dribles", "field": "Dribles"},
-        {"key": "xa", "label": "xA", "field": "xA"},
-        {"key": "progressao", "label": "Progressão", "field": "Cond.Prog"},
-        {"key": "cruzamentos", "label": "Cruzamentos", "field": "Cruz."},
-        {"key": "toques_area", "label": "Toques na Área", "field": "ToquesArea"},
+        _ax("Duelos Vencidos"),
+        _ax("Ações Defensivas"),
+        *_PASSES,
+        *_CRIACAO,
+        _ax("Cruzamentos"),
+        _ax("1v1 - Ofensivo", "Dribles (1v1)"),
+        _ax("Conduções Progressivas"),
+        _ax("Acelerações"),
+        *_FIN,
+        *_TERMINAL,
+        _ax("Recepção de Passes Longos"),
     ],
     "atacantes": [
-        {"key": "gols", "label": "Gols", "field": "Gols"},
-        {"key": "finalizacao", "label": "Finalizações", "field": "Finalizações"},
-        {"key": "toques_area", "label": "Toques na Área", "field": "ToquesArea"},
-        {"key": "progressao", "label": "Progressão", "field": "Cond.Prog"},
+        *_FIN,
+        *_TERMINAL,
+        _ax("Aéreo", "Duelos Aéreos"),
+        _ax("Disputas com Bola"),
+        _ax("1v1 - Ofensivo", "Dribles (1v1)"),
+        _ax("Conduções Progressivas"),
+        *_PASSES,
+        *_CRIACAO,
+        _ax("Cruzamentos"),
+        _ax("Recepção de Passes Longos"),
     ],
+}
+
+# Gráficos salvos com chaves antigas continuam resolvendo via player.scatter.
+LEGACY_SCATTER_FIELDS = {
+    "zagueiros": {
+        "intervencoes": "interception_won_p90",
+        "confrontos_of": "DuelosOf",
+        "construcao": "n_construcao",
+        "duelo_ar": "n_duelo_ar",
+        "contencao": "n_contencao",
+        "ofensividade": "n_conducao",
+        "passes_prog": "PassesProg",
+        "duelos_def": "DuelosDef",
+    },
+    "laterais": {
+        "cruzamentos": "Cruz.",
+        "progressao": "Cond.Prog",
+        "xa": "xA",
+        "construcao": "n_construcao",
+        "duelos_def": "DuelosDef",
+    },
+    "meio-campistas": {
+        "finalizacao": "Finalizações",
+        "progressao": "Cond.Prog",
+        "xa": "xA",
+        "construcao": "n_construcao",
+        "duelos_def": "DuelosDef",
+    },
+    "extremos": {
+        "dribles": "Dribles",
+        "xa": "xA",
+        "progressao": "Cond.Prog",
+        "cruzamentos": "Cruz.",
+        "toques_area": "ToquesArea",
+    },
+    "atacantes": {
+        "gols": "Gols",
+        "finalizacao": "Finalizações",
+        "toques_area": "ToquesArea",
+        "progressao": "Cond.Prog",
+    },
 }
 
 
@@ -2155,7 +2239,10 @@ def build_player_payload(row: pd.Series, family_key: str, pool_size: int) -> dic
         "tendencies": tendencies,
         "aspects": aspects,
         "profiles_available": family["profiles"],
-        "scatter": {m["key"]: float(row.get(m["field"], 0) or 0) for m in SCATTER_METRICS[family_key]},
+        "scatter": {
+            **{m["key"]: float(row.get(m["field"], 0) or 0) for m in SCATTER_METRICS[family_key] if m["field"]},
+            **{k: float(row.get(field, 0) or 0) for k, field in LEGACY_SCATTER_FIELDS[family_key].items()},
+        },
     }
     if family_key == "zagueiros":
         lean = row.get("hybrid_lean")

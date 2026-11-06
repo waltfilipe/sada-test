@@ -54,12 +54,22 @@ export type AthleteSeasonRow = {
 export function athleteSeasonRows(identity: {
   athleteId?: string | null;
   personKey?: string | null;
+  league?: string | null;
+  season?: string | null;
+  playerId?: string | null;
 }): AthleteSeasonRow[] {
   const registry = athletesRegistry();
+  // Linhas sem athlete_id carimbado: a própria linha resolve a pessoa via
+  // persons.json (liga+temporada+player_id -> person_key).
+  const personKey =
+    identity.personKey ??
+    (identity.league && identity.season && identity.playerId
+      ? personsMap()[identity.league]?.[identity.season]?.[identity.playerId] ?? null
+      : null);
   let record = identity.athleteId ? registry[identity.athleteId] : undefined;
-  if (!record && identity.personKey) {
+  if (!record && personKey) {
     record = Object.values(registry).find(
-      (item) => item.person_key === identity.personKey || item.person_keys?.includes(identity.personKey!),
+      (item) => item.person_key === personKey || item.person_keys?.includes(personKey),
     );
   }
   if (!record?.rows?.length) return [];

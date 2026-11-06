@@ -18,7 +18,7 @@ type Props = {
 };
 
 export function ScatterExportModal({ athletes, onClose, onExport }: Props) {
-  const { season: viewedSeason } = useLeague();
+  const { leagueId, season: viewedSeason } = useLeague();
   const [mounted, setMounted] = useState(false);
   const [pickedId, setPickedId] = useState(athletes[0]?.player_id ?? "");
   const [rowsById, setRowsById] = useState<Record<string, ExportSeasonPick[]>>({});
@@ -29,10 +29,13 @@ export function ScatterExportModal({ athletes, onClose, onExport }: Props) {
   // Anos disponíveis do atleta no registro (cross-liga) para fichas extras no PDF.
   useEffect(() => {
     const player = athletes.find((item) => item.player_id === pickedId);
-    if (!player || (!player.athlete_id && !player.person_key) || rowsById[pickedId]) return;
+    if (!player || rowsById[pickedId]) return;
     const qs = new URLSearchParams();
     if (player.athlete_id) qs.set("athlete_id", player.athlete_id);
-    else qs.set("person_key", player.person_key!);
+    if (player.person_key) qs.set("person_key", player.person_key);
+    qs.set("league", leagueId);
+    qs.set("season", viewedSeason);
+    qs.set("player_id", player.player_id);
     let cancelled = false;
     fetch(`/api/athlete-rows?${qs}`)
       .then((res) => (res.ok ? res.json() : null))
@@ -43,7 +46,7 @@ export function ScatterExportModal({ athletes, onClose, onExport }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [pickedId, athletes, rowsById]);
+  }, [pickedId, athletes, rowsById, leagueId, viewedSeason]);
 
   const otherSeasons = (rowsById[pickedId] ?? []).filter((row) => row.season !== viewedSeason);
   const picked = otherSeasons.filter((row) => pickedSeasons.has(row.season));

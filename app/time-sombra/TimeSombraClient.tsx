@@ -813,7 +813,8 @@ export function TimeSombraClient({ playersByLeague, board: viewBoard }: Props) {
                     setDetailPlayerId(null);
                     setPlacementPlayerId(null);
                     setSlotQuery("");
-                    setPicker({ slot, mode: "reserve" });
+                    // Slot vazio: "+" escala titular; ocupado: "+" adiciona reserva.
+                    setPicker({ slot, mode: viewAssignments[slot.id] ? "reserve" : "starter" });
                   }}
                 />
               </div>

@@ -30,9 +30,9 @@ export function ReserveBench({
     .filter((player): player is PlayerSearchRow => Boolean(player));
 
   return (
-    <section className="shadow-reserve-bench" aria-label="Banquinho de reservas">
+    <section className="shadow-reserve-bench" aria-label="Banco de reservas">
       <header className="shadow-bench-head">
-        <h3 className="section-label">Banquinho de reservas</h3>
+        <h3 className="section-label">Banco de reservas</h3>
         <span className="shadow-bench-count">{players.length}</span>
       </header>
       {players.length ? (
@@ -73,7 +73,7 @@ export function ReserveBench({
       ) : (
         <p className="shadow-bench-empty">
           {editable
-            ? "Nenhum reserva. O + na posição manda o atleta para o banquinho."
+            ? "Nenhum reserva. O + em posição ocupada manda o atleta para o banco."
             : "Nenhum reserva neste elenco."}
         </p>
       )}

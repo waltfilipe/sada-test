@@ -52,6 +52,25 @@ export type ScatterAxis = {
   label: string;
 };
 
+/** Display aliases for source sub-metric names. */
+const SUB_LABEL_ALIASES: Record<string, string> = {
+  "Assistências para remate": "Passes Chave",
+};
+
+function statLabel(label: string): string {
+  return SUB_LABEL_ALIASES[label] ?? label;
+}
+
+/** Finds a numeric sub-metric by label (e.g. "Passes", "Rebatidas", "Toques na área"). */
+function findSubMetric(items: AspectItem[], label: string): AspectSubMetric | undefined {
+  for (const item of items) {
+    for (const sub of item.sub_metrics ?? []) {
+      if (sub.label === label && parseNumber(sub.display_value) != null) return sub;
+    }
+  }
+  return undefined;
+}
+
 function parseNumber(raw?: string | null): number | null {
   if (!raw) return null;
   const text = raw.trim();
@@ -150,10 +169,19 @@ function sumPer90(subs: AspectSubMetric[], minutes: number): number {
 }
 
 export function scatterAxis(player: PlayerProfile, key: string): ScatterAxis {
-  const item = findAspect(flattenAspects(player), key);
-  if (!item) return { value: player.scatter[key] ?? 0, label: volumeLabel(key) };
-
+  const items = flattenAspects(player);
   const minutes = player.minutes ?? 0;
+
+  // Sub-metric axes resolve first so "Passes" hits Distribuição→Passes and not
+  // the "Passes Progressivos" item via prefix match.
+  const subHit = findSubMetric(items, key);
+  if (subHit) {
+    const value = per90(parseNumber(subHit.display_value)!, subHit.label, minutes);
+    return { value, label: volumeLabel(statLabel(subHit.label)) };
+  }
+
+  const item = findAspect(items, key);
+  if (!item) return { value: player.scatter[key] ?? 0, label: volumeLabel(key) };
 
   if (item.kind === "def_efficiency_group" || item.label === "Eficiência Defensiva") {
     const score = item.sub_metrics?.find((sub) => /efici[eê]ncia defensiva/i.test(sub.label));
@@ -248,12 +276,12 @@ export function aspectFilterStats(player: PlayerProfile): Record<string, number>
       }
       const numeric = parseNumber(sub.display_value);
       if (numeric != null) {
-        setOnce(volumeLabel(sub.label), per90(numeric, sub.label, minutes));
+        setOnce(volumeLabel(statLabel(sub.label)), per90(numeric, sub.label, minutes));
         continue;
       }
       const signed = parseSigned(sub.display_value);
       if (signed != null && /^[+\-−]/.test((sub.display_value ?? "").trim())) {
-        setOnce(sub.label, signed);
+        setOnce(statLabel(sub.label), signed);
       }
     }
   }

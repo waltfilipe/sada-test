@@ -1638,13 +1638,14 @@ export function PlayerReportButton({
   // Registro de identidade dá TODOS os anos disponíveis (cross_season está
   // vazio em linhas de arquivo e não cobre quem saiu da base corrente).
   useEffect(() => {
-    if (!scout.athlete_id && !scout.person_key) {
-      setRegistryRows(null);
-      return;
-    }
+    // Sempre resolve a linha: identidade carimbada quando existe, senão
+    // liga+temporada+player_id cai no persons.json e cobre qualquer linha.
     const qs = new URLSearchParams();
     if (scout.athlete_id) qs.set("athlete_id", scout.athlete_id);
-    else qs.set("person_key", scout.person_key!);
+    if (scout.person_key) qs.set("person_key", scout.person_key);
+    qs.set("league", leagueId);
+    qs.set("season", primaryArchiveLabel ?? currentSeason);
+    qs.set("player_id", scout.player_id);
     let cancelled = false;
     fetch(`/api/athlete-rows?${qs}`)
       .then((res) => (res.ok ? res.json() : null))
@@ -1657,7 +1658,7 @@ export function PlayerReportButton({
     return () => {
       cancelled = true;
     };
-  }, [scout.athlete_id, scout.person_key]);
+  }, [scout.athlete_id, scout.person_key, scout.player_id, leagueId, primaryArchiveLabel, currentSeason]);
 
   const archiveYears = useMemo(() => {
     const viewedYear = primaryArchiveLabel ?? currentSeason;

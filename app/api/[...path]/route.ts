@@ -144,10 +144,13 @@ export async function GET(request: Request, { params }: Params) {
   if (resource === "athlete-rows" && path.length === 1) {
     const athleteId = url.searchParams.get("athlete_id");
     const personKey = url.searchParams.get("person_key");
-    if (!athleteId && !personKey) {
+    const league = url.searchParams.get("league");
+    const season = url.searchParams.get("season");
+    const playerId = url.searchParams.get("player_id");
+    if (!athleteId && !personKey && !(league && season && playerId)) {
       return NextResponse.json({ error: "missing_params" }, { status: 400 });
     }
-    const rows = athleteSeasonRows({ athleteId, personKey });
+    const rows = athleteSeasonRows({ athleteId, personKey, league, season, playerId });
     return NextResponse.json({ rows });
   }
 

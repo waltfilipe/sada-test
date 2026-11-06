@@ -171,7 +171,7 @@ export function PitchView({
                 <button
                   type="button"
                   className="shadow-slot-plus"
-                  aria-label={`Adicionar reserva em ${slot.label}`}
+                  aria-label={player ? `Adicionar reserva em ${slot.label}` : `Escalar titular em ${slot.label}`}
                   onClick={(event) => {
                     event.stopPropagation();
                     onAddReserve(slot);
@@ -201,11 +201,11 @@ export function PitchView({
         </p>
       ) : editable ? (
         <p className="shadow-pitch-hint">
-          Arraste entre posições · + manda o reserva ao banquinho
+          Arraste entre posições · + escala titular ou adiciona reserva
         </p>
       ) : (
         <p className="shadow-pitch-hint">
-          Titulares pelos minutos em cada posição · reservas no banquinho
+          Titulares pelos minutos em cada posição · reservas no banco
         </p>
       )}
     </div>
