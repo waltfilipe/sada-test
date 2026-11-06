@@ -415,6 +415,8 @@ export function ScatterClient({
     const map = new Map<string, Metric>();
     for (const player of poolPlayers) {
       for (const stat of familySectionStats(player, family)) {
+        // Scatter só plota volumes — eficiência/score não agrega ao gráfico.
+        if (stat.kind === "efficiency" || stat.kind === "score") continue;
         if (!map.has(stat.key)) map.set(stat.key, { key: stat.key, label: stat.label, section: stat.section });
       }
     }
