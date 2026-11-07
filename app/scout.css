@@ -151,6 +151,19 @@
   background: var(--gold);
 }
 
+/* Botão CTA para o app SADA-Elencos (montado em /elencos/*). */
+.topbar-elencos-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 650;
+  color: var(--gold, #facc15);
+}
+
+.topbar-elencos-icon {
+  font-size: 0.72em;
+}
+
 .topbar-link-muted {
   opacity: 0.3;
   cursor: not-allowed;

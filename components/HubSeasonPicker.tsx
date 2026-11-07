@@ -64,9 +64,7 @@ const FEATURES: Feature[] = [
   { path: "/comparar", icon: "fa-scale-balanced", title: "Comparar atletas", category: "Análise", fact: "Radar lado a lado" },
   { path: "/filtros", icon: "fa-sliders", title: "Filtros avançados", category: "Busca", fact: "Idade · minutos · perfil" },
   { path: "/scatter", icon: "fa-chart-line", title: "Scatter", category: "Análise", fact: "Quem foge da curva" },
-  { path: "/elenco", icon: "fa-people-group", title: "Elenco do clube", category: "Clubes", fact: "Campinho editável", elencos: true },
-  { path: "/elencos-previos", icon: "fa-clock-rotate-left", title: "Elencos prévios", category: "Clubes", fact: "2022–2025", elencos: true },
-  { path: "/time-sombra", icon: "fa-chess-board", title: "Time sombra", category: "Planejamento", fact: "Alvos por posição", elencos: true },
+  { path: "/elenco", icon: "fa-people-group", title: "Elencos", category: "Clubes", fact: "App dedicado · campinho editável", elencos: true },
 ];
 
 const ENTER_DELAY_MS = 350;
@@ -602,12 +600,12 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
         <div className="hb-custom-copy">
           <SiteLogo variant="horizontal" className="hb-custom-lockup" />
           <span className="hb-custom-eyebrow">Monte o seu elenco ideal</span>
-          <h2 id="hb-custom-title">time sombra</h2>
+          <h2 id="hb-custom-title">elencos</h2>
           <p>
-            Escolha alvos por posição em qualquer série, compare com o elenco atual e leve o relatório pronto para a
-            reunião.
+            Escale clubes, revise temporadas anteriores e monte times sombra com alvos por posição — tudo no app
+            dedicado de elencos.
           </p>
-          <Link href={elencosPath("serie-a", "/time-sombra")} className="hb-cta">
+          <Link href={elencosPath("serie-a", "/elenco")} className="hb-cta">
             Começar
           </Link>
           <Link href={leagueHref("serie-a", "/comparar")} className="hb-more">

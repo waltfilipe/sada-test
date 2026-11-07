@@ -11,9 +11,6 @@ const SECTIONS = [
   { path: "/filtros", kicker: "Busca", title: "Filtros", text: "Cruze clube, idade, minutagem, pé e tendências para achar o perfil certo." },
   { path: "/comparar", kicker: "Duelo", title: "Comparar", text: "Coloque dois ou três atletas da mesma posição lado a lado." },
   { path: "/scatter", kicker: "Mapa", title: "Scatter", text: "Veja a posição inteira num gráfico e encontre quem se destaca." },
-  { path: "/elenco", kicker: "Escalação", title: "Elenco", text: "Escale o elenco de qualquer clube por posição e minutos jogados." },
-  { path: "/elencos-previos", kicker: "Histórico", title: "Elencos Prévios", text: "O time mais usado de cada clube em temporadas anteriores, com similares de hoje." },
-  { path: "/time-sombra", kicker: "Alvos", title: "Time Sombra", text: "Monte o time dos seus sonhos com atletas de uma liga ou de todas." },
   { path: "/atletas", kicker: "Atletas", title: "Atletas", text: "Ficha resumida por jogador, com temporadas 2026 (scout) e 2025 (arquivo)." },
 ] as const;
 
@@ -21,10 +18,6 @@ export function LeagueHomeMain({ leagueId }: { leagueId: LeagueId }) {
   const meta = getMeta(leagueId);
   const counts = new Map(meta.families.map((family) => [family.key, family.count]));
   const href = (path: string) => leaguePath(leagueId, path);
-  // Boards de elenco vivem no app SADA-Elencos (/elencos/* via rewrite).
-  const ELENCOS_PATHS = new Set(["/elenco", "/elencos-previos", "/time-sombra"]);
-  const sectionHref = (path: string) =>
-    ELENCOS_PATHS.has(path) ? elencosPath(leagueId, path) : href(path);
 
   return (
     <div className="scout-root home-page">
@@ -45,7 +38,7 @@ export function LeagueHomeMain({ leagueId }: { leagueId: LeagueId }) {
               Explorar posições
             </Link>
             <Link className="home-cta home-cta-ghost" href={elencosPath(leagueId, "/elenco")}>
-              Ver elencos
+              Abrir Elencos
             </Link>
           </div>
           <dl className="home-stats">
@@ -68,7 +61,7 @@ export function LeagueHomeMain({ leagueId }: { leagueId: LeagueId }) {
           <h2 id="home-sections-title">O que você pode fazer</h2>
           <div className="home-cards">
             {SECTIONS.map((section) => (
-              <Link key={section.path} href={sectionHref(section.path)} className="home-card">
+              <Link key={section.path} href={href(section.path)} className="home-card">
                 <span className="home-card-kicker">{section.kicker}</span>
                 <strong>{section.title}</strong>
                 <p>{section.text}</p>

@@ -17,12 +17,11 @@ const NAV_SCOUT = [
   { key: "scatter", path: "/scatter", label: "Scatter", global: false },
 ] as const;
 
-// Boards de elenco vivem no app SADA-Elencos, montado em /elencos/* via
-// rewrite — mesma origem, então o localStorage do time sombra é o mesmo.
+// Botão único para o app SADA-Elencos, montado em /elencos/* via rewrite —
+// mesma origem, então o localStorage do time sombra é o mesmo. Futuros apps
+// (SADA-Sulamérica, SADA-Europa) apontam para o mesmo lugar.
 const NAV_SQUAD = [
-  { key: "elenco", path: "/elenco", label: "Elenco", global: false, anywhere: true },
-  { key: "elencos-previos", path: "/elencos-previos", label: "Elencos Prévios", global: false, anywhere: true },
-  { key: "time-sombra", path: "/time-sombra", label: "Time Sombra", global: false, anywhere: true },
+  { key: "elencos", path: "/elenco", label: "Elencos", global: false, anywhere: true },
 ] as const;
 
 const SQUAD_KEYS = new Set<string>(NAV_SQUAD.map((item) => item.key));
@@ -79,17 +78,23 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
     return items.map((item) => {
       const disabled = !item.global && !item.anywhere && (hubMode || !league);
       const isActive = item.key === active;
+      const external = SQUAD_KEYS.has(item.key);
       return (
         <Link
           key={item.key}
           href={disabled ? "#" : navHref(item)}
           onClick={disabled ? (event) => event.preventDefault() : undefined}
-          className={[isActive ? "active" : "", disabled ? "topbar-link-muted" : ""].filter(Boolean).join(" ")}
+          className={[
+            isActive ? "active" : "",
+            disabled ? "topbar-link-muted" : "",
+            external ? "topbar-elencos-btn" : "",
+          ].filter(Boolean).join(" ")}
           aria-current={isActive ? "page" : undefined}
           aria-disabled={disabled ? true : undefined}
-          title={disabled ? "Escolha uma competição no início" : undefined}
+          title={disabled ? "Escolha uma competição no início" : external ? "Abrir o app SADA-Elencos" : undefined}
         >
           {item.label}
+          {external ? <i className="fa-solid fa-arrow-right topbar-elencos-icon" aria-hidden="true" /> : null}
         </Link>
       );
     });
