@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { BRASILEIRAO_LEAGUES, type LeagueId } from "@/lib/leagues";
+import { elencosPath } from "@/lib/elencosApp";
 import { ESTADUAIS_LEVELS } from "@/lib/estaduaisHub";
 import { POSITION_FAMILIES } from "@/lib/positions";
 import {
@@ -50,6 +51,8 @@ type Feature = {
   category: string;
   fact: string;
   isNew?: boolean;
+  /** Link abre no app SADA-Elencos (/elencos/* via rewrite). */
+  elencos?: boolean;
 };
 
 /** "Produtos" da vitrine: cada ferramenta do site. */
@@ -61,9 +64,9 @@ const FEATURES: Feature[] = [
   { path: "/comparar", icon: "fa-scale-balanced", title: "Comparar atletas", category: "Análise", fact: "Radar lado a lado" },
   { path: "/filtros", icon: "fa-sliders", title: "Filtros avançados", category: "Busca", fact: "Idade · minutos · perfil" },
   { path: "/scatter", icon: "fa-chart-line", title: "Scatter", category: "Análise", fact: "Quem foge da curva" },
-  { path: "/elenco", icon: "fa-people-group", title: "Elenco do clube", category: "Clubes", fact: "Campinho editável" },
-  { path: "/elencos-previos", icon: "fa-clock-rotate-left", title: "Elencos prévios", category: "Clubes", fact: "2022–2025" },
-  { path: "/time-sombra", icon: "fa-chess-board", title: "Time sombra", category: "Planejamento", fact: "Alvos por posição" },
+  { path: "/elenco", icon: "fa-people-group", title: "Elenco do clube", category: "Clubes", fact: "Campinho editável", elencos: true },
+  { path: "/elencos-previos", icon: "fa-clock-rotate-left", title: "Elencos prévios", category: "Clubes", fact: "2022–2025", elencos: true },
+  { path: "/time-sombra", icon: "fa-chess-board", title: "Time sombra", category: "Planejamento", fact: "Alvos por posição", elencos: true },
 ];
 
 const ENTER_DELAY_MS = 350;
@@ -548,7 +551,7 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
             {FEATURES.map((feature, index) => (
               <Link
                 key={feature.title}
-                href={leagueHref("serie-a", feature.path)}
+                href={feature.elencos ? elencosPath("serie-a", feature.path) : leagueHref("serie-a", feature.path)}
                 className="hb-product"
                 style={vars({ "--i": index })}
               >
@@ -604,7 +607,7 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
             Escolha alvos por posição em qualquer série, compare com o elenco atual e leve o relatório pronto para a
             reunião.
           </p>
-          <Link href={leagueHref("serie-a", "/time-sombra")} className="hb-cta">
+          <Link href={elencosPath("serie-a", "/time-sombra")} className="hb-cta">
             Começar
           </Link>
           <Link href={leagueHref("serie-a", "/comparar")} className="hb-more">

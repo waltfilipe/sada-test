@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { SiteLogo } from "@/components/SiteLogo";
 import { useLeagueOptional } from "@/components/LeagueProvider";
 import { getLeague, leaguePath, LEAGUES, type LeagueInfo } from "@/lib/leagues";
+import { elencosPath } from "@/lib/elencosApp";
 import { isBrasileiraoLeague, withSeasonQuery } from "@/lib/seasons";
 
 const NAV_SCOUT = [
@@ -16,11 +17,15 @@ const NAV_SCOUT = [
   { key: "scatter", path: "/scatter", label: "Scatter", global: false },
 ] as const;
 
+// Boards de elenco vivem no app SADA-Elencos, montado em /elencos/* via
+// rewrite — mesma origem, então o localStorage do time sombra é o mesmo.
 const NAV_SQUAD = [
   { key: "elenco", path: "/elenco", label: "Elenco", global: false, anywhere: true },
   { key: "elencos-previos", path: "/elencos-previos", label: "Elencos Prévios", global: false, anywhere: true },
   { key: "time-sombra", path: "/time-sombra", label: "Time Sombra", global: false, anywhere: true },
 ] as const;
+
+const SQUAD_KEYS = new Set<string>(NAV_SQUAD.map((item) => item.key));
 
 export type ScoutSection =
   | (typeof NAV_SCOUT)[number]["key"]
@@ -61,8 +66,9 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
     return isBrasileiraoLeague(target.id) ? withSeasonQuery(base, league?.season ?? "2026") : base;
   }
 
-  function navHref(item: { path: string; global: boolean; anywhere?: boolean }) {
+  function navHref(item: { key: string; path: string; global: boolean; anywhere?: boolean }) {
     if (item.global) return item.path;
+    if (SQUAD_KEYS.has(item.key)) return elencosPath(league?.leagueId ?? "serie-a", item.path);
     if (hubMode || !league) return item.anywhere ? item.path : "/";
     return league.href(item.path);
   }
