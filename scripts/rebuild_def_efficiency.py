@@ -176,22 +176,23 @@ def _fmt_n(v: float) -> str:
     return f"{v:.1f}".replace(".", ",")
 
 
-# CSV defensivo SofaScore por (liga, temporada) — temporada corrente é 2026.
-RECOVERY_SOURCES: dict[tuple[str, str], str] = {
-    ("serie-a", "2026"): "BR26_defensive.csv",
-    ("serie-b", "2026"): "BRB26_defensive.csv",
-    ("serie-c", "2026"): "BRC26_defensive.csv",
-    ("serie-d", "2026"): "BRD26_defensive.csv",
-    ("mls-next-pro", "2026"): "MLS_NEXT_PRO_defensive.csv",
-    ("serie-a", "2022"): "BRA22_defensive.csv",
-    ("serie-a", "2023"): "BRA23_defensive.csv",
-    ("serie-a", "2024"): "BRA24_defensive.csv",
-    ("serie-a", "2025"): "BRA25_defensive.csv",
-    ("serie-b", "2023"): "BRB23_defensive.csv",
-    ("serie-b", "2024"): "BRB24_defensive.csv",
-    ("serie-b", "2025"): "BRB25_defensive.csv",
-    ("serie-c", "2025"): "BRC25_defensive.csv",
-}
+# CSV defensivo SofaScore por (liga, temporada) — convenção de nome do fetcher.
+# Arquivos novos (ex.: BRC24_defensive.csv) são usados automaticamente.
+def recovery_source_for(league: str, season: str) -> Path | None:
+    yy = season[2:]
+    if league.startswith("est"):
+        name = "BRE26" if season == "2026" else None
+    elif league == "serie-a":
+        name = "BR26" if season == "2026" else f"BRA{yy}"
+    elif league == "mls-next-pro":
+        name = "MLS_NEXT_PRO" if season == "2026" else None
+    else:
+        prefix = {"serie-b": "BRB", "serie-c": "BRC", "serie-d": "BRD"}.get(league)
+        name = f"{prefix}{yy}" if prefix else None
+    if not name:
+        return None
+    path = ROOT / f"{name}_defensive.csv"
+    return path if path.exists() else None
 
 
 def build_recovery_ctx(league: str, season: str) -> dict:
@@ -200,8 +201,7 @@ def build_recovery_ctx(league: str, season: str) -> dict:
     Retorna índice por player_id e fallback por (nome, clube) para linhas sem
     âncora — o CSV só tem clubes da própria liga, então o fuzzy é seguro.
     """
-    csv_name = RECOVERY_SOURCES[(league, season)]
-    ss = aggregate_sofascore(ROOT / csv_name)
+    ss = aggregate_sofascore(recovery_source_for(league, season))
     by_ssid = {str(r["player_id"]): float(r["ball_recovery_p90"]) for _, r in ss.iterrows()}
     by_token: dict[str, list[int]] = {}
     for idx, pname in enumerate(ss["player_name"]):
@@ -480,9 +480,9 @@ def main() -> None:
         family = path.stem.replace("family-", "")
         league, season = _league_season_of(path)
         key = (league, season)
-        if key not in ctxs and key in RECOVERY_SOURCES and (ROOT / RECOVERY_SOURCES[key]).exists():
+        if key not in ctxs and recovery_source_for(league, season):
             ctxs[key] = build_recovery_ctx(league, season)
-            print(f"[{league}/{season}] {RECOVERY_SOURCES[key]}: {len(ctxs[key]['by_pid'])} âncoras ss_id")
+            print(f"[{league}/{season}] {recovery_source_for(league, season).name}: {len(ctxs[key]['by_pid'])} âncoras ss_id")
         recovery_ctx = ctxs.get(key)
         values = process_family_file(path, recovery_ctx)
         profiles_dir = path.parent / "profiles"
