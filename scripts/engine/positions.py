@@ -1384,14 +1384,20 @@ def _accuracy_badge(eff_pct: Any) -> str | None:
 
 
 def _fmt_per90(value: float) -> str:
+    if not np.isfinite(value):
+        value = 0.0
     return f"{value:.1f}".replace(".", ",")
 
 
 def _fmt_num(value: float, *, decimals: int = 1) -> str:
+    if not np.isfinite(value):
+        value = 0.0
     return f"{value:.{decimals}f}".replace(".", ",")
 
 
 def _fmt_z_score(value: float) -> str:
+    if not np.isfinite(value):
+        value = 0.0
     return f"{value:+.1f}".replace(".", ",")
 
 

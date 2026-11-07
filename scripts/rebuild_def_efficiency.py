@@ -50,9 +50,10 @@ def _num(raw) -> float | None:
         return None
     text = str(raw).strip().replace("−", "-").replace(" ", "").replace(",", ".")
     try:
-        return float(text)
+        value = float(text)
     except ValueError:
         return None
+    return value if math.isfinite(value) else None
 
 
 def _pct(raw) -> float | None:
@@ -60,9 +61,36 @@ def _pct(raw) -> float | None:
         return None
     text = str(raw).strip().replace(",", ".").rstrip("%")
     try:
-        return float(text) / 100.0
+        value = float(text) / 100.0
     except ValueError:
         return None
+    return value if math.isfinite(value) else None
+
+
+def _sanitize_nan(entity: dict) -> None:
+    """Limpa strings "nan" herdadas de divisões por zero do pipeline.
+
+    NaN em display_value envenena a leitura: float("nan") é truthy e passa
+    pelo `or 0.0` — vira NaN nos componentes, no somatório de Ações sem Bola
+    e no ranking denso (comparações com NaN são sempre falsas).
+    """
+    for key in ("display_value", "efficiency_value"):
+        raw = entity.get(key)
+        if isinstance(raw, str) and raw.strip().lower() in ("nan", "nan%", "-nan"):
+            entity[key] = "0%" if key == "efficiency_value" else "0,0"
+    pct = entity.get("percentile")
+    if isinstance(pct, str) and pct.strip().lower() == "nan":
+        entity["percentile"] = 0.0
+    elif isinstance(pct, float) and not math.isfinite(pct):
+        entity["percentile"] = 0.0
+
+
+def _sanitize_aspects(player: dict) -> None:
+    for items in (player.get("aspects") or {}).values():
+        for item in items:
+            _sanitize_nan(item)
+            for sub in item.get("sub_metrics") or []:
+                _sanitize_nan(sub)
 
 
 def _find(aspects: dict, *labels: str) -> dict | None:
@@ -361,6 +389,8 @@ def process_family_file(path: Path, recovery_ctx: dict | None) -> dict[str, dict
     if not isinstance(players, list) or not players:
         return {}
     family = path.stem.replace("family-", "")
+    for player in players:
+        _sanitize_aspects(player)
 
     # ctx None = liga/temporada sem CSV (estaduais, arquivos sem fonte);
     # atleta sem match na fonte recebe recovery=None (sub omitida, não 0,0)
@@ -439,6 +469,7 @@ def patch_profiles(profiles_dir: Path, values: dict[str, dict], family: str, cov
         return 0
     for path in profiles_dir.glob("*.json"):
         profile = json.loads(path.read_text(encoding="utf-8"))
+        _sanitize_aspects(profile)
         pid = profile.get("player_id") or path.stem
         item = _def_eff_item(profile.get("aspects") or {})
         if pid in values:
