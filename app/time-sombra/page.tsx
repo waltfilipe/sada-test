@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function LegacyShadowRedirect() {
-  redirect("/elencos/serie-a/time-sombra");
+  redirect("https://sada-elencos.vercel.app/serie-a/time-sombra");
 }

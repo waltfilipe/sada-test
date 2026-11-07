@@ -20,13 +20,14 @@ const nextConfig: NextConfig = {
     ],
   },
   allowedDevOrigins: ["*.agent.cvm.dev", "*.cvm.dev"],
-  // Monta o app SADA-Elencos sob /elencos/* na mesma origem: compartilha o
-  // localStorage do time sombra entre os dois projetos.
+  // Túnel same-origin para a API do SADA-Elencos (sync do time sombra via
+  // /elencos/api/* → evita CORS no fetch). A navegação usa o domínio próprio
+  // do app; o proxy integral fica como fallback para links antigos.
   async rewrites() {
     return [
       {
         source: "/elencos/:path*",
-        destination: "https://sada-elencos.vercel.app/elencos/:path*",
+        destination: "https://sada-elencos.vercel.app/:path*",
       },
     ];
   },

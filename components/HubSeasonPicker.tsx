@@ -51,7 +51,7 @@ type Feature = {
   category: string;
   fact: string;
   isNew?: boolean;
-  /** Link abre no app SADA-Elencos (/elencos/* via rewrite). */
+  /** Link abre no app SADA-Elencos (domínio próprio). */
   elencos?: boolean;
 };
 

@@ -7,7 +7,6 @@ import {
   type Formation,
 } from "@/lib/formations";
 import type { LeagueId } from "@/lib/leagues";
-import { ELENCOS_BASE } from "@/lib/elencosApp";
 import type { PositionFamily } from "@/lib/types";
 
 export type ShadowScope = LeagueId | "todas" | "estaduais";
@@ -18,10 +17,11 @@ export type ShadowScope = LeagueId | "todas" | "estaduais";
  * falha em silêncio e o localStorage continua sendo a única fonte. Push é
  * debounced por escopo.
  */
+const ELENCOS_API_BASE = "/elencos";
 const pushTimers = new Map<ShadowScope, ReturnType<typeof setTimeout>>();
 
 function shadowApi(scope: ShadowScope): string {
-  return `${ELENCOS_BASE}/api/shadow/${scope}`;
+  return `${ELENCOS_API_BASE}/api/shadow/${scope}`;
 }
 
 function pushShadowToCloud(scope: ShadowScope, state: ShadowTeamState): void {

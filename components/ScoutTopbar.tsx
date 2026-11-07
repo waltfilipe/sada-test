@@ -17,9 +17,9 @@ const NAV_SCOUT = [
   { key: "scatter", path: "/scatter", label: "Scatter", global: false },
 ] as const;
 
-// Botão único para o app SADA-Elencos, montado em /elencos/* via rewrite —
-// mesma origem, então o localStorage do time sombra é o mesmo. Futuros apps
-// (SADA-Sulamérica, SADA-Europa) apontam para o mesmo lugar.
+// Botão único para o app SADA-Elencos (domínio próprio). O estado do time
+// sombra é compartilhado via nuvem — futuros apps (SADA-Sulamérica,
+// SADA-Europa) apontam para o mesmo lugar.
 const NAV_SQUAD = [
   { key: "elencos", path: "/elenco", label: "Elencos", global: false, anywhere: true },
 ] as const;
