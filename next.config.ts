@@ -20,6 +20,16 @@ const nextConfig: NextConfig = {
     ],
   },
   allowedDevOrigins: ["*.agent.cvm.dev", "*.cvm.dev"],
+  // Monta o app SADA-Elencos sob /elencos/* na mesma origem: compartilha o
+  // localStorage do time sombra entre os dois projetos.
+  async rewrites() {
+    return [
+      {
+        source: "/elencos/:path*",
+        destination: "https://sada-elencos.vercel.app/elencos/:path*",
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
