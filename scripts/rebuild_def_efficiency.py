@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Rebuild dos aspectos defensivos nos JSONs do site.
 
-1) Recuperações/90 (SofaScore ball_recovery): casa cada atleta ao
-   BR26_defensive.csv por identidade — sofascore_player_id do registro
-   (people.json âncoras serie-a/2026), fallback nome+clube.
+1) Recuperações/90 (SofaScore ball_recovery): casa cada atleta ao CSV
+   defensivo da sua liga/temporada por identidade — sofascore_player_id do
+   registro (people.json âncoras {liga}/{temporada}), fallback nome+clube.
    - zagueiros/laterais/meio-campistas: "Ações Defensivas" vira
      "Ações Defensivas e Recuperações" com a 4ª sub-métrica.
    - extremos: item próprio "Recuperações" no grupo defensivo.
-   Temporadas arquivadas (seasons/*) não têm fonte — ficam sem a métrica.
+   Ligas/temporadas sem CSV (estaduais, arquivos sem fonte) ficam sem a
+   métrica — subs indevidas são removidas.
 
 2) Eficiência Defensiva — modelo saldo defensivo (já aplicado):
    ação = duelos vencidos + interceptações + rebatidas + chutes bloqueados;
@@ -175,28 +176,48 @@ def _fmt_n(v: float) -> str:
     return f"{v:.1f}".replace(".", ",")
 
 
-def build_recovery_ctx() -> dict:
-    """Recuperações por identidade: CSV BR26 (ss_id) × âncoras people.json.
+# CSV defensivo SofaScore por (liga, temporada) — temporada corrente é 2026.
+RECOVERY_SOURCES: dict[tuple[str, str], str] = {
+    ("serie-a", "2026"): "BR26_defensive.csv",
+    ("serie-b", "2026"): "BRB26_defensive.csv",
+    ("serie-c", "2026"): "BRC26_defensive.csv",
+    ("serie-d", "2026"): "BRD26_defensive.csv",
+    ("mls-next-pro", "2026"): "MLS_NEXT_PRO_defensive.csv",
+    ("serie-a", "2022"): "BRA22_defensive.csv",
+    ("serie-a", "2023"): "BRA23_defensive.csv",
+    ("serie-a", "2024"): "BRA24_defensive.csv",
+    ("serie-a", "2025"): "BRA25_defensive.csv",
+    ("serie-b", "2023"): "BRB23_defensive.csv",
+    ("serie-b", "2024"): "BRB24_defensive.csv",
+    ("serie-b", "2025"): "BRB25_defensive.csv",
+    ("serie-c", "2025"): "BRC25_defensive.csv",
+}
 
-    Só cobre linhas (serie-a, 2026) — o CSV é uma temporada/liga só. Retorna
-    índice por player_id e fallback por (nome, clube) para linhas sem âncora.
+
+def build_recovery_ctx(league: str, season: str) -> dict:
+    """Recuperações por identidade: CSV da liga/temporada × âncoras people.json.
+
+    Retorna índice por player_id e fallback por (nome, clube) para linhas sem
+    âncora — o CSV só tem clubes da própria liga, então o fuzzy é seguro.
     """
-    ss = aggregate_sofascore(ROOT / "BR26_defensive.csv")
+    csv_name = RECOVERY_SOURCES[(league, season)]
+    ss = aggregate_sofascore(ROOT / csv_name)
     by_ssid = {str(r["player_id"]): float(r["ball_recovery_p90"]) for _, r in ss.iterrows()}
     by_token: dict[str, list[int]] = {}
     for idx, pname in enumerate(ss["player_name"]):
         for tok in set(normalize_text(pname).split()):
             by_token.setdefault(tok, []).append(idx)
     people = json.loads((DATA / "cross-season" / "people.json").read_text(encoding="utf-8"))
+    anchor_key = f"{league}/{season}"
     by_pid: dict[str, float] = {}
     by_key: dict[tuple[str, str], float] = {}
     for person in people.values():
-        ss_id = (person.get("sofascore") or {}).get("serie-a/2026")
+        ss_id = (person.get("sofascore") or {}).get(anchor_key)
         value = by_ssid.get(str(ss_id)) if ss_id is not None else None
         if value is None:
             continue
         for row in person.get("rows") or []:
-            if row.get("league") == "serie-a" and str(row.get("season")) == "2026":
+            if row.get("league") == league and str(row.get("season")) == season:
                 pid = row.get("player_id")
                 if pid:
                     by_pid[pid] = value
@@ -213,8 +234,8 @@ def _recovery_for(player: dict, ctx: dict) -> float | None:
     key = (normalize_text(name), normalize_text(club))
     if key in ctx["by_key"]:
         return ctx["by_key"][key]
-    # fallback fuzzy — seguro aqui porque o arquivo é sempre Série A (todos os
-    # clubes do site existem no CSV; homônimo de outra liga não é candidato)
+    # fallback fuzzy — seguro porque o CSV é da mesma liga/temporada do arquivo
+    # (todos os clubes do site são candidatos legítimos ao match)
     if key in ctx["_cache"]:
         return ctx["_cache"][key]
     idxs = sorted({i for tok in key[0].split() for i in ctx["by_token"].get(tok, ())})
@@ -341,8 +362,8 @@ def process_family_file(path: Path, recovery_ctx: dict | None) -> dict[str, dict
         return {}
     family = path.stem.replace("family-", "")
 
-    # recuperação por atleta — ctx só existe para a Série A corrente (CSV BR26);
-    # None = atleta sem âncora/id na fonte (sub omitida em vez de 0,0 falso)
+    # ctx None = liga/temporada sem CSV (estaduais, arquivos sem fonte);
+    # atleta sem match na fonte recebe recovery=None (sub omitida, não 0,0)
     covered = recovery_ctx is not None
     recoveries: list[float | None] = (
         [_recovery_for(p, recovery_ctx) for p in players] if covered else [None] * len(players)
@@ -443,18 +464,29 @@ def patch_profiles(profiles_dir: Path, values: dict[str, dict], family: str, cov
     return patched
 
 
+def _league_season_of(path: Path) -> tuple[str, str]:
+    """data/{liga}/family-*.json → (liga, "2026"); .../seasons/{ano}/ → (liga, ano)."""
+    rel = path.relative_to(DATA)
+    league = rel.parts[0]
+    season = rel.parts[2] if len(rel.parts) > 3 and rel.parts[1] == "seasons" else "2026"
+    return league, season
+
+
 def main() -> None:
-    recovery_ctx = build_recovery_ctx()
-    print(f"Recuperações: {len(recovery_ctx['by_pid'])} atletas casados por ss_id")
+    ctxs: dict[tuple[str, str], dict] = {}
     family_files = sorted(DATA.glob("*/family-*.json")) + sorted(DATA.glob("*/seasons/*/family-*.json"))
     patched_players = 0
     for path in family_files:
         family = path.stem.replace("family-", "")
-        # fonte só cobre a Série A corrente (BR26); demais arquivos ficam sem
-        covered = path.parent == DATA / "serie-a"
-        values = process_family_file(path, recovery_ctx if covered else None)
+        league, season = _league_season_of(path)
+        key = (league, season)
+        if key not in ctxs and key in RECOVERY_SOURCES and (ROOT / RECOVERY_SOURCES[key]).exists():
+            ctxs[key] = build_recovery_ctx(league, season)
+            print(f"[{league}/{season}] {RECOVERY_SOURCES[key]}: {len(ctxs[key]['by_pid'])} âncoras ss_id")
+        recovery_ctx = ctxs.get(key)
+        values = process_family_file(path, recovery_ctx)
         profiles_dir = path.parent / "profiles"
-        patched_players += patch_profiles(profiles_dir, values, family, covered)
+        patched_players += patch_profiles(profiles_dir, values, family, recovery_ctx is not None)
         print(f"{path.relative_to(DATA)}: {len(values)} linhas")
     print(f"Perfis atualizados: {patched_players}")
 
