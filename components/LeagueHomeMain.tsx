@@ -37,7 +37,12 @@ export function LeagueHomeMain({ leagueId }: { leagueId: LeagueId }) {
             <Link className="home-cta" href={href("/posicao/zagueiros")}>
               Explorar posições
             </Link>
-            <Link className="home-cta home-cta-ghost" href={elencosPath(leagueId, "/elenco")}>
+            <Link
+              className="home-cta home-cta-ghost"
+              href={elencosPath(leagueId, "/elenco")}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Abrir Elencos
             </Link>
           </div>

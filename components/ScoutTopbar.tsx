@@ -83,6 +83,8 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
         <Link
           key={item.key}
           href={disabled ? "#" : navHref(item)}
+          target={external ? "_blank" : undefined}
+          rel={external ? "noopener noreferrer" : undefined}
           onClick={disabled ? (event) => event.preventDefault() : undefined}
           className={[
             isActive ? "active" : "",

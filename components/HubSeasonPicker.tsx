@@ -550,6 +550,8 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
               <Link
                 key={feature.title}
                 href={feature.elencos ? elencosPath("serie-a", feature.path) : leagueHref("serie-a", feature.path)}
+                target={feature.elencos ? "_blank" : undefined}
+                rel={feature.elencos ? "noopener noreferrer" : undefined}
                 className="hb-product"
                 style={vars({ "--i": index })}
               >
@@ -605,7 +607,7 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
             Escale clubes, revise temporadas anteriores e monte times sombra com alvos por posição — tudo no app
             dedicado de elencos.
           </p>
-          <Link href={elencosPath("serie-a", "/elenco")} className="hb-cta">
+          <Link href={elencosPath("serie-a", "/elenco")} className="hb-cta" target="_blank" rel="noopener noreferrer">
             Começar
           </Link>
           <Link href={leagueHref("serie-a", "/comparar")} className="hb-more">
