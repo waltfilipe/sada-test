@@ -145,6 +145,15 @@ def main() -> int:
         f"(grafo: {matched_person}, âncora TM: {matched_tm}, override: {forced}) "
         f"— {cleared} sem identidade resolvida · {touched_files} arquivos"
     )
+
+    # auditoria de identidade — roda sempre que a cadeia stampa (novos atletas)
+    if "--no-audit" not in sys.argv:
+        try:
+            import audit_identity
+
+            audit_identity.main()
+        except Exception as exc:  # auditoria nunca derruba a cadeia
+            log(f"audit_identity falhou (ignorado): {exc}")
     return 0
 
 
