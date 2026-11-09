@@ -1,629 +1,634 @@
 {
- "player_id": "serie-b-luiz-o-crb-509",
- "name": "Luizão",
- "club": "CRB",
- "label": "Luizão (CRB)",
- "position": "Meio-campista",
- "position_family": "meio-campistas",
- "nationality": "Brazil",
- "birth_year": 1998,
- "height": 184,
- "foot": "Destro",
- "minutes": 362,
- "minutes_pct": 9.9,
- "goals": 0,
- "assists": 0,
- "rating": 6.6,
- "ratings": {
-  "geral": 6.6,
-  "contencao": 6.8,
-  "construtor": 6.3,
-  "boxtobox": 6.3
- },
- "ranks": {
-  "geral": 62,
-  "contencao": 23,
-  "construtor": 96,
-  "boxtobox": 90
- },
- "profile": "Contenção",
- "profile_shares": {
-  "contencao": 69.0,
-  "construtor": 17.0,
-  "boxtobox": 14.0
- },
- "tendencies": {
-  "construcao": 43.0,
-  "ofensividade": 25.0,
-  "def1v1": 68.0,
-  "contencao": 9.0,
-  "duelo_aereo": 92.0
- },
- "aspects": {
-  "defensivos": [
-   {
-    "label": "Duelos Defensivos",
-    "kind": "metric",
-    "grade": "A",
-    "percentile": 92.0,
-    "stats": [],
-    "display_value": "7,2",
-    "efficiency_pct": 100.0,
-    "efficiency_value": "69%"
-   },
-   {
-    "label": "Duelos Aéreos",
-    "kind": "metric",
-    "grade": "B+",
-    "percentile": 75.7,
-    "stats": [],
-    "display_value": "2,2",
-    "efficiency_pct": 100.0,
-    "efficiency_value": "78%"
-   },
-   {
-    "label": "Ações Defensivas e Recuperações",
-    "kind": "metric_group",
-    "grade": "B-",
-    "percentile": 56.1,
-    "sub_metrics": [
-     {
-      "label": "Rebatidas",
-      "percentile": 78.9,
-      "display_value": "2,0"
-     },
-     {
-      "label": "Interceptações",
-      "percentile": 2.7,
-      "display_value": "0,3"
-     },
-     {
-      "label": "Chutes Bloqueados",
-      "percentile": 80.8,
-      "display_value": "0,6"
-     },
-     {
-      "label": "Recuperações",
-      "percentile": 61.9,
-      "display_value": "4,6"
-     }
-    ],
-    "stats": []
-   },
-   {
-    "label": "Eficiência Defensiva",
-    "kind": "def_efficiency_group",
-    "grade": "B+",
-    "percentile": 80.9,
-    "pair_badge": [
-     100.0,
-     89.2,
-     80.9
-    ],
-    "sub_metrics": [
-     {
-      "label": "Erros Totais",
-      "percentile": 100.0,
-      "display_value": "0"
-     },
-     {
-      "label": "Ações sem Bola/90",
-      "percentile": 89.2,
-      "display_value": "12,5"
-     },
-     {
-      "label": "Índice de Eficiência",
-      "percentile": 80.9,
-      "display_value": "+0,6"
-     }
-    ],
-    "stats": []
-   }
-  ],
-  "construcao": [
-   {
-    "label": "Passes Progressivos",
-    "kind": "pass_certos",
-    "grade": "C",
-    "certos_per90": 4.97,
-    "display_value": "5,0",
-    "percentile": 40.3,
-    "efficiency_pct": 2.7,
-    "efficiency_value": "60%",
-    "stats": []
-   },
-   {
-    "label": "Passes para Terço Final",
-    "kind": "pass_certos",
-    "grade": "D",
-    "certos_per90": 4.23,
-    "display_value": "4,2",
-    "percentile": 20.5,
-    "efficiency_pct": 21.9,
-    "efficiency_value": "71%",
-    "stats": []
-   },
-   {
-    "label": "Passes Longos",
-    "kind": "pass_certos",
-    "grade": "B+",
-    "certos_per90": 3.98,
-    "display_value": "4,0",
-    "percentile": 77.8,
-    "efficiency_pct": 7.0,
-    "efficiency_value": "44%",
-    "stats": []
-   },
-   {
-    "label": "Distribuição",
-    "kind": "metric_group",
-    "grade": "C",
-    "percentile": 44.3,
-    "sub_metrics": [
-     {
-      "label": "Passes",
-      "percentile": 44.3,
-      "display_value": "35,5"
-     },
-     {
-      "label": "Passes Recebidos",
-      "percentile": 39.0,
-      "display_value": "24,9"
-     }
-    ],
-    "stats": []
-   }
-  ],
-  "perfil_construcao": [
-   {
-    "label": "Tendência de Passe",
-    "kind": "construction_share",
-    "grade": "A",
-    "percentile": 88.6,
-    "display_value": "11%",
-    "share_pct": 11.2,
-    "pool_avg_pct": 8.4,
-    "scale_max_pct": 30.0,
-    "stats": [],
-    "bar_key": "pass_tendency",
-    "axis_left": "Curto",
-    "axis_right": "Longo"
-   },
-   {
-    "label": "Passes Progressivos",
-    "kind": "construction_share",
-    "grade": "C+",
-    "percentile": 48.1,
-    "display_value": "14%",
-    "share_pct": 14.0,
-    "pool_avg_pct": 14.3,
-    "scale_max_pct": 30.0,
-    "stats": [],
-    "bar_key": "progressive_share",
-    "axis_left": "Baixo",
-    "axis_right": "Alto"
-   }
-  ],
-  "perfil_defensivo": [
-   {
-    "label": "Estilo de defesa",
-    "kind": "construction_share",
-    "grade": "C",
-    "percentile": 38.0,
-    "display_value": "1,77",
-    "share_pct": 38.0,
-    "pool_avg_pct": 2.3,
-    "scale_max_pct": 100.0,
-    "stats": [],
-    "bar_key": "def_contact_style",
-    "axis_left": "Cobertura",
-    "axis_right": "Agressivo"
-   },
-   {
-    "label": "Disciplina defensiva",
-    "kind": "construction_share",
-    "grade": "B+",
-    "percentile": 78.5,
-    "display_value": "35%",
-    "share_pct": 34.8,
-    "pool_avg_pct": 1.6,
-    "scale_max_pct": 100.0,
-    "stats": [],
-    "bar_key": "def_foul_style",
-    "axis_left": "Disciplinado",
-    "axis_right": "Faltoso"
-   }
-  ],
-  "ofensivos": [
-   {
-    "label": "Disputas com Bola",
-    "kind": "metric",
-    "grade": "B-",
-    "percentile": 64.4,
-    "stats": [],
-    "display_value": "3,7",
-    "efficiency_pct": 74.0,
-    "efficiency_value": "56%"
-   },
-   {
-    "label": "Conduções Progressivas",
-    "kind": "metric",
-    "grade": "C",
-    "percentile": 41.3,
-    "stats": [],
-    "display_value": "0,5"
-   },
-   {
-    "label": "1v1 - Ofensivo",
-    "kind": "metric",
-    "grade": "B-",
-    "percentile": 56.5,
-    "stats": [],
-    "display_value": "0,8",
-    "efficiency_pct": 68.9,
-    "efficiency_value": "67%"
-   }
-  ],
-  "passes_finais": [
-   {
-    "label": "Passes Chave e Área",
-    "kind": "metric_group",
-    "grade": "D",
-    "percentile": 19.2,
-    "sub_metrics": [
-     {
-      "label": "Assistências para remate",
-      "percentile": 19.2,
-      "display_value": "0,2"
-     },
-     {
-      "label": "Passes para Área",
-      "percentile": 19.0,
-      "display_value": "0,2"
-     }
-    ],
-    "stats": []
-   },
-   {
-    "label": "Pré Assistências e xA",
-    "kind": "metric_group",
-    "grade": "C-",
-    "percentile": 32.6,
-    "sub_metrics": [
-     {
-      "label": "Pré Assistências",
-      "percentile": 32.6,
-      "display_value": "1"
-     },
-     {
-      "label": "xA",
-      "percentile": 11.3,
-      "display_value": "0,10"
-     }
-    ],
-    "stats": []
-   },
-   {
-    "label": "Passes Criativos",
-    "kind": "metric",
-    "grade": "D",
-    "percentile": 0.0,
-    "stats": [],
-    "display_value": "0,0",
-    "efficiency_pct": 25.3,
-    "efficiency_value": "43%",
-    "sub_metrics": [
-     {
-      "label": "Passes Criativos",
-      "percentile": 0.0,
-      "display_value": "0,0"
-     },
-     {
-      "label": "Passes Inteligentes",
-      "percentile": 0.0,
-      "display_value": "0,0"
-     },
-     {
-      "label": "Passes em Profundidade",
-      "percentile": 0.0,
-      "display_value": "0,0"
-     }
-    ]
-   }
-  ],
-  "ofensividade": [
-   {
-    "label": "Finalizações",
-    "kind": "metric_group",
-    "grade": "D",
-    "percentile": 18.2,
-    "sub_metrics": [
-     {
-      "label": "Finalizações",
-      "percentile": 18.2,
-      "display_value": "0,5"
-     },
-     {
-      "label": "xG",
-      "percentile": 4.8,
-      "display_value": "0,01"
-     }
-    ],
-    "stats": [],
-    "efficiency_pct": 4.8,
-    "efficiency_value": "0,01"
-   },
-   {
-    "label": "Ofensividade",
-    "kind": "metric_group",
-    "grade": "C",
-    "percentile": 38.5,
-    "sub_metrics": [
-     {
-      "label": "Ações Ofensivas",
-      "percentile": 38.5,
-      "display_value": "0,8"
-     },
-     {
-      "label": "Toques na Área",
-      "percentile": 11.7,
-      "display_value": "0,2"
-     }
-    ],
-    "stats": []
-   }
-  ]
- },
- "profiles_available": [
-  "Contenção",
-  "Construtor",
-  "Box-to-box",
-  "Híbrido"
- ],
- "scatter": {
-  "duelos_def": 7.21,
-  "finalizacao": 0.5,
-  "progressao": 0.5,
-  "xa": 0.1,
-  "construcao": 43.037974683544306
- },
- "cluster": {
-  "family": "meio-campistas",
-  "archetype": "Contenção",
-  "archetype_label": "Contenção",
-  "hybrid_badge": null,
-  "hybrid_badge_short": null,
-  "shares": {
-   "contencao": 68.6,
-   "construtor": 17.1,
-   "boxtobox": 14.3
-  },
-  "ratings": {
-   "contencao": 6.8,
-   "construtor": 6.3,
-   "boxtobox": 6.3
-  }
- },
- "transfermarkt": {
-  "id": "518723",
-  "photo": "https://img.a.transfermarkt.technology/portrait/header/518723-1668766095.png?lm=4711",
-  "market_value": "€ 250 mil",
-  "market_value_eur": 250000,
-  "contract_until": "2026-11-30",
-  "contract_remaining": "28 dia(s)",
-  "on_loan_from": null,
+  "player_id": "serie-b-luiz-o-crb-509",
+  "name": "Luizão",
   "club": "CRB",
-  "profile_url": "https://www.transfermarkt.com.br/luizao/profil/spieler/518723",
+  "label": "Luizão (CRB)",
+  "position": "Meio-campista",
+  "position_family": "meio-campistas",
+  "nationality": "Brazil",
+  "birth_year": 1998,
+  "height": 184,
   "foot": "Destro",
-  "height": 184
- },
- "physical_run": {
-  "source": "sofascore_run",
-  "competition": "Brasileirão Série B",
-  "position_pool": "Meio-campista",
-  "position_pool_size": 108,
-  "matches": 10,
-  "minutes": 314,
-  "kilometers_p90": 8.06,
-  "top_speed": 31.67,
-  "sprints_p90": 8.89,
-  "running_km_p90": 1.14,
-  "high_speed_km_p90": 0.37,
-  "sprinting_km_p90": 0.1,
-  "percentiles": {
-   "kilometers_p90": 57.8,
-   "top_speed": 15.8,
-   "sprints_p90": 84.3,
-   "running_km_p90": 49.0,
-   "high_speed_km_p90": 73.5,
-   "sprinting_km_p90": 77.5
+  "minutes": 362,
+  "minutes_pct": 9.9,
+  "goals": 0,
+  "assists": 0,
+  "rating": 6.6,
+  "ratings": {
+    "geral": 6.6,
+    "contencao": 6.8,
+    "construtor": 6.3,
+    "boxtobox": 6.3
   },
   "ranks": {
-   "kilometers_p90": 46,
-   "top_speed": 92,
-   "sprints_p90": 19,
-   "running_km_p90": 56,
-   "high_speed_km_p90": 30,
-   "sprinting_km_p90": 26
-  }
- },
- "discipline": {
-  "fouls_per90": 1.24,
-  "fouls_total": 5,
-  "yellow_per90": 0.25,
-  "yellow_total": 1,
-  "red_per90": 0.0,
-  "red_total": 0,
-  "pool": {
-   "fouls_per90": 1.68,
-   "yellow_per90": 0.26,
-   "red_per90": 0.02
-  }
- },
- "pass_distance_m": 14.9,
- "cross_season": {
-  "seasons": [
-   {
-    "year": "2025",
-    "league": "serie-b",
-    "minutes": 2159,
-    "club": "Atlético GO"
-   }
+    "geral": 62,
+    "contencao": 23,
+    "construtor": 96,
+    "boxtobox": 90
+  },
+  "profile": "Contenção",
+  "profile_shares": {
+    "contencao": 69.0,
+    "construtor": 17.0,
+    "boxtobox": 14.0
+  },
+  "tendencies": {
+    "construcao": 43.0,
+    "ofensividade": 25.0,
+    "def1v1": 68.0,
+    "contencao": 9.0,
+    "duelo_aereo": 92.0
+  },
+  "aspects": {
+    "defensivos": [
+      {
+        "label": "Duelos Defensivos",
+        "kind": "metric",
+        "grade": "A",
+        "percentile": 92.0,
+        "stats": [],
+        "display_value": "7,2",
+        "efficiency_pct": 100.0,
+        "efficiency_value": "69%"
+      },
+      {
+        "label": "Duelos Aéreos",
+        "kind": "metric",
+        "grade": "B+",
+        "percentile": 75.7,
+        "stats": [],
+        "display_value": "2,2",
+        "efficiency_pct": 100.0,
+        "efficiency_value": "78%"
+      },
+      {
+        "label": "Ações Defensivas e Recuperações",
+        "kind": "metric_group",
+        "grade": "B-",
+        "percentile": 56.1,
+        "sub_metrics": [
+          {
+            "label": "Rebatidas",
+            "percentile": 78.9,
+            "display_value": "2,0"
+          },
+          {
+            "label": "Interceptações",
+            "percentile": 2.7,
+            "display_value": "0,3"
+          },
+          {
+            "label": "Chutes Bloqueados",
+            "percentile": 80.8,
+            "display_value": "0,6"
+          },
+          {
+            "label": "Recuperações",
+            "percentile": 61.9,
+            "display_value": "4,6"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Eficiência Defensiva",
+        "kind": "def_efficiency_group",
+        "grade": "B+",
+        "percentile": 80.9,
+        "pair_badge": [
+          100.0,
+          89.2,
+          80.9
+        ],
+        "sub_metrics": [
+          {
+            "label": "Erros Totais",
+            "percentile": 100.0,
+            "display_value": "0"
+          },
+          {
+            "label": "Ações sem Bola/90",
+            "percentile": 89.2,
+            "display_value": "12,5"
+          },
+          {
+            "label": "Índice de Eficiência",
+            "percentile": 80.9,
+            "display_value": "+0,6"
+          }
+        ],
+        "stats": []
+      }
+    ],
+    "construcao": [
+      {
+        "label": "Passes Progressivos",
+        "kind": "pass_certos",
+        "grade": "C",
+        "certos_per90": 4.97,
+        "display_value": "5,0",
+        "percentile": 40.3,
+        "efficiency_pct": 2.7,
+        "efficiency_value": "60%",
+        "stats": []
+      },
+      {
+        "label": "Passes para Terço Final",
+        "kind": "pass_certos",
+        "grade": "D",
+        "certos_per90": 4.23,
+        "display_value": "4,2",
+        "percentile": 20.5,
+        "efficiency_pct": 21.9,
+        "efficiency_value": "71%",
+        "stats": []
+      },
+      {
+        "label": "Passes Longos",
+        "kind": "pass_certos",
+        "grade": "B+",
+        "certos_per90": 3.98,
+        "display_value": "4,0",
+        "percentile": 77.8,
+        "efficiency_pct": 7.0,
+        "efficiency_value": "44%",
+        "stats": []
+      },
+      {
+        "label": "Distribuição",
+        "kind": "metric_group",
+        "grade": "C",
+        "percentile": 44.3,
+        "sub_metrics": [
+          {
+            "label": "Passes",
+            "percentile": 44.3,
+            "display_value": "35,5"
+          },
+          {
+            "label": "Passes Recebidos",
+            "percentile": 39.0,
+            "display_value": "24,9"
+          }
+        ],
+        "stats": []
+      }
+    ],
+    "perfil_construcao": [
+      {
+        "label": "Tendência de Passe",
+        "kind": "construction_share",
+        "grade": "A",
+        "percentile": 88.6,
+        "display_value": "11%",
+        "share_pct": 11.2,
+        "pool_avg_pct": 8.4,
+        "scale_max_pct": 30.0,
+        "stats": [],
+        "bar_key": "pass_tendency",
+        "axis_left": "Curto",
+        "axis_right": "Longo"
+      },
+      {
+        "label": "Passes Progressivos",
+        "kind": "construction_share",
+        "grade": "C+",
+        "percentile": 48.1,
+        "display_value": "14%",
+        "share_pct": 14.0,
+        "pool_avg_pct": 14.3,
+        "scale_max_pct": 30.0,
+        "stats": [],
+        "bar_key": "progressive_share",
+        "axis_left": "Baixo",
+        "axis_right": "Alto"
+      }
+    ],
+    "perfil_defensivo": [
+      {
+        "label": "Estilo de defesa",
+        "kind": "construction_share",
+        "grade": "C",
+        "percentile": 38.0,
+        "display_value": "1,77",
+        "share_pct": 38.0,
+        "pool_avg_pct": 2.3,
+        "scale_max_pct": 100.0,
+        "stats": [],
+        "bar_key": "def_contact_style",
+        "axis_left": "Cobertura",
+        "axis_right": "Agressivo"
+      },
+      {
+        "label": "Disciplina defensiva",
+        "kind": "construction_share",
+        "grade": "B+",
+        "percentile": 78.5,
+        "display_value": "35%",
+        "share_pct": 34.8,
+        "pool_avg_pct": 1.6,
+        "scale_max_pct": 100.0,
+        "stats": [],
+        "bar_key": "def_foul_style",
+        "axis_left": "Disciplinado",
+        "axis_right": "Faltoso"
+      }
+    ],
+    "ofensivos": [
+      {
+        "label": "Disputas com Bola",
+        "kind": "metric",
+        "grade": "B-",
+        "percentile": 64.4,
+        "stats": [],
+        "display_value": "3,7",
+        "efficiency_pct": 74.0,
+        "efficiency_value": "56%"
+      },
+      {
+        "label": "Conduções Progressivas",
+        "kind": "metric",
+        "grade": "C",
+        "percentile": 41.3,
+        "stats": [],
+        "display_value": "0,5"
+      },
+      {
+        "label": "1v1 - Ofensivo",
+        "kind": "metric",
+        "grade": "B-",
+        "percentile": 56.5,
+        "stats": [],
+        "display_value": "0,8",
+        "efficiency_pct": 68.9,
+        "efficiency_value": "67%"
+      }
+    ],
+    "passes_finais": [
+      {
+        "label": "Passes Chave e Área",
+        "kind": "metric_group",
+        "grade": "D",
+        "percentile": 19.2,
+        "sub_metrics": [
+          {
+            "label": "Assistências para remate",
+            "percentile": 19.2,
+            "display_value": "0,2"
+          },
+          {
+            "label": "Passes para Área",
+            "percentile": 19.0,
+            "display_value": "0,2"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Pré Assistências e xA",
+        "kind": "metric_group",
+        "grade": "C-",
+        "percentile": 32.6,
+        "sub_metrics": [
+          {
+            "label": "Pré Assistências",
+            "percentile": 32.6,
+            "display_value": "1"
+          },
+          {
+            "label": "xA",
+            "percentile": 11.3,
+            "display_value": "0,10"
+          }
+        ],
+        "stats": []
+      },
+      {
+        "label": "Passes Criativos",
+        "kind": "metric",
+        "grade": "D",
+        "percentile": 0.0,
+        "stats": [],
+        "display_value": "0,0",
+        "efficiency_pct": 25.3,
+        "efficiency_value": "43%",
+        "sub_metrics": [
+          {
+            "label": "Passes Criativos",
+            "percentile": 0.0,
+            "display_value": "0,0"
+          },
+          {
+            "label": "Passes Inteligentes",
+            "percentile": 0.0,
+            "display_value": "0,0"
+          },
+          {
+            "label": "Passes em Profundidade",
+            "percentile": 0.0,
+            "display_value": "0,0"
+          }
+        ]
+      }
+    ],
+    "ofensividade": [
+      {
+        "label": "Finalizações",
+        "kind": "metric_group",
+        "grade": "D",
+        "percentile": 18.2,
+        "sub_metrics": [
+          {
+            "label": "Finalizações",
+            "percentile": 18.2,
+            "display_value": "0,5"
+          },
+          {
+            "label": "xG",
+            "percentile": 4.8,
+            "display_value": "0,01"
+          }
+        ],
+        "stats": [],
+        "efficiency_pct": 4.8,
+        "efficiency_value": "0,01"
+      },
+      {
+        "label": "Ofensividade",
+        "kind": "metric_group",
+        "grade": "C",
+        "percentile": 38.5,
+        "sub_metrics": [
+          {
+            "label": "Ações Ofensivas",
+            "percentile": 38.5,
+            "display_value": "0,8"
+          },
+          {
+            "label": "Toques na Área",
+            "percentile": 11.7,
+            "display_value": "0,2"
+          }
+        ],
+        "stats": []
+      }
+    ]
+  },
+  "profiles_available": [
+    "Contenção",
+    "Construtor",
+    "Box-to-box",
+    "Híbrido"
   ],
-  "metrics": {
-   "Duelos Defensivos": {
-    "predicted": 5.3176,
-    "resid_sd": 1.1828,
-    "train_n90": 20.79
-   },
-   "Duelos Defensivos::Eficiência": {
-    "predicted": 57.7862,
-    "resid_sd": 5.4132,
-    "train_n90": 20.79
-   },
-   "Duelos Aéreos": {
-    "predicted": 1.7806,
-    "resid_sd": 0.7267,
-    "train_n90": 20.79
-   },
-   "Duelos Aéreos::Eficiência": {
-    "predicted": 49.2938,
-    "role_change_flag": true,
-    "resid_sd": 11.0907,
-    "train_n90": 20.79
-   },
-   "Ações Defensivas::Rebatidas": {
-    "predicted": 1.9926,
-    "resid_sd": 0.683,
-    "train_n90": 20.79
-   },
-   "Ações Defensivas::Interceptações": {
-    "predicted": 1.2556,
-    "resid_sd": 0.8593,
-    "train_n90": 20.79
-   },
-   "Ações Defensivas::Chutes Bloqueados": {
-    "predicted": 0.4115,
-    "resid_sd": 0.1924,
-    "train_n90": 20.79
-   },
-   "Eficiência Defensiva::Erros Totais": {
-    "predicted": 0.029,
-    "resid_sd": 0.0563,
-    "train_n90": 20.79
-   },
-   "Passes Progressivos": {
-    "predicted": 5.6709,
-    "resid_sd": 1.3163,
-    "train_n90": 20.81
-   },
-   "Passes Progressivos::Eficiência": {
-    "predicted": 74.408,
-    "resid_sd": 6.6991,
-    "train_n90": 20.81
-   },
-   "Passes para Terço Final": {
-    "predicted": 5.9077,
-    "resid_sd": 1.5516,
-    "train_n90": 20.81
-   },
-   "Passes para Terço Final::Eficiência": {
-    "predicted": 73.9796,
-    "resid_sd": 5.7922,
-    "train_n90": 20.81
-   },
-   "Passes Longos": {
-    "predicted": 3.9388,
-    "resid_sd": 0.9922,
-    "train_n90": 20.81
-   },
-   "Passes Longos::Eficiência": {
-    "predicted": 58.9476,
-    "resid_sd": 8.0347,
-    "train_n90": 20.81
-   },
-   "Distribuição::Passes": {
-    "predicted": 38.2669,
-    "resid_sd": 6.5607,
-    "train_n90": 20.82
-   },
-   "Distribuição::Passes Recebidos": {
-    "predicted": 26.1954,
-    "resid_sd": 5.6925,
-    "train_n90": 20.82
-   },
-   "Disputas com Bola": {
-    "predicted": 2.7714,
-    "resid_sd": 0.9071,
-    "train_n90": 20.81
-   },
-   "Disputas com Bola::Eficiência": {
-    "predicted": 50.5753,
-    "resid_sd": 7.459,
-    "train_n90": 20.81
-   },
-   "Conduções Progressivas": {
-    "predicted": 0.6207,
-    "resid_sd": 0.3984,
-    "train_n90": 20.75
-   },
-   "1v1 - Ofensivo": {
-    "predicted": 0.7146,
-    "resid_sd": 0.5762,
-    "train_n90": 20.82
-   },
-   "1v1 - Ofensivo::Eficiência": {
-    "predicted": 57.5922,
-    "resid_sd": 13.5736,
-    "train_n90": 20.82
-   },
-   "Passes Chave e Área::Assistências para remate": {
-    "predicted": 0.5076,
-    "resid_sd": 0.3299,
-    "train_n90": 20.82
-   },
-   "Passes Chave e Área::Passes para Área": {
-    "predicted": 0.5061,
-    "resid_sd": 0.3224,
-    "train_n90": 20.82
-   },
-   "Pré Assistências e xA::Pré Assistências": {
-    "predicted": 0.0543,
-    "resid_sd": 0.0574,
-    "train_n90": 20.82
-   },
-   "Pré Assistências e xA::xA": {
-    "predicted": 0.033,
-    "resid_sd": 0.0374,
-    "train_n90": 20.82
-   },
-   "Passes Criativos::Eficiência": {
-    "predicted": 58.8789,
-    "resid_sd": 11.6803,
-    "train_n90": 20.82
-   },
-   "Finalizações::Finalizações": {
-    "predicted": 0.7046,
-    "resid_sd": 0.3791,
-    "train_n90": 20.81
-   },
-   "Finalizações::xG": {
-    "predicted": 0.0033,
-    "resid_sd": 0.0026,
-    "train_n90": 20.79
-   },
-   "Ofensividade::Ações Ofensivas": {
-    "predicted": 0.852,
-    "resid_sd": 0.4941,
-    "train_n90": 20.81
-   },
-   "Ofensividade::Toques na Área": {
-    "predicted": 0.5472,
-    "resid_sd": 0.3845,
-    "train_n90": 20.81
-   }
+  "scatter": {
+    "duelos_def": 7.21,
+    "finalizacao": 0.5,
+    "progressao": 0.5,
+    "xa": 0.1,
+    "construcao": 43.037974683544306
+  },
+  "cluster": {
+    "family": "meio-campistas",
+    "archetype": "Contenção",
+    "archetype_label": "Contenção",
+    "hybrid_badge": null,
+    "hybrid_badge_short": null,
+    "shares": {
+      "contencao": 68.6,
+      "construtor": 17.1,
+      "boxtobox": 14.3
+    },
+    "ratings": {
+      "contencao": 6.8,
+      "construtor": 6.3,
+      "boxtobox": 6.3
+    }
+  },
+  "transfermarkt": {
+    "id": "518723",
+    "photo": "https://img.a.transfermarkt.technology/portrait/header/518723-1668766095.png?lm=4711",
+    "market_value": "€ 250 mil",
+    "market_value_eur": 250000,
+    "contract_until": "2026-11-30",
+    "contract_remaining": "28 dia(s)",
+    "on_loan_from": null,
+    "club": "CRB",
+    "profile_url": "https://www.transfermarkt.com.br/luizao/profil/spieler/518723",
+    "foot": "Destro",
+    "height": 184
+  },
+  "physical_run": {
+    "source": "sofascore_run",
+    "competition": "Brasileirão Série B",
+    "position_pool": "Meio-campista",
+    "position_pool_size": 108,
+    "matches": 10,
+    "minutes": 314,
+    "kilometers_p90": 8.06,
+    "top_speed": 31.67,
+    "sprints_p90": 8.89,
+    "running_km_p90": 1.14,
+    "high_speed_km_p90": 0.37,
+    "sprinting_km_p90": 0.1,
+    "percentiles": {
+      "kilometers_p90": 57.8,
+      "top_speed": 15.8,
+      "sprints_p90": 84.3,
+      "running_km_p90": 49.0,
+      "high_speed_km_p90": 73.5,
+      "sprinting_km_p90": 77.5
+    },
+    "ranks": {
+      "kilometers_p90": 46,
+      "top_speed": 92,
+      "sprints_p90": 19,
+      "running_km_p90": 56,
+      "high_speed_km_p90": 30,
+      "sprinting_km_p90": 26
+    }
+  },
+  "discipline": {
+    "fouls_per90": 1.24,
+    "fouls_total": 5,
+    "yellow_per90": 0.25,
+    "yellow_total": 1,
+    "red_per90": 0.0,
+    "red_total": 0,
+    "pool": {
+      "fouls_per90": 1.68,
+      "yellow_per90": 0.26,
+      "red_per90": 0.02
+    }
+  },
+  "pass_distance_m": 14.9,
+  "athlete_id": "ath-002689",
+  "person_key": "name:luizao|1998|0",
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2025",
+        "league": "serie-b",
+        "minutes": 2159,
+        "club": "Atlético GO"
+      }
+    ],
+    "metrics": {
+      "Duelos Defensivos": {
+        "predicted": 5.3176,
+        "resid_sd": 1.1828,
+        "train_n90": 20.79
+      },
+      "Duelos Defensivos::Eficiência": {
+        "predicted": 57.7862,
+        "resid_sd": 5.4132,
+        "train_n90": 20.79
+      },
+      "Duelos Aéreos": {
+        "predicted": 1.7806,
+        "resid_sd": 0.7267,
+        "train_n90": 20.79
+      },
+      "Duelos Aéreos::Eficiência": {
+        "predicted": 49.2938,
+        "role_change_flag": true,
+        "resid_sd": 11.0907,
+        "train_n90": 20.79
+      },
+      "Ações Defensivas e Recuperações::Rebatidas": {
+        "predicted": 2.1121,
+        "resid_sd": 0.6678,
+        "train_n90": 21.4
+      },
+      "Ações Defensivas e Recuperações::Interceptações": {
+        "predicted": 1.1252,
+        "resid_sd": 0.6184,
+        "train_n90": 21.4
+      },
+      "Ações Defensivas e Recuperações::Chutes Bloqueados": {
+        "predicted": 0.4179,
+        "resid_sd": 0.1933,
+        "train_n90": 21.4
+      },
+      "Ações Defensivas e Recuperações::Recuperações": {
+        "predicted": 4.7818,
+        "resid_sd": 1.3859,
+        "train_n90": 21.45
+      },
+      "Eficiência Defensiva::Erros Totais": {
+        "predicted": 0.029,
+        "resid_sd": 0.0563,
+        "train_n90": 20.79
+      },
+      "Passes Progressivos": {
+        "predicted": 5.6709,
+        "resid_sd": 1.3163,
+        "train_n90": 20.81
+      },
+      "Passes Progressivos::Eficiência": {
+        "predicted": 74.408,
+        "resid_sd": 6.6991,
+        "train_n90": 20.81
+      },
+      "Passes para Terço Final": {
+        "predicted": 5.9077,
+        "resid_sd": 1.5516,
+        "train_n90": 20.81
+      },
+      "Passes para Terço Final::Eficiência": {
+        "predicted": 73.9796,
+        "resid_sd": 5.7922,
+        "train_n90": 20.81
+      },
+      "Passes Longos": {
+        "predicted": 3.9388,
+        "resid_sd": 0.9922,
+        "train_n90": 20.81
+      },
+      "Passes Longos::Eficiência": {
+        "predicted": 58.9476,
+        "resid_sd": 8.0347,
+        "train_n90": 20.81
+      },
+      "Distribuição::Passes": {
+        "predicted": 38.2669,
+        "resid_sd": 6.5607,
+        "train_n90": 20.82
+      },
+      "Distribuição::Passes Recebidos": {
+        "predicted": 26.1954,
+        "resid_sd": 5.6925,
+        "train_n90": 20.82
+      },
+      "Disputas com Bola": {
+        "predicted": 2.7714,
+        "resid_sd": 0.9071,
+        "train_n90": 20.81
+      },
+      "Disputas com Bola::Eficiência": {
+        "predicted": 50.5753,
+        "resid_sd": 7.459,
+        "train_n90": 20.81
+      },
+      "Conduções Progressivas": {
+        "predicted": 0.6207,
+        "resid_sd": 0.3984,
+        "train_n90": 20.75
+      },
+      "1v1 - Ofensivo": {
+        "predicted": 0.7146,
+        "resid_sd": 0.5762,
+        "train_n90": 20.82
+      },
+      "1v1 - Ofensivo::Eficiência": {
+        "predicted": 57.5922,
+        "resid_sd": 13.5736,
+        "train_n90": 20.82
+      },
+      "Passes Chave e Área::Assistências para remate": {
+        "predicted": 0.5076,
+        "resid_sd": 0.3299,
+        "train_n90": 20.82
+      },
+      "Passes Chave e Área::Passes para Área": {
+        "predicted": 0.5061,
+        "resid_sd": 0.3224,
+        "train_n90": 20.82
+      },
+      "Pré Assistências e xA::Pré Assistências": {
+        "predicted": 0.0543,
+        "resid_sd": 0.0574,
+        "train_n90": 20.82
+      },
+      "Pré Assistências e xA::xA": {
+        "predicted": 0.033,
+        "resid_sd": 0.0374,
+        "train_n90": 20.82
+      },
+      "Passes Criativos::Eficiência": {
+        "predicted": 58.8789,
+        "resid_sd": 11.6803,
+        "train_n90": 20.82
+      },
+      "Finalizações::Finalizações": {
+        "predicted": 0.7046,
+        "resid_sd": 0.3791,
+        "train_n90": 20.81
+      },
+      "Finalizações::xG": {
+        "predicted": 0.0033,
+        "resid_sd": 0.0026,
+        "train_n90": 20.79
+      },
+      "Ofensividade::Ações Ofensivas": {
+        "predicted": 0.852,
+        "resid_sd": 0.4941,
+        "train_n90": 20.81
+      },
+      "Ofensividade::Toques na Área": {
+        "predicted": 0.5472,
+        "resid_sd": 0.3845,
+        "train_n90": 20.81
+      }
+    }
   }
- },
- "athlete_id": "ath-002689",
- "person_key": "name:luizao|1998|0"
 }
