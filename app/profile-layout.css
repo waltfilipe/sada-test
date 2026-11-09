@@ -7440,60 +7440,14 @@
 .xp-panel.xp-up { --xp: #1be7ff; }
 .xp-panel.xp-down { --xp: #fbbf24; }
 
-.xp-hero {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.6rem 1rem;
-}
 
-.xp-hero-nums {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  color: var(--text-3);
-}
 
-.xp-hero-nums > div {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
 
-.xp-hero-nums strong {
-  font-size: 1.7rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  color: var(--text);
-}
 
-.xp-hero-exp strong { color: var(--text-2); }
 
-.xp-hero-nums span {
-  font-size: 0.6rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
 
-.xp-hero-nums i { font-size: 0.7rem; opacity: 0.6; }
 
-.xp-hero-delta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--xp) 35%, transparent);
-  background: color-mix(in srgb, var(--xp) 11%, transparent);
-  color: var(--xp);
-  font-size: 0.7rem;
-  white-space: nowrap;
-}
 
-.xp-hero-delta i { font-size: 0.6rem; }
-.xp-hero-delta strong { font-size: 0.9rem; font-weight: 800; }
 
 .xp-chart {
   --xp: #93c5fd;
@@ -7519,36 +7473,9 @@
 .xp-axis { fill: var(--text-3); font-size: 9px; letter-spacing: 0.04em; }
 .xp-zone-label { fill: var(--text-3); font-size: 8.5px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.75; }
 
-.xp-facts {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  border-top: 1px solid rgba(147, 197, 253, 0.1);
-}
 
-.xp-fact {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  padding: 0.38rem 0;
-  border-bottom: 1px solid rgba(147, 197, 253, 0.06);
-}
 
-.xp-fact dt {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.74rem;
-  color: var(--text-3);
-}
 
-.xp-fact dd {
-  margin: 0;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text);
-}
 
 .xp-caption {
   margin: 0;
@@ -7561,3 +7488,107 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── xProg enxuto + campinho de distância de passe ────────────────── */
+.xp-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.6rem;
+}
+
+.xp-metric {
+  --xp: #93c5fd;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--xp) 22%, transparent);
+  background: color-mix(in srgb, var(--xp) 6%, transparent);
+}
+
+.xp-metric.xp-up { --xp: #1be7ff; }
+.xp-metric.xp-down { --xp: #fbbf24; }
+
+.xp-metric-head {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.xp-metric-body {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.6rem;
+}
+
+.xp-metric-body strong {
+  font-size: 1.65rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.xp-metric-body strong small {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--text-3);
+}
+
+.xp-metric-exp {
+  font-size: 0.7rem;
+  color: var(--text-3);
+}
+
+.xp-metric-exp b {
+  color: var(--text-2);
+  font-weight: 700;
+}
+
+.xp-metric-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  color: var(--xp);
+}
+
+.xp-metric-delta i { font-size: 0.55rem; }
+.xp-metric-delta b { font-weight: 800; }
+
+.pd-pitch {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 0.2rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pd-turf { fill: rgba(16, 120, 96, 0.16); stroke: rgba(147, 197, 253, 0.14); stroke-width: 0.5; }
+.pd-stripe { fill: rgba(255, 255, 255, 0.025); }
+.pd-stripe-alt { fill: rgba(255, 255, 255, 0); }
+.pd-lines rect,
+.pd-lines line,
+.pd-lines circle {
+  fill: none;
+  stroke: rgba(226, 232, 240, 0.26);
+  stroke-width: 0.45;
+}
+
+.pd-me line { stroke: var(--tend); stroke-width: 1.3; stroke-linecap: round; filter: drop-shadow(0 0 1.6px var(--tend)); }
+.pd-me polygon { fill: var(--tend); }
+.pd-ball { fill: #f8fafc; stroke: #0b1626; stroke-width: 0.6; }
+.pd-me text { fill: var(--text); font-size: 4.6px; font-weight: 800; }
+.pd-avg line { stroke: rgba(226, 232, 240, 0.5); stroke-width: 0.8; stroke-dasharray: 2 1.6; stroke-linecap: round; }
+.pd-avg polygon { fill: rgba(226, 232, 240, 0.55); }
+.pd-avg circle { fill: rgba(226, 232, 240, 0.7); }
+.pd-avg text { fill: var(--text-3); font-size: 3.4px; letter-spacing: 0.04em; }
