@@ -232,7 +232,27 @@ export type DisciplineInfo = {
   };
 };
 
+/** Progressão esperada (scripts/apply_xprog.py): passes progressivos/90 reais vs. esperados por volume, precisão e estilo do time. */
+export type XProg = {
+  actual: number;
+  expected: number;
+  delta: number;
+  delta_pct: number;
+  passes90: number;
+  pass_pct: number;
+  team_p90: number;
+  sd: number;
+  r2: number;
+  n: number;
+  low_sample: boolean;
+  acc_actual?: number;
+  acc_expected?: number;
+  acc_delta?: number;
+  acc_r2?: number;
+};
+
 export type PlayerProfile = PlayerSummary & {
+  xprog?: XProg;
   cross_season?: CrossSeasonProjection;
   /** Comprimento médio de passes (m) — entrada opcional de similaridade, fora dos cards do dossiê. */
   pass_distance_m?: number | null;

@@ -34,6 +34,17 @@ splits de linha). O registro sempre respeita overrides.
 
 `athletes.json` nunca reutiliza ids: pessoas desaparecidas ficam `active:false`.
 
+## xProgressão (`xprog`)
+
+`python scripts/apply_xprog.py` — após rebuilds de dados (junto de
+`apply_pass_distance.py`). Regressão OLS por liga + temporada + família
+(zagueiros/laterais/meio-campistas): passes progressivos/90 esperados a partir
+de passes/90, % passe e passes/90 do time (proxy de posse; média ponderada por
+minutos, sem goleiros). Grava `xprog` {actual, expected, delta, delta_pct, …}
+em `family-*.json` + `profiles/` (liga corrente, sub-ligas de estaduais e
+`seasons/<ano>` de A/B/C). Casamento por (nome, clube **ou** clube do período).
+Exibido no popup "Tendências e xProg" (`PassTendencies.tsx`).
+
 ## Heatmaps por temporada (SofaScore)
 
 - Temporada corrente: `apply_heatmaps_to_site.py` (CSV defensivo BR26).
