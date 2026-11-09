@@ -1,19 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ConstructionProfileBars, type TendencyBarEntry } from "@/components/position/ConstructionProfileBars";
 import { useLoading } from "@/components/LoadingProvider";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { flattenAspects } from "@/lib/aspectLookup";
 import { crossingReading, formatPer90 } from "@/lib/crossingTendency";
+import { centeredTendencyPosition } from "@/lib/tendencyScale";
 import type { AspectItem, PlayerProfile } from "@/lib/types";
 import { StatWindow } from "./ScoutStatsSections";
-
-type BarSpec = {
-  label: string;
-  share: number;
-  average: number;
-};
 
 function parseDisplay(value?: string | null): number | null {
   if (!value) return null;
@@ -65,51 +59,91 @@ function formatPct(value: number): string {
   return `${Math.round(value)}%`;
 }
 
-function barEntry(
-  spec: BarSpec,
-  tip: string,
-  options?: { per90?: boolean; scale?: number; lengthSpectrum?: boolean },
-): TendencyBarEntry {
-  const per90 = options?.per90 === true;
-  const scale = options?.scale ?? Math.max(40, spec.share, spec.average, 1);
-  return {
-    displayLabel: spec.label,
-    infoTip: tip,
-    valueScale: per90 ? "per90" : "percent",
-    centerAverage: true,
-    lengthSpectrum: options?.lengthSpectrum === true,
-    item: {
-      label: spec.label,
-      grade: "",
-      stats: [],
-      share_pct: spec.share,
-      pool_avg_pct: spec.average,
-      scale_max_pct: scale,
-      display_value: per90 ? formatPer90(spec.share) : formatPct(spec.share),
-    },
-  };
+type Direction = "up" | "down" | "neutral";
+
+type TendencyRow = {
+  key: string;
+  icon: string;
+  title: string;
+  tip: string;
+  unit: "pct" | "per90";
+  value: number;
+  average: number;
+  scale: number;
+  leftEnd: string;
+  rightEnd: string;
+  reading: string;
+};
+
+function format(value: number, unit: "pct" | "per90"): string {
+  return unit === "pct" ? formatPct(value) : formatPer90(value);
 }
 
-function passVerdict(share: number, average: number): string {
-  const gap = share - average;
-  if (gap >= 2) return "Passe mais longo que a média da posição.";
-  if (gap <= -2) return "Passe mais curto que a média da posição.";
-  return "Passe na média da posição, entre curto e longo.";
-}
-
-function deltaChip(value: number, average: number, unit: "pct" | "per90"): { label: string; tone: "up" | "down" | "neutral" } {
+function direction(value: number, average: number, unit: "pct" | "per90"): Direction {
   const gap = value - average;
-  const abs = Math.abs(gap);
-  if (unit === "pct") {
-    if (abs < 1.5) return { label: "Na média", tone: "neutral" };
-    return gap > 0
-      ? { label: `+${Math.round(abs)} p.p. vs pool`, tone: "up" }
-      : { label: `−${Math.round(abs)} p.p. vs pool`, tone: "down" };
-  }
-  if (abs < 0.15) return { label: "Na média", tone: "neutral" };
-  return gap > 0
-    ? { label: `+${formatPer90(abs)} vs pool`, tone: "up" }
-    : { label: `−${formatPer90(abs)} vs pool`, tone: "down" };
+  if (Math.abs(gap) < (unit === "pct" ? 1.5 : 0.15)) return "neutral";
+  return gap > 0 ? "up" : "down";
+}
+
+function deltaText(value: number, average: number, unit: "pct" | "per90"): string {
+  const dir = direction(value, average, unit);
+  if (dir === "neutral") return "Na média";
+  const abs = Math.abs(value - average);
+  const sign = dir === "up" ? "+" : "−";
+  return unit === "pct" ? `${sign}${Math.round(abs)} p.p.` : `${sign}${formatPer90(abs)} /90`;
+}
+
+function markerInset(value: number): number {
+  return Math.min(96, Math.max(4, value));
+}
+
+function TendencyCard({ row }: { row: TendencyRow }) {
+  const dir = direction(row.value, row.average, row.unit);
+  const pos = markerInset(centeredTendencyPosition(row.value, row.average, row.scale));
+  const from = Math.min(pos, 50);
+  const to = Math.max(pos, 50);
+  return (
+    <article className={`tend-card tend-${dir}`}>
+      <header className="tend-card-head">
+        <span className="tend-card-icon" aria-hidden="true">
+          <i className={`fa-solid ${row.icon}`} />
+        </span>
+        <h4 className="tend-card-title">{row.title}</h4>
+        <Tooltip content={row.tip}>
+          <button type="button" className="tendency-info-btn" aria-label="Mais informações">
+            <i className="fa-solid fa-circle-info" aria-hidden="true" />
+          </button>
+        </Tooltip>
+        <span className={`tend-delta tend-delta-${dir}`}>
+          {dir !== "neutral" ? (
+            <i className={`fa-solid ${dir === "up" ? "fa-arrow-up" : "fa-arrow-down"}`} aria-hidden="true" />
+          ) : null}
+          {deltaText(row.value, row.average, row.unit)}
+        </span>
+      </header>
+
+      <div className="tend-card-main">
+        <strong className="tend-card-value tabular">{format(row.value, row.unit)}</strong>
+        <span className="tend-card-avg">
+          média da posição <b className="tabular">{format(row.average, row.unit)}</b>
+        </span>
+      </div>
+
+      <div className="tend-track" aria-hidden="true">
+        <span className="tend-track-rail" />
+        <span className="tend-track-fill" style={{ left: `${from}%`, width: `${to - from}%` }} />
+        <span className="tend-track-mid" />
+        <span className="tend-track-dot" style={{ left: `${pos}%` }} />
+      </div>
+      <div className="tend-track-ends" aria-hidden="true">
+        <span>{row.leftEnd}</span>
+        <span>média</span>
+        <span>{row.rightEnd}</span>
+      </div>
+
+      <p className="tend-card-reading">{row.reading}</p>
+    </article>
+  );
 }
 
 export function PassTendencies({ player, players }: { player: PlayerProfile; players: PlayerProfile[] }) {
@@ -133,62 +167,73 @@ export function PassTendencies({ player, players }: { player: PlayerProfile; pla
       progStored?.pool_avg_pct ??
       mean(pool.map(progressiveShare).filter((value): value is number => value != null));
 
-    const rows: TendencyBarEntry[] = [];
-    const chips: { key: string; title: string; player: string; pool: string; chip: ReturnType<typeof deltaChip> }[] = [];
+    const rows: TendencyRow[] = [];
 
     if (long != null && longAverage != null) {
-      rows.push(
-        barEntry(
-          { label: "Passe curto ↔ longo", share: long, average: longAverage },
-          "Parcela de passes longos no total. O meio da barra é a média da posição: à esquerda o passe é mais curto, à direita mais longo.",
-          { lengthSpectrum: true },
-        ),
-      );
-      chips.push({
+      const gap = long - longAverage;
+      rows.push({
         key: "long",
+        icon: "fa-ruler-horizontal",
         title: "Passe curto ↔ longo",
-        player: formatPct(long),
-        pool: formatPct(longAverage),
-        chip: deltaChip(long, longAverage, "pct"),
+        tip: "Parcela de passes longos no total de passes, comparada à média da posição.",
+        unit: "pct",
+        value: long,
+        average: longAverage,
+        scale: Math.max(40, long, longAverage, 1),
+        leftEnd: "Mais curto",
+        rightEnd: "Mais longo",
+        reading:
+          gap >= 1.5
+            ? "Joga mais longo que a média da posição."
+            : gap <= -1.5
+              ? "Joga mais curto que a média da posição."
+              : "Em linha com a média, entre passe curto e longo.",
       });
     }
     if (progressive != null && progressiveAverage != null) {
-      rows.push(
-        barEntry(
-          { label: "Passes progressivos", share: progressive, average: progressiveAverage },
-          "Parcela de passes progressivos no total de passes, comparada à média da posição.",
-        ),
-      );
-      chips.push({
+      const gap = progressive - progressiveAverage;
+      rows.push({
         key: "prog",
+        icon: "fa-angles-up",
         title: "Passes progressivos",
-        player: formatPct(progressive),
-        pool: formatPct(progressiveAverage),
-        chip: deltaChip(progressive, progressiveAverage, "pct"),
+        tip: "Parcela de passes progressivos no total de passes, comparada à média da posição.",
+        unit: "pct",
+        value: progressive,
+        average: progressiveAverage,
+        scale: Math.max(40, progressive, progressiveAverage, 1),
+        leftEnd: "Menos",
+        rightEnd: "Mais",
+        reading:
+          gap >= 1.5
+            ? "Busca avançar o jogo com mais frequência que a média."
+            : gap <= -1.5
+              ? "Prioriza passes seguros mais que a média."
+              : "Progressão em linha com a média da posição.",
       });
     }
     const crossing = crossingReading(player, pool);
     if (crossing) {
-      rows.push(
-        barEntry(
-          { label: "Cruzamentos", share: crossing.volume, average: crossing.average },
-          "Volume de cruzamentos por 90 minutos. A marca central é a média da posição nesta série.",
-          { per90: true, scale: crossing.scale },
-        ),
-      );
-      chips.push({
+      const gap = crossing.volume - crossing.average;
+      rows.push({
         key: "cross",
+        icon: "fa-arrow-right-arrow-left",
         title: "Cruzamentos",
-        player: formatPer90(crossing.volume),
-        pool: formatPer90(crossing.average),
-        chip: deltaChip(crossing.volume, crossing.average, "per90"),
+        tip: "Volume de cruzamentos por 90 minutos, comparado à média da posição nesta série.",
+        unit: "per90",
+        value: crossing.volume,
+        average: crossing.average,
+        scale: crossing.scale,
+        leftEnd: "Menos",
+        rightEnd: "Mais",
+        reading:
+          gap >= 0.15
+            ? "Cruza mais que a média da posição."
+            : gap <= -0.15
+              ? "Cruza menos que a média da posição."
+              : "Volume de cruzamentos na média da posição.",
       });
     }
-    return {
-      rows,
-      chips,
-      verdict: long != null && longAverage != null ? passVerdict(long, longAverage) : null,
-    };
+    return { rows };
   }, [player, players]);
 
   const openModal = () => {
@@ -212,15 +257,19 @@ export function PassTendencies({ player, players }: { player: PlayerProfile; pla
       {open ? (
         <StatWindow title="Tendências de passe" onClose={() => setOpen(false)}>
           <div className="tendency-modal">
-
             {reading.rows.length ? (
-              <ConstructionProfileBars entries={reading.rows} embedded />
+              <div className="tend-grid">
+                {reading.rows.map((row) => (
+                  <TendencyCard key={row.key} row={row} />
+                ))}
+              </div>
             ) : (
               <p className="pass-tendencies-note">Sem amostra de passes para esta posição.</p>
             )}
 
             <p className="pass-tendencies-note tendency-footnote">
-              A marca central de cada barra é a média da posição nesta série. O ponto colorido é o atleta.
+              O traço central é a média da posição nesta série; o ponto é o atleta. Quanto mais longe do centro, mais
+              marcada a tendência.
             </p>
           </div>
         </StatWindow>

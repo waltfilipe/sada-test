@@ -3,8 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLoading } from "@/components/LoadingProvider";
 import { Tooltip } from "@/components/ui/Tooltip";
-import type { AspectItem, DisciplineInfo, PlayerProfile } from "@/lib/types";
-import { ConstructionProfileBars, type TendencyBarEntry } from "../ConstructionProfileBars";
+import type { DisciplineInfo, PlayerProfile } from "@/lib/types";
 import { StatWindow } from "./ScoutStatsSections";
 
 type MetricKey = "fouls" | "yellow" | "red";
@@ -36,15 +35,25 @@ function toneFor(value: number, avg: number): Tone {
   return ratio <= 0.85 ? "good" : ratio >= 1.15 ? "bad" : "even";
 }
 
-function deltaLabel(value: number, avg: number, decimals: number): string {
+type Delta = { tone: Tone; icon: string; big: string; text: string };
+
+/** Menos é melhor: abaixo da média = verde. `big` é o número em destaque, `text` a leitura. */
+function deltaInfo(value: number, avg: number, decimals: number): Delta {
+  const tone = toneFor(value, avg);
+  const gap = value - avg;
+  const icon = tone === "even" ? "fa-equals" : gap > 0 ? "fa-arrow-trend-up" : "fa-arrow-trend-down";
   if (avg < MIN_RATIO_AVG) {
-    const gap = value - avg;
-    if (Math.abs(gap) < 0.005) return "na média";
-    return `${gap > 0 ? "+" : "−"}${fmt(Math.abs(gap), decimals)} /90`;
+    if (tone === "even") return { tone: "even", icon: "fa-equals", big: "Na média", text: "da posição" };
+    return {
+      tone,
+      icon,
+      big: `${gap > 0 ? "+" : "−"}${fmt(Math.abs(gap), decimals)}`,
+      text: gap > 0 ? "/90 acima da média" : "/90 abaixo da média",
+    };
   }
   const pct = Math.round(((value - avg) / avg) * 100);
-  if (pct === 0) return "na média";
-  return `${pct > 0 ? "+" : "−"}${Math.abs(pct)}% vs média`;
+  if (pct === 0) return { tone: "even", icon: "fa-equals", big: "Na média", text: "da posição" };
+  return { tone, icon, big: `${Math.abs(pct)}%`, text: pct > 0 ? "acima da média" : "abaixo da média" };
 }
 
 function buildMetrics(disc: DisciplineInfo): Metric[] {
@@ -122,7 +131,8 @@ function CardStack({ kind, count }: { kind: "yellow" | "red"; count: number }) {
 }
 
 function SummaryTile({ metric }: { metric: Metric }) {
-  const tone = metric.per90 != null && metric.avg != null ? toneFor(metric.per90, metric.avg) : "even";
+  const comparable = metric.per90 != null && metric.avg != null;
+  const delta = comparable ? deltaInfo(metric.per90!, metric.avg!, metric.decimals) : null;
   return (
     <div className={`disc-tile disc-tile-${metric.key}`}>
       <div className="disc-tile-head">
@@ -132,36 +142,37 @@ function SummaryTile({ metric }: { metric: Metric }) {
       <div className="disc-tile-body">
         <strong className="disc-tile-total tabular">{metric.total ?? "—"}</strong>
         <span className="disc-tile-unit">na temporada</span>
+        {metric.key !== "fouls" ? <CardStack kind={metric.key} count={metric.total ?? 0} /> : null}
       </div>
-      <div className="disc-tile-foot">
-        {metric.key === "fouls" ? (
-          <span className="disc-tile-rate tabular">
-            {metric.per90 != null ? fmt(metric.per90, 1) : "—"} <em>/90</em>
+      {delta ? (
+        <div className={`disc-delta disc-delta-${delta.tone}`}>
+          <span className="disc-delta-icon" aria-hidden="true">
+            <i className={`fa-solid ${delta.icon}`} />
           </span>
-        ) : (
-          <CardStack kind={metric.key} count={metric.total ?? 0} />
-        )}
-        {metric.per90 != null && metric.avg != null ? (
-          <span className={`disc-chip disc-chip-${tone}`}>{deltaLabel(metric.per90, metric.avg, metric.decimals)}</span>
-        ) : null}
-      </div>
+          <span className="disc-delta-copy">
+            <strong className="tabular">{delta.big}</strong>
+            <span>{delta.text}</span>
+          </span>
+        </div>
+      ) : null}
+      {comparable ? (
+        <dl className="disc-versus">
+          <div>
+            <dt>Atleta</dt>
+            <dd className="tabular">
+              {fmt(metric.per90!, metric.decimals)} <em>/90</em>
+            </dd>
+          </div>
+          <div>
+            <dt>Média da posição</dt>
+            <dd className="tabular">
+              {fmt(metric.avg!, metric.decimals)} <em>/90</em>
+            </dd>
+          </div>
+        </dl>
+      ) : null}
     </div>
   );
-}
-
-/** Converte a métrica de disciplina em entrada da barra clássica do site (/90). */
-function compareEntry(metric: Metric & { per90: number; avg: number }): TendencyBarEntry {
-  const scale = Math.max(metric.per90, metric.avg, metric.key === "fouls" ? 0.5 : 0.05) * 1.6;
-  const item: AspectItem = {
-    label: metric.label,
-    grade: "",
-    stats: [],
-    share_pct: metric.per90,
-    pool_avg_pct: metric.avg,
-    scale_max_pct: scale,
-    display_value: fmt(metric.per90, metric.decimals),
-  };
-  return { item, displayLabel: metric.label, valueScale: "per90" };
 }
 
 export function DisciplineTendencies({ player }: { player: PlayerProfile }) {
@@ -178,9 +189,6 @@ export function DisciplineTendencies({ player }: { player: PlayerProfile }) {
 
   if (!disc) return null;
 
-  const comparable = metrics.filter(
-    (m): m is Metric & { per90: number; avg: number } => m.per90 != null && m.avg != null,
-  );
   const totalsText = `${disc.fouls_total ?? "—"} faltas · ${disc.yellow_total} amarelos · ${disc.red_total} vermelhos`;
 
   const openModal = () => {
@@ -226,16 +234,9 @@ export function DisciplineTendencies({ player }: { player: PlayerProfile }) {
               ))}
             </div>
 
-            {comparable.length ? (
-              <section className="disc-compare" aria-label="Comparação com a posição">
-                <h4 className="disc-section-title">Por 90 minutos vs média da posição</h4>
-                <ConstructionProfileBars entries={comparable.map(compareEntry)} embedded />
-              </section>
-            ) : null}
-
             <p className="disc-footnote">
-              <i className="fa-solid fa-circle-info" aria-hidden="true" /> Comparado com atletas da mesma posição nesta
-              série. Menos é melhor — barra verde indica disciplina acima da média.
+              <i className="fa-solid fa-circle-info" aria-hidden="true" /> Taxas por 90 minutos comparadas com atletas
+              da mesma posição nesta série. Menos é melhor: verde = mais disciplinado que a média.
             </p>
           </div>
         </StatWindow>
