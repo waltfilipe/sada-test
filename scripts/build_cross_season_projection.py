@@ -256,6 +256,18 @@ def main() -> None:
         print(f"  {fam}: {rep}")
 
     enriched = 0
+    registry_path = DATA / "cross-season" / "athletes.json"
+    athlete_rows: dict[str, set] = {}
+    if registry_path.is_file():
+        try:
+            reg = json.loads(registry_path.read_text(encoding="utf-8"))
+            for aid, rec in (reg.get("athletes") or {}).items():
+                athlete_rows[aid] = {
+                    (r.get("league"), r.get("season"), r.get("player_id"))
+                    for r in (rec.get("rows") or [])
+                }
+        except json.JSONDecodeError:
+            pass
     for league in BR_LEAGUES:
         for path in sorted((DATA / league).glob("family-*.json")):
             payload = json.loads(path.read_text(encoding="utf-8"))
@@ -270,6 +282,15 @@ def main() -> None:
                 )
                 key = key_index.get(sig)
                 hist = timeline.get(key, []) if key else []
+                owned = athlete_rows.get(player.get("athlete_id") or "")
+                if owned and hist:
+                    filtered = [
+                        h
+                        for h in hist
+                        if (h.get("_league"), h.get("_season"), h.get("player_id")) in owned
+                    ]
+                    if filtered:
+                        hist = filtered
                 past = [h for h in hist if h.get("_season") != CURRENT]
                 if not past:
                     continue
