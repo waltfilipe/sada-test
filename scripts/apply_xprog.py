@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Anexa `xprog` (progressao esperada) aos JSONs de zagueiros/laterais/meio-campistas.
+"""Anexa `xprog` (progressao esperada) aos JSONs de zagueiros, laterais,
+meio-campistas e extremos (inclui meias ofensivos).
 
 Modelo (por liga + temporada + familia, OLS):
     E[passes progressivos/90] = a + b*passes/90 + c*%passe + d*passes/90 do time
@@ -33,7 +34,7 @@ from engine.load_data import load_players_dataframe  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 HIST = ROOT / "wyscout" / "historical"
-FAMILIES = ("zagueiros", "laterais", "meio-campistas")
+FAMILIES = ("zagueiros", "laterais", "meio-campistas", "extremos")
 TEAM_COLS = ("Equipa dentro de um período de tempo seleccionado", "Equipe")
 MIN_FIT_PRIMARY = 600
 MIN_FIT_FALLBACK = 300
