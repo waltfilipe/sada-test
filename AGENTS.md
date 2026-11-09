@@ -18,6 +18,10 @@ Ordem da cadeia (rode nesta sequência após rebuilds de dados):
 4. `python scripts/apply_athlete_ids.py` — grava `athlete_id`/`person_key` em
    `players.json`, `family-*.json` e `profiles/` de **todas** as ligas
    (estaduais/D/MLS casam por `tm_id` verificado).
+5. `python scripts/audit_identity.py` — fila de revisão de identidade
+   (homônimos fundidos, âncoras ss erradas, fusões de trajetória) →
+   `data/cross-season/identity-audit.json`. Resolva os achados em
+   `identity-overrides.json` e re-rode os passos 2–4.
 
 Scripts de reparo (`repair_persons_by_tm.py`, `resolve_tm_disputes.py`,
 `fix_heatmap_identity.py`) reescrevem `persons.json` — depois deles, rode de
