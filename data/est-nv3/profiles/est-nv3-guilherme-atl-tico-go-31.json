@@ -13,29 +13,29 @@
   "minutes_pct": 50.9,
   "goals": 0,
   "assists": 2,
-  "rating": 7.1,
+  "rating": 6.7,
   "ratings": {
-    "geral": 7.1,
-    "defensivo": 7.5,
+    "geral": 6.7,
+    "defensivo": 6.0,
     "construtor": 5.9,
-    "ofensivo": 5.8
+    "ofensivo": 5.9
   },
   "ranks": {
-    "geral": 14,
-    "defensivo": 13,
+    "geral": 100,
+    "defensivo": 184,
     "construtor": 199,
-    "ofensivo": 200
+    "ofensivo": 190
   },
-  "profile": "Defensivo",
+  "profile": "Ofensivo",
   "profile_shares": {
-    "defensivo": 70.0,
-    "construtor": 14.0,
-    "ofensivo": 16.0
+    "defensivo": 13.0,
+    "construtor": 21.0,
+    "ofensivo": 66.0
   },
   "tendencies": {
     "construcao": 50.0,
     "ofensividade": 58.0,
-    "def1v1": 77.0,
+    "def1v1": 22.0,
     "contencao": 42.0,
     "duelo_aereo": 56.0
   },
@@ -64,28 +64,28 @@
       {
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
-        "grade": "B",
-        "percentile": 66.0,
+        "grade": "D",
+        "percentile": 0.0,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 96.2,
-            "display_value": "4,1"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Interceptações",
-            "percentile": 19.6,
-            "display_value": "0,9"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Chutes Bloqueados",
-            "percentile": 97.4,
-            "display_value": "0,8"
+            "percentile": 0.0,
+            "display_value": "0,4"
           },
           {
             "label": "Recuperações",
-            "percentile": 50.9,
-            "display_value": "7,3"
+            "percentile": 0.0,
+            "display_value": "0,0"
           }
         ],
         "stats": []
@@ -93,28 +93,28 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "A",
-        "percentile": 96.3,
+        "grade": "C-",
+        "percentile": 33.9,
         "pair_badge": [
-          77.8,
-          87.2,
-          96.3
+          100.0,
+          34.9,
+          33.9
         ],
         "sub_metrics": [
           {
             "label": "Erros Totais",
-            "percentile": 77.8,
-            "display_value": "2"
+            "percentile": 100.0,
+            "display_value": "0"
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 87.2,
-            "display_value": "17,3"
+            "percentile": 34.9,
+            "display_value": "4,2"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 96.3,
-            "display_value": "+1,8"
+            "percentile": 33.9,
+            "display_value": "-0,5"
           }
         ],
         "stats": []
@@ -208,11 +208,11 @@
       {
         "label": "Estilo de defesa",
         "kind": "construction_share",
-        "grade": "D",
-        "percentile": 7.3,
-        "display_value": "1,20",
-        "share_pct": 7.3,
-        "pool_avg_pct": 2.5,
+        "grade": "B+",
+        "percentile": 75.2,
+        "display_value": "3,16",
+        "share_pct": 75.2,
+        "pool_avg_pct": 2.6,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -222,8 +222,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "A",
-        "percentile": 96.3,
+        "grade": "C-",
+        "percentile": 33.9,
         "display_value": "70%",
         "share_pct": 69.6,
         "pool_avg_pct": 1.2,
@@ -424,19 +424,19 @@
   },
   "cluster": {
     "family": "laterais",
-    "archetype": "Defensivo",
-    "archetype_label": "Defensivo",
+    "archetype": "Ofensivo",
+    "archetype_label": "Ofensivo",
     "hybrid_badge": null,
     "hybrid_badge_short": null,
     "shares": {
-      "defensivo": 69.5,
-      "construtor": 14.0,
-      "ofensivo": 16.5
+      "defensivo": 13.3,
+      "construtor": 20.7,
+      "ofensivo": 66.0
     },
     "ratings": {
-      "defensivo": 7.5,
+      "defensivo": 6.0,
       "construtor": 5.9,
-      "ofensivo": 5.8
+      "ofensivo": 5.9
     }
   },
   "transfermarkt": {
@@ -452,5 +452,6 @@
     "matched_name": "Guilherme Lopes",
     "match_score": 104.0
   },
+  "competition": "Goiano",
   "athlete_id": "ath-001520"
 }

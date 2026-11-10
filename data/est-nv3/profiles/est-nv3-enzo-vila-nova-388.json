@@ -13,29 +13,29 @@
   "minutes_pct": 15.9,
   "goals": 1,
   "assists": 0,
-  "rating": 6.9,
+  "rating": 6.7,
   "ratings": {
-    "geral": 6.9,
-    "contencao": 7.0,
+    "geral": 6.7,
+    "contencao": 6.4,
     "construtor": 6.9,
-    "boxtobox": 7.2
+    "boxtobox": 6.9
   },
   "ranks": {
-    "geral": 36,
-    "contencao": 27,
+    "geral": 85,
+    "contencao": 95,
     "construtor": 43,
-    "boxtobox": 18
+    "boxtobox": 36
   },
-  "profile": "Híbrido",
+  "profile": "Box-to-box",
   "profile_shares": {
-    "contencao": 42.0,
-    "construtor": 19.0,
-    "boxtobox": 39.0
+    "contencao": 12.0,
+    "construtor": 20.0,
+    "boxtobox": 69.0
   },
   "tendencies": {
     "construcao": 67.0,
-    "ofensividade": 96.0,
-    "def1v1": 90.0,
+    "ofensividade": 84.0,
+    "def1v1": 40.0,
     "contencao": 17.0,
     "duelo_aereo": 65.0
   },
@@ -64,18 +64,18 @@
       {
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
-        "grade": "B",
-        "percentile": 68.2,
+        "grade": "D",
+        "percentile": 0.0,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 83.7,
-            "display_value": "2,1"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Interceptações",
-            "percentile": 100.0,
-            "display_value": "2,6"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Chutes Bloqueados",
@@ -84,8 +84,8 @@
           },
           {
             "label": "Recuperações",
-            "percentile": 88.9,
-            "display_value": "9,5"
+            "percentile": 0.0,
+            "display_value": "0,0"
           }
         ],
         "stats": []
@@ -93,12 +93,12 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "A",
-        "percentile": 87.0,
+        "grade": "C+",
+        "percentile": 54.6,
         "pair_badge": [
           100.0,
-          94.4,
-          87.0
+          31.5,
+          54.6
         ],
         "sub_metrics": [
           {
@@ -108,13 +108,13 @@
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 94.4,
-            "display_value": "17,7"
+            "percentile": 31.5,
+            "display_value": "3,5"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 87.0,
-            "display_value": "+1,2"
+            "percentile": 54.6,
+            "display_value": "-0,0"
           }
         ],
         "stats": []
@@ -209,9 +209,9 @@
         "label": "Estilo de defesa",
         "kind": "construction_share",
         "grade": "D",
-        "percentile": 22.2,
-        "display_value": "1,48",
-        "share_pct": 22.2,
+        "percentile": 24.1,
+        "display_value": "1,62",
+        "share_pct": 24.1,
         "pool_avg_pct": 2.6,
         "scale_max_pct": 100.0,
         "stats": [],
@@ -222,8 +222,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "A",
-        "percentile": 87.0,
+        "grade": "C+",
+        "percentile": 54.6,
         "display_value": "62%",
         "share_pct": 61.9,
         "pool_avg_pct": 1.7,
@@ -410,19 +410,19 @@
   },
   "cluster": {
     "family": "meio-campistas",
-    "archetype": "Híbrido",
-    "archetype_label": "Híbrido",
-    "hybrid_badge": "MC Combativo",
-    "hybrid_badge_short": "Combativo",
+    "archetype": "Box-to-box",
+    "archetype_label": "Box-to-box",
+    "hybrid_badge": null,
+    "hybrid_badge_short": null,
     "shares": {
-      "contencao": 42.2,
-      "construtor": 18.9,
-      "boxtobox": 39.0
+      "contencao": 11.5,
+      "construtor": 19.7,
+      "boxtobox": 68.7
     },
     "ratings": {
-      "contencao": 7.0,
+      "contencao": 6.4,
       "construtor": 6.9,
-      "boxtobox": 7.2
+      "boxtobox": 6.9
     }
   },
   "transfermarkt": {
@@ -440,5 +440,6 @@
     "matched_name": "Enzo",
     "match_via": "Vila Nova 2025"
   },
+  "competition": "Goiano",
   "athlete_id": "ath-001014"
 }

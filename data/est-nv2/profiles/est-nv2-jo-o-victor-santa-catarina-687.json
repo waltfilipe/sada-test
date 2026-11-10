@@ -13,29 +13,29 @@
   "minutes_pct": 16.8,
   "goals": 1,
   "assists": 1,
-  "rating": 6.9,
+  "rating": 6.6,
   "ratings": {
-    "geral": 6.9,
-    "contencao": 6.7,
+    "geral": 6.6,
+    "contencao": 6.0,
     "construtor": 6.9,
-    "boxtobox": 7.0
+    "boxtobox": 6.5
   },
   "ranks": {
-    "geral": 37,
-    "contencao": 59,
+    "geral": 145,
+    "contencao": 236,
     "construtor": 40,
-    "boxtobox": 32
+    "boxtobox": 109
   },
-  "profile": "Híbrido",
+  "profile": "Box-to-box",
   "profile_shares": {
-    "contencao": 26.0,
-    "construtor": 23.0,
-    "boxtobox": 52.0
+    "contencao": 8.0,
+    "construtor": 18.0,
+    "boxtobox": 74.0
   },
   "tendencies": {
     "construcao": 60.0,
-    "ofensividade": 99.0,
-    "def1v1": 70.0,
+    "ofensividade": 88.0,
+    "def1v1": 17.0,
     "contencao": 45.0,
     "duelo_aereo": 71.0
   },
@@ -64,18 +64,18 @@
       {
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
-        "grade": "C",
-        "percentile": 39.2,
+        "grade": "D",
+        "percentile": 0.0,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 37.2,
-            "display_value": "0,9"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Interceptações",
-            "percentile": 89.1,
-            "display_value": "2,1"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Chutes Bloqueados",
@@ -84,8 +84,8 @@
           },
           {
             "label": "Recuperações",
-            "percentile": 30.4,
-            "display_value": "6,5"
+            "percentile": 0.0,
+            "display_value": "0,0"
           }
         ],
         "stats": []
@@ -93,28 +93,28 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "C",
-        "percentile": 40.9,
+        "grade": "D",
+        "percentile": 18.2,
         "pair_badge": [
-          88.9,
-          54.5,
-          40.9
+          100.0,
+          17.3,
+          18.2
         ],
         "sub_metrics": [
           {
             "label": "Erros Totais",
-            "percentile": 88.9,
-            "display_value": "1"
+            "percentile": 100.0,
+            "display_value": "0"
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 54.5,
-            "display_value": "13,9"
+            "percentile": 17.3,
+            "display_value": "4,4"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 40.9,
-            "display_value": "-0,2"
+            "percentile": 18.2,
+            "display_value": "-1,0"
           }
         ],
         "stats": []
@@ -208,11 +208,11 @@
       {
         "label": "Estilo de defesa",
         "kind": "construction_share",
-        "grade": "B+",
-        "percentile": 82.7,
-        "display_value": "3,55",
-        "share_pct": 82.7,
-        "pool_avg_pct": 2.9,
+        "grade": "A",
+        "percentile": 88.2,
+        "display_value": "4,25",
+        "share_pct": 88.2,
+        "pool_avg_pct": 3.0,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -222,8 +222,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "C",
-        "percentile": 40.9,
+        "grade": "D",
+        "percentile": 18.2,
         "display_value": "62%",
         "share_pct": 61.5,
         "pool_avg_pct": 1.6,
@@ -410,20 +410,21 @@
   },
   "cluster": {
     "family": "meio-campistas",
-    "archetype": "Híbrido",
-    "archetype_label": "Híbrido",
-    "hybrid_badge": "MC Combativo",
-    "hybrid_badge_short": "Combativo",
+    "archetype": "Box-to-box",
+    "archetype_label": "Box-to-box",
+    "hybrid_badge": null,
+    "hybrid_badge_short": null,
     "shares": {
-      "contencao": 25.5,
-      "construtor": 23.0,
-      "boxtobox": 51.5
+      "contencao": 7.5,
+      "construtor": 18.1,
+      "boxtobox": 74.5
     },
     "ratings": {
-      "contencao": 6.7,
+      "contencao": 6.0,
       "construtor": 6.9,
-      "boxtobox": 7.0
+      "boxtobox": 6.5
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "competition": "Catarinense"
 }

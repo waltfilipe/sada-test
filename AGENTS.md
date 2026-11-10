@@ -64,6 +64,14 @@ Exibido no popup "Tendências e xProg" (`PassTendencies.tsx`).
   <csv do campeonato> --source-dir <pasta onlyheatmaps>` — depois conferir
   ss_ids duplicados em `data/heatmaps` (colisões de homônimos) e rodar a
   cadeia 2–4 para estampar as âncoras.
+- `apply_estadual_competition.py` — carimba `competition` ("Paulista A2",
+  "Catarinense"...) em players/family/profiles das ligas est-nv* + hub;
+  rode após rebuild dos níveis. O campo rotula a competição real do atleta
+  no site e nos reports (percentis seguem contra o pool do nível).
+- Reports multi-liga: `/api/athlete-rows` devolve linhas por liga+temporada;
+  ligas fora do grafo de pessoas (est-nv*, serie-d) entram pelo `athlete_id`
+  carimbado via âncora tm/ss verificada (ver `NON_GRAPH_LEAGUES` em
+  `lib/athleteRows.server.ts`).
 
 ## Verificação
 

@@ -76,6 +76,8 @@ export type PlayerSummary = {
   name: string;
   club: string;
   label: string;
+  /** Campeonato real do atleta dentro da liga (ex.: "Paulista A2" em est-nv2). */
+  competition?: string | null;
   position: string;
   position_family: PositionFamily;
   nationality: string | null;

@@ -13,29 +13,29 @@
   "minutes_pct": 52.8,
   "goals": 0,
   "assists": 0,
-  "rating": 6.5,
+  "rating": 6.2,
   "ratings": {
-    "geral": 6.5,
-    "contencao": 6.1,
+    "geral": 6.2,
+    "contencao": 5.3,
     "construtor": 6.6,
-    "boxtobox": 5.8
+    "boxtobox": 5.7
   },
   "ranks": {
-    "geral": 178,
-    "contencao": 229,
-    "construtor": 99,
-    "boxtobox": 265
+    "geral": 279,
+    "contencao": 293,
+    "construtor": 100,
+    "boxtobox": 278
   },
-  "profile": "Contenção",
+  "profile": "Box-to-box",
   "profile_shares": {
-    "contencao": 70.0,
-    "construtor": 16.0,
-    "boxtobox": 14.0
+    "contencao": 17.0,
+    "construtor": 30.0,
+    "boxtobox": 54.0
   },
   "tendencies": {
     "construcao": 47.0,
-    "ofensividade": 31.0,
-    "def1v1": 74.0,
+    "ofensividade": 15.0,
+    "def1v1": 11.0,
     "contencao": 100.0,
     "duelo_aereo": 21.0
   },
@@ -64,18 +64,18 @@
       {
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
-        "grade": "C",
-        "percentile": 44.5,
+        "grade": "D",
+        "percentile": 0.0,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 76.2,
-            "display_value": "2,1"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Interceptações",
-            "percentile": 64.1,
-            "display_value": "1,1"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Chutes Bloqueados",
@@ -84,8 +84,8 @@
           },
           {
             "label": "Recuperações",
-            "percentile": 37.5,
-            "display_value": "4,3"
+            "percentile": 0.0,
+            "display_value": "0,0"
           }
         ],
         "stats": []
@@ -94,11 +94,11 @@
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
         "grade": "D",
-        "percentile": 3.7,
+        "percentile": 0.0,
         "pair_badge": [
           100.0,
-          50.9,
-          3.7
+          0.0,
+          0.0
         ],
         "sub_metrics": [
           {
@@ -108,13 +108,13 @@
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 50.9,
-            "display_value": "10,4"
+            "percentile": 0.0,
+            "display_value": "2,9"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 3.7,
-            "display_value": "-1,8"
+            "percentile": 0.0,
+            "display_value": "-3,0"
           }
         ],
         "stats": []
@@ -208,11 +208,11 @@
       {
         "label": "Estilo de defesa",
         "kind": "construction_share",
-        "grade": "B-",
-        "percentile": 58.3,
-        "display_value": "2,20",
-        "share_pct": 58.3,
-        "pool_avg_pct": 2.2,
+        "grade": "A",
+        "percentile": 95.4,
+        "display_value": "4,16",
+        "share_pct": 95.4,
+        "pool_avg_pct": 2.3,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -223,7 +223,7 @@
         "label": "Disciplina defensiva",
         "kind": "construction_share",
         "grade": "D",
-        "percentile": 3.7,
+        "percentile": 0.0,
         "display_value": "98%",
         "share_pct": 97.7,
         "pool_avg_pct": 1.6,
@@ -410,20 +410,21 @@
   },
   "cluster": {
     "family": "meio-campistas",
-    "archetype": "Contenção",
-    "archetype_label": "Contenção",
+    "archetype": "Box-to-box",
+    "archetype_label": "Box-to-box",
     "hybrid_badge": null,
     "hybrid_badge_short": null,
     "shares": {
-      "contencao": 69.5,
-      "construtor": 16.4,
-      "boxtobox": 14.2
+      "contencao": 16.6,
+      "construtor": 29.9,
+      "boxtobox": 53.5
     },
     "ratings": {
-      "contencao": 6.1,
+      "contencao": 5.3,
       "construtor": 6.6,
-      "boxtobox": 5.8
+      "boxtobox": 5.7
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "competition": "Mineiro"
 }

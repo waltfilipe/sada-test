@@ -13,24 +13,24 @@
   "minutes_pct": 0.1,
   "goals": 0,
   "assists": 0,
-  "rating": 6.5,
+  "rating": 6.4,
   "ratings": {
-    "geral": 6.5,
+    "geral": 6.4,
     "contencao": 6.5,
     "construtor": 6.5,
     "boxtobox": 6.4
   },
   "ranks": {
-    "geral": 149,
-    "contencao": 76,
+    "geral": 177,
+    "contencao": 66,
     "construtor": 95,
-    "boxtobox": 109
+    "boxtobox": 107
   },
-  "profile": "Contenção",
+  "profile": "Box-to-box",
   "profile_shares": {
-    "contencao": 70.0,
-    "construtor": 7.0,
-    "boxtobox": 23.0
+    "contencao": 24.0,
+    "construtor": 8.0,
+    "boxtobox": 68.0
   },
   "tendencies": {
     "construcao": 0.0,
@@ -65,12 +65,12 @@
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
         "grade": "D",
-        "percentile": 8.6,
+        "percentile": 0.0,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 23.3,
-            "display_value": "0,7"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Interceptações",
@@ -84,8 +84,8 @@
           },
           {
             "label": "Recuperações",
-            "percentile": 11.1,
-            "display_value": "2,5"
+            "percentile": 0.0,
+            "display_value": "0,0"
           }
         ],
         "stats": []
@@ -94,26 +94,26 @@
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
         "grade": "B-",
-        "percentile": 60.2,
+        "percentile": 62.0,
         "pair_badge": [
-          60.0,
-          22.2,
-          60.2
+          100.0,
+          0.0,
+          62.0
         ],
         "sub_metrics": [
           {
             "label": "Erros Totais",
-            "percentile": 60.0,
-            "display_value": "2"
+            "percentile": 100.0,
+            "display_value": "0"
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 22.2,
-            "display_value": "3,2"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 60.2,
+            "percentile": 62.0,
             "display_value": "+0,1"
           }
         ],
@@ -223,7 +223,7 @@
         "label": "Disciplina defensiva",
         "kind": "construction_share",
         "grade": "B-",
-        "percentile": 60.2,
+        "percentile": 62.0,
         "display_value": "0%",
         "share_pct": 0.0,
         "pool_avg_pct": 1.7,
@@ -410,20 +410,21 @@
   },
   "cluster": {
     "family": "meio-campistas",
-    "archetype": "Contenção",
-    "archetype_label": "Contenção",
+    "archetype": "Box-to-box",
+    "archetype_label": "Box-to-box",
     "hybrid_badge": null,
     "hybrid_badge_short": null,
     "shares": {
-      "contencao": 70.2,
-      "construtor": 7.3,
-      "boxtobox": 22.6
+      "contencao": 24.1,
+      "construtor": 8.0,
+      "boxtobox": 67.8
     },
     "ratings": {
       "contencao": 6.5,
       "construtor": 6.5,
-      "boxtobox": 6.4
+      "boxtobox": 6.5
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "competition": "Cearense"
 }

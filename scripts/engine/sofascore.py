@@ -74,6 +74,9 @@ def name_similarity(query: str, candidate: str) -> float:
     return min(100.0, score)
 
 
+_CLUB_STOPWORDS = {"de", "do", "da", "dos", "das", "e", "ec", "fc", "sc", "se", "cf"}
+
+
 def club_match_score(wy_club: str, ss_team: str) -> int:
     wy_norm = normalize_text(wy_club)
     ss_norm = normalize_text(ss_team)
@@ -81,8 +84,10 @@ def club_match_score(wy_club: str, ss_team: str) -> int:
         return 0
     if wy_norm in ss_norm or ss_norm in wy_norm:
         return 100
-    wy_tokens = set(wy_norm.split())
-    ss_tokens = set(ss_norm.split())
+    # Stopwords ("de", "EC", "FC"...) não provam nada: "Bahia de Feira" x
+    # "Inter de Limeira" ou "Goiatuba EC" x "EC São Bernardo" seriam falso par.
+    wy_tokens = {t for t in wy_norm.split() if t not in _CLUB_STOPWORDS}
+    ss_tokens = {t for t in ss_norm.split() if t not in _CLUB_STOPWORDS}
     overlap = len(wy_tokens & ss_tokens)
     if overlap:
         return 40 + overlap * 15
@@ -120,7 +125,7 @@ def aggregate_sofascore(path: Path | None = None) -> pd.DataFrame:
     return players
 
 
-def match_ss_row(wy_row: pd.Series, ss: pd.DataFrame) -> pd.Series | None:
+def match_ss_row(wy_row: pd.Series, ss: pd.DataFrame, require_club: bool = False) -> pd.Series | None:
     wy_name = str(wy_row["Jogador"])
     wy_club = str(wy_row["Equipe"])
     wy_token_count = len(normalize_text(wy_name).split())
@@ -130,6 +135,11 @@ def match_ss_row(wy_row: pd.Series, ss: pd.DataFrame) -> pd.Series | None:
         ns = name_similarity(wy_name, cand["player_name"])
         cs = club_match_score(wy_club, cand["primary_team"])
         cand_token_count = len(normalize_text(cand["player_name"]).split())
+        # Ligas estaduais: o CSV é por campeonato e os clubes são disjuntos —
+        # match só por nome vira homônimo errado (atleta do Baiano recebendo
+        # stats de quem jogou o Catarinense). Nesses pools exige clube.
+        if require_club and cs < 50:
+            continue
         if cs == 0 and cand_token_count > wy_token_count:
             continue
         if cs < 50 and ns < 90:
@@ -154,7 +164,7 @@ def _refresh_eff_duelos_def(row: pd.Series) -> float:
     return ((duelos_def * pct_duelos_def) + carrinhos) / duelos_def_l
 
 
-def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None) -> pd.DataFrame:
+def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None, require_club: bool = False) -> pd.DataFrame:
     """Merge SofaScore p90 stats; interceptações/rebatidas passam a vir do SS."""
     out = df.copy()
     csv_path = path or SS_PATH
@@ -184,7 +194,7 @@ def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None) -> pd.D
     err_combined_p90: list[float] = []
 
     for _, row in out.iterrows():
-        hit = match_ss_row(row, ss)
+        hit = match_ss_row(row, ss, require_club=require_club)
         if hit is None:
             inter_vals.append(0.0)
             clearance_vals.append(0.0)

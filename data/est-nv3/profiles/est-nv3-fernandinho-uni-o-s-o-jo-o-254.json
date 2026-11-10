@@ -13,29 +13,29 @@
   "minutes_pct": 38.0,
   "goals": 0,
   "assists": 0,
-  "rating": 6.6,
+  "rating": 6.9,
   "ratings": {
-    "geral": 6.6,
+    "geral": 6.9,
     "construcao": 6.8,
-    "defesa": 7.0,
-    "perfil": 7.0
+    "defesa": 7.5,
+    "perfil": 7.3
   },
   "ranks": {
-    "geral": 81,
+    "geral": 38,
     "construcao": 93,
-    "defesa": 72,
-    "perfil": 44
+    "defesa": 33,
+    "perfil": 25
   },
   "profile": "Defensor de Área",
   "profile_shares": {
-    "construcao": 32.0,
-    "defesa": 68.0
+    "construcao": 24.0,
+    "defesa": 76.0
   },
   "tendencies": {
     "construcao": 9.0,
     "ofensividade": 68.0,
     "def1v1": 15.0,
-    "contencao": 67.0,
+    "contencao": 100.0,
     "duelo_aereo": 83.0
   },
   "aspects": {
@@ -53,28 +53,28 @@
       {
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
-        "grade": "D",
-        "percentile": 18.4,
+        "grade": "B",
+        "percentile": 68.1,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 8.9,
-            "display_value": "1,8"
+            "percentile": 27.5,
+            "display_value": "3,1"
           },
           {
             "label": "Interceptações",
-            "percentile": 40.0,
-            "display_value": "1,3"
+            "percentile": 97.5,
+            "display_value": "3,0"
           },
           {
             "label": "Chutes Bloqueados",
-            "percentile": 11.4,
-            "display_value": "0,2"
+            "percentile": 57.5,
+            "display_value": "0,7"
           },
           {
             "label": "Recuperações",
-            "percentile": 13.3,
-            "display_value": "6,6"
+            "percentile": 90.0,
+            "display_value": "12,0"
           }
         ],
         "stats": []
@@ -82,28 +82,28 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "B-",
-        "percentile": 58.8,
+        "grade": "B+",
+        "percentile": 84.2,
         "pair_badge": [
-          60.0,
-          60.5,
-          58.8
+          100.0,
+          92.1,
+          84.2
         ],
         "sub_metrics": [
           {
             "label": "Erros Totais",
-            "percentile": 60.0,
-            "display_value": "4"
+            "percentile": 100.0,
+            "display_value": "0"
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 60.5,
-            "display_value": "11,8"
+            "percentile": 92.1,
+            "display_value": "20,8"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 58.8,
-            "display_value": "+0,1"
+            "percentile": 84.2,
+            "display_value": "+1,1"
           }
         ],
         "stats": []
@@ -178,10 +178,10 @@
       {
         "label": "Estilo de defesa",
         "kind": "construction_share",
-        "grade": "C-",
-        "percentile": 33.3,
-        "display_value": "0,74",
-        "share_pct": 33.3,
+        "grade": "C",
+        "percentile": 40.4,
+        "display_value": "0,84",
+        "share_pct": 40.4,
         "pool_avg_pct": 1.0,
         "scale_max_pct": 100.0,
         "stats": [],
@@ -192,8 +192,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "B-",
-        "percentile": 58.8,
+        "grade": "B+",
+        "percentile": 84.2,
         "display_value": "20%",
         "share_pct": 20.3,
         "pool_avg_pct": 0.9,
@@ -274,14 +274,14 @@
   "scatter": {
     "duelos_def": 3.23,
     "confrontos_of": 0.78,
-    "intervencoes": 1.2949640287769786,
+    "intervencoes": 3.0241935483870965,
     "construcao": 8.771929824561402,
     "duelo_ar": 83.33333333333334,
-    "contencao": 66.66666666666666,
+    "contencao": 100.0,
     "ofensividade": 68.42105263157895,
     "passes_prog": 6.56
   },
-  "hybrid_lean": "+ Defensivo",
+  "hybrid_lean": null,
   "cluster": {
     "family": "zagueiros",
     "archetype": "Defensor de Área",
@@ -289,15 +289,16 @@
     "construtor_badge": null,
     "construtor_badge_short": null,
     "shares": {
-      "defensor_area": 69.8,
-      "construtor": 10.0,
-      "combativo": 20.2
+      "defensor_area": 72.8,
+      "construtor": 5.2,
+      "combativo": 22.0
     },
     "ratings": {
-      "defensor_area": 7.0,
+      "defensor_area": 7.3,
       "construtor": 5.5,
-      "combativo": 6.3
+      "combativo": 7.0
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "competition": "Paulista A3"
 }

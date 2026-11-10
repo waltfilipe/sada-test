@@ -16,26 +16,26 @@
   "rating": 6.7,
   "ratings": {
     "geral": 6.7,
-    "defensivo": 6.2,
+    "defensivo": 5.9,
     "construtor": 6.5,
     "ofensivo": 6.7
   },
   "ranks": {
-    "geral": 117,
-    "defensivo": 189,
+    "geral": 111,
+    "defensivo": 232,
     "construtor": 98,
     "ofensivo": 80
   },
   "profile": "Híbrido",
   "profile_shares": {
-    "defensivo": 30.0,
-    "construtor": 34.0,
-    "ofensivo": 37.0
+    "defensivo": 22.0,
+    "construtor": 37.0,
+    "ofensivo": 41.0
   },
   "tendencies": {
     "construcao": 81.0,
     "ofensividade": 87.0,
-    "def1v1": 82.0,
+    "def1v1": 60.0,
     "contencao": 100.0,
     "duelo_aereo": 76.0
   },
@@ -64,28 +64,28 @@
       {
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
-        "grade": "B",
-        "percentile": 73.2,
+        "grade": "D",
+        "percentile": 9.8,
         "sub_metrics": [
           {
             "label": "Rebatidas",
+            "percentile": 17.6,
+            "display_value": "1,7"
+          },
+          {
+            "label": "Interceptações",
+            "percentile": 2.0,
+            "display_value": "0,4"
+          },
+          {
+            "label": "Chutes Bloqueados",
             "percentile": 0.0,
             "display_value": "0,0"
           },
           {
-            "label": "Interceptações",
-            "percentile": 92.9,
-            "display_value": "2,0"
-          },
-          {
-            "label": "Chutes Bloqueados",
-            "percentile": 100.0,
-            "display_value": "2,0"
-          },
-          {
             "label": "Recuperações",
-            "percentile": 100.0,
-            "display_value": "10,0"
+            "percentile": 19.6,
+            "display_value": "3,0"
           }
         ],
         "stats": []
@@ -94,11 +94,11 @@
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
         "grade": "D",
-        "percentile": 7.5,
+        "percentile": 1.9,
         "pair_badge": [
           100.0,
-          100.0,
-          7.5
+          12.3,
+          1.9
         ],
         "sub_metrics": [
           {
@@ -108,13 +108,13 @@
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 100.0,
-            "display_value": "17,5"
+            "percentile": 12.3,
+            "display_value": "8,7"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 7.5,
-            "display_value": "-1,3"
+            "percentile": 1.9,
+            "display_value": "-2,5"
           }
         ],
         "stats": []
@@ -209,10 +209,10 @@
         "label": "Estilo de defesa",
         "kind": "construction_share",
         "grade": "A",
-        "percentile": 100.0,
-        "display_value": "4,30",
-        "share_pct": 100.0,
-        "pool_avg_pct": 1.6,
+        "percentile": 88.7,
+        "display_value": "2,28",
+        "share_pct": 88.7,
+        "pool_avg_pct": 1.7,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -223,7 +223,7 @@
         "label": "Disciplina defensiva",
         "kind": "construction_share",
         "grade": "D",
-        "percentile": 7.5,
+        "percentile": 1.9,
         "display_value": "100%",
         "share_pct": 100.0,
         "pool_avg_pct": 1.3,
@@ -426,18 +426,19 @@
     "family": "laterais",
     "archetype": "Híbrido",
     "archetype_label": "Híbrido",
-    "hybrid_badge": "Lateral Completo",
-    "hybrid_badge_short": "Completo",
+    "hybrid_badge": "Lateral Projetivo",
+    "hybrid_badge_short": "Projetivo",
     "shares": {
-      "defensivo": 29.6,
-      "construtor": 33.5,
-      "ofensivo": 36.9
+      "defensivo": 22.4,
+      "construtor": 36.9,
+      "ofensivo": 40.7
     },
     "ratings": {
-      "defensivo": 6.2,
+      "defensivo": 5.9,
       "construtor": 6.5,
       "ofensivo": 6.7
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "competition": "Gaúcho"
 }

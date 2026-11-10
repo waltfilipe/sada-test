@@ -16,26 +16,26 @@
   "rating": 6.8,
   "ratings": {
     "geral": 6.8,
-    "contencao": 5.6,
+    "contencao": 6.0,
     "construtor": 7.0,
-    "boxtobox": 5.7
+    "boxtobox": 6.3
   },
   "ranks": {
-    "geral": 77,
-    "contencao": 287,
+    "geral": 80,
+    "contencao": 252,
     "construtor": 38,
-    "boxtobox": 278
+    "boxtobox": 164
   },
-  "profile": "Construtor",
+  "profile": "Híbrido",
   "profile_shares": {
-    "contencao": 5.0,
-    "construtor": 80.0,
-    "boxtobox": 15.0
+    "contencao": 15.0,
+    "construtor": 51.0,
+    "boxtobox": 34.0
   },
   "tendencies": {
     "construcao": 79.0,
-    "ofensividade": 55.0,
-    "def1v1": 1.0,
+    "ofensividade": 79.0,
+    "def1v1": 30.0,
     "contencao": 87.0,
     "duelo_aereo": 14.0
   },
@@ -64,18 +64,18 @@
       {
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
-        "grade": "D",
-        "percentile": 0.2,
+        "grade": "C-",
+        "percentile": 32.9,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 0.0,
-            "display_value": "0,0"
+            "percentile": 15.5,
+            "display_value": "0,5"
           },
           {
             "label": "Interceptações",
-            "percentile": 0.0,
-            "display_value": "0,0"
+            "percentile": 74.5,
+            "display_value": "1,3"
           },
           {
             "label": "Chutes Bloqueados",
@@ -84,8 +84,8 @@
           },
           {
             "label": "Recuperações",
-            "percentile": 1.0,
-            "display_value": "1,5"
+            "percentile": 41.5,
+            "display_value": "4,4"
           }
         ],
         "stats": []
@@ -94,11 +94,11 @@
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
         "grade": "D",
-        "percentile": 6.5,
+        "percentile": 13.9,
         "pair_badge": [
           100.0,
-          0.0,
-          6.5
+          18.5,
+          13.9
         ],
         "sub_metrics": [
           {
@@ -108,13 +108,13 @@
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 0.0,
-            "display_value": "4,0"
+            "percentile": 18.5,
+            "display_value": "8,7"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 6.5,
-            "display_value": "-1,8"
+            "percentile": 13.9,
+            "display_value": "-1,0"
           }
         ],
         "stats": []
@@ -209,10 +209,10 @@
         "label": "Estilo de defesa",
         "kind": "construction_share",
         "grade": "A",
-        "percentile": 100.0,
-        "display_value": "8,30",
-        "share_pct": 100.0,
-        "pool_avg_pct": 2.2,
+        "percentile": 99.1,
+        "display_value": "5,83",
+        "share_pct": 99.1,
+        "pool_avg_pct": 2.3,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -223,7 +223,7 @@
         "label": "Disciplina defensiva",
         "kind": "construction_share",
         "grade": "D",
-        "percentile": 6.5,
+        "percentile": 13.9,
         "display_value": "94%",
         "share_pct": 94.2,
         "pool_avg_pct": 1.6,
@@ -410,19 +410,19 @@
   },
   "cluster": {
     "family": "meio-campistas",
-    "archetype": "Construtor",
-    "archetype_label": "Construtor",
-    "hybrid_badge": null,
-    "hybrid_badge_short": null,
+    "archetype": "Híbrido",
+    "archetype_label": "Híbrido",
+    "hybrid_badge": "MC Projetivo",
+    "hybrid_badge_short": "Projetivo",
     "shares": {
-      "contencao": 4.8,
-      "construtor": 80.5,
-      "boxtobox": 14.6
+      "contencao": 15.4,
+      "construtor": 50.6,
+      "boxtobox": 34.0
     },
     "ratings": {
-      "contencao": 5.6,
+      "contencao": 6.0,
       "construtor": 7.0,
-      "boxtobox": 5.7
+      "boxtobox": 6.3
     }
   },
   "transfermarkt": {
@@ -438,5 +438,6 @@
     "match_score": 104.0,
     "on_loan_from": null
   },
+  "competition": "Gaúcho",
   "athlete_id": "ath-004433"
 }

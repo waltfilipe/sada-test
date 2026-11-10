@@ -13,29 +13,29 @@
   "minutes_pct": 11.7,
   "goals": 1,
   "assists": 0,
-  "rating": 6.8,
+  "rating": 6.4,
   "ratings": {
-    "geral": 6.8,
-    "contencao": 7.0,
+    "geral": 6.4,
+    "contencao": 6.6,
     "construtor": 6.2,
-    "boxtobox": 7.1
+    "boxtobox": 7.0
   },
   "ranks": {
-    "geral": 67,
-    "contencao": 29,
+    "geral": 209,
+    "contencao": 68,
     "construtor": 210,
-    "boxtobox": 24
+    "boxtobox": 32
   },
   "profile": "Contenção",
   "profile_shares": {
-    "contencao": 87.0,
-    "construtor": 2.0,
-    "boxtobox": 11.0
+    "contencao": 73.0,
+    "construtor": 5.0,
+    "boxtobox": 22.0
   },
   "tendencies": {
     "construcao": 0.0,
-    "ofensividade": 52.0,
-    "def1v1": 94.0,
+    "ofensividade": 34.0,
+    "def1v1": 47.0,
     "contencao": 0.0,
     "duelo_aereo": 94.0
   },
@@ -64,28 +64,28 @@
       {
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
-        "grade": "B",
-        "percentile": 74.3,
+        "grade": "D",
+        "percentile": 0.0,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 90.4,
-            "display_value": "2,0"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Interceptações",
-            "percentile": 51.1,
-            "display_value": "1,4"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Chutes Bloqueados",
-            "percentile": 60.0,
+            "percentile": 0.0,
             "display_value": "0,3"
           },
           {
             "label": "Recuperações",
-            "percentile": 95.7,
-            "display_value": "10,6"
+            "percentile": 0.0,
+            "display_value": "0,0"
           }
         ],
         "stats": []
@@ -93,12 +93,12 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "A",
-        "percentile": 98.2,
+        "grade": "B",
+        "percentile": 73.6,
         "pair_badge": [
           100.0,
-          99.1,
-          98.2
+          21.8,
+          73.6
         ],
         "sub_metrics": [
           {
@@ -108,13 +108,13 @@
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 99.1,
-            "display_value": "20,9"
+            "percentile": 21.8,
+            "display_value": "6,6"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 98.2,
-            "display_value": "+1,7"
+            "percentile": 73.6,
+            "display_value": "+0,5"
           }
         ],
         "stats": []
@@ -209,10 +209,10 @@
         "label": "Estilo de defesa",
         "kind": "construction_share",
         "grade": "D",
-        "percentile": 10.9,
-        "display_value": "1,32",
-        "share_pct": 10.9,
-        "pool_avg_pct": 2.9,
+        "percentile": 20.0,
+        "display_value": "1,60",
+        "share_pct": 20.0,
+        "pool_avg_pct": 3.0,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -222,8 +222,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "A",
-        "percentile": 98.2,
+        "grade": "B",
+        "percentile": 73.6,
         "display_value": "32%",
         "share_pct": 31.9,
         "pool_avg_pct": 1.6,
@@ -415,17 +415,18 @@
     "hybrid_badge": null,
     "hybrid_badge_short": null,
     "shares": {
-      "contencao": 87.0,
-      "construtor": 2.0,
-      "boxtobox": 11.0
+      "contencao": 72.7,
+      "construtor": 5.2,
+      "boxtobox": 22.1
     },
     "ratings": {
-      "contencao": 7.0,
+      "contencao": 6.6,
       "construtor": 6.2,
-      "boxtobox": 7.1
+      "boxtobox": 7.0
     }
   },
   "transfermarkt": null,
+  "competition": "Paulista A2",
   "heatmap": {
     "tournament_id": 1234,
     "season_id": 87118,

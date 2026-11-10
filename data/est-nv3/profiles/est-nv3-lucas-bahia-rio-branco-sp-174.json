@@ -16,26 +16,26 @@
   "rating": 6.6,
   "ratings": {
     "geral": 6.6,
-    "defensivo": 6.5,
+    "defensivo": 6.6,
     "construtor": 6.7,
     "ofensivo": 7.3
   },
   "ranks": {
     "geral": 120,
-    "defensivo": 65,
+    "defensivo": 48,
     "construtor": 57,
     "ofensivo": 20
   },
-  "profile": "Ofensivo",
+  "profile": "Híbrido",
   "profile_shares": {
-    "defensivo": 22.0,
-    "construtor": 15.0,
-    "ofensivo": 64.0
+    "defensivo": 37.0,
+    "construtor": 24.0,
+    "ofensivo": 39.0
   },
   "tendencies": {
     "construcao": 46.0,
     "ofensividade": 72.0,
-    "def1v1": 67.0,
+    "def1v1": 69.0,
     "contencao": 54.0,
     "duelo_aereo": 29.0
   },
@@ -65,11 +65,11 @@
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
         "grade": "D",
-        "percentile": 1.4,
+        "percentile": 1.1,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 3.8,
+            "percentile": 2.1,
             "display_value": "0,4"
           },
           {
@@ -84,7 +84,7 @@
           },
           {
             "label": "Recuperações",
-            "percentile": 1.9,
+            "percentile": 2.1,
             "display_value": "0,4"
           }
         ],
@@ -93,12 +93,12 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "D",
-        "percentile": 24.8,
+        "grade": "C-",
+        "percentile": 25.7,
         "pair_badge": [
           88.9,
-          51.4,
-          24.8
+          56.9,
+          25.7
         ],
         "sub_metrics": [
           {
@@ -108,12 +108,12 @@
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 51.4,
+            "percentile": 56.9,
             "display_value": "7,9"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 24.8,
+            "percentile": 25.7,
             "display_value": "-0,6"
           }
         ],
@@ -212,7 +212,7 @@
         "percentile": 90.8,
         "display_value": "3,74",
         "share_pct": 90.8,
-        "pool_avg_pct": 2.5,
+        "pool_avg_pct": 2.6,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -222,8 +222,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "D",
-        "percentile": 24.8,
+        "grade": "C-",
+        "percentile": 25.7,
         "display_value": "61%",
         "share_pct": 60.8,
         "pool_avg_pct": 1.2,
@@ -424,20 +424,21 @@
   },
   "cluster": {
     "family": "laterais",
-    "archetype": "Ofensivo",
-    "archetype_label": "Ofensivo",
-    "hybrid_badge": null,
-    "hybrid_badge_short": null,
+    "archetype": "Híbrido",
+    "archetype_label": "Híbrido",
+    "hybrid_badge": "Lateral Moderno",
+    "hybrid_badge_short": "Moderno",
     "shares": {
-      "defensivo": 21.9,
-      "construtor": 14.6,
-      "ofensivo": 63.5
+      "defensivo": 37.1,
+      "construtor": 24.2,
+      "ofensivo": 38.7
     },
     "ratings": {
-      "defensivo": 6.5,
+      "defensivo": 6.6,
       "construtor": 6.7,
       "ofensivo": 7.3
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "competition": "Paulista A3"
 }

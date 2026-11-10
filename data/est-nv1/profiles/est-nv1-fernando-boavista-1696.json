@@ -13,29 +13,29 @@
   "minutes_pct": 3.2,
   "goals": 0,
   "assists": 0,
-  "rating": 6.2,
+  "rating": 6.5,
   "ratings": {
-    "geral": 6.2,
-    "contencao": 6.4,
+    "geral": 6.5,
+    "contencao": 6.6,
     "construtor": 6.3,
-    "boxtobox": 6.2
+    "boxtobox": 6.3
   },
   "ranks": {
-    "geral": 278,
-    "contencao": 140,
+    "geral": 181,
+    "contencao": 84,
     "construtor": 178,
-    "boxtobox": 205
+    "boxtobox": 164
   },
-  "profile": "Box-to-box",
+  "profile": "Contenção",
   "profile_shares": {
-    "contencao": 23.0,
-    "construtor": 9.0,
-    "boxtobox": 68.0
+    "contencao": 82.0,
+    "construtor": 4.0,
+    "boxtobox": 15.0
   },
   "tendencies": {
     "construcao": 0.0,
     "ofensividade": 0.0,
-    "def1v1": 0.0,
+    "def1v1": 16.0,
     "contencao": 100.0,
     "duelo_aereo": 0.0
   },
@@ -64,28 +64,28 @@
       {
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
-        "grade": "D",
-        "percentile": 7.2,
+        "grade": "B",
+        "percentile": 72.4,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 21.8,
-            "display_value": "0,7"
+            "percentile": 83.5,
+            "display_value": "2,3"
           },
           {
             "label": "Interceptações",
-            "percentile": 5.8,
-            "display_value": "0,3"
+            "percentile": 92.5,
+            "display_value": "2,0"
           },
           {
             "label": "Chutes Bloqueados",
-            "percentile": 0.0,
-            "display_value": "0,0"
+            "percentile": 54.1,
+            "display_value": "0,3"
           },
           {
             "label": "Recuperações",
-            "percentile": 1.0,
-            "display_value": "1,0"
+            "percentile": 59.4,
+            "display_value": "4,9"
           }
         ],
         "stats": []
@@ -94,11 +94,11 @@
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
         "grade": "B-",
-        "percentile": 59.3,
+        "percentile": 63.0,
         "pair_badge": [
           100.0,
-          0.0,
-          59.3
+          36.1,
+          63.0
         ],
         "sub_metrics": [
           {
@@ -108,13 +108,13 @@
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 0.0,
-            "display_value": "2,1"
+            "percentile": 36.1,
+            "display_value": "9,5"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 59.3,
-            "display_value": "+0,0"
+            "percentile": 63.0,
+            "display_value": "+0,3"
           }
         ],
         "stats": []
@@ -209,10 +209,10 @@
         "label": "Estilo de defesa",
         "kind": "construction_share",
         "grade": "D",
-        "percentile": 0.0,
-        "display_value": "0,50",
-        "share_pct": 0.0,
-        "pool_avg_pct": 2.2,
+        "percentile": 3.7,
+        "display_value": "0,86",
+        "share_pct": 3.7,
+        "pool_avg_pct": 2.3,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -223,7 +223,7 @@
         "label": "Disciplina defensiva",
         "kind": "construction_share",
         "grade": "B-",
-        "percentile": 59.3,
+        "percentile": 63.0,
         "display_value": "0%",
         "share_pct": 0.0,
         "pool_avg_pct": 1.6,
@@ -410,19 +410,19 @@
   },
   "cluster": {
     "family": "meio-campistas",
-    "archetype": "Box-to-box",
-    "archetype_label": "Box-to-box",
+    "archetype": "Contenção",
+    "archetype_label": "Contenção",
     "hybrid_badge": null,
     "hybrid_badge_short": null,
     "shares": {
-      "contencao": 23.4,
-      "construtor": 8.8,
-      "boxtobox": 67.7
+      "contencao": 81.5,
+      "construtor": 3.6,
+      "boxtobox": 14.9
     },
     "ratings": {
-      "contencao": 6.4,
+      "contencao": 6.6,
       "construtor": 6.3,
-      "boxtobox": 6.2
+      "boxtobox": 6.3
     }
   },
   "transfermarkt": {
@@ -439,5 +439,6 @@
     "height": null,
     "matched_name": "Fernando",
     "match_score": 102.0
-  }
+  },
+  "competition": "Carioca"
 }

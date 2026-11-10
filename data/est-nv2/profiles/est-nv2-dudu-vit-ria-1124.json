@@ -21,21 +21,21 @@
     "boxtobox": 6.2
   },
   "ranks": {
-    "geral": 37,
-    "contencao": 162,
+    "geral": 35,
+    "contencao": 166,
     "construtor": 66,
-    "boxtobox": 206
+    "boxtobox": 212
   },
   "profile": "Híbrido",
   "profile_shares": {
-    "contencao": 3.0,
-    "construtor": 92.0,
-    "boxtobox": 5.0
+    "contencao": 2.0,
+    "construtor": 94.0,
+    "boxtobox": 4.0
   },
   "tendencies": {
     "construcao": 100.0,
-    "ofensividade": 99.0,
-    "def1v1": 70.0,
+    "ofensividade": 96.0,
+    "def1v1": 49.0,
     "contencao": 100.0,
     "duelo_aereo": 100.0
   },
@@ -65,17 +65,17 @@
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
         "grade": "D",
-        "percentile": 10.3,
+        "percentile": 0.0,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 2.1,
-            "display_value": "0,2"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Interceptações",
-            "percentile": 26.1,
-            "display_value": "1,0"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Chutes Bloqueados",
@@ -84,8 +84,8 @@
           },
           {
             "label": "Recuperações",
-            "percentile": 13.0,
-            "display_value": "5,0"
+            "percentile": 0.0,
+            "display_value": "0,0"
           }
         ],
         "stats": []
@@ -93,12 +93,12 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "C",
-        "percentile": 35.5,
+        "grade": "C-",
+        "percentile": 29.1,
         "pair_badge": [
           100.0,
-          19.1,
-          35.5
+          0.0,
+          29.1
         ],
         "sub_metrics": [
           {
@@ -108,13 +108,13 @@
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 19.1,
-            "display_value": "7,9"
+            "percentile": 0.0,
+            "display_value": "1,7"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 35.5,
-            "display_value": "-0,3"
+            "percentile": 29.1,
+            "display_value": "-0,4"
           }
         ],
         "stats": []
@@ -209,10 +209,10 @@
         "label": "Estilo de defesa",
         "kind": "construction_share",
         "grade": "D",
-        "percentile": 0.9,
-        "display_value": "0,88",
-        "share_pct": 0.9,
-        "pool_avg_pct": 2.9,
+        "percentile": 0.0,
+        "display_value": "0,75",
+        "share_pct": 0.0,
+        "pool_avg_pct": 3.0,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -222,8 +222,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "C",
-        "percentile": 35.5,
+        "grade": "C-",
+        "percentile": 29.1,
         "display_value": "58%",
         "share_pct": 58.2,
         "pool_avg_pct": 1.6,
@@ -412,12 +412,12 @@
     "family": "meio-campistas",
     "archetype": "Híbrido",
     "archetype_label": "Híbrido",
-    "hybrid_badge": "MC Completo",
-    "hybrid_badge_short": "Completo",
+    "hybrid_badge": "MC Projetivo",
+    "hybrid_badge_short": "Projetivo",
     "shares": {
-      "contencao": 2.6,
-      "construtor": 92.0,
-      "boxtobox": 5.3
+      "contencao": 1.9,
+      "construtor": 93.6,
+      "boxtobox": 4.5
     },
     "ratings": {
       "contencao": 6.3,
@@ -440,5 +440,6 @@
     "matched_name": "Dudu",
     "match_via": "Vitória 2025"
   },
+  "competition": "Baiano",
   "athlete_id": "ath-000885"
 }

@@ -13,24 +13,24 @@
   "minutes_pct": 0.8,
   "goals": 0,
   "assists": 1,
-  "rating": 6.4,
+  "rating": 6.3,
   "ratings": {
-    "geral": 6.4,
-    "contencao": 6.5,
+    "geral": 6.3,
+    "contencao": 6.4,
     "construtor": 6.4,
     "boxtobox": 6.4
   },
   "ranks": {
-    "geral": 210,
-    "contencao": 107,
+    "geral": 240,
+    "contencao": 144,
     "construtor": 143,
-    "boxtobox": 131
+    "boxtobox": 129
   },
-  "profile": "Contenção",
+  "profile": "Box-to-box",
   "profile_shares": {
-    "contencao": 75.0,
-    "construtor": 7.0,
-    "boxtobox": 18.0
+    "contencao": 18.0,
+    "construtor": 10.0,
+    "boxtobox": 72.0
   },
   "tendencies": {
     "construcao": 0.0,
@@ -64,13 +64,13 @@
       {
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
-        "grade": "C+",
-        "percentile": 46.6,
+        "grade": "C-",
+        "percentile": 25.0,
         "sub_metrics": [
           {
             "label": "Rebatidas",
-            "percentile": 96.0,
-            "display_value": "3,1"
+            "percentile": 0.0,
+            "display_value": "0,0"
           },
           {
             "label": "Interceptações",
@@ -84,8 +84,8 @@
           },
           {
             "label": "Recuperações",
-            "percentile": 90.4,
-            "display_value": "6,2"
+            "percentile": 100.0,
+            "display_value": "9,0"
           }
         ],
         "stats": []
@@ -93,12 +93,12 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "B-",
-        "percentile": 61.1,
+        "grade": "C+",
+        "percentile": 54.6,
         "pair_badge": [
           100.0,
-          30.6,
-          61.1
+          26.9,
+          54.6
         ],
         "sub_metrics": [
           {
@@ -108,13 +108,13 @@
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 30.6,
-            "display_value": "9,3"
+            "percentile": 26.9,
+            "display_value": "9,0"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 61.1,
-            "display_value": "+0,1"
+            "percentile": 54.6,
+            "display_value": "-0,0"
           }
         ],
         "stats": []
@@ -212,7 +212,7 @@
         "percentile": 0.0,
         "display_value": "0,00",
         "share_pct": 0.0,
-        "pool_avg_pct": 2.2,
+        "pool_avg_pct": 2.3,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -222,8 +222,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "B-",
-        "percentile": 61.1,
+        "grade": "C+",
+        "percentile": 54.6,
         "display_value": "0%",
         "share_pct": 0.0,
         "pool_avg_pct": 1.6,
@@ -410,19 +410,19 @@
   },
   "cluster": {
     "family": "meio-campistas",
-    "archetype": "Contenção",
-    "archetype_label": "Contenção",
+    "archetype": "Box-to-box",
+    "archetype_label": "Box-to-box",
     "hybrid_badge": null,
     "hybrid_badge_short": null,
     "shares": {
-      "contencao": 75.3,
-      "construtor": 6.9,
-      "boxtobox": 17.8
+      "contencao": 18.3,
+      "construtor": 10.1,
+      "boxtobox": 71.5
     },
     "ratings": {
-      "contencao": 6.5,
+      "contencao": 6.4,
       "construtor": 6.4,
-      "boxtobox": 6.3
+      "boxtobox": 6.4
     }
   },
   "transfermarkt": {
@@ -440,5 +440,6 @@
     "matched_name": "Ryan",
     "match_via": "Corinthians 2024"
   },
+  "competition": "Paulista",
   "athlete_id": "ath-003825"
 }

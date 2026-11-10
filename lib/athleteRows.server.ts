@@ -3,7 +3,8 @@ import "server-only";
 import fs from "fs";
 import path from "path";
 import { getPlayers } from "./data.server";
-import { isLeagueId } from "./leagues";
+import { isLeagueId, type LeagueId } from "./leagues";
+import { CURRENT_SEASON } from "./seasons";
 import type { PositionFamily } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data", "cross-season");
@@ -17,6 +18,10 @@ type AthleteRecord = {
 
 let athletesCache: Record<string, AthleteRecord> | null = null;
 let personsCache: Record<string, Record<string, Record<string, string>>> | null = null;
+
+// Ligas sem linhas no grafo de pessoas (persons.json só cobre série A/B/C):
+// o join nelas acontece pelo athlete_id carimbado via âncora verificada.
+const NON_GRAPH_LEAGUES: LeagueId[] = ["serie-d", "est-nv1", "est-nv2", "est-nv3", "est-nv4"];
 
 function athletesRegistry(): Record<string, AthleteRecord> {
   if (!athletesCache) {
@@ -44,6 +49,8 @@ export type AthleteSeasonRow = {
   family: PositionFamily | null;
   club: string;
   minutes: number;
+  /** Campeonato real dentro da liga (ex.: "Paulista A2" em est-nv2). */
+  competition?: string | null;
 };
 
 /**
@@ -67,19 +74,24 @@ export function athleteSeasonRows(identity: {
       ? personsMap()[identity.league]?.[identity.season]?.[identity.playerId] ?? null
       : null);
   let record = identity.athleteId ? registry[identity.athleteId] : undefined;
+  let recordId = identity.athleteId ?? null;
   if (!record && personKey) {
-    record = Object.values(registry).find(
-      (item) => item.person_key === personKey || item.person_keys?.includes(personKey),
+    const hit = Object.entries(registry).find(
+      ([, item]) => item.person_key === personKey || item.person_keys?.includes(personKey),
     );
+    if (hit) {
+      record = hit[1];
+      recordId = hit[0];
+    }
   }
-  if (!record?.rows?.length) return [];
+  if (!record?.rows?.length && !recordId) return [];
 
   const keys = new Set(
-    [record.person_key, ...(record.person_keys ?? [])].filter((key): key is string => Boolean(key)),
+    [record?.person_key, ...(record?.person_keys ?? [])].filter((key): key is string => Boolean(key)),
   );
 
   const out: AthleteSeasonRow[] = [];
-  for (const row of record.rows) {
+  for (const row of record?.rows ?? []) {
     if (!row.league || !row.season || !isLeagueId(row.league)) continue;
     try {
       const players = getPlayers(row.league, row.season);
@@ -104,9 +116,38 @@ export function athleteSeasonRows(identity: {
         family: target.position_family ?? null,
         club: target.club,
         minutes: target.minutes ?? 0,
+        competition: target.competition ?? null,
       });
     } catch {
       // Liga/temporada sem arquivo (ex.: estadual sem histórico).
+    }
+  }
+
+  // Ligas fora do grafo de pessoas (est-nv*, serie-d): sem linha no registro,
+  // mas as linhas carimbadas com athlete_id (join por tm_id verificado) ainda
+  // resolvem a mesma pessoa — é o que liga Paulista A2 a Série C no report.
+  if (recordId || keys.size) {
+    const season = CURRENT_SEASON;
+    for (const league of NON_GRAPH_LEAGUES) {
+      try {
+        for (const player of getPlayers(league, season)) {
+          const hit =
+            (recordId && player.athlete_id === recordId) ||
+            (player.person_key != null && keys.has(player.person_key));
+          if (!hit) continue;
+          out.push({
+            league,
+            season,
+            player_id: player.player_id,
+            family: player.position_family ?? null,
+            club: player.club,
+            minutes: player.minutes ?? 0,
+            competition: player.competition ?? null,
+          });
+        }
+      } catch {
+        // Liga sem dados publicados.
+      }
     }
   }
 

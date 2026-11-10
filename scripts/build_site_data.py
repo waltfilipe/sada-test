@@ -79,7 +79,7 @@ def build_league(
     df = attach_base_measures(raw_df)
     def_csv = defensive_csv_override or league["defensive_csv"]
     if not skip_sofascore:
-        df = attach_sofascore_metrics(df, path=def_csv)
+        df = attach_sofascore_metrics(df, path=def_csv, require_club=league_id.startswith("est"))
     df = df[df["Posição"] != "Goleiro"].copy()
 
     all_players: list[dict] = []

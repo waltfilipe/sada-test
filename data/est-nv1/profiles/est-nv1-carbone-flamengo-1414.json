@@ -21,8 +21,8 @@
     "ofensivo": 6.4
   },
   "ranks": {
-    "geral": 216,
-    "defensivo": 109,
+    "geral": 214,
+    "defensivo": 104,
     "construtor": 126,
     "ofensivo": 145
   },
@@ -35,7 +35,7 @@
   "tendencies": {
     "construcao": 0.0,
     "ofensividade": 0.0,
-    "def1v1": 3.0,
+    "def1v1": 5.0,
     "contencao": 100.0,
     "duelo_aereo": 0.0
   },
@@ -65,7 +65,7 @@
         "label": "Ações Defensivas e Recuperações",
         "kind": "metric_group",
         "grade": "C+",
-        "percentile": 49.8,
+        "percentile": 50.0,
         "sub_metrics": [
           {
             "label": "Rebatidas",
@@ -84,7 +84,7 @@
           },
           {
             "label": "Recuperações",
-            "percentile": 99.0,
+            "percentile": 100.0,
             "display_value": "7,5"
           }
         ],
@@ -93,12 +93,12 @@
       {
         "label": "Eficiência Defensiva",
         "kind": "def_efficiency_group",
-        "grade": "B-",
-        "percentile": 55.7,
+        "grade": "C+",
+        "percentile": 52.8,
         "pair_badge": [
           100.0,
-          93.4,
-          55.7
+          92.5,
+          52.8
         ],
         "sub_metrics": [
           {
@@ -108,12 +108,12 @@
           },
           {
             "label": "Ações sem Bola/90",
-            "percentile": 93.4,
+            "percentile": 92.5,
             "display_value": "15,0"
           },
           {
             "label": "Índice de Eficiência",
-            "percentile": 55.7,
+            "percentile": 52.8,
             "display_value": "+0,1"
           }
         ],
@@ -212,7 +212,7 @@
         "percentile": 0.0,
         "display_value": "0,00",
         "share_pct": 0.0,
-        "pool_avg_pct": 1.6,
+        "pool_avg_pct": 1.7,
         "scale_max_pct": 100.0,
         "stats": [],
         "bar_key": "def_contact_style",
@@ -222,8 +222,8 @@
       {
         "label": "Disciplina defensiva",
         "kind": "construction_share",
-        "grade": "B-",
-        "percentile": 55.7,
+        "grade": "C+",
+        "percentile": 52.8,
         "display_value": "0%",
         "share_pct": 0.0,
         "pool_avg_pct": 1.3,
@@ -439,5 +439,6 @@
       "ofensivo": 6.4
     }
   },
-  "transfermarkt": null
+  "transfermarkt": null,
+  "competition": "Carioca"
 }

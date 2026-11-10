@@ -1032,6 +1032,7 @@ export function ReportSheet({
   totalPages = 2,
   archiveSeasonLabel,
   leagueName,
+  poolName,
   skipProjection = false,
 }: {
   player: PlayerProfile;
@@ -1045,6 +1046,8 @@ export function ReportSheet({
   archiveSeasonLabel?: string;
   /** League of the evaluated season (archive sheets may come from another division). */
   leagueName?: string;
+  /** Pool que gera os percentis quando difere da competicao (ex.: Paulista A2 -> Estaduais Nv2). */
+  poolName?: string;
   skipProjection?: boolean;
 }) {
   const league = useLeague();
@@ -1082,6 +1085,7 @@ export function ReportSheet({
   const sheetLeague = leagueName ?? league.name;
   const sheetSeason = archiveSeasonLabel ?? league.season;
   const leagueLabel = `${sheetLeague} ${sheetSeason}`;
+  const poolLabel = `${poolName ?? sheetLeague} ${sheetSeason}`;
   const leagueBanner = sheetLeague;
 
   const bio = reportBio(player, lang);
@@ -1282,7 +1286,7 @@ export function ReportSheet({
               <ul>
                 <li>
                   <span className="player-report-legend-key is-pct" aria-hidden="true" />
-                  {copy.legendPercentile(copy.pool(familyLabel, leagueLabel))}
+                  {copy.legendPercentile(copy.pool(familyLabel, poolLabel))}
                 </li>
                 <li>
                   <span className="player-report-legend-key is-rate" aria-hidden="true">
@@ -1411,6 +1415,8 @@ type SummarySheetRow = {
   /** Season year shown in the sheet (e.g. "2024"). */
   year: string;
   leagueName: string;
+  /** Pool dos percentis quando difere da competicao exibida. */
+  poolName?: string;
 };
 
 function weightedMean(values: { value: number; weight: number }[]): number | null {
@@ -2025,7 +2031,7 @@ export function AnalystSheet({
     const now = new Date();
     return (y - now.getFullYear()) * 12 + (m - 1 - now.getMonth());
   })();
-  const leagues = [...new Set(ordered.map((row) => row.leagueName).filter(Boolean))].join(" / ");
+  const leagues = [...new Set(rows.map((row) => row.poolName ?? row.leagueName).filter(Boolean))].join(" / ");
   const badges = useMemo(() => playerStatBadges(main), [main]);
   const toneByBadge = useMemo(() => {
     const tones = new Map<string, string>();
@@ -2234,8 +2240,17 @@ type ReportSheetSpec = {
   /** Season year evaluated on this sheet (for the summary page and the banner). */
   seasonYear: string;
   leagueName: string;
+  poolName?: string;
   archiveSeasonLabel?: string;
   skipProjection?: boolean;
+};
+
+type ArchiveRow = {
+  league: string;
+  season: string;
+  competition?: string | null;
+  minutes?: number;
+  key: string;
 };
 
 export function PlayerReportButton({
@@ -2265,7 +2280,7 @@ export function PlayerReportButton({
     { player, seasonYear: "", leagueName: "", skipProjection: false },
   ]);
   const [includeArchive, setIncludeArchive] = useState<Record<string, boolean>>({});
-  const [registryRows, setRegistryRows] = useState<{ league: string; season: string }[] | null>(null);
+  const [registryRows, setRegistryRows] = useState<{ league: string; season: string; competition?: string | null; minutes?: number }[] | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
   // Registro de identidade dá TODOS os anos disponíveis (cross_season está
@@ -2282,7 +2297,7 @@ export function PlayerReportButton({
     let cancelled = false;
     fetch(`/api/athlete-rows?${qs}`)
       .then((res) => (res.ok ? res.json() : null))
-      .then((data: { rows?: { league: string; season: string }[] } | null) => {
+      .then((data: { rows?: { league: string; season: string; competition?: string | null; minutes?: number }[] } | null) => {
         if (!cancelled) setRegistryRows(data?.rows ?? null);
       })
       .catch(() => {
@@ -2293,13 +2308,26 @@ export function PlayerReportButton({
     };
   }, [scout.athlete_id, scout.person_key, scout.player_id, leagueId, primaryArchiveLabel, currentSeason]);
 
-  const archiveYears = useMemo(() => {
-    const viewedYear = primaryArchiveLabel ?? currentSeason;
-    const years = new Set<string>();
-    for (const row of registryRows ?? []) if (row.season) years.add(row.season);
-    for (const row of scout.cross_season?.seasons ?? []) years.add(row.year);
-    return [...years].filter((year) => year !== viewedYear).sort((a, b) => b.localeCompare(a));
-  }, [registryRows, scout.cross_season, primaryArchiveLabel, currentSeason]);
+  // Linha = liga+temporada: um atleta pode ter Paulista A2 e Serie C no mesmo ano.
+  const archiveRows = useMemo<ArchiveRow[]>(() => {
+    const viewedKey = `${leagueId}|${primaryArchiveLabel ?? currentSeason}`;
+    const map = new Map<string, ArchiveRow>();
+    for (const row of registryRows ?? []) {
+      if (!row.league || !row.season) continue;
+      const key = `${row.league}|${row.season}`;
+      if (!map.has(key)) map.set(key, { ...row, key });
+    }
+    for (const row of scout.cross_season?.seasons ?? []) {
+      if (!row.year) continue;
+      const league = row.league ?? leagueId;
+      const key = `${league}|${row.year}`;
+      if (!map.has(key)) map.set(key, { league, season: row.year, key });
+    }
+    map.delete(viewedKey);
+    return [...map.values()].sort(
+      (a, b) => b.season.localeCompare(a.season) || (b.minutes ?? 0) - (a.minutes ?? 0),
+    );
+  }, [registryRows, scout.cross_season, leagueId, primaryArchiveLabel, currentSeason]);
 
   useEffect(() => {
     setMounted(true);
@@ -2348,14 +2376,10 @@ export function PlayerReportButton({
     return getLeague(rowLeague)?.name ?? rowLeague;
   }
 
-  async function fetchArchiveProfile(year: string): Promise<{ profile: PlayerProfile; league: string } | null> {
-    const league =
-      registryRows?.find((row) => row.season === year)?.league ??
-      scout.cross_season?.seasons.find((s) => s.year === year)?.league ??
-      leagueId;
+  async function fetchArchiveProfile(row: ArchiveRow): Promise<{ profile: PlayerProfile; competition?: string | null } | null> {
     const qs = new URLSearchParams({
-      league,
-      season: year,
+      league: row.league,
+      season: row.season,
       name: scout.name,
       birth_year: String(scout.birth_year ?? ""),
     });
@@ -2363,7 +2387,8 @@ export function PlayerReportButton({
     if (scout.person_key) qs.set("person_key", scout.person_key);
     const res = await fetch(`/api/player-season?${qs}`);
     if (!res.ok) return null;
-    return { profile: (await res.json()) as PlayerProfile, league };
+    const profile = (await res.json()) as PlayerProfile;
+    return { profile, competition: row.competition ?? profile.competition ?? null };
   }
 
   async function exportPdf(next: ReportLang) {
@@ -2377,22 +2402,24 @@ export function PlayerReportButton({
         skipProjection: player.player_id !== scout.player_id,
         archiveSeasonLabel: primaryArchiveLabel,
         seasonYear: primaryArchiveLabel ?? currentSeason,
-        leagueName: leagueNameFor(primaryRow?.league),
+        leagueName: player.competition ?? leagueNameFor(primaryRow?.league),
+        poolName: leagueNameFor(primaryRow?.league ?? leagueId),
       },
     ];
-    const covered = new Set(primaryArchiveLabel ? [primaryArchiveLabel] : []);
-    for (const year of archiveYears) {
-      if (!includeArchive[year] || covered.has(year)) continue;
-      const found = await fetchArchiveProfile(year);
+    const covered = new Set([`${leagueId}|${primaryArchiveLabel ?? currentSeason}`]);
+    for (const row of archiveRows) {
+      if (!includeArchive[row.key] || covered.has(row.key)) continue;
+      const found = await fetchArchiveProfile(row);
       if (found) {
         sheets.push({
           player: found.profile,
-          archiveSeasonLabel: year,
-          seasonYear: year,
-          leagueName: leagueNameFor(found.league),
+          archiveSeasonLabel: row.season,
+          seasonYear: row.season,
+          leagueName: found.competition ?? leagueNameFor(row.league),
+          poolName: leagueNameFor(row.league),
           skipProjection: true,
         });
-        covered.add(year);
+        covered.add(row.key);
       }
     }
     setReportSheets(sheets);
@@ -2408,6 +2435,7 @@ export function PlayerReportButton({
         player: sheet.player,
         year: sheet.seasonYear,
         leagueName: sheet.leagueName,
+        poolName: sheet.poolName,
       })),
     [reportSheets],
   );
@@ -2427,23 +2455,21 @@ export function PlayerReportButton({
         </button>
         {menuOpen ? (
           <div className="shadow-add-dropdown" role="menu">
-            {archiveYears.length ? (
+            {archiveRows.length ? (
               <div className="player-report-archive-picks" role="group" aria-label="Temporadas no PDF">
                 <p className="player-report-archive-picks-title">Incluir fichas de arquivo</p>
-                {archiveYears.map((year) => (
-                  <label key={year} className="player-report-archive-pick">
+                {archiveRows.map((row) => (
+                  <label key={row.key} className="player-report-archive-pick">
                     <input
                       type="checkbox"
-                      checked={Boolean(includeArchive[year])}
+                      checked={Boolean(includeArchive[row.key])}
                       onChange={(event) =>
-                        setIncludeArchive((current) => ({ ...current, [year]: event.target.checked }))
+                        setIncludeArchive((current) => ({ ...current, [row.key]: event.target.checked }))
                       }
                     />
                     <span>
-                      Temporada {year}
-                      {registryRows?.find((row) => row.season === year)?.league
-                        ? ` · ${leagueNameFor(registryRows.find((row) => row.season === year)!.league)}`
-                        : ""}
+                      Temporada {row.season}
+                      {` · ${row.competition ?? leagueNameFor(row.league)}`}
                     </span>
                   </label>
                 ))}
@@ -2479,6 +2505,7 @@ export function PlayerReportButton({
                   sheetUrl={sheetUrl}
                   archiveSeasonLabel={sheet.archiveSeasonLabel}
                   leagueName={sheet.leagueName}
+                  poolName={sheet.poolName}
                   skipProjection={sheet.skipProjection}
                   pageOffset={index * 2}
                   totalPages={totalPages}
