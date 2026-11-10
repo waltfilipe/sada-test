@@ -56,6 +56,14 @@ Exibido no popup "Tendências e xProg" (`PassTendencies.tsx`).
   `sofascore["{liga}/{temp}"]` em `people.json`/`athletes.json`
   (`build_people.py` relê esse diretório em rebuilds).
 - Exibição é gated por `meta.heatmaps_enabled` da temporada.
+- Estaduais (est-nv1..4): CSVs defensivos SofaScore por nível em
+  `BRE26NV{1,2,3}_defensive.csv` (merge dos CSVs por campeonato — Nv1:
+  CAR/GAU/MIN/PAUA1, Nv2: PR/CAT/PAUA2, Nv3: PAUA3; Nv4 sem fonte ainda).
+  `BRE26_defensive.csv` é o merge completo usado pelo hub `estaduais`.
+  Heatmaps de estadual: `apply_heatmaps_to_site.py --league est-nvX --csv
+  <csv do campeonato> --source-dir <pasta onlyheatmaps>` — depois conferir
+  ss_ids duplicados em `data/heatmaps` (colisões de homônimos) e rodar a
+  cadeia 2–4 para estampar as âncoras.
 
 ## Verificação
 

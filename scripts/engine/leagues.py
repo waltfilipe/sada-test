@@ -21,14 +21,14 @@ WYSCOUT_2026 = ROOT / "wyscout" / "2026"
 _ESTADUAIS_XLSX = sorted((WYSCOUT_2026 / "estaduais").glob("*.xlsx"))
 
 
-def _estaduais_league(league_id: str, label: str) -> LeagueConfig:
+def _estaduais_league(league_id: str, label: str, defensive_csv: Path) -> LeagueConfig:
     """Same Wyscout exports. est-nv* rows are filtered to that level after load."""
     return {
         "id": league_id,
         "label": label,
         "season": "2026",
         "xlsx": _ESTADUAIS_XLSX,
-        "defensive_csv": ROOT / "BRE26_defensive.csv",
+        "defensive_csv": defensive_csv,
         "heatmaps": False,
         "heatmaps_dir": None,
         "physical_run": False,
@@ -91,9 +91,10 @@ LEAGUES: dict[str, LeagueConfig] = {
         "physical_run": False,
         "run_csv": None,
     },
-    "estaduais": _estaduais_league("estaduais", "Estaduais"),
-    "est-nv1": _estaduais_league("est-nv1", "Estaduais Nv1"),
-    "est-nv2": _estaduais_league("est-nv2", "Estaduais Nv2"),
-    "est-nv3": _estaduais_league("est-nv3", "Estaduais Nv3"),
-    "est-nv4": _estaduais_league("est-nv4", "Estaduais Nv4"),
+    "estaduais": _estaduais_league("estaduais", "Estaduais", ROOT / "BRE26_defensive.csv"),
+    "est-nv1": _estaduais_league("est-nv1", "Estaduais Nv1", ROOT / "BRE26NV1_defensive.csv"),
+    "est-nv2": _estaduais_league("est-nv2", "Estaduais Nv2", ROOT / "BRE26NV2_defensive.csv"),
+    "est-nv3": _estaduais_league("est-nv3", "Estaduais Nv3", ROOT / "BRE26NV3_defensive.csv"),
+    # Nv4 (Paraense/Alagoano/Potiguar/Paulista A4): sem exportacao SofaScore ainda.
+    "est-nv4": _estaduais_league("est-nv4", "Estaduais Nv4", ROOT / "BRE26NV4_defensive.csv"),
 }
