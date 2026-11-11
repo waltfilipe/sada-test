@@ -99,7 +99,10 @@ percentis/perfis = Paulista A2 2022-2026 inteiro (não por temporada).
 Gera `data/est-paua2/` (2026) + `data/est-paua2/seasons/{2022..2025}`,
 xProg e distância por ano. Depois: `link_paua2_athletes.py` (propaga
 athlete_id das linhas est-nv2 por nome+clube+nasc na mesma temporada →
-`row_athlete`) e `apply_athlete_ids.py`. Rótulo do pool: `poolName` em
+`row_athlete`), `apply_athlete_ids.py`.
+O builder ja replica o bloco `transfermarkt` (foto/valor/url) das linhas
+est-nv2 equivalentes — atleta sem enriquecimento TM proprio herda da linha
+do nivel. Rótulo do pool: `poolName` em
 `lib/leagues.ts` ("Paulista A2 · 2022–26").
 Ordenação da aba Posição: ligas `est*` ordenam por minutagem; nacionais
 por rating (`PositionScoutPage.tsx`).

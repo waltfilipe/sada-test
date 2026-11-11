@@ -145,6 +145,44 @@ def write_year(out_dir: Path, year: str, players: list[dict], family_payloads: d
     log(f"  {out_dir.name if out_dir.name != LEAGUE else year}: {len(players)} jogadores")
 
 
+def _norm(value) -> str:
+    return " ".join(str(value or "").strip().lower().split())
+
+
+def backfill_tm_blocks() -> int:
+    fixed = 0
+    for year in YEARS:
+        nv2_dir = DATA / "est-nv2" if year == CURRENT_YEAR else DATA / "est-nv2" / "seasons" / year
+        p2_dir = DATA / LEAGUE if year == CURRENT_YEAR else DATA / LEAGUE / "seasons" / year
+        try:
+            nv2_players = json.loads((nv2_dir / "players.json").read_text(encoding="utf-8")).get("players", [])
+        except OSError:
+            continue
+        idx = {
+            (_norm(r.get("name")), _norm(r.get("club")), str(r.get("birth_year") or "")): r["transfermarkt"]
+            for r in nv2_players
+            if (r.get("transfermarkt") or {}).get("id")
+        }
+        for fp in [p2_dir / "players.json", *sorted(p2_dir.glob("family-*.json"))]:
+            try:
+                payload = json.loads(fp.read_text(encoding="utf-8"))
+            except OSError:
+                continue
+            changed = False
+            for r in payload.get("players", []):
+                if r.get("transfermarkt"):
+                    continue
+                tm = idx.get((_norm(r.get("name")), _norm(r.get("club")), str(r.get("birth_year") or "")))
+                if tm:
+                    r["transfermarkt"] = tm
+                    fixed += 1
+                    changed = True
+            if changed:
+                fp.write_text(dumps_json(payload), encoding="utf-8")
+    log(f"bloco TM replicado do Nv2 em {fixed} linhas")
+    return fixed
+
+
 def main() -> None:
     log("=== est-paua2: pool multi-ano 2022-2026 ===")
     frames = [load_year(year) for year in YEARS]
@@ -179,6 +217,11 @@ def main() -> None:
     for year, df_y in year_df.items():
         out_dir = DATA / LEAGUE if year == CURRENT_YEAR else DATA / LEAGUE / "seasons" / year
         write_year(out_dir, year, by_year_players[year], by_year_family[year], df_y)
+
+    # Bloco transfermarkt (foto, valor de mercado, url) nao e reenriquecido
+    # aqui — replica da linha est-nv2 equivalente (nome+clube+nasc na mesma
+    # temporada), sem chamada de rede.
+    backfill_tm_blocks()
 
     # xProg + distancia de passe por temporada (modelo fit por ano, como nos
     # snapshots de nivel).
