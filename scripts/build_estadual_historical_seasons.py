@@ -65,6 +65,7 @@ SOURCES: dict[str, dict[str, str]] = {
 # campeonato do CSV (pool est-nv* mistura campeonatos no mesmo build).
 SOFASCORE_CSV: dict[tuple[str, str], tuple[Path, str]] = {
     ("est-nv2", "2022"): (ROOT / "PAUA222_defensive.csv", "paulista-a2"),
+    ("est-nv2", "2023"): (ROOT / "PAUA223_defensive.csv", "paulista-a2"),
     ("est-nv2", "2024"): (ROOT / "PAUA224_defensive.csv", "paulista-a2"),
     ("est-nv2", "2025"): (ROOT / "PAUA225_defensive.csv", "paulista-a2"),
 }
