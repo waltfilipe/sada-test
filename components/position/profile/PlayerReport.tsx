@@ -2376,6 +2376,12 @@ export function PlayerReportButton({
     return getLeague(rowLeague)?.name ?? rowLeague;
   }
 
+  function poolNameFor(rowLeague?: string): string {
+    const league = rowLeague ? getLeague(rowLeague) : undefined;
+    if (league?.poolName) return league.poolName;
+    return leagueNameFor(rowLeague);
+  }
+
   async function fetchArchiveProfile(row: ArchiveRow): Promise<{ profile: PlayerProfile; competition?: string | null } | null> {
     const qs = new URLSearchParams({
       league: row.league,
@@ -2403,7 +2409,7 @@ export function PlayerReportButton({
         archiveSeasonLabel: primaryArchiveLabel,
         seasonYear: primaryArchiveLabel ?? currentSeason,
         leagueName: player.competition ?? leagueNameFor(primaryRow?.league),
-        poolName: leagueNameFor(primaryRow?.league ?? leagueId),
+        poolName: poolNameFor(primaryRow?.league ?? leagueId),
       },
     ];
     const covered = new Set([`${leagueId}|${primaryArchiveLabel ?? currentSeason}`]);
@@ -2416,7 +2422,7 @@ export function PlayerReportButton({
           archiveSeasonLabel: row.season,
           seasonYear: row.season,
           leagueName: found.competition ?? leagueNameFor(row.league),
-          poolName: leagueNameFor(row.league),
+          poolName: poolNameFor(row.league),
           skipProjection: true,
         });
         covered.add(row.key);

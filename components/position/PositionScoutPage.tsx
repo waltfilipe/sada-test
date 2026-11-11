@@ -193,8 +193,13 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
         if (!q) return true;
         return player.name.toLowerCase().includes(q) || player.club.toLowerCase().includes(q);
       })
-      .sort((a, b) => positionRating(b) - positionRating(a));
-  }, [players, profile, badges, badgesById, club, foot, flankSide, origin, ageBand, minutesBand, query]);
+      .sort((a, b) =>
+        // Estaduais ordenam por minutagem; ligas nacionais por rating.
+        leagueId.startsWith("est")
+          ? (b.minutes ?? 0) - (a.minutes ?? 0)
+          : positionRating(b) - positionRating(a),
+      );
+  }, [players, leagueId, profile, badges, badgesById, club, foot, flankSide, origin, ageBand, minutesBand, query]);
 
   const filterKey = `${profile ?? ""}|${badges.join(",")}|${club ?? ""}|${foot ?? ""}|${flankSide ?? ""}|${origin ?? ""}|${ageBand ?? ""}|${minutesBand ?? ""}`;
   const initialFilter = useRef(true);

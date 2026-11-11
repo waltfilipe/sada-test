@@ -27,7 +27,8 @@ function loadHubData(): HubData {
         players: meta.player_count,
         families: Object.fromEntries(meta.families.map((family) => [family.key, family.count])),
       };
-      players += meta.player_count;
+      // est-paua2 replica o recorte do Nv2 — não conta de novo no total.
+      if (league.id !== "est-paua2") players += meta.player_count;
     }
     seasons[season] = { leagues, players };
   }

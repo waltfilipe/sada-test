@@ -543,6 +543,23 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
                   </Link>
                 </li>
               ))}
+              <li style={vars({ "--i": ESTADUAIS_LEVELS.length })}>
+                <Link
+                  href={leagueHref("est-paua2")}
+                  className={`hb-level${available("est-paua2") ? "" : " hb-level-empty"}`}
+                  title="Paulista A2 — bloco próprio · percentis no pool multi-ano 2022–2026"
+                >
+                  <span className="hb-level-n">A2</span>
+                  <span className="hb-level-name">
+                    Paulista A2
+                    {!available("est-paua2") ? <em className="hb-level-empty-note">{` · sem dados em ${season}`}</em> : null}
+                    <em className="hb-level-empty-note"> · pool 22–26</em>
+                  </span>
+                  <span className="hb-level-logos" aria-hidden>
+                    <img src="/competitions/paulista-a2.png" alt="" />
+                  </span>
+                </Link>
+              </li>
             </ul>
           </div>
         </section>

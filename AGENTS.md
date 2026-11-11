@@ -91,3 +91,15 @@ Exibido no popup "Tendências e xProg" (`PassTendencies.tsx`).
 - `npx tsc --noEmit` — typecheck
 - Dev: `npx next dev -p 3310`
 - Metadados de scrape `*_run.done.json` ficam fora do git.
+
+## Bloco Paulista A2 multi-ano (est-paua2)
+
+`build_paua2_pool.py` — piloto de campeonato-estadual próprio: pool de
+percentis/perfis = Paulista A2 2022-2026 inteiro (não por temporada).
+Gera `data/est-paua2/` (2026) + `data/est-paua2/seasons/{2022..2025}`,
+xProg e distância por ano. Depois: `link_paua2_athletes.py` (propaga
+athlete_id das linhas est-nv2 por nome+clube+nasc na mesma temporada →
+`row_athlete`) e `apply_athlete_ids.py`. Rótulo do pool: `poolName` em
+`lib/leagues.ts` ("Paulista A2 · 2022–26").
+Ordenação da aba Posição: ligas `est*` ordenam por minutagem; nacionais
+por rating (`PositionScoutPage.tsx`).
