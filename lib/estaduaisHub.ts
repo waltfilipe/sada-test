@@ -80,7 +80,7 @@ export const ESTADUAIS_LEVELS: EstadualLevel[] = [
       { id: "est-alagoano", name: "Alagoano", logo: "/competitions/alagoano.png", brand: "ALA" },
       { id: "est-potiguar", name: "Potiguar", logo: "/competitions/potiguar.png", brand: "POT" },
       { id: "est-paulista-a4", name: "Paulista A4", logo: "/competitions/paulista-a4.png", brand: "A4" },
-      { id: "est-copa-paulista", name: "Copa Paulista", logo: "/competitions/paulista.svg", brand: "CP", poolName: "Copa Paulista · 22–25" },
+      { id: "est-copa-paulista", name: "Copa Paulista", logo: "/competitions/copa-paulista.png", brand: "CP", poolName: "Copa Paulista · 22–25" },
     ],
   },
 ];
