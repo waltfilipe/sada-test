@@ -59,6 +59,16 @@ SOURCES: dict[str, dict[str, str]] = {
     "copa-paulista": {y: f"Outros/Copa Paulista {y}.xlsx" for y in ("2022", "2023", "2024", "2025")},
 }
 
+# CSVs defensivos SofaScore por (liga, temporada) -> (csv, campeonato).
+# Mesma ideia do SOFASCORE_CSV de build_historical_seasons.py. require_club
+# já é aplicado nas ligas est-*; `campeonato` restringe o merge às linhas do
+# campeonato do CSV (pool est-nv* mistura campeonatos no mesmo build).
+SOFASCORE_CSV: dict[tuple[str, str], tuple[Path, str]] = {
+    ("est-nv2", "2022"): (ROOT / "PAUA222_defensive.csv", "paulista-a2"),
+    ("est-nv2", "2024"): (ROOT / "PAUA224_defensive.csv", "paulista-a2"),
+    ("est-nv2", "2025"): (ROOT / "PAUA225_defensive.csv", "paulista-a2"),
+}
+
 
 def log(msg: str) -> None:
     print(msg, flush=True)
@@ -145,6 +155,8 @@ def main() -> None:
         if only and f"{league_id}/{year}" not in only:
             continue
         out_dir = DATA / league_id / "seasons" / year
+        def_entry = SOFASCORE_CSV.get((league_id, year))
+        def_csv, def_champ = def_entry if def_entry else (None, None)
         log(f"\n=== {league_id} {year}: {[p.name for p in files]} ===")
         build_league(
             league_id,
@@ -154,9 +166,11 @@ def main() -> None:
             skip_heatmaps=True,
             skip_physical_run=True,
             skip_transfermarkt=True,
-            skip_sofascore=True,
+            skip_sofascore=def_csv is None,
             skip_profiles_dir=True,
             prefer_period_club=True,
+            defensive_csv_override=def_csv,
+            defensive_championship=def_champ,
         )
         stamp_competition(league_id, out_dir, files)
 

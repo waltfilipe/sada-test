@@ -61,6 +61,7 @@ def build_league(
     skip_profiles_dir: bool = False,
     prefer_period_club: bool = False,
     defensive_csv_override: Path | None = None,
+    defensive_championship: str | None = None,
     heatmaps_source_dir: Path | None = None,
 ) -> None:
     league = LEAGUES[league_id]
@@ -79,7 +80,12 @@ def build_league(
     df = attach_base_measures(raw_df)
     def_csv = defensive_csv_override or league["defensive_csv"]
     if not skip_sofascore:
-        df = attach_sofascore_metrics(df, path=def_csv, require_club=league_id.startswith("est"))
+        df = attach_sofascore_metrics(
+            df,
+            path=def_csv,
+            require_club=league_id.startswith("est"),
+            championship=defensive_championship,
+        )
     df = df[df["Posição"] != "Goleiro"].copy()
 
     all_players: list[dict] = []

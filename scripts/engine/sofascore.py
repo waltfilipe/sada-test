@@ -164,8 +164,12 @@ def _refresh_eff_duelos_def(row: pd.Series) -> float:
     return ((duelos_def * pct_duelos_def) + carrinhos) / duelos_def_l
 
 
-def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None, require_club: bool = False) -> pd.DataFrame:
-    """Merge SofaScore p90 stats; interceptações/rebatidas passam a vir do SS."""
+def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None, require_club: bool = False, championship: str | None = None) -> pd.DataFrame:
+    """Merge SofaScore p90 stats; interceptações/rebatidas passam a vir do SS.
+
+    ``championship`` limita o merge às linhas cujo ``Campeonato`` bate com o do
+    CSV — CSV de campeonato único num pool multi-campeonato (est-nv*) senão
+    vaza via fuzzy club match (ex.: "Rio Branco PR" ~ "Rio Claro FC")."""
     out = df.copy()
     csv_path = path or SS_PATH
     for col in SS_STAT_COLS:
@@ -194,7 +198,10 @@ def attach_sofascore_metrics(df: pd.DataFrame, path: Path | None = None, require
     err_combined_p90: list[float] = []
 
     for _, row in out.iterrows():
-        hit = match_ss_row(row, ss, require_club=require_club)
+        if championship and str(row.get("Campeonato") or "").strip() != championship:
+            hit = None
+        else:
+            hit = match_ss_row(row, ss, require_club=require_club)
         if hit is None:
             inter_vals.append(0.0)
             clearance_vals.append(0.0)
