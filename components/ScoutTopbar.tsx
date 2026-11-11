@@ -7,7 +7,7 @@ import { SiteLogo } from "@/components/SiteLogo";
 import { useLeagueOptional } from "@/components/LeagueProvider";
 import { getLeague, leaguePath, LEAGUES, type LeagueInfo } from "@/lib/leagues";
 import { elencosPath } from "@/lib/elencosApp";
-import { isBrasileiraoLeague, withSeasonQuery } from "@/lib/seasons";
+import { hasSeasonArchive, isBrasileiraoLeague, withSeasonQuery } from "@/lib/seasons";
 
 const NAV_SCOUT = [
   { key: "inicio", path: "/", label: "Início", global: true },
@@ -62,7 +62,7 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
   function switchHref(target: LeagueInfo) {
     const rest = pathname.replace(/^\/[^/]+/, "") || "/";
     const base = leaguePath(target.id, rest);
-    return isBrasileiraoLeague(target.id) ? withSeasonQuery(base, league?.season ?? "2026") : base;
+    return hasSeasonArchive(target.id) ? withSeasonQuery(base, league?.season ?? "2026") : base;
   }
 
   function navHref(item: { key: string; path: string; global: boolean; anywhere?: boolean }) {
@@ -106,13 +106,13 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
   const showContext = !hubMode && league != null;
   const contextLogo =
     league != null && isBrasileiraoLeague(league.leagueId) ? leagueInfo?.logo : undefined;
-  // Outras séries da mesma temporada: arquivo só existe para as séries do
-  // Brasileirão A/B/C; na temporada atual valem todas as ligas.
+  // Outras séries da mesma temporada: arquivo existe nas ligas com snapshots
+  // publicados (Brasileirão A/B/C + estaduais Nv1–Nv3); na atual valem todas.
   const switchOptions = league
     ? LEAGUES.filter(
         (item) =>
           item.id !== league.leagueId &&
-          (league.isCurrentSeason || item.id === "serie-a" || item.id === "serie-b" || item.id === "serie-c"),
+          (league.isCurrentSeason || hasSeasonArchive(item.id)),
       )
     : [];
 

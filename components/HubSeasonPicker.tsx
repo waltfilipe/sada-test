@@ -332,8 +332,12 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
     available(id) ? withSeasonQuery(`/${id}${path}`, season) : `/${id}${path}`;
 
   const seriesCount = BRASILEIRAO_LEAGUES.filter((league) => available(league.id)).length;
-  const competitions = seriesCount + (isArchiveHub ? 0 : ESTADUAIS_LEVELS.length);
-  const estPlayers = ESTADUAIS_LEVELS.reduce((sum, level) => sum + (current.leagues[level.id]?.players ?? 0), 0);
+  const estAvailable = ESTADUAIS_LEVELS.filter((level) => available(level.id)).length;
+  const competitions = seriesCount + (isArchiveHub ? estAvailable : ESTADUAIS_LEVELS.length);
+  const estPlayers = ESTADUAIS_LEVELS.reduce(
+    (sum, level) => sum + (seasonData.leagues[level.id]?.players ?? 0),
+    0,
+  );
 
   const stats = [
     { label: "Atletas", value: seasonData.players },
@@ -515,15 +519,22 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
 
           <div className="hb-estaduais hb-reveal" aria-label="Estaduais por nível">
             <span className="hb-estaduais-title">
-              Estaduais {CURRENT_SEASON}
+              Estaduais {season}
               <em>{fmt(estPlayers)} atletas</em>
             </span>
             <ul>
               {ESTADUAIS_LEVELS.map((level, index) => (
                 <li key={level.id} style={vars({ "--i": index })}>
-                  <Link href={`/${level.id}/posicao/zagueiros`} className="hb-level" title={level.members.map((m) => m.name).join(" · ")}>
+                  <Link
+                    href={leagueHref(level.id)}
+                    className={`hb-level${available(level.id) ? "" : " hb-level-empty"}`}
+                    title={level.members.map((m) => m.name).join(" · ")}
+                  >
                     <span className="hb-level-n">N{index + 1}</span>
-                    <span className="hb-level-name">{level.name}</span>
+                    <span className="hb-level-name">
+                      {level.name}
+                      {!available(level.id) ? <em className="hb-level-empty-note">{` · sem dados em ${season}`}</em> : null}
+                    </span>
                     <span className="hb-level-logos" aria-hidden>
                       {level.members.slice(0, 4).map((member) => (
                         <img key={member.id} src={member.logo} alt="" />

@@ -17,7 +17,7 @@ import { isProjectionEligible, realisticProjection } from "@/lib/minuteProjectio
 import { familyBySlug } from "@/lib/positions";
 import { resolveSeasonPlayerId } from "@/lib/seasonRosterMatch";
 import { leaguePath } from "@/lib/leagues";
-import { BRASILEIRAO_SEASONS, CURRENT_SEASON, isBrasileiraoLeague, withSeasonQuery } from "@/lib/seasons";
+import { BRASILEIRAO_SEASONS, CURRENT_SEASON, hasSeasonArchive, withSeasonQuery } from "@/lib/seasons";
 import { familySectionStats, scatterAxis, scatterAxisLabel } from "@/lib/scatterAxis";
 import {
   newSavedChartId,
@@ -276,7 +276,7 @@ export function ScatterClient({
   // — Somar temporadas: pool une as temporadas marcadas; quem está em mais de
   // uma entra com a média ponderada pelos minutos de cada ano. —
   const seasonOptions = useMemo(() => {
-    if (!isBrasileiraoLeague(leagueId)) return [] as string[];
+    if (!hasSeasonArchive(leagueId)) return [] as string[];
     return [...new Set([CURRENT_SEASON, season, ...extraSeasons])].sort((a, b) => Number(b) - Number(a));
   }, [leagueId, season, extraSeasons]);
   const [pickedSeasons, setPickedSeasons] = useState<ReadonlySet<string>>(
@@ -402,7 +402,7 @@ export function ScatterClient({
 
   const dossierHrefFor = useCallback(
     (merged: MergedPlayer) =>
-      isBrasileiraoLeague(leagueId)
+      hasSeasonArchive(leagueId)
         ? withSeasonQuery(leaguePath(leagueId, `/posicao/${family}?atleta=${merged.__repId}`), merged.__repSeason)
         : href(`/posicao/${family}?atleta=${merged.__repId}`),
     [leagueId, family, href],

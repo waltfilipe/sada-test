@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { HubSeasonPicker, type HubData } from "@/components/HubSeasonPicker";
 import { getMeta } from "@/lib/data.server";
-import { BRASILEIRAO_LEAGUES, LEAGUES } from "@/lib/leagues";
+import { LEAGUES } from "@/lib/leagues";
 import { BRASILEIRAO_SEASONS, CURRENT_SEASON, INTRO_STORAGE_KEY } from "@/lib/seasons";
 import type { SiteMeta } from "@/lib/types";
 
@@ -16,7 +16,7 @@ function loadHubData(): HubData {
   for (const season of BRASILEIRAO_SEASONS) {
     const leagues: HubData["seasons"][string]["leagues"] = {};
     let players = 0;
-    for (const league of season === CURRENT_SEASON ? LEAGUES : BRASILEIRAO_LEAGUES) {
+    for (const league of LEAGUES) {
       let meta: SiteMeta;
       try {
         meta = getMeta(league.id, season);

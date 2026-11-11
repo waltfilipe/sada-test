@@ -4,7 +4,7 @@ import { Suspense, useMemo, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import { LeagueProvider, useLeague } from "@/components/LeagueProvider";
 import { getLeague, leaguePath, type LeagueId } from "@/lib/leagues";
-import { CURRENT_SEASON, isBrasileiraoLeague, parseSeasonParam, withSeasonQuery } from "@/lib/seasons";
+import { CURRENT_SEASON, hasSeasonArchive, parseSeasonParam, withSeasonQuery } from "@/lib/seasons";
 
 type Props = {
   leagueId: LeagueId;
@@ -28,7 +28,7 @@ function SeasonLeagueProviderInner({ leagueId, children }: Props) {
       leagueId,
       href: (path: string) => {
         const base = leaguePath(leagueId, path);
-        if (!isBrasileiraoLeague(leagueId)) return base;
+        if (!hasSeasonArchive(leagueId)) return base;
         return withSeasonQuery(base, season);
       },
       heatmaps: info.heatmaps && season === CURRENT_SEASON,

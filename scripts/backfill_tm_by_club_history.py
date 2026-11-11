@@ -49,7 +49,7 @@ from engine.transfermarkt import (  # noqa: E402
 )
 
 DATA = ROOT / "data"
-LEAGUES = ("serie-a", "serie-b", "serie-c", "serie-d")
+LEAGUES = ("serie-a", "serie-b", "serie-c", "serie-d", "est-nv1", "est-nv2", "est-nv3", "est-nv4")
 CURRENT_TM_SEASON = 2026
 SQUADS_PATH = DATA / "transfermarkt-squads.json"
 

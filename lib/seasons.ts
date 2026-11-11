@@ -9,6 +9,20 @@ export function isBrasileiraoLeague(league: LeagueId): boolean {
   return league === "serie-a" || league === "serie-b" || league === "serie-c";
 }
 
+/** Ligas com snapshots publicados em data/{league}/seasons/{ano}. */
+const ARCHIVE_LEAGUES: ReadonlySet<LeagueId> = new Set<LeagueId>([
+  "serie-a",
+  "serie-b",
+  "serie-c",
+  "est-nv1",
+  "est-nv2",
+  "est-nv3",
+]);
+
+export function hasSeasonArchive(league: LeagueId): boolean {
+  return ARCHIVE_LEAGUES.has(league);
+}
+
 export function parseSeasonParam(value: string | null | undefined): BrasileiraoSeason {
   if (value && (BRASILEIRAO_SEASONS as readonly string[]).includes(value)) {
     return value as BrasileiraoSeason;

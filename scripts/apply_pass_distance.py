@@ -133,6 +133,21 @@ def main() -> None:
         written, present = patch_league_dir(season_dir, mapping)
         print(f"{league_id}/{year}: {present} com distancia ({written} gravados)")
 
+    from build_estadual_historical_seasons import estadual_season_snapshots
+
+    for league_id, year, xlsx_files in estadual_season_snapshots():
+        season_dir = DATA_DIR / league_id / "seasons" / year
+        if not season_dir.is_dir():
+            continue
+        try:
+            df = load_players_dataframe(league_id, xlsx_override=xlsx_files)
+        except Exception as exc:  # noqa: BLE001
+            print(f"{league_id}/{year}: falha ao ler xlsx ({exc})")
+            continue
+        mapping = pass_distance_map(df)
+        written, present = patch_league_dir(season_dir, mapping)
+        print(f"{league_id}/{year}: {present} com distancia ({written} gravados)")
+
 
 if __name__ == "__main__":
     main()

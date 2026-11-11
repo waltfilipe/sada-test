@@ -23,6 +23,16 @@ let personsCache: Record<string, Record<string, Record<string, string>>> | null 
 // o join nelas acontece pelo athlete_id carimbado via âncora verificada.
 const NON_GRAPH_LEAGUES: LeagueId[] = ["serie-d", "est-nv1", "est-nv2", "est-nv3", "est-nv4"];
 
+/** Temporadas publicadas para ligas fora do grafo: corrente + data/{league}/seasons/*. */
+function nonGraphSeasons(league: LeagueId): string[] {
+  const seasons = new Set<string>([CURRENT_SEASON]);
+  const root = path.join(process.cwd(), "data", league, "seasons");
+  if (fs.existsSync(root)) {
+    for (const entry of fs.readdirSync(root)) seasons.add(entry);
+  }
+  return [...seasons];
+}
+
 function athletesRegistry(): Record<string, AthleteRecord> {
   if (!athletesCache) {
     const payload = JSON.parse(
@@ -127,10 +137,10 @@ export function athleteSeasonRows(identity: {
   // mas as linhas carimbadas com athlete_id (join por tm_id verificado) ainda
   // resolvem a mesma pessoa — é o que liga Paulista A2 a Série C no report.
   if (recordId || keys.size) {
-    const season = CURRENT_SEASON;
     for (const league of NON_GRAPH_LEAGUES) {
-      try {
-        for (const player of getPlayers(league, season)) {
+      for (const season of nonGraphSeasons(league)) {
+        try {
+          for (const player of getPlayers(league, season)) {
           const hit =
             (recordId && player.athlete_id === recordId) ||
             (player.person_key != null && keys.has(player.person_key));
@@ -144,9 +154,10 @@ export function athleteSeasonRows(identity: {
             minutes: player.minutes ?? 0,
             competition: player.competition ?? null,
           });
+          }
+        } catch {
+          // Liga/temporada sem dados publicados.
         }
-      } catch {
-        // Liga sem dados publicados.
       }
     }
   }

@@ -68,6 +68,17 @@ Exibido no popup "Tendências e xProg" (`PassTendencies.tsx`).
   "Catarinense"...) em players/family/profiles das ligas est-nv* + hub;
   rode após rebuild dos níveis. O campo rotula a competição real do atleta
   no site e nos reports (percentis seguem contra o pool do nível).
+- `build_estadual_historical_seasons.py` — temporadas arquivadas dos
+  estaduais: sincroniza os xlsx por campeonato (Desktop `Estaduais/` →
+  `wyscout/historical/estaduais/{comp}-{ano}.xlsx`, já com `Campeonato`
+  carimbado) e roda `build_league` por (nível, ano) →
+  `data/{est-nv*}/seasons/{ano}` + stamp `competition`. `--only est-nvX/AAAA`
+  para um build só. Nv3 histórico tem só Paulista A3; Nv4 não tem arquivo.
+  Atenção: "Paranaense 2022.xlsx" é na verdade a elite do Paranaense 2023
+  (o "… CERTO.xlsx" é o 2022 real) — o mapeamento está no SOURCES do script.
+  Depois dos builds: `apply_xprog.py` e `apply_pass_distance.py` já cobrem
+  os snapshots estaduais; `backfill_tm_by_club_history.py` cobre est-nv* e
+  resolve tm_id por elenco/ano (join → `athlete_id` via `apply_athlete_ids`).
 - Reports multi-liga: `/api/athlete-rows` devolve linhas por liga+temporada;
   ligas fora do grafo de pessoas (est-nv*, serie-d) entram pelo `athlete_id`
   carimbado via âncora tm/ss verificada (ver `NON_GRAPH_LEAGUES` em
