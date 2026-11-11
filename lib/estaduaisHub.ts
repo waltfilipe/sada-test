@@ -44,7 +44,7 @@ export const ESTADUAIS_LEVELS: EstadualLevel[] = [
     hint: "Paulista A1 · Carioca · Gaúcho · Mineiro — pool multi-ano 2022–26.",
     members: [
       { id: "est-paulista-a1", name: "Paulista A1", logo: "/competitions/paulista.png", brand: "A1", poolName: "Paulista A1 · 22–26" },
-      { id: "est-carioca", name: "Carioca", logo: "/competitions/carioca.svg", brand: "CAR", poolName: "Carioca · 22–26" },
+      { id: "est-carioca", name: "Carioca", logo: "/competitions/carioca.png", brand: "CAR", poolName: "Carioca · 22–26" },
       { id: "est-gaucho", name: "Gaúcho", logo: "/competitions/gaucho.png", brand: "GAU", poolName: "Gaúcho · 22–26" },
       { id: "est-mineiro", name: "Mineiro", logo: "/competitions/mineiro.svg", brand: "MIN", poolName: "Mineiro · 22–26" },
     ],
@@ -55,7 +55,7 @@ export const ESTADUAIS_LEVELS: EstadualLevel[] = [
     hint: "Paranaense · Catarinense · Paulista A2 · Baiano — pool multi-ano 2022–26.",
     members: [
       { id: "est-paranaense", name: "Paranaense", logo: "/competitions/paranaense.png", brand: "PAR", poolName: "Paranaense · 22–26" },
-      { id: "est-catarinense", name: "Catarinense", logo: "/competitions/catarinense.jpg", brand: "CAT", poolName: "Catarinense · 22–26" },
+      { id: "est-catarinense", name: "Catarinense", logo: "/competitions/catarinense.png", brand: "CAT", poolName: "Catarinense · 22–26" },
       { id: "est-paulista-a2", name: "Paulista A2", logo: "/competitions/paulista-a2.png", brand: "A2", poolName: "Paulista A2 · 22–26" },
       { id: "est-baiano", name: "Baiano", logo: "/competitions/baiano.svg", brand: "BAI", poolName: "Baiano · 22–26" },
     ],
@@ -65,10 +65,10 @@ export const ESTADUAIS_LEVELS: EstadualLevel[] = [
     name: "Estaduais Nv3",
     hint: "Cearense · Pernambucano · Paulista A3 · Goiano. A3 com pool 2022–26; demais só 2026.",
     members: [
-      { id: "est-cearense", name: "Cearense", logo: "/competitions/cearense.svg", brand: "CEA" },
-      { id: "est-pernambucano", name: "Pernambucano", logo: "/competitions/pernambucano.svg", brand: "PER" },
+      { id: "est-cearense", name: "Cearense", logo: "/competitions/cearense.png", brand: "CEA" },
+      { id: "est-pernambucano", name: "Pernambucano", logo: "/competitions/pernambucano.png", brand: "PER" },
       { id: "est-paulista-a3", name: "Paulista A3", logo: "/competitions/paulista-a3.png", brand: "A3", poolName: "Paulista A3 · 22–26" },
-      { id: "est-goiano", name: "Goiano", logo: "/competitions/goiano.svg", brand: "GOI" },
+      { id: "est-goiano", name: "Goiano", logo: "/competitions/goiano.png", brand: "GOI" },
     ],
   },
   {
