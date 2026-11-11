@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLeague } from "@/components/LeagueProvider";
+import { getLeague } from "@/lib/leagues";
 import { usePlayerArchiveProfile } from "@/hooks/usePlayerArchiveProfile";
 import type { AthleteSeasonRow } from "@/lib/athleteRows.server";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -41,7 +42,7 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
   // equivalente em currentPlayers não enxerga nenhum dos dois casos).
   const [athleteRows, setAthleteRows] = useState<AthleteSeasonRow[] | null>(null);
   useEffect(() => {
-    if (isCurrentSeason || (!player.athlete_id && !player.person_key)) {
+    if (!player.athlete_id && !player.person_key) {
       setAthleteRows(null);
       return;
     }
@@ -61,6 +62,21 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
       cancelled = true;
     };
   }, [isCurrentSeason, player.athlete_id, player.person_key]);
+
+  // Faixa de carreira: outras linhas do atleta (estadual ↔ série nacional ↔
+  // temporadas anteriores), navegáveis. Dedup por temporada+clube+competição
+  // (est-paua2 e est-nv2 carregam a mesma temporada do A2 — fica uma entrada).
+  const careerRows = useMemo(() => {
+    if (!athleteRows?.length) return [];
+    const seen = new Map<string, AthleteSeasonRow>();
+    for (const row of athleteRows) {
+      if (row.player_id === player.player_id && row.league === leagueId) continue;
+      const key = `${row.season}|${row.club}|${row.competition ?? row.league}`;
+      const prev = seen.get(key);
+      if (!prev || (prev.league !== leagueId && row.league === leagueId)) seen.set(key, row);
+    }
+    return [...seen.values()].sort((a, b) => b.season.localeCompare(a.season));
+  }, [athleteRows, player.player_id, leagueId]);
 
   const archiveHubSlicer = useMemo(() => {
     if (isCurrentSeason) return undefined;
@@ -178,6 +194,28 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
             : archiveHubSlicer
         }
       />
+
+      {careerRows.length ? (
+        <nav className="profile-career-strip" aria-label="Outras temporadas e ligas do atleta">
+          <span className="profile-career-strip-label">Também em</span>
+          {careerRows.map((row) => (
+            <button
+              key={`${row.league}|${row.season}|${row.player_id}`}
+              type="button"
+              className="profile-career-chip"
+              onClick={() => {
+                const qs = row.season === CURRENT_SEASON ? "" : `&temporada=${row.season}`;
+                router.push(`/${row.league}/posicao/${row.family ?? family}?atleta=${row.player_id}${qs}`);
+              }}
+            >
+              <strong>{row.club}</strong>
+              <span>
+                {row.competition ?? getLeague(row.league)?.name ?? row.league} {row.season}
+              </span>
+            </button>
+          ))}
+        </nav>
+      ) : null}
 
       <div className={`profile-content-grid${showHeatmap ? "" : " profile-content-grid-no-heatmap"}`}>
         {showHeatmap ? (

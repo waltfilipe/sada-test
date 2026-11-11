@@ -428,6 +428,51 @@
   padding: 0.35rem;
 }
 
+.profile-career-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.65rem 0 0.85rem;
+}
+
+.profile-career-strip-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.45);
+  margin-right: 0.15rem;
+}
+
+.profile-career-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(148, 163, 184, 0.1);
+  color: #e2e8f0;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.profile-career-chip:hover {
+  border-color: rgba(148, 163, 184, 0.7);
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.profile-career-chip strong {
+  font-weight: 700;
+}
+
+.profile-career-chip span {
+  color: rgba(226, 232, 240, 0.65);
+  font-size: 0.72rem;
+}
+
 .profile-archive-banner {
   display: flex;
   align-items: center;
