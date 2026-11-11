@@ -111,6 +111,9 @@ def main() -> int:
     transfers = json.loads(transfers_path.read_text(encoding="utf-8")) if transfers_path.exists() else {}
     all_rows = load_all_rows()
     ss_by_pid, ss_by_row = load_sofascore_ids()
+    overrides_path = DATA / "cross-season" / "identity-overrides.json"
+    overrides = json.loads(overrides_path.read_text(encoding="utf-8")) if overrides_path.exists() else {}
+    tm_unanchor: dict = overrides.get("tm_unanchor") or {}
 
     people: dict[str, dict] = {}
     conflicts: list[dict] = []
@@ -147,7 +150,7 @@ def main() -> int:
                     rec["clubs"].append(row["club"])
                 tm = row.get("transfermarkt") or {}
                 tm_id = str(tm.get("id")) if tm.get("id") else None
-                if tm_id:
+                if tm_id and tm_id != tm_unanchor.get(person_key):
                     rec.setdefault("_tm_ids", []).append((tm_id, season, tm))
                 ss = ss_by_row.get(f"{league}/{season}/{player_id}") or ss_by_pid.get(player_id)
                 if ss:

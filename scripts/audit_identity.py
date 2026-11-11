@@ -41,6 +41,13 @@ IMPROBABLE_PAIRS = {
 }
 
 
+def load_json(path: Path, default):
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except OSError:
+        return default
+
+
 def norm(s: str) -> str:
     s = unicodedata.normalize("NFKD", s or "")
     return "".join(c for c in s if not unicodedata.combining(c)).lower().strip()
@@ -219,12 +226,19 @@ def main() -> None:
                 })
 
     # ---- R4: homônimos na mesma liga+temporada --------------------------------
+    overrides = load_json(XS / "identity-overrides.json", {})
+    distinct_pairs = {tuple(sorted(p)) for p in overrides.get("distinct_pairs", [])}
+
+    def all_pairs_allowlisted(aids: list) -> bool:
+        from itertools import combinations
+        return all(tuple(sorted(pair)) in distinct_pairs for pair in combinations(sorted(aids), 2))
+
     by_name: dict[tuple[str, str, str], set] = defaultdict(set)
     for r in rows:
         if r["athlete_id"]:
             by_name[(r["league"], r["season"], norm(r["name"]))].add(r["athlete_id"])
     for (league, season, nm), aids in sorted(by_name.items()):
-        if len(aids) > 1:
+        if len(aids) > 1 and not all_pairs_allowlisted(sorted(aids)):
             findings["homonym-collision"].append({
                 "league": league, "season": season, "name": nm,
                 "athlete_ids": sorted(aids),

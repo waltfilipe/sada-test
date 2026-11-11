@@ -15,6 +15,13 @@ Ordem da cadeia (rode nesta sequência após rebuilds de dados):
 3. `python scripts/build_athlete_registry.py` — reanexa/emite `athlete_id`
    (estável por person_key, depois âncoras tm/ss) → `athletes.json`;
    warnings de âncoras conflitantes entram em `_meta.warnings` (fila de revisão).
+3.5 `python scripts/reconcile_tm_anchors.py` — tm_id deve ser único:
+   quando 2+ pessoas carregam o mesmo tm_id, o dono é decidido pelo cache
+   de elencos (`data/transfermarkt-squads.json`): nascimento + clubes onde
+   o tm_id apareceu. Perdedores ganham override `tm_unanchor` (honrado por
+   build_people.py) e o bloco transfermarkt errado some das linhas (foto
+   errada junto). Homônimos legítimos → `distinct_pairs` (audit ignora).
+
 4. `python scripts/apply_athlete_ids.py` — grava `athlete_id`/`person_key` em
    `players.json`, `family-*.json` e `profiles/` de **todas** as ligas
    (estaduais/D/MLS casam por `tm_id` verificado).
