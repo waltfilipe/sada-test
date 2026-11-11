@@ -412,7 +412,8 @@ def _pattern_championship(norm_club: str) -> str | None:
 
 # One Wyscout export = one competition. Cups that share clubs with the estadual
 # are excluded so minutes stay on the state championship, not the regional cup.
-EXCLUDED_COMPETITIONS: Final[frozenset[str]] = frozenset({"copa-do-nordeste", "copa-paulista"})
+# copa-paulista virou Nv4 propria (arquivos historicos 2022-2025 dedicados).
+EXCLUDED_COMPETITIONS: Final[frozenset[str]] = frozenset({"copa-do-nordeste"})
 
 COMPETITION_LEVEL: Final[dict[str, str]] = {
     "paulista-a1": "est-nv1",
@@ -431,6 +432,7 @@ COMPETITION_LEVEL: Final[dict[str, str]] = {
     "alagoano": "est-nv4",
     "potiguar": "est-nv4",
     "paulista-a4": "est-nv4",
+    "copa-paulista": "est-nv4",
 }
 
 # Period-club sets taken from the 2026 Wyscout exports (normalized).

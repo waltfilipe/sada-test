@@ -73,7 +73,9 @@ Exibido no popup "Tendências e xProg" (`PassTendencies.tsx`).
   `wyscout/historical/estaduais/{comp}-{ano}.xlsx`, já com `Campeonato`
   carimbado) e roda `build_league` por (nível, ano) →
   `data/{est-nv*}/seasons/{ano}` + stamp `competition`. `--only est-nvX/AAAA`
-  para um build só. Nv3 histórico tem só Paulista A3; Nv4 não tem arquivo.
+  para um build só. Nv3 histórico tem só Paulista A3; Nv4 histórico tem só
+  Copa Paulista (2022-2025, fontes em `Estaduais/Outros/` — ela saiu de
+  `EXCLUDED_COMPETITIONS` e virou campeonato Nv4 em `COMPETITION_LEVEL`).
   Atenção: "Paranaense 2022.xlsx" é na verdade a elite do Paranaense 2023
   (o "… CERTO.xlsx" é o 2022 real) — o mapeamento está no SOURCES do script.
   Depois dos builds: `apply_xprog.py` e `apply_pass_distance.py` já cobrem

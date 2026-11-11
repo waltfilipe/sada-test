@@ -38,6 +38,7 @@ CHAMP_LABEL: dict[str, str] = {
     "paraense": "Paraense",
     "alagoano": "Alagoano",
     "potiguar": "Potiguar",
+    "copa-paulista": "Copa Paulista",
 }
 
 

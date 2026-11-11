@@ -55,6 +55,8 @@ SOURCES: dict[str, dict[str, str]] = {
     },
     "paulista-a2": {y: f"Paulista A2 {y}.xlsx" for y in ("2022", "2023", "2024", "2025")},
     "paulista-a3": {y: f"Paulista A3 {y}.xlsx" for y in ("2022", "2023", "2024", "2025")},
+    # Copa Paulista (Nv4) — sem edicao 2026 ainda (torneio de 2o semestre).
+    "copa-paulista": {y: f"Outros/Copa Paulista {y}.xlsx" for y in ("2022", "2023", "2024", "2025")},
 }
 
 
