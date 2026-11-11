@@ -519,16 +519,18 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
           </div>
 
           <div className="hb-estaduais hb-reveal" aria-label="Estaduais por nível">
-            <header className="hb-estaduais-head">
-              <span className="hb-estaduais-title">Estaduais {season}</span>
-              <em>
-                {fmt(estPlayers)} atletas · {estMembers.length} campeonatos
-              </em>
+            <header className="hb-comps-head hb-estaduais-head">
+              <h2>
+                competições <span>estaduais</span>
+              </h2>
+              <span>
+                {fmt(estPlayers)} atletas · {estMembers.length} campeonatos · temporada {season}
+              </span>
             </header>
             <ul>
               {ESTADUAIS_LEVELS.map((level, index) => (
                 <li key={level.key} style={vars({ "--i": index })}>
-                  <section className="hb-level" aria-label={level.name}>
+                  <section className={`hb-level hb-level-${level.key}`} aria-label={level.name}>
                     <div className="hb-level-head">
                       <span className="hb-level-n">N{index + 1}</span>
                       <span className="hb-level-name">{level.name.replace("Estaduais ", "Nível ").replace("Nv", "")}</span>

@@ -1263,33 +1263,11 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter {
 /* Estaduais */
 
 .hb-estaduais {
-  margin-top: 2.4rem;
-  padding: 1.6rem 1.6rem 1.7rem;
-  border-radius: 20px;
-  border: 1px solid var(--hb-line);
-  background: linear-gradient(180deg, var(--hb-panel) 0%, var(--hb-panel-2) 100%);
+  margin-top: 3.6rem;
 }
 
 .hb-estaduais-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.4rem 1rem;
-  margin-bottom: 1.2rem;
-}
-
-.hb-estaduais-title {
-  font-size: 0.95rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.hb-estaduais-head em {
-  font-style: normal;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-3);
+  margin-bottom: 2rem;
 }
 
 .hb-estaduais ul {
@@ -1415,7 +1393,34 @@ html:not(.sada-intro-seen) .hb:not(.is-live) .hb-hero-letter {
   opacity: 0.45;
 }
 
+.hb-estaduais li:has(.hb-level-nv4) {
+  grid-column: 1 / -1;
+}
+
+.hb-level-nv4 .hb-level-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.hb-level-nv4 .hb-member {
+  padding: 0.65rem 0.4rem 0.55rem;
+}
+
+.hb-level-nv4 .hb-member-logo {
+  width: 3.1rem;
+  height: 3.1rem;
+  margin-bottom: 0.3rem;
+}
+
+.hb-level-nv4 .hb-member-logo img {
+  width: 2.1rem;
+  height: 2.1rem;
+}
+
 @media (max-width: 760px) {
+  .hb-level-nv4 .hb-level-grid {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  }
+
   .hb-estaduais ul {
     grid-template-columns: minmax(0, 1fr);
   }
