@@ -519,30 +519,41 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
           </div>
 
           <div className="hb-estaduais hb-reveal" aria-label="Estaduais por nível">
-            <span className="hb-estaduais-title">
-              Estaduais {season}
-              <em>{fmt(estPlayers)} atletas</em>
-            </span>
+            <header className="hb-estaduais-head">
+              <span className="hb-estaduais-title">Estaduais {season}</span>
+              <em>
+                {fmt(estPlayers)} atletas · {estMembers.length} campeonatos
+              </em>
+            </header>
             <ul>
               {ESTADUAIS_LEVELS.map((level, index) => (
                 <li key={level.key} style={vars({ "--i": index })}>
-                  <div className="hb-level hb-level-group" title={level.hint}>
-                    <span className="hb-level-n">N{index + 1}</span>
-                    <span className="hb-level-name">{level.name}</span>
-                    <span className="hb-level-logos hb-level-logos-big">
-                      {level.members.map((member) => (
-                        <Link
-                          key={member.id}
-                          href={leagueHref(member.id)}
-                          className={`hb-member${available(member.id) ? "" : " hb-member-empty"}`}
-                          title={`${member.name}${available(member.id) ? "" : ` · sem dados em ${season}`}`}
-                        >
-                          <img src={member.logo} alt={member.name} />
-                          <span>{member.name}</span>
-                        </Link>
-                      ))}
-                    </span>
-                  </div>
+                  <section className="hb-level" aria-label={level.name}>
+                    <div className="hb-level-head">
+                      <span className="hb-level-n">N{index + 1}</span>
+                      <span className="hb-level-name">{level.name.replace("Estaduais ", "Nível ").replace("Nv", "")}</span>
+                    </div>
+                    <div className="hb-level-grid">
+                      {level.members.map((member) => {
+                        const ok = available(member.id);
+                        const count = seasonData.leagues[member.id]?.players;
+                        return (
+                          <Link
+                            key={member.id}
+                            href={leagueHref(member.id)}
+                            className={`hb-member${ok ? "" : " hb-member-empty"}`}
+                            title={ok ? member.name : `${member.name} · sem dados em ${season}`}
+                          >
+                            <span className="hb-member-logo">
+                              <img src={member.logo} alt="" />
+                            </span>
+                            <strong>{member.name}</strong>
+                            <small>{ok && count ? `${fmt(count)} atletas` : "sem dados"}</small>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </section>
                 </li>
               ))}
             </ul>
