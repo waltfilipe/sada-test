@@ -64,8 +64,7 @@ export function PositionProfileView({ player, family, players, currentPlayers, h
   }, [isCurrentSeason, player.athlete_id, player.person_key]);
 
   // Faixa de carreira: outras linhas do atleta (estadual ↔ série nacional ↔
-  // temporadas anteriores), navegáveis. Dedup por temporada+clube+competição
-  // (est-paua2 e est-nv2 carregam a mesma temporada do A2 — fica uma entrada).
+  // temporadas anteriores), navegáveis. Dedup por temporada+clube+competição.
   const careerRows = useMemo(() => {
     if (!athleteRows?.length) return [];
     const seen = new Map<string, AthleteSeasonRow>();

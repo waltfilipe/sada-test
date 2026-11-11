@@ -63,17 +63,21 @@ const BRASILEIRAO: LeagueInfo[] = [
   },
 ];
 
-const ESTADUAIS: LeagueInfo[] = ESTADUAIS_LEVELS.map((level) => ({
-  id: level.id,
-  slug: level.id,
-  name: level.name,
-  season: "2026",
-  brand: level.id.replace("est-nv", "N"),
-  tagline: "Estaduais",
-  heatmaps: false,
-  physicalRun: false,
-  logo: level.members[0]?.logo ?? "/competitions/outros.svg",
-}));
+const ESTADUAIS: LeagueInfo[] = ESTADUAIS_LEVELS.flatMap((level) =>
+  level.members.map((member) => ({
+    id: member.id,
+    slug: member.id,
+    name: member.name,
+    poolName: member.poolName,
+    // Copa Paulista ainda não tem edição 2026 — a mais recente é 2025.
+    season: member.id === "est-copa-paulista" ? "2025" : "2026",
+    brand: member.brand,
+    tagline: "Estaduais",
+    heatmaps: false,
+    physicalRun: false,
+    logo: member.logo,
+  })),
+);
 
 /** Ligas publicadas no site. Estaduais entram por nível, não por campeonato. */
 export const LEAGUES: LeagueInfo[] = [...BRASILEIRAO, ...ESTADUAIS];

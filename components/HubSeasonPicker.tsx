@@ -331,11 +331,12 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
   const leagueHref = (id: LeagueId, path = "/posicao/zagueiros") =>
     available(id) ? withSeasonQuery(`/${id}${path}`, season) : `/${id}${path}`;
 
+  const estMembers = ESTADUAIS_LEVELS.flatMap((level) => level.members);
   const seriesCount = BRASILEIRAO_LEAGUES.filter((league) => available(league.id)).length;
-  const estAvailable = ESTADUAIS_LEVELS.filter((level) => available(level.id)).length;
-  const competitions = seriesCount + (isArchiveHub ? estAvailable : ESTADUAIS_LEVELS.length);
-  const estPlayers = ESTADUAIS_LEVELS.reduce(
-    (sum, level) => sum + (seasonData.leagues[level.id]?.players ?? 0),
+  const estAvailable = estMembers.filter((member) => available(member.id)).length;
+  const competitions = seriesCount + (isArchiveHub ? estAvailable : estMembers.length);
+  const estPlayers = estMembers.reduce(
+    (sum, member) => sum + (seasonData.leagues[member.id]?.players ?? 0),
     0,
   );
 
@@ -524,23 +525,24 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
             </span>
             <ul>
               {ESTADUAIS_LEVELS.map((level, index) => (
-                <li key={level.id} style={vars({ "--i": index })}>
-                  <Link
-                    href={leagueHref(level.id)}
-                    className={`hb-level${available(level.id) ? "" : " hb-level-empty"}`}
-                    title={level.members.map((m) => m.name).join(" · ")}
-                  >
+                <li key={level.key} style={vars({ "--i": index })}>
+                  <div className="hb-level hb-level-group" title={level.hint}>
                     <span className="hb-level-n">N{index + 1}</span>
-                    <span className="hb-level-name">
-                      {level.name}
-                      {!available(level.id) ? <em className="hb-level-empty-note">{` · sem dados em ${season}`}</em> : null}
-                    </span>
-                    <span className="hb-level-logos" aria-hidden>
-                      {level.members.slice(0, 4).map((member) => (
-                        <img key={member.id} src={member.logo} alt="" />
+                    <span className="hb-level-name">{level.name}</span>
+                    <span className="hb-level-logos hb-level-logos-big">
+                      {level.members.map((member) => (
+                        <Link
+                          key={member.id}
+                          href={leagueHref(member.id)}
+                          className={`hb-member${available(member.id) ? "" : " hb-member-empty"}`}
+                          title={`${member.name}${available(member.id) ? "" : ` · sem dados em ${season}`}`}
+                        >
+                          <img src={member.logo} alt={member.name} />
+                          <span>{member.name}</span>
+                        </Link>
                       ))}
                     </span>
-                  </Link>
+                  </div>
                 </li>
               ))}
             </ul>

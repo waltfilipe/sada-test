@@ -291,6 +291,28 @@ def main() -> None:
             continue
         run_one(f"{league_id}/{year}", df, season_dir, [])
 
+    # Campeonatos estaduais individuais (est-<slug>): cada ano tem xlsx proprio.
+    from build_est_championships import CHAMPIONSHIPS, sources_for
+
+    for slug, _label, level, file_base, history in CHAMPIONSHIPS:
+        league_id = f"est-{slug}"
+        years = sources_for(slug, file_base, history)
+        latest = max(years) if years else ""
+        for year, xlsx in sorted(years.items()):
+            dirs = [DATA_DIR / league_id if year == latest else DATA_DIR / league_id / "seasons" / year]
+            if year == latest and latest != "2026":
+                dirs.append(DATA_DIR / league_id / "seasons" / year)
+            dirs = [d for d in dirs if d.is_dir()]
+            if not dirs or not xlsx.is_file():
+                continue
+            try:
+                df = load_players_dataframe(level, xlsx_override=[xlsx], prefer_period_club=True)
+            except Exception as exc:  # noqa: BLE001
+                print(f"{league_id}/{year}: falha ao ler xlsx ({exc})")
+                continue
+            for season_dir in dirs:
+                run_one(f"{league_id}/{year}", df, season_dir, [])
+
 
 if __name__ == "__main__":
     main()

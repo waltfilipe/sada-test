@@ -2325,12 +2325,7 @@ export function PlayerReportButton({
     }
     map.delete(viewedKey);
     const rows = [...map.values()];
-    // est-paua2 e est-nv2 carregam a mesma temporada do A2: no PDF fica só
-    // a ficha do bloco dedicado (pool multi-ano).
-    const paua2Seasons = new Set(rows.filter((r) => r.league === "est-paua2").map((r) => r.season));
-    return rows
-      .filter((r) => !(r.league === "est-nv2" && r.competition === "Paulista A2" && paua2Seasons.has(r.season)))
-      .sort((a, b) => b.season.localeCompare(a.season) || (b.minutes ?? 0) - (a.minutes ?? 0));
+    return rows.sort((a, b) => b.season.localeCompare(a.season) || (b.minutes ?? 0) - (a.minutes ?? 0));
   }, [registryRows, scout.cross_season, leagueId, primaryArchiveLabel, currentSeason]);
 
   const archiveGroups = useMemo(

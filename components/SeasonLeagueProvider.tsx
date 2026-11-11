@@ -20,8 +20,10 @@ function SeasonLeagueProviderInner({ leagueId, children }: Props) {
   // League pages are prerendered without ?temporada, so hydrate as the current season
   // (matching the static HTML) and switch to the requested season right after.
   const hydrated = useSyncExternalStore(subscribeNoop, isClient, isServer);
-  const season = hydrated ? parseSeasonParam(searchParams.get("temporada")) : CURRENT_SEASON;
   const info = getLeague(leagueId)!;
+  const season = hydrated
+    ? parseSeasonParam(searchParams.get("temporada") ?? info.season)
+    : info.season;
 
   const value = useMemo(
     () => ({

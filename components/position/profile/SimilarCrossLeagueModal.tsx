@@ -60,7 +60,7 @@ function SimilarResultsList({
         <li key={`${hit.league}:${hit.player_id}`}>
           <Link
             href={leaguePath(
-              hit.league ?? (target === "estaduais" ? "est-nv1" : target),
+              hit.league ?? (target === "estaduais" ? ESTADUAIS_LEAGUE_IDS[0] : target),
               `/posicao/${family}?atleta=${encodeURIComponent(hit.player_id)}`,
             )}
             className="similar-result-card"
