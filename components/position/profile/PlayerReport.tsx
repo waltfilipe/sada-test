@@ -2324,10 +2324,23 @@ export function PlayerReportButton({
       if (!map.has(key)) map.set(key, { league, season: row.year, key });
     }
     map.delete(viewedKey);
-    return [...map.values()].sort(
-      (a, b) => b.season.localeCompare(a.season) || (b.minutes ?? 0) - (a.minutes ?? 0),
-    );
+    const rows = [...map.values()];
+    // est-paua2 e est-nv2 carregam a mesma temporada do A2: no PDF fica só
+    // a ficha do bloco dedicado (pool multi-ano).
+    const paua2Seasons = new Set(rows.filter((r) => r.league === "est-paua2").map((r) => r.season));
+    return rows
+      .filter((r) => !(r.league === "est-nv2" && r.competition === "Paulista A2" && paua2Seasons.has(r.season)))
+      .sort((a, b) => b.season.localeCompare(a.season) || (b.minutes ?? 0) - (a.minutes ?? 0));
   }, [registryRows, scout.cross_season, leagueId, primaryArchiveLabel, currentSeason]);
+
+  const archiveGroups = useMemo(
+    () =>
+      [
+        { key: "est", label: "Estaduais", rows: archiveRows.filter((row) => row.league.startsWith("est")) },
+        { key: "nat", label: "Séries nacionais", rows: archiveRows.filter((row) => !row.league.startsWith("est")) },
+      ].filter((group) => group.rows.length),
+    [archiveRows],
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -2464,21 +2477,49 @@ export function PlayerReportButton({
             {archiveRows.length ? (
               <div className="player-report-archive-picks" role="group" aria-label="Temporadas no PDF">
                 <p className="player-report-archive-picks-title">Incluir fichas de arquivo</p>
-                {archiveRows.map((row) => (
-                  <label key={row.key} className="player-report-archive-pick">
-                    <input
-                      type="checkbox"
-                      checked={Boolean(includeArchive[row.key])}
-                      onChange={(event) =>
-                        setIncludeArchive((current) => ({ ...current, [row.key]: event.target.checked }))
-                      }
-                    />
-                    <span>
-                      Temporada {row.season}
-                      {` · ${row.competition ?? leagueNameFor(row.league)}`}
-                    </span>
-                  </label>
-                ))}
+                {archiveGroups.map((group) => {
+                  const all = group.rows.every((row) => includeArchive[row.key]);
+                  const some = group.rows.some((row) => includeArchive[row.key]);
+                  return (
+                    <div key={group.key} className="player-report-archive-group">
+                      <label className="player-report-archive-pick player-report-archive-pick-group">
+                        <input
+                          type="checkbox"
+                          checked={all}
+                          ref={(el) => {
+                            if (el) el.indeterminate = !all && some;
+                          }}
+                          onChange={(event) =>
+                            setIncludeArchive((current) => {
+                              const next = { ...current };
+                              for (const row of group.rows) next[row.key] = event.target.checked;
+                              return next;
+                            })
+                          }
+                        />
+                        <span>
+                          <strong>{group.label}</strong>
+                          {` · ${group.rows.length}`}
+                        </span>
+                      </label>
+                      {group.rows.map((row) => (
+                        <label key={row.key} className="player-report-archive-pick player-report-archive-pick-child">
+                          <input
+                            type="checkbox"
+                            checked={Boolean(includeArchive[row.key])}
+                            onChange={(event) =>
+                              setIncludeArchive((current) => ({ ...current, [row.key]: event.target.checked }))
+                            }
+                          />
+                          <span>
+                            Temporada {row.season}
+                            {` · ${row.competition ?? leagueNameFor(row.league)}`}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  );
+                })}
               </div>
             ) : null}
             <button type="button" role="menuitem" data-report-lang="pt" onClick={() => void exportPdf("pt")}>
