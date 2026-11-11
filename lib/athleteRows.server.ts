@@ -21,7 +21,7 @@ let personsCache: Record<string, Record<string, Record<string, string>>> | null 
 
 // Ligas sem linhas no grafo de pessoas (persons.json só cobre série A/B/C):
 // o join nelas acontece pelo athlete_id carimbado via âncora verificada.
-const NON_GRAPH_LEAGUES: LeagueId[] = ["serie-d", "est-nv1", "est-nv2", "est-nv3", "est-nv4", "est-paua2"];
+const NON_GRAPH_LEAGUES: LeagueId[] = ["serie-d", "est-nv1", "est-nv2", "est-nv3", "est-nv4"];
 
 /** Temporadas publicadas para ligas fora do grafo: corrente + data/{league}/seasons/*. */
 function nonGraphSeasons(league: LeagueId): string[] {

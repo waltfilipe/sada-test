@@ -66,6 +66,6 @@ export const ESTADUAIS_LEVELS: EstadualLevel[] = [
   },
 ];
 
-export const ESTADUAIS_LEAGUE_IDS = ["est-nv1", "est-nv2", "est-nv3", "est-nv4", "est-paua2"] as const;
+export const ESTADUAIS_LEAGUE_IDS = ["est-nv1", "est-nv2", "est-nv3", "est-nv4"] as const;
 
 export type EstadualLeagueId = (typeof ESTADUAIS_LEAGUE_IDS)[number];

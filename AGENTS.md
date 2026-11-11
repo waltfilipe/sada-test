@@ -99,7 +99,12 @@ Exibido no popup "Tendências e xProg" (`PassTendencies.tsx`).
 - Dev: `npx next dev -p 3310`
 - Metadados de scrape `*_run.done.json` ficam fora do git.
 
-## Bloco Paulista A2 multi-ano (est-paua2)
+## Bloco Paulista A2 multi-ano (est-paua2) — DESATIVADO
+
+Removido do site (duplicava linhas do Nv2 na ficha/PDF). Scripts mantidos
+para reativação: build_paua2_pool.py + link_paua2_athletes.py. Para voltar:
+rebuild, recolocar em ESTADUAIS_LEAGUE_IDS/LEAGUES/ARCHIVE_LEAGUES/
+NON_GRAPH_LEAGUES e no hub.
 
 `build_paua2_pool.py` — piloto de campeonato-estadual próprio: pool de
 percentis/perfis = Paulista A2 2022-2026 inteiro (não por temporada).

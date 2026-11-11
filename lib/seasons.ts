@@ -18,7 +18,6 @@ const ARCHIVE_LEAGUES: ReadonlySet<LeagueId> = new Set<LeagueId>([
   "est-nv2",
   "est-nv3",
   "est-nv4",
-  "est-paua2",
 ]);
 
 export function hasSeasonArchive(league: LeagueId): boolean {

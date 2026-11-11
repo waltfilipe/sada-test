@@ -75,24 +75,8 @@ const ESTADUAIS: LeagueInfo[] = ESTADUAIS_LEVELS.map((level) => ({
   logo: level.members[0]?.logo ?? "/competitions/outros.svg",
 }));
 
-/** Bloco próprio do Paulista A2 — pool multi-ano 2022-2026 (piloto). */
-const PAUA2: LeagueInfo[] = [
-  {
-    id: "est-paua2",
-    slug: "est-paua2",
-    name: "Paulista A2",
-    poolName: "Paulista A2 · 2022–26",
-    season: "2026",
-    brand: "A2",
-    tagline: "Estaduais",
-    heatmaps: false,
-    physicalRun: false,
-    logo: "/competitions/paulista-a2.png",
-  },
-];
-
 /** Ligas publicadas no site. Estaduais entram por nível, não por campeonato. */
-export const LEAGUES: LeagueInfo[] = [...BRASILEIRAO, ...ESTADUAIS, ...PAUA2];
+export const LEAGUES: LeagueInfo[] = [...BRASILEIRAO, ...ESTADUAIS];
 
 export const BRASILEIRAO_LEAGUES = BRASILEIRAO;
 
