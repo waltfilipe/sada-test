@@ -54,13 +54,14 @@ export const ESTADUAIS_LEVELS: EstadualLevel[] = [
   {
     id: "est-nv4",
     name: "Estaduais Nv4",
-    hint: "Notas calculadas só entre Paraense, Alagoano, Potiguar e Paulista A4.",
+    hint: "Notas calculadas só entre Paraense, Alagoano, Potiguar, Paulista A4 e Copa Paulista.",
     logo: "/competitions/outros.svg",
     members: [
       { id: "paraense", name: "Paraense", logo: "/competitions/paraense.svg" },
       { id: "alagoano", name: "Alagoano", logo: "/competitions/alagoano.svg" },
       { id: "potiguar", name: "Potiguar", logo: "/competitions/potiguar.svg" },
       { id: "paulista-a4", name: "Paulista A4", logo: "/competitions/paulista-a4.svg" },
+      { id: "copa-paulista", name: "Copa Paulista", logo: "/competitions/paulista.svg" },
     ],
   },
 ];
