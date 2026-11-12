@@ -232,6 +232,17 @@ export function archetypeRank(
 }
 
 /**
+ * Afinidade mínima (%) para a nota de um perfil ser exibida como oficial.
+ * Afinidade = como o atleta joga; nota = quão bem ele rankearia naquele eixo.
+ * Abaixo do corte a nota é hipotética (ele quase não joga assim) e só aparece no tooltip.
+ */
+export const GRADE_MIN_SHARE = 20;
+
+export function gradeApplies(share: number, isMain: boolean): boolean {
+  return isMain || share >= GRADE_MIN_SHARE;
+}
+
+/**
  * Letra do eixo do perfil: prefere a nota contra o pool multi-anual ponderado
  * (cluster.hist, gerado por scripts/apply_hist_profile_grades.py); cai para o
  * percentil de rank na temporada quando o hist não existe (ligas sem histórico).

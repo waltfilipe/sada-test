@@ -8648,3 +8648,31 @@
 .pd-avg polygon { fill: rgba(226, 232, 240, 0.55); }
 .pd-avg circle { fill: rgba(226, 232, 240, 0.7); }
 .pd-avg text { fill: var(--text-3); font-size: 3.4px; letter-spacing: 0.04em; }
+
+/* Perfis pouco usados: sem nota oficial, visual recuado para não competir com o principal. */
+.profile-radar-row.is-minor .profile-radar-row-bar span {
+  opacity: 0.55;
+}
+
+.profile-radar-row.is-minor .profile-radar-row-pct {
+  color: var(--text-3, #8a9bb0);
+}
+
+.profile-radar-row.is-minor .profile-radar-row-rank {
+  font-style: italic;
+}
+
+.profile-perfil-grade.is-muted {
+  color: var(--text-3, #8a9bb0);
+  background: rgba(186, 204, 224, 0.05);
+  border: 1px dashed rgba(186, 204, 224, 0.22);
+  box-shadow: none;
+  font-weight: 600;
+}
+
+.profile-radar-footnote {
+  margin: 0.15rem 0 0;
+  color: var(--text-3, #8a9bb0);
+  font-size: 0.64rem;
+  line-height: 1.4;
+}

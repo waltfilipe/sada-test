@@ -10,7 +10,16 @@ import {
   archetypeMetaFor,
   type ArchetypeTrait,
 } from "@/lib/clusterMeta";
-import { activeProfileKeys, archetypeClusterSlug, archetypeGrade, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
+import {
+  GRADE_MIN_SHARE,
+  activeProfileKeys,
+  archetypeClusterSlug,
+  archetypeGrade,
+  archetypeRank,
+  gradeApplies,
+  profileAccent,
+  sortedProfileShareRows,
+} from "@/lib/profileShares";
 import { gradeTier, tierVars } from "@/lib/scoutTheme";
 import { SectionRadar } from "@/components/position/profile/PlayerReport";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -43,6 +52,8 @@ function profileMetaForLabel(label: string, family: PositionFamily) {
 function ProfileTooltipContent({
   label,
   grade,
+  theoreticalGrade,
+  share,
   rank,
   poolSize,
   histPct,
@@ -50,6 +61,8 @@ function ProfileTooltipContent({
 }: {
   label: string;
   grade: string | null;
+  theoreticalGrade: string | null;
+  share: number;
   rank: number | null;
   poolSize: number;
   histPct: number | null;
@@ -65,13 +78,22 @@ function ProfileTooltipContent({
       <div className="profile-archetype-tip-head">
         <span className="profile-archetype-tip-label">{label}</span>
         <span className="profile-archetype-tip-rating tabular" style={{ color: accent }}>
-          {grade ?? "—"}
-          {rank ? ` · ${rank}º de ${poolSize}` : ""}
+          {grade ? `${grade}${rank ? ` · ${rank}º de ${poolSize}` : ""}` : `${Math.round(share)}% de afinidade`}
         </span>
       </div>
-      {histPct != null ? (
-        <p className="profile-archetype-tip-copy">Nota calculada contra o pool multi-temporada da liga (P{Math.round(histPct)})</p>
-      ) : null}
+      {grade ? (
+        <p className="profile-archetype-tip-copy">
+          Nota: quão bem ele executa este perfil, contra o pool multi-temporada da liga
+          {histPct != null ? ` (P${Math.round(histPct)})` : ""}.
+        </p>
+      ) : (
+        <p className="profile-archetype-tip-copy">
+          Sem nota: o atleta joga pouco neste estilo ({Math.round(share)}% de afinidade, abaixo de {GRADE_MIN_SHARE}%).
+          {theoreticalGrade
+            ? ` Só como referência teórica, ele teria ${theoreticalGrade}${histPct != null ? ` (P${Math.round(histPct)})` : ""} se fosse avaliado neste perfil.`
+            : ""}
+        </p>
+      )}
       {meta?.description ? <p className="profile-archetype-tip-copy">{meta.description}</p> : null}
       <TraitList title="Valoriza" traits={ups} direction="up" />
       <TraitList title="Desvaloriza" traits={downs} direction="down" />
@@ -128,7 +150,9 @@ export function ProfileCard({ player, family, players }: Props) {
           const active = activeKeys.has(row.key);
           const accent = profileAccent(row.label);
           const rank = archetypeRank(player, players, row.label, family);
-          const grade = archetypeGrade(player, row.label, rank, poolSize);
+          const theoreticalGrade = archetypeGrade(player, row.label, rank, poolSize);
+          const applies = gradeApplies(row.share, active);
+          const grade = applies ? theoreticalGrade : null;
           const histPct = (() => {
             const slug = archetypeClusterSlug(row.label);
             return slug ? (player.cluster?.hist?.[slug]?.pct ?? null) : null;
@@ -142,6 +166,8 @@ export function ProfileCard({ player, family, players }: Props) {
                   <ProfileTooltipContent
                     label={row.label}
                     grade={grade}
+                    theoreticalGrade={theoreticalGrade}
+                    share={row.share}
                     rank={rank}
                     poolSize={poolSize}
                     histPct={histPct}
@@ -161,7 +187,9 @@ export function ProfileCard({ player, family, players }: Props) {
                         <i className="fa-solid fa-circle-info profile-perfil-row-info" aria-hidden="true" />
                       </span>
                       <span className="profile-perfil-row-rank tabular">
-                        {rank ? (
+                        {!applies ? (
+                          "Pouco utilizado · sem nota"
+                        ) : rank ? (
                           <>
                             <strong>{rank}º</strong> de {poolSize}
                           </>
@@ -171,9 +199,9 @@ export function ProfileCard({ player, family, players }: Props) {
                       </span>
                     </div>
                     <span
-                      className="profile-perfil-grade tabular"
-                      style={tierVars(token)}
-                      aria-label={`Classificação ${grade ?? "indisponível"}`}
+                      className={`profile-perfil-grade tabular${grade ? "" : " is-muted"}`}
+                      style={grade ? tierVars(token) : undefined}
+                      aria-label={`Classificação ${grade ?? "não aplicável"}`}
                     >
                       {grade ?? "—"}
                     </span>
@@ -205,15 +233,18 @@ export function ProfileRadarCard({ player, family, players }: Props) {
     () =>
       shareRows.map((row) => {
         const rank = archetypeRank(player, players, row.label, family);
-        const grade = archetypeGrade(player, row.label, rank, poolSize);
+        const theoreticalGrade = archetypeGrade(player, row.label, rank, poolSize);
+        const main = activeKeys.has(row.key);
+        const applies = gradeApplies(row.share, main);
         const slug = archetypeClusterSlug(row.label);
         const histPct = slug ? (player.cluster?.hist?.[slug]?.pct ?? null) : null;
         return {
           ...row,
           rank,
-          grade,
+          grade: applies ? theoreticalGrade : null,
+          theoreticalGrade,
           histPct,
-          main: activeKeys.has(row.key),
+          main,
           score: Math.round(row.share),
           accent: profileAccent(row.label),
         };
@@ -235,7 +266,7 @@ export function ProfileRadarCard({ player, family, players }: Props) {
     <div className="player-card profile-perfil-card stat-radar-card profile-radar-card">
       <div className="profile-card-head">
         <span className="section-label">Perfil</span>
-        <span className="profile-card-head-hint">Estilo de jogo e nota em cada perfil</span>
+        <span className="profile-card-head-hint">Como joga e quão bem executa</span>
       </div>
       <div className="profile-radar-body">
         <div className="stat-radar-figure">
@@ -243,7 +274,7 @@ export function ProfileRadarCard({ player, family, players }: Props) {
         </div>
         <div className="profile-radar-panel">
           <div className="profile-radar-cols" aria-hidden="true">
-            <span>Perfil · afinidade</span>
+            <span>Como joga (afinidade)</span>
             <span>Nota</span>
           </div>
           <ul className="profile-radar-list">
@@ -254,6 +285,8 @@ export function ProfileRadarCard({ player, family, players }: Props) {
                     <ProfileTooltipContent
                       label={row.label}
                       grade={row.grade}
+                      theoreticalGrade={row.theoreticalGrade}
+                      share={row.share}
                       rank={row.rank}
                       poolSize={poolSize}
                       histPct={row.histPct}
@@ -263,7 +296,7 @@ export function ProfileRadarCard({ player, family, players }: Props) {
                   block
                 >
                   <div
-                    className={`profile-radar-row${row.main ? " is-main" : ""}${hovered === row.label ? " is-hover" : hovered ? " is-dim" : ""}`}
+                    className={`profile-radar-row${row.main ? " is-main" : ""}${row.grade ? "" : " is-minor"}${hovered === row.label ? " is-hover" : hovered ? " is-dim" : ""}`}
                     style={{ "--profile-accent": row.accent } as React.CSSProperties}
                     onMouseEnter={() => setHovered(row.label)}
                     onMouseLeave={() => setHovered(null)}
@@ -280,12 +313,12 @@ export function ProfileRadarCard({ player, family, players }: Props) {
                       <span className="profile-radar-row-pct tabular">{row.score}%</span>
                     </span>
                     <span className="profile-radar-row-rank tabular">
-                      {row.rank ? `${row.rank}º de ${poolSize} na liga` : "Sem colocação"}
+                      {!row.grade ? "Pouco utilizado · sem nota" : row.rank ? `${row.rank}º de ${poolSize} na liga` : "Sem colocação"}
                     </span>
                     <span
-                      className="profile-perfil-grade tabular"
-                      style={tierVars(gradeTier(row.grade ?? "C"))}
-                      aria-label={`Nota ${row.grade ?? "indisponível"}`}
+                      className={`profile-perfil-grade tabular${row.grade ? "" : " is-muted"}`}
+                      style={row.grade ? tierVars(gradeTier(row.grade)) : undefined}
+                      aria-label={`Nota ${row.grade ?? "não aplicável"}`}
                     >
                       {row.grade ?? "—"}
                     </span>
@@ -294,6 +327,9 @@ export function ProfileRadarCard({ player, family, players }: Props) {
               </li>
             ))}
           </ul>
+          <p className="profile-radar-footnote">
+            A nota só vale para perfis em que o atleta atua ({GRADE_MIN_SHARE}%+ de afinidade). Passe o mouse para detalhes.
+          </p>
         </div>
       </div>
     </div>

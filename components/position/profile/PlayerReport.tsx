@@ -14,7 +14,7 @@ import { formatFoot } from "@/lib/feet";
 import { getLeague } from "@/lib/leagues";
 import { familyBySlug } from "@/lib/positions";
 import { profileMetaForFamily } from "@/lib/profileMeta";
-import { activeProfileKeys, archetypeGrade, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
+import { activeProfileKeys, archetypeGrade, archetypeRank, gradeApplies, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
 import { isProjectionEligible, realisticProjection } from "@/lib/minuteProjection";
 import { playerInitials } from "@/lib/scoutTheme";
 import { badgeCatalogForFamily, playerStatBadges } from "@/lib/statBadges";
@@ -260,7 +260,7 @@ function reportMix(player: PlayerProfile, family: PositionFamily, players: Playe
         share: row.share,
         active: active.has(row.key),
         rank,
-        grade: archetypeGrade(player, row.label, rank, pool.length),
+        grade: gradeApplies(row.share, active.has(row.key)) ? archetypeGrade(player, row.label, rank, pool.length) : null,
       };
     });
   }
