@@ -6,7 +6,7 @@ import {
   StatMedalCount,
 } from "@/components/position/profile/StatBadgeStrip";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
-import { findAspect, flattenAspects } from "@/lib/aspectLookup";
+import { findAspect, flattenAspects, visibleSubMetrics } from "@/lib/aspectLookup";
 import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
 import { statRowLabel } from "@/lib/seasonTotals";
 import { earnedStatBadges, statBadgeForMetric } from "@/lib/statBadges";
@@ -99,8 +99,8 @@ function CompareAspectBlock({
 
   if (hasSubMetrics) {
     const labels = new Set([
-      ...(itemA?.sub_metrics ?? []).map((row) => row.label),
-      ...(itemB?.sub_metrics ?? []).map((row) => row.label),
+      ...(itemA ? visibleSubMetrics(itemA) : []).map((row) => row.label),
+      ...(itemB ? visibleSubMetrics(itemB) : []).map((row) => row.label),
     ]);
 
     return (

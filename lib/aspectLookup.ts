@@ -1,4 +1,11 @@
-import type { AspectItem, PlayerProfile } from "@/lib/types";
+import type { AspectItem, AspectSubMetric, PlayerProfile } from "@/lib/types";
+
+/** Sub-métricas que só entram em cálculos (grupo, selos, totais) — nunca exibidas. */
+export const HIDDEN_SUB_METRICS = new Set(["Chutes Bloqueados"]);
+
+export function visibleSubMetrics(item: AspectItem): AspectSubMetric[] {
+  return (item.sub_metrics ?? []).filter((sub) => !HIDDEN_SUB_METRICS.has(sub.label));
+}
 
 export function flattenAspects(player: PlayerProfile): AspectItem[] {
   const groups = player.aspects;

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { MetricGradientBar } from "@/components/ui/MetricGradientBar";
-import { findAspect, flattenAspects } from "@/lib/aspectLookup";
+import { findAspect, flattenAspects, visibleSubMetrics } from "@/lib/aspectLookup";
 import { statSectionsForFamily, type StatSectionTone } from "@/lib/aspectStatSections";
 import { isProjectionEligible, realisticProjection } from "@/lib/minuteProjection";
 import { statRowLabel } from "@/lib/seasonTotals";
@@ -86,9 +86,10 @@ function StatAspectBlock({
   efficiencyEdge?: StatEdge;
   subEdges?: Record<string, StatEdge>;
 }) {
+  const visibleSubs = visibleSubMetrics(item);
   const hasSubMetrics =
     (item.kind === "def_efficiency_group" || item.kind === "metric_group") &&
-    Boolean(item.sub_metrics?.length);
+    Boolean(visibleSubs.length);
   const title = groupTitle ?? item.label;
   const badge = statBadgeForMetric(item, title);
   const hasBadge = Boolean(badge);
@@ -105,7 +106,7 @@ function StatAspectBlock({
       </div>
       <div className="stat-aspect-group-body">
         {hasSubMetrics ? (
-          item.sub_metrics!.map((sub: AspectSubMetric) => (
+          visibleSubs.map((sub: AspectSubMetric) => (
             <StatMetricRow
               key={sub.label}
               label={statRowLabel(sub.label)}

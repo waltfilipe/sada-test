@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 
 import { resolveAspectBadge } from "@/lib/aspectBadges";
+import { visibleSubMetrics } from "@/lib/aspectLookup";
 import { clampPercent, percentileBarFillStyle, statValueStyle } from "@/lib/scoutTheme";
 import { STAT_TOOLTIPS } from "@/lib/statTooltips";
 import type { AspectItem } from "@/lib/types";
@@ -56,10 +57,11 @@ function volumeLabel(item: AspectItem): string {
 }
 
 function ExpandableBody({ item }: { item: AspectItem }) {
-  if ((item.kind === "def_efficiency_group" || item.kind === "metric_group") && item.sub_metrics?.length) {
+  const subs = visibleSubMetrics(item);
+  if ((item.kind === "def_efficiency_group" || item.kind === "metric_group") && subs.length) {
     return (
       <div className="aspect-expand-body">
-        {item.sub_metrics.map((sub) => (
+        {subs.map((sub) => (
           <MetricBar
             key={sub.label}
             label={sub.label}

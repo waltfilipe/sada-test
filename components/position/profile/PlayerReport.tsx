@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { ClubLogo } from "@/components/ClubLogo";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { useLeague } from "@/components/LeagueProvider";
-import { findAspect, flattenAspects } from "@/lib/aspectLookup";
+import { findAspect, flattenAspects, visibleSubMetrics } from "@/lib/aspectLookup";
 import { crossingReading, crossingVolumePer90, formatPer90 } from "@/lib/crossingTendency";
 import { statRowLabel } from "@/lib/seasonTotals";
 import { centeredTendencyPosition } from "@/lib/tendencyScale";
@@ -64,7 +64,7 @@ function percentileOf(value: number | null | undefined): number | null {
 function blocksFor(item: AspectItem, title: string, lang: ReportLang): ReportBlock[] {
   const copy = REPORT_COPY[lang];
   const blockTitle = translateLabel(title, lang);
-  const subs = item.sub_metrics ?? [];
+  const subs = visibleSubMetrics(item);
   if (subs.length) {
     const lines = subs
       .map((sub) => ({

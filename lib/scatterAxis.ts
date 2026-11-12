@@ -1,4 +1,4 @@
-import { findAspect, flattenAspects } from "@/lib/aspectLookup";
+import { findAspect, flattenAspects, HIDDEN_SUB_METRICS } from "@/lib/aspectLookup";
 import { statSectionsForFamily } from "@/lib/aspectStatSections";
 import type { AspectItem, AspectSubMetric, PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -361,6 +361,7 @@ export function familySectionStats(player: PlayerProfile, family: PositionFamily
       }
 
       for (const sub of item.sub_metrics ?? []) {
+        if (HIDDEN_SUB_METRICS.has(sub.label)) continue;
         const subRate = parseSuccessRate(sub.display_value);
         if (subRate != null) {
           push({ key: sub.label, label: statLabel(sub.label), value: subRate * 100, kind: "efficiency", section: section.title });
@@ -429,6 +430,7 @@ export function aspectFilterStats(player: PlayerProfile): Record<string, number>
     if (directRate != null) setOnce(`Eficiência ${item.label}`, directRate * 100);
 
     for (const sub of item.sub_metrics ?? []) {
+      if (HIDDEN_SUB_METRICS.has(sub.label)) continue;
       const subRate = parseSuccessRate(sub.display_value);
       if (subRate != null) {
         const key = /^%|^efici[eê]ncia/i.test(sub.label) ? sub.label : `Eficiência ${item.label}`;
