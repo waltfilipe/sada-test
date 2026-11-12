@@ -4,9 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { AT_ARCHETYPE_META, EX_ARCHETYPE_META, LAT_ARCHETYPE_META, MC_ARCHETYPE_META, ZAG_ARCHETYPE_META } from "@/lib/clusterMeta";
 import { formatFoot } from "@/lib/feet";
-import { playerInitials, profileGradeFromRank } from "@/lib/scoutTheme";
+import { playerInitials } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
-import { archetypeRank, sortedProfileShareRows } from "@/lib/profileShares";
+import { archetypeGrade, archetypeRank, sortedProfileShareRows } from "@/lib/profileShares";
 import { playerMatchesClusterFilter } from "../ArchetypeMixCard";
 import { PickerFilterMenu, type FilterOption } from "./PickerFilterMenu";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
@@ -87,7 +87,7 @@ export function PositionPlayerPicker({
       const label = sortedProfileShareRows(player)[0]?.label;
       if (!label) continue;
       const rank = archetypeRank(player, players, label, family);
-      const grade = rank ? profileGradeFromRank(rank, players.length) : null;
+      const grade = archetypeGrade(player, label, rank, players.length);
       if (grade) map.set(player.player_id, { grade, label });
     }
     return map;

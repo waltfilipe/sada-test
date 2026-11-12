@@ -14,6 +14,7 @@ import {
   latArchetypeTone,
   mcArchetypeTone,
 } from "@/lib/clusterMeta";
+import { profileGradeFromRank } from "@/lib/scoutTheme";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 export type ProfileShareRow = {
@@ -228,4 +229,21 @@ export function archetypeRank(
 
   const index = sorted.findIndex((entry) => entry.player_id === player.player_id);
   return index >= 0 ? index + 1 : null;
+}
+
+/**
+ * Letra do eixo do perfil: prefere a nota contra o pool multi-anual ponderado
+ * (cluster.hist, gerado por scripts/apply_hist_profile_grades.py); cai para o
+ * percentil de rank na temporada quando o hist não existe (ligas sem histórico).
+ */
+export function archetypeGrade(
+  player: PlayerProfile,
+  label: string,
+  rank: number | null,
+  poolSize: number,
+): string | null {
+  const slug = archetypeClusterSlug(label);
+  const hist = slug ? player.cluster?.hist?.[slug] : undefined;
+  if (hist) return hist.grade;
+  return rank ? profileGradeFromRank(rank, poolSize) : null;
 }

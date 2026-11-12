@@ -2,8 +2,7 @@ import "server-only";
 
 import { withResolvedSeasonPhoto } from "@/lib/playerPhotoLookup.server";
 import { POSITION_FAMILIES } from "@/lib/positions";
-import { archetypeRank, sortedProfileShareRows } from "@/lib/profileShares";
-import { profileGradeFromRank } from "@/lib/scoutTheme";
+import { archetypeGrade, archetypeRank, sortedProfileShareRows } from "@/lib/profileShares";
 import type { LeagueId } from "@/lib/leagues";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { getFamilyPlayers } from "@/lib/data.server";
@@ -27,7 +26,7 @@ function withSeasonMeta(
   const resolved = withResolvedSeasonPhoto(league, season, player) as PlayerProfile;
   const profiles = sortedProfileShareRows(resolved).map((row) => {
     const rank = archetypeRank(resolved, pool, row.label, family);
-    return { label: row.label, share: row.share, rank, grade: rank ? profileGradeFromRank(rank, pool.length) : null };
+    return { label: row.label, share: row.share, rank, grade: archetypeGrade(resolved, row.label, rank, pool.length) };
   });
   resolved.season_meta = { pool_size: pool.length, profiles };
   return resolved;

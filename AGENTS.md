@@ -90,6 +90,15 @@ Exibido no popup "Tendências e xProg" (`PassTendencies.tsx`).
   (est-* corrente), `wyscout/historical/{liga}-{ano}.xlsx` e
   `wyscout/historical/estaduais/{slug}-{ano}.xlsx` (est-* arquivado).
   Rode após rebuilds de dados — o bloco não é gerado pelo builder.
+- `apply_hist_profile_grades.py` — letras de perfil contra o pool multi-anual
+  ponderado da liga (temporada mais antiga = peso 1 … mais recente = N).
+  Recupera o z do composto via `z = 2.5·atanh((nota−6.5)/1.85)`, ajusta μ/σ
+  ponderados por slug e grava `cluster.hist[slug] = {z, pct, grade}` +
+  `hist_pool` (referência) em family-*/players/profiles (root + seasons).
+  O site usa `archetypeGrade` (lib/profileShares.ts): hist primeiro,
+  fallback = rank na temporada. Caveat: a nota gravada já tem specialty_floor,
+  truncando a cauda esquerda do eixo do arquétipo — para referência exata,
+  persistir `m8_final_<slug>` no build. Rode após rebuilds de dados.
 - `build_estadual_historical_seasons.py` — temporadas arquivadas dos
   estaduais: sincroniza os xlsx por campeonato (Desktop `Estaduais/` →
   `wyscout/historical/estaduais/{comp}-{ano}.xlsx`, já com `Campeonato`

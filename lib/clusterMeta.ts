@@ -14,6 +14,15 @@ export type ZagArchetypeRatings = {
   combativo: number;
 };
 
+/** Grade do eixo contra o pool multi-anual ponderado da liga (curva normal no z do composto). */
+export type ClusterHistGrade = {
+  z: number;
+  pct: number;
+  grade: string;
+};
+
+export type ClusterHistGrades = Record<string, ClusterHistGrade>;
+
 export type ZagCluster = {
   family?: "zagueiros";
   archetype: ZagArchetype;
@@ -23,6 +32,7 @@ export type ZagCluster = {
   construtor_badge_short?: string | null;
   shares: ZagClusterShares;
   ratings: ZagArchetypeRatings;
+  hist?: ClusterHistGrades;
 };
 
 export type LatArchetype = "Defensivo" | "Construtor" | "Ofensivo" | "Híbrido";
@@ -49,6 +59,7 @@ export type LatCluster = {
   hybrid_badge_short?: string | null;
   shares: LatClusterShares;
   ratings: LatArchetypeRatings;
+  hist?: ClusterHistGrades;
 };
 
 export type McArchetype = "Contenção" | "Construtor" | "Box-to-box" | "Híbrido";
@@ -75,6 +86,7 @@ export type McCluster = {
   hybrid_badge_short?: string | null;
   shares: McClusterShares;
   ratings: McArchetypeRatings;
+  hist?: ClusterHistGrades;
 };
 
 export type ExArchetype = "Driblador" | "Meia Ponta" | "Ruptura" | "Híbrido";
@@ -101,6 +113,7 @@ export type ExCluster = {
   hybrid_badge_short?: string | null;
   shares: ExClusterShares;
   ratings: ExArchetypeRatings;
+  hist?: ClusterHistGrades;
 };
 
 export type AtArchetype = "Finalizador" | "Alvo" | "Móvel" | "Híbrido";
@@ -125,6 +138,7 @@ export type AtCluster = {
   hybrid_badge_short?: string | null;
   shares: AtClusterShares;
   ratings: AtArchetypeRatings;
+  hist?: ClusterHistGrades;
 };
 
 export type PositionCluster = ZagCluster | LatCluster | McCluster | ExCluster | AtCluster;
