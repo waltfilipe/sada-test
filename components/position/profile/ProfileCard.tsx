@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Tooltip } from "@/components/ui/Tooltip";
 import {
   atArchetypeMetaFor,
@@ -10,8 +10,8 @@ import {
   archetypeMetaFor,
   type ArchetypeTrait,
 } from "@/lib/clusterMeta";
-import { activeProfileKeys, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
-import { gradeTier, profileGradeFromRank, tierVars } from "@/lib/scoutTheme";
+import { activeProfileKeys, archetypeClusterSlug, archetypeGrade, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
+import { gradeTier, tierVars } from "@/lib/scoutTheme";
 import { SectionRadar } from "@/components/position/profile/PlayerReport";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -45,12 +45,14 @@ function ProfileTooltipContent({
   grade,
   rank,
   poolSize,
+  histPct,
   family,
 }: {
   label: string;
   grade: string | null;
   rank: number | null;
   poolSize: number;
+  histPct: number | null;
   family: PositionFamily;
 }) {
   const meta = profileMetaForLabel(label, family);
@@ -67,6 +69,9 @@ function ProfileTooltipContent({
           {rank ? ` · ${rank}º de ${poolSize}` : ""}
         </span>
       </div>
+      {histPct != null ? (
+        <p className="profile-archetype-tip-copy">Nota calculada contra o pool multi-temporada da liga (P{Math.round(histPct)})</p>
+      ) : null}
       {meta?.description ? <p className="profile-archetype-tip-copy">{meta.description}</p> : null}
       <TraitList title="Valoriza" traits={ups} direction="up" />
       <TraitList title="Desvaloriza" traits={downs} direction="down" />
@@ -123,7 +128,11 @@ export function ProfileCard({ player, family, players }: Props) {
           const active = activeKeys.has(row.key);
           const accent = profileAccent(row.label);
           const rank = archetypeRank(player, players, row.label, family);
-          const grade = rank ? profileGradeFromRank(rank, poolSize) : null;
+          const grade = archetypeGrade(player, row.label, rank, poolSize);
+          const histPct = (() => {
+            const slug = archetypeClusterSlug(row.label);
+            return slug ? (player.cluster?.hist?.[slug]?.pct ?? null) : null;
+          })();
           const token = gradeTier(grade ?? "C");
           const shareWidth = Math.max(3, Math.min(100, row.share));
           return (
@@ -135,6 +144,7 @@ export function ProfileCard({ player, family, players }: Props) {
                     grade={grade}
                     rank={rank}
                     poolSize={poolSize}
+                    histPct={histPct}
                     family={family}
                   />
                 }
@@ -188,21 +198,27 @@ export function ProfileCard({ player, family, players }: Props) {
 /** Radar of the position profiles: each axis is the player's percentile in that archetype ranking. */
 export function ProfileRadarCard({ player, family, players }: Props) {
   const shareRows = useMemo(() => sortedProfileShareRows(player), [player]);
+  const activeKeys = useMemo(() => activeProfileKeys(player, shareRows), [player, shareRows]);
+  const [hovered, setHovered] = useState<string | null>(null);
   const poolSize = players.length;
   const rows = useMemo(
     () =>
       shareRows.map((row) => {
         const rank = archetypeRank(player, players, row.label, family);
-        const grade = rank ? profileGradeFromRank(rank, poolSize) : null;
+        const grade = archetypeGrade(player, row.label, rank, poolSize);
+        const slug = archetypeClusterSlug(row.label);
+        const histPct = slug ? (player.cluster?.hist?.[slug]?.pct ?? null) : null;
         return {
           ...row,
           rank,
           grade,
+          histPct,
+          main: activeKeys.has(row.key),
           score: Math.round(row.share),
           accent: profileAccent(row.label),
         };
       }),
-    [shareRows, player, players, family, poolSize],
+    [shareRows, player, players, family, poolSize, activeKeys],
   );
 
   if (rows.length < 3) return <ProfileCard player={player} family={family} players={players} />;
@@ -219,41 +235,66 @@ export function ProfileRadarCard({ player, family, players }: Props) {
     <div className="player-card profile-perfil-card stat-radar-card profile-radar-card">
       <div className="profile-card-head">
         <span className="section-label">Perfil</span>
-        <span className="profile-card-head-hint">Afinidade com cada perfil</span>
+        <span className="profile-card-head-hint">Estilo de jogo e nota em cada perfil</span>
       </div>
       <div className="profile-radar-body">
         <div className="stat-radar-figure">
-          <SectionRadar scores={scores} variant="screen" shape="sectors" />
+          <SectionRadar scores={scores} variant="screen" shape="sectors" activeTitle={hovered} onHoverTitle={setHovered} />
         </div>
-        <ul className="profile-radar-list">
-          {rows.map((row) => (
-            <li key={row.key}>
-              <Tooltip
-                content={
-                  <ProfileTooltipContent
-                    label={row.label}
-                    grade={row.grade}
-                    rank={row.rank}
-                    poolSize={poolSize}
-                    family={family}
-                  />
-                }
-                block
-              >
-                <div className="profile-radar-row" style={{ "--profile-accent": row.accent } as React.CSSProperties}>
-                  <span className="profile-radar-row-label">
-                    <i aria-hidden="true" />
-                    {row.label}
-                  </span>
-                  <span className="profile-radar-row-rank tabular">{row.rank ? `${row.rank}º de ${poolSize}` : "—"}</span>
-                  <span className="profile-perfil-grade tabular" style={tierVars(gradeTier(row.grade ?? "C"))}>
-                    {row.grade ?? "—"}
-                  </span>
-                </div>
-              </Tooltip>
-            </li>
-          ))}
-        </ul>
+        <div className="profile-radar-panel">
+          <div className="profile-radar-cols" aria-hidden="true">
+            <span>Perfil · afinidade</span>
+            <span>Nota</span>
+          </div>
+          <ul className="profile-radar-list">
+            {rows.map((row) => (
+              <li key={row.key}>
+                <Tooltip
+                  content={
+                    <ProfileTooltipContent
+                      label={row.label}
+                      grade={row.grade}
+                      rank={row.rank}
+                      poolSize={poolSize}
+                      histPct={row.histPct}
+                      family={family}
+                    />
+                  }
+                  block
+                >
+                  <div
+                    className={`profile-radar-row${row.main ? " is-main" : ""}${hovered === row.label ? " is-hover" : hovered ? " is-dim" : ""}`}
+                    style={{ "--profile-accent": row.accent } as React.CSSProperties}
+                    onMouseEnter={() => setHovered(row.label)}
+                    onMouseLeave={() => setHovered(null)}
+                  >
+                    <span className="profile-radar-row-label">
+                      <i aria-hidden="true" />
+                      <b>{row.label}</b>
+                      {row.main ? <em>Principal</em> : null}
+                    </span>
+                    <span className="profile-radar-row-affinity">
+                      <span className="profile-radar-row-bar" aria-hidden="true">
+                        <span style={{ width: `${Math.max(3, Math.min(100, row.score))}%` }} />
+                      </span>
+                      <span className="profile-radar-row-pct tabular">{row.score}%</span>
+                    </span>
+                    <span className="profile-radar-row-rank tabular">
+                      {row.rank ? `${row.rank}º de ${poolSize} na liga` : "Sem colocação"}
+                    </span>
+                    <span
+                      className="profile-perfil-grade tabular"
+                      style={tierVars(gradeTier(row.grade ?? "C"))}
+                      aria-label={`Nota ${row.grade ?? "indisponível"}`}
+                    >
+                      {row.grade ?? "—"}
+                    </span>
+                  </div>
+                </Tooltip>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

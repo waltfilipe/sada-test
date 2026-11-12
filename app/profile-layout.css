@@ -4605,9 +4605,9 @@
 .profile-radar-body {
   display: grid;
   flex: 1;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   min-height: 0;
 }
 
@@ -4623,13 +4623,68 @@
 }
 
 .profile-radar-body .profile-radar-list {
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
 .profile-radar-body .profile-radar-row {
-  padding: 0.55rem 0.65rem;
-  row-gap: 0.15rem;
   font-size: 0.8rem;
+}
+
+.profile-radar-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+/* Column captions explain the two different measures: radar share vs. grade. */
+.profile-radar-cols {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.15rem 0.35rem;
+  border-bottom: 1px solid rgba(186, 204, 224, 0.1);
+  color: var(--text-3, #8a9bb0);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.profile-radar-cols span:last-child {
+  width: 2.9rem;
+  text-align: center;
+}
+
+/* Wedges of the profile radar: translucent track + filled value, linked to the list. */
+.player-report-radar .radar-sector-bg {
+  fill-opacity: 0.07;
+  cursor: pointer;
+  transition: fill-opacity 0.18s ease;
+}
+
+.player-report-radar .radar-sector-bg.is-active {
+  fill-opacity: 0.18;
+}
+
+.player-report-radar .radar-sector {
+  fill-opacity: 0.55;
+  transition: fill-opacity 0.18s ease, stroke-width 0.18s ease, opacity 0.18s ease;
+}
+
+.player-report-radar .radar-sector.is-active {
+  fill-opacity: 0.8;
+}
+
+.player-report-radar .radar-sector.is-dim {
+  opacity: 0.35;
+}
+
+.stat-radar-card .radar-label {
+  transition: opacity 0.18s ease;
+}
+
+.stat-radar-card .radar-label.is-dim {
+  opacity: 0.4;
 }
 
 .profile-radar-card:has(.profile-radar-body) {
@@ -4638,13 +4693,19 @@
 
 @container (max-width: 480px) {
   .profile-radar-body {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 0.5rem;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: 0.6rem;
   }
 
-  .profile-radar-body .profile-radar-row {
-    padding: 0.45rem 0.5rem;
-    font-size: 0.74rem;
+  .profile-radar-body .stat-radar-figure {
+    height: auto;
+  }
+
+  .profile-radar-body .stat-radar-figure .player-report-radar {
+    display: block;
+    max-width: 300px;
+    margin: 0 auto;
   }
 }
 
@@ -4657,15 +4718,54 @@
 }
 
 .profile-radar-row {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 2.1rem;
-  grid-template-rows: auto auto;
-  column-gap: 0.55rem;
+  grid-template-columns: minmax(0, 1fr) 2.9rem;
+  grid-template-rows: auto auto auto;
+  column-gap: 0.7rem;
+  row-gap: 0.28rem;
   align-items: center;
-  padding: 0.32rem 0.45rem;
-  border-radius: 7px;
-  background: rgba(186, 204, 224, 0.04);
+  padding: 0.6rem 0.65rem 0.6rem 0.85rem;
+  border: 1px solid rgba(186, 204, 224, 0.08);
+  border-radius: 10px;
+  background: rgba(186, 204, 224, 0.035);
+  overflow: hidden;
   font-size: 0.74rem;
+  cursor: help;
+  transition: background 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+}
+
+/* Accent rail = same colour as the radar wedge, so each row visibly belongs to a slice. */
+.profile-radar-row::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--profile-accent);
+  opacity: 0.4;
+  transition: opacity 0.18s ease;
+}
+
+.profile-radar-row.is-main {
+  border-color: color-mix(in srgb, var(--profile-accent) 38%, transparent);
+  background: color-mix(in srgb, var(--profile-accent) 9%, transparent);
+}
+
+.profile-radar-row.is-main::before {
+  opacity: 1;
+}
+
+.profile-radar-row.is-hover {
+  border-color: color-mix(in srgb, var(--profile-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--profile-accent) 14%, transparent);
+}
+
+.profile-radar-row.is-hover::before {
+  opacity: 1;
+}
+
+.profile-radar-row.is-dim {
+  opacity: 0.55;
 }
 
 .profile-radar-row-label {
@@ -4673,36 +4773,91 @@
   grid-column: 1;
   grid-row: 1;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   min-width: 0;
   color: var(--text, #e8eef6);
-  font-weight: 650;
   line-height: 1.2;
+}
+
+.profile-radar-row-label b {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .profile-radar-row-label i {
   flex: 0 0 auto;
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 2px;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 3px;
   background: var(--profile-accent);
+}
+
+.profile-radar-row-label em {
+  flex: 0 0 auto;
+  padding: 0.08rem 0.38rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--profile-accent) 20%, transparent);
+  color: var(--profile-accent);
+  font-size: 0.56rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.profile-radar-row-affinity {
+  display: flex;
+  grid-column: 1;
+  grid-row: 2;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.profile-radar-row-bar {
+  display: block;
+  flex: 1;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(186, 204, 224, 0.12);
+  overflow: hidden;
+}
+
+.profile-radar-row-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--profile-accent);
+  transition: width 0.3s ease;
+}
+
+.profile-radar-row-pct {
+  flex: 0 0 auto;
+  min-width: 2.2rem;
+  color: var(--profile-accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-align: right;
 }
 
 .profile-radar-row-rank {
   grid-column: 1;
-  grid-row: 2;
+  grid-row: 3;
   color: var(--text-3, #8a9bb0);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   line-height: 1.25;
 }
 
 .profile-radar-row .profile-perfil-grade {
   grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-row: 1 / span 3;
+  align-self: center;
   justify-self: center;
   min-width: 0;
-  padding: 0.12rem 0.3rem;
-  font-size: 0.72rem;
+  width: 2.9rem;
+  padding: 0.5rem 0;
+  font-size: 1.15rem;
 }
 
 .stat-radar-card .radar-center {

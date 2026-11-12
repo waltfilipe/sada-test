@@ -6,6 +6,7 @@ import { PositionFamilyTabs } from "@/components/PositionFamilyTabs";
 import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { FICHA_ORIGEM_PARAM, FICHA_TEMPORADA_PARAM } from "@/lib/seasons";
 import { BadgeFilterBox } from "@/components/filters/BadgeFilterBox";
+import { RangeSlider } from "@/components/filters/RangeSlider";
 import { PositionProfileView } from "@/components/position/profile/PositionProfileView";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import { archetypesForFamily } from "@/lib/clusterMeta";
@@ -25,19 +26,10 @@ import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-const AGE_BANDS = [
-  { value: "u21", label: "Até 21", min: 0, max: 21 },
-  { value: "22-25", label: "22–25", min: 22, max: 25 },
-  { value: "26-29", label: "26–29", min: 26, max: 29 },
-  { value: "30+", label: "30+", min: 30, max: 200 },
-];
-
-const MINUTES_BANDS: { value: string; label: string; min?: number; max?: number }[] = [
-  { value: "30", label: "Até 30%", max: 30 },
-  { value: "50", label: "Até 50%", max: 50 },
-  { value: "75", label: "Até 75%", max: 75 },
-  { value: "75+", label: "75% ou mais", min: 75 },
-];
+const AGE_MIN = 16;
+const AGE_MAX = 45;
+const AGE_RANGE: [number, number] = [AGE_MIN, AGE_MAX];
+const MINUTES_RANGE: [number, number] = [0, 100];
 
 function ageOf(player: PlayerProfile): number | null {
   return player.birth_year ? CURRENT_YEAR - player.birth_year : null;
@@ -138,8 +130,8 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
   const [query, setQuery] = useState("");
   const [profile, setProfile] = useState<string | null>(null);
   const [badges, setBadges] = useState<string[]>([]);
-  const [ageBand, setAgeBand] = useState<string | null>(null);
-  const [minutesBand, setMinutesBand] = useState<string | null>(null);
+  const [ageRange, setAgeRange] = useState<[number, number]>(AGE_RANGE);
+  const [minutesRange, setMinutesRange] = useState<[number, number]>(MINUTES_RANGE);
   const [foot, setFoot] = useState<string | null>(null);
   const [origin, setOrigin] = useState<"br" | "out" | null>(null);
   const [club, setClub] = useState<string | null>(null);
@@ -165,8 +157,8 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const age = AGE_BANDS.find((band) => band.value === ageBand);
-    const minutes = MINUTES_BANDS.find((band) => band.value === minutesBand);
+    const ageActive = ageRange[0] > AGE_MIN || ageRange[1] < AGE_MAX;
+    const minutesActive = minutesRange[0] > 0 || minutesRange[1] < 100;
 
     return players
       .filter((player) => {
@@ -180,15 +172,13 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
         if (flankSide && !playerMatchesFlankSide(player, flankSide)) return false;
         if (origin === "br" && player.nationality !== "Brazil") return false;
         if (origin === "out" && player.nationality === "Brazil") return false;
-        if (age) {
+        if (ageActive) {
           const years = ageOf(player);
-          if (years == null || years < age.min || years > age.max) return false;
+          if (years == null || years < ageRange[0] || years > ageRange[1]) return false;
         }
-        if (minutes) {
+        if (minutesActive) {
           const share = player.minutes_pct;
-          if (share == null) return false;
-          if (minutes.max != null && share > minutes.max) return false;
-          if (minutes.min != null && share < minutes.min) return false;
+          if (share == null || share < minutesRange[0] || share > minutesRange[1]) return false;
         }
         if (!q) return true;
         return player.name.toLowerCase().includes(q) || player.club.toLowerCase().includes(q);
@@ -199,9 +189,9 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
           ? (b.minutes ?? 0) - (a.minutes ?? 0)
           : positionRating(b) - positionRating(a),
       );
-  }, [players, leagueId, profile, badges, badgesById, club, foot, flankSide, origin, ageBand, minutesBand, query]);
+  }, [players, leagueId, profile, badges, badgesById, club, foot, flankSide, origin, ageRange, minutesRange, query]);
 
-  const filterKey = `${profile ?? ""}|${badges.join(",")}|${club ?? ""}|${foot ?? ""}|${flankSide ?? ""}|${origin ?? ""}|${ageBand ?? ""}|${minutesBand ?? ""}`;
+  const filterKey = `${profile ?? ""}|${badges.join(",")}|${club ?? ""}|${foot ?? ""}|${flankSide ?? ""}|${origin ?? ""}|${ageRange.join("-")}|${minutesRange.join("-")}`;
   const initialFilter = useRef(true);
 
   useEffect(() => {
@@ -262,8 +252,8 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
     setQuery("");
     setProfile(null);
     setBadges([]);
-    setAgeBand(null);
-    setMinutesBand(null);
+    setAgeRange(AGE_RANGE);
+    setMinutesRange(MINUTES_RANGE);
     setFoot(null);
     setOrigin(null);
     setClub(null);
@@ -277,8 +267,8 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
   const panelCount =
     (profile ? 1 : 0) +
     badges.length +
-    (ageBand ? 1 : 0) +
-    (minutesBand ? 1 : 0) +
+    (ageRange[0] > AGE_MIN || ageRange[1] < AGE_MAX ? 1 : 0) +
+    (minutesRange[0] > 0 || minutesRange[1] < 100 ? 1 : 0) +
     (foot ? 1 : 0) +
     (origin ? 1 : 0) +
     (club ? 1 : 0) +
@@ -382,37 +372,8 @@ export function PositionScoutPage({ family, players: initialPlayers, heatmapsEna
                 </section>
 
                 <div className="zag-v2-pairs">
-                  <section>
-                    <h2>Idade</h2>
-                    <div className="zag-v2-chips">
-                      {AGE_BANDS.map((band) => (
-                        <button
-                          key={band.value}
-                          type="button"
-                          className={ageBand === band.value ? "active" : ""}
-                          onClick={() => setAgeBand(ageBand === band.value ? null : band.value)}
-                        >
-                          {band.label}
-                        </button>
-                      ))}
-                    </div>
-                  </section>
-
-                  <section>
-                    <h2>Minutagem</h2>
-                    <div className="zag-v2-chips">
-                      {MINUTES_BANDS.map((band) => (
-                        <button
-                          key={band.value}
-                          type="button"
-                          className={minutesBand === band.value ? "active" : ""}
-                          onClick={() => setMinutesBand(minutesBand === band.value ? null : band.value)}
-                        >
-                          {band.label}
-                        </button>
-                      ))}
-                    </div>
-                  </section>
+                  <RangeSlider label="Idade" min={AGE_MIN} max={AGE_MAX} value={ageRange} onChange={setAgeRange} suffix="anos" />
+                  <RangeSlider label="Minutagem" min={0} max={100} step={5} value={minutesRange} onChange={setMinutesRange} suffix="%" />
                 </div>
 
                 {showFlankFilter ? (

@@ -14,9 +14,9 @@ import { formatFoot } from "@/lib/feet";
 import { getLeague } from "@/lib/leagues";
 import { familyBySlug } from "@/lib/positions";
 import { profileMetaForFamily } from "@/lib/profileMeta";
-import { activeProfileKeys, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
+import { activeProfileKeys, archetypeGrade, archetypeRank, profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
 import { isProjectionEligible, realisticProjection } from "@/lib/minuteProjection";
-import { playerInitials, profileGradeFromRank } from "@/lib/scoutTheme";
+import { playerInitials } from "@/lib/scoutTheme";
 import { badgeCatalogForFamily, playerStatBadges } from "@/lib/statBadges";
 import {
   REPORT_COPY,
@@ -260,7 +260,7 @@ function reportMix(player: PlayerProfile, family: PositionFamily, players: Playe
         share: row.share,
         active: active.has(row.key),
         rank,
-        grade: rank ? profileGradeFromRank(rank, pool.length) : null,
+        grade: archetypeGrade(player, row.label, rank, pool.length),
       };
     });
   }
@@ -551,11 +551,16 @@ export function SectionRadar({
   scores,
   variant = "print",
   shape: shapeStyle = "polygon",
+  activeTitle = null,
+  onHoverTitle,
 }: {
   scores: SectionScore[];
   variant?: "print" | "screen";
   /** "sectors" draws one wedge per axis (on-screen profile radar). */
   shape?: "polygon" | "sectors";
+  /** Axis currently highlighted (e.g. hovered in the linked list); the others are dimmed. */
+  activeTitle?: string | null;
+  onHoverTitle?: (title: string | null) => void;
 }) {
   const screen = variant === "screen";
   const sectors = shapeStyle === "sectors";
@@ -598,17 +603,24 @@ export function SectionRadar({
           ))}
           <circle cx={cx} cy={cy} r={radius / 2} className="radar-ring is-median" />
           {scores.map((item, index) => (
-            <path key={`bg-${item.title}`} d={sector(index, 100)} fill={colorOf(item)} opacity={0.07} />
+            <path
+              key={`bg-${item.title}`}
+              d={sector(index, 100)}
+              fill={colorOf(item)}
+              className={`radar-sector-bg${activeTitle === item.title ? " is-active" : ""}`}
+              onMouseEnter={onHoverTitle ? () => onHoverTitle(item.title) : undefined}
+              onMouseLeave={onHoverTitle ? () => onHoverTitle(null) : undefined}
+            />
           ))}
           {scores.map((item, index) => (
             <path
               key={item.title}
               d={sector(index, Math.max(6, item.score))}
               fill={colorOf(item)}
-              fillOpacity={0.55}
               stroke={colorOf(item)}
-              strokeWidth={1.5}
-              className="radar-sector"
+              strokeWidth={activeTitle === item.title ? 2.2 : 1.5}
+              className={`radar-sector${activeTitle === item.title ? " is-active" : activeTitle ? " is-dim" : ""}`}
+              pointerEvents="none"
             />
           ))}
           <circle cx={cx} cy={cy} r={3} className="radar-center" />
@@ -641,7 +653,13 @@ export function SectionRadar({
         const lift = (lines.length - 1) * lineHeight;
         const dy = Math.sin(a) < -0.5 ? -4 - lift : Math.sin(a) > 0.5 ? 10 : -lift / 2;
         return (
-          <text key={item.title} x={x} y={y + dy} textAnchor={anchor} className="radar-label">
+          <text
+            key={item.title}
+            x={x}
+            y={y + dy}
+            textAnchor={anchor}
+            className={`radar-label${activeTitle && activeTitle !== item.title ? " is-dim" : ""}`}
+          >
             {lines.map((line, lineIndex) => (
               <tspan key={line} x={x} dy={lineIndex ? lineHeight : 0}>
                 {line}
