@@ -9,6 +9,7 @@ import { POSITION_FAMILIES } from "./positions";
 import { playerStatBadges } from "./statBadges";
 import { familySectionStats } from "./scatterAxis";
 import { withResolvedSeasonPhoto, withResolvedSeasonPhotos } from "./playerPhotoLookup.server";
+import { withSadaValues } from "./valorSada.server";
 import { withPlayersDepartures } from "./transfersLookup.server";
 import type { PlayerHeatmapData, PlayerProfile, PlayerSearchRow, PlayerSummary, PositionFamily, SiteMeta } from "./types";
 
@@ -98,7 +99,7 @@ export function getPlayers(league?: string, season?: string): PlayerSummary[] {
       parseSeasonParam(season) === CURRENT_SEASON
         ? payload.players
         : withResolvedSeasonPhotos(id, season ?? CURRENT_SEASON, payload.players);
-    playersCache.set(key, { ...payload, players: resolved });
+    playersCache.set(key, { ...payload, players: withSadaValues(resolved, id) });
   }
   return playersCache.get(key)!.players;
 }
@@ -225,8 +226,9 @@ export function getFamilyPlayers(family: PositionFamily, league?: string, season
       ? payload.players
       : withResolvedSeasonPhotos(id, season ?? CURRENT_SEASON, payload.players);
   const withTransfers = withPlayersDepartures(id, parseSeasonParam(season), resolved);
-  familyCache.set(key, withTransfers);
-  return withTransfers;
+  const withValues = withSadaValues(withTransfers, id);
+  familyCache.set(key, withValues);
+  return withValues;
 }
 
 export function filterPlayers(

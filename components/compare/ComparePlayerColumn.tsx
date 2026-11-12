@@ -11,6 +11,7 @@ import { StatProfileRadarCard } from "@/components/position/profile/PlayerReport
 import { ScoutStatsSections } from "@/components/position/profile/ScoutStatsSections";
 import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { playerInitials } from "@/lib/scoutTheme";
+import { marketValueLabel } from "@/lib/valorSada";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
@@ -247,7 +248,7 @@ export function ComparePlayerColumn({
           <dl className="compare-fact-grid">
             <div>
               <dt>Valor</dt>
-              <dd>{tm?.market_value ?? "—"}</dd>
+              <dd>{marketValueLabel(tm?.market_value, player.sada_value)}</dd>
             </div>
             <div>
               <dt>Contrato</dt>

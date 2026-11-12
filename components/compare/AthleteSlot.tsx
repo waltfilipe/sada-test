@@ -9,6 +9,7 @@ import { formatFoot } from "@/lib/feet";
 import { dominantRatingKey } from "@/lib/profileMeta";
 import { formatRating, playerInitials, ratingTier, tierVars } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
+import { marketValueLabel } from "@/lib/valorSada";
 import type { PlayerProfile } from "@/lib/types";
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -155,7 +156,7 @@ export function AthleteSlot({ side, player, players, onChange, compact = false, 
       <footer className="slot-market">
         <div>
           <span>Valor de mercado</span>
-          <strong>{tm?.market_value ?? "—"}</strong>
+          <strong>{marketValueLabel(tm?.market_value, player.sada_value)}</strong>
         </div>
         <div>
           <span>Contrato</span>

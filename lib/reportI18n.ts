@@ -488,6 +488,18 @@ export function localizeMarketValue(value: string | null | undefined, lang: Repo
   return `€ ${pt}${isMillions ? " mi" : unit ? " mil" : ""}`;
 }
 
+/** Valor SADA (€ numérico) no mesmo estilo do localizeMarketValue, com `*` de estimativa. */
+export function localizeSadaValue(value: number | null | undefined, lang: ReportLang): string {
+  if (value == null || !Number.isFinite(value)) return "—";
+  const star = "*";
+  if (lang === "en") {
+    if (value >= 1_000_000) return `€${(value / 1_000_000).toFixed(1).replace(",0", "")}m${star}`;
+    return `€${Math.round(value / 1_000)}k${star}`;
+  }
+  if (value >= 1_000_000) return `€ ${(value / 1_000_000).toFixed(1).replace(".", ",").replace(",0", "")} mi${star}`;
+  return `€ ${Math.round(value / 1_000)} mil${star}`;
+}
+
 /** Contract length from Transfermarkt, e.g. "3 anos e 4 meses". */
 export function localizeContract(value: string | null | undefined, lang: ReportLang): string {
   const raw = value?.trim();

@@ -19,6 +19,7 @@ import { DisciplineTendencies } from "./DisciplineTendencies";
 import { PassTendencies } from "./PassTendencies";
 import { PlayerSeasonSlicer } from "@/components/PlayerSeasonSlicer";
 import { profileAccent } from "@/lib/profileShares";
+import { formatEur, marketValueLabel, valorSide, valorSideLabel } from "@/lib/valorSada";
 import type { BrasileiraoSeason } from "@/lib/seasons";
 import { CURRENT_SEASON } from "@/lib/seasons";
 
@@ -101,7 +102,7 @@ function HeroStat({
   icon: string;
   label: string;
   tone?: "warn" | "danger";
-  tooltip?: string;
+  tooltip?: React.ReactNode;
   value: React.ReactNode;
   foot?: React.ReactNode;
 }) {
@@ -289,9 +290,26 @@ export function PlayerHero({
           <HeroStat
             icon="fa-coins"
             label="Valor de mercado"
-            tooltip="Estimativa de valor no Transfermarkt."
-            value={tm?.market_value ?? "—"}
-            foot="Transfermarkt"
+            tooltip={
+              <span className="hero-value-tip">
+                <span className="hero-value-tip-row">
+                  <span>Transfermarkt</span>
+                  <strong>{tm?.market_value ?? "—"}</strong>
+                </span>
+                <span className="hero-value-tip-row">
+                  <span>SADA (modelo)</span>
+                  <strong>{formatEur(player.sada_value)}</strong>
+                </span>
+                <span className="hero-value-tip-side">
+                  {valorSideLabel(valorSide(player.sada_value ?? 0, tm?.market_value_eur).side)}
+                </span>
+                {!tm?.market_value && player.sada_value != null ? (
+                  <span className="hero-value-tip-note">*estimativa do modelo SADA</span>
+                ) : null}
+              </span>
+            }
+            value={marketValueLabel(tm?.market_value, player.sada_value)}
+            foot={tm?.market_value ? "Transfermarkt" : "SADA*"}
           />
           <HeroStat
             icon={onLoanFrom ? "fa-right-left" : "fa-file-signature"}

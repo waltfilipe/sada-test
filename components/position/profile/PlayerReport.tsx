@@ -22,6 +22,7 @@ import {
   REPORT_COPY,
   localizeContract,
   localizeMarketValue,
+  localizeSadaValue,
   localizeValue,
   ordinal,
   reportLocale,
@@ -1142,7 +1143,7 @@ export function ReportSheet({
       key: "market",
       icon: "fa-euro-sign",
       label: copy.marketValue,
-      value: localizeMarketValue(tm?.market_value, lang),
+      value: tm?.market_value ? localizeMarketValue(tm.market_value, lang) : localizeSadaValue(player.sada_value, lang),
       sub: tm?.on_loan_from ? copy.onLoan(tm.on_loan_from) : null,
     },
     {
@@ -1892,7 +1893,7 @@ export function SeasonSummarySheet({
                 </div>
                 <div>
                   <dt>{copy.marketValue}</dt>
-                  <dd>{localizeMarketValue(tm?.market_value, lang)}</dd>
+                  <dd>{tm?.market_value ? localizeMarketValue(tm.market_value, lang) : localizeSadaValue(main.sada_value, lang)}</dd>
                 </div>
                 <div>
                   <dt>{copy.contractUntilKpi}</dt>
@@ -2091,7 +2092,7 @@ export function AnalystSheet({
         foot: foot ? translateLabel(foot, lang).toLocaleLowerCase(lang === "en" ? "en-GB" : "pt-BR") : null,
         contractDate,
         contractMonths: contractMonthsLeft,
-        marketValue: tm?.market_value ? localizeMarketValue(tm.market_value, lang) : null,
+        marketValue: tm?.market_value ? localizeMarketValue(tm.market_value, lang) : localizeSadaValue(main.sada_value, lang),
       },
       physical: avgRun ? reportRunRows(avgRun, lang).map((metric) => ({ key: metric.key, label: metric.label, value: metric.value, pct: metric.pct ?? null })) : null,
     });
@@ -2141,7 +2142,7 @@ export function AnalystSheet({
               </div>
               <div>
                 <dt>{copy.marketValue}</dt>
-                <dd>{localizeMarketValue(tm?.market_value, lang)}</dd>
+                <dd>{tm?.market_value ? localizeMarketValue(tm.market_value, lang) : localizeSadaValue(main.sada_value, lang)}</dd>
               </div>
               <div>
                 <dt>{copy.contractUntilKpi}</dt>

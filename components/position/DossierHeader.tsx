@@ -5,6 +5,7 @@ import { ClubLogo } from "@/components/ClubLogo";
 import { formatFoot } from "@/lib/feet";
 import { familyBySlug } from "@/lib/positions";
 import { playerInitials } from "@/lib/scoutTheme";
+import { marketValueLabel } from "@/lib/valorSada";
 import { PlayerPhoto } from "@/components/PlayerPhoto";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 import { DossierRatings } from "./DossierRatings";
@@ -77,7 +78,7 @@ export function DossierHeader({ player, poolSize, family }: Props) {
         <div className="bar-group bar-market">
           <div className="bar-item">
             <span>Valor de mercado</span>
-            <strong>{tm?.market_value ?? "—"}</strong>
+            <strong>{marketValueLabel(tm?.market_value, player.sada_value)}</strong>
           </div>
           <div className="bar-item">
             <span>Contrato</span>

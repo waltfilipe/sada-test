@@ -10,6 +10,7 @@ import { formatFoot } from "@/lib/feet";
 import { playerInitials, ratingTier, formatRating, tierVars } from "@/lib/scoutTheme";
 import { positionRating } from "@/lib/scoutUi";
 import { dominantRatingKey } from "@/lib/profileMeta";
+import { marketValueLabel } from "@/lib/valorSada";
 import type { PlayerProfile, PositionFamily } from "@/lib/types";
 
 type Side = "a" | "b";
@@ -122,7 +123,7 @@ function DuelSide({
       <div className="duel-meta">
         <div className="duel-chips">
           <DuelChip icon="fa-coins" label="Valor">
-            {tm?.market_value ?? "—"}
+            {marketValueLabel(tm?.market_value, player.sada_value)}
           </DuelChip>
           <DuelChip
             icon={onLoanFrom ? "fa-right-left" : "fa-file-signature"}

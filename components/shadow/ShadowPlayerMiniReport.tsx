@@ -6,6 +6,7 @@ import { Tooltip } from "@/components/ui/Tooltip";
 import { SectionRadar, statProfileScores, type SectionScore } from "@/components/position/profile/PlayerReport";
 import { usePlayerProfile } from "@/hooks/usePlayerProfileCache";
 import { formatFoot } from "@/lib/feet";
+import { marketValueLabel } from "@/lib/valorSada";
 import { profileAccent, sortedProfileShareRows } from "@/lib/profileShares";
 import type { LeagueId } from "@/lib/leagues";
 import type { PlayerSearchRow } from "@/lib/types";
@@ -84,7 +85,7 @@ export function ShadowPlayerMiniReport({
     { label: "Altura", value: height ? `${(height / 100).toFixed(2).replace(".", ",")} m` : "—" },
     { label: "Pé", value: formatDominantFoot(player.foot ?? profile?.foot) },
     { label: "Contrato", value: monthsRemaining(tm?.contract_until) },
-    { label: "Valor", value: tm?.market_value ?? "—" },
+    { label: "Valor", value: marketValueLabel(tm?.market_value, player.sada_value) },
   ];
 
   return (

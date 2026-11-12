@@ -92,6 +92,8 @@ export type PlayerSummary = {
   hybrid_lean?: string | null;
   cluster?: PositionCluster | null;
   transfermarkt?: TransfermarktInfo;
+  /** Estimativa de valor de mercado do modelo SADA v4 (€). Exibida com asterisco quando não há valor TM. */
+  sada_value?: number | null;
 };
 
 export type Tendencies = {

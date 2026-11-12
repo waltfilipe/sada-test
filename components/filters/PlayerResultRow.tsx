@@ -10,6 +10,7 @@ import { AddToShadowMenu } from "@/components/shadow/AddToShadowMenu";
 import { PlayerHeatmap } from "@/components/position/profile/PlayerHeatmap";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { formatFoot } from "@/lib/feet";
+import { marketValueLabel } from "@/lib/valorSada";
 import { playerInitials } from "@/lib/scoutTheme";
 import type { FamilyBadgeOption } from "@/lib/statBadges";
 import type { PlayerSearchRow } from "@/lib/types";
@@ -33,7 +34,7 @@ export function PlayerResultRow({
     { label: "Altura", value: player.height ? `${player.height}` : "—", unit: player.height ? "cm" : undefined },
     { label: "Pé", value: formatFoot(player.foot) ?? "—" },
     { label: "Minutos", value: player.minutes.toLocaleString("pt-BR") },
-    { label: "Valor", value: tm?.market_value ?? "—" },
+    { label: "Valor", value: marketValueLabel(tm?.market_value, player.sada_value) },
     { label: "Contrato", value: tm?.contract_remaining ?? "—" },
   ];
 
