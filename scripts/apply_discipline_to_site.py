@@ -79,9 +79,12 @@ def read_sources(paths: list[Path]) -> dict[str, dict]:
 
 
 def source_for(league: str, season: str) -> list[Path]:
+    if league.startswith("est-"):
+        slug = league[4:]
+        if season == "2026":
+            return [WY26 / "estaduais" / f"{slug}.xlsx"]
+        return [HIST / "estaduais" / f"{slug}-{season}.xlsx"]
     if season == "2026":
-        if league.startswith("est-"):
-            return sorted((WY26 / "estaduais").glob("*.xlsx"))
         return [WY26 / f"{league}-pt1.xlsx", WY26 / f"{league}-pt2.xlsx"]
     return [HIST / f"{league}-{season}.xlsx"]
 
@@ -120,7 +123,7 @@ def apply_dir(season_dir: Path, index: dict[str, dict]) -> int:
         for p in players:
             if p.get("discipline"):
                 p["discipline"]["pool"] = fam_pools[fam_path.stem]
-        fam_path.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+        fam_path.write_text(json.dumps(doc, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
         total += matched
 
     prof_dir = season_dir / "profiles"
@@ -133,14 +136,14 @@ def apply_dir(season_dir: Path, index: dict[str, dict]) -> int:
                 prof["discipline"] = dict(disc)
             else:
                 prof.pop("discipline", None)
-            prof_path.write_text(json.dumps(prof, ensure_ascii=False), encoding="utf-8")
+            prof_path.write_text(json.dumps(prof, ensure_ascii=False, indent=2), encoding="utf-8")
 
     players_path = season_dir / "players.json"
     if players_path.is_file():
         doc = json.loads(players_path.read_text(encoding="utf-8"))
         rows = doc.get("players", doc if isinstance(doc, list) else [])
         inject_players(rows, index)
-        players_path.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+        players_path.write_text(json.dumps(doc, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     return total
 
 

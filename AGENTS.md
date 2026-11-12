@@ -82,6 +82,14 @@ Exibido no popup "Tendências e xProg" (`PassTendencies.tsx`).
   "Catarinense"...) em players/family/profiles das ligas est-nv* + hub;
   rode após rebuild dos níveis. O campo rotula a competição real do atleta
   no site e nos reports (percentis seguem contra o pool do nível).
+- `apply_discipline_to_site.py` — injeta bloco `discipline` (faltas/90,
+  amarelos, vermelhos + médias do pool por família) em family-*/players/
+  profiles de todas as ligas e temporadas; alimenta o modal "Disciplina"
+  do hero. Match por nome+clube (nunca por nome sozinho). Fontes:
+  `wyscout/2026/{liga}-pt*.xlsx`, `wyscout/2026/estaduais/{slug}.xlsx`
+  (est-* corrente), `wyscout/historical/{liga}-{ano}.xlsx` e
+  `wyscout/historical/estaduais/{slug}-{ano}.xlsx` (est-* arquivado).
+  Rode após rebuilds de dados — o bloco não é gerado pelo builder.
 - `build_estadual_historical_seasons.py` — temporadas arquivadas dos
   estaduais: sincroniza os xlsx por campeonato (Desktop `Estaduais/` →
   `wyscout/historical/estaduais/{comp}-{ano}.xlsx`, já com `Campeonato`
