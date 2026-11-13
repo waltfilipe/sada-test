@@ -40,6 +40,7 @@ SOFASCORE_CSV: dict[tuple[str, str], Path] = {
     ("serie-b", "2023"): ROOT / "BRB23_defensive.csv",
     ("serie-b", "2024"): ROOT / "BRB24_defensive.csv",
     ("serie-b", "2025"): ROOT / "BRB25_defensive.csv",
+    ("serie-c", "2023"): ROOT / "BRC23_defensive.csv",
     ("serie-c", "2024"): ROOT / "BRC24_defensive.csv",
     ("serie-c", "2025"): ROOT / "BRC25_defensive.csv",
 }
