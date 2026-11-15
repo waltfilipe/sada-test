@@ -117,6 +117,20 @@ Exibido no popup "Tendências e xProg" (`PassTendencies.tsx`).
   carimbado via âncora tm/ss verificada (ver `NON_GRAPH_LEAGUES` em
   `lib/athleteRows.server.ts`).
 
+## PDF — páginas do analista
+
+`AnalystSheet` (`components/position/profile/PlayerReport.tsx`) gera **duas** páginas
+A4 no fim do relatório (por isso `totalPages = ... + 2`): (1) resumo do analista
+(identidade + KPIs, síntese em tom de scout, leitura estatística, números por
+temporada) e (2) "Encaixe tático". A síntese vem de `lib/reportInsights.ts`
+(`story` = manchete + parágrafos com `**destaque**`; a redação varia de forma
+estável por atleta via seed do nome). O encaixe vem de `lib/tacticalFit.ts`:
+regras por família (funções + esquemas, 4-3-3 / 4-2-3-1 / 4-4-2 / 3-5-2 / 3-4-3 /
+4-1-2-1-2 / 3-4-2-1) pontuadas por afinidade de perfil + percentis por bloco +
+físico (GPS). Ajustar função/esquema = editar `FAMILIES` nesse arquivo.
+Página com `overflow:hidden`: após mexer no layout, conferir que
+`.player-report-body` não tem scrollHeight > clientHeight.
+
 ## Verificação
 
 - `npx tsc --noEmit` — typecheck

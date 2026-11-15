@@ -33,6 +33,7 @@ import {
 } from "@/lib/reportI18n";
 import { useLoading } from "@/components/LoadingProvider";
 import { buildInsights, type Insight, type InsightDir } from "@/lib/reportInsights";
+import type { FitRole, FitScheme } from "@/lib/tacticalFit";
 import { PlayerHeatmap } from "./PlayerHeatmap";
 import type { AspectItem, PlayerHeatmapData, PlayerPhysicalRun, PlayerProfile, PositionFamily, XProg } from "@/lib/types";
 
@@ -1563,21 +1564,21 @@ function buildSummaryModel(rows: SummarySheetRow[], lang: ReportLang) {
       weight: sum ? minutes[index] : 1,
       scores: sectionScores(sections),
       metrics: reportMetrics(sections, copy, lang),
-      mix: sortedProfileShareRows(row.player).map((item) => ({ ...item, label: translateLabel(item.label, lang) })),
+      mix: sortedProfileShareRows(row.player).map((item) => ({ ...item, raw: item.label, label: translateLabel(item.label, lang) })),
     };
   });
   const weightTotal = detail.reduce((total, item) => total + item.weight, 0) || 1;
 
-  const mixSums = new Map<string, { share: number; tone: string }>();
+  const mixSums = new Map<string, { share: number; tone: string; raw: string }>();
   for (const item of detail) {
     for (const row of item.mix) {
-      const entry = mixSums.get(row.label) ?? { share: 0, tone: row.tone };
+      const entry = mixSums.get(row.label) ?? { share: 0, tone: row.tone, raw: row.raw };
       entry.share += row.share * item.weight;
       mixSums.set(row.label, entry);
     }
   }
   const avgMix = [...mixSums.entries()]
-    .map(([label, entry]) => ({ label, tone: entry.tone, share: entry.share / weightTotal }))
+    .map(([label, entry]) => ({ label, raw: entry.raw, tone: entry.tone, share: entry.share / weightTotal }))
     .sort((a, b) => b.share - a.share)
     .slice(0, 4);
 
@@ -2014,7 +2015,105 @@ function InsightCard({ item }: { item: Insight }) {
   );
 }
 
-/** Página final: leitura estatística direta para o scout. */
+/** **negrito** inline, para os textos gerados em tom de scout. */
+function RichText({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(/\*\*(.+?)\*\*/g).map((part, index) =>
+        index % 2 ? (
+          <b key={index} className={/^[\d-]+$/.test(part) ? "nw" : undefined}>
+            {part}
+          </b>
+        ) : (
+          <Fragment key={index}>{part}</Fragment>
+        ),
+      )}
+    </>
+  );
+}
+
+/** Campo em miniatura: a formação inteira, com a posição do atleta destacada. */
+function FormationPitch({ dots, at }: { dots: [number, number][]; at: [number, number] }) {
+  const fx = (x: number) => 8 + x * 0.84;
+  const fy = (y: number) => 9 + y * 1.22;
+  return (
+    <svg className="fit-pitch" viewBox="0 0 100 140" aria-hidden="true">
+      <rect className="fit-pitch-turf" x="1.5" y="1.5" width="97" height="137" rx="4" />
+      <g className="fit-pitch-lines">
+        <rect x="1.5" y="1.5" width="97" height="137" rx="4" />
+        <line x1="1.5" y1="70" x2="98.5" y2="70" />
+        <circle cx="50" cy="70" r="11" />
+        <rect x="24" y="1.5" width="52" height="22" />
+        <rect x="38" y="1.5" width="24" height="9" />
+        <rect x="24" y="116.5" width="52" height="22" />
+        <rect x="38" y="129.5" width="24" height="9" />
+      </g>
+      {dots.map(([x, y], index) =>
+        x === at[0] && y === at[1] ? null : (
+          <circle key={index} className={index === 0 ? "fit-dot is-gk" : "fit-dot"} cx={fx(x)} cy={fy(y)} r={index === 0 ? 3.2 : 3.7} />
+        ),
+      )}
+      <circle className="fit-halo" cx={fx(at[0])} cy={fy(at[1])} r="9" />
+      <circle className="fit-hit" cx={fx(at[0])} cy={fy(at[1])} r="5.2" />
+    </svg>
+  );
+}
+
+const fitTone = (score: number) => (score >= 75 ? "is-ideal" : score >= 62 ? "is-strong" : "is-good");
+
+function FitEvidence({ items }: { items: { label: string; pct: number }[] }) {
+  if (!items.length) return null;
+  return (
+    <ul className="fit-evidence">
+      {items.map((item) => (
+        <li key={item.label} className={percentileTone(item.pct)}>
+          <span>{item.label}</span>
+          <b>{item.pct}</b>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function FitSchemeCard({ item, best, copy }: { item: FitScheme; best: boolean; copy: ReportCopy }) {
+  return (
+    <article className={`fit-scheme ${fitTone(item.score)}${best ? " is-best" : ""}`}>
+      {best ? <span className="fit-ribbon">{copy.fitBest}</span> : null}
+      <FormationPitch dots={item.dots} at={item.at} />
+      <div className="fit-scheme-head">
+        <strong>{item.formation}</strong>
+        <span className="fit-level">{item.level}</span>
+      </div>
+      <h3>{item.slot}</h3>
+      <p>{item.why}</p>
+      <FitEvidence items={item.evidence} />
+      <span className="fit-meter" aria-hidden="true">
+        <i style={{ width: `${Math.max(6, item.score)}%` }} />
+      </span>
+    </article>
+  );
+}
+
+function FitRoleRow({ item, index }: { item: FitRole; index: number }) {
+  return (
+    <li className={`fit-role ${fitTone(item.score)}${item.main ? " is-main" : ""}`}>
+      <span className="fit-role-n">{index + 1}</span>
+      <div className="fit-role-text">
+        <h3>{item.name}</h3>
+        <p>{item.blurb}</p>
+      </div>
+      <FitEvidence items={item.evidence} />
+      <div className="fit-role-meter">
+        <span className="fit-meter" aria-hidden="true">
+          <i style={{ width: `${Math.max(6, item.score)}%` }} />
+        </span>
+        <b>{item.level}</b>
+      </div>
+    </li>
+  );
+}
+
+/** Páginas finais: leitura do scout (estatística + síntese) e encaixe tático. */
 export function AnalystSheet({
   rows,
   family,
@@ -2057,53 +2156,92 @@ export function AnalystSheet({
     for (const option of badgeCatalogForFamily(family)) tones.set(option.key, option.tone);
     return tones;
   }, [family]);
+  const heatmap = useMemo(() => mergedSummaryHeatmap(ordered), [ordered]);
+  const bio = useMemo(() => reportBio(main, lang), [main, lang]);
+
+  const sumStat = (label: string) => {
+    const values = ordered.map((row) => parseStat(metricDisplay(row.player, label)));
+    return values.every((value) => value != null) ? values.reduce((a, b) => (a ?? 0) + (b ?? 0), 0) : null;
+  };
+  const goals = ordered.reduce((sum, row) => sum + (row.player.goals ?? 0), 0);
+  const assists = ordered.reduce((sum, row) => sum + (row.player.assists ?? 0), 0);
+  const xgSum = sumStat("xG");
+  const xaSum = sumStat("xA");
+  const marketValue = tm?.market_value ? localizeMarketValue(tm.market_value, lang) : localizeSadaValue(main.sada_value, lang);
+
+  const side = useMemo<"left" | "right" | null>(() => {
+    const text = `${main.position} ${main.foot ?? ""}`.toLocaleLowerCase("pt-BR");
+    if (/esquerd|canhot|left/.test(text)) return "left";
+    if (/direit|destr|right/.test(text)) return "right";
+    return null;
+  }, [main.position, main.foot]);
 
   const report = useMemo(() => {
-    const sumStat = (label: string) => {
-      const values = ordered.map((row) => parseStat(metricDisplay(row.player, label)));
-      return values.every((value) => value != null) ? values.reduce((a, b) => (a ?? 0) + (b ?? 0), 0) : null;
-    };
     const avgRun = averagePhysicalRun(ordered);
     const xprog = xprogView(detail.map((item) => ({ x: item.row.player.xprog, weight: item.weight })));
     return buildInsights({
       lang,
+      name: main.name,
+      family,
       position: translateLabel(main.position, lang),
-      profile: dominant ? { label: dominant.label, share: dominant.share, second: avgMix[1] ? { label: avgMix[1].label, share: avgMix[1].share } : null } : null,
+      profile: dominant
+        ? {
+            label: dominant.label,
+            raw: dominant.raw,
+            share: dominant.share,
+            second: avgMix[1] ? { label: avgMix[1].label, share: avgMix[1].share } : null,
+          }
+        : null,
+      profiles: avgMix.map((item) => ({ label: item.raw, share: item.share })),
+      side,
       seasons: ordered.map((row) => ({
         year: row.year,
         club: row.player.display_club ?? row.player.club,
         minutes: row.player.minutes ?? 0,
         minutesPct: row.player.minutes_pct ?? null,
       })),
-      blocks: matrix.map((entry) => ({ title: entry.title, cells: entry.cells, avg: entry.avg })),
+      blocks: matrix.map((entry) => ({ title: entry.title, tone: entry.tone, cells: entry.cells, avg: entry.avg })),
       metrics: avgMetrics,
       errorsLabel: translateLabel("Erros Totais", lang),
       xprog,
-      production: {
-        goals: ordered.reduce((sum, row) => sum + (row.player.goals ?? 0), 0),
-        assists: ordered.reduce((sum, row) => sum + (row.player.assists ?? 0), 0),
-        xg: sumStat("xG"),
-        xa: sumStat("xA"),
-        minutes: totalMinutes,
-      },
+      production: { goals, assists, xg: xgSum, xa: xaSum, minutes: totalMinutes },
       person: {
         age,
         heightCm: main.height ?? null,
         foot: foot ? translateLabel(foot, lang).toLocaleLowerCase(lang === "en" ? "en-GB" : "pt-BR") : null,
         contractDate,
         contractMonths: contractMonthsLeft,
-        marketValue: tm?.market_value ? localizeMarketValue(tm.market_value, lang) : localizeSadaValue(main.sada_value, lang),
+        marketValue,
       },
       physical: avgRun ? reportRunRows(avgRun, lang).map((metric) => ({ key: metric.key, label: metric.label, value: metric.value, pct: metric.pct ?? null })) : null,
     });
-  }, [ordered, detail, matrix, avgMetrics, dominant, main, clubs, totalMinutes, lang, copy]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ordered, detail, matrix, avgMetrics, avgMix, dominant, main, family, side, totalMinutes, lang, copy]);
 
+  const currentClub = clubs[clubs.length - 1] ?? main.display_club ?? main.club;
+  const passedBy = [...new Set(clubs)];
   const facts = [
-    translateLabel(main.position, lang),
-    clubs.join(" → "),
-    age != null ? copy.bioYears(age) : null,
-    foot ? translateLabel(foot, lang) : null,
-  ].filter((item): item is string => Boolean(item));
+    {
+      key: "minutes",
+      icon: "fa-stopwatch",
+      label: multi ? copy.minutesKpi(ordered.length) : copy.minutes,
+      value: totalMinutes.toLocaleString(locale),
+      sub: multi ? span : main.minutes_pct != null ? copy.minutesShare(Math.round(main.minutes_pct)) : null,
+    },
+    { key: "goals", icon: "fa-futbol", label: copy.goals, value: goals.toLocaleString(locale), sub: xgSum != null ? `xG ${fmtNum(xgSum, 1, lang)}` : null },
+    { key: "assists", icon: "fa-shoe-prints", label: copy.assists, value: assists.toLocaleString(locale), sub: xaSum != null ? `xA ${fmtNum(xaSum, 1, lang)}` : null },
+    { key: "market", icon: "fa-euro-sign", label: copy.marketValue, value: marketValue, sub: tm?.on_loan_from ? copy.onLoan(tm.on_loan_from) : null },
+    {
+      key: "contract",
+      icon: "fa-file-signature",
+      label: copy.contract,
+      value: localizeContract(tm?.contract_remaining, lang),
+      sub: contractDate ? copy.contractUntil(contractDate) : null,
+    },
+  ];
+
+  const fit = report.fit;
+  const mixChips = avgMix.slice(0, 3);
 
   return (
     <article className="player-report player-report-analyst" lang={lang === "en" ? "en" : "pt-BR"}>
@@ -2116,49 +2254,74 @@ export function AnalystSheet({
           seasonTag={multi ? copy.multiTag : copy.seasonTag}
         />
         <div className="player-report-body">
-          <section className="player-report-an-head">
+          <section className="player-report-identity">
             <PlayerPhoto
               src={tm?.photo}
               alt=""
-              className="player-report-mini-photo"
-              fallback={<span className="player-report-mini-photo player-report-photo-fallback">{playerInitials(main.name)}</span>}
+              className="player-report-photo"
+              fallback={<span className="player-report-photo player-report-photo-fallback">{playerInitials(main.name)}</span>}
             />
-            <div className="player-report-an-who">
+            <div className="player-report-who">
+              <p className="player-report-eyebrow">{translateLabel(main.position, lang)}</p>
               <h1>{main.name}</h1>
-              <p>
-                {facts.join(" · ")}
-                {dominant ? (
-                  <>
-                    {" · "}
-                    {multi ? copy.avgProfileTitle : copy.tacticalProfile}: <b>{dominant.label}</b> ({Math.round(dominant.share)}%)
-                  </>
-                ) : null}
+              <p className="player-report-club">
+                <ClubLogo club={currentClub} size={16} />
+                <span>{currentClub}</span>
               </p>
+              {passedBy.length > 1 ? (
+                <p className="player-report-trail">
+                  {span} · {passedBy.join(" · ")}
+                </p>
+              ) : null}
+              {bio.length ? (
+                <ul className="player-report-bio">
+                  {bio.map((item) => (
+                    <li key={item.label}>
+                      <i className={`fa-solid ${item.icon}`} aria-hidden="true" />
+                      <span className="player-report-bio-text">
+                        <span className="player-report-bio-label">{item.label}</span>
+                        <strong>{item.value}</strong>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
-            <dl className="player-report-kpis">
-              <div>
-                <dt>{multi ? copy.minutesKpi(ordered.length) : copy.minutes}</dt>
-                <dd>{totalMinutes.toLocaleString(locale)}</dd>
-              </div>
-              <div>
-                <dt>{copy.marketValue}</dt>
-                <dd>{tm?.market_value ? localizeMarketValue(tm.market_value, lang) : localizeSadaValue(main.sada_value, lang)}</dd>
-              </div>
-              <div>
-                <dt>{copy.contractUntilKpi}</dt>
-                <dd>{contractDate ?? "—"}</dd>
-              </div>
-            </dl>
+            <div className="player-report-heat">
+              <p className="player-report-label">{multi ? copy.avgHeatmapTitle : copy.heatmap}</p>
+              {heatmap ? (
+                <PlayerHeatmap playerName={main.name} heatmap={heatmap} fixed={{ width: 176, height: 114 }} />
+              ) : (
+                <p className="player-report-heat-empty">{copy.heatmapEmpty}</p>
+              )}
+            </div>
           </section>
 
-          <section className="player-report-synth">
+          <dl className="player-report-facts">
+            {facts.map((fact) => (
+              <div key={fact.key}>
+                <dt>
+                  <i className={`fa-solid ${fact.icon}`} aria-hidden="true" />
+                  {fact.label}
+                </dt>
+                <dd>
+                  {fact.value}
+                  {fact.sub ? <small>{fact.sub}</small> : null}
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          <section className="player-report-synth player-report-story">
             <div>
               <p className="player-report-label">{copy.synthesis}</p>
+              <h2 className="player-report-story-headline">
+                <RichText text={report.story.headline} />
+              </h2>
               <div className="player-report-synth-text">
-                {report.paragraphs.map((item) => (
-                  <p key={item.label}>
-                    <b>{item.label}</b>
-                    {item.text}
+                {report.story.body.map((text, index) => (
+                  <p key={index} className={fit && index === report.story.body.length - 1 ? "is-verdict" : undefined}>
+                    <RichText text={text} />
                   </p>
                 ))}
               </div>
@@ -2177,7 +2340,7 @@ export function AnalystSheet({
             </div>
           </section>
 
-          <section className="player-report-card player-report-keynums">
+          <section className={`player-report-card player-report-keynums${ordered.length >= 9 ? " is-dense" : ""}`}>
             <header className="player-report-card-head">
               <h2>{copy.keyNumbers}</h2>
               <span>{leagues}</span>
@@ -2224,29 +2387,82 @@ export function AnalystSheet({
             </table>
           </section>
 
-          <section>
-            <h2 className="player-report-heading">{copy.fitTitle}</h2>
-            <div className="player-report-fit">
-              <article className="is-yes">
-                <i className="fa-solid fa-check" aria-hidden="true" />
-                <div>
-                  <h3>{copy.fitYes}</h3>
-                  <p>{report.fit.yes}</p>
-                </div>
-              </article>
-              <article className="is-no">
-                <i className="fa-solid fa-exclamation" aria-hidden="true" />
-                <div>
-                  <h3>{copy.fitNo}</h3>
-                  <p>{report.fit.no}</p>
-                </div>
-              </article>
-            </div>
-          </section>
-
           <footer className="player-report-foot">
             <p className="player-report-avg-note">{copy.insightsNote(copy.pool(familyLabel, leagues))}</p>
             <ReportColophon generated={generated} page={copy.page(pageNumber, totalPages)} />
+          </footer>
+        </div>
+      </div>
+
+      <div className="player-report-page fit-page">
+        <ReportBanner
+          kicker={copy.fitKicker}
+          league={multi ? familyLabel : leagues}
+          family={multi ? copy.multiSeasons(ordered.length) : familyLabel}
+          season={span}
+          seasonTag={multi ? copy.multiTag : copy.seasonTag}
+        />
+        <div className="player-report-body">
+          <header className="player-report-cont fit-cont">
+            <strong>{main.name}</strong>
+            <span>
+              {translateLabel(main.position, lang)} · {currentClub}
+              {age != null ? ` · ${copy.bioYears(age)}` : ""}
+            </span>
+          </header>
+
+          {fit ? (
+            <>
+              <section className="fit-verdict">
+                <i className="fa-solid fa-bullseye" aria-hidden="true" />
+                <div>
+                  <p className="player-report-label">{copy.fitTitle}</p>
+                  <p className="fit-verdict-text">
+                    <RichText text={fit.verdict} />
+                  </p>
+                  {mixChips.length ? (
+                    <ul className="fit-mix">
+                      {mixChips.map((item) => (
+                        <li key={item.label}>
+                          <i style={{ background: profileAccent(item.raw) }} aria-hidden="true" />
+                          {item.label}
+                          <b>{Math.round(item.share)}%</b>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              </section>
+
+              <section>
+                <h2 className="player-report-heading">{copy.fitSchemes}</h2>
+                <div className="fit-schemes">
+                  {fit.schemes.map((item, index) => (
+                    <FitSchemeCard key={item.formation} item={item} best={index === 0} copy={copy} />
+                  ))}
+                </div>
+                <p className="fit-legend">
+                  <i aria-hidden="true" />
+                  {copy.fitHere}
+                </p>
+              </section>
+
+              <section>
+                <h2 className="player-report-heading">{copy.fitRoles}</h2>
+                <ol className="fit-roles">
+                  {fit.roles.map((item, index) => (
+                    <FitRoleRow key={item.name} item={item} index={index} />
+                  ))}
+                </ol>
+              </section>
+            </>
+          ) : (
+            <p className="player-report-heat-empty">{copy.heatmapEmpty}</p>
+          )}
+
+          <footer className="player-report-foot">
+            <p className="player-report-avg-note">{copy.fitNote}</p>
+            <ReportColophon generated={generated} page={copy.page(pageNumber + 1, totalPages)} />
           </footer>
         </div>
       </div>
@@ -2461,7 +2677,7 @@ export function PlayerReportButton({
   }
 
   const copy = REPORT_COPY[lang];
-  const totalPages = reportSheets.length * 2 + (reportSheets.length > 1 ? 2 : 0) + 1;
+  const totalPages = reportSheets.length * 2 + (reportSheets.length > 1 ? 2 : 0) + 2;
   const summaryRows = useMemo(
     () =>
       reportSheets.map((sheet) => ({
@@ -2582,7 +2798,7 @@ export function PlayerReportButton({
                 />
               ) : null}
               {reportSheets[0]?.seasonYear ? (
-                <AnalystSheet rows={summaryRows} family={family} lang={lang} pageNumber={totalPages} totalPages={totalPages} />
+                <AnalystSheet rows={summaryRows} family={family} lang={lang} pageNumber={totalPages - 1} totalPages={totalPages} />
               ) : null}
             </>,
             document.body,

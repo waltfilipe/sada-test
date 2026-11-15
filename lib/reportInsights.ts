@@ -1,17 +1,24 @@
 import { reportLocale, type ReportLang } from "@/lib/reportI18n";
+import { buildTacticalFit, type TacticalFit } from "@/lib/tacticalFit";
 
-/** Leituras automáticas da página final do PDF ("Resumo do analista"). */
+/** Leituras automáticas das páginas finais do PDF ("Resumo do analista" e "Encaixe tático"). */
 
 export type InsightDir = "up" | "down" | "even";
 
 export type InsightInput = {
   lang: ReportLang;
+  /** Para variar a redação de forma estável entre atletas. */
+  name: string;
+  family: string;
   position: string;
-  profile: { label: string; share: number; second: { label: string; share: number } | null } | null;
+  profile: { label: string; raw: string; share: number; second: { label: string; share: number } | null } | null;
+  /** Perfis com rótulo do site (PT) e afinidade média, do maior para o menor. */
+  profiles: { label: string; share: number }[];
+  side: "left" | "right" | null;
   /** Temporadas em ordem cronológica. */
   seasons: { year: string; club: string; minutes: number; minutesPct: number | null }[];
   /** Blocos (média dos percentis): uma célula por temporada + média ponderada. */
-  blocks: { title: string; cells: (number | null)[]; avg: number }[];
+  blocks: { title: string; tone: string; cells: (number | null)[]; avg: number }[];
   /** Métricas com percentil médio entre as temporadas. */
   metrics: { name: string; context: string; percentile: number }[];
   errorsLabel: string;
@@ -60,10 +67,10 @@ export type Insight = {
 };
 
 export type InsightReport = {
-  /** Parágrafos da síntese (jogo, físico, trajetória). */
-  paragraphs: { label: string; text: string }[];
+  /** Síntese em tom de scout: manchete + parágrafos, com **destaques** inline. */
+  story: { headline: string; body: string[] };
   insights: Insight[];
-  fit: { yes: string; no: string };
+  fit: TacticalFit | null;
 };
 
 type Pair = { pt: string; en: string };
@@ -260,6 +267,31 @@ export function physicalReading(
   return { label: row.label[en ? 1 : 0], sentence: text };
 }
 
+/** Frase curta de leitura física, para encaixar no meio da síntese. */
+function physicalBrief(physical: InsightInput["physical"], lang: ReportLang): string | null {
+  if (!physical?.length) return null;
+  const en = lang === "en";
+  const find = (key: string) => physical.find((m) => m.key === key);
+  const avg = (keys: string[]) => {
+    const values = keys.map((k) => find(k)?.pct).filter((v): v is number => v != null);
+    return values.length ? mean(values) : null;
+  };
+  const top = find("top_speed");
+  const speed = level(top?.pct ?? null);
+  const rep = level(avg(["sprints_p90", "sprinting_km_p90"]));
+  const vol = level(avg(["kilometers_p90", "running_km_p90"]));
+  if (!speed && !rep && !vol) return null;
+  const parts: string[] = [];
+  if (speed === "hi") parts.push(en ? `has a high top speed (${top?.value})` : `tem pico de velocidade alto (${top?.value})`);
+  if (speed === "lo") parts.push(en ? `has a modest top speed (${top?.value})` : `tem pico de velocidade baixo (${top?.value})`);
+  if (rep === "hi") parts.push(en ? "repeats sprints often" : "repete sprints com frequência");
+  if (rep === "lo") parts.push(en ? "makes few sprints" : "faz poucos sprints");
+  if (vol === "hi") parts.push(en ? "covers a lot of ground" : "cobre muito campo");
+  if (vol === "lo") parts.push(en ? "covers less ground than the position" : "cobre menos campo que a posição");
+  if (!parts.length) return en ? "Physically, he is in line with the position." : "Fisicamente, está dentro da média da posição.";
+  return en ? `Physically, he ${list(parts, lang)}.` : `Fisicamente, ${list(parts, lang)}.`;
+}
+
 export function buildInsights(input: InsightInput): InsightReport {
   const { lang, blocks, seasons } = input;
   const en = lang === "en";
@@ -271,7 +303,6 @@ export function buildInsights(input: InsightInput): InsightReport {
   const best = byAvg[0] ?? null;
   const weakest = [...byAvg].reverse();
   const worst = weakest[0] && weakest[0].avg < 50 ? weakest[0] : null;
-  const worst2 = weakest[1] && weakest[1].avg < 45 ? weakest[1] : null;
   const second = byAvg[1] && byAvg[1].avg >= 55 ? byAvg[1] : null;
   const span = multi ? `${first.year.slice(2)}–${last.year.slice(2)}` : first?.year ?? "";
 
@@ -282,7 +313,9 @@ export function buildInsights(input: InsightInput): InsightReport {
   const metricBars = (items: typeof tops): InsightBar[] =>
     items.map((m) => ({ label: m.name, fill: m.percentile, display: String(m.percentile), tone: toneOfPct(m.percentile), median: true }));
 
-  // ── Síntese ─────────────────────────────────────────────────────────────
+  // ── Síntese (tom de scout) ──────────────────────────────────────────────
+  const seed = [...`${input.name}|${input.position}|${n}`].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const pick = <T,>(salt: number, options: T[]): T => options[(seed + salt * 7) % options.length];
   const trends = multi
     ? blocks
         .map((b) => ({ title: b.title, from: b.cells[0], to: b.cells[b.cells.length - 1], cells: b.cells }))
@@ -293,42 +326,90 @@ export function buildInsights(input: InsightInput): InsightReport {
   const bigTrend = trends[0] && Math.abs(trends[0].delta) >= 15 ? trends[0] : null;
   const phys = physicalReading(input.physical, lang);
   const pr = input.person;
-  const cap = (text: string) => text.charAt(0).toLocaleUpperCase() + text.slice(1);
-  const paragraphs: { label: string; text: string }[] = [];
+  const loc = en ? "en-GB" : "pt-BR";
+  const cap = (text: string) => text.charAt(0).toLocaleUpperCase(loc) + text.slice(1);
+  const lower = (text: string) => text.toLocaleLowerCase(loc);
+  const bold = (value: string | number) => `**${value}**`;
 
-  // Jogo: quem é o atleta.
   const share = input.profile ? Math.round(input.profile.share) : 0;
   const secondary = input.profile?.second && input.profile.second.share >= 25 ? input.profile.second : null;
-  const phrase = input.profile ? PROFILE_PHRASE[input.profile.label]?.[lang] ?? null : null;
-  const strongAerial = tops.some((m) => /(a[ée]re|aerial)/i.test(m.name));
-  const tall = pr.heightCm != null && pr.heightCm >= 186;
-  const tallBit = tall
+  const archetype = input.profile ? lower(input.profile.label) : null;
+  const phrase = input.profile ? PROFILE_PHRASE[input.profile.raw]?.[lang]?.split(": ")[1] ?? null : null;
+
+  // Manchete: quem é, o que o sustenta e o que o limita, numa frase.
+  const sig = best ? voice(best.title, "role", lang) : null;
+  const gap = worst ? voice(worst.title, "role", lang) : null;
+  const sigText = sig
     ? en
-      ? `tall (${pr.heightCm} cm)${strongAerial ? ", which shows in the aerial numbers" : ""}`
-      : `porte alto (${pr.heightCm} cm)${strongAerial ? ", que aparece nos números aéreos" : ""}`
+      ? pick(1, [`the edge is ${sig}`, `stands out for ${sig}`, `strongest in ${sig}`])
+      : pick(1, [`o diferencial está em ${sig}`, `destaca-se em ${sig}`, `vale pelo que entrega em ${sig}`])
     : null;
-  const identity = [input.position, pr.age != null ? (en ? `${pr.age} years old` : `${pr.age} anos`) : null, pr.foot, tallBit]
-    .filter(Boolean)
-    .join(", ");
-  let game = `${cap(identity)}.`;
-  if (input.profile) {
-    const lower = input.profile.label.toLocaleLowerCase(en ? "en-GB" : "pt-BR");
-    const how = share >= 60 ? (en ? "predominantly" : "predominantemente") : share >= 45 ? (en ? "mostly" : "majoritariamente") : null;
-    const tag = how
-      ? `${how} ${lower} (${share}%)`
-      : en
-        ? `a blend led by ${input.profile.label} (${share}%)`
-        : `perfil misto, liderado por ${input.profile.label} (${share}%)`;
-    game += ` ${cap(phrase ?? (en ? "profile" : "perfil"))}, ${tag}`;
-    if (secondary) game += en ? `, with traces of ${secondary.label} (${Math.round(secondary.share)}%)` : `, com traços de ${secondary.label} (${Math.round(secondary.share)}%)`;
-    game += ".";
+  const gapText = gap
+    ? en
+      ? pick(2, [`less convincing in ${gap}`, `watch ${gap}`])
+      : pick(2, [`menos convincente em ${gap}`, `ponto de atenção: ${gap}`])
+    : null;
+  const bioBits = [pr.age != null ? (en ? `${pr.age} years old` : `${pr.age} anos`) : null, pr.foot].filter(Boolean).join(", ");
+  const lead = `${cap(lower(input.position))}${archetype ? (en ? ` with a ${archetype} profile` : ` de perfil ${archetype}`) : ""}`;
+  const headline = `${lead}${bioBits ? `, ${bioBits}` : ""}${sigText ? ` — ${sigText}` : ""}${gapText ? `; ${gapText}` : ""}.`;
+
+  // 1º parágrafo: como joga.
+  const play: string[] = [];
+  if (input.profile && phrase) {
+    const trace = secondary
+      ? en
+        ? `, with traces of ${secondary.label} (${Math.round(secondary.share)}%)`
+        : `, com traços de ${secondary.label} (${Math.round(secondary.share)}%)`
+      : "";
+    const pct = bold(`${share}%`);
+    play.push(
+      share >= 45
+        ? en ? `As a ${archetype} (${pct}), ${phrase}${trace}.` : `Como ${archetype} (${pct}), ${phrase}${trace}.`
+        : en ? `A blended profile led by ${archetype} (${pct}): ${phrase}${trace}.` : `Perfil misto, liderado por ${archetype} (${pct}): ${phrase}${trace}.`,
+    );
   }
-  paragraphs.push({ label: en ? "Game" : "Jogo", text: game });
+  if (best) {
+    const strong = list(tops.slice(0, 2).map((m) => `${m.name} (P${m.percentile})`), lang);
+    const avg = bold(Math.round(best.avg));
+    const t = bold(lower(best.title));
+    const withList = (before: string) => (strong ? `${before}${strong}` : "");
+    play.push(
+      en
+        ? pick(3, [
+            `His game rests on ${t} (average ${avg})${withList(", led by ")}.`,
+            `Where he stands out most: ${t} — average ${avg}${withList(", with ")}.`,
+            `The strongest numbers come from ${t} (average ${avg})${withList(": ")}.`,
+          ])
+        : pick(3, [
+            `O jogo se apoia em ${t} (média ${avg})${withList(", puxado por ")}.`,
+            `Onde mais se destaca: ${t} — média ${avg}${withList(", com ")}.`,
+            `Os números mais fortes vêm de ${t} (média ${avg})${withList(": ")}.`,
+          ]),
+    );
+    if (second && second.avg >= 65) play.push(en ? `He adds ${lower(second.title)} (${Math.round(second.avg)}).` : `Soma ainda ${lower(second.title)} (${Math.round(second.avg)}).`);
+  }
+  if (worst) {
+    const low = list(bottoms.slice(0, 2).map((m) => `${m.name} (P${m.percentile})`), lang);
+    const avg = bold(Math.round(worst.avg));
+    play.push(
+      en
+        ? `In ${bold(lower(worst.title))} the average drops to ${avg}${low ? `; in the detail, the lowest percentiles are ${low}` : ""}.`
+        : `Já em ${bold(lower(worst.title))} a média cai para ${avg}${low ? `; no detalhe, os menores percentis são ${low}` : ""}.`,
+    );
+  }
+  if (input.xprog && input.xprog.dir !== "even") {
+    const up = input.xprog.dir === "up";
+    play.push(
+      en
+        ? `On progression he delivers ${up ? "above" : "below"} what his passing volume suggests (${signed(input.xprog.delta, 1, lang)} progressive passes/90).`
+        : `Na progressão, entrega ${up ? "acima" : "abaixo"} do esperado pelo volume de passes (${signed(input.xprog.delta, 1, lang)} progressivos/90).`,
+    );
+  }
 
-  if (phys) paragraphs.push({ label: en ? "Physical" : "Físico", text: phys.sentence });
-
-  // Trajetória: minutos, histórico e situação contratual.
-  const bits: string[] = [];
+  // 2º parágrafo: físico, minutos, trajetória e situação contratual.
+  const ctx: string[] = [];
+  const brief = physicalBrief(input.physical, lang);
+  if (brief) ctx.push(brief);
   const lastMin = last.minutesPct;
   const total = seasons.reduce((sum, season) => sum + season.minutes, 0);
   const fmtMin = (v: number) => v.toLocaleString(reportLocale(lang));
@@ -341,16 +422,17 @@ export function buildInsights(input: InsightInput): InsightReport {
           ? en ? "has a run of games" : "tem sequência"
           : en ? "has had few minutes" : "teve poucos minutos";
   if (multi) {
-    const tail = role && lastMin != null
-      ? en
-        ? `; in ${last.year} he ${role} at ${last.club} (${Math.round(lastMin)}% of league minutes)`
-        : `; em ${last.year} ${role} no ${last.club} (${Math.round(lastMin)}% dos minutos da competição)`
-      : "";
-    bits.push(en ? `${fmtMin(total)} minutes over ${n} seasons${tail}.` : `${fmtMin(total)} min em ${n} temporadas${tail}.`);
+    ctx.push(
+      role && lastMin != null
+        ? en
+          ? `In ${last.year} he ${role} at ${last.club} (${Math.round(lastMin)}% of league minutes).`
+          : `Em ${last.year} ${role} no ${last.club} (${Math.round(lastMin)}% dos minutos da competição).`
+        : en ? `${fmtMin(total)} minutes over ${n} seasons.` : `${fmtMin(total)} min em ${n} temporadas.`,
+    );
     const shorts = seasons.filter((season) => season.minutesPct != null && season.minutesPct < 30 && season !== last);
     if (shorts.length) {
       const names = list(shorts.map((x) => `${x.year} (${Math.round(x.minutesPct as number)}%)`), lang);
-      bits.push(
+      ctx.push(
         en
           ? `${names} ${shorts.length > 1 ? "are short samples" : "is a short sample"}, so read with caution.`
           : `${names} ${shorts.length > 1 ? "são amostras curtas e pedem" : "é amostra curta e pede"} cautela.`,
@@ -359,18 +441,25 @@ export function buildInsights(input: InsightInput): InsightReport {
   } else {
     const where = en ? ` at ${last.club}` : ` no ${last.club}`;
     const pct = lastMin != null ? (en ? ` (${Math.round(lastMin)}% of league minutes)` : ` (${Math.round(lastMin)}% da competição)`) : "";
-    bits.push(en ? `${fmtMin(total)} minutes${pct}${where}${role ? `; ${role}` : ""}.` : `${fmtMin(total)} min${pct}${where}${role ? `, onde ${role}` : ""}.`);
+    ctx.push(en ? `${fmtMin(total)} minutes${pct}${where}${role ? `; ${role}` : ""}.` : `${fmtMin(total)} min${pct}${where}${role ? `, onde ${role}` : ""}.`);
   }
   if (bigTrend) {
     const moved = first.club !== last.club;
     const up = bigTrend.delta > 0;
-    bits.push(
+    ctx.push(
       en
         ? `${bigTrend.title} ${up ? "rose" : "fell"} from ${bigTrend.from} to ${bigTrend.to}${moved ? `, coinciding with the move from ${first.club} to ${last.club}: worth checking whether it is the new team's tactical role` : ""}.`
         : `${bigTrend.title} ${up ? "subiu" : "caiu"} de ${bigTrend.from} para ${bigTrend.to}${moved ? `, junto com a mudança de ${first.club} para o ${last.club}: vale entender se é função tática do novo clube` : ""}.`,
     );
   } else if (multi) {
-    bits.push(en ? "Profile stable across seasons and clubs." : "Perfil estável entre temporadas e clubes.");
+    ctx.push(en ? "Profile stable across seasons and clubs." : "Perfil estável entre temporadas e clubes.");
+  }
+  const pdt = input.production;
+  const xgaTotal = pdt.xg != null && pdt.xa != null ? pdt.xg + pdt.xa : null;
+  if (xgaTotal != null && pdt.minutes > 0) {
+    const ga = pdt.goals + pdt.assists;
+    if (ga - xgaTotal >= 1.5 && ga >= xgaTotal * 1.3) ctx.push(en ? "G+A sits above xG+xA, which tends to regress." : "G+A acima do xG+xA, o que tende a regredir.");
+    else if (ga - xgaTotal <= -1.5) ctx.push(en ? "G+A is below xG+xA, so there is room to grow." : "G+A abaixo do xG+xA: há margem para crescer.");
   }
   const expiring = pr.contractMonths != null && pr.contractMonths >= 0 && pr.contractMonths <= 8;
   const contract = pr.contractDate
@@ -390,8 +479,7 @@ export function buildInsights(input: InsightInput): InsightReport {
           ? en ? " — still has room to grow" : " — ainda com margem de evolução"
           : "";
   const deal = [contract, market].filter((item): item is string => Boolean(item));
-  if (deal.length) bits.push(`${cap(list(deal, lang))}${ageNote}.`);
-  paragraphs.push({ label: en ? "Track record" : "Trajetória", text: bits.join(" ") });
+  if (deal.length) ctx.push(`${cap(list(deal, lang))}${ageNote}.`);
 
   // ── Leituras visuais ────────────────────────────────────────────────────
   const insights: Insight[] = [];
@@ -470,22 +558,25 @@ export function buildInsights(input: InsightInput): InsightReport {
     }
   }
 
-  // ── Encaixe ─────────────────────────────────────────────────────────────
-  const yes = best
-    ? en
-      ? `Teams that need ${voice(best.title, "role", lang)}${second ? ` and ${voice(second.title, "role", lang)}` : ""}.`
-      : `Times que precisem de ${voice(best.title, "role", lang)}${second ? ` e ${voice(second.title, "role", lang)}` : ""}.`
-    : "—";
-  const xga = p.xg != null && p.xa != null ? p.xg + p.xa : null;
-  const overperf = xga != null && p.goals + p.assists - xga >= 1.5 && p.goals + p.assists >= xga * 1.3;
-  let no = worst
-    ? en
-      ? `Roles that demand ${voice(worst.title, "role", lang)}${worst2 ? ` and ${voice(worst2.title, "role", lang)}` : ""}.`
-      : `Funções que exijam ${voice(worst.title, "role", lang)}${worst2 ? ` e ${voice(worst2.title, "role", lang)}` : ""}.`
-    : en
-      ? "No clear statistical restriction."
-      : "Sem restrição estatística clara.";
-  if (overperf) no += en ? " G+A above xG+xA tends to drop." : " G+A acima do xG+xA tende a cair.";
+  // ── Encaixe tático ──────────────────────────────────────────────────────
+  const fit = buildTacticalFit({
+    lang,
+    family: input.family,
+    profiles: input.profiles,
+    blocks: blocks.map((b) => ({ tone: b.tone, title: b.title, avg: b.avg })),
+    physical: input.physical,
+    side: input.side,
+  });
+  const body = [play.join(" "), ctx.join(" ")].filter(Boolean);
+  if (fit) {
+    const topRole = fit.roles[0];
+    const forms = fit.schemes.slice(0, 2).map((s) => bold(s.formation));
+    body.push(
+      en
+        ? `In practice: ${bold(lower(topRole.name))}, best placed in ${forms.join(" or ")}.`
+        : `Na prática: ${bold(lower(topRole.name))}, com melhor encaixe em ${forms.join(" ou ")}.`,
+    );
+  }
 
-  return { paragraphs, insights: insights.slice(0, 4), fit: { yes, no } };
+  return { story: { headline, body }, insights: insights.slice(0, 4), fit };
 }
