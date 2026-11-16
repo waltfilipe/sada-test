@@ -2084,6 +2084,7 @@ function FitSchemeCard({ item, best, copy }: { item: FitScheme; best: boolean; c
         <strong>{item.formation}</strong>
         <span className="fit-level">{item.level}</span>
       </div>
+      <span className="fit-scheme-tag">{item.tag}</span>
       <h3>{item.slot}</h3>
       <p>{item.why}</p>
       <FitEvidence items={item.evidence} />

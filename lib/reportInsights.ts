@@ -564,6 +564,7 @@ export function buildInsights(input: InsightInput): InsightReport {
     family: input.family,
     profiles: input.profiles,
     blocks: blocks.map((b) => ({ tone: b.tone, title: b.title, avg: b.avg })),
+    metrics: input.metrics?.map((m) => ({ name: m.name, percentile: m.percentile })),
     physical: input.physical,
     side: input.side,
   });
