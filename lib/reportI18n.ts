@@ -133,6 +133,8 @@ export const REPORT_COPY = {
     fitRoles: "Funções indicadas",
     fitBest: "Melhor encaixe",
     fitHere: "Posição do atleta",
+    fitMove: "Movimento indicado",
+    fitCross: "Adaptação",
     fitNote: "Indicação a partir do perfil de jogo (afinidade média) e dos percentis por bloco, ponderados pelos minutos. É hipótese para validar em vídeo.",
     insightsNote: (pool: string) =>
       `Como ler: percentis (0–100) contra ${pool} da mesma temporada; verde a partir de 70, laranja até 30; mediana = 50. Leituras automáticas a partir dos dados das páginas anteriores — hipóteses para validar em vídeo.`,
@@ -267,6 +269,8 @@ export const REPORT_COPY = {
     fitRoles: "Recommended roles",
     fitBest: "Best fit",
     fitHere: "Player's slot",
+    fitMove: "Suggested movement",
+    fitCross: "Adaptation",
     fitNote: "Recommendation from the playing profile (average affinity) and block percentiles, weighted by minutes. A hypothesis to check on video.",
     insightsNote: (pool: string) =>
       `How to read: percentiles (0–100) vs ${pool} of the same season; green from 70, orange up to 30; median = 50. Automatic readings from the previous pages — hypotheses to check on video.`,

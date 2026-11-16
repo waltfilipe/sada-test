@@ -131,6 +131,17 @@ de perfil + percentis por bloco + percentis de métricas específicas + GPS; e
 **slots por esquema** (4-3-3 / 4-2-3-1 / 4-4-2 / 3-5-2 / 3-4-3 / 4-1-2-1-2 /
 3-4-2-1), cada um listando as funções que cabem nele — o card mostra a função
 em que o atleta renderia melhor NAQUELE desenho (o nome muda por esquema).
+Funções com `gate` são **adaptações de posição** (lateral defensivo → zagueiro
+pelo lado na linha de 3; lateral ofensivo driblador → ponta; extremo com volume
+defensivo → ala; volante alto e forte no alto → zagueiro; zagueiro construtor →
+volante; atacante driblador → atacante pelo lado): só entram se o critério
+(percentis/altura) passa e o score ≥ `CROSS_MIN`; aparecem no máximo 1× entre
+os esquemas (card âmbar "Adaptação") e 1× entre as funções. `move` = movimento
+típico da função (delta no campinho) → seta tracejada no card + legenda.
+Métricas casam por `aspect` (rótulo PT do aspecto, estável entre idiomas);
+`buildInsights` filtra aspectos fora da família avaliada (temporadas curtas em
+outra posição não contaminam). A síntese usa `ACTIONS` (aspecto → ação em
+campo) e a função do encaixe como sujeito da manchete.
 Ajustar função/slot = editar `FAMILIES` nesse arquivo.
 Página com `overflow:hidden`: após mexer no layout, conferir que
 `.player-report-body` não tem scrollHeight > clientHeight.

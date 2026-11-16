@@ -1,5 +1,7 @@
 import { reportLocale, type ReportLang } from "@/lib/reportI18n";
 import { buildTacticalFit, type TacticalFit } from "@/lib/tacticalFit";
+import { statSectionsForFamily } from "@/lib/aspectStatSections";
+import type { PositionFamily } from "@/lib/types";
 
 /** Leituras automáticas das páginas finais do PDF ("Resumo do analista" e "Encaixe tático"). */
 
@@ -20,7 +22,7 @@ export type InsightInput = {
   /** Blocos (média dos percentis): uma célula por temporada + média ponderada. */
   blocks: { title: string; tone: string; cells: (number | null)[]; avg: number }[];
   /** Métricas com percentil médio entre as temporadas. */
-  metrics: { name: string; context: string; percentile: number }[];
+  metrics: { name: string; context: string; percentile: number; aspect?: string }[];
   errorsLabel: string;
   xprog: {
     actual: number;
@@ -129,7 +131,66 @@ const PROFILE_PHRASE: Record<string, Pair> = {
   Móvel: { pt: "perfil móvel: sai da referência e associa", en: "mobile profile: drops off the reference point and combines" },
   "Defensor de Área": { pt: "perfil de área: protege a grande área e domina o jogo aéreo", en: "box-defender profile: protects the penalty area and dominates in the air" },
   Combativo: { pt: "perfil combativo: sai para o duelo e antecipa", en: "aggressive profile: steps out to duel and anticipates" },
+  Híbrido: { pt: "perfil híbrido: equilibra as duas fases sem um traço que domine", en: "hybrid profile: balances both phases without one dominant trait" },
 };
+
+/** Aspecto (rótulo PT, sem acento) → o que o atleta faz em campo, acima / abaixo da posição. */
+const ACTIONS: { match: string; up: Pair; down: Pair | null }[] = [
+  { match: "duelos defensivos", up: { pt: "ganha a maioria dos duelos que disputa", en: "wins most of the duels he contests" }, down: { pt: "perde duelos demais para a posição", en: "loses too many duels for the position" } },
+  { match: "duelos vencidos", up: { pt: "ganha muitos duelos", en: "wins a lot of duels" }, down: { pt: "perde muitos duelos", en: "loses a lot of duels" } },
+  { match: "acoes defensivas", up: { pt: "intercepta e recupera muita bola", en: "intercepts and wins back a lot of balls" }, down: { pt: "participa pouco da recuperação", en: "takes little part in winning the ball back" } },
+  { match: "recuperac", up: { pt: "recupera muitas bolas", en: "wins back a lot of balls" }, down: { pt: "recupera poucas bolas", en: "wins back few balls" } },
+  { match: "eficiencia defensiva", up: { pt: "dificilmente é batido", en: "is rarely beaten" }, down: { pt: "é batido com frequência", en: "gets beaten too often" } },
+  { match: "aereo", up: { pt: "é forte no jogo aéreo", en: "is strong in the air" }, down: { pt: "sofre no jogo aéreo", en: "struggles in the air" } },
+  { match: "passes progressivos", up: { pt: "quebra linhas com o passe", en: "breaks lines with his passing" }, down: { pt: "pouco arrisca o passe vertical", en: "rarely risks the vertical pass" } },
+  { match: "passes para terco final", up: { pt: "coloca a bola no terço final com frequência", en: "regularly gets the ball into the final third" }, down: { pt: "raramente leva a bola ao terço final", en: "rarely moves the ball into the final third" } },
+  { match: "passes longos", up: { pt: "tem um bom lançamento", en: "has a good long pass" }, down: { pt: "não é jogador de lançamento", en: "is not a long-passing player" } },
+  { match: "distribuicao", up: { pt: "circula a bola com segurança", en: "circulates the ball securely" }, down: { pt: "erra mais passes do que a posição tolera", en: "misplaces more passes than the position allows" } },
+  { match: "disputas com bola", up: { pt: "protege bem a bola sob pressão", en: "shields the ball well under pressure" }, down: { pt: "perde a bola com facilidade sob pressão", en: "loses the ball easily under pressure" } },
+  { match: "1v1", up: { pt: "parte para cima no um contra um", en: "takes defenders on one-on-one" }, down: { pt: "pouco busca o drible", en: "rarely looks to dribble" } },
+  { match: "progress", up: { pt: "carrega a bola para a frente", en: "drives forward with the ball" }, down: { pt: "conduz pouco", en: "rarely carries the ball" } },
+  { match: "cruzamentos", up: { pt: "cruza com volume e qualidade", en: "crosses with volume and quality" }, down: { pt: "cruza pouco", en: "crosses little" } },
+  { match: "passes chave", up: { pt: "acha o passe que deixa o companheiro na cara do gol", en: "finds the pass that puts a team-mate through" }, down: { pt: "cria pouco no último terço", en: "creates little in the final third" } },
+  { match: "pre assist", up: { pt: "aparece muito no penúltimo passe", en: "features a lot in the pass before the assist" }, down: null },
+  { match: "passes criativos", up: { pt: "arrisca o passe criativo", en: "risks the creative pass" }, down: { pt: "arrisca pouco o passe criativo", en: "rarely risks the creative pass" } },
+  { match: "gols e xg", up: { pt: "chega em boas condições de finalizar e converte", en: "gets into good shooting positions and converts" }, down: { pt: "chega pouco em condição de gol", en: "rarely gets into scoring positions" } },
+  { match: "finalizacoes", up: { pt: "finaliza com volume", en: "shoots often" }, down: { pt: "finaliza pouco", en: "shoots little" } },
+  { match: "efetividade", up: { pt: "converte acima da média", en: "converts above average" }, down: { pt: "desperdiça mais do que deveria", en: "wastes more chances than he should" } },
+  { match: "ofensividade", up: { pt: "pisa muito na área adversária", en: "gets into the opposition box a lot" }, down: { pt: "aparece pouco na área adversária", en: "rarely appears in the opposition box" } },
+  { match: "acoes terminais", up: { pt: "participa muito das jogadas finais", en: "is heavily involved in the final actions" }, down: { pt: "participa pouco das jogadas finais", en: "is rarely involved in the final actions" } },
+  { match: "verticalidade", up: { pt: "joga sempre de frente para o gol", en: "always plays towards goal" }, down: { pt: "joga mais para os lados do que para a frente", en: "plays more sideways than forwards" } },
+];
+
+/** pct = média do aspecto; label/top = a linha mais forte dele (cita a métrica concreta). */
+type AspectRead = { label: string; pct: number; top: number; action: (typeof ACTIONS)[number] };
+
+const plain = (s: string) =>
+  s
+    .toLocaleLowerCase("pt-BR")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+/** Média dos percentis por aspecto, com a ação correspondente; do mais forte ao mais fraco. */
+function aspectReads(metrics: InsightInput["metrics"]): AspectRead[] {
+  const groups = new Map<string, { label: string; top: number; values: number[]; action: (typeof ACTIONS)[number] }>();
+  for (const m of metrics) {
+    const key = plain(m.aspect ?? m.name);
+    if (key.includes("erro") || plain(m.name).includes("erro")) continue;
+    const action = ACTIONS.find((a) => key.includes(a.match));
+    if (!action) continue;
+    // Uma leitura por ação: evita "forte no alto" e "sofre no alto" vindos de aspectos irmãos.
+    const group = groups.get(action.match) ?? { label: "", top: -1, values: [], action };
+    if (m.percentile > group.top) {
+      group.top = m.percentile;
+      group.label = m.name.replace(/\s*\/\s*90|\s*%$/g, "").trim().toLocaleLowerCase("pt-BR");
+    }
+    group.values.push(m.percentile);
+    groups.set(action.match, group);
+  }
+  return [...groups.values()]
+    .map((g) => ({ label: g.label, top: g.top, pct: g.values.reduce((a, b) => a + b, 0) / g.values.length, action: g.action }))
+    .sort((a, b) => b.pct - a.pct);
+}
 
 function voiceKey(title: string): keyof typeof BLOCK_VOICE | null {
   const t = title.toLocaleLowerCase();
@@ -292,7 +353,14 @@ function physicalBrief(physical: InsightInput["physical"], lang: ReportLang): st
   return en ? `Physically, he ${list(parts, lang)}.` : `Fisicamente, ${list(parts, lang)}.`;
 }
 
-export function buildInsights(input: InsightInput): InsightReport {
+export function buildInsights(raw: InsightInput): InsightReport {
+  // Só aspectos da família avaliada: temporadas curtas em outra posição não contaminam a leitura.
+  const familyAspects = new Set(
+    statSectionsForFamily(raw.family as PositionFamily)
+      .flatMap((section) => section.labels)
+      .map((label) => (label === "Conduções Progressivas" ? "Progressão" : label)),
+  );
+  const input: InsightInput = { ...raw, metrics: raw.metrics.filter((m) => !m.aspect || familyAspects.has(m.aspect)) };
   const { lang, blocks, seasons } = input;
   const en = lang === "en";
   const n = seasons.length;
@@ -313,6 +381,18 @@ export function buildInsights(input: InsightInput): InsightReport {
   const metricBars = (items: typeof tops): InsightBar[] =>
     items.map((m) => ({ label: m.name, fill: m.percentile, display: String(m.percentile), tone: toneOfPct(m.percentile), median: true }));
 
+  // ── Encaixe tático (antes da síntese: a função vira o sujeito do texto) ──
+  const fit = buildTacticalFit({
+    lang,
+    family: input.family,
+    profiles: input.profiles,
+    blocks: blocks.map((b) => ({ tone: b.tone, title: b.title, avg: b.avg })),
+    metrics: input.metrics.map((m) => ({ aspect: m.aspect ?? m.name, label: m.name, percentile: m.percentile })),
+    physical: input.physical,
+    side: input.side,
+    heightCm: input.person.heightCm,
+  });
+
   // ── Síntese (tom de scout) ──────────────────────────────────────────────
   const seed = [...`${input.name}|${input.position}|${n}`].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
   const pick = <T,>(salt: number, options: T[]): T => options[(seed + salt * 7) % options.length];
@@ -330,79 +410,89 @@ export function buildInsights(input: InsightInput): InsightReport {
   const cap = (text: string) => text.charAt(0).toLocaleUpperCase(loc) + text.slice(1);
   const lower = (text: string) => text.toLocaleLowerCase(loc);
   const bold = (value: string | number) => `**${value}**`;
+  const L = (pair: Pair) => pair[lang];
+  const and = en ? " and " : " e ";
+  const an = (word: string) => (/^[aeiou]/i.test(word.replace(/\*/g, "")) ? "an" : "a");
 
-  const share = input.profile ? Math.round(input.profile.share) : 0;
   const secondary = input.profile?.second && input.profile.second.share >= 25 ? input.profile.second : null;
+  const share = input.profile ? Math.round(input.profile.share) : 0;
   const archetype = input.profile ? lower(input.profile.label) : null;
-  const phrase = input.profile ? PROFILE_PHRASE[input.profile.raw]?.[lang]?.split(": ")[1] ?? null : null;
+  const [profileNoun, phrase] = input.profile ? PROFILE_PHRASE[input.profile.raw]?.[lang]?.split(": ") ?? [null, null] : [null, null];
 
-  // Manchete: quem é, o que o sustenta e o que o limita, numa frase.
-  const sig = best ? voice(best.title, "role", lang) : null;
-  const gap = worst ? voice(worst.title, "role", lang) : null;
-  const sigText = sig
-    ? en
-      ? pick(1, [`the edge is ${sig}`, `stands out for ${sig}`, `strongest in ${sig}`])
-      : pick(1, [`o diferencial está em ${sig}`, `destaca-se em ${sig}`, `vale pelo que entrega em ${sig}`])
-    : null;
-  const gapText = gap
-    ? en
-      ? pick(2, [`less convincing in ${gap}`, `watch ${gap}`])
-      : pick(2, [`menos convincente em ${gap}`, `ponto de atenção: ${gap}`])
-    : null;
-  const bioBits = [pr.age != null ? (en ? `${pr.age} years old` : `${pr.age} anos`) : null, pr.foot].filter(Boolean).join(", ");
-  const lead = `${cap(lower(input.position))}${archetype ? (en ? ` with a ${archetype} profile` : ` de perfil ${archetype}`) : ""}`;
-  const headline = `${lead}${bioBits ? `, ${bioBits}` : ""}${sigText ? ` — ${sigText}` : ""}${gapText ? `; ${gapText}` : ""}.`;
+  // O que ele FAZ em campo: aspectos agregados e traduzidos em ação.
+  const aspects = aspectReads(input.metrics);
+  const strengths = aspects.filter((a) => a.pct >= 70).slice(0, 3);
+  const gaps = [...aspects].reverse().filter((a) => a.pct <= 35 && a.action.down).slice(0, 2);
+  const up = (a: AspectRead) => L(a.action.up);
+  const down = (a: AspectRead) => L(a.action.down as Pair);
 
-  // 1º parágrafo: como joga.
-  const play: string[] = [];
-  if (input.profile && phrase) {
-    const trace = secondary
+  // Manchete: a função como sujeito + o que entrega + a ressalva.
+  const subject = fit?.best?.role ?? input.position;
+  let headline: string;
+  if (strengths.length) {
+    const does = strengths.slice(0, 2).map(up).join(and);
+    const but = gaps[0] ? ` — ${en ? `${pick(2, ["but", "though"])} he` : pick(2, ["mas", "só que"])} ${down(gaps[0])}` : "";
+    headline = `${cap(lower(subject))} ${en ? "who" : "que"} ${does}${but}.`;
+  } else {
+    const top = byAvg[0];
+    const lead = `${cap(lower(subject))}${archetype ? (en ? ` with a ${archetype} profile` : ` de perfil ${archetype}`) : ""}`;
+    headline = top
       ? en
-        ? `, with traces of ${secondary.label} (${Math.round(secondary.share)}%)`
-        : `, com traços de ${secondary.label} (${Math.round(secondary.share)}%)`
-      : "";
-    const pct = bold(`${share}%`);
-    play.push(
-      share >= 45
-        ? en ? `As a ${archetype} (${pct}), ${phrase}${trace}.` : `Como ${archetype} (${pct}), ${phrase}${trace}.`
-        : en ? `A blended profile led by ${archetype} (${pct}): ${phrase}${trace}.` : `Perfil misto, liderado por ${archetype} (${pct}): ${phrase}${trace}.`,
-    );
+        ? `${lead}: no standout trait, his best area is ${voice(top.title, "role", lang)}.`
+        : `${lead}: sem um traço dominante, o melhor que entrega é ${voice(top.title, "role", lang)}.`
+      : `${lead}.`;
   }
-  if (best) {
-    const strong = list(tops.slice(0, 2).map((m) => `${m.name} (P${m.percentile})`), lang);
-    const avg = bold(Math.round(best.avg));
-    const t = bold(lower(best.title));
-    const withList = (before: string) => (strong ? `${before}${strong}` : "");
+
+  // 1º parágrafo: como joga, com o dado sustentando a leitura.
+  const play: string[] = [];
+  if (input.profile && phrase && profileNoun) {
+    if (share >= 45 || !secondary) {
+      play.push(
+        en
+          ? pick(3, [`${cap(profileNoun)}: ${phrase}.`, `First and foremost a ${profileNoun} — ${phrase}.`])
+          : pick(3, [`${cap(profileNoun)}: ${phrase}.`, `É, antes de tudo, um ${profileNoun} — ${phrase}.`]),
+      );
+    } else {
+      play.push(
+        en
+          ? `He doesn't fit a single label — a ${profileNoun} with traces of ${lower(secondary.label)}: ${phrase}.`
+          : `Não cabe num rótulo só — ${profileNoun} com traços de ${lower(secondary.label)}: ${phrase}.`,
+      );
+    }
+  }
+  const lead = strengths.find((a) => a.top >= 80);
+  if (lead) {
+    const top = Math.max(5, Math.ceil((100 - lead.top) / 5) * 5);
     play.push(
       en
-        ? pick(3, [
-            `His game rests on ${t} (average ${avg})${withList(", led by ")}.`,
-            `Where he stands out most: ${t} — average ${avg}${withList(", with ")}.`,
-            `The strongest numbers come from ${t} (average ${avg})${withList(": ")}.`,
+        ? pick(4, [
+            `The data backs it up: in ${lead.label} he is in the ${bold(`top ${top}%`)} for the position.`,
+            `It shows in the numbers — ${lead.label} puts him in the ${bold(`top ${top}%`)} of the position.`,
           ])
-        : pick(3, [
-            `O jogo se apoia em ${t} (média ${avg})${withList(", puxado por ")}.`,
-            `Onde mais se destaca: ${t} — média ${avg}${withList(", com ")}.`,
-            `Os números mais fortes vêm de ${t} (média ${avg})${withList(": ")}.`,
+        : pick(4, [
+            `O dado confirma: em ${lead.label}, está entre os ${bold(`${top}% melhores`)} da posição.`,
+            `Aparece nos números — em ${lead.label}, fica entre os ${bold(`${top}% melhores`)} da posição.`,
           ]),
     );
-    if (second && second.avg >= 65) play.push(en ? `He adds ${lower(second.title)} (${Math.round(second.avg)}).` : `Soma ainda ${lower(second.title)} (${Math.round(second.avg)}).`);
   }
-  if (worst) {
-    const low = list(bottoms.slice(0, 2).map((m) => `${m.name} (P${m.percentile})`), lang);
-    const avg = bold(Math.round(worst.avg));
-    play.push(
-      en
-        ? `In ${bold(lower(worst.title))} the average drops to ${avg}${low ? `; in the detail, the lowest percentiles are ${low}` : ""}.`
-        : `Já em ${bold(lower(worst.title))} a média cai para ${avg}${low ? `; no detalhe, os menores percentis são ${low}` : ""}.`,
-    );
+  if (strengths[2]) play.push(en ? `He also ${up(strengths[2])}.` : `Além disso, ${up(strengths[2])}.`);
+  const worstBlock = byAvg.length > 1 && byAvg[byAvg.length - 1].avg < 45 ? byAvg[byAvg.length - 1] : null;
+  if (gaps[1] || worstBlock) {
+    const first = gaps[1] ? down(gaps[1]) : null;
+    const where = worstBlock ? bold(lower(worstBlock.title)) : null;
+    const label = en ? pick(5, ["The caveat", "Where he falls short"]) : pick(5, ["A ressalva", "Onde deixa a desejar"]);
+    const body = en
+      ? [first ? `he ${first}` : null, where ? `${where} is the weakest area of his game` : null].filter(Boolean).join(", and ")
+      : [first, where ? `${where} é o setor mais frágil do jogo dele` : null].filter(Boolean).join(", e ");
+    play.push(`${label}: ${body}.`);
   }
   if (input.xprog && input.xprog.dir !== "even") {
-    const up = input.xprog.dir === "up";
+    const above = input.xprog.dir === "up";
+    const delta = num(Math.abs(input.xprog.delta), 1, lang);
     play.push(
       en
-        ? `On progression he delivers ${up ? "above" : "below"} what his passing volume suggests (${signed(input.xprog.delta, 1, lang)} progressive passes/90).`
-        : `Na progressão, entrega ${up ? "acima" : "abaixo"} do esperado pelo volume de passes (${signed(input.xprog.delta, 1, lang)} progressivos/90).`,
+        ? `He progresses the ball ${above ? "more" : "less"} than his passing volume suggests (${delta} progressive passes/90 ${above ? "above" : "below"} expected).`
+        : `Progride ${above ? "mais" : "menos"} do que o volume de passes sugere (${delta} passes progressivos/90 ${above ? "acima" : "abaixo"} do esperado).`,
     );
   }
 
@@ -413,21 +503,21 @@ export function buildInsights(input: InsightInput): InsightReport {
   const lastMin = last.minutesPct;
   const total = seasons.reduce((sum, season) => sum + season.minutes, 0);
   const fmtMin = (v: number) => v.toLocaleString(reportLocale(lang));
-  const role =
+  const standing =
     lastMin == null
       ? null
       : lastMin >= 55
-        ? en ? "is a regular starter" : "é titular"
+        ? en ? "was a regular starter" : "foi titular"
         : lastMin >= 30
-          ? en ? "has a run of games" : "tem sequência"
-          : en ? "has had few minutes" : "teve poucos minutos";
+          ? en ? "got a run of games" : "ganhou sequência"
+          : en ? "had few minutes" : "teve poucos minutos";
   if (multi) {
     ctx.push(
-      role && lastMin != null
+      standing && lastMin != null
         ? en
-          ? `In ${last.year} he ${role} at ${last.club} (${Math.round(lastMin)}% of league minutes).`
-          : `Em ${last.year} ${role} no ${last.club} (${Math.round(lastMin)}% dos minutos da competição).`
-        : en ? `${fmtMin(total)} minutes over ${n} seasons.` : `${fmtMin(total)} min em ${n} temporadas.`,
+          ? `In ${last.year} he ${standing} at ${last.club} (${Math.round(lastMin)}% of the minutes).`
+          : `Em ${last.year}, ${standing} no ${last.club} (${Math.round(lastMin)}% dos minutos).`
+        : en ? `${fmtMin(total)} minutes over ${n} seasons.` : `Soma ${fmtMin(total)} minutos em ${n} temporadas.`,
     );
     const shorts = seasons.filter((season) => season.minutesPct != null && season.minutesPct < 30 && season !== last);
     if (shorts.length) {
@@ -435,31 +525,35 @@ export function buildInsights(input: InsightInput): InsightReport {
       ctx.push(
         en
           ? `${names} ${shorts.length > 1 ? "are short samples" : "is a short sample"}, so read with caution.`
-          : `${names} ${shorts.length > 1 ? "são amostras curtas e pedem" : "é amostra curta e pede"} cautela.`,
+          : `${names} ${shorts.length > 1 ? "são amostras curtas" : "é amostra curta"} — vale ler com cautela.`,
       );
     }
   } else {
-    const where = en ? ` at ${last.club}` : ` no ${last.club}`;
-    const pct = lastMin != null ? (en ? ` (${Math.round(lastMin)}% of league minutes)` : ` (${Math.round(lastMin)}% da competição)`) : "";
-    ctx.push(en ? `${fmtMin(total)} minutes${pct}${where}${role ? `; ${role}` : ""}.` : `${fmtMin(total)} min${pct}${where}${role ? `, onde ${role}` : ""}.`);
+    const pct = lastMin != null ? ` (${Math.round(lastMin)}%${en ? " of the minutes" : " da competição"})` : "";
+    ctx.push(
+      en
+        ? `${fmtMin(total)} minutes at ${last.club}${pct}${standing ? `; he ${standing}` : ""}.`
+        : `Foram ${fmtMin(total)} minutos no ${last.club}${pct}${standing ? `; ${standing}` : ""}.`,
+    );
   }
   if (bigTrend) {
     const moved = first.club !== last.club;
-    const up = bigTrend.delta > 0;
+    const rose = bigTrend.delta > 0;
+    const t = lower(bigTrend.title);
     ctx.push(
       en
-        ? `${bigTrend.title} ${up ? "rose" : "fell"} from ${bigTrend.from} to ${bigTrend.to}${moved ? `, coinciding with the move from ${first.club} to ${last.club}: worth checking whether it is the new team's tactical role` : ""}.`
-        : `${bigTrend.title} ${up ? "subiu" : "caiu"} de ${bigTrend.from} para ${bigTrend.to}${moved ? `, junto com a mudança de ${first.club} para o ${last.club}: vale entender se é função tática do novo clube` : ""}.`,
+        ? `His ${bold(t)} average ${rose ? "rose" : "fell"} from ${bigTrend.from} to ${bigTrend.to}${moved ? ` — in step with the move from ${first.club} to ${last.club}, which points to the role at the new club` : ""}.`
+        : `No bloco ${bold(bigTrend.title)}, a média ${rose ? "subiu" : "caiu"} de ${bigTrend.from} para ${bigTrend.to}${moved ? ` — junto com a troca do ${first.club} pelo ${last.club}, o que sugere efeito da função no novo clube` : ""}.`,
     );
   } else if (multi) {
-    ctx.push(en ? "Profile stable across seasons and clubs." : "Perfil estável entre temporadas e clubes.");
+    ctx.push(en ? "His profile has held steady from season to season." : "De uma temporada para outra, o perfil se manteve.");
   }
   const pdt = input.production;
   const xgaTotal = pdt.xg != null && pdt.xa != null ? pdt.xg + pdt.xa : null;
   if (xgaTotal != null && pdt.minutes > 0) {
     const ga = pdt.goals + pdt.assists;
-    if (ga - xgaTotal >= 1.5 && ga >= xgaTotal * 1.3) ctx.push(en ? "G+A sits above xG+xA, which tends to regress." : "G+A acima do xG+xA, o que tende a regredir.");
-    else if (ga - xgaTotal <= -1.5) ctx.push(en ? "G+A is below xG+xA, so there is room to grow." : "G+A abaixo do xG+xA: há margem para crescer.");
+    if (ga - xgaTotal >= 1.5 && ga >= xgaTotal * 1.3) ctx.push(en ? "He has produced more G+A than his xG+xA suggests, which tends to regress." : "Produziu mais G+A do que o xG+xA indica, o que costuma regredir.");
+    else if (ga - xgaTotal <= -1.5) ctx.push(en ? "His G+A trails his xG+xA, so there is room to grow." : "O G+A está abaixo do xG+xA: há margem para crescer.");
   }
   const expiring = pr.contractMonths != null && pr.contractMonths >= 0 && pr.contractMonths <= 8;
   const contract = pr.contractDate
@@ -558,25 +652,26 @@ export function buildInsights(input: InsightInput): InsightReport {
     }
   }
 
-  // ── Encaixe tático ──────────────────────────────────────────────────────
-  const fit = buildTacticalFit({
-    lang,
-    family: input.family,
-    profiles: input.profiles,
-    blocks: blocks.map((b) => ({ tone: b.tone, title: b.title, avg: b.avg })),
-    metrics: input.metrics?.map((m) => ({ name: m.name, percentile: m.percentile })),
-    physical: input.physical,
-    side: input.side,
-  });
+  // 3º parágrafo: na prática — onde rende, o movimento-chave e a adaptação possível.
   const body = [play.join(" "), ctx.join(" ")].filter(Boolean);
-  if (fit) {
-    const topRole = fit.roles[0];
-    const forms = fit.schemes.slice(0, 2).map((s) => bold(s.formation));
-    body.push(
-      en
-        ? `In practice: ${bold(lower(topRole.name))}, best placed in ${forms.join(" or ")}.`
-        : `Na prática: ${bold(lower(topRole.name))}, com melhor encaixe em ${forms.join(" ou ")}.`,
-    );
+  if (fit?.best) {
+    const b = fit.best;
+    const where = en
+      ? pick(6, [
+          `In practice, he is at his best as ${an(b.role)} ${bold(lower(b.role))} in a ${bold(b.formation)} (${lower(b.tag)})`,
+          `His natural fit is the ${bold(lower(b.role))} role in a ${bold(b.formation)}, as the ${lower(b.tag)}`,
+        ])
+      : pick(6, [
+          `Na prática, rende mais como ${bold(lower(b.role))} num ${bold(b.formation)} (${lower(b.tag)})`,
+          `O encaixe natural é como ${bold(lower(b.role))} num ${bold(b.formation)}, no papel de ${lower(b.tag)}`,
+        ]);
+    const move = b.moveLabel ? (en ? `; the key movement: ${lower(b.moveLabel)}` : `; o movimento-chave: ${lower(b.moveLabel)}`) : "";
+    const cross = fit.cross
+      ? en
+        ? ` If the squad needs it, he can be adapted as ${an(fit.cross.name)} ${bold(lower(fit.cross.name))} (${fit.cross.formation}) — ${fit.cross.reason}.`
+        : ` Se o elenco pedir, dá para adaptá-lo como ${bold(lower(fit.cross.name))} (${fit.cross.formation}): ${fit.cross.reason}.`
+      : "";
+    body.push(`${where}${move}.${cross}`);
   }
 
   return { story: { headline, body }, insights: insights.slice(0, 4), fit };

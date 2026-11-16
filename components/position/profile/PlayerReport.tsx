@@ -41,6 +41,8 @@ type ReportCopy = (typeof REPORT_COPY)[ReportLang];
 
 type ReportLine = {
   label: string;
+  /** Aspecto de origem (rótulo PT, estável entre idiomas). */
+  aspect?: string;
   value: string;
   percentile: number | null;
   sub?: boolean;
@@ -70,6 +72,7 @@ function blocksFor(item: AspectItem, title: string, lang: ReportLang): ReportBlo
   if (subs.length) {
     const lines = subs
       .map((sub) => ({
+        aspect: title,
         label: translateLabel(statRowLabel(sub.label), lang),
         value: localizeValue(sub.display_value?.trim() || "—", lang),
         percentile: percentileOf(sub.percentile),
@@ -87,6 +90,7 @@ function blocksFor(item: AspectItem, title: string, lang: ReportLang): ReportBlo
   const efficiency: ReportLine | null =
     item.efficiency_pct != null || item.efficiency_value
       ? {
+          aspect: title,
           label: copy.efficiency,
           value: localizeValue(item.efficiency_value?.trim() || "—", lang),
           percentile: percentileOf(item.efficiency_pct),
@@ -99,14 +103,14 @@ function blocksFor(item: AspectItem, title: string, lang: ReportLang): ReportBlo
     return [
       {
         title: null,
-        lines: [{ label: translateLabel(statRowLabel(title), lang), value: volumeValue, percentile: volumePercentile }],
+        lines: [{ aspect: title, label: translateLabel(statRowLabel(title), lang), value: volumeValue, percentile: volumePercentile }],
       },
     ];
   }
   return [
     {
       title: blockTitle,
-      lines: [{ label: copy.per90, value: volumeValue, percentile: volumePercentile }, efficiency],
+      lines: [{ aspect: title, label: copy.per90, value: volumeValue, percentile: volumePercentile }, efficiency],
     },
   ];
 }
@@ -414,6 +418,7 @@ const TONE_COLORS: Record<string, string> = {
 
 type ReportMetric = {
   name: string;
+  aspect?: string;
   context: string;
   value: string;
   percentile: number;
@@ -442,6 +447,7 @@ function reportMetrics(sections: ReportSection[], copy: ReportCopy, lang: Report
         const isEfficiency = line.label === copy.efficiency;
         const generic = (isVolume || isEfficiency) && Boolean(block.title);
         metrics.push({
+          aspect: line.aspect,
           name: generic ? `${block.title} ${isVolume ? "/90" : "%"}` : line.label,
           context: generic ? (isVolume ? copy.volume : copy.efficiency) : line.label === indexLabel ? copy.indexTag : block.title ?? section.title,
           value: line.value,
@@ -1614,6 +1620,7 @@ function buildSummaryModel(rows: SummarySheetRow[], lang: ReportLang) {
   });
   const avgMetrics: ReportMetric[] = [...aggs.values()].map((agg) => ({
     name: agg.name,
+    aspect: agg.aspect,
     context: agg.context,
     tone: agg.tone,
     percentile: Math.round(agg.weighted / (agg.weight || 1)),
@@ -2033,7 +2040,39 @@ function RichText({ text }: { text: string }) {
 }
 
 /** Campo em miniatura: a formação inteira, com a posição do atleta destacada. */
-function FormationPitch({ dots, at }: { dots: [number, number][]; at: [number, number] }) {
+/** Seta curva do movimento indicado (coordenadas já no viewBox do campinho). */
+function MoveArrow({ from, to }: { from: [number, number]; to: [number, number] }) {
+  const [x1, y1] = from;
+  const [x2, y2] = to;
+  const len = Math.hypot(x2 - x1, y2 - y1) || 1;
+  const [ux, uy] = [(x2 - x1) / len, (y2 - y1) / len];
+  // Curva suave para o lado de fora; começa fora do halo do atleta.
+  const bend = Math.min(7, len * 0.2);
+  const cx = (x1 + x2) / 2 - uy * bend;
+  const cy = (y1 + y2) / 2 + ux * bend;
+  const sx = x1 + ux * 7;
+  const sy = y1 + uy * 7;
+  const dl = Math.hypot(x2 - cx, y2 - cy) || 1;
+  const [dx, dy] = [(x2 - cx) / dl, (y2 - cy) / dl];
+  const head = 4.2;
+  const ex = x2 - dx * head * 0.6;
+  const ey = y2 - dy * head * 0.6;
+  const points = [
+    [x2, y2],
+    [x2 - dx * head - dy * head * 0.62, y2 - dy * head + dx * head * 0.62],
+    [x2 - dx * head + dy * head * 0.62, y2 - dy * head - dx * head * 0.62],
+  ]
+    .map(([px, py]) => `${px.toFixed(1)},${py.toFixed(1)}`)
+    .join(" ");
+  return (
+    <g className="fit-move">
+      <path d={`M${sx.toFixed(1)} ${sy.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`} />
+      <polygon points={points} />
+    </g>
+  );
+}
+
+function FormationPitch({ dots, at, move }: { dots: [number, number][]; at: [number, number]; move?: [number, number] | null }) {
   const fx = (x: number) => 8 + x * 0.84;
   const fy = (y: number) => 9 + y * 1.22;
   return (
@@ -2053,6 +2092,8 @@ function FormationPitch({ dots, at }: { dots: [number, number][]; at: [number, n
           <circle key={index} className={index === 0 ? "fit-dot is-gk" : "fit-dot"} cx={fx(x)} cy={fy(y)} r={index === 0 ? 3.2 : 3.7} />
         ),
       )}
+      {move ? <circle className="fit-ghost" cx={fx(move[0])} cy={fy(move[1])} r="4.4" /> : null}
+      {move ? <MoveArrow from={[fx(at[0]), fy(at[1])]} to={[fx(move[0]), fy(move[1])]} /> : null}
       <circle className="fit-halo" cx={fx(at[0])} cy={fy(at[1])} r="9" />
       <circle className="fit-hit" cx={fx(at[0])} cy={fy(at[1])} r="5.2" />
     </svg>
@@ -2077,9 +2118,15 @@ function FitEvidence({ items }: { items: { label: string; pct: number }[] }) {
 
 function FitSchemeCard({ item, best, copy }: { item: FitScheme; best: boolean; copy: ReportCopy }) {
   return (
-    <article className={`fit-scheme ${fitTone(item.score)}${best ? " is-best" : ""}`}>
-      {best ? <span className="fit-ribbon">{copy.fitBest}</span> : null}
-      <FormationPitch dots={item.dots} at={item.at} />
+    <article className={`fit-scheme ${item.cross ? "is-cross" : fitTone(item.score)}${best ? " is-best" : ""}`}>
+      {best || item.cross ? <span className="fit-ribbon">{item.cross ? copy.fitCross : copy.fitBest}</span> : null}
+      <FormationPitch dots={item.dots} at={item.at} move={item.move} />
+      {item.moveLabel ? (
+        <p className="fit-move-label">
+          <i className="fa-solid fa-arrow-right-long" aria-hidden="true" />
+          {item.moveLabel}
+        </p>
+      ) : null}
       <div className="fit-scheme-head">
         <strong>{item.formation}</strong>
         <span className="fit-level">{item.level}</span>
@@ -2097,8 +2144,8 @@ function FitSchemeCard({ item, best, copy }: { item: FitScheme; best: boolean; c
 
 function FitRoleRow({ item, index }: { item: FitRole; index: number }) {
   return (
-    <li className={`fit-role ${fitTone(item.score)}${item.main ? " is-main" : ""}`}>
-      <span className="fit-role-n">{index + 1}</span>
+    <li className={`fit-role ${item.cross ? "is-cross" : fitTone(item.score)}${item.main ? " is-main" : ""}`}>
+      <span className="fit-role-n">{item.cross ? <i className="fa-solid fa-right-left" aria-hidden="true" /> : index + 1}</span>
       <div className="fit-role-text">
         <h3>{item.name}</h3>
         <p>{item.blurb}</p>
@@ -2445,6 +2492,11 @@ export function AnalystSheet({
                 <p className="fit-legend">
                   <i aria-hidden="true" />
                   {copy.fitHere}
+                  <svg className="fit-legend-arrow" viewBox="0 0 22 8" aria-hidden="true">
+                    <path d="M1 4 H16" />
+                    <polygon points="21,4 15,0.8 15,7.2" />
+                  </svg>
+                  {copy.fitMove}
                 </p>
               </section>
 

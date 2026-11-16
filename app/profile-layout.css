@@ -8229,6 +8229,26 @@
   .fit-role.is-strong { --tone: #0e7490; --tone-bg: #ecfeff; }
   .fit-scheme.is-good,
   .fit-role.is-good { --tone: #64748b; --tone-bg: #f1f5f9; }
+  .fit-scheme.is-cross,
+  .fit-role.is-cross { --tone: #b45309; --tone-bg: #fffbeb; }
+
+  .fit-scheme.is-cross {
+    border-style: dashed;
+    border-top-style: solid;
+    background: linear-gradient(180deg, #fffbeb 0%, #fff 34%);
+  }
+
+  .fit-scheme.is-cross .fit-pitch-turf {
+    fill: #fdf6e7;
+  }
+
+  .fit-scheme.is-cross .fit-pitch-lines {
+    stroke: #ecd9b0;
+  }
+
+  .fit-role.is-cross .fit-role-n {
+    font-size: 8px;
+  }
 
   .fit-scheme.is-best {
     border-color: color-mix(in srgb, var(--tone) 40%, #fff);
@@ -8317,6 +8337,59 @@
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+  }
+
+  .fit-move path {
+    fill: none;
+    stroke: var(--tone);
+    stroke-width: 1.9;
+    stroke-dasharray: 2.6 1.8;
+    stroke-linecap: round;
+  }
+
+  .fit-move polygon {
+    fill: var(--tone);
+  }
+
+  .fit-ghost {
+    fill: none;
+    stroke: var(--tone);
+    stroke-width: 0.9;
+    stroke-dasharray: 1.4 1.2;
+    opacity: 0.75;
+  }
+
+  .fit-move-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2mm;
+    margin: -0.8mm 0 0.4mm !important;
+    color: var(--tone);
+    font-size: 7.2px;
+    font-weight: 750;
+    text-align: center;
+  }
+
+  .fit-move-label i {
+    font-size: 7px;
+  }
+
+  .fit-legend-arrow {
+    width: 5.6mm;
+    height: 2.2mm;
+    margin-left: 2.4mm;
+  }
+
+  .fit-legend-arrow path {
+    fill: none;
+    stroke: #0e7490;
+    stroke-width: 1.5;
+    stroke-dasharray: 2.4 1.6;
+  }
+
+  .fit-legend-arrow polygon {
+    fill: #0e7490;
   }
 
   .fit-scheme-tag {

@@ -4,9 +4,14 @@ import type { ReportLang } from "@/lib/reportI18n";
  *
  *  Modelo em duas camadas:
  *  1) funções (roles) com nomes do jargão de scout — pontuadas por afinidade de perfil,
- *     percentis por bloco, percentis de métricas específicas e GPS;
+ *     percentis por bloco, percentis por aspecto (chave PT estável) e GPS;
  *  2) cada slot de cada esquema lista as funções que cabem nele — o card mostra a função
- *     em que o atleta renderia melhor NAQUELE desenho (o nome muda por esquema). */
+ *     em que o atleta renderia melhor NAQUELE desenho (o nome muda por esquema).
+ *
+ *  Funções com `gate` são adaptações de posição (lateral → zagueiro de lado, extremo → ala,
+ *  volante → zagueiro...): só entram quando os dados/altura sustentam, e aparecem no máximo
+ *  uma vez entre os esquemas e uma entre as funções. `move` é o movimento típico da função
+ *  (delta no campinho, lado direito, y negativo = para frente) — vira seta no card. */
 
 export type Trait = "defensivos" | "aereo" | "passes" | "dribles" | "finais" | "ofensividade" | "finalizacao";
 export type XY = [number, number];
@@ -15,8 +20,16 @@ type FormationKey = "4-3-3" | "4-2-3-1" | "4-4-2" | "3-5-2" | "3-4-3" | "4-1-2-1
 type PhysKey = "speed" | "rep" | "vol";
 type Weights = Partial<Record<Trait, number>>;
 type PhysWeights = Partial<Record<PhysKey, number>>;
-/** [padrão do nome da métrica (sem acento, minúsculo), peso] */
+/** [trecho do aspecto PT (sem acento), peso] */
 type MetricWeight = [string, number];
+
+type GateCtx = {
+  t: (trait: Trait) => number;
+  m: (pattern: string) => number | null;
+  share: (profile: string) => number;
+  height: number | null;
+  phys: PhysWeights;
+};
 
 /** Pontos 0–100 (x: esquerda→direita, y: ataque em cima). O primeiro é o goleiro. */
 const BACK4: XY[] = [[13, 73], [37, 78], [63, 78], [87, 73]];
@@ -41,6 +54,14 @@ type RoleDef = {
   traits: Weights;
   metrics?: MetricWeight[];
   phys?: PhysWeights;
+  /** Movimento típico (delta no campinho). */
+  move?: XY;
+  /** Rótulo curto do movimento, para a legenda da seta. */
+  moveLabel?: Pair;
+  /** Adaptação de posição: só entra quando o critério passa. */
+  gate?: (c: GateCtx) => boolean;
+  /** Por que a adaptação faz sentido (vai para a síntese e o card). */
+  reason?: Pair;
 };
 
 type SchemeDef = {
@@ -69,7 +90,9 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Zagueiro construtor", "Ball-playing centre-back"),
         blurb: p("Inicia a saída, quebra linhas com o passe e conduz", "Starts moves, breaks lines with the pass and carries"),
         traits: { passes: 0.5, defensivos: 0.2, dribles: 0.3 },
-        metrics: [["passes progressivos", 0.4], ["passes para terço final", 0.3], ["conduções", 0.3]],
+        metrics: [["passes progressivos", 0.4], ["passes para terco final", 0.3], ["progress", 0.3]],
+        move: [0, -15],
+        moveLabel: p("Avança conduzindo", "Steps in with the ball"),
       },
       {
         key: "anticipador",
@@ -77,7 +100,9 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Zagueiro de antecipação", "Front-foot centre-back"),
         blurb: p("Sai para o duelo, antecipa e pressiona o portador", "Steps out to duel, anticipates and presses the carrier"),
         traits: { defensivos: 0.7, aereo: 0.3 },
-        metrics: [["duelos defensivos", 0.45], ["ações defensivas", 0.35], ["duelos aéreos", 0.2]],
+        metrics: [["duelos defensivos", 0.45], ["acoes defensivas", 0.35], ["aereo", 0.2]],
+        move: [0, -11],
+        moveLabel: p("Sai no bote", "Steps out to engage"),
       },
       {
         key: "area",
@@ -85,7 +110,7 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Zagueiro de área", "Penalty-box defender"),
         blurb: p("Posicionado na grande área: protege e domina o jogo aéreo", "Positioned in the box: protects it and dominates in the air"),
         traits: { aereo: 0.5, defensivos: 0.5 },
-        metrics: [["duelos aéreos", 0.45], ["eficiência defensiva", 0.3], ["ações defensivas", 0.25]],
+        metrics: [["aereo", 0.45], ["eficiencia defensiva", 0.3], ["acoes defensivas", 0.25]],
       },
       {
         key: "libero",
@@ -93,7 +118,9 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Líbero", "Sweeper"),
         blurb: p("Homem central do trio: cobre, sai com bola e organiza", "Central man of the three: covers, carries out and organises"),
         traits: { passes: 0.4, defensivos: 0.35, dribles: 0.25 },
-        metrics: [["passes longos", 0.4], ["conduções", 0.3], ["ações defensivas", 0.3]],
+        metrics: [["passes longos", 0.4], ["progress", 0.3], ["acoes defensivas", 0.3]],
+        move: [0, -14],
+        moveLabel: p("Sai jogando pelo meio", "Carries out through the middle"),
       },
       {
         key: "lado",
@@ -101,8 +128,21 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Zagueiro de lado", "Wide centre-back"),
         blurb: p("Lateral do trio de zaga: cobre o corredor e sai em condução", "Wide man of the back three: covers the channel and carries out"),
         traits: { defensivos: 0.45, dribles: 0.25, passes: 0.3 },
-        metrics: [["duelos defensivos", 0.4], ["conduções", 0.3], ["ações defensivas", 0.3]],
+        metrics: [["duelos defensivos", 0.4], ["progress", 0.3], ["acoes defensivas", 0.3]],
         phys: { speed: 0.3, rep: 0.2 },
+        move: [9, -12],
+        moveLabel: p("Cobre o corredor do ala", "Covers the wing-back's channel"),
+      },
+      {
+        key: "volante_zag",
+        name: p("Volante", "Defensive midfielder"),
+        blurb: p("Adianta-se para o meio: leva a qualidade de passe para a frente da zaga", "Steps up into midfield: takes his passing range in front of the defence"),
+        traits: { passes: 0.5, defensivos: 0.3, dribles: 0.2 },
+        metrics: [["passes progressivos", 0.35], ["passes longos", 0.3], ["progress", 0.35]],
+        move: [0, -12],
+        moveLabel: p("Pisa no meio com bola", "Steps into midfield on the ball"),
+        gate: (c) => c.t("passes") >= 68 && c.t("dribles") >= 55 && c.share("Construtor") >= 35,
+        reason: p("passe e condução acima da posição sustentam a função à frente da zaga", "passing and carrying above the position support the role in front of the defence"),
       },
     ],
     schemes: [
@@ -173,6 +213,22 @@ const FAMILIES: Record<string, FamilyDef> = {
         why: p("Sem amplitude própria: a zaga precisa vencer 1v1 e o jogo aéreo", "With no natural width the back line must win duels and aerials"),
         need: { defensivos: 0.5, aereo: 0.5 },
       },
+      {
+        formation: "4-2-3-1",
+        tag: p("Adaptação · duplo pivô", "Adaptation · double pivot"),
+        roles: ["volante_zag"],
+        at: [63, 60],
+        why: p("Volante que vem da zaga: dá o primeiro passe e protege a linha de quatro", "A midfielder from the back line: plays the first pass and screens the back four"),
+        need: { passes: 0.55, defensivos: 0.45 },
+      },
+      {
+        formation: "4-3-3",
+        tag: p("Adaptação · pivô único", "Adaptation · single pivot"),
+        roles: ["volante_zag"],
+        at: [50, 60],
+        why: p("Pivô de origem defensiva: cobre a zaga e distribui de frente para o jogo", "A defensive-origin pivot: covers the back line and distributes facing play"),
+        need: { passes: 0.5, defensivos: 0.5 },
+      },
     ],
   },
   laterais: {
@@ -184,8 +240,10 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Ala", "Wing-back"),
         blurb: p("Dono do corredor inteiro: defende como lateral e ataca como ponta", "Owns the whole flank: defends like a full-back, attacks like a winger"),
         traits: { finais: 0.3, defensivos: 0.25, ofensividade: 0.25, dribles: 0.2 },
-        metrics: [["cruzamentos", 0.4], ["ações defensivas", 0.3], ["progressão", 0.3]],
+        metrics: [["cruzamentos", 0.4], ["acoes defensivas", 0.3], ["progress", 0.3]],
         phys: { rep: 0.4, vol: 0.3 },
+        move: [0, -30],
+        moveLabel: p("Corre o corredor inteiro", "Runs the whole flank"),
       },
       {
         key: "apoio",
@@ -193,7 +251,9 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Lateral de apoio", "Support full-back"),
         blurb: p("Sobe em ultrapassagem com critério e equilibra as duas fases", "Overlaps with judgement and balances both phases"),
         traits: { defensivos: 0.35, finais: 0.25, passes: 0.2, ofensividade: 0.2 },
-        metrics: [["cruzamentos", 0.3], ["ações defensivas", 0.4], ["passes progressivos", 0.3]],
+        metrics: [["cruzamentos", 0.3], ["acoes defensivas", 0.4], ["passes progressivos", 0.3]],
+        move: [2, -24],
+        moveLabel: p("Ultrapassa por fora", "Overlaps outside"),
       },
       {
         key: "marcacao",
@@ -201,15 +261,43 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Lateral de marcação", "Defensive full-back"),
         blurb: p("Fecha o corredor, marca por fora e arrisca pouco", "Shuts the flank, marks wide and takes few risks"),
         traits: { defensivos: 0.65, passes: 0.2, dribles: 0.15 },
-        metrics: [["duelos defensivos", 0.4], ["ações defensivas", 0.4], ["eficiência defensiva", 0.2]],
+        metrics: [["duelos defensivos", 0.4], ["acoes defensivas", 0.4], ["eficiencia defensiva", 0.2]],
       },
       {
         key: "invertido",
         profile: "Construtor",
-        name: p("Lateral-meia", "Inverted full-back"),
-        blurb: p("Fecha por dentro na saída e vira opção de passe no meio", "Steps inside in build-up and becomes a midfield passing option"),
+        name: p("Lateral por dentro", "Inverted full-back"),
+        blurb: p("Sai do corredor para dentro na saída: vira volante ao lado do pivô", "Moves inside in build-up: becomes a midfielder next to the pivot"),
         traits: { passes: 0.55, dribles: 0.2, defensivos: 0.25 },
-        metrics: [["passes progressivos", 0.35], ["distribuição", 0.35], ["disputas com bola", 0.3]],
+        metrics: [["passes progressivos", 0.35], ["distribuicao", 0.35], ["disputas com bola", 0.3]],
+        move: [-24, -14],
+        moveLabel: p("Fecha por dentro como volante", "Tucks inside as a midfielder"),
+      },
+      {
+        key: "zag_lado",
+        profile: "Defensivo",
+        name: p("Zagueiro pelo lado", "Wide centre-back"),
+        blurb: p("Fecha a linha de três pelo lado: marca o corredor e cobre o ala", "Closes the back three on the side: marks the channel and covers the wing-back"),
+        traits: { defensivos: 0.75, passes: 0.25 },
+        metrics: [["duelos defensivos", 0.35], ["aereo", 0.35], ["eficiencia defensiva", 0.3]],
+        phys: { speed: 0.2 },
+        move: [10, -10],
+        moveLabel: p("Sai para o corredor", "Steps out to the channel"),
+        gate: (c) => c.t("defensivos") >= 62 && (c.share("Defensivo") >= 30 || (c.m("aereo") ?? 0) >= 55) && (c.height == null || c.height >= 176),
+        reason: p("a força defensiva e o duelo permitem fechar a linha de três pelo lado", "his defending and duelling let him close the back three on the side"),
+      },
+      {
+        key: "ponta",
+        profile: "Ofensivo",
+        name: p("Ponta", "Winger"),
+        blurb: p("Adiantado para a linha de ataque: leva o drible e o cruzamento para mais perto da área", "Pushed up into the front line: takes his dribbling and crossing closer to goal"),
+        traits: { dribles: 0.4, finais: 0.35, ofensividade: 0.25 },
+        metrics: [["1v1", 0.4], ["cruzamentos", 0.3], ["progress", 0.3]],
+        phys: { speed: 0.3 },
+        move: [2, -12],
+        moveLabel: p("Ataca a linha de fundo", "Attacks the byline"),
+        gate: (c) => c.t("dribles") >= 62 && (c.t("finais") >= 58 || c.t("ofensividade") >= 58),
+        reason: p("drible e chegada ao terço final de ponta", "winger-level dribbling and final-third presence"),
       },
     ],
     schemes: [
@@ -218,7 +306,7 @@ const FAMILIES: Record<string, FamilyDef> = {
         tag: p("Lateral do corredor", "Flank full-back"),
         roles: ["apoio", "invertido", "ala"],
         at: [87, 73],
-        why: p("Sobe em ultrapassagem com o trio de meio cobrindo atrás", "Overlaps while the midfield three cover behind"),
+        why: p("Com o trio de meio cobrindo, pode ultrapassar ou fechar por dentro", "With the midfield three covering, he can overlap or tuck inside"),
         need: { ofensividade: 0.3, finais: 0.3, dribles: 0.2, defensivos: 0.2 },
       },
       {
@@ -273,6 +361,39 @@ const FAMILIES: Record<string, FamilyDef> = {
         need: { finais: 0.3, ofensividade: 0.25, defensivos: 0.25, dribles: 0.2 },
         phys: { vol: 0.4, rep: 0.3 },
       },
+      {
+        formation: "3-5-2",
+        tag: p("Adaptação · zaga de três", "Adaptation · back three"),
+        roles: ["zag_lado"],
+        at: [75, 77],
+        why: p("Zagueiro pelo lado do trio: usa a marcação de lateral num corredor mais curto", "Wide centre-back of the three: uses full-back marking over a shorter channel"),
+        need: { defensivos: 0.7, passes: 0.3 },
+      },
+      {
+        formation: "3-4-3",
+        tag: p("Adaptação · zaga de três", "Adaptation · back three"),
+        roles: ["zag_lado"],
+        at: [75, 77],
+        why: p("Fecha a linha de três e cobre as subidas do ala", "Closes the back three and covers the wing-back's runs"),
+        need: { defensivos: 0.7, passes: 0.3 },
+      },
+      {
+        formation: "4-3-3",
+        tag: p("Adaptação · ponta", "Adaptation · winger"),
+        roles: ["ponta"],
+        at: [85, 22],
+        why: p("Adiantado para o trio de ataque: drible e cruzamento perto da área", "Pushed into the front three: dribbling and crossing near the box"),
+        need: { dribles: 0.45, finais: 0.35, ofensividade: 0.2 },
+        phys: { speed: 0.2 },
+      },
+      {
+        formation: "4-4-2",
+        tag: p("Adaptação · meia aberto", "Adaptation · wide midfielder"),
+        roles: ["ponta"],
+        at: [87, 52],
+        why: p("Uma linha à frente: ataca o corredor e ainda volta para compor", "One line further up: attacks the flank and still tracks back"),
+        need: { dribles: 0.35, finais: 0.3, defensivos: 0.2, ofensividade: 0.15 },
+      },
     ],
   },
   "meio-campistas": {
@@ -284,7 +405,19 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Primeiro volante", "Holding midfielder"),
         blurb: p("Fixa-se à frente da zaga: corta linhas de passe e equilibra", "Sits in front of the defence: cuts passing lanes and balances"),
         traits: { defensivos: 0.65, passes: 0.35 },
-        metrics: [["ações defensivas", 0.45], ["eficiência defensiva", 0.3], ["passes longos", 0.25]],
+        metrics: [["acoes defensivas", 0.45], ["eficiencia defensiva", 0.3], ["passes longos", 0.25]],
+        move: [15, 5],
+        moveLabel: p("Cobre o lado da bola", "Covers the ball side"),
+      },
+      {
+        key: "saida3",
+        profile: "Construtor",
+        name: p("Volante de saída de três", "Dropping pivot"),
+        blurb: p("Baixa entre os zagueiros na saída e forma linha de três com bola", "Drops between the centre-backs in build-up to form a back three"),
+        traits: { passes: 0.55, defensivos: 0.45 },
+        metrics: [["passes longos", 0.35], ["distribuicao", 0.35], ["acoes defensivas", 0.3]],
+        move: [0, 16],
+        moveLabel: p("Baixa entre os zagueiros", "Drops between the centre-backs"),
       },
       {
         key: "pressao",
@@ -292,8 +425,10 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Volante de pressão", "Ball-winning midfielder"),
         blurb: p("Caçador de bola: duelo, desarme e intensidade na marcação", "Ball-hunter: duels, tackles and pressing intensity"),
         traits: { defensivos: 0.75, dribles: 0.15, passes: 0.1 },
-        metrics: [["duelos defensivos", 0.5], ["ações defensivas", 0.35], ["duelos aéreos", 0.15]],
+        metrics: [["duelos defensivos", 0.5], ["acoes defensivas", 0.35], ["aereo", 0.15]],
         phys: { rep: 0.3 },
+        move: [0, -11],
+        moveLabel: p("Sobe para pressionar", "Steps up to press"),
       },
       {
         key: "regista",
@@ -301,7 +436,9 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Regista", "Deep-lying playmaker"),
         blurb: p("Recebe da zaga, dita o ritmo e muda o corredor com o lançamento", "Receives from the back line, sets the tempo and switches play"),
         traits: { passes: 0.65, finais: 0.15, defensivos: 0.2 },
-        metrics: [["passes longos", 0.4], ["distribuição", 0.35], ["passes progressivos", 0.25]],
+        metrics: [["passes longos", 0.4], ["distribuicao", 0.35], ["passes progressivos", 0.25]],
+        move: [-16, 4],
+        moveLabel: p("Abre para receber da zaga", "Drifts wide to receive from the back"),
       },
       {
         key: "segundo",
@@ -309,7 +446,9 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Segundo volante", "Second pivot"),
         blurb: p("Sai da base com bola e chega à frente sem perder a cobertura", "Steps out of the double pivot and arrives without losing cover"),
         traits: { defensivos: 0.35, passes: 0.25, dribles: 0.2, ofensividade: 0.2 },
-        metrics: [["conduções", 0.35], ["ações defensivas", 0.35], ["disputas com bola", 0.3]],
+        metrics: [["progress", 0.35], ["acoes defensivas", 0.35], ["disputas com bola", 0.3]],
+        move: [0, -18],
+        moveLabel: p("Sai da base para chegar", "Breaks forward from the base"),
       },
       {
         key: "b2b",
@@ -317,8 +456,10 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Box-to-box", "Box-to-box midfielder"),
         blurb: p("Duas áreas: chega ao ataque e volta para compor", "Both boxes: arrives in attack and recovers to hold shape"),
         traits: { defensivos: 0.3, ofensividade: 0.25, dribles: 0.2, passes: 0.15, finais: 0.1 },
-        metrics: [["finalizações", 0.3], ["ações defensivas", 0.35], ["conduções", 0.35]],
+        metrics: [["finalizacoes", 0.3], ["acoes defensivas", 0.35], ["progress", 0.35]],
         phys: { vol: 0.4, rep: 0.3 },
+        move: [0, -26],
+        moveLabel: p("Pisa na área", "Arrives in the box"),
       },
       {
         key: "mezzala",
@@ -326,7 +467,9 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Interior (mezzala)", "Inside-half (mezzala)"),
         blurb: p("Joga no half-space: conduz, associa e ataca o espaço", "Plays the half-space: carries, combines and attacks the gap"),
         traits: { dribles: 0.3, finais: 0.3, passes: 0.25, ofensividade: 0.15 },
-        metrics: [["1v1 - ofensivo", 0.35], ["passes chave", 0.35], ["conduções", 0.3]],
+        metrics: [["1v1", 0.35], ["passes chave", 0.35], ["progress", 0.3]],
+        move: [9, -19],
+        moveLabel: p("Ataca o half-space", "Attacks the half-space"),
       },
       {
         key: "armador",
@@ -334,7 +477,7 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Meia-armador", "Playmaker (10)"),
         blurb: p("Entre linhas: último passe, visão e criação", "Between the lines: final pass, vision and creation"),
         traits: { finais: 0.5, passes: 0.35, dribles: 0.15 },
-        metrics: [["passes chave", 0.4], ["pré assistências", 0.35], ["passes criativos", 0.25]],
+        metrics: [["passes chave", 0.4], ["pre assist", 0.35], ["passes criativos", 0.25]],
       },
       {
         key: "meia_ataque",
@@ -342,14 +485,33 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Meia-atacante", "Attacking midfielder"),
         blurb: p("Infiltra e finaliza: joga como segundo atacante", "Makes runs and finishes: plays like a second striker"),
         traits: { ofensividade: 0.4, finais: 0.25, dribles: 0.2, passes: 0.15 },
-        metrics: [["finalizações", 0.45], ["ofensividade", 0.3], ["1v1 - ofensivo", 0.25]],
+        metrics: [["finalizacoes", 0.45], ["ofensividade", 0.3], ["1v1", 0.25]],
+        move: [0, -16],
+        moveLabel: p("Infiltra na área", "Runs into the box"),
+      },
+      {
+        key: "zag_mc",
+        profile: "Contenção",
+        name: p("Zagueiro", "Centre-back"),
+        blurb: p("Recua para a linha defensiva: leva o duelo, o jogo aéreo e o passe do meio para a zaga", "Drops into the back line: brings his duelling, aerial game and midfield passing"),
+        traits: { defensivos: 0.6, passes: 0.25, aereo: 0.15 },
+        metrics: [["aereo", 0.35], ["duelos defensivos", 0.35], ["eficiencia defensiva", 0.3]],
+        move: [0, -14],
+        moveLabel: p("Sai jogando para o meio", "Steps into midfield on the ball"),
+        gate: (c) => {
+          const air = c.m("aereo") ?? 0;
+          const duels = c.m("duelos defensivos") ?? 0;
+          const tall = c.height != null && c.height > 0 ? c.height >= 183 : air >= 75;
+          return tall && air >= 60 && (c.t("defensivos") >= 55 || duels >= 65);
+        },
+        reason: p("estatura, jogo aéreo e duelo de zagueiro", "centre-back height, aerial game and duelling"),
       },
     ],
     schemes: [
       {
         formation: "4-3-3",
         tag: p("Pivô único", "Single pivot"),
-        roles: ["contencao", "regista", "pressao"],
+        roles: ["contencao", "saida3", "regista", "pressao"],
         at: [50, 60],
         why: p("Protege a zaga sozinho: recupera, cobre e dá o primeiro passe", "Shields the back line alone: recovers, covers and plays the first pass"),
         need: { defensivos: 0.55, passes: 0.45 },
@@ -366,7 +528,7 @@ const FAMILIES: Record<string, FamilyDef> = {
       {
         formation: "4-2-3-1",
         tag: p("Duplo pivô", "Double pivot"),
-        roles: ["segundo", "contencao", "regista", "pressao"],
+        roles: ["segundo", "contencao", "saida3", "regista", "pressao"],
         at: [63, 60],
         why: p("Dupla à frente da zaga: um segura, o outro distribui", "Pair in front of the defence: one holds, the other distributes"),
         need: { defensivos: 0.5, passes: 0.5 },
@@ -391,7 +553,7 @@ const FAMILIES: Record<string, FamilyDef> = {
       {
         formation: "4-1-2-1-2",
         tag: p("Pivô do losango", "Anchor of the diamond"),
-        roles: ["contencao", "regista"],
+        roles: ["contencao", "saida3", "regista"],
         at: [50, 62],
         why: p("Âncora do losango: equilibra quatro jogadores à frente", "Anchor of the diamond: balances four players ahead"),
         need: { defensivos: 0.55, passes: 0.45 },
@@ -448,6 +610,22 @@ const FAMILIES: Record<string, FamilyDef> = {
         need: { defensivos: 0.45, passes: 0.35, ofensividade: 0.2 },
         phys: { vol: 0.4 },
       },
+      {
+        formation: "3-5-2",
+        tag: p("Adaptação · centro da zaga de três", "Adaptation · centre of the back three"),
+        roles: ["zag_mc"],
+        at: [50, 80],
+        why: p("Central do trio: protegido pelos dois lados, sai jogando como volante", "Middle of the three: protected on both sides, carries out like a midfielder"),
+        need: { defensivos: 0.55, passes: 0.3, aereo: 0.15 },
+      },
+      {
+        formation: "4-3-3",
+        tag: p("Adaptação · zaga de quatro", "Adaptation · back four"),
+        roles: ["zag_mc"],
+        at: [63, 78],
+        why: p("Zagueiro com passe de meio-campista: qualifica a saída curta", "A centre-back with midfield passing: improves the short build-up"),
+        need: { defensivos: 0.6, passes: 0.25, aereo: 0.15 },
+      },
     ],
   },
   extremos: {
@@ -459,7 +637,9 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Ponta de 1v1", "Touchline winger"),
         blurb: p("Aberto na linha: desequilibra no drible e chega ao fundo", "Hugs the line: unbalances in 1v1 and reaches the byline"),
         traits: { dribles: 0.5, finais: 0.3, passes: 0.1, ofensividade: 0.1 },
-        metrics: [["1v1 - ofensivo", 0.45], ["cruzamentos", 0.3], ["disputas com bola", 0.25]],
+        metrics: [["1v1", 0.45], ["cruzamentos", 0.3], ["disputas com bola", 0.25]],
+        move: [3, -12],
+        moveLabel: p("Vai ao fundo", "Goes to the byline"),
       },
       {
         key: "ruptura",
@@ -467,8 +647,10 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Extremo de ruptura", "Inside forward"),
         blurb: p("Ataca a profundidade, corta por dentro e finaliza", "Attacks depth, cuts inside and finishes"),
         traits: { finalizacao: 0.35, dribles: 0.25, ofensividade: 0.25, finais: 0.15 },
-        metrics: [["gols e xg", 0.4], ["verticalidade", 0.35], ["1v1 - ofensivo", 0.25]],
+        metrics: [["gols e xg", 0.4], ["verticalidade", 0.35], ["1v1", 0.25]],
         phys: { speed: 0.35, rep: 0.25 },
+        move: [-19, -8],
+        moveLabel: p("Corta para dentro", "Cuts inside"),
       },
       {
         key: "meia_ponta",
@@ -476,7 +658,9 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Meia-ponta", "Inside playmaker"),
         blurb: p("Fecha por dentro e joga entre linhas: último passe e finalização", "Drifts inside between the lines: final pass and finishing"),
         traits: { finais: 0.4, passes: 0.25, dribles: 0.2, finalizacao: 0.15 },
-        metrics: [["passes chave", 0.4], ["pré assistências", 0.35], ["passes criativos", 0.25]],
+        metrics: [["passes chave", 0.4], ["pre assist", 0.35], ["passes criativos", 0.25]],
+        move: [-22, 6],
+        moveLabel: p("Flutua entre linhas", "Drifts between the lines"),
       },
       {
         key: "segundo_atq",
@@ -485,6 +669,8 @@ const FAMILIES: Record<string, FamilyDef> = {
         blurb: p("Joga colado no 9: associa e ataca a segunda bola", "Plays off the 9: links up and attacks the second ball"),
         traits: { finalizacao: 0.35, finais: 0.3, dribles: 0.2, ofensividade: 0.15 },
         metrics: [["gols e xg", 0.4], ["passes chave", 0.3], ["disputas com bola", 0.3]],
+        move: [-8, -6],
+        moveLabel: p("Ataca a segunda bola", "Attacks the second ball"),
       },
       {
         key: "operario",
@@ -492,8 +678,22 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Extremo de cobertura", "Wide worker"),
         blurb: p("Ataca e volta: compõe a linha de meio sem perder a saída de bola", "Attacks and tracks back: joins the midfield line without losing attacking output"),
         traits: { defensivos: 0.35, finais: 0.25, dribles: 0.25, ofensividade: 0.15 },
-        metrics: [["recuperações", 0.4], ["ações defensivas", 0.35], ["cruzamentos", 0.25]],
+        metrics: [["recuperac", 0.4], ["acoes defensivas", 0.35], ["cruzamentos", 0.25]],
         phys: { vol: 0.35, rep: 0.3 },
+        move: [0, 16],
+        moveLabel: p("Recompõe a linha de meio", "Tracks back into midfield"),
+      },
+      {
+        key: "ala_ex",
+        name: p("Ala", "Wing-back"),
+        blurb: p("Recua para o corredor inteiro: defende como lateral e mantém o 1v1 e o cruzamento", "Drops to own the whole flank: defends like a full-back, keeps the 1v1 and the cross"),
+        traits: { defensivos: 0.4, finais: 0.25, dribles: 0.2, ofensividade: 0.15 },
+        metrics: [["recuperac", 0.35], ["acoes defensivas", 0.35], ["cruzamentos", 0.3]],
+        phys: { rep: 0.3, vol: 0.3 },
+        move: [0, -26],
+        moveLabel: p("Corre o corredor inteiro", "Runs the whole flank"),
+        gate: (c) => c.t("defensivos") >= 58 && (c.phys.vol == null || c.phys.vol >= 45),
+        reason: p("volume defensivo raro para um extremo", "defensive volume that is rare for a winger"),
       },
     ],
     schemes: [
@@ -565,6 +765,24 @@ const FAMILIES: Record<string, FamilyDef> = {
         why: p("Sem pontas, parte de dentro e ataca o corredor", "With no wingers, starts inside and attacks the channel"),
         need: { finalizacao: 0.3, dribles: 0.3, finais: 0.25, ofensividade: 0.15 },
       },
+      {
+        formation: "3-5-2",
+        tag: p("Adaptação · ala", "Adaptation · wing-back"),
+        roles: ["ala_ex"],
+        at: [90, 50],
+        why: p("Ala de origem ofensiva: amplitude, 1v1 e o retorno que os dados mostram", "An attacking-origin wing-back: width, 1v1 and the work rate the data shows"),
+        need: { defensivos: 0.4, finais: 0.3, dribles: 0.3 },
+        phys: { rep: 0.3, vol: 0.3 },
+      },
+      {
+        formation: "3-4-3",
+        tag: p("Adaptação · ala", "Adaptation · wing-back"),
+        roles: ["ala_ex"],
+        at: [90, 52],
+        why: p("Dono do corredor com três zagueiros cobrindo atrás", "Owns the flank with three centre-backs covering behind"),
+        need: { defensivos: 0.4, finais: 0.3, dribles: 0.3 },
+        phys: { rep: 0.3, vol: 0.3 },
+      },
     ],
   },
   atacantes: {
@@ -576,7 +794,9 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Centroavante de área", "Penalty-box striker"),
         blurb: p("Finalizador: posicionamento, primeiro toque e definição", "Finisher: positioning, first touch and end product"),
         traits: { finalizacao: 0.75, aereo: 0.15, dribles: 0.1 },
-        metrics: [["gols e xg", 0.5], ["finalizações", 0.35], ["efetividade", 0.15]],
+        metrics: [["gols e xg", 0.5], ["finalizacoes", 0.35], ["efetividade", 0.15]],
+        move: [-9, -5],
+        moveLabel: p("Ataca o primeiro pau", "Attacks the near post"),
       },
       {
         key: "referencia",
@@ -584,7 +804,9 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Homem de referência", "Target man"),
         blurb: p("Pivô e jogo aéreo: segura a bola e faz o time subir", "Hold-up and aerial play: pins the centre-back and brings the team up"),
         traits: { aereo: 0.5, finalizacao: 0.35, finais: 0.15 },
-        metrics: [["duelos aéreos", 0.55], ["gols e xg", 0.3], ["passes chave", 0.15]],
+        metrics: [["aereo", 0.55], ["gols e xg", 0.3], ["passes chave", 0.15]],
+        move: [0, 11],
+        moveLabel: p("Vem de costas para o pivô", "Comes short to hold the ball up"),
       },
       {
         key: "falso9",
@@ -593,6 +815,8 @@ const FAMILIES: Record<string, FamilyDef> = {
         blurb: p("Sai da referência, atrai o zagueiro e associa por dentro", "Drops off the line, drags the centre-back out and links inside"),
         traits: { finais: 0.4, dribles: 0.35, finalizacao: 0.25 },
         metrics: [["passes chave", 0.35], ["disputas com bola", 0.35], ["gols e xg", 0.3]],
+        move: [0, 20],
+        moveLabel: p("Recua para associar", "Drops to link play"),
       },
       {
         key: "profundidade",
@@ -600,8 +824,10 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Atacante de profundidade", "Running striker"),
         blurb: p("Joga no ombro do zagueiro: ataca as costas da linha", "Plays on the shoulder: runs in behind the line"),
         traits: { finalizacao: 0.4, dribles: 0.35, finais: 0.15, aereo: 0.1 },
-        metrics: [["gols e xg", 0.4], ["1v1 - ofensivo", 0.35], ["disputas com bola", 0.25]],
+        metrics: [["gols e xg", 0.4], ["1v1", 0.35], ["disputas com bola", 0.25]],
         phys: { speed: 0.4, rep: 0.2 },
+        move: [12, -8],
+        moveLabel: p("Ataca as costas da zaga", "Runs in behind"),
       },
       {
         key: "pressao",
@@ -609,15 +835,27 @@ const FAMILIES: Record<string, FamilyDef> = {
         name: p("Atacante de pressão", "Pressing striker"),
         blurb: p("Primeiro defensor: persegue a saída adversária e força o erro", "First defender: chases the build-up and forces mistakes"),
         traits: { dribles: 0.4, finalizacao: 0.3, finais: 0.15, aereo: 0.15 },
-        metrics: [["disputas com bola", 0.5], ["1v1 - ofensivo", 0.3], ["gols e xg", 0.2]],
+        metrics: [["disputas com bola", 0.5], ["1v1", 0.3], ["gols e xg", 0.2]],
         phys: { rep: 0.45, vol: 0.25 },
+      },
+      {
+        key: "aberto",
+        name: p("Atacante pelo lado", "Wide forward"),
+        blurb: p("Parte da ponta para atacar o espaço e finalizar em diagonal", "Starts wide to attack space and finish on the diagonal"),
+        traits: { dribles: 0.45, finalizacao: 0.3, finais: 0.25 },
+        metrics: [["1v1", 0.4], ["progress", 0.3], ["gols e xg", 0.3]],
+        phys: { speed: 0.3 },
+        move: [-18, -6],
+        moveLabel: p("Diagonal para finalizar", "Diagonal run to finish"),
+        gate: (c) => c.t("dribles") >= 65 && (c.phys.speed == null || c.phys.speed >= 50),
+        reason: p("drible e condução de ponta", "winger-level dribbling and carrying"),
       },
     ],
     schemes: [
       {
         formation: "4-3-3",
         tag: p("Centroavante do trio", "Centre-forward of the three"),
-        roles: ["area", "profundidade", "pressao"],
+        roles: ["area", "profundidade", "pressao", "falso9"],
         at: [50, 14],
         why: p("Fixa a área e finaliza o que os pontas criam", "Pins the box and finishes what the wingers create"),
         need: { finalizacao: 0.55, aereo: 0.15, dribles: 0.15, finais: 0.15 },
@@ -670,6 +908,15 @@ const FAMILIES: Record<string, FamilyDef> = {
         why: p("Referência central com dois pontas abertos cruzando", "Central reference with two wide wingers delivering crosses"),
         need: { finalizacao: 0.55, aereo: 0.2, finais: 0.1, dribles: 0.15 },
       },
+      {
+        formation: "4-3-3",
+        tag: p("Adaptação · ponta", "Adaptation · winger"),
+        roles: ["aberto"],
+        at: [85, 22],
+        why: p("Parte da ponta e ataca a área em diagonal, com o 9 fixando a zaga", "Starts wide and attacks the box on the diagonal while the 9 pins the defence"),
+        need: { dribles: 0.45, finalizacao: 0.35, finais: 0.2 },
+        phys: { speed: 0.2 },
+      },
     ],
   },
 };
@@ -681,10 +928,11 @@ export type FitInput = {
   profiles: { label: string; share: number }[];
   /** Blocos da temporada: tom (traço), título já localizado e percentil médio. */
   blocks: { tone: string; title: string; avg: number }[];
-  /** Métricas individuais com percentil médio — usadas para separar funções parecidas. */
-  metrics?: { name: string; percentile: number }[];
+  /** Métricas: aspecto PT (chave estável), rótulo localizado e percentil médio. */
+  metrics?: { aspect: string; label: string; percentile: number }[];
   physical: { key: string; pct: number | null }[] | null;
   side: "left" | "right" | null;
+  heightCm?: number | null;
 };
 
 export type FitEvidence = { label: string; pct: number };
@@ -700,6 +948,11 @@ export type FitScheme = {
   level: string;
   dots: XY[];
   at: XY;
+  /** Ponto final da seta de movimento (coordenadas do campinho), se houver. */
+  move: XY | null;
+  moveLabel: string | null;
+  /** Adaptação de posição. */
+  cross: boolean;
   evidence: FitEvidence[];
 };
 
@@ -709,52 +962,37 @@ export type FitRole = {
   score: number;
   level: string;
   main: boolean;
+  cross: boolean;
   evidence: FitEvidence[];
 };
 
-export type TacticalFit = { schemes: FitScheme[]; roles: FitRole[]; verdict: string };
+export type FitCross = { name: string; reason: string; formation: string; tag: string };
+
+export type TacticalFit = {
+  schemes: FitScheme[];
+  roles: FitRole[];
+  verdict: string;
+  /** Melhor slot nativo e adaptação sugerida, para a síntese. */
+  best: { role: string; formation: string; tag: string; moveLabel: string | null } | null;
+  cross: FitCross | null;
+};
 
 const clamp = (v: number, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, v));
-
 const norm = (s: string) =>
   s
     .toLocaleLowerCase("pt-BR")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
+/** Pontuação mínima para uma adaptação aparecer. */
+const CROSS_MIN = 55;
+/** Desconto da adaptação: o atleta não tem a rotina da posição. */
+const CROSS_PENALTY = 4;
 
-function traitScore(weights: Weights, byTrait: Map<string, number>): number | null {
+function weighted(pairs: [number | null | undefined, number][]): number | null {
   let sum = 0;
   let total = 0;
-  for (const [trait, weight] of Object.entries(weights) as [Trait, number][]) {
-    const pct = byTrait.get(trait);
-    if (pct == null) continue;
-    sum += pct * weight;
-    total += weight;
-  }
-  return total ? sum / total : null;
-}
-
-/** Percentil de uma métrica pelo padrão do nome; prefere a linha de volume ("/90"). */
-function metricPct(pattern: string, metrics: { name: string; percentile: number }[]): number | null {
-  const hits = metrics.filter((m) => norm(m.name).includes(pattern));
-  if (!hits.length) return null;
-  const volume = hits.find((m) => m.name.includes("/90"));
-  return (volume ?? hits[0]).percentile;
-}
-
-/** Pontuação da função: blocos por tom + métricas específicas, ponderadas juntas. */
-function roleStatScore(role: RoleDef, byTrait: Map<string, number>, metrics: { name: string; percentile: number }[]): number | null {
-  let sum = 0;
-  let total = 0;
-  for (const [trait, weight] of Object.entries(role.traits) as [Trait, number][]) {
-    const pct = byTrait.get(trait);
-    if (pct == null) continue;
-    sum += pct * weight;
-    total += weight;
-  }
-  for (const [pattern, weight] of role.metrics ?? []) {
-    const pct = metricPct(pattern, metrics);
+  for (const [pct, weight] of pairs) {
     if (pct == null) continue;
     sum += pct * weight;
     total += weight;
@@ -794,6 +1032,22 @@ function level(score: number, lang: ReportLang): string {
   return en ? "Good" : "Bom";
 }
 
+/** Fim da seta: delta ampliado para leitura e afastado de outro jogador para não cobri-lo. */
+function moveTarget(at: XY, delta: XY, dots: XY[]): XY {
+  let end: XY = [clamp(at[0] + delta[0] * 1.3, 5, 95), clamp(at[1] + delta[1] * 1.3, 6, 90)];
+  for (const dot of dots.slice(1)) {
+    if (dot[0] === at[0] && dot[1] === at[1]) continue;
+    const dx = end[0] - dot[0];
+    const dy = end[1] - dot[1];
+    const dist = Math.hypot(dx, dy);
+    if (dist >= 7) continue;
+    // Empurra para o lado oposto ao jogador; se coincidir, recua para trás da linha dele.
+    const [ux, uy] = dist > 0.5 ? [dx / dist, dy / dist] : [0, 1];
+    end = [clamp(dot[0] + ux * 8, 5, 95), clamp(dot[1] + uy * 8, 6, 90)];
+  }
+  return end;
+}
+
 function snap(dots: XY[], at: XY): XY {
   let best = dots[1] ?? at;
   let dist = Infinity;
@@ -819,109 +1073,166 @@ export function buildTacticalFit(input: FitInput): TacticalFit | null {
     byTrait.set(block.tone, block.avg);
     titles.set(block.tone, block.title);
   }
-  const metrics = input.metrics ?? [];
+  const metrics = (input.metrics ?? [])
+    .map((m) => ({ ...m, key: norm(m.aspect) }))
+    .filter((m) => !m.key.includes("erro") && !norm(m.label).includes("erro"));
+  const metricHits = (pattern: string) => metrics.filter((m) => m.key.includes(norm(pattern)));
+  const metricPct = (pattern: string): number | null => {
+    const hits = metricHits(pattern);
+    return hits.length ? hits.reduce((sum, m) => sum + m.percentile, 0) / hits.length : null;
+  };
   const phys = physLevels(input.physical);
-  const roleByKey = new Map(def.roles.map((role) => [role.key, role]));
+  const shareOf = (label: string) => input.profiles.find((item) => item.label === label)?.share ?? 0;
+  const ctx: GateCtx = {
+    t: (trait) => byTrait.get(trait) ?? 0,
+    m: metricPct,
+    share: shareOf,
+    height: input.heightCm ?? null,
+    phys,
+  };
 
-  /** Evidências da função: blocos/métricas mais fortes dentre os que ela pede. */
-  const evidenceFor = (role: RoleDef, extra?: Weights): FitEvidence[] => {
+  /** Evidências: os dois sinais mais fortes dentre os que a função pede. */
+  const evidenceFor = (role: RoleDef): FitEvidence[] => {
     const rows: { label: string; score: number; pct: number }[] = [];
-    for (const [trait, weight] of Object.entries(extra ?? role.traits) as [Trait, number][]) {
+    for (const [trait, weight] of Object.entries(role.traits) as [Trait, number][]) {
       const pct = byTrait.get(trait);
       if (pct != null) rows.push({ label: titles.get(trait) ?? trait, score: pct * weight, pct });
     }
-    if (!extra) {
-      for (const [pattern, weight] of role.metrics ?? []) {
-        const pct = metricPct(pattern, metrics);
-        if (pct != null) {
-          const hit = metrics.filter((m) => norm(m.name).includes(pattern));
-          const label = (hit.find((m) => m.name.includes("/90")) ?? hit[0]).name;
-          rows.push({ label, score: pct * weight, pct });
-        }
-      }
+    for (const [pattern, weight] of role.metrics ?? []) {
+      const hits = metricHits(pattern);
+      if (!hits.length) continue;
+      const top = hits.reduce((a, b) => (b.percentile > a.percentile ? b : a));
+      rows.push({ label: top.label, score: (metricPct(pattern) ?? 0) * weight, pct: top.percentile });
     }
+    const seen = new Set<string>();
     return rows
       .sort((a, b) => b.score - a.score)
+      .filter((row) => (seen.has(row.label) ? false : (seen.add(row.label), true)))
       .slice(0, 2)
       .map((row) => ({ label: row.label, pct: Math.round(row.pct) }));
   };
 
+  const allowed = def.roles.filter((role) => !role.gate || role.gate(ctx));
+  const roleByKey = new Map(allowed.map((role) => [role.key, role]));
   const roleScores = new Map<string, number>();
-  const roles = def.roles
+  const roles = allowed
     .map((role) => {
-      const share = role.profile ? input.profiles.find((item) => item.label === role.profile)?.share ?? 0 : null;
-      const profileScore = share != null && input.profiles.length ? clamp(share * 1.3) : null;
-      const stats = roleStatScore(role, byTrait, metrics);
+      const profileScore = role.profile && input.profiles.length ? clamp(shareOf(role.profile) * 1.3) : null;
+      const stats = weighted([
+        ...(Object.entries(role.traits) as [Trait, number][]).map(([trait, w]): [number | undefined, number] => [byTrait.get(trait), w]),
+        ...(role.metrics ?? []).map(([pattern, w]): [number | null, number] => [metricPct(pattern), w]),
+      ]);
       const parts = [profileScore, stats].filter((v): v is number => v != null);
       let score = parts.length ? parts.reduce((a, b) => a + b, 0) / parts.length : 0;
       score += physBonus(role.phys, phys);
+      if (role.gate) score -= CROSS_PENALTY;
       score = clamp(score);
       roleScores.set(role.key, score);
       return { role, score };
     })
     .sort((a, b) => b.score - a.score);
 
-  const side = input.side;
-  const mirrorX = (xy: XY): XY => (def.mirror && side === "left" ? [100 - xy[0], xy[1]] : xy);
+  const flip = def.mirror && input.side === "left";
+  const mirrorX = (xy: XY): XY => (flip ? [100 - xy[0], xy[1]] : xy);
 
   /** Por slot, a função disponível em que o atleta rende melhor. */
-  const schemes = def.schemes
+  const ranked = def.schemes
     .map((scheme) => {
-      let bestKey = scheme.roles[0];
-      let bestRoleScore = -1;
+      let best: RoleDef | null = null;
+      let bestScore = -1;
       for (const key of scheme.roles) {
-        const score = roleScores.get(key) ?? 0;
-        if (score > bestRoleScore) {
-          bestRoleScore = score;
-          bestKey = key;
+        const role = roleByKey.get(key);
+        const score = roleScores.get(key);
+        if (role && score != null && score > bestScore) {
+          best = role;
+          bestScore = score;
         }
       }
-      const need = traitScore(scheme.need, byTrait);
-      let score = need == null ? bestRoleScore : bestRoleScore * 0.55 + need * 0.45;
+      if (!best) return null;
+      const need = weighted((Object.entries(scheme.need) as [Trait, number][]).map(([trait, w]) => [byTrait.get(trait), w]));
+      let score = need == null ? bestScore : bestScore * 0.55 + need * 0.45;
       score += physBonus(scheme.phys, phys);
-      return { scheme, roleKey: bestKey, score: clamp(score) };
+      if (best.gate) score -= CROSS_PENALTY;
+      return { scheme, role: best, score: clamp(score) };
     })
+    .filter((row): row is NonNullable<typeof row> => row != null)
     .sort((a, b) => b.score - a.score);
 
-  const seen = new Set<string>();
-  const top = schemes
-    .filter(({ scheme, roleKey }) => {
-      const key = `${scheme.formation}|${roleKey}`;
-      return seen.has(key) ? false : (seen.add(key), true);
-    })
-    .slice(0, 3);
+  const natives = ranked.filter((row) => !row.role.gate);
+  const crossBest = ranked.find((row) => row.role.gate && row.score >= CROSS_MIN) ?? null;
+  const formations = new Set<string>();
+  const picked: typeof ranked = [];
+  for (const row of natives) {
+    if (picked.length >= (crossBest ? 2 : 3)) break;
+    if (formations.has(row.scheme.formation)) continue;
+    formations.add(row.scheme.formation);
+    picked.push(row);
+  }
+  if (crossBest) picked.push(crossBest);
 
-  const fitSchemes: FitScheme[] = top.map(({ scheme, roleKey, score }) => {
+  const fitSchemes: FitScheme[] = picked.map(({ scheme, role, score }) => {
     const dots = FORMATIONS[scheme.formation].map(mirrorX);
-    const role = roleByKey.get(roleKey);
+    const at = snap(dots, mirrorX(scheme.at));
+    const move = role.move ? moveTarget(at, [flip ? -role.move[0] : role.move[0], role.move[1]], dots) : null;
     return {
       formation: scheme.formation,
-      slot: role ? lc(role.name) : lc(scheme.tag),
+      slot: lc(role.name),
       tag: lc(scheme.tag),
       why: lc(scheme.why),
       score: Math.round(score),
       level: level(score, input.lang),
       dots,
-      at: snap(dots, mirrorX(scheme.at)),
-      evidence: role ? evidenceFor(role) : [],
+      at,
+      move,
+      moveLabel: role.move && role.moveLabel ? lc(role.moveLabel) : null,
+      cross: Boolean(role.gate),
+      evidence: evidenceFor(role),
     };
   });
 
-  const fitRoles: FitRole[] = roles.slice(0, 3).map(({ role, score }, index) => ({
+  const nativeRoles = roles.filter((row) => !row.role.gate);
+  const crossRole = roles.find((row) => row.role.gate && row.score >= CROSS_MIN) ?? null;
+  const roleRows = [...nativeRoles.slice(0, crossRole ? 2 : 3), ...(crossRole ? [crossRole] : [])];
+  const fitRoles: FitRole[] = roleRows.map(({ role, score }, index) => ({
     name: lc(role.name),
     blurb: lc(role.blurb),
     score: Math.round(score),
-    level: index === 0 ? (en ? "Main" : "Principal") : en ? "Alternative" : "Alternativa",
+    level: role.gate ? (en ? "Adaptation" : "Adaptação") : index === 0 ? (en ? "Main" : "Principal") : en ? "Alternative" : "Alternativa",
     main: index === 0,
+    cross: Boolean(role.gate),
     evidence: evidenceFor(role),
   }));
 
-  const bestRole = roles[0].role;
-  const formations = fitSchemes.slice(0, 2).map((s) => `**${s.formation}**`);
-  const roleName = `**${lc(bestRole.name).toLowerCase()}**`;
-  const verdict = en
-    ? `By profile and data, the strongest read is a ${roleName} — best placed in ${formations.join(" or ")}.`
-    : `Pelo perfil e pelos dados, a leitura mais forte é de ${roleName} — rende melhor em ${formations.join(" ou ")}.`;
+  const top = natives[0] ?? null;
+  const crossPick = crossBest ?? (crossRole ? ranked.find((row) => row.role === crossRole.role) ?? null : null);
+  const cross: FitCross | null = crossPick?.role.reason
+    ? { name: lc(crossPick.role.name), reason: lc(crossPick.role.reason), formation: crossPick.scheme.formation, tag: lc(crossPick.scheme.tag) }
+    : null;
 
-  return { schemes: fitSchemes, roles: fitRoles, verdict };
+  const bestRole = nativeRoles[0]?.role ?? roles[0].role;
+  const forms = fitSchemes.filter((s) => !s.cross).slice(0, 2).map((s) => `**${s.formation}**`);
+  const roleName = `**${lc(bestRole.name).toLowerCase()}**`;
+  const crossText = cross
+    ? en
+      ? ` As an adaptation, he can also play as **${cross.name.toLowerCase()}**.`
+      : ` Como adaptação, pode ainda atuar como **${cross.name.toLowerCase()}**.`
+    : "";
+  const verdict = en
+    ? `By profile and data, the strongest read is a ${roleName} — best placed in ${forms.join(" or ")}.${crossText}`
+    : `Pelo perfil e pelos dados, a leitura mais forte é de ${roleName} — rende melhor em ${forms.join(" ou ")}.${crossText}`;
+
+  return {
+    schemes: fitSchemes,
+    roles: fitRoles,
+    verdict,
+    best: top
+      ? {
+          role: lc(top.role.name),
+          formation: top.scheme.formation,
+          tag: lc(top.scheme.tag),
+          moveLabel: top.role.move && top.role.moveLabel ? lc(top.role.moveLabel) : null,
+        }
+      : null,
+    cross,
+  };
 }
