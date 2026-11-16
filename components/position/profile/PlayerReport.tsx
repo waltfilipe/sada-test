@@ -2040,39 +2040,7 @@ function RichText({ text }: { text: string }) {
 }
 
 /** Campo em miniatura: a formação inteira, com a posição do atleta destacada. */
-/** Seta curva do movimento indicado (coordenadas já no viewBox do campinho). */
-function MoveArrow({ from, to }: { from: [number, number]; to: [number, number] }) {
-  const [x1, y1] = from;
-  const [x2, y2] = to;
-  const len = Math.hypot(x2 - x1, y2 - y1) || 1;
-  const [ux, uy] = [(x2 - x1) / len, (y2 - y1) / len];
-  // Curva suave para o lado de fora; começa fora do halo do atleta.
-  const bend = Math.min(7, len * 0.2);
-  const cx = (x1 + x2) / 2 - uy * bend;
-  const cy = (y1 + y2) / 2 + ux * bend;
-  const sx = x1 + ux * 7;
-  const sy = y1 + uy * 7;
-  const dl = Math.hypot(x2 - cx, y2 - cy) || 1;
-  const [dx, dy] = [(x2 - cx) / dl, (y2 - cy) / dl];
-  const head = 4.2;
-  const ex = x2 - dx * head * 0.6;
-  const ey = y2 - dy * head * 0.6;
-  const points = [
-    [x2, y2],
-    [x2 - dx * head - dy * head * 0.62, y2 - dy * head + dx * head * 0.62],
-    [x2 - dx * head + dy * head * 0.62, y2 - dy * head - dx * head * 0.62],
-  ]
-    .map(([px, py]) => `${px.toFixed(1)},${py.toFixed(1)}`)
-    .join(" ");
-  return (
-    <g className="fit-move">
-      <path d={`M${sx.toFixed(1)} ${sy.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`} />
-      <polygon points={points} />
-    </g>
-  );
-}
-
-function FormationPitch({ dots, at, move }: { dots: [number, number][]; at: [number, number]; move?: [number, number] | null }) {
+function FormationPitch({ dots, at }: { dots: [number, number][]; at: [number, number] }) {
   const fx = (x: number) => 8 + x * 0.84;
   const fy = (y: number) => 9 + y * 1.22;
   return (
@@ -2092,8 +2060,6 @@ function FormationPitch({ dots, at, move }: { dots: [number, number][]; at: [num
           <circle key={index} className={index === 0 ? "fit-dot is-gk" : "fit-dot"} cx={fx(x)} cy={fy(y)} r={index === 0 ? 3.2 : 3.7} />
         ),
       )}
-      {move ? <circle className="fit-ghost" cx={fx(move[0])} cy={fy(move[1])} r="4.4" /> : null}
-      {move ? <MoveArrow from={[fx(at[0]), fy(at[1])]} to={[fx(move[0]), fy(move[1])]} /> : null}
       <circle className="fit-halo" cx={fx(at[0])} cy={fy(at[1])} r="9" />
       <circle className="fit-hit" cx={fx(at[0])} cy={fy(at[1])} r="5.2" />
     </svg>
@@ -2120,7 +2086,7 @@ function FitSchemeCard({ item, best, copy }: { item: FitScheme; best: boolean; c
   return (
     <article className={`fit-scheme ${item.cross ? "is-cross" : fitTone(item.score)}${best ? " is-best" : ""}`}>
       {best || item.cross ? <span className="fit-ribbon">{item.cross ? copy.fitCross : copy.fitBest}</span> : null}
-      <FormationPitch dots={item.dots} at={item.at} move={item.move} />
+      <FormationPitch dots={item.dots} at={item.at} />
       {item.moveLabel ? (
         <p className="fit-move-label">
           <i className="fa-solid fa-arrow-right-long" aria-hidden="true" />
@@ -2492,11 +2458,6 @@ export function AnalystSheet({
                 <p className="fit-legend">
                   <i aria-hidden="true" />
                   {copy.fitHere}
-                  <svg className="fit-legend-arrow" viewBox="0 0 22 8" aria-hidden="true">
-                    <path d="M1 4 H16" />
-                    <polygon points="21,4 15,0.8 15,7.2" />
-                  </svg>
-                  {copy.fitMove}
                 </p>
               </section>
 
