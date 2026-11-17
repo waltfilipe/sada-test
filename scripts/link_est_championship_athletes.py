@@ -56,15 +56,18 @@ def main() -> int:
     people = load_json(XS / "people.json", {})
     overrides = load_json(OVERRIDES, {})
     row_athlete: dict = overrides.setdefault("row_athlete", {})
+    tm_unanchor: dict = overrides.get("tm_unanchor") or {}
 
     # indice: (temporada, nome, clube) -> athlete_ids; e person por athlete
     index: dict[tuple[str, str, str], set] = defaultdict(set)
     person_by_athlete: dict[str, dict] = {}
-    for rec in people.values():
-        aid = rec.get("athlete_id")
+    person_key_by_athlete: dict[str, str] = {}
+    for pkey, rec in people.items():
+        aid = (rec or {}).get("athlete_id")
         if not aid:
             continue
         person_by_athlete[aid] = rec
+        person_key_by_athlete[aid] = pkey
         birth = rec.get("birth_year")
         if not birth:
             continue
@@ -85,7 +88,18 @@ def main() -> int:
             for by in {birth, birth - 1, birth + 1}:
                 index[(str(season), norm(row.get("name")), norm(row.get("club")), str(by))].add(aid)
             tm = row.get("transfermarkt") or {}
-            if tm.get("id") or tm.get("photo"):
+            rid = str(tm.get("id") or "")
+            pkey = person_key_by_athlete.get(aid)
+            # nao enriquece a pessoa a partir de bloco de outro atleta:
+            # id desancorado da pessoa, ou id que diverge da ancora dela
+            bad = bool(rid) and (
+                rid == str(tm_unanchor.get(pkey or "") or "")
+                or (
+                    bool((person_by_athlete.get(aid) or {}).get("tm_id"))
+                    and rid != str(person_by_athlete[aid]["tm_id"])
+                )
+            )
+            if (tm.get("id") or tm.get("photo")) and not bad:
                 person = person_by_athlete.setdefault(aid, {})
                 for fkey, fval in (
                     ("tm_id", tm.get("id")),
@@ -96,6 +110,11 @@ def main() -> int:
                     ("market_value_eur", tm.get("market_value_eur")),
                     ("sofascore_player_id", tm.get("sofascore_player_id")),
                 ):
+                    # foto/url de perfil so valem se carregam o proprio tm_id —
+                    # bloco com id certo + foto de outro atleta (propagacao
+                    # velha) nao pode enriquecer a pessoa
+                    if fkey in ("photo", "profile_url") and rid and rid not in str(fval or ""):
+                        continue
                     if fval and not person.get(fkey):
                         person[fkey] = fval
 
@@ -107,13 +126,40 @@ def main() -> int:
         atleta com linha nacional fotografada ficava sem foto nos estaduais.
         """
         person = person_by_athlete.get(aid) or {}
-        if not (person.get("tm_id") or person.get("photo")):
+        p_tm = person.get("tm_id")
+        if not (p_tm or person.get("photo")):
             return None
-        row_tm = row.get("transfermarkt") or {}
-        if row_tm.get("photo"):
+        row_tm = dict(row.get("transfermarkt") or {})
+        rid = str(row_tm.get("id") or "")
+        if p_tm and rid and rid != str(p_tm):
+            # bloco da linha era de outro atleta (propagacao antiga/errada) —
+            # a âncora verificada da pessoa substitui tudo, sem carregar a
+            # foto/url/market do estranho
+            return {
+                k: v
+                for k, v in {
+                    "id": p_tm,
+                    "photo": person.get("photo"),
+                    "club": person.get("tm_club"),
+                    "profile_url": person.get("profile_url"),
+                    "market_value": person.get("market_value"),
+                    "market_value_eur": person.get("market_value_eur"),
+                    "sofascore_player_id": person.get("sofascore_player_id"),
+                }.items()
+                if v is not None
+            } or None
+        if p_tm and rid == str(p_tm):
+            # mesmo atleta: descarta campos da linha que apontam para outro
+            # tm_id (foto/url herdadas de propagacao antiga)
+            row_tm = {
+                k: v
+                for k, v in row_tm.items()
+                if k not in ("photo", "profile_url") or not v or str(p_tm) in str(v)
+            }
+        if not p_tm and row_tm.get("photo"):
             return None
         block = {
-            "id": person.get("tm_id"),
+            "id": p_tm,
             "photo": person.get("photo"),
             "club": person.get("tm_club"),
             "profile_url": person.get("profile_url"),
@@ -124,22 +170,30 @@ def main() -> int:
         merged = {**row_tm, **{k: v for k, v in block.items() if v is not None}}
         return merged or None
 
+    def stale_unanchored(row: dict, aid: str) -> bool:
+        """Bloco da linha e um tm_id que o override desancorou da pessoa."""
+        bad = tm_unanchor.get(person_key_by_athlete.get(aid) or "")
+        return bool(bad) and str((row.get("transfermarkt") or {}).get("id") or "") == str(bad)
+
     added = already = ambiguous = no_match = tm_filled = 0
     for league, season, directory in iter_dirs():
         players_file = directory / "players.json"
         payload = load_json(players_file, None)
         if payload is None:
             continue
-        tm_by_pid: dict[str, dict] = {}
+        resolved_tm: dict[str, dict | None] = {}
         for row in payload.get("players", []):
             key = f"{league}/{season}/{row.get('player_id')}"
             if key in row_athlete:
                 already += 1
-                block = person_tm_block(row_athlete[key], row)
+                aid = row_athlete[key]
+                if stale_unanchored(row, aid):
+                    row["transfermarkt"] = None
+                block = person_tm_block(aid, row)
                 if block:
                     row["transfermarkt"] = block
-                    tm_by_pid[row["player_id"]] = block
                     tm_filled += 1
+                resolved_tm[row["player_id"]] = row.get("transfermarkt")
                 continue
             aids: set = set()
             for by in {row.get("birth_year"), (row.get("birth_year") or 0) - 1, (row.get("birth_year") or 0) + 1}:
@@ -148,27 +202,30 @@ def main() -> int:
                 aid = next(iter(aids))
                 row_athlete[key] = aid
                 added += 1
+                if stale_unanchored(row, aid):
+                    row["transfermarkt"] = None
                 block = person_tm_block(aid, row)
                 if block:
                     row["transfermarkt"] = block
-                    tm_by_pid[row["player_id"]] = block
                     tm_filled += 1
+                resolved_tm[row["player_id"]] = row.get("transfermarkt")
             elif len(aids) > 1:
                 ambiguous += 1
             else:
                 no_match += 1
         players_file.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-        # propaga o bloco TM para as familias (display vem delas)
-        if tm_by_pid:
+        # espelha nas familias o bloco resolvido na linha irma (display vem
+        # delas) — inclusive None quando o bloco velho era de outro atleta
+        if resolved_tm:
             for fp in sorted(directory.glob("family-*.json")):
                 fam = load_json(fp, None)
                 if fam is None:
                     continue
                 changed = False
                 for row in fam.get("players", []):
-                    block = tm_by_pid.get(row.get("player_id") or "")
-                    if block and not (row.get("transfermarkt") or {}).get("photo"):
-                        row["transfermarkt"] = {**(row.get("transfermarkt") or {}), **block}
+                    pid = row.get("player_id") or ""
+                    if pid in resolved_tm and row.get("transfermarkt") != resolved_tm[pid]:
+                        row["transfermarkt"] = resolved_tm[pid]
                         changed = True
                 if changed:
                     fp.write_text(json.dumps(fam, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")

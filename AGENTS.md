@@ -42,8 +42,11 @@ novo os passos 2–4.
 
 Correções humanas vivem em `data/cross-season/identity-overrides.json`
 (versionado): `merge_people` (person_key → canônico), `pin_athlete`
-(person_key → athlete_id), `row_athlete` (liga/temporada/player_id → athlete_id,
-splits de linha). O registro sempre respeita overrides.
+(person_key → athlete_id), `pin_person` (liga/temporada/player_id →
+person_key — força de pessoa **no grafo**, contrapartida do `row_athlete`
+para splits que a inferência não resolve; linhas pinadas não são absorvidas
+pelo merge de temporadas disjuntas), `row_athlete` (liga/temporada/player_id →
+athlete_id, splits de linha). O registro sempre respeita overrides.
 
 `athletes.json` nunca reutiliza ids: pessoas desaparecidas ficam `active:false`.
 

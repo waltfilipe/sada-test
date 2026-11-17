@@ -201,6 +201,29 @@ def main() -> None:
             pass
     key_index = assign_season_keys(all_rows, prev_keys)
 
+    # ``pin_person`` overrides (liga/temporada/player_id -> person_key): força
+    # de pessoa no nivel do grafo — a contrapartida do ``row_athlete`` para
+    # splits que a inferencia nao resolve (ex.: homonimos colados pelo merge
+    # de temporadas disjuntas). Linhas pinadas nao podem ser absorvidas por
+    # outra pessoa.
+    try:
+        _ov = json.loads((DATA / "cross-season" / "identity-overrides.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        _ov = {}
+    for row in all_rows:
+        forced = (_ov.get("pin_person") or {}).get(
+            f"{row.get('_league')}/{row.get('_season')}/{row.get('player_id')}"
+        )
+        if forced:
+            row["_person_key"] = forced
+            sig = (
+                norm_name(row.get("name", "")),
+                row.get("birth_year") or 0,
+                row.get("position_family") or "",
+                norm_name(row.get("club") or ""),
+            )
+            key_index[sig] = forced
+
     timeline: dict[str, list[dict]] = {}
     persons_map: dict[str, dict[str, dict[str, str]]] = {}
     for p in all_rows:
