@@ -203,16 +203,14 @@ def main() -> int:
             for row in rows:
                 if not isinstance(row, dict) or not row.get("player_id"):
                     continue
-                before = (row.get("athlete_id"), row.get("person_key"),
-                          row.get("name_display"), (row.get("transfermarkt") or {}).get("photo"))
+                before = json.dumps(row, ensure_ascii=False, sort_keys=True, default=str)
                 result = patch_row(row, league, season, resolve, person_of)
-                after = (row.get("athlete_id"), row.get("person_key"),
-                         row.get("name_display"), (row.get("transfermarkt") or {}).get("photo"))
+                after = json.dumps(row, ensure_ascii=False, sort_keys=True, default=str)
                 if result == "id":
                     stamped += 1
                     if row_athlete.get(f"{league}/{season}/{row['player_id']}"):
                         forced += 1
-                    elif after[1]:
+                    elif row.get("person_key"):
                         matched_person += 1
                     else:
                         matched_tm += 1

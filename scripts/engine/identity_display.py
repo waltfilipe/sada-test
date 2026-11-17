@@ -88,8 +88,36 @@ def sync_row_presentation(row: dict, person: dict) -> bool:
         del row["name_display"]
         changed = True
 
-    p_photo = person.get("photo")
+    p_tm = str(person.get("tm_id") or "")
     tm = row.get("transfermarkt")
+    if p_tm:
+        if not isinstance(tm, dict):
+            tm = {}
+            row["transfermarkt"] = tm
+            changed = True
+        rid = str(tm.get("id") or "")
+        if rid != p_tm:
+            # bloco ausente ou de outro atleta (match errado/propagacao
+            # velha) — campos que apontam para o estranho saem e a pessoa
+            # repõe os seus (mesmo comportamento do linker nos est-*)
+            for fkey in ("id", "club", "profile_url", "market_value", "market_value_eur",
+                         "contract_until", "contract_remaining", "on_loan_from",
+                         "sofascore_player_id"):
+                tm.pop(fkey, None)
+            fill = {
+                "id": p_tm,
+                "club": person.get("tm_club"),
+                "profile_url": person.get("profile_url"),
+                "market_value": person.get("market_value"),
+                "market_value_eur": person.get("market_value_eur"),
+                "sofascore_player_id": person.get("sofascore_player_id"),
+            }
+            for fkey, fval in fill.items():
+                if fval is not None and tm.get(fkey) != fval:
+                    tm[fkey] = fval
+            changed = True
+
+    p_photo = person.get("photo")
     if p_photo:
         if not isinstance(tm, dict):
             tm = {}
