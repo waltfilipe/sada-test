@@ -45,7 +45,8 @@ export function getAthleteList(league: LeagueId): AthleteListItem[] {
   const items: AthleteListItem[] = [];
 
   for (const player of current) {
-    const key = normKey(player.name, player.club);
+    // match_key do arquivo foi gravado com o nome cru da fonte
+    const key = normKey(player.name_raw ?? player.name, player.club);
     const archived = archiveByKey.get(key);
     if (archived) usedArchive.add(archived.archive_id);
 
@@ -60,6 +61,7 @@ export function getAthleteList(league: LeagueId): AthleteListItem[] {
     items.push({
       athlete_id: player.player_id,
       name: player.name,
+      name_raw: player.name_raw,
       club: player.club,
       position: player.position,
       position_family: player.position_family,
@@ -107,7 +109,7 @@ export function getAthleteDetail(league: LeagueId, athleteId: string): AthleteDe
         profile: getPlayerProfile(athleteId, league),
       };
     }
-    const key = normKey(card.name, card.club);
+    const key = normKey(card.name_raw ?? card.name, card.club);
     archive2025 = loadArchive(league).find((row) => row.match_key === key);
   } else {
     archive2025 = loadArchive(league).find((row) => row.archive_id === athleteId);

@@ -50,6 +50,32 @@ athlete_id, splits de linha). O registro sempre respeita overrides.
 
 `athletes.json` nunca reutiliza ids: pessoas desaparecidas ficam `active:false`.
 
+## Cartão canônico (nome + foto por atleta)
+
+Identidade resolvida não basta: nome e foto também são propriedades do
+atleta, não da linha. `scripts/engine/identity_display.py`
+(`sync_row_presentation`) é a camada de apresentação, chamada por
+`apply_athlete_ids.py` em **toda** linha com identidade:
+
+- `name_display` — nome de exibição canônico quando difere do nome cru da
+  fonte. Fonte: override `display_name` (person_key → nome de guerra, ex.:
+  `name:joao vitor|2004|0` → "Dantas") aplicado em `build_people.py` →
+  `person.display_name`. `name` nunca é sobrescrito (chave de match/busca);
+  no site `data.server.ts#withDisplayName` promove `name_display` a `name`
+  na fronteira e preserva o cru em `name_raw` (matchers usam
+  `name_raw ?? name`).
+- foto **tudo-ou-nada**: a foto canônica da pessoa vai para todas as linhas
+  do atleta. Fontes provadas: `person.photo`, override `canonical_photo`
+  (person_key → url), `athletes.json` com tm **não disputado**, ou foto de
+  linha cuja âncora prova ser dele (tm da linha = tm da pessoa, tm que
+  resolveu o atleta, `/photos/{ss_id}` nas âncoras `person.sofascore`).
+  Sem canônica: só se remove foto provadamente estranha (CDN TM com outro
+  tm_id, /photos/{ss} fora das âncoras) — o resto fica e o audit aponta.
+
+Audit (etapa 5) cobre a camada: `name-divergence` (nomes divergentes sem
+override → fila de sugestão), `photo-coverage` (foto em parte das linhas),
+`photo-mismatch` (foto provadamente alheia).
+
 ## xProgressão (`xprog`)
 
 `python scripts/apply_xprog.py` — após rebuilds de dados (junto de

@@ -229,7 +229,7 @@ export function resetPhotoIndexCache() {
 }
 
 function lookupTransfermarkt(
-  player: Pick<PlayerSummary, "name" | "club" | "birth_year" | "transfermarkt">,
+  player: Pick<PlayerSummary, "name" | "name_raw" | "club" | "birth_year" | "transfermarkt">,
 ): TransfermarktInfo | null {
   if (player.transfermarkt?.photo) return player.transfermarkt;
   const maps = photoIndex();
@@ -238,21 +238,24 @@ function lookupTransfermarkt(
     const fromId = maps.byTmId.get(String(tmId));
     if (fromId?.photo) return fromId;
   }
-  const fromNc = maps.byNameClub.get(`${normName(player.name)}::${normClub(player.club)}`);
+  // os índices são chaveados pelo nome cru da fonte — com cartão canônico,
+  // `name` já é o nome de exibição e o registro fica em `name_raw`
+  const raw = player.name_raw ?? player.name;
+  const fromNc = maps.byNameClub.get(`${normName(raw)}::${normClub(player.club)}`);
   if (fromNc?.photo) return fromNc;
   // When the name maps to a single identity, any candidate is that athlete.
   // When shared (homonyms), only a club-verified candidate may apply — no
   // photo is better than a wrong one.
-  const uniquePerson = (maps.personsByName.get(normName(player.name))?.size ?? 0) <= 1;
+  const uniquePerson = (maps.personsByName.get(normName(raw))?.size ?? 0) <= 1;
   const resolve = (candidates: PhotoCandidate[] | undefined): TransfermarktInfo | null => {
     if (!candidates?.length) return null;
     const clubHit = candidates.find((c) => c.club && clubCompatible(c.club, player.club));
     if (clubHit) return clubHit.tm;
     return uniquePerson ? candidates[0].tm : null;
   };
-  const fromAthlete = resolve(maps.byAthlete.get(athleteKey(player.name, player.birth_year)));
+  const fromAthlete = resolve(maps.byAthlete.get(athleteKey(raw, player.birth_year)));
   if (fromAthlete?.photo) return fromAthlete;
-  const fromName = resolve(maps.byName.get(normName(player.name)));
+  const fromName = resolve(maps.byName.get(normName(raw)));
   if (fromName?.photo) return fromName;
   return player.transfermarkt ?? null;
 }

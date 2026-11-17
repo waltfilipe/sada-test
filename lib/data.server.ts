@@ -89,6 +89,18 @@ export function getStandings(league?: string, season?: string): string[] {
   return standingsCache.get(key)!;
 }
 
+/**
+ * Cartão canônico do atleta: quando a linha traz `name_display` (override
+ * curado — ex.: registro "João Vitor" → nome de guerra "Dantas"), o nome
+ * exibido passa a ser o canônico em TODAS as competições. O nome cru da
+ * fonte fica em `name_raw` para busca/match (matchers usam `name_raw ?? name`).
+ */
+function withDisplayName<T extends PlayerSummary>(player: T): T {
+  const display = player.name_display;
+  if (!display || display === player.name) return player;
+  return { ...player, name: display, name_raw: player.name_raw ?? player.name };
+}
+
 export function getPlayers(league?: string, season?: string): PlayerSummary[] {
   const id = resolveLeague(league);
   const key = cacheKey(id, season);
@@ -99,7 +111,10 @@ export function getPlayers(league?: string, season?: string): PlayerSummary[] {
       parseSeasonParam(season) === CURRENT_SEASON
         ? payload.players
         : withResolvedSeasonPhotos(id, season ?? CURRENT_SEASON, payload.players);
-    playersCache.set(key, { ...payload, players: withSadaValues(resolved, id) });
+    playersCache.set(key, {
+      ...payload,
+      players: withSadaValues(resolved, id).map(withDisplayName),
+    });
   }
   return playersCache.get(key)!.players;
 }
@@ -226,7 +241,7 @@ export function getFamilyPlayers(family: PositionFamily, league?: string, season
       ? payload.players
       : withResolvedSeasonPhotos(id, season ?? CURRENT_SEASON, payload.players);
   const withTransfers = withPlayersDepartures(id, parseSeasonParam(season), resolved);
-  const withValues = withSadaValues(withTransfers, id);
+  const withValues = withSadaValues(withTransfers, id).map(withDisplayName);
   familyCache.set(key, withValues);
   return withValues;
 }
@@ -280,7 +295,7 @@ export function filterPlayers(
     }
     if (filters.search) {
       const q = filters.search.toLowerCase();
-      const hay = `${player.name} ${player.club} ${player.position}`.toLowerCase();
+      const hay = `${player.name} ${player.name_raw ?? ""} ${player.club} ${player.position}`.toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;

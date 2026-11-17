@@ -15,6 +15,10 @@ Regras:
                             liga+temporada (watchlist de homônimos)
   R5 birth-spread         — anos de nascimento do atleta variando >2 anos
   R6 multi-club-season    — athlete_id com 3+ clubes na mesma liga+temporada
+  R7 name-divergence      — atleta com nomes de linha divergentes e sem
+                            display_name curado (fila de sugestão p/ override)
+  R8 photo-coverage       — atleta com foto em parte das linhas (tudo-ou-nada)
+  R9 photo-mismatch       — foto da linha provadamente de outro atleta
 """
 
 from __future__ import annotations
@@ -27,6 +31,8 @@ from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from engine.identity_display import photo_is_foreign  # noqa: E402
 DATA = ROOT / "data"
 XS = DATA / "cross-season"
 OUT = XS / "identity-audit.json"
@@ -93,11 +99,15 @@ def load_rows() -> list[dict]:
         league, season = league_of(path), season_of(path)
         family = path.stem.removeprefix("family-")
         for p in payload.get("players", []):
+            tm = p.get("transfermarkt") or {}
             rows.append({
                 "league": league,
                 "season": season,
                 "player_id": p.get("player_id"),
                 "name": p.get("name"),
+                "name_display": p.get("name_display"),
+                "photo": tm.get("photo"),
+                "tm_id": str(tm.get("id")) if tm.get("id") else None,
                 "club": p.get("club"),
                 "birth_year": p.get("birth_year"),
                 "family": p.get("position_family") or family,
@@ -174,11 +184,16 @@ def main() -> None:
                     "ss_id": ss, "row_club": my_club, "csv_clubs": sorted(csv_club),
                 })
 
-    # ---- R3/R5/R6: por athlete_id sobre as linhas -----------------------------
+    # ---- R3/R5/R6/R7/R8/R9: por athlete_id sobre as linhas --------------------
     by_ath: dict[str, list[dict]] = defaultdict(list)
     for r in rows:
         if r["athlete_id"]:
             by_ath[r["athlete_id"]].append(r)
+    person_by_athlete = {
+        (rec or {}).get("athlete_id"): (key, rec)
+        for key, rec in people.items()
+        if (rec or {}).get("athlete_id")
+    }
 
     for aid, rs in by_ath.items():
         name = rs[0]["name"]
@@ -223,6 +238,35 @@ def main() -> None:
                 findings["multi-club-season"].append({
                     "athlete_id": aid, "name": name,
                     "league": league, "season": season, "clubs": sorted(clubs),
+                })
+
+        # R7: nomes de linha divergentes sem nome de exibição curado — fila de
+        # sugestão para overrides.display_name (nome de guerra ≠ registro)
+        person = (person_by_athlete.get(aid) or (None, {}))[1]
+        distinct_names = {norm(r["name"]) for r in rs if r.get("name")}
+        if len(distinct_names) > 1 and not person.get("display_name"):
+            findings["name-divergence"].append({
+                "athlete_id": aid, "person_key": person_by_athlete[aid][0],
+                "names": sorted({r["name"] for r in rs if r.get("name")}),
+                "rows": [f'{r["league"]}/{r["season"]}:{r["name"]}' for r in rs],
+            })
+
+        # R8: foto em parte das linhas — a política é tudo-ou-nada por atleta
+        with_photo = sum(1 for r in rs if r.get("photo"))
+        if 0 < with_photo < len(rs):
+            findings["photo-coverage"].append({
+                "athlete_id": aid, "name": name,
+                "with_photo": with_photo, "rows_total": len(rs),
+                "missing": [f'{r["league"]}/{r["season"]}:{r["club"]}' for r in rs if not r.get("photo")],
+            })
+
+        # R9: foto provadamente de outro atleta (id embutido diverge da âncora)
+        for r in rs:
+            if r.get("photo") and photo_is_foreign(r["photo"], r.get("tm_id"), person):
+                findings["photo-mismatch"].append({
+                    "athlete_id": aid, "name": name,
+                    "league": r["league"], "season": r["season"], "club": r["club"],
+                    "photo": r["photo"], "person_tm": person.get("tm_id"),
                 })
 
     # ---- R4: homônimos na mesma liga+temporada --------------------------------

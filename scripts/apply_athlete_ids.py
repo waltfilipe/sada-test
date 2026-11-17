@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
@@ -24,6 +25,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from engine.json_util import dumps_json  # noqa: E402
+from engine.identity_display import LOCAL_PHOTO, sync_row_presentation  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -65,7 +67,8 @@ def iter_dirs() -> list[tuple[str, str, Path]]:
     return dirs
 
 
-def patch_row(row: dict, league: str, season: str, resolve) -> str:
+def patch_row(row: dict, league: str, season: str, resolve, person_of) -> str:
+    """Stampa identidade + cartão canônico (nome de exibição/foto)."""
     athlete_id, person_key = resolve(league, season, row)
     if athlete_id:
         row["athlete_id"] = athlete_id
@@ -73,15 +76,19 @@ def patch_row(row: dict, league: str, season: str, resolve) -> str:
             row["person_key"] = person_key
         else:
             row.pop("person_key", None)
+        sync_row_presentation(row, person_of(athlete_id, person_key))
         return "id"
     row.pop("athlete_id", None)
     row.pop("person_key", None)
+    # sem identidade o cartão canônico tambem não pode ficar (era de outro)
+    row.pop("name_display", None)
     return "none"
 
 
 def main() -> int:
     persons: dict = load_json(XS / "persons.json", {})
     people: dict = load_json(XS / "people.json", {})
+    athletes: dict = load_json(XS / "athletes.json", {}).get("athletes") or {}
     overrides = load_json(XS / "identity-overrides.json", {})
     row_athlete: dict = overrides.get("row_athlete") or {}
 
@@ -91,6 +98,43 @@ def main() -> int:
         for v in people.values()
         if (v or {}).get("tm_id") and (v or {}).get("athlete_id")
     }
+    # pessoa por athlete_id — carrega o cartão canônico (display_name/foto)
+    athlete_to_person = {
+        (v or {}).get("athlete_id"): v
+        for v in people.values()
+        if (v or {}).get("athlete_id")
+    }
+    athlete_rec = {aid: (rec or {}) for aid, rec in athletes.items()}
+
+    # tm_id reivindicado por 2+ atletas não pode ancorar apresentação —
+    # foto/valor em disputa ficam fora do cartão canônico
+    tm_claims: dict[str, set] = defaultdict(set)
+    for v in people.values():
+        if (v or {}).get("tm_id") and (v or {}).get("athlete_id"):
+            tm_claims[str(v["tm_id"])].add(v["athlete_id"])
+    for aid, rec in athlete_rec.items():
+        if rec.get("tm_id"):
+            tm_claims[str(rec["tm_id"])].add(aid)
+
+    def athlete_card(aid: str | None) -> dict:
+        """Cartão do registro de atletas — só quando a âncora é indisputa."""
+        rec = athlete_rec.get(aid or "") or {}
+        tm = str(rec.get("tm_id") or "")
+        if not tm or tm_claims.get(tm) != {aid}:
+            return {"sofascore": rec.get("sofascore") or {}}
+        out = {"tm_id": tm, "sofascore": rec.get("sofascore") or {}}
+        if rec.get("photo"):
+            out["photo"] = rec["photo"]
+        if rec.get("profile_url"):
+            out["profile_url"] = rec["profile_url"]
+        return out
+
+    def base_person(aid: str | None, pkey: str | None) -> dict:
+        """Pessoa (people.json) sobre o cartão do registro como fallback."""
+        person = people.get(pkey or "") or athlete_to_person.get(aid or "") or {}
+        merged = athlete_card(aid)
+        merged.update({k: v for k, v in person.items() if v})
+        return merged
 
     def resolve(league: str, season: str, row: dict) -> tuple[str | None, str | None]:
         player_id = row.get("player_id") or ""
@@ -104,6 +148,43 @@ def main() -> int:
         if tm_id and str(tm_id) in tm_to_athlete:
             return tm_to_athlete[str(tm_id)], None
         return None, None
+
+    # foto derivada por atleta: linha cuja âncora a prova ser dele —
+    # tm da linha == tm da pessoa, ou tm que resolveu o próprio atleta,
+    # ou /photos/{ss_id} presente nas âncoras SofaScore da pessoa
+    athlete_photo: dict[str, str] = {}
+    for league, season, directory in iter_dirs():
+        payload = load_json(directory / "players.json", None)
+        if payload is None:
+            continue
+        for row in payload.get("players", []):
+            if not isinstance(row, dict):
+                continue
+            aid, pkey = resolve(league, season, row)
+            if not aid or aid in athlete_photo:
+                continue
+            person = base_person(aid, pkey)
+            if person.get("photo"):
+                athlete_photo[aid] = person["photo"]
+                continue
+            tm = row.get("transfermarkt") or {}
+            ph = str(tm.get("photo") or "")
+            if not ph:
+                continue
+            rid = str(tm.get("id") or "")
+            p_tm = str(person.get("tm_id") or "")
+            if (p_tm and rid == p_tm) or (rid and tm_to_athlete.get(rid) == aid):
+                athlete_photo[aid] = ph
+                continue
+            m = LOCAL_PHOTO.match(ph)
+            if m and m.group(1) in {str(v) for v in (person.get("sofascore") or {}).values()}:
+                athlete_photo[aid] = ph
+
+    def person_of(athlete_id: str | None, person_key: str | None) -> dict:
+        rec = base_person(athlete_id, person_key)
+        if not rec.get("photo") and athlete_photo.get(athlete_id or ""):
+            rec["photo"] = athlete_photo[athlete_id]
+        return rec
 
     touched_files = 0
     stamped = matched_person = matched_tm = forced = cleared = 0
@@ -122,9 +203,11 @@ def main() -> int:
             for row in rows:
                 if not isinstance(row, dict) or not row.get("player_id"):
                     continue
-                before = (row.get("athlete_id"), row.get("person_key"))
-                result = patch_row(row, league, season, resolve)
-                after = (row.get("athlete_id"), row.get("person_key"))
+                before = (row.get("athlete_id"), row.get("person_key"),
+                          row.get("name_display"), (row.get("transfermarkt") or {}).get("photo"))
+                result = patch_row(row, league, season, resolve, person_of)
+                after = (row.get("athlete_id"), row.get("person_key"),
+                         row.get("name_display"), (row.get("transfermarkt") or {}).get("photo"))
                 if result == "id":
                     stamped += 1
                     if row_athlete.get(f"{league}/{season}/{row['player_id']}"):

@@ -61,7 +61,8 @@ export function findPlayerInSeason(
       if (identity?.personKey && player.person_key === identity.personKey) {
         return withSeasonMeta(league, season, player, pool, family.key);
       }
-      if (normPlayerName(player.name) !== norm) continue;
+      // casa pelo nome cru da fonte ou pelo nome de exibição canônico
+      if (normPlayerName(player.name_raw ?? player.name) !== norm && normPlayerName(player.name) !== norm) continue;
       const pb = player.birth_year ?? null;
       if (birthYear == null || pb == null) continue;
       const diff = Math.abs(pb - birthYear);

@@ -74,6 +74,10 @@ export type PlayerSummary = {
   /** Chave derivada da resolução de identidade (debug/rastreio). */
   person_key?: string | null;
   name: string;
+  /** Nome cru da fonte (Wyscout/export) — preservado quando `name` carrega o cartão canônico (name_display). */
+  name_raw?: string | null;
+  /** Nome de exibição canônico do atleta (override em identity-overrides.json) — promovido a `name` na fronteira. */
+  name_display?: string | null;
   club: string;
   label: string;
   /** Campeonato real do atleta dentro da liga (ex.: "Paulista A2" em est-nv2). */

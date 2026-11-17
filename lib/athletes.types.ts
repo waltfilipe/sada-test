@@ -52,6 +52,8 @@ export type AthleteArchiveFile = {
 export type AthleteListItem = {
   athlete_id: string;
   name: string;
+  /** Nome cru da fonte quando `name` é o cartão canônico (match com arquivo). */
+  name_raw?: string | null;
   club: string;
   position: string;
   position_family: PlayerSummary["position_family"] | null;

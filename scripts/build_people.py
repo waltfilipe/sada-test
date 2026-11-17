@@ -114,6 +114,8 @@ def main() -> int:
     overrides_path = DATA / "cross-season" / "identity-overrides.json"
     overrides = json.loads(overrides_path.read_text(encoding="utf-8")) if overrides_path.exists() else {}
     tm_unanchor: dict = overrides.get("tm_unanchor") or {}
+    display_names: dict = overrides.get("display_name") or {}
+    canonical_photos: dict = overrides.get("canonical_photo") or {}
 
     people: dict[str, dict] = {}
     conflicts: list[dict] = []
@@ -220,6 +222,13 @@ def main() -> int:
                         "person_clubs": rec["clubs"],
                     }
                 )
+
+        # cartão canônico curado: nome de exibição (nome de guerra — a linha
+        # traz o nome de registro da fonte) e foto de capa verificada.
+        if display_names.get(person_key):
+            rec["display_name"] = display_names[person_key]
+        if canonical_photos.get(person_key):
+            rec["photo"] = canonical_photos[person_key]
 
         rec["rows"].sort(key=lambda r: (r["season"], r["league"]))
         rec["clubs"].sort()
