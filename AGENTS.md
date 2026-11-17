@@ -25,6 +25,12 @@ Ordem da cadeia (rode nesta sequência após rebuilds de dados):
 4. `python scripts/apply_athlete_ids.py` — grava `athlete_id`/`person_key` em
    `players.json`, `family-*.json` e `profiles/` de **todas** as ligas
    (estaduais/D/MLS casam por `tm_id` verificado).
+4.5 `python scripts/apply_cross_season_non_graph.py` — propaga o bloco
+   `cross_season` (histórico + previsões ridge da projeção de minutos) da
+   linha nacional corrente do atleta para suas linhas fora do grafo
+   (est-*, serie-d, mls-next-pro) via `athlete_id`. Sem isso, atletas como
+   Lucas Mila (Série C 2026 + Goiano 2026) projetam só com o prior do
+   pool estadual, ignorando o histórico nacional.
 5. `python scripts/audit_identity.py` — fila de revisão de identidade
    (homônimos fundidos, âncoras ss erradas, fusões de trajetória) →
    `data/cross-season/identity-audit.json`. Resolva os achados em
@@ -171,3 +177,19 @@ do nivel. Rótulo do pool: `poolName` em
 `lib/leagues.ts` ("Paulista A2 · 2022–26").
 Ordenação da aba Posição: ligas `est*` ordenam por minutagem; nacionais
 por rating (`PositionScoutPage.tsx`).
+
+## Ideias pendentes
+
+### Ideia 1 — Perfil posicional via heatmap (ofensividade/interioridade)
+
+Agregar por liga+temporada, a partir dos pontos do heatmap SofaScore
+(`heatmap.points`, eixos: x = direção de ataque 0→100, y = largura):
+`{avancoX, campoAdv%, tercoFinal%, interior%, lado}` por atleta +
+percentil dentro da família+liga+temporada (piso ~300 pontos).
+Usos: "atuou mais avançado que X% dos zagueiros da liga" (ofensividade),
+"recebeu por dentro" para extremos (meia-ponta vs ponta aberto),
+detecção de linha de 3 por time (3 zagueiros titulares + dispersão lateral)
+para reforçar encaixe "Zagueiro pelo lado". Sempre relativo ao pool da
+liga/temporada (heatmap mede jogador+time). Temporadas sem heatmap: omite.
+Ref.: análise Castán — Sport B24 x=36.9 (top ~15% zagueiros da liga);
+Cruzeiro A23 x=34.7 (mediana); detectou linha de 4 no Cruzeiro 2023.
