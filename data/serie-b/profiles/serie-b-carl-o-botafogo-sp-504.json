@@ -294,21 +294,6 @@
       "combativo": 6.6
     }
   },
-  "transfermarkt": {
-    "id": "740161",
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/default.jpg?lm=4711",
-    "market_value": null,
-    "market_value_eur": null,
-    "contract_until": null,
-    "contract_remaining": null,
-    "on_loan_from": null,
-    "club": "Ferroviária",
-    "profile_url": "https://www.transfermarkt.com.br/carlao/profil/spieler/740161",
-    "foot": "Destro",
-    "height": 189,
-    "matched_name": "Carlão",
-    "match_via": "Ferroviária 2026"
-  },
   "physical_run": {
     "source": "sofascore_run",
     "competition": "Brasileirão Série B",
@@ -371,5 +356,136 @@
     "acc_expected": 60.7,
     "acc_delta": 3.6,
     "acc_r2": 0.462
+  },
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2022",
+        "league": "serie-b",
+        "minutes": 956,
+        "club": "Náutico"
+      },
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 744,
+        "club": "Paysandu"
+      },
+      {
+        "year": "2025",
+        "league": "serie-b",
+        "minutes": 1550,
+        "club": "Botafogo SP"
+      }
+    ],
+    "metrics": {
+      "Duelos Defensivos": {
+        "predicted": 4.6524,
+        "resid_sd": 0.9945,
+        "train_n90": 22.55
+      },
+      "Duelos Defensivos::Eficiência": {
+        "predicted": 66.5603,
+        "resid_sd": 6.0348,
+        "train_n90": 22.55
+      },
+      "Ações Defensivas e Recuperações::Rebatidas": {
+        "predicted": 3.4521,
+        "resid_sd": 1.5975,
+        "train_n90": 22.87
+      },
+      "Ações Defensivas e Recuperações::Interceptações": {
+        "predicted": 1.4809,
+        "resid_sd": 0.8808,
+        "train_n90": 22.87
+      },
+      "Ações Defensivas e Recuperações::Chutes Bloqueados": {
+        "predicted": 0.7048,
+        "role_change_flag": true,
+        "resid_sd": 0.2743,
+        "train_n90": 22.87
+      },
+      "Eficiência Defensiva::Erros Totais": {
+        "predicted": 0.0651,
+        "resid_sd": 0.0778,
+        "train_n90": 22.55
+      },
+      "Eficiência Defensiva::Índice de Eficiência": {
+        "predicted": -0.9512,
+        "resid_sd": 0.805,
+        "train_n90": 20.84
+      },
+      "Passes Progressivos": {
+        "predicted": 7.4377,
+        "resid_sd": 1.4873,
+        "train_n90": 22.51
+      },
+      "Passes Progressivos::Eficiência": {
+        "predicted": 67.9714,
+        "resid_sd": 6.5477,
+        "train_n90": 22.51
+      },
+      "Passes para Terço Final": {
+        "predicted": 5.0838,
+        "resid_sd": 1.494,
+        "train_n90": 22.51
+      },
+      "Passes para Terço Final::Eficiência": {
+        "predicted": 67.1259,
+        "resid_sd": 7.8788,
+        "train_n90": 22.51
+      },
+      "Passes Longos": {
+        "predicted": 5.2163,
+        "role_change_flag": true,
+        "resid_sd": 1.2456,
+        "train_n90": 22.51
+      },
+      "Passes Longos::Eficiência": {
+        "predicted": 50.1933,
+        "resid_sd": 7.0047,
+        "train_n90": 22.51
+      },
+      "Disputas com Bola": {
+        "predicted": 1.0031,
+        "resid_sd": 0.5011,
+        "train_n90": 22.51
+      },
+      "Disputas com Bola::Eficiência": {
+        "predicted": 50.1735,
+        "resid_sd": 13.5899,
+        "train_n90": 22.51
+      },
+      "Conduções Progressivas": {
+        "predicted": 0.7248,
+        "resid_sd": 0.4651,
+        "train_n90": 22.48
+      },
+      "Gols e xG::Gols": {
+        "predicted": 0.0299,
+        "resid_sd": 0.0462,
+        "train_n90": 22.44
+      },
+      "Gols e xG::xG": {
+        "predicted": 0.0459,
+        "resid_sd": 0.0316,
+        "train_n90": 22.44
+      },
+      "Gols e xG::xA": {
+        "predicted": 0.0094,
+        "resid_sd": 0.0119,
+        "train_n90": 22.38
+      },
+      "Aéreo": {
+        "predicted": 4.0142,
+        "resid_sd": 0.8497,
+        "train_n90": 22.38
+      },
+      "Aéreo::Eficiência": {
+        "predicted": 61.8308,
+        "resid_sd": 7.9107,
+        "train_n90": 22.38
+      }
+    }
   }
 }
