@@ -16,7 +16,7 @@ from .normalize import (
     rank_players,
     zscore_linear_100,
 )
-from .pool_reference import distribution, reference_mask, reference_pool, zscore_against
+from .pool_reference import distribution, reference_mask, reference_pool, zscore_against, zscore_by_season
 from .profiles import FAMILY_PROFILE_CONFIG, profile_ratings_from_row, profile_ranks_from_row, profile_shares_from_row
 from .at_tri_composite_config import AT_TRI_COMPOSITE_CONFIG, apply_at_tri_composite_ratings
 from .ex_hierarchy import apply_ex_hierarchical_clusters
@@ -257,17 +257,62 @@ def _feat_col(pool: pd.DataFrame, *candidates: str) -> pd.Series:
     raise KeyError(f"Nenhuma coluna encontrada: {candidates}")
 
 
+# Colunas defensivas SofaScore que sofreram drift de definição entre gerações
+# de scrape (total_clearance/90 ~+40% em 2025-26, ball_recovery em queda).
+# Em pools multi-ano (`Temporada` com 2+ valores) o compute gera `{col}__ys`
+# com o z-score por temporada — os consumidores de percentil/eixo leem essa
+# variante; os valores exibidos continuam crus.
+SS_YEAR_SCALED_COLS = (
+    "interception_won_p90",
+    "total_clearance_p90",
+    "outfielder_block_p90",
+    "ball_recovery_p90",
+)
+
+
+def _attach_year_scaled_ss(pool: pd.DataFrame) -> pd.DataFrame:
+    """Cria `{col}__ys` = z-score por temporada das colunas SS com drift."""
+    if "Temporada" not in pool.columns or pool["Temporada"].nunique(dropna=True) < 2:
+        return pool
+    out = pool.copy()
+    seasons = pool["Temporada"]
+    for col in SS_YEAR_SCALED_COLS:
+        if col in pool.columns:
+            vals = pd.to_numeric(pool[col], errors="coerce").fillna(0.0)
+            out[f"{col}__ys"] = zscore_by_season(vals, seasons)
+    return out
+
+
+def _raw_ss_col(pool: pd.DataFrame, name: str, fallback: pd.Series) -> pd.Series:
+    """Coluna SS crua por-90 — para razões/somas que precisam de unidade real."""
+    if name in pool.columns:
+        return pd.to_numeric(pool[name], errors="coerce").fillna(0.0)
+    return fallback
+
+
+def _raw_ss_inter_col(pool: pd.DataFrame) -> pd.Series:
+    if "interception_won_p90" in pool.columns:
+        return pd.to_numeric(pool["interception_won_p90"], errors="coerce").fillna(0)
+    return _feat_col(pool, "Interseções", "Interseções/90").astype(float)
+
+
+def _raw_ss_clearance_col(pool: pd.DataFrame) -> pd.Series:
+    if "total_clearance_p90" in pool.columns:
+        return pd.to_numeric(pool["total_clearance_p90"], errors="coerce").fillna(0)
+    return _feat_col(pool, "Carrinhos", "Cortes/90").astype(float)
+
+
 def _ss_inter_col(pool: pd.DataFrame) -> pd.Series:
     """Interceptações: SofaScore interception_won_p90 (fallback Wyscout)."""
     if "interception_won_p90" in pool.columns:
-        return pd.to_numeric(pool["interception_won_p90"], errors="coerce").fillna(0)
+        return numeric_col(pool, "interception_won_p90")
     return _feat_col(pool, "Interseções", "Interseções/90").astype(float)
 
 
 def _ss_clearance_col(pool: pd.DataFrame) -> pd.Series:
     """Rebatidas/cortes: SofaScore total_clearance_p90 (fallback Wyscout)."""
     if "total_clearance_p90" in pool.columns:
-        return pd.to_numeric(pool["total_clearance_p90"], errors="coerce").fillna(0)
+        return numeric_col(pool, "total_clearance_p90")
     return _feat_col(pool, "Carrinhos", "Cortes/90").astype(float)
 
 
@@ -1030,6 +1075,7 @@ def compute_family_metrics(
 
     reference_index = pd.Index(pool.index[qualified.to_numpy()])
     with reference_pool(reference_index):
+        pool = _attach_year_scaled_ss(pool)
         result = _dispatch()
     result.attrs["reference_index"] = reference_index
     return result
@@ -1068,14 +1114,17 @@ def _duelos_won_p90(pool: pd.DataFrame, vol_col: str, pct_col: str) -> pd.Series
 
 def _acoes_def_bem_sucedidas(pool: pd.DataFrame) -> pd.Series:
     """Interceptações + rebatidas + duelos def vencidos + bloqueios (p90)."""
-    inter = _ss_inter_col(pool)
-    clear = _ss_clearance_col(pool)
-    block = numeric_col(pool, "outfielder_block_p90")
+    inter = _raw_ss_inter_col(pool)
+    clear = _raw_ss_clearance_col(pool)
+    block = _raw_ss_col(pool, "outfielder_block_p90", pd.Series(0.0, index=pool.index))
     dd_won = _duelos_won_p90(pool, "DuelosDef", "%DuelosDefW")
     return inter + clear + dd_won + block
 
 
 def _num_col(pool: pd.DataFrame, name: str) -> pd.Series:
+    scaled = f"{name}__ys"
+    if scaled in pool.columns:
+        name = scaled
     if name not in pool.columns:
         return pd.Series(0.0, index=pool.index)
     return pd.to_numeric(pool[name], errors="coerce").fillna(0.0).astype(float)
@@ -1262,13 +1311,18 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     da_vol = _feat_col(out, "Duelos aérios/90", "DuelosAr").astype(float)
     inter_vol = _ss_inter_col(out)
     clear_vol = _ss_clearance_col(out)
-    line_def = clear_vol + da_vol
-    contact_def = dd_vol + inter_vol
+    # Razões e somas exibidas precisam de taxas por-90 cruas (unidade real);
+    # as variantes __ys valem apenas para percentis e eixos.
+    _seasons = out["Temporada"] if "Temporada" in out.columns else None
+    inter_p90 = _raw_ss_col(out, "interception_won_p90", inter_vol)
+    clear_p90 = _raw_ss_col(out, "total_clearance_p90", clear_vol)
+    line_def = clear_p90 + da_vol
+    contact_def = dd_vol + inter_p90
     m4_ratio = (contact_def / line_def.replace(0, np.nan)).fillna(0.0)
     faltas = numeric_col(out, "Faltas/90")
     out["_def_m4_ratio"] = m4_ratio.astype(float)
     out["_pool_avg_def_m4"] = float(distribution(m4_ratio).mean())
-    out["_asp_def_style"] = percentile_rank(m4_ratio, ascending=True)
+    out["_asp_def_style"] = percentile_rank(zscore_by_season(m4_ratio, _seasons), ascending=True)
     out["_asp_faltas_vol"] = percentile_rank(faltas, ascending=True)
     out["_pool_avg_faltas"] = float(distribution(faltas).mean())
 
@@ -1277,10 +1331,12 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
     # chutes bloqueados — novo sub do grupo Eficiência Defensiva.
     recovery_vol = numeric_col(out, "ball_recovery_p90")
     block_vol = numeric_col(out, "outfielder_block_p90")
+    recovery_p90 = _raw_ss_col(out, "ball_recovery_p90", recovery_vol)
+    block_p90 = _raw_ss_col(out, "outfielder_block_p90", block_vol)
     out["_asp_recovery_vol"] = percentile_rank(recovery_vol, ascending=True)
-    acoes_sem_bola = dd_won + recovery_vol + inter_vol + clear_vol + block_vol
+    acoes_sem_bola = dd_won + recovery_p90 + inter_p90 + clear_p90 + block_p90
     out["_acoes_sem_bola_vol"] = acoes_sem_bola.astype(float)
-    out["_asp_acoes_sem_bola"] = percentile_rank(acoes_sem_bola, ascending=True)
+    out["_asp_acoes_sem_bola"] = percentile_rank(zscore_by_season(acoes_sem_bola, _seasons), ascending=True)
 
     mappings: dict[str, pd.Series] = {
         "duelos_def_vol": _pool_percentile(out, "Duelos defensivos/90", "DuelosDef"),
@@ -1308,7 +1364,7 @@ def attach_aspect_percentiles(pool: pd.DataFrame) -> pd.DataFrame:
         "passes_long_certos90": _pool_percentile(out, "CompBL"),
         "passes_long_res": long_res,
         "rem_int_vol": _pool_percentile(out, "Remates intercetados/90"),
-        "ad_vol": percentile_rank(out["_acoes_def_comp"], ascending=True),
+        "ad_vol": percentile_rank(zscore_by_season(out["_acoes_def_comp"], _seasons), ascending=True),
         "tend_long": percentile_rank(share_long.fillna(0), ascending=True),
         "tend_prog": percentile_rank(share_prog.fillna(0), ascending=True),
         "tend_lat": percentile_rank(lat_ratio.fillna(0), ascending=True),

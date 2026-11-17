@@ -80,6 +80,15 @@ Exibido no popup "Tendências e xProg" (`PassTendencies.tsx`).
   `seasons/{ano}`. A tela inicial agrupa por nível só visualmente
   (`ESTADUAIS_LEVELS` em `lib/estaduaisHub.ts`). Depois do build:
   `link_est_championship_athletes.py` + cadeia de identidade.
+  Normalização por temporada: métricas defensivas SofaScore mudaram de
+  definição entre gerações de scrape (total_clearance/90 ~+40% em 25–26,
+  ball_recovery em queda). Em pools multi-ano, `compute_family_metrics`
+  cria `{col}__ys` (z por temporada, amostra qualificada do próprio ano)
+  para interception_won/total_clearance/outfielder_block/ball_recovery;
+  `numeric_col`/`_num_col`/`_ss_*`/`year_scaled_col` leem a variante, e os
+  `_axis_z` das hierarquias usam `zscore_by_season` (pool_reference.py).
+  Valores exibidos continuam crus; razões/somas por-90 (m4, ações sem
+  bola) usam `_raw_ss_*` e são normalizadas só no percentil.
   Heatmaps de estadual: `apply_heatmaps_to_site.py --league est-nvX --csv
   <csv do campeonato> --source-dir <pasta onlyheatmaps>` — depois conferir
   ss_ids duplicados em `data/heatmaps` (colisões de homônimos) e rodar a

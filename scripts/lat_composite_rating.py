@@ -64,6 +64,8 @@ def score_ofensividade_pool(pool: pd.DataFrame) -> pd.Series:
 
 def build_lat_tri_composite_metric_scores(pool: pd.DataFrame) -> pd.DataFrame:
     """Twelve metric scores (0–100) for lateral tri-composite ratings."""
+    from engine.normalize import year_scaled_col
+
     enriched = enrich_pool(pool)
     enriched["block_p90"] = _pool_col(pool, "outfielder_block_p90")
     enriched["faltas_p90"] = _pool_col(pool, "Faltas/90", "Faltas")
@@ -84,8 +86,8 @@ def build_lat_tri_composite_metric_scores(pool: pd.DataFrame) -> pd.DataFrame:
 
     extra = _scores_by_player_id(
         pool,
-        rebatidas=score_vol_impact_5050(clear, clear, conf_ref=8.0),
-        interceptions=score_vol_impact_5050(inter, inter, conf_ref=6.0),
+        rebatidas=score_vol_impact_5050(clear, year_scaled_col(pool, "total_clearance_p90", clear), conf_ref=8.0),
+        interceptions=score_vol_impact_5050(inter, year_scaled_col(pool, "interception_won_p90", inter), conf_ref=6.0),
         eficiencia_def_v2=score_eficiencia_def_v2_pool(enriched),
         ptf_mitigated=ptf_res.apply(lambda r: pct_rank(r, ptf_res)),
         distribuicao=score_distribuicao_pool(pool),

@@ -118,13 +118,14 @@ def score_eficiencia_def_pool(target_enriched: pd.DataFrame) -> pd.DataFrame:
 
 
 def _score_eficiencia_def_frame(enriched: pd.DataFrame) -> pd.DataFrame:
-    # menor custo = melhor eficiência
-    enriched["eff_pct"] = enriched["custo_def"].apply(
-        lambda c: 100.0 - pct_rank(c, enriched["custo_def"])
-    )
-    enriched["acoes_pct"] = enriched["acoes_def"].apply(
-        lambda a: pct_rank(a, enriched["acoes_def"])
-    )
+    from engine.pool_reference import zscore_by_season
+
+    # menor custo = melhor eficiência — z por temporada em pools multi-ano
+    seasons = enriched["Temporada"] if "Temporada" in enriched.columns else None
+    custo_z = zscore_by_season(enriched["custo_def"], seasons)
+    acoes_z = zscore_by_season(enriched["acoes_def"], seasons)
+    enriched["eff_pct"] = custo_z.apply(lambda c: 100.0 - pct_rank(c, custo_z))
+    enriched["acoes_pct"] = acoes_z.apply(lambda a: pct_rank(a, acoes_z))
     enriched["eficiencia_def"] = (
         WEIGHT_EFF_DEF * enriched["eff_pct"] + WEIGHT_ACOES * enriched["acoes_pct"]
     )
@@ -271,6 +272,8 @@ def _scores_by_player_id(pool: pd.DataFrame, **columns: pd.Series) -> pd.DataFra
 
 def build_tri_composite_metric_scores(pool: pd.DataFrame) -> pd.DataFrame:
     """Eight metric scores (0–100) for tri-composite zagueiro ratings."""
+    from engine.normalize import year_scaled_col
+
     enriched = enrich_pool(pool)
     enriched["block_p90"] = _pool_col(pool, "outfielder_block_p90")
     enriched["faltas_p90"] = _pool_col(pool, "Faltas/90", "Faltas")
@@ -294,8 +297,8 @@ def build_tri_composite_metric_scores(pool: pd.DataFrame) -> pd.DataFrame:
     extra = _scores_by_player_id(
         pool,
         eficiencia_def_v2=score_eficiencia_def_v2_pool(enriched),
-        rebatidas=score_vol_impact_5050(clear, clear, conf_ref=8.0),
-        interceptions=score_vol_impact_5050(inter, inter, conf_ref=6.0),
+        rebatidas=score_vol_impact_5050(clear, year_scaled_col(pool, "total_clearance_p90", clear), conf_ref=8.0),
+        interceptions=score_vol_impact_5050(inter, year_scaled_col(pool, "interception_won_p90", inter), conf_ref=6.0),
         conducao_prog=score_vol_impact_5050(cond, cond, conf_ref=4.0),
         ptf_mitigated=ptf_res.apply(lambda r: pct_rank(r, ptf_res)),
     )

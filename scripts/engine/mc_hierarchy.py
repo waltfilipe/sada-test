@@ -40,7 +40,10 @@ def _zscore(series: pd.Series) -> pd.Series:
 
 
 def _axis_z(feat_df: pd.DataFrame, cols: list[str]) -> pd.Series:
-    return pd.DataFrame({col: _zscore(feat_df[col]) for col in cols}).mean(axis=1)
+    from .pool_reference import zscore_by_season
+
+    seasons = feat_df["Temporada"] if "Temporada" in feat_df.columns else None
+    return pd.DataFrame({col: zscore_by_season(feat_df[col], seasons) for col in cols}).mean(axis=1)
 
 
 def _softmax_shares(scores: np.ndarray) -> np.ndarray:
@@ -114,6 +117,8 @@ def build_mc_feature_df(pool: pd.DataFrame) -> pd.DataFrame:
     for col in dict.fromkeys(DEF_COLS + CON_COLS + B2B_COLS):
         out[col] = numeric_col(out, col)
     unique_cols = list(dict.fromkeys(DEF_COLS + CON_COLS + B2B_COLS))
+    if "Temporada" in out.columns:
+        unique_cols.append("Temporada")
     return out[unique_cols].copy()
 
 

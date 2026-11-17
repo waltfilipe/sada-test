@@ -29,6 +29,7 @@ def _build_feature_row(wy_row: pd.Series, ss_row: pd.Series | None) -> dict[str,
     share_long = float(wy_row.get("Passes longos/90") or wy_row.get("PassesLongos") or 0) / total if total else 0.0
     share_prog = float(wy_row.get("Passes progressivos/90") or wy_row.get("PassesProg") or 0) / total if total else 0.0
     feats = {
+        "Temporada": wy_row.get("Temporada"),
         "duelos_def": float(wy_row.get("DuelosDef") or 0),
         "duelos_aereos": float(wy_row.get("DuelosAr") or 0),
         "passes_terco_final": float(wy_row.get("PTF") or 0),
@@ -50,8 +51,20 @@ def _zscore(series: pd.Series) -> pd.Series:
     return zscore_against(series)
 
 
+def _seasons(feat_df: pd.DataFrame) -> pd.Series | None:
+    return feat_df["Temporada"] if "Temporada" in feat_df.columns else None
+
+
+def _zscore_season(feat_df: pd.DataFrame, col: str) -> pd.Series:
+    """Z por temporada: métricas SofaScore mudam de escala entre scrapes, então
+    pools multi-ano normalizam cada ano na sua própria amostra qualificada."""
+    from .pool_reference import zscore_by_season
+
+    return zscore_by_season(feat_df[col], _seasons(feat_df))
+
+
 def _axis_z(feat_df: pd.DataFrame, cols: list[str]) -> pd.Series:
-    return pd.DataFrame({col: _zscore(feat_df[col]) for col in cols}).mean(axis=1)
+    return pd.DataFrame({col: _zscore_season(feat_df, col) for col in cols}).mean(axis=1)
 
 
 def _softmax_shares(scores: np.ndarray) -> np.ndarray:
@@ -121,7 +134,7 @@ def _classify_archetypes(feat_df: pd.DataFrame) -> pd.DataFrame:
     z_area = _axis_z(feat, AREA_COLS)
     z_con = _axis_z(feat, CON_COLS)
     z_com = _axis_z(feat, COM_COLS)
-    z_dd = _zscore(feat["duelos_def"])
+    z_dd = _zscore_season(feat, "duelos_def")
 
     from .pool_reference import distribution
 

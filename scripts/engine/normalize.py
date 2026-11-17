@@ -7,9 +7,27 @@ from .pool_reference import distribution
 
 
 def numeric_col(pool: pd.DataFrame, col: str, default: float = 0.0) -> pd.Series:
+    scaled = f"{col}__ys"
+    if scaled in pool.columns:
+        return pd.to_numeric(pool[scaled], errors="coerce").fillna(default)
     if col not in pool.columns:
         return pd.Series(default, index=pool.index, dtype=float)
     return pd.to_numeric(pool[col], errors="coerce").fillna(default)
+
+
+def year_scaled_col(pool: pd.DataFrame, col: str, fallback: pd.Series | None = None) -> pd.Series:
+    """Variante normalizada por temporada (`{col}__ys`) de uma coluna de métrica.
+
+    Gerada em `compute_family_metrics` para colunas SofaScore que sofreram drift
+    de escala entre gerações de scrape. Quando não existe (pool de temporada
+    única), devolve `fallback` (normalmente a série crua por-90).
+    """
+    scaled = f"{col}__ys"
+    if scaled in pool.columns:
+        return pd.to_numeric(pool[scaled], errors="coerce").fillna(0.0)
+    if fallback is not None:
+        return fallback
+    return pd.Series(0.0, index=pool.index, dtype=float)
 
 
 def _percentile_rank_raw(values: pd.Series, ascending: bool) -> pd.Series:

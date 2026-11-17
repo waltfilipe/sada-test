@@ -67,3 +67,23 @@ def zscore_against(
     if clip is not None:
         scored = scored.clip(-clip, clip)
     return scored
+
+
+def zscore_by_season(series: pd.Series, seasons: pd.Series | None) -> pd.Series:
+    """Z-score dentro de cada temporada, sobre a amostra qualificada daquele ano.
+
+    As métricas defensivas do SofaScore mudaram de definição entre gerações de
+    scrape (total_clearance/90 saltou ~40% nos exports de 2025-26 enquanto
+    ball_recovery caiu), então um z pooled sobre pools multi-ano de estaduais
+    infla sistematicamente as temporadas recentes. Normalizar por temporada
+    mantém o pool multi-ano comparável. Com uma única temporada no pool cai
+    no z pooled normal.
+    """
+    values = pd.to_numeric(series, errors="coerce").fillna(0.0)
+    if seasons is None:
+        return zscore_against(values)
+    seasons = seasons.reindex(values.index)
+    if seasons.nunique(dropna=True) < 2:
+        return zscore_against(values)
+    scored = values.groupby(seasons).transform(zscore_against)
+    return scored.fillna(0.0)
