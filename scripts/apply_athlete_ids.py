@@ -67,8 +67,11 @@ def iter_dirs() -> list[tuple[str, str, Path]]:
     return dirs
 
 
-def patch_row(row: dict, league: str, season: str, resolve, person_of) -> str:
+def patch_row(row: dict, league: str, season: str, resolve, person_of,
+              row_unanchor: set = frozenset()) -> str:
     """Stampa identidade + cartão canônico (nome de exibição/foto)."""
+    if f"{league}/{season}/{row.get('player_id') or ''}" in row_unanchor:
+        row.pop("transfermarkt", None)
     athlete_id, person_key = resolve(league, season, row)
     if athlete_id:
         row["athlete_id"] = athlete_id
@@ -91,6 +94,9 @@ def main() -> int:
     athletes: dict = load_json(XS / "athletes.json", {}).get("athletes") or {}
     overrides = load_json(XS / "identity-overrides.json", {})
     row_athlete: dict = overrides.get("row_athlete") or {}
+    # linhas cujo bloco transfermarkt é provadamente de outro atleta
+    # (contradição física com o perfil TM) — bloco removido, sem re-ancoragem
+    row_unanchor = set(overrides.get("row_unanchor") or [])
 
     key_to_athlete = {k: (v or {}).get("athlete_id") for k, v in people.items()}
     tm_to_athlete = {
@@ -138,9 +144,12 @@ def main() -> int:
 
     def resolve(league: str, season: str, row: dict) -> tuple[str | None, str | None]:
         player_id = row.get("player_id") or ""
-        forced = row_athlete.get(f"{league}/{season}/{player_id}")
-        if forced:
-            return forced, None
+        key = f"{league}/{season}/{player_id}"
+        if key in row_unanchor:
+            return None, None  # âncora removida por contradição física
+        if key in row_athlete:
+            # valor null = limpeza explícita de identidade
+            return (row_athlete[key] or None), None
         person_key = (persons.get(league) or {}).get(season, {}).get(player_id)
         if person_key:
             return key_to_athlete.get(person_key), person_key
@@ -204,7 +213,7 @@ def main() -> int:
                 if not isinstance(row, dict) or not row.get("player_id"):
                     continue
                 before = json.dumps(row, ensure_ascii=False, sort_keys=True, default=str)
-                result = patch_row(row, league, season, resolve, person_of)
+                result = patch_row(row, league, season, resolve, person_of, row_unanchor)
                 after = json.dumps(row, ensure_ascii=False, sort_keys=True, default=str)
                 if result == "id":
                     stamped += 1

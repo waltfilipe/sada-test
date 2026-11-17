@@ -434,12 +434,6 @@
       "ofensivo": 6.2
     }
   },
-  "transfermarkt": {
-    "photo": "https://img.a.transfermarkt.technology/portrait/header/147366-1716603236.jpg?lm=4711",
-    "id": "147366",
-    "club": "Botafogo FC",
-    "profile_url": "https://www.transfermarkt.com.br/jonathan/profil/spieler/147366"
-  },
   "physical_run": {
     "source": "sofascore_run",
     "competition": "Brasileirão Série B",
@@ -501,6 +495,100 @@
     "acc_delta": -9.4,
     "acc_r2": 0.265
   },
-  "athlete_id": "ath-004427",
-  "person_key": "name:jonathan|2002|0"
+  "cross_season": {
+    "seasons": [
+      {
+        "year": "2024",
+        "league": "serie-b",
+        "minutes": 538,
+        "club": "Ceará"
+      }
+    ],
+    "metrics": {
+      "Duelos Defensivos": {
+        "predicted": 5.9563,
+        "resid_sd": 1.1988,
+        "train_n90": 21.2
+      },
+      "Duelos Defensivos::Eficiência": {
+        "predicted": 62.9776,
+        "resid_sd": 5.8563,
+        "train_n90": 21.2
+      },
+      "Ações Defensivas e Recuperações::Rebatidas": {
+        "predicted": 2.5723,
+        "resid_sd": 1.1665,
+        "train_n90": 21.41
+      },
+      "Ações Defensivas e Recuperações::Interceptações": {
+        "predicted": 1.4556,
+        "resid_sd": 0.8223,
+        "train_n90": 21.41
+      },
+      "Ações Defensivas e Recuperações::Chutes Bloqueados": {
+        "predicted": 0.2799,
+        "resid_sd": 0.1694,
+        "train_n90": 21.41
+      },
+      "Eficiência Defensiva::Erros Totais": {
+        "predicted": 0.0481,
+        "resid_sd": 0.0688,
+        "train_n90": 21.2
+      },
+      "Passes Progressivos": {
+        "predicted": 6.6611,
+        "role_change_flag": true,
+        "resid_sd": 1.492,
+        "train_n90": 21.15
+      },
+      "Passes Progressivos::Eficiência": {
+        "predicted": 74.8568,
+        "resid_sd": 5.4554,
+        "train_n90": 21.15
+      },
+      "Passes para Terço Final": {
+        "predicted": 4.6232,
+        "role_change_flag": true,
+        "resid_sd": 1.328,
+        "train_n90": 21.15
+      },
+      "Passes para Terço Final::Eficiência": {
+        "predicted": 72.3793,
+        "role_change_flag": true,
+        "resid_sd": 7.469,
+        "train_n90": 21.15
+      },
+      "Passes Longos": {
+        "predicted": 2.7106,
+        "resid_sd": 1.0716,
+        "train_n90": 21.15
+      },
+      "Passes Longos::Eficiência": {
+        "predicted": 52.9357,
+        "role_change_flag": true,
+        "resid_sd": 7.7553,
+        "train_n90": 21.15
+      },
+      "Disputas com Bola": {
+        "predicted": 1.7657,
+        "resid_sd": 0.8006,
+        "train_n90": 21.15
+      },
+      "Disputas com Bola::Eficiência": {
+        "predicted": 46.6555,
+        "resid_sd": 7.5048,
+        "train_n90": 21.15
+      },
+      "Gols e xG::Gols": {
+        "predicted": 0.0287,
+        "resid_sd": 0.0492,
+        "train_n90": 21.13
+      },
+      "Gols e xG::xG": {
+        "predicted": 0.0535,
+        "resid_sd": 0.0347,
+        "train_n90": 21.13
+      }
+    }
+  }
 }

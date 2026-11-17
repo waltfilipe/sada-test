@@ -89,7 +89,8 @@ def season_of(path: Path) -> str:
 
 def league_of(path: Path) -> str:
     parts = path.relative_to(DATA).parts
-    return parts[0]
+    # data/family-*.json (raiz) é o hub agregado — parts[0] é o próprio arquivo
+    return "hub" if len(parts) == 1 else parts[0]
 
 
 def load_rows() -> list[dict]:
