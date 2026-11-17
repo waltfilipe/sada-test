@@ -38,32 +38,75 @@ def _person_tm_ids(person: list[dict]) -> set[str]:
     return {tm_id for tm_id in (_tm_id(r) for r in person) if tm_id}
 
 
-def _split_persons(rows: list[dict]) -> list[list[dict]]:
+def _anchor_suspect(row: dict, tm_id: str | None, tm_physique: dict) -> bool:
+    """A âncora tm da linha é fisicamente incompatível com a própria linha?
+
+    Altura da linha diverge >=5cm da altura do perfil TM reivindicado —
+    o match por nome+clube grudou o bloco de um homônimo na linha.
+    """
+    if not tm_id:
+        return False
+    h = row.get("height") or 0
+    ref = (tm_physique.get(str(tm_id)) or {}).get("height")
+    return bool(h and ref and abs(int(h) - int(ref)) >= 5)
+
+
+def _heights(person: list[dict]) -> tuple[int, int] | None:
+    hs = [int(r["height"]) for r in person if r.get("height")]
+    return (min(hs), max(hs)) if hs else None
+
+
+def _heights_incompatible(a: tuple[int, int] | None, b: tuple[int, int] | None) -> bool:
+    """Faixas de altura disjuntas (>4cm de folga) — mesma pessoa não pode ser."""
+    if not a or not b:
+        return False
+    return a[0] > b[1] + 4 or b[0] > a[1] + 4
+
+
+def _split_persons(rows: list[dict], tm_physique: dict | None = None) -> list[list[dict]]:
     """Split an ambiguous (name, birth, family) group into persons.
 
-    Only called when some season has 2+ rows — that alone proves homonyms.
     Verified Transfermarkt ids are a hard partition: rows sharing a tm_id are
-    provably the same athlete, rows with different tm_ids can never merge.
-    Unpinned rows are chained by shared club; afterwards, persons whose season
-    sets are disjoint are re-merged (same athlete changing clubs), unless both
-    carry conflicting verified ids.
+    provably the same athlete, rows with different tm_ids can never merge —
+    MAS um tm_id reivindicado só vale se for fisicamente compatível com a
+    linha (altura da linha ≈ altura do perfil TM no cache de elencos); uma
+    âncora suspeita deixa de ser prova. Altura também bloqueia merges entre
+    pessoas com faixas disjuntas. Unpinned rows are chained by shared club;
+    afterwards, persons whose season sets are disjoint are re-merged (same
+    athlete changing clubs), unless both carry conflicting verified ids.
     """
+    tm_physique = tm_physique or {}
+
+    def verified_tm(row: dict) -> str | None:
+        tm_id = _tm_id(row)
+        return None if _anchor_suspect(row, tm_id, tm_physique) else tm_id
+
+    def person_tm(person: list[dict]) -> set[str]:
+        # só âncoras verificadas — uma linha com âncora de homônimo não deve
+        # carregar o tm_id errado para dentro da pessoa nem bloquear merges
+        return {t for t in (verified_tm(r) for r in person) if t}
+
     persons: list[list[dict]] = []
     for row in sorted(rows, key=lambda r: (r.get("_season") or "", r.get("_league") or "")):
         row_club = norm_name(row.get("club") or "")
-        row_tm = _tm_id(row)
+        row_tm = verified_tm(row)
+        row_h = int(row["height"]) if row.get("height") else None
         candidates = []
         for person in persons:
-            person_tm = _person_tm_ids(person)
-            if row_tm and person_tm:
+            ptm = person_tm(person)
+            if row_tm and ptm:
                 # verified ids disagree → provably different athletes
-                if row_tm not in person_tm:
+                if row_tm not in ptm:
                     continue
+            if row_h and _heights_incompatible(
+                (row_h, row_h), _heights(person)
+            ):
+                continue
             if row_club and any(norm_name(r.get("club") or "") == row_club for r in person):
                 candidates.append(person)
         if row_tm and not candidates:
             # pin to the person already holding this tm_id, if any
-            pinned = next((p for p in persons if row_tm in _person_tm_ids(p)), None)
+            pinned = next((p for p in persons if row_tm in person_tm(p)), None)
             if pinned is not None:
                 candidates.append(pinned)
         if not candidates:
@@ -74,13 +117,14 @@ def _split_persons(rows: list[dict]) -> list[list[dict]]:
     merged: list[list[dict]] = []
     for person in persons:
         seasons = {r.get("_season") for r in person}
-        person_tm = _person_tm_ids(person)
+        ptm = person_tm(person)
         target = next(
             (
                 m
                 for m in merged
                 if not seasons & {r.get("_season") for r in m}
-                and not (person_tm and _person_tm_ids(m) and person_tm != _person_tm_ids(m))
+                and not (ptm and person_tm(m) and ptm != person_tm(m))
+                and not _heights_incompatible(_heights(person), _heights(m))
             ),
             None,
         )
@@ -95,6 +139,7 @@ def _split_persons(rows: list[dict]) -> list[list[dict]]:
 def assign_season_keys(
     rows: list[dict],
     prev_keys: dict[tuple[str, str, str], str] | None = None,
+    tm_physique: dict | None = None,
 ) -> dict[tuple[str, int], str]:
     """Link seasons by normalized name + birth-year cluster + family + club chain.
 
@@ -127,10 +172,13 @@ def assign_season_keys(
             for row in group_rows:
                 s = row.get("_season") or ""
                 season_counts[s] = season_counts.get(s, 0) + 1
+            # O atalho de 1-linha-por-temporada ainda exige âncoras únicas:
+            # 2+ tm_ids distintos no grupo provam homônimos colados.
             persons = (
                 [group_rows]
                 if all(count == 1 for count in season_counts.values())
-                else _split_persons(group_rows)
+                and len({t for t in (_tm_id(r) for r in group_rows) if t}) <= 1
+                else _split_persons(group_rows, tm_physique)
             )
             # Carry-forward: a person identical to a previous build keeps its
             # person_key, so transfers.json/people.json survive rebuilds.
@@ -199,7 +247,23 @@ def main() -> None:
                         prev_keys[(lg, s, pid)] = key
         except json.JSONDecodeError:
             pass
-    key_index = assign_season_keys(all_rows, prev_keys)
+    # Física de referência por tm_id (cache de elencos): altura/nascimento do
+    # perfil verificado — invalida âncoras de homônimo coladas por nome+clube.
+    squads_path = DATA / "transfermarkt-squads.json"
+    tm_physique: dict[str, dict] = {}
+    if squads_path.exists():
+        try:
+            for entry in json.loads(squads_path.read_text(encoding="utf-8")).values():
+                for e in entry.get("squad", []):
+                    tid = str(e.get("id") or "")
+                    if tid and tid not in tm_physique:
+                        tm_physique[tid] = {
+                            "height": e.get("height"),
+                            "birth_year": e.get("birth_year"),
+                        }
+        except json.JSONDecodeError:
+            pass
+    key_index = assign_season_keys(all_rows, prev_keys, tm_physique)
 
     # ``pin_person`` overrides (liga/temporada/player_id -> person_key): força
     # de pessoa no nivel do grafo — a contrapartida do ``row_athlete`` para

@@ -10,6 +10,11 @@ Ordem da cadeia (rode nesta sequência após rebuilds de dados):
 1. `python scripts/build_cross_season_projection.py` — resolve `person_key`
    (nome+ano±1, cadeia de clubes, tm_id como partição dura) → `persons.json`,
    `models.json`, enriquece `cross_season` nas famílias/perfis.
+   **Trava física**: um tm_id reivindicado só vale como âncora se a altura da
+   linha for compatível com o perfil TM (cache de elencos; ≥5cm de divergência
+   = âncora de homônimo → rebaixada para "não ancorada" no split). Faixas de
+   altura disjuntas (>4cm) bloqueiam junção por clube e o merge de temporadas
+   disjuntas. `pin_person` continua acima de qualquer trava (verdade humana).
 2. `python scripts/build_people.py` — consolida `people.json` (âncoras
    Transfermarkt/SofaScore por pessoa).
 3. `python scripts/build_athlete_registry.py` — reanexa/emite `athlete_id`
@@ -35,6 +40,10 @@ Ordem da cadeia (rode nesta sequência após rebuilds de dados):
    (homônimos fundidos, âncoras ss erradas, fusões de trajetória) →
    `data/cross-season/identity-audit.json`. Resolva os achados em
    `identity-overrides.json` e re-rode os passos 2–4.
+   Checagens físicas: `height-spread` (±5cm entre linhas do atleta),
+   `anchor-physique` (linha vs altura/nascimento do perfil TM da pessoa —
+   aponta a linha mal ancorada) e `position-mismatch` (linha cuja família é
+   par improvável com a dominante do atleta — localiza a linha errada).
 
 Scripts de reparo (`repair_persons_by_tm.py`, `resolve_tm_disputes.py`,
 `fix_heatmap_identity.py`) reescrevem `persons.json` — depois deles, rode de

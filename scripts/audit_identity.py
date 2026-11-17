@@ -19,6 +19,11 @@ Regras:
                             display_name curado (fila de sugestão p/ override)
   R8 photo-coverage       — atleta com foto em parte das linhas (tudo-ou-nada)
   R9 photo-mismatch       — foto da linha provadamente de outro atleta
+  R10 height-spread       — alturas das linhas do atleta variando >=5cm
+  R11 anchor-physique     — linha com físico incompatível com a âncora tm da
+                            pessoa (altura/nascimento do cache de elencos)
+  R12 position-mismatch   — linha cuja família é par improvável com a família
+                            dominante do atleta (localiza a linha errada)
 """
 
 from __future__ import annotations
@@ -27,7 +32,7 @@ import csv
 import json
 import sys
 import unicodedata
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -110,12 +115,24 @@ def load_rows() -> list[dict]:
                 "tm_id": str(tm.get("id")) if tm.get("id") else None,
                 "club": p.get("club"),
                 "birth_year": p.get("birth_year"),
+                "height": p.get("height"),
                 "family": p.get("position_family") or family,
                 "position": p.get("position"),
                 "athlete_id": p.get("athlete_id"),
                 "person_key": p.get("person_key"),
             })
     return rows
+
+
+def load_tm_physique() -> dict[str, dict]:
+    """tm_id -> {height, birth_year} do cache de elencos (âncora verificada)."""
+    out: dict[str, dict] = {}
+    for entry in load_json(DATA / "transfermarkt-squads.json", {}).values():
+        for e in entry.get("squad", []):
+            tid = str(e.get("id") or "")
+            if tid and tid not in out:
+                out[tid] = {"height": e.get("height"), "birth_year": e.get("birth_year")}
+    return out
 
 
 def defensive_csvs() -> dict[tuple[str, str], Path]:
@@ -184,7 +201,8 @@ def main() -> None:
                     "ss_id": ss, "row_club": my_club, "csv_clubs": sorted(csv_club),
                 })
 
-    # ---- R3/R5/R6/R7/R8/R9: por athlete_id sobre as linhas --------------------
+    # ---- R3/R5/R6/R7/R8/R9/R10/R11/R12: por athlete_id sobre as linhas --------
+    tm_physique = load_tm_physique()
     by_ath: dict[str, list[dict]] = defaultdict(list)
     for r in rows:
         if r["athlete_id"]:
@@ -242,11 +260,11 @@ def main() -> None:
 
         # R7: nomes de linha divergentes sem nome de exibição curado — fila de
         # sugestão para overrides.display_name (nome de guerra ≠ registro)
-        person = (person_by_athlete.get(aid) or (None, {}))[1]
+        person_key, person = person_by_athlete.get(aid) or (None, {})
         distinct_names = {norm(r["name"]) for r in rs if r.get("name")}
         if len(distinct_names) > 1 and not person.get("display_name"):
             findings["name-divergence"].append({
-                "athlete_id": aid, "person_key": person_by_athlete[aid][0],
+                "athlete_id": aid, "person_key": person_key,
                 "names": sorted({r["name"] for r in rs if r.get("name")}),
                 "rows": [f'{r["league"]}/{r["season"]}:{r["name"]}' for r in rs],
             })
@@ -267,6 +285,46 @@ def main() -> None:
                     "athlete_id": aid, "name": name,
                     "league": r["league"], "season": r["season"], "club": r["club"],
                     "photo": r["photo"], "person_tm": person.get("tm_id"),
+                })
+
+        # R10: dispersão física — alturas das linhas variando >=5cm
+        heights = [int(r["height"]) for r in rs if r.get("height")]
+        if len(heights) >= 2 and max(heights) - min(heights) >= 5:
+            findings["height-spread"].append({
+                "athlete_id": aid, "name": name,
+                "min": min(heights), "max": max(heights),
+                "rows": [f'{r["league"]}/{r["season"]}:{r["club"]}({r["height"]}cm)' for r in rs],
+            })
+
+        # R11: linha incompatível com a âncora tm da própria pessoa —
+        # localiza a linha mal ancorada (homônimo colado por nome+clube)
+        p_tm = person.get("tm_id")
+        phys = tm_physique.get(str(p_tm)) if p_tm else None
+        if phys:
+            for r in rs:
+                h, by = r.get("height"), r.get("birth_year")
+                h_bad = h and phys.get("height") and abs(int(h) - int(phys["height"])) >= 4
+                b_bad = by and phys.get("birth_year") and abs(int(by) - int(phys["birth_year"])) >= 3
+                if h_bad or b_bad:
+                    findings["anchor-physique"].append({
+                        "athlete_id": aid, "name": name,
+                        "league": r["league"], "season": r["season"], "club": r["club"],
+                        "row_height": h, "tm_height": phys.get("height"),
+                        "row_birth": by, "tm_birth": phys.get("birth_year"),
+                        "tm_id": p_tm, "player_id": r["player_id"],
+                    })
+
+        # R12: linha cuja família é par improvável com a família dominante —
+        # aponta a linha estranha dentro da pessoa (o R3b diz que existe)
+        fam_counter = Counter(r["family"] for r in rs if r.get("family"))
+        modal = fam_counter.most_common(1)[0][0] if fam_counter else None
+        for r in rs:
+            if modal and r["family"] and frozenset((modal, r["family"])) in IMPROBABLE_PAIRS:
+                findings["position-mismatch"].append({
+                    "athlete_id": aid, "name": name, "dominant_family": modal,
+                    "league": r["league"], "season": r["season"], "club": r["club"],
+                    "row_family": r["family"], "position": r.get("position"),
+                    "player_id": r["player_id"],
                 })
 
     # ---- R4: homônimos na mesma liga+temporada --------------------------------
