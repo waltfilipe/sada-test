@@ -6,6 +6,13 @@ liga (est-nv*, series nacionais) do mesmo atleta: join por (temporada,
 nome normalizado, clube normalizado, nascimento +-1) contra person.rows.
 So grava `row_athlete` quando o par e unico.
 
+Sem par por clube, um segundo passe aceita o atleta cujo nome+nascimento
+e UNICO em todo o people.json E cuja ancora tm e fisicamente compativel
+com a linha (altura <=4cm e nascimento <=1 ano do perfil TM no cache de
+elencos) — cobre quem jogou o estadual por um clube e a liga nacional por
+outro (Santos x Remo, Capivariano x Maringa). Homonimos com o mesmo nome
+mas fisico/nascimento divergentes nao passam.
+
 Alem disso, replica o bloco `transfermarkt` da pessoa (foto/valor/url)
 nas linhas linkadas — sem chamada de rede.
 
@@ -58,8 +65,20 @@ def main() -> int:
     row_athlete: dict = overrides.setdefault("row_athlete", {})
     tm_unanchor: dict = overrides.get("tm_unanchor") or {}
 
+    # fisico verificado por tm_id (cache de elencos): altura+nascimento do
+    # perfil — base do segundo passe de linkagem
+    tm_physique: dict[str, dict] = {}
+    for entry in load_json(DATA / "transfermarkt-squads.json", {}).values():
+        for e in entry.get("squad", []):
+            tid = str(e.get("id") or "")
+            if tid and tid not in tm_physique:
+                tm_physique[tid] = {
+                    "height": e.get("height"), "birth_year": e.get("birth_year")
+                }
+
     # indice: (temporada, nome, clube) -> athlete_ids; e person por athlete
     index: dict[tuple[str, str, str], set] = defaultdict(set)
+    name_index: dict[str, set] = defaultdict(set)
     person_by_athlete: dict[str, dict] = {}
     person_key_by_athlete: dict[str, str] = {}
     for pkey, rec in people.items():
@@ -68,6 +87,7 @@ def main() -> int:
             continue
         person_by_athlete[aid] = rec
         person_key_by_athlete[aid] = pkey
+        name_index[norm(rec.get("name"))].add(aid)
         birth = rec.get("birth_year")
         if not birth:
             continue
@@ -198,6 +218,20 @@ def main() -> int:
             aids: set = set()
             for by in {row.get("birth_year"), (row.get("birth_year") or 0) - 1, (row.get("birth_year") or 0) + 1}:
                 aids |= index.get((season, norm(row.get("name")), norm(row.get("club")), str(by)), set())
+            if not aids:
+                # segundo passe: nome unico no grafo inteiro + fisico da
+                # linha compativel com a ancora tm do atleta
+                row_h = row.get("height") or 0
+                row_b = row.get("birth_year") or 0
+                for cand in name_index.get(norm(row.get("name")), set()):
+                    p_tm = (person_by_athlete.get(cand) or {}).get("tm_id")
+                    phys = tm_physique.get(str(p_tm)) if p_tm else None
+                    if not phys or not row_h or not row_b:
+                        continue
+                    tm_h, tm_b = phys.get("height"), phys.get("birth_year")
+                    if (tm_h and abs(int(row_h) - int(tm_h)) <= 4
+                            and tm_b and abs(int(row_b) - int(tm_b)) <= 1):
+                        aids.add(cand)
             if len(aids) == 1:
                 aid = next(iter(aids))
                 row_athlete[key] = aid
