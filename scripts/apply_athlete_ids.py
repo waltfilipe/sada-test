@@ -145,14 +145,14 @@ def main() -> int:
     def resolve(league: str, season: str, row: dict) -> tuple[str | None, str | None]:
         player_id = row.get("player_id") or ""
         key = f"{league}/{season}/{player_id}"
-        if key in row_unanchor:
-            return None, None  # âncora removida por contradição física
         if key in row_athlete:
             # valor null = limpeza explícita de identidade
             return (row_athlete[key] or None), None
         person_key = (persons.get(league) or {}).get(season, {}).get(player_id)
         if person_key:
             return key_to_athlete.get(person_key), person_key
+        if key in row_unanchor:
+            return None, None  # âncora removida por contradição física
         tm_id = (row.get("transfermarkt") or {}).get("id")
         if tm_id and str(tm_id) in tm_to_athlete:
             return tm_to_athlete[str(tm_id)], None

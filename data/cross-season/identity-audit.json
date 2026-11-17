@@ -1,18 +1,18 @@
 {
  "generated_for": "identity audit",
  "counts": {
-  "anchor-physique": 1231,
-  "birth-spread": 146,
-  "height-spread": 151,
-  "homonym-collision": 106,
-  "improbable-family-pair": 275,
+  "anchor-physique": 1255,
+  "birth-spread": 160,
+  "height-spread": 158,
+  "homonym-collision": 97,
+  "improbable-family-pair": 279,
   "multi-club-season": 3,
-  "name-divergence": 93,
-  "photo-coverage": 7,
-  "position-mismatch": 339,
-  "same-season-family": 129,
-  "ss-anchor-club": 208,
-  "ss-anchor-collision": 108
+  "name-divergence": 95,
+  "photo-coverage": 10,
+  "position-mismatch": 345,
+  "same-season-family": 133,
+  "ss-anchor-club": 207,
+  "ss-anchor-collision": 109
  },
  "findings": {
   "ss-anchor-collision": [
@@ -508,7 +508,8 @@
     "ss_id": "870787",
     "owners": [
      "name:marlon|1994|0",
-     "name:marlon|1994|1"
+     "name:marlon|1994|1",
+     "name:marlon|1994|3"
     ]
    },
    {
@@ -733,8 +734,14 @@
     "ss_id": "242054",
     "owners": [
      "name:vitinho|1999|0",
-     "name:vitinho|1999|2",
-     "name:vitinho|1999|6"
+     "name:vitinho|1999|2"
+    ]
+   },
+   {
+    "ss_id": "1066721",
+    "owners": [
+     "name:vitinho|1999|3",
+     "name:vitinho|1999|5"
     ]
    },
    {
@@ -775,8 +782,8 @@
    {
     "ss_id": "978731",
     "owners": [
-     "name:ze vitor|2000|1",
-     "name:ze vitor|2000|2"
+     "name:ze vitor|2000|0",
+     "name:ze vitor|2000|1"
     ]
    }
   ],
@@ -2586,23 +2593,13 @@
     ]
    },
    {
-    "athlete_id": "ath-004153",
+    "athlete_id": "ath-004155",
     "name": "Vitinho",
     "anchor": "serie-c/2026",
     "ss_id": "959474",
     "row_club": "Santa Cruz",
     "csv_clubs": [
      "Caxias"
-    ]
-   },
-   {
-    "athlete_id": "ath-004155",
-    "name": "Vitinho",
-    "anchor": "serie-a/2025",
-    "ss_id": "242054",
-    "row_club": "Botafogo",
-    "csv_clubs": [
-     "Corinthians"
     ]
    },
    {
@@ -2766,7 +2763,7 @@
     ]
    },
    {
-    "athlete_id": "ath-004410",
+    "athlete_id": "ath-004408",
     "name": "Zé Vitor",
     "anchor": "serie-c/2024",
     "ss_id": "978731",
@@ -3348,21 +3345,6 @@
     ]
    },
    {
-    "athlete_id": "ath-004391",
-    "name": "Zé Gabriel",
-    "season": "2025",
-    "families": [
-     "atacantes",
-     "meio-campistas",
-     "zagueiros"
-    ],
-    "clubs": [
-     "Boavista",
-     "Criciúma",
-     "Vasco da Gama"
-    ]
-   },
-   {
     "athlete_id": "ath-002657",
     "name": "Luiz Felipe",
     "season": "2023",
@@ -3506,20 +3488,6 @@
     "clubs": [
      "Sertãozinho",
      "São Bento"
-    ]
-   },
-   {
-    "athlete_id": "ath-004408",
-    "name": "Zé Vitor",
-    "season": "2024",
-    "families": [
-     "extremos",
-     "zagueiros"
-    ],
-    "clubs": [
-     "Athletico Paranaense",
-     "Tombense",
-     "Vasco da Gama"
     ]
    },
    {
@@ -3739,6 +3707,19 @@
     ]
    },
    {
+    "athlete_id": "ath-000613",
+    "name": "Cleberson",
+    "season": "2022",
+    "families": [
+     "extremos",
+     "zagueiros"
+    ],
+    "clubs": [
+     "EC São José",
+     "Ituano"
+    ]
+   },
+   {
     "athlete_id": "ath-000233",
     "name": "A. Salas",
     "season": "2025",
@@ -3831,6 +3812,19 @@
      "Grêmio Prudente",
      "Marcílio Dias",
      "Marília"
+    ]
+   },
+   {
+    "athlete_id": "ath-004237",
+    "name": "Wellisson",
+    "season": "2023",
+    "families": [
+     "atacantes",
+     "laterais"
+    ],
+    "clubs": [
+     "Azuriz",
+     "Figueirense"
     ]
    },
    {
@@ -4006,6 +4000,35 @@
     ]
    },
    {
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "season": "2022",
+    "families": [
+     "atacantes",
+     "extremos",
+     "meio-campistas",
+     "zagueiros"
+    ],
+    "clubs": [
+     "Ponte Preta",
+     "Votuporanguense",
+     "Ypiranga Erechim"
+    ]
+   },
+   {
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "season": "2024",
+    "families": [
+     "extremos",
+     "zagueiros"
+    ],
+    "clubs": [
+     "Guarani",
+     "Portuguesa Santista"
+    ]
+   },
+   {
     "athlete_id": "ath-000851",
     "name": "Coutinho",
     "season": "2026",
@@ -4153,6 +4176,7 @@
     ],
     "clubs": [
      "Maringá",
+     "Ponte Preta",
      "Portuguesa Santista"
     ]
    },
@@ -4167,6 +4191,32 @@
     "clubs": [
      "Pouso Alegre",
      "XV de Piracicaba"
+    ]
+   },
+   {
+    "athlete_id": "ath-003135",
+    "name": "Nathan",
+    "season": "2026",
+    "families": [
+     "laterais",
+     "zagueiros"
+    ],
+    "clubs": [
+     "Buriram United",
+     "Juventude"
+    ]
+   },
+   {
+    "athlete_id": "ath-003135",
+    "name": "Nathan",
+    "season": "2025",
+    "families": [
+     "laterais",
+     "zagueiros"
+    ],
+    "clubs": [
+     "Cuiabá",
+     "Internacional"
     ]
    },
    {
@@ -4635,16 +4685,16 @@
     ],
     "pairs": [
      [
-      "laterais",
-      "zagueiros"
-     ],
-     [
       "atacantes",
       "zagueiros"
      ],
      [
       "atacantes",
       "laterais"
+     ],
+     [
+      "laterais",
+      "zagueiros"
      ]
     ],
     "rows": [
@@ -4902,11 +4952,11 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "extremos",
       "zagueiros"
      ],
      [
-      "extremos",
+      "laterais",
       "zagueiros"
      ]
     ],
@@ -5061,6 +5111,7 @@
      "est-baiano/2025:Vitória(atacantes)",
      "est-gaucho/2022:Caxias(extremos)",
      "est-gaucho/2023:Ypiranga Erechim(extremos)",
+     "est-gaucho/2023:EC São José(meio-campistas)",
      "est-gaucho/2024:EC São José(extremos)",
      "est-goiano/2026:ABECAT Ouvidorense(extremos)",
      "est-paulista-a3/2024:Matonense(extremos)",
@@ -5068,6 +5119,7 @@
      "serie-a/2026:Vitória(extremos)",
      "serie-a/2024:Vitória(extremos)",
      "serie-a/2025:Vitória(extremos)",
+     "serie-b/2022:Vila Nova(extremos)",
      "serie-b/2023:Vitória(extremos)",
      "serie-c/2023:EC São José(laterais)",
      "serie-c/2024:EC São José(laterais)",
@@ -5139,20 +5191,20 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "atacantes",
       "zagueiros"
      ],
      [
       "atacantes",
-      "zagueiros"
+      "laterais"
      ],
      [
       "extremos",
       "zagueiros"
      ],
      [
-      "atacantes",
-      "laterais"
+      "laterais",
+      "zagueiros"
      ]
     ],
     "rows": [
@@ -5375,20 +5427,20 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "atacantes",
       "zagueiros"
      ],
      [
       "atacantes",
-      "zagueiros"
+      "laterais"
      ],
      [
       "extremos",
       "zagueiros"
      ],
      [
-      "atacantes",
-      "laterais"
+      "laterais",
+      "zagueiros"
      ]
     ],
     "rows": [
@@ -5875,11 +5927,11 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "extremos",
       "zagueiros"
      ],
      [
-      "extremos",
+      "laterais",
       "zagueiros"
      ]
     ],
@@ -5930,20 +5982,20 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "atacantes",
       "zagueiros"
      ],
      [
       "atacantes",
-      "zagueiros"
+      "laterais"
      ],
      [
       "extremos",
       "zagueiros"
      ],
      [
-      "atacantes",
-      "laterais"
+      "laterais",
+      "zagueiros"
      ]
     ],
     "rows": [
@@ -6013,6 +6065,7 @@
      "est-mineiro/2026:América Mineiro(zagueiros)",
      "serie-a/2022:Fluminense(extremos)",
      "serie-a/2023:Grêmio(extremos)",
+     "serie-a/2024:Grêmio(atacantes)",
      "serie-a/2025:Grêmio(extremos)"
     ]
    },
@@ -6082,11 +6135,11 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "extremos",
       "zagueiros"
      ],
      [
-      "extremos",
+      "laterais",
       "zagueiros"
      ]
     ],
@@ -6135,7 +6188,6 @@
     "athlete_id": "ath-004391",
     "name": "Zé Gabriel",
     "families": [
-     "atacantes",
      "laterais",
      "meio-campistas",
      "zagueiros"
@@ -6144,24 +6196,13 @@
      [
       "laterais",
       "zagueiros"
-     ],
-     [
-      "atacantes",
-      "zagueiros"
-     ],
-     [
-      "atacantes",
-      "laterais"
      ]
     ],
     "rows": [
      "est-carioca/2022:Vasco da Gama(meio-campistas)",
-     "est-carioca/2023:Vasco da Gama(atacantes)",
      "est-carioca/2023:Vasco da Gama(meio-campistas)",
      "est-carioca/2024:Vasco da Gama(meio-campistas)",
-     "est-carioca/2025:Boavista(atacantes)",
      "est-carioca/2025:Vasco da Gama(meio-campistas)",
-     "est-catarinense/2022:Marcílio Dias(atacantes)",
      "est-pernambucano/2026:Sport Recife(laterais)",
      "est-pernambucano/2026:Sport Recife(meio-campistas)",
      "serie-a/2023:Vasco da Gama(meio-campistas)",
@@ -6223,6 +6264,7 @@
      "est-carioca/2023:Resende(zagueiros)",
      "est-copa-paulista/2026:Noroeste(zagueiros)",
      "est-copa-paulista/2025:Noroeste(zagueiros)",
+     "est-gaucho/2022:Brasil de Pelotas(atacantes)",
      "est-paulista-a2/2026:Linense(zagueiros)",
      "est-paulista-a2/2024:Linense(zagueiros)",
      "est-paulista-a2/2025:Santo André(zagueiros)",
@@ -6273,11 +6315,11 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "extremos",
       "zagueiros"
      ],
      [
-      "extremos",
+      "laterais",
       "zagueiros"
      ]
     ],
@@ -6285,6 +6327,29 @@
      "est-carioca/2022:Flamengo(zagueiros)",
      "hub/2026:Vitória(extremos)",
      "serie-a/2022:Flamengo(laterais)"
+    ]
+   },
+   {
+    "athlete_id": "ath-003510",
+    "name": "Raí",
+    "families": [
+     "atacantes",
+     "extremos",
+     "laterais",
+     "meio-campistas"
+    ],
+    "pairs": [
+     [
+      "atacantes",
+      "laterais"
+     ]
+    ],
+    "rows": [
+     "est-carioca/2023:Botafogo(atacantes)",
+     "est-gaucho/2024:Novo Hamburgo(laterais)",
+     "serie-a/2023:Botafogo(extremos)",
+     "serie-b/2026:Juventude(meio-campistas)",
+     "serie-b/2025:Volta Redonda(extremos)"
     ]
    },
    {
@@ -6460,34 +6525,6 @@
      "est-copa-paulista/2025:São Bento(laterais)",
      "est-paulista-a2/2026:Sertãozinho(zagueiros)",
      "serie-c/2023:Volta Redonda(laterais)"
-    ]
-   },
-   {
-    "athlete_id": "ath-004408",
-    "name": "Zé Vitor",
-    "families": [
-     "extremos",
-     "zagueiros"
-    ],
-    "pairs": [
-     [
-      "extremos",
-      "zagueiros"
-     ]
-    ],
-    "rows": [
-     "est-carioca/2023:Vasco da Gama(zagueiros)",
-     "est-carioca/2024:Vasco da Gama(zagueiros)",
-     "est-mineiro/2022:América Mineiro(zagueiros)",
-     "est-mineiro/2023:Tombense(zagueiros)",
-     "est-mineiro/2024:Tombense(zagueiros)",
-     "est-paulista-a2/2026:Ferroviária(zagueiros)",
-     "serie-a/2023:Vasco da Gama(zagueiros)",
-     "serie-a/2024:Athletico Paranaense(extremos)",
-     "serie-a/2025:Mirassol(extremos)",
-     "serie-b/2022:Vasco da Gama(zagueiros)",
-     "serie-b/2023:Tombense(zagueiros)",
-     "serie-c/2026:Ferroviária(zagueiros)"
     ]
    },
    {
@@ -6716,11 +6753,11 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "extremos",
       "zagueiros"
      ],
      [
-      "extremos",
+      "laterais",
       "zagueiros"
      ]
     ],
@@ -6746,11 +6783,11 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "extremos",
       "zagueiros"
      ],
      [
-      "extremos",
+      "laterais",
       "zagueiros"
      ]
     ],
@@ -7177,6 +7214,37 @@
     ]
    },
    {
+    "athlete_id": "ath-000613",
+    "name": "Cleberson",
+    "families": [
+     "extremos",
+     "laterais",
+     "meio-campistas",
+     "zagueiros"
+    ],
+    "pairs": [
+     [
+      "extremos",
+      "zagueiros"
+     ],
+     [
+      "laterais",
+      "zagueiros"
+     ]
+    ],
+    "rows": [
+     "est-catarinense/2026:Santa Catarina(meio-campistas)",
+     "est-catarinense/2025:Santa Catarina(meio-campistas)",
+     "est-copa-paulista/2026:Inter de Limeira(meio-campistas)",
+     "est-copa-paulista/2025:Inter de Limeira(meio-campistas)",
+     "est-gaucho/2022:EC São José(extremos)",
+     "est-paulista-a1/2022:Ituano(zagueiros)",
+     "est-paulista-a3/2024:USAC(laterais)",
+     "serie-b/2022:Ituano(zagueiros)",
+     "serie-d/2026:Santa Catarina(meio-campistas)"
+    ]
+   },
+   {
     "athlete_id": "ath-001963",
     "name": "Jhony Douglas",
     "families": [
@@ -7598,6 +7666,31 @@
     ]
    },
    {
+    "athlete_id": "ath-004237",
+    "name": "Wellisson",
+    "families": [
+     "atacantes",
+     "extremos",
+     "laterais"
+    ],
+    "pairs": [
+     [
+      "atacantes",
+      "laterais"
+     ]
+    ],
+    "rows": [
+     "est-catarinense/2023:Figueirense(laterais)",
+     "est-gaucho/2026:Avenida(atacantes)",
+     "est-paranaense/2022:União PR(atacantes)",
+     "est-paranaense/2023:Azuriz(atacantes)",
+     "est-paranaense/2024:Azuriz(extremos)",
+     "est-paranaense/2025:Azuriz(extremos)",
+     "serie-c/2023:Figueirense(laterais)",
+     "serie-d/2026:Blumenau(atacantes)"
+    ]
+   },
+   {
     "athlete_id": "ath-000706",
     "name": "Danilo Silva",
     "families": [
@@ -7702,8 +7795,10 @@
     ],
     "rows": [
      "est-catarinense/2023:Avaí(meio-campistas)",
+     "est-catarinense/2024:Avaí(extremos)",
      "est-catarinense/2025:Avaí(meio-campistas)",
      "est-gaucho/2026:EC São José(atacantes)",
+     "est-mineiro/2024:Itabirito(extremos)",
      "serie-a/2022:Avaí(meio-campistas)",
      "serie-b/2023:Avaí(meio-campistas)",
      "serie-b/2025:Avaí(laterais)",
@@ -8003,11 +8098,11 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "extremos",
       "zagueiros"
      ],
      [
-      "extremos",
+      "laterais",
       "zagueiros"
      ]
     ],
@@ -8086,11 +8181,11 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "extremos",
       "zagueiros"
      ],
      [
-      "extremos",
+      "laterais",
       "zagueiros"
      ]
     ],
@@ -8111,16 +8206,16 @@
     ],
     "pairs": [
      [
-      "laterais",
-      "zagueiros"
-     ],
-     [
       "atacantes",
       "zagueiros"
      ],
      [
       "atacantes",
       "laterais"
+     ],
+     [
+      "laterais",
+      "zagueiros"
      ]
     ],
     "rows": [
@@ -8181,6 +8276,43 @@
     ]
    },
    {
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "families": [
+     "atacantes",
+     "extremos",
+     "meio-campistas",
+     "zagueiros"
+    ],
+    "pairs": [
+     [
+      "atacantes",
+      "zagueiros"
+     ],
+     [
+      "extremos",
+      "zagueiros"
+     ]
+    ],
+    "rows": [
+     "est-copa-paulista/2026:XV de Piracicaba(extremos)",
+     "est-copa-paulista/2023:Portuguesa Santista(extremos)",
+     "est-copa-paulista/2025:XV de Piracicaba(extremos)",
+     "est-gaucho/2022:Ypiranga Erechim(atacantes)",
+     "est-mineiro/2023:Patrocinense(extremos)",
+     "est-paulista-a1/2022:Ponte Preta(meio-campistas)",
+     "est-paulista-a1/2024:Guarani(zagueiros)",
+     "est-paulista-a2/2026:XV de Piracicaba(extremos)",
+     "est-paulista-a2/2024:Portuguesa Santista(extremos)",
+     "est-paulista-a2/2025:Grêmio Prudente(extremos)",
+     "est-paulista-a3/2022:Votuporanguense(extremos)",
+     "serie-b/2022:Ponte Preta(zagueiros)",
+     "serie-b/2023:Ceará(meio-campistas)",
+     "serie-b/2024:Guarani(zagueiros)",
+     "serie-d/2026:XV de Piracicaba(extremos)"
+    ]
+   },
+   {
     "athlete_id": "ath-000851",
     "name": "Coutinho",
     "families": [
@@ -8197,10 +8329,13 @@
     "rows": [
      "est-copa-paulista/2026:São Bento(meio-campistas)",
      "est-copa-paulista/2022:São Bernardo(extremos)",
+     "est-copa-paulista/2022:São Bernardo(extremos)",
      "est-copa-paulista/2025:São Bento(meio-campistas)",
      "est-paraense/2026:São Raimundo(zagueiros)",
      "est-paulista-a2/2026:São Bento(extremos)",
      "est-paulista-a2/2023:São Caetano(extremos)",
+     "est-paulista-a2/2023:São Caetano(extremos)",
+     "est-paulista-a2/2024:São Bento(extremos)",
      "est-paulista-a2/2024:São Bento(extremos)",
      "hub/2026:São Paulo(zagueiros)",
      "serie-a/2026:São Paulo(zagueiros)"
@@ -8216,16 +8351,16 @@
     ],
     "pairs": [
      [
-      "laterais",
-      "zagueiros"
-     ],
-     [
       "atacantes",
       "zagueiros"
      ],
      [
       "atacantes",
       "laterais"
+     ],
+     [
+      "laterais",
+      "zagueiros"
      ]
     ],
     "rows": [
@@ -8515,6 +8650,7 @@
      "est-paranaense/2026:Maringá(zagueiros)",
      "est-paulista-a3/2026:Portuguesa Santista(laterais)",
      "est-paulista-a3/2023:RB Brasil(laterais)",
+     "serie-b/2026:Ponte Preta(laterais)",
      "serie-b/2023:Ceará(zagueiros)",
      "serie-b/2024:Ceará(zagueiros)"
     ]
@@ -8595,12 +8731,25 @@
     "families": [
      "atacantes",
      "extremos",
-     "laterais"
+     "laterais",
+     "zagueiros"
     ],
     "pairs": [
      [
       "atacantes",
+      "zagueiros"
+     ],
+     [
+      "atacantes",
       "laterais"
+     ],
+     [
+      "extremos",
+      "zagueiros"
+     ],
+     [
+      "laterais",
+      "zagueiros"
      ]
     ],
     "rows": [
@@ -8608,7 +8757,9 @@
      "est-gaucho/2026:Juventude(laterais)",
      "est-gaucho/2025:Internacional(laterais)",
      "est-paulista-a2/2022:Juventus(extremos)",
-     "serie-a/2022:Avaí(atacantes)"
+     "serie-a/2022:Avaí(atacantes)",
+     "serie-b/2026:Buriram United(zagueiros)",
+     "serie-b/2025:Cuiabá(zagueiros)"
     ]
    },
    {
@@ -8626,6 +8777,7 @@
      ]
     ],
     "rows": [
+     "est-copa-paulista/2024:Monte Azul(extremos)",
      "est-copa-paulista/2024:Monte Azul(laterais)",
      "est-paranaense/2022:Azuriz(atacantes)",
      "serie-b/2023:Ceará(extremos)",
@@ -8662,16 +8814,16 @@
     ],
     "pairs": [
      [
-      "laterais",
-      "zagueiros"
-     ],
-     [
       "atacantes",
       "zagueiros"
      ],
      [
       "atacantes",
       "laterais"
+     ],
+     [
+      "laterais",
+      "zagueiros"
      ]
     ],
     "rows": [
@@ -8721,11 +8873,11 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "extremos",
       "zagueiros"
      ],
      [
-      "extremos",
+      "laterais",
       "zagueiros"
      ]
     ],
@@ -8756,8 +8908,6 @@
      "est-mineiro/2024:Cruzeiro(laterais)",
      "serie-a/2026:Grêmio(laterais)",
      "serie-a/2022:Fluminense(laterais)",
-     "serie-a/2023:Cruzeiro(laterais)",
-     "serie-a/2024:Cruzeiro(laterais)",
      "serie-a/2025:Grêmio(laterais)"
     ]
    },
@@ -8772,11 +8922,11 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "extremos",
       "zagueiros"
      ],
      [
-      "extremos",
+      "laterais",
       "zagueiros"
      ]
     ],
@@ -9203,7 +9353,6 @@
      "est-paulista-a1/2022:Grêmio Novorizontino(atacantes)",
      "est-paulista-a2/2023:Grêmio Novorizontino(meio-campistas)",
      "serie-a/2024:Palmeiras(extremos)",
-     "serie-a/2025:Ceará(extremos)",
      "serie-b/2026:Grêmio Novorizontino(extremos)",
      "serie-b/2022:Grêmio Novorizontino(extremos)",
      "serie-b/2023:Grêmio Novorizontino(extremos)",
@@ -9419,16 +9568,16 @@
     ],
     "pairs": [
      [
-      "laterais",
-      "zagueiros"
-     ],
-     [
       "atacantes",
       "zagueiros"
      ],
      [
       "atacantes",
       "laterais"
+     ],
+     [
+      "laterais",
+      "zagueiros"
      ]
     ],
     "rows": [
@@ -9541,11 +9690,11 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "extremos",
       "zagueiros"
      ],
      [
-      "extremos",
+      "laterais",
       "zagueiros"
      ]
     ],
@@ -9700,6 +9849,29 @@
     ]
    },
    {
+    "athlete_id": "ath-002082",
+    "name": "Jonathan",
+    "families": [
+     "laterais",
+     "zagueiros"
+    ],
+    "pairs": [
+     [
+      "laterais",
+      "zagueiros"
+     ]
+    ],
+    "rows": [
+     "est-mineiro/2026:Cruzeiro(zagueiros)",
+     "est-mineiro/2025:Cruzeiro(zagueiros)",
+     "serie-a/2026:Cruzeiro(zagueiros)",
+     "serie-a/2023:América Mineiro(zagueiros)",
+     "serie-a/2024:Cruzeiro(zagueiros)",
+     "serie-a/2025:Cruzeiro(zagueiros)",
+     "serie-b/2022:CSA(laterais)"
+    ]
+   },
+   {
     "athlete_id": "ath-002344",
     "name": "L. Villalba",
     "families": [
@@ -9756,16 +9928,16 @@
     ],
     "pairs": [
      [
-      "laterais",
-      "zagueiros"
-     ],
-     [
       "atacantes",
       "zagueiros"
      ],
      [
       "atacantes",
       "laterais"
+     ],
+     [
+      "laterais",
+      "zagueiros"
      ]
     ],
     "rows": [
@@ -10329,11 +10501,11 @@
     ],
     "pairs": [
      [
-      "laterais",
+      "extremos",
       "zagueiros"
      ],
      [
-      "extremos",
+      "laterais",
       "zagueiros"
      ]
     ],
@@ -10983,7 +11155,6 @@
     ],
     "rows": [
      "hub/2026:Cruzeiro(zagueiros)",
-     "serie-b/2022:CSA(laterais)",
      "serie-c/2026:Maringá(laterais)",
      "serie-c/2025:Maringá(zagueiros)"
     ]
@@ -11666,6 +11837,19 @@
     "player_id": "serie-c-alisson-floresta-ec-144"
    },
    {
+    "athlete_id": "ath-000152",
+    "name": "Alisson",
+    "league": "serie-c",
+    "season": "2025",
+    "club": "Caxias",
+    "row_height": 188,
+    "tm_height": 174,
+    "row_birth": 1996,
+    "tm_birth": 1993,
+    "tm_id": "229736",
+    "player_id": "serie-c-alisson-caxias-237"
+   },
+   {
     "athlete_id": "ath-002244",
     "name": "Kauê Junior",
     "league": "est-baiano",
@@ -11903,6 +12087,19 @@
     "athlete_id": "ath-002999",
     "name": "Matheuzinho",
     "league": "est-gaucho",
+    "season": "2023",
+    "club": "EC São José",
+    "row_height": 169,
+    "tm_height": 165,
+    "row_birth": 1994,
+    "tm_birth": 1997,
+    "tm_id": "365368",
+    "player_id": "est-gaucho-matheuzinho-ec-s-o-jos-143-2023"
+   },
+   {
+    "athlete_id": "ath-002999",
+    "name": "Matheuzinho",
+    "league": "est-gaucho",
     "season": "2024",
     "club": "EC São José",
     "row_height": 169,
@@ -11924,6 +12121,19 @@
     "tm_birth": 1997,
     "tm_id": "365368",
     "player_id": "est-goiano-matheuzinho-abecat-ouvidorense-129-2026"
+   },
+   {
+    "athlete_id": "ath-002999",
+    "name": "Matheuzinho",
+    "league": "serie-b",
+    "season": "2022",
+    "club": "Vila Nova",
+    "row_height": 171,
+    "tm_height": 165,
+    "row_birth": 1994,
+    "tm_birth": 1997,
+    "tm_id": "365368",
+    "player_id": "serie-b-matheuzinho-vila-nova-154"
    },
    {
     "athlete_id": "ath-002999",
@@ -12242,6 +12452,19 @@
     "name": "Dudu",
     "league": "est-catarinense",
     "season": "2022",
+    "club": "Barra",
+    "row_height": 182,
+    "tm_height": 186,
+    "row_birth": 2001,
+    "tm_birth": 1999,
+    "tm_id": "691811",
+    "player_id": "est-catarinense-dudu-barra-152-2022"
+   },
+   {
+    "athlete_id": "ath-000885",
+    "name": "Dudu",
+    "league": "est-catarinense",
+    "season": "2022",
     "club": "Prospera Criciuma",
     "row_height": 179,
     "tm_height": 186,
@@ -12249,6 +12472,19 @@
     "tm_birth": 1999,
     "tm_id": "691811",
     "player_id": "est-catarinense-dudu-prospera-criciuma-167-2022"
+   },
+   {
+    "athlete_id": "ath-000885",
+    "name": "Dudu",
+    "league": "est-copa-paulista",
+    "season": "2023",
+    "club": "Primavera SP",
+    "row_height": 176,
+    "tm_height": 186,
+    "row_birth": 2001,
+    "tm_birth": 1999,
+    "tm_id": "691811",
+    "player_id": "est-copa-paulista-dudu-primavera-sp-121-2023"
    },
    {
     "athlete_id": "ath-000885",
@@ -15309,6 +15545,19 @@
     "athlete_id": "ath-003134",
     "name": "Nathan",
     "league": "serie-a",
+    "season": "2024",
+    "club": "Grêmio",
+    "row_height": 177,
+    "tm_height": 188,
+    "row_birth": 1998,
+    "tm_birth": 1995,
+    "tm_id": "339711",
+    "player_id": "nathan-gr-mio-510"
+   },
+   {
+    "athlete_id": "ath-003134",
+    "name": "Nathan",
+    "league": "serie-a",
     "season": "2025",
     "club": "Grêmio",
     "row_height": 177,
@@ -15538,6 +15787,19 @@
     "tm_birth": 2001,
     "tm_id": "813048",
     "player_id": "serie-b-vitinho-sampaio-corr-a-154"
+   },
+   {
+    "athlete_id": "ath-004153",
+    "name": "Vitinho",
+    "league": "serie-b",
+    "season": "2025",
+    "club": "Goiás",
+    "row_height": 173,
+    "tm_height": 169,
+    "row_birth": 2005,
+    "tm_birth": 2001,
+    "tm_id": "813048",
+    "player_id": "serie-b-vitinho-goi-s-533"
    },
    {
     "athlete_id": "ath-004260",
@@ -15798,6 +16060,45 @@
     "tm_birth": 1998,
     "tm_id": "524591",
     "player_id": "serie-b-dg-ava-63"
+   },
+   {
+    "athlete_id": "ath-003653",
+    "name": "Riquelme",
+    "league": "est-carioca",
+    "season": "2022",
+    "club": "Vasco da Gama",
+    "row_height": 173,
+    "tm_height": 181,
+    "row_birth": 2002,
+    "tm_birth": 2006,
+    "tm_id": "1221317",
+    "player_id": "est-carioca-riquelme-vasco-da-gama-202-2022"
+   },
+   {
+    "athlete_id": "ath-003653",
+    "name": "Riquelme",
+    "league": "hub",
+    "season": "2026",
+    "club": "Grêmio",
+    "row_height": 177,
+    "tm_height": 181,
+    "row_birth": 2006,
+    "tm_birth": 2006,
+    "tm_id": "1221317",
+    "player_id": "riquelme-gr-mio-635"
+   },
+   {
+    "athlete_id": "ath-003653",
+    "name": "Riquelme",
+    "league": "serie-b",
+    "season": "2022",
+    "club": "Vasco da Gama",
+    "row_height": 173,
+    "tm_height": 181,
+    "row_birth": 2004,
+    "tm_birth": 2006,
+    "tm_id": "1221317",
+    "player_id": "serie-b-riquelme-vasco-da-gama-584"
    },
    {
     "athlete_id": "ath-004172",
@@ -16110,6 +16411,19 @@
     "tm_birth": 1998,
     "tm_id": "877578",
     "player_id": "est-paulista-a3-luiz-felipe-desportivo-brasil-213-2022"
+   },
+   {
+    "athlete_id": "ath-001967",
+    "name": "Joanderson",
+    "league": "est-gaucho",
+    "season": "2022",
+    "club": "Brasil de Pelotas",
+    "row_height": 180,
+    "tm_height": 198,
+    "row_birth": 1996,
+    "tm_birth": 1999,
+    "tm_id": "942557",
+    "player_id": "est-gaucho-joanderson-brasil-de-pelotas-189-2022"
    },
    {
     "athlete_id": "ath-001967",
@@ -17672,6 +17986,32 @@
     "player_id": "est-paulista-a1-eduardo-red-bull-bragantino-215-2026"
    },
    {
+    "athlete_id": "ath-000613",
+    "name": "Cleberson",
+    "league": "est-paulista-a1",
+    "season": "2022",
+    "club": "Ituano",
+    "row_height": 185,
+    "tm_height": 169,
+    "row_birth": 1992,
+    "tm_birth": 2002,
+    "tm_id": "868069",
+    "player_id": "est-paulista-a1-cleberson-ituano-71-2022"
+   },
+   {
+    "athlete_id": "ath-000613",
+    "name": "Cleberson",
+    "league": "serie-b",
+    "season": "2022",
+    "club": "Ituano",
+    "row_height": 185,
+    "tm_height": 169,
+    "row_birth": 1994,
+    "tm_birth": 2002,
+    "tm_id": "868069",
+    "player_id": "serie-b-cleberson-ituano-795"
+   },
+   {
     "athlete_id": "ath-000233",
     "name": "A. Salas",
     "league": "serie-b",
@@ -17735,6 +18075,45 @@
     "tm_birth": 1996,
     "tm_id": "520462",
     "player_id": "serie-b-r-mulo-souza-chapecoense-760"
+   },
+   {
+    "athlete_id": "ath-004459",
+    "name": "Jaílson",
+    "league": "est-catarinense",
+    "season": "2022",
+    "club": "Brusque",
+    "row_height": 182,
+    "tm_height": 187,
+    "row_birth": 1992,
+    "tm_birth": 1995,
+    "tm_id": "366948",
+    "player_id": "est-catarinense-ja-lson-brusque-78-2022"
+   },
+   {
+    "athlete_id": "ath-004459",
+    "name": "Jaílson",
+    "league": "serie-b",
+    "season": "2022",
+    "club": "Brusque",
+    "row_height": 182,
+    "tm_height": 187,
+    "row_birth": 1994,
+    "tm_birth": 1995,
+    "tm_id": "366948",
+    "player_id": "serie-b-ja-lson-brusque-296"
+   },
+   {
+    "athlete_id": "ath-004459",
+    "name": "Jaílson",
+    "league": "serie-c",
+    "season": "2023",
+    "club": "Botafogo PB",
+    "row_height": 182,
+    "tm_height": 187,
+    "row_birth": 1994,
+    "tm_birth": 1995,
+    "tm_id": "366948",
+    "player_id": "serie-c-ja-lson-botafogo-pb-220"
    },
    {
     "athlete_id": "ath-001580",
@@ -18270,6 +18649,19 @@
     "player_id": "serie-c-marcelinho-ypiranga-erechim-212"
    },
    {
+    "athlete_id": "ath-002773",
+    "name": "Marcelinho",
+    "league": "serie-c",
+    "season": "2024",
+    "club": "Sampaio Corrêa",
+    "row_height": 180,
+    "tm_height": 176,
+    "row_birth": 2000,
+    "tm_birth": 1996,
+    "tm_id": "439782",
+    "player_id": "serie-c-marcelinho-sampaio-corr-a-472"
+   },
+   {
     "athlete_id": "ath-004150",
     "name": "Vitinho",
     "league": "est-paranaense",
@@ -18333,6 +18725,32 @@
     "tm_birth": 1999,
     "tm_id": "525510",
     "player_id": "est-mineiro-elias-uberl-ndia-142-2024"
+   },
+   {
+    "athlete_id": "ath-004237",
+    "name": "Wellisson",
+    "league": "est-catarinense",
+    "season": "2023",
+    "club": "Figueirense",
+    "row_height": 177,
+    "tm_height": 184,
+    "row_birth": 1999,
+    "tm_birth": 1996,
+    "tm_id": "412681",
+    "player_id": "est-catarinense-wellisson-figueirense-193-2023"
+   },
+   {
+    "athlete_id": "ath-004237",
+    "name": "Wellisson",
+    "league": "serie-c",
+    "season": "2023",
+    "club": "Figueirense",
+    "row_height": 177,
+    "tm_height": 184,
+    "row_birth": 2000,
+    "tm_birth": 1996,
+    "tm_id": "412681",
+    "player_id": "serie-c-wellisson-figueirense-613"
    },
    {
     "athlete_id": "ath-000706",
@@ -18502,6 +18920,58 @@
     "tm_birth": 2003,
     "tm_id": "1083235",
     "player_id": "serie-c-henrique-rodrigues-figueirense-221"
+   },
+   {
+    "athlete_id": "ath-004032",
+    "name": "Tito",
+    "league": "est-catarinense",
+    "season": "2024",
+    "club": "Figueirense",
+    "row_height": 179,
+    "tm_height": 184,
+    "row_birth": 1997,
+    "tm_birth": 2000,
+    "tm_id": "867798",
+    "player_id": "est-catarinense-tito-figueirense-57-2024"
+   },
+   {
+    "athlete_id": "ath-004032",
+    "name": "Tito",
+    "league": "serie-c",
+    "season": "2026",
+    "club": "Itabaiana",
+    "row_height": 179,
+    "tm_height": 184,
+    "row_birth": 1997,
+    "tm_birth": 2000,
+    "tm_id": "867798",
+    "player_id": "serie-c-tito-itabaiana-244"
+   },
+   {
+    "athlete_id": "ath-004032",
+    "name": "Tito",
+    "league": "serie-c",
+    "season": "2023",
+    "club": "Ypiranga Erechim",
+    "row_height": 179,
+    "tm_height": 184,
+    "row_birth": 1998,
+    "tm_birth": 2000,
+    "tm_id": "867798",
+    "player_id": "serie-c-tito-ypiranga-erechim-344"
+   },
+   {
+    "athlete_id": "ath-004032",
+    "name": "Tito",
+    "league": "serie-c",
+    "season": "2024",
+    "club": "Figueirense",
+    "row_height": 179,
+    "tm_height": 184,
+    "row_birth": 1999,
+    "tm_birth": 2000,
+    "tm_id": "867798",
+    "player_id": "serie-c-tito-figueirense-474"
    },
    {
     "athlete_id": "ath-001311",
@@ -19726,6 +20196,71 @@
     "player_id": "serie-c-ronald-carvalho-maring-181"
    },
    {
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "league": "est-paulista-a1",
+    "season": "2022",
+    "club": "Ponte Preta",
+    "row_height": 186,
+    "tm_height": 175,
+    "row_birth": 1999,
+    "tm_birth": 1996,
+    "tm_id": "450193",
+    "player_id": "est-paulista-a1-l-o-santos-ponte-preta-145-2022"
+   },
+   {
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "league": "est-paulista-a1",
+    "season": "2024",
+    "club": "Guarani",
+    "row_height": 186,
+    "tm_height": 175,
+    "row_birth": 1999,
+    "tm_birth": 1996,
+    "tm_id": "450193",
+    "player_id": "est-paulista-a1-l-o-santos-guarani-15-2024"
+   },
+   {
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "league": "serie-b",
+    "season": "2022",
+    "club": "Ponte Preta",
+    "row_height": 186,
+    "tm_height": 175,
+    "row_birth": 2000,
+    "tm_birth": 1996,
+    "tm_id": "450193",
+    "player_id": "serie-b-l-o-santos-ponte-preta-586"
+   },
+   {
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "league": "serie-b",
+    "season": "2023",
+    "club": "Ceará",
+    "row_height": 186,
+    "tm_height": 175,
+    "row_birth": 2000,
+    "tm_birth": 1996,
+    "tm_id": "450193",
+    "player_id": "serie-b-l-o-santos-cear-262"
+   },
+   {
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "league": "serie-b",
+    "season": "2024",
+    "club": "Guarani",
+    "row_height": 186,
+    "tm_height": 175,
+    "row_birth": 2000,
+    "tm_birth": 1996,
+    "tm_id": "450193",
+    "player_id": "serie-b-l-o-santos-guarani-307"
+   },
+   {
     "athlete_id": "ath-003292",
     "name": "Paulo Henrique",
     "league": "est-copa-paulista",
@@ -19861,6 +20396,19 @@
     "league": "est-copa-paulista",
     "season": "2022",
     "club": "São Bernardo",
+    "row_height": 177,
+    "tm_height": 192,
+    "row_birth": 2001,
+    "tm_birth": 1995,
+    "tm_id": "257376",
+    "player_id": "est-copa-paulista-coutinho-s-o-bernardo-396-2022"
+   },
+   {
+    "athlete_id": "ath-000851",
+    "name": "Coutinho",
+    "league": "est-copa-paulista",
+    "season": "2022",
+    "club": "São Bernardo",
     "row_height": 0,
     "tm_height": 192,
     "row_birth": 2000,
@@ -19913,12 +20461,38 @@
     "league": "est-paulista-a2",
     "season": "2023",
     "club": "São Caetano",
+    "row_height": 177,
+    "tm_height": 192,
+    "row_birth": 2001,
+    "tm_birth": 1995,
+    "tm_id": "257376",
+    "player_id": "est-paulista-a2-coutinho-s-o-caetano-314-2023"
+   },
+   {
+    "athlete_id": "ath-000851",
+    "name": "Coutinho",
+    "league": "est-paulista-a2",
+    "season": "2023",
+    "club": "São Caetano",
     "row_height": 0,
     "tm_height": 192,
     "row_birth": 2000,
     "tm_birth": 1995,
     "tm_id": "257376",
     "player_id": "est-paulista-a2-coutinho-s-o-caetano-315-2023"
+   },
+   {
+    "athlete_id": "ath-000851",
+    "name": "Coutinho",
+    "league": "est-paulista-a2",
+    "season": "2024",
+    "club": "São Bento",
+    "row_height": 177,
+    "tm_height": 192,
+    "row_birth": 2001,
+    "tm_birth": 1995,
+    "tm_id": "257376",
+    "player_id": "est-paulista-a2-coutinho-s-o-bento-1110-2024"
    },
    {
     "athlete_id": "ath-000851",
@@ -20454,6 +21028,19 @@
     "player_id": "serie-c-rafael-verrone-an-polis-89"
    },
    {
+    "athlete_id": "ath-001259",
+    "name": "Frank",
+    "league": "serie-c",
+    "season": "2023",
+    "club": "América RN",
+    "row_height": 172,
+    "tm_height": 176,
+    "row_birth": 1995,
+    "tm_birth": 2001,
+    "tm_id": "798105",
+    "player_id": "serie-c-frank-am-rica-rn-523"
+   },
+   {
     "athlete_id": "ath-002083",
     "name": "Jonathan",
     "league": "est-mineiro",
@@ -20478,32 +21065,6 @@
     "tm_birth": 2003,
     "tm_id": "813119",
     "player_id": "est-paranaense-jonathan-maring-621-2026"
-   },
-   {
-    "athlete_id": "ath-003653",
-    "name": "Riquelme",
-    "league": "hub",
-    "season": "2026",
-    "club": "Grêmio",
-    "row_height": 177,
-    "tm_height": 181,
-    "row_birth": 2006,
-    "tm_birth": 2006,
-    "tm_id": "1221317",
-    "player_id": "riquelme-gr-mio-635"
-   },
-   {
-    "athlete_id": "ath-003653",
-    "name": "Riquelme",
-    "league": "serie-b",
-    "season": "2022",
-    "club": "Vasco da Gama",
-    "row_height": 173,
-    "tm_height": 181,
-    "row_birth": 2004,
-    "tm_birth": 2006,
-    "tm_id": "1221317",
-    "player_id": "serie-b-riquelme-vasco-da-gama-584"
    },
    {
     "athlete_id": "ath-004258",
@@ -20634,6 +21195,32 @@
     "tm_birth": 2001,
     "tm_id": "740273",
     "player_id": "nathan-ava-612"
+   },
+   {
+    "athlete_id": "ath-003135",
+    "name": "Nathan",
+    "league": "serie-b",
+    "season": "2026",
+    "club": "Buriram United",
+    "row_height": 188,
+    "tm_height": 183,
+    "row_birth": 1995,
+    "tm_birth": 2001,
+    "tm_id": "740273",
+    "player_id": "serie-b-nathan-buriram-united-322"
+   },
+   {
+    "athlete_id": "ath-003135",
+    "name": "Nathan",
+    "league": "serie-b",
+    "season": "2025",
+    "club": "Cuiabá",
+    "row_height": 188,
+    "tm_height": 183,
+    "row_birth": 1996,
+    "tm_birth": 2001,
+    "tm_id": "740273",
+    "player_id": "serie-b-nathan-cuiab-102"
    },
    {
     "athlete_id": "ath-003317",
@@ -20959,6 +21546,19 @@
     "tm_birth": 1996,
     "tm_id": "553870",
     "player_id": "est-mineiro-gabriel-lima-tombense-282-2024"
+   },
+   {
+    "athlete_id": "ath-001330",
+    "name": "Gabriel Lima",
+    "league": "serie-b",
+    "season": "2022",
+    "club": "Tombense",
+    "row_height": 171,
+    "tm_height": 177,
+    "row_birth": 1999,
+    "tm_birth": 1996,
+    "tm_id": "553870",
+    "player_id": "serie-b-gabriel-lima-tombense-773"
    },
    {
     "athlete_id": "ath-001330",
@@ -21336,58 +21936,6 @@
     "tm_birth": 2004,
     "tm_id": "1082706",
     "player_id": "serie-c-islan-csa-119"
-   },
-   {
-    "athlete_id": "ath-004409",
-    "name": "Zé Vitor",
-    "league": "est-gaucho",
-    "season": "2024",
-    "club": "Ypiranga Erechim",
-    "row_height": 182,
-    "tm_height": 194,
-    "row_birth": 1999,
-    "tm_birth": 2000,
-    "tm_id": "825780",
-    "player_id": "est-gaucho-z-vitor-ypiranga-erechim-61-2024"
-   },
-   {
-    "athlete_id": "ath-004409",
-    "name": "Zé Vitor",
-    "league": "serie-b",
-    "season": "2022",
-    "club": "Vasco da Gama",
-    "row_height": 182,
-    "tm_height": 194,
-    "row_birth": 2000,
-    "tm_birth": 2000,
-    "tm_id": "825780",
-    "player_id": "serie-b-z-vitor-vasco-da-gama-718"
-   },
-   {
-    "athlete_id": "ath-004409",
-    "name": "Zé Vitor",
-    "league": "serie-b",
-    "season": "2023",
-    "club": "Londrina",
-    "row_height": 182,
-    "tm_height": 194,
-    "row_birth": 2000,
-    "tm_birth": 2000,
-    "tm_id": "825780",
-    "player_id": "serie-b-z-vitor-londrina-429"
-   },
-   {
-    "athlete_id": "ath-004409",
-    "name": "Zé Vitor",
-    "league": "serie-c",
-    "season": "2024",
-    "club": "Ypiranga Erechim",
-    "row_height": 182,
-    "tm_height": 194,
-    "row_birth": 2000,
-    "tm_birth": 2000,
-    "tm_id": "825780",
-    "player_id": "serie-c-z-vitor-ypiranga-erechim-134"
    },
    {
     "athlete_id": "ath-001310",
@@ -25381,6 +25929,19 @@
     "player_id": "serie-c-roger-paysandu-618"
    },
    {
+    "athlete_id": "ath-001881",
+    "name": "Jajá",
+    "league": "serie-b",
+    "season": "2022",
+    "club": "Cruzeiro",
+    "row_height": 177,
+    "tm_height": 187,
+    "row_birth": 2002,
+    "tm_birth": 2005,
+    "tm_id": "1222302",
+    "player_id": "serie-b-jaj-cruzeiro-249"
+   },
+   {
     "athlete_id": "ath-001952",
     "name": "Jhonatan Garcia",
     "league": "est-paulista-a2",
@@ -25734,19 +26295,6 @@
    {
     "athlete_id": "ath-004462",
     "name": "Jonathan",
-    "league": "serie-b",
-    "season": "2022",
-    "club": "CSA",
-    "row_height": 0,
-    "tm_height": 187,
-    "row_birth": 2007,
-    "tm_birth": 2004,
-    "tm_id": "1083207",
-    "player_id": "serie-b-jonathan-csa-733"
-   },
-   {
-    "athlete_id": "ath-004462",
-    "name": "Jonathan",
     "league": "serie-c",
     "season": "2026",
     "club": "Maringá",
@@ -25925,19 +26473,6 @@
     "tm_birth": 1996,
     "tm_id": "418530",
     "player_id": "serie-b-danielzinho-mirassol-7"
-   },
-   {
-    "athlete_id": "ath-004410",
-    "name": "Zé Vitor",
-    "league": "serie-c",
-    "season": "2024",
-    "club": "Volta Redonda",
-    "row_height": 192,
-    "tm_height": 194,
-    "row_birth": 2003,
-    "tm_birth": 2000,
-    "tm_id": "825780",
-    "player_id": "serie-c-z-vitor-volta-redonda-91"
    },
    {
     "athlete_id": "ath-003654",
@@ -26733,32 +27268,6 @@
     "player_id": "serie-c-lvaro-csa-639"
    },
    {
-    "athlete_id": "ath-004459",
-    "name": "Jaílson",
-    "league": "serie-b",
-    "season": "2022",
-    "club": "Brusque",
-    "row_height": 182,
-    "tm_height": 187,
-    "row_birth": 1994,
-    "tm_birth": 1995,
-    "tm_id": "366948",
-    "player_id": "serie-b-ja-lson-brusque-296"
-   },
-   {
-    "athlete_id": "ath-004459",
-    "name": "Jaílson",
-    "league": "serie-c",
-    "season": "2023",
-    "club": "Botafogo PB",
-    "row_height": 182,
-    "tm_height": 187,
-    "row_birth": 1994,
-    "tm_birth": 1995,
-    "tm_id": "366948",
-    "player_id": "serie-c-ja-lson-botafogo-pb-220"
-   },
-   {
     "athlete_id": "ath-001100",
     "name": "F. Labandeira",
     "league": "serie-b",
@@ -27290,32 +27799,6 @@
     "tm_birth": 2003,
     "tm_id": "1095627",
     "player_id": "serie-c-felipinho-remo-662"
-   },
-   {
-    "athlete_id": "ath-004032",
-    "name": "Tito",
-    "league": "serie-c",
-    "season": "2023",
-    "club": "Ypiranga Erechim",
-    "row_height": 179,
-    "tm_height": 184,
-    "row_birth": 1998,
-    "tm_birth": 2000,
-    "tm_id": "867798",
-    "player_id": "serie-c-tito-ypiranga-erechim-344"
-   },
-   {
-    "athlete_id": "ath-004032",
-    "name": "Tito",
-    "league": "serie-c",
-    "season": "2024",
-    "club": "Figueirense",
-    "row_height": 179,
-    "tm_height": 184,
-    "row_birth": 1999,
-    "tm_birth": 2000,
-    "tm_id": "867798",
-    "player_id": "serie-c-tito-figueirense-474"
    },
    {
     "athlete_id": "ath-003126",
@@ -28095,6 +28578,17 @@
     "athlete_id": "ath-001967",
     "name": "Joanderson",
     "dominant_family": "zagueiros",
+    "league": "est-gaucho",
+    "season": "2022",
+    "club": "Brasil de Pelotas",
+    "row_family": "atacantes",
+    "position": "Atacante",
+    "player_id": "est-gaucho-joanderson-brasil-de-pelotas-189-2022"
+   },
+   {
+    "athlete_id": "ath-001967",
+    "name": "Joanderson",
+    "dominant_family": "zagueiros",
     "league": "serie-c",
     "season": "2022",
     "club": "Brasil de Pelotas",
@@ -28299,28 +28793,6 @@
     "row_family": "laterais",
     "position": "Lateral Esquerdo",
     "player_id": "serie-c-marco-gabriel-volta-redonda-545"
-   },
-   {
-    "athlete_id": "ath-004408",
-    "name": "Zé Vitor",
-    "dominant_family": "zagueiros",
-    "league": "serie-a",
-    "season": "2024",
-    "club": "Athletico Paranaense",
-    "row_family": "extremos",
-    "position": "Meia Ofensivo",
-    "player_id": "z-vitor-athletico-paranaense-558"
-   },
-   {
-    "athlete_id": "ath-004408",
-    "name": "Zé Vitor",
-    "dominant_family": "zagueiros",
-    "league": "serie-a",
-    "season": "2025",
-    "club": "Mirassol",
-    "row_family": "extremos",
-    "position": "Extremo Esquerdo",
-    "player_id": "z-vitor-mirassol-697"
    },
    {
     "athlete_id": "ath-000036",
@@ -28884,6 +29356,28 @@
     "player_id": "serie-c-thiago-rosa-maring-299"
    },
    {
+    "athlete_id": "ath-004237",
+    "name": "Wellisson",
+    "dominant_family": "atacantes",
+    "league": "est-catarinense",
+    "season": "2023",
+    "club": "Figueirense",
+    "row_family": "laterais",
+    "position": "Lateral Direito",
+    "player_id": "est-catarinense-wellisson-figueirense-193-2023"
+   },
+   {
+    "athlete_id": "ath-004237",
+    "name": "Wellisson",
+    "dominant_family": "atacantes",
+    "league": "serie-c",
+    "season": "2023",
+    "club": "Figueirense",
+    "row_family": "laterais",
+    "position": "Lateral Direito",
+    "player_id": "serie-c-wellisson-figueirense-613"
+   },
+   {
     "athlete_id": "ath-000706",
     "name": "Danilo Silva",
     "dominant_family": "laterais",
@@ -29225,6 +29719,39 @@
     "player_id": "serie-b-j-lio-c-sar-am-rica-mineiro-81"
    },
    {
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "dominant_family": "extremos",
+    "league": "est-paulista-a1",
+    "season": "2024",
+    "club": "Guarani",
+    "row_family": "zagueiros",
+    "position": "Zagueiro",
+    "player_id": "est-paulista-a1-l-o-santos-guarani-15-2024"
+   },
+   {
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "dominant_family": "extremos",
+    "league": "serie-b",
+    "season": "2022",
+    "club": "Ponte Preta",
+    "row_family": "zagueiros",
+    "position": "Zagueiro",
+    "player_id": "serie-b-l-o-santos-ponte-preta-586"
+   },
+   {
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "dominant_family": "extremos",
+    "league": "serie-b",
+    "season": "2024",
+    "club": "Guarani",
+    "row_family": "zagueiros",
+    "position": "Zagueiro",
+    "player_id": "serie-b-l-o-santos-guarani-307"
+   },
+   {
     "athlete_id": "ath-000851",
     "name": "Coutinho",
     "dominant_family": "extremos",
@@ -29531,6 +30058,28 @@
     "row_family": "laterais",
     "position": "Lateral Direito",
     "player_id": "est-gaucho-nathan-internacional-295-2025"
+   },
+   {
+    "athlete_id": "ath-003135",
+    "name": "Nathan",
+    "dominant_family": "atacantes",
+    "league": "serie-b",
+    "season": "2026",
+    "club": "Buriram United",
+    "row_family": "zagueiros",
+    "position": "Zagueiro",
+    "player_id": "serie-b-nathan-buriram-united-322"
+   },
+   {
+    "athlete_id": "ath-003135",
+    "name": "Nathan",
+    "dominant_family": "atacantes",
+    "league": "serie-b",
+    "season": "2025",
+    "club": "Cuiabá",
+    "row_family": "zagueiros",
+    "position": "Zagueiro",
+    "player_id": "serie-b-nathan-cuiab-102"
    },
    {
     "athlete_id": "ath-000798",
@@ -30092,6 +30641,17 @@
     "row_family": "laterais",
     "position": "Lateral Direito",
     "player_id": "serie-b-rafael-barcelos-am-rica-mineiro-100"
+   },
+   {
+    "athlete_id": "ath-002082",
+    "name": "Jonathan",
+    "dominant_family": "zagueiros",
+    "league": "serie-b",
+    "season": "2022",
+    "club": "CSA",
+    "row_family": "laterais",
+    "position": "Lateral Direito",
+    "player_id": "serie-b-jonathan-csa-733"
    },
    {
     "athlete_id": "ath-002344",
@@ -30878,17 +31438,6 @@
     "athlete_id": "ath-004462",
     "name": "Jonathan",
     "dominant_family": "zagueiros",
-    "league": "serie-b",
-    "season": "2022",
-    "club": "CSA",
-    "row_family": "laterais",
-    "position": "Lateral Direito",
-    "player_id": "serie-b-jonathan-csa-733"
-   },
-   {
-    "athlete_id": "ath-004462",
-    "name": "Jonathan",
-    "dominant_family": "zagueiros",
     "league": "serie-c",
     "season": "2026",
     "club": "Maringá",
@@ -31189,7 +31738,8 @@
      "hub/2026:Fluminense(174cm)",
      "serie-c/2026:Confiança(188cm)",
      "serie-c/2023:Floresta EC(186cm)",
-     "serie-c/2024:Floresta EC(186cm)"
+     "serie-c/2024:Floresta EC(186cm)",
+     "serie-c/2025:Caxias(188cm)"
     ]
    },
    {
@@ -31253,6 +31803,32 @@
     ]
    },
    {
+    "athlete_id": "ath-002999",
+    "name": "Matheuzinho",
+    "min": 165,
+    "max": 171,
+    "rows": [
+     "est-baiano/2026:Vitória(165cm)",
+     "est-baiano/2024:Vitória(165cm)",
+     "est-baiano/2025:Vitória(165cm)",
+     "est-gaucho/2022:Caxias(165cm)",
+     "est-gaucho/2023:Ypiranga Erechim(165cm)",
+     "est-gaucho/2023:EC São José(169cm)",
+     "est-gaucho/2024:EC São José(169cm)",
+     "est-goiano/2026:ABECAT Ouvidorense(169cm)",
+     "est-paulista-a3/2024:Matonense(0cm)",
+     "hub/2026:Vitória(165cm)",
+     "serie-a/2026:Vitória(165cm)",
+     "serie-a/2024:Vitória(165cm)",
+     "serie-a/2025:Vitória(165cm)",
+     "serie-b/2022:Vila Nova(171cm)",
+     "serie-b/2023:Vitória(165cm)",
+     "serie-c/2023:EC São José(169cm)",
+     "serie-c/2024:EC São José(169cm)",
+     "serie-d/2026:Brasiliense(169cm)"
+    ]
+   },
+   {
     "athlete_id": "ath-004072",
     "name": "Vicente",
     "min": 163,
@@ -31289,14 +31865,16 @@
    {
     "athlete_id": "ath-000885",
     "name": "Dudu",
-    "min": 179,
+    "min": 176,
     "max": 187,
     "rows": [
      "est-baiano/2026:Vitória(186cm)",
      "est-baiano/2024:Vitória(186cm)",
      "est-catarinense/2022:Barra(187cm)",
+     "est-catarinense/2022:Barra(182cm)",
      "est-catarinense/2022:Prospera Criciuma(179cm)",
      "est-copa-paulista/2022:Primavera SP(187cm)",
+     "est-copa-paulista/2023:Primavera SP(176cm)",
      "est-paulista-a2/2023:Primavera SP(187cm)",
      "hub/2026:Vitória(186cm)",
      "serie-a/2026:Vitória(186cm)",
@@ -31695,6 +32273,18 @@
     ]
    },
    {
+    "athlete_id": "ath-000340",
+    "name": "B. Garré",
+    "min": 172,
+    "max": 182,
+    "rows": [
+     "est-carioca/2026:Vasco da Gama(172cm)",
+     "est-mineiro/2024:América Mineiro(182cm)",
+     "serie-b/2022:Ituano(182cm)",
+     "serie-b/2024:América Mineiro(182cm)"
+    ]
+   },
+   {
     "athlete_id": "ath-003290",
     "name": "Paulo Henrique",
     "min": 170,
@@ -31725,6 +32315,7 @@
      "est-carioca/2026:Botafogo(175cm)",
      "est-carioca/2025:Botafogo(175cm)",
      "est-carioca/2025:Botafogo(182cm)",
+     "est-gaucho/2023:Juventude(176cm)",
      "est-paulista-a1/2022:Guarani(176cm)",
      "hub/2026:Botafogo(175cm)",
      "serie-a/2026:Botafogo(175cm)",
@@ -31897,6 +32488,7 @@
      "est-mineiro/2026:América Mineiro(188cm)",
      "serie-a/2022:Fluminense(177cm)",
      "serie-a/2023:Grêmio(177cm)",
+     "serie-a/2024:Grêmio(177cm)",
      "serie-a/2025:Grêmio(177cm)"
     ]
    },
@@ -31925,8 +32517,10 @@
      "est-carioca/2022:Vasco da Gama(175cm)",
      "est-cearense/2026:Floresta EC(175cm)",
      "est-cearense/2026:Fortaleza(169cm)",
+     "serie-b/2026:Fortaleza(169cm)",
      "serie-b/2022:Vasco da Gama(175cm)",
      "serie-b/2023:Sampaio Corrêa(176cm)",
+     "serie-b/2025:Goiás(173cm)",
      "serie-c/2024:Sampaio Corrêa(0cm)"
     ]
    },
@@ -32011,6 +32605,19 @@
     ]
    },
    {
+    "athlete_id": "ath-003510",
+    "name": "Raí",
+    "min": 175,
+    "max": 182,
+    "rows": [
+     "est-carioca/2023:Botafogo(175cm)",
+     "est-gaucho/2024:Novo Hamburgo(182cm)",
+     "serie-a/2023:Botafogo(175cm)",
+     "serie-b/2026:Juventude(175cm)",
+     "serie-b/2025:Volta Redonda(175cm)"
+    ]
+   },
+   {
     "athlete_id": "ath-002693",
     "name": "Luizinho",
     "min": 170,
@@ -32075,26 +32682,6 @@
      "serie-a/2023:Flamengo(188cm)",
      "serie-a/2024:Athletico Paranaense(185cm)",
      "serie-b/2026:Operário PR(185cm)"
-    ]
-   },
-   {
-    "athlete_id": "ath-004408",
-    "name": "Zé Vitor",
-    "min": 189,
-    "max": 194,
-    "rows": [
-     "est-carioca/2023:Vasco da Gama(192cm)",
-     "est-carioca/2024:Vasco da Gama(192cm)",
-     "est-mineiro/2022:América Mineiro(189cm)",
-     "est-mineiro/2023:Tombense(189cm)",
-     "est-mineiro/2024:Tombense(189cm)",
-     "est-paulista-a2/2026:Ferroviária(192cm)",
-     "serie-a/2023:Vasco da Gama(192cm)",
-     "serie-a/2024:Athletico Paranaense(194cm)",
-     "serie-a/2025:Mirassol(194cm)",
-     "serie-b/2022:Vasco da Gama(192cm)",
-     "serie-b/2023:Tombense(189cm)",
-     "serie-c/2026:Ferroviária(192cm)"
     ]
    },
    {
@@ -32347,6 +32934,18 @@
     ]
    },
    {
+    "athlete_id": "ath-003121",
+    "name": "Natanael",
+    "min": 168,
+    "max": 185,
+    "rows": [
+     "est-catarinense/2026:Joinville(168cm)",
+     "serie-c/2026:Floresta EC(185cm)",
+     "serie-c/2022:Ferroviário(185cm)",
+     "serie-c/2023:Botafogo PB(185cm)"
+    ]
+   },
+   {
     "athlete_id": "ath-000966",
     "name": "Eduardo",
     "min": 178,
@@ -32364,6 +32963,23 @@
     ]
    },
    {
+    "athlete_id": "ath-000613",
+    "name": "Cleberson",
+    "min": 169,
+    "max": 185,
+    "rows": [
+     "est-catarinense/2026:Santa Catarina(169cm)",
+     "est-catarinense/2025:Santa Catarina(169cm)",
+     "est-copa-paulista/2026:Inter de Limeira(169cm)",
+     "est-copa-paulista/2025:Inter de Limeira(169cm)",
+     "est-gaucho/2022:EC São José(169cm)",
+     "est-paulista-a1/2022:Ituano(185cm)",
+     "est-paulista-a3/2024:USAC(169cm)",
+     "serie-b/2022:Ituano(185cm)",
+     "serie-d/2026:Santa Catarina(169cm)"
+    ]
+   },
+   {
     "athlete_id": "ath-002589",
     "name": "Lucas Silva",
     "min": 176,
@@ -32374,6 +32990,21 @@
      "est-gaucho/2022:Grêmio(181cm)",
      "serie-b/2022:Grêmio(181cm)",
      "serie-d/2026:CSA(176cm)"
+    ]
+   },
+   {
+    "athlete_id": "ath-004438",
+    "name": "Rodriguinho",
+    "min": 170,
+    "max": 179,
+    "rows": [
+     "est-catarinense/2022:Chapecoense(179cm)",
+     "est-cearense/2026:Fortaleza(170cm)",
+     "est-mineiro/2026:Cruzeiro(170cm)",
+     "est-mineiro/2025:Cruzeiro(170cm)",
+     "serie-b/2026:Ponte Preta(179cm)",
+     "serie-b/2022:Chapecoense(179cm)",
+     "serie-c/2025:Confiança(179cm)"
     ]
    },
    {
@@ -32460,7 +33091,7 @@
     "athlete_id": "ath-002773",
     "name": "Marcelinho",
     "min": 169,
-    "max": 176,
+    "max": 180,
     "rows": [
      "est-catarinense/2023:Camboriú(176cm)",
      "est-catarinense/2024:Chapecoense(169cm)",
@@ -32468,7 +33099,8 @@
      "est-gaucho/2022:Ypiranga Erechim(174cm)",
      "est-paranaense/2024:Galo Maringá(176cm)",
      "serie-c/2026:Ypiranga Erechim(176cm)",
-     "serie-c/2022:Ypiranga Erechim(174cm)"
+     "serie-c/2022:Ypiranga Erechim(174cm)",
+     "serie-c/2024:Sampaio Corrêa(180cm)"
     ]
    },
    {
@@ -32486,6 +33118,22 @@
      "serie-a/2023:Coritiba(175cm)",
      "serie-b/2025:Athletic Club(175cm)",
      "serie-c/2026:Santa Cruz(175cm)"
+    ]
+   },
+   {
+    "athlete_id": "ath-004237",
+    "name": "Wellisson",
+    "min": 177,
+    "max": 184,
+    "rows": [
+     "est-catarinense/2023:Figueirense(177cm)",
+     "est-gaucho/2026:Avenida(184cm)",
+     "est-paranaense/2022:União PR(184cm)",
+     "est-paranaense/2023:Azuriz(184cm)",
+     "est-paranaense/2024:Azuriz(184cm)",
+     "est-paranaense/2025:Azuriz(184cm)",
+     "serie-c/2023:Figueirense(177cm)",
+     "serie-d/2026:Blumenau(184cm)"
     ]
    },
    {
@@ -32626,16 +33274,26 @@
     ]
    },
    {
-    "athlete_id": "ath-004438",
-    "name": "Rodriguinho",
-    "min": 170,
-    "max": 179,
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "min": 175,
+    "max": 186,
     "rows": [
-     "est-cearense/2026:Fortaleza(170cm)",
-     "est-mineiro/2026:Cruzeiro(170cm)",
-     "est-mineiro/2025:Cruzeiro(170cm)",
-     "serie-b/2022:Chapecoense(179cm)",
-     "serie-c/2025:Confiança(179cm)"
+     "est-copa-paulista/2026:XV de Piracicaba(175cm)",
+     "est-copa-paulista/2023:Portuguesa Santista(175cm)",
+     "est-copa-paulista/2025:XV de Piracicaba(175cm)",
+     "est-gaucho/2022:Ypiranga Erechim(175cm)",
+     "est-mineiro/2023:Patrocinense(175cm)",
+     "est-paulista-a1/2022:Ponte Preta(186cm)",
+     "est-paulista-a1/2024:Guarani(186cm)",
+     "est-paulista-a2/2026:XV de Piracicaba(175cm)",
+     "est-paulista-a2/2024:Portuguesa Santista(175cm)",
+     "est-paulista-a2/2025:Grêmio Prudente(175cm)",
+     "est-paulista-a3/2022:Votuporanguense(175cm)",
+     "serie-b/2022:Ponte Preta(186cm)",
+     "serie-b/2023:Ceará(186cm)",
+     "serie-b/2024:Guarani(186cm)",
+     "serie-d/2026:XV de Piracicaba(175cm)"
     ]
    },
    {
@@ -32654,6 +33312,26 @@
      "serie-a/2025:Santos(180cm)",
      "serie-b/2022:Grêmio(180cm)",
      "serie-b/2024:Santos(180cm)"
+    ]
+   },
+   {
+    "athlete_id": "ath-000851",
+    "name": "Coutinho",
+    "min": 177,
+    "max": 190,
+    "rows": [
+     "est-copa-paulista/2026:São Bento(0cm)",
+     "est-copa-paulista/2022:São Bernardo(177cm)",
+     "est-copa-paulista/2022:São Bernardo(0cm)",
+     "est-copa-paulista/2025:São Bento(0cm)",
+     "est-paraense/2026:São Raimundo(0cm)",
+     "est-paulista-a2/2026:São Bento(0cm)",
+     "est-paulista-a2/2023:São Caetano(177cm)",
+     "est-paulista-a2/2023:São Caetano(0cm)",
+     "est-paulista-a2/2024:São Bento(177cm)",
+     "est-paulista-a2/2024:São Bento(0cm)",
+     "hub/2026:São Paulo(190cm)",
+     "serie-a/2026:São Paulo(190cm)"
     ]
    },
    {
@@ -32745,6 +33423,7 @@
      "est-paranaense/2026:Maringá(180cm)",
      "est-paulista-a3/2026:Portuguesa Santista(185cm)",
      "est-paulista-a3/2023:RB Brasil(185cm)",
+     "serie-b/2026:Ponte Preta(185cm)",
      "serie-b/2023:Ceará(187cm)",
      "serie-b/2024:Ceará(187cm)"
     ]
@@ -32759,7 +33438,9 @@
      "est-gaucho/2026:Juventude(183cm)",
      "est-gaucho/2025:Internacional(183cm)",
      "est-paulista-a2/2022:Juventus(0cm)",
-     "serie-a/2022:Avaí(190cm)"
+     "serie-a/2022:Avaí(190cm)",
+     "serie-b/2026:Buriram United(188cm)",
+     "serie-b/2025:Cuiabá(188cm)"
     ]
    },
    {
@@ -32768,6 +33449,7 @@
     "min": 172,
     "max": 179,
     "rows": [
+     "est-copa-paulista/2024:Monte Azul(0cm)",
      "est-copa-paulista/2024:Monte Azul(179cm)",
      "est-paranaense/2022:Azuriz(177cm)",
      "serie-b/2023:Ceará(172cm)",
@@ -32785,6 +33467,7 @@
      "est-gaucho/2024:Ypiranga Erechim(183cm)",
      "est-gaucho/2025:Caxias(183cm)",
      "est-mineiro/2024:Tombense(171cm)",
+     "serie-b/2022:Tombense(171cm)",
      "serie-c/2023:Manaus(171cm)",
      "serie-d/2026:EC São José(171cm)"
     ]
@@ -32876,7 +33559,6 @@
      "est-paulista-a1/2022:Grêmio Novorizontino(175cm)",
      "est-paulista-a2/2023:Grêmio Novorizontino(175cm)",
      "serie-a/2024:Palmeiras(175cm)",
-     "serie-a/2025:Ceará(175cm)",
      "serie-b/2026:Grêmio Novorizontino(175cm)",
      "serie-b/2022:Grêmio Novorizontino(175cm)",
      "serie-b/2023:Grêmio Novorizontino(175cm)",
@@ -32896,22 +33578,6 @@
      "serie-c/2022:Ferroviário(187cm)",
      "serie-c/2022:Ferroviário(186cm)",
      "serie-c/2023:Volta Redonda(186cm)"
-    ]
-   },
-   {
-    "athlete_id": "ath-004409",
-    "name": "Zé Vitor",
-    "min": 182,
-    "max": 194,
-    "rows": [
-     "est-gaucho/2024:Ypiranga Erechim(182cm)",
-     "est-paranaense/2023:Operário PR(194cm)",
-     "est-paranaense/2024:Maringá(194cm)",
-     "est-paranaense/2025:Maringá(194cm)",
-     "hub/2026:Vitória(194cm)",
-     "serie-b/2022:Vasco da Gama(182cm)",
-     "serie-b/2023:Londrina(182cm)",
-     "serie-c/2024:Ypiranga Erechim(182cm)"
     ]
    },
    {
@@ -32943,11 +33609,11 @@
    {
     "athlete_id": "ath-004441",
     "name": "Vitinho",
-    "min": 169,
+    "min": 165,
     "max": 182,
     "rows": [
      "est-goiano/2026:Atlético GO(182cm)",
-     "serie-b/2026:Fortaleza(169cm)",
+     "serie-c/2022:Atlético Cearense(165cm)",
      "serie-c/2022:Atlético Cearense(0cm)"
     ]
    },
@@ -33206,6 +33872,16 @@
     ]
    },
    {
+    "athlete_id": "ath-001881",
+    "name": "Jajá",
+    "min": 177,
+    "max": 187,
+    "rows": [
+     "est-paulista-a2/2026:Água Santa(187cm)",
+     "serie-b/2022:Cruzeiro(177cm)"
+    ]
+   },
+   {
     "athlete_id": "ath-003632",
     "name": "Franco",
     "min": 174,
@@ -33364,7 +34040,6 @@
     "max": 187,
     "rows": [
      "hub/2026:Cruzeiro(187cm)",
-     "serie-b/2022:CSA(0cm)",
      "serie-c/2026:Maringá(180cm)",
      "serie-c/2025:Maringá(180cm)"
     ]
@@ -33536,6 +34211,23 @@
     ]
    },
    {
+    "athlete_id": "ath-000152",
+    "name": "Alisson",
+    "min": 1993,
+    "max": 1996,
+    "rows": [
+     "est-alagoano/2026:ASA(1995)",
+     "est-catarinense/2024:Joinville(1995)",
+     "est-gaucho/2025:Caxias(1995)",
+     "est-paulista-a2/2026:Água Santa(1995)",
+     "hub/2026:Fluminense(1993)",
+     "serie-c/2026:Confiança(1995)",
+     "serie-c/2023:Floresta EC(1994)",
+     "serie-c/2024:Floresta EC(1994)",
+     "serie-c/2025:Caxias(1996)"
+    ]
+   },
+   {
     "athlete_id": "ath-003804",
     "name": "Ruan Pablo",
     "min": 2002,
@@ -33599,7 +34291,7 @@
    {
     "athlete_id": "ath-002999",
     "name": "Matheuzinho",
-    "min": 1995,
+    "min": 1994,
     "max": 1999,
     "rows": [
      "est-baiano/2026:Vitória(1998)",
@@ -33607,6 +34299,7 @@
      "est-baiano/2025:Vitória(1997)",
      "est-gaucho/2022:Caxias(1998)",
      "est-gaucho/2023:Ypiranga Erechim(1998)",
+     "est-gaucho/2023:EC São José(1994)",
      "est-gaucho/2024:EC São José(1995)",
      "est-goiano/2026:ABECAT Ouvidorense(1995)",
      "est-paulista-a3/2024:Matonense(1998)",
@@ -33614,6 +34307,7 @@
      "serie-a/2026:Vitória(1997)",
      "serie-a/2024:Vitória(1999)",
      "serie-a/2025:Vitória(1998)",
+     "serie-b/2022:Vila Nova(1994)",
      "serie-b/2023:Vitória(1999)",
      "serie-c/2023:EC São José(1996)",
      "serie-c/2024:EC São José(1995)",
@@ -33694,8 +34388,10 @@
      "est-baiano/2026:Vitória(1999)",
      "est-baiano/2024:Vitória(1999)",
      "est-catarinense/2022:Barra(1999)",
+     "est-catarinense/2022:Barra(2001)",
      "est-catarinense/2022:Prospera Criciuma(1999)",
      "est-copa-paulista/2022:Primavera SP(1999)",
+     "est-copa-paulista/2023:Primavera SP(2001)",
      "est-paulista-a2/2023:Primavera SP(1999)",
      "hub/2026:Vitória(1999)",
      "serie-a/2026:Vitória(1999)",
@@ -33919,6 +34615,18 @@
     ]
    },
    {
+    "athlete_id": "ath-000340",
+    "name": "B. Garré",
+    "min": 1994,
+    "max": 2001,
+    "rows": [
+     "est-carioca/2026:Vasco da Gama(2001)",
+     "est-mineiro/2024:América Mineiro(1994)",
+     "serie-b/2022:Ituano(1996)",
+     "serie-b/2024:América Mineiro(1995)"
+    ]
+   },
+   {
     "athlete_id": "ath-003290",
     "name": "Paulo Henrique",
     "min": 1996,
@@ -33949,6 +34657,7 @@
      "est-carioca/2026:Botafogo(1999)",
      "est-carioca/2025:Botafogo(1999)",
      "est-carioca/2025:Botafogo(2001)",
+     "est-gaucho/2023:Juventude(1998)",
      "est-paulista-a1/2022:Guarani(1998)",
      "hub/2026:Botafogo(1999)",
      "serie-a/2026:Botafogo(1999)",
@@ -34041,16 +34750,34 @@
     ]
    },
    {
+    "athlete_id": "ath-003134",
+    "name": "Nathan",
+    "min": 1995,
+    "max": 1998,
+    "rows": [
+     "est-carioca/2022:Fluminense(1996)",
+     "est-gaucho/2024:Grêmio(1996)",
+     "est-gaucho/2025:Grêmio(1996)",
+     "est-mineiro/2026:América Mineiro(1995)",
+     "serie-a/2022:Fluminense(1997)",
+     "serie-a/2023:Grêmio(1997)",
+     "serie-a/2024:Grêmio(1998)",
+     "serie-a/2025:Grêmio(1997)"
+    ]
+   },
+   {
     "athlete_id": "ath-004153",
     "name": "Vitinho",
     "min": 2000,
-    "max": 2003,
+    "max": 2005,
     "rows": [
      "est-carioca/2022:Vasco da Gama(2000)",
      "est-cearense/2026:Floresta EC(2003)",
      "est-cearense/2026:Fortaleza(2001)",
+     "serie-b/2026:Fortaleza(2001)",
      "serie-b/2022:Vasco da Gama(2001)",
      "serie-b/2023:Sampaio Corrêa(2003)",
+     "serie-b/2025:Goiás(2005)",
      "serie-c/2024:Sampaio Corrêa(2000)"
     ]
    },
@@ -34078,6 +34805,19 @@
      "serie-b/2025:Avaí(2002)",
      "serie-c/2023:Amazonas(2000)",
      "serie-c/2025:Itabaiana(2000)"
+    ]
+   },
+   {
+    "athlete_id": "ath-003653",
+    "name": "Riquelme",
+    "min": 2002,
+    "max": 2006,
+    "rows": [
+     "est-carioca/2022:Vasco da Gama(2002)",
+     "est-copa-paulista/2023:Red Bull Bragantino(2006)",
+     "est-paulista-a3/2024:RB Bragantino II(2006)",
+     "hub/2026:Grêmio(2006)",
+     "serie-b/2022:Vasco da Gama(2004)"
     ]
    },
    {
@@ -34133,6 +34873,37 @@
      "serie-a/2022:Fluminense(2002)",
      "serie-a/2023:Fluminense(2002)",
      "serie-a/2024:Fluminense(2003)"
+    ]
+   },
+   {
+    "athlete_id": "ath-001967",
+    "name": "Joanderson",
+    "min": 1996,
+    "max": 1999,
+    "rows": [
+     "est-carioca/2022:Resende(1999)",
+     "est-carioca/2023:Resende(1999)",
+     "est-copa-paulista/2026:Noroeste(1999)",
+     "est-copa-paulista/2025:Noroeste(1999)",
+     "est-gaucho/2022:Brasil de Pelotas(1996)",
+     "est-paulista-a2/2026:Linense(1999)",
+     "est-paulista-a2/2024:Linense(1999)",
+     "est-paulista-a2/2025:Santo André(1999)",
+     "serie-c/2022:Brasil de Pelotas(1998)",
+     "serie-d/2026:CRAC(1999)"
+    ]
+   },
+   {
+    "athlete_id": "ath-003510",
+    "name": "Raí",
+    "min": 2000,
+    "max": 2003,
+    "rows": [
+     "est-carioca/2023:Botafogo(2002)",
+     "est-gaucho/2024:Novo Hamburgo(2000)",
+     "serie-a/2023:Botafogo(2003)",
+     "serie-b/2026:Juventude(2002)",
+     "serie-b/2025:Volta Redonda(2003)"
     ]
    },
    {
@@ -34224,26 +34995,6 @@
      "serie-a/2023:Flamengo(1992)",
      "serie-a/2024:Athletico Paranaense(1994)",
      "serie-b/2026:Operário PR(1992)"
-    ]
-   },
-   {
-    "athlete_id": "ath-004408",
-    "name": "Zé Vitor",
-    "min": 2001,
-    "max": 2004,
-    "rows": [
-     "est-carioca/2023:Vasco da Gama(2002)",
-     "est-carioca/2024:Vasco da Gama(2002)",
-     "est-mineiro/2022:América Mineiro(2001)",
-     "est-mineiro/2023:Tombense(2001)",
-     "est-mineiro/2024:Tombense(2001)",
-     "est-paulista-a2/2026:Ferroviária(2002)",
-     "serie-a/2023:Vasco da Gama(2004)",
-     "serie-a/2024:Athletico Paranaense(2002)",
-     "serie-a/2025:Mirassol(2001)",
-     "serie-b/2022:Vasco da Gama(2004)",
-     "serie-b/2023:Tombense(2002)",
-     "serie-c/2026:Ferroviária(2002)"
     ]
    },
    {
@@ -34387,6 +35138,18 @@
     ]
    },
    {
+    "athlete_id": "ath-003121",
+    "name": "Natanael",
+    "min": 1991,
+    "max": 1996,
+    "rows": [
+     "est-catarinense/2026:Joinville(1991)",
+     "serie-c/2026:Floresta EC(1995)",
+     "serie-c/2022:Ferroviário(1996)",
+     "serie-c/2023:Botafogo PB(1996)"
+    ]
+   },
+   {
     "athlete_id": "ath-001771",
     "name": "Italo",
     "min": 2002,
@@ -34394,6 +35157,23 @@
     "rows": [
      "est-catarinense/2026:Brusque(2006)",
      "serie-c/2025:Brusque(2002)"
+    ]
+   },
+   {
+    "athlete_id": "ath-000613",
+    "name": "Cleberson",
+    "min": 1992,
+    "max": 2003,
+    "rows": [
+     "est-catarinense/2026:Santa Catarina(2003)",
+     "est-catarinense/2025:Santa Catarina(2002)",
+     "est-copa-paulista/2026:Inter de Limeira(2003)",
+     "est-copa-paulista/2025:Inter de Limeira(2003)",
+     "est-gaucho/2022:EC São José(2002)",
+     "est-paulista-a1/2022:Ituano(1992)",
+     "est-paulista-a3/2024:USAC(2003)",
+     "serie-b/2022:Ituano(1994)",
+     "serie-d/2026:Santa Catarina(2003)"
     ]
    },
    {
@@ -34412,6 +35192,22 @@
      "serie-a/2022:Ceará(2005)",
      "serie-a/2025:Ceará(2006)",
      "serie-b/2023:Ceará(2005)"
+    ]
+   },
+   {
+    "athlete_id": "ath-001052",
+    "name": "Evandro",
+    "min": 1993,
+    "max": 1998,
+    "rows": [
+     "est-catarinense/2026:Marcílio Dias(1993)",
+     "est-catarinense/2022:Concórdia(1993)",
+     "est-catarinense/2025:Concórdia(1993)",
+     "est-copa-paulista/2023:XV de Piracicaba(1993)",
+     "est-paulista-a3/2026:Paulista(1993)",
+     "serie-b/2023:ABC(1998)",
+     "serie-c/2024:Botafogo PB(1998)",
+     "serie-c/2025:Botafogo PB(1998)"
     ]
    },
    {
@@ -34536,7 +35332,8 @@
      "est-gaucho/2022:Ypiranga Erechim(1998)",
      "est-paranaense/2024:Galo Maringá(1996)",
      "serie-c/2026:Ypiranga Erechim(1996)",
-     "serie-c/2022:Ypiranga Erechim(2000)"
+     "serie-c/2022:Ypiranga Erechim(2000)",
+     "serie-c/2024:Sampaio Corrêa(2000)"
     ]
    },
    {
@@ -34598,6 +35395,22 @@
     ]
    },
    {
+    "athlete_id": "ath-004237",
+    "name": "Wellisson",
+    "min": 1996,
+    "max": 2000,
+    "rows": [
+     "est-catarinense/2023:Figueirense(1999)",
+     "est-gaucho/2026:Avenida(1997)",
+     "est-paranaense/2022:União PR(1997)",
+     "est-paranaense/2023:Azuriz(1996)",
+     "est-paranaense/2024:Azuriz(1996)",
+     "est-paranaense/2025:Azuriz(1997)",
+     "serie-c/2023:Figueirense(2000)",
+     "serie-d/2026:Blumenau(1997)"
+    ]
+   },
+   {
     "athlete_id": "ath-000706",
     "name": "Danilo Silva",
     "min": 1992,
@@ -34629,8 +35442,10 @@
     "max": 2004,
     "rows": [
      "est-catarinense/2023:Avaí(2002)",
+     "est-catarinense/2024:Avaí(2002)",
      "est-catarinense/2025:Avaí(2002)",
      "est-gaucho/2026:EC São José(2001)",
+     "est-mineiro/2024:Itabirito(2001)",
      "serie-a/2022:Avaí(2004)",
      "serie-b/2023:Avaí(2003)",
      "serie-b/2025:Avaí(2003)",
@@ -34779,6 +35594,29 @@
     ]
    },
    {
+    "athlete_id": "ath-002417",
+    "name": "Léo Santos",
+    "min": 1996,
+    "max": 2000,
+    "rows": [
+     "est-copa-paulista/2026:XV de Piracicaba(1996)",
+     "est-copa-paulista/2023:Portuguesa Santista(1996)",
+     "est-copa-paulista/2025:XV de Piracicaba(1996)",
+     "est-gaucho/2022:Ypiranga Erechim(1996)",
+     "est-mineiro/2023:Patrocinense(1996)",
+     "est-paulista-a1/2022:Ponte Preta(1999)",
+     "est-paulista-a1/2024:Guarani(1999)",
+     "est-paulista-a2/2026:XV de Piracicaba(1996)",
+     "est-paulista-a2/2024:Portuguesa Santista(1996)",
+     "est-paulista-a2/2025:Grêmio Prudente(1996)",
+     "est-paulista-a3/2022:Votuporanguense(1996)",
+     "serie-b/2022:Ponte Preta(2000)",
+     "serie-b/2023:Ceará(2000)",
+     "serie-b/2024:Guarani(2000)",
+     "serie-d/2026:XV de Piracicaba(1996)"
+    ]
+   },
+   {
     "athlete_id": "ath-000398",
     "name": "Bruno Henrique",
     "min": 1995,
@@ -34800,11 +35638,14 @@
     "max": 2002,
     "rows": [
      "est-copa-paulista/2026:São Bento(2000)",
+     "est-copa-paulista/2022:São Bernardo(2001)",
      "est-copa-paulista/2022:São Bernardo(2000)",
      "est-copa-paulista/2025:São Bento(2000)",
      "est-paraense/2026:São Raimundo(2002)",
      "est-paulista-a2/2026:São Bento(2000)",
+     "est-paulista-a2/2023:São Caetano(2001)",
      "est-paulista-a2/2023:São Caetano(2000)",
+     "est-paulista-a2/2024:São Bento(2001)",
      "est-paulista-a2/2024:São Bento(2000)",
      "hub/2026:São Paulo(1995)",
      "serie-a/2026:São Paulo(1995)"
@@ -34879,6 +35720,39 @@
     ]
    },
    {
+    "athlete_id": "ath-001259",
+    "name": "Frank",
+    "min": 1995,
+    "max": 2001,
+    "rows": [
+     "est-copa-paulista/2023:Mirassol(2001)",
+     "est-copa-paulista/2024:Votuporanguense(2001)",
+     "est-goiano/2026:Goiatuba EC(2001)",
+     "est-paulista-a1/2022:Mirassol(2001)",
+     "est-paulista-a2/2025:Votuporanguense(2001)",
+     "est-paulista-a3/2024:Votuporanguense(2001)",
+     "serie-c/2023:América RN(1995)",
+     "serie-d/2026:Goiatuba EC(2001)"
+    ]
+   },
+   {
+    "athlete_id": "ath-002083",
+    "name": "Jonathan",
+    "min": 2002,
+    "max": 2005,
+    "rows": [
+     "est-copa-paulista/2023:Red Bull Bragantino(2003)",
+     "est-mineiro/2025:Pouso Alegre(2003)",
+     "est-mineiro/2025:Betim(2003)",
+     "est-paranaense/2026:Maringá(2003)",
+     "est-paulista-a3/2026:Portuguesa Santista(2003)",
+     "est-paulista-a3/2023:RB Brasil(2003)",
+     "serie-b/2026:Ponte Preta(2002)",
+     "serie-b/2023:Ceará(2005)",
+     "serie-b/2024:Ceará(2005)"
+    ]
+   },
+   {
     "athlete_id": "ath-004258",
     "name": "Luiz Henrique",
     "min": 1992,
@@ -34892,6 +35766,21 @@
      "serie-c/2022:Manaus(1994)",
      "serie-c/2023:Pouso Alegre(1993)",
      "serie-c/2025:Confiança(1993)"
+    ]
+   },
+   {
+    "athlete_id": "ath-003135",
+    "name": "Nathan",
+    "min": 1995,
+    "max": 2002,
+    "rows": [
+     "est-copa-paulista/2024:Juventus(2000)",
+     "est-gaucho/2026:Juventude(2002)",
+     "est-gaucho/2025:Internacional(2001)",
+     "est-paulista-a2/2022:Juventus(2000)",
+     "serie-a/2022:Avaí(2000)",
+     "serie-b/2026:Buriram United(1995)",
+     "serie-b/2025:Cuiabá(1996)"
     ]
    },
    {
@@ -34976,7 +35865,6 @@
      "est-paulista-a1/2022:Grêmio Novorizontino(2001)",
      "est-paulista-a2/2023:Grêmio Novorizontino(2001)",
      "serie-a/2024:Palmeiras(2003)",
-     "serie-a/2025:Ceará(2002)",
      "serie-b/2026:Grêmio Novorizontino(2001)",
      "serie-b/2022:Grêmio Novorizontino(2003)",
      "serie-b/2023:Grêmio Novorizontino(2003)",
@@ -35097,6 +35985,17 @@
     ]
    },
    {
+    "athlete_id": "ath-004441",
+    "name": "Vitinho",
+    "min": 2001,
+    "max": 2004,
+    "rows": [
+     "est-goiano/2026:Atlético GO(2001)",
+     "serie-c/2022:Atlético Cearense(2004)",
+     "serie-c/2022:Atlético Cearense(2001)"
+    ]
+   },
+   {
     "athlete_id": "ath-000396",
     "name": "Bruno Lopes",
     "min": 1995,
@@ -35183,6 +36082,21 @@
      "est-mineiro/2025:América Mineiro(2006)",
      "serie-b/2025:América Mineiro(2007)",
      "serie-d/2026:Lagarto(1995)"
+    ]
+   },
+   {
+    "athlete_id": "ath-002082",
+    "name": "Jonathan",
+    "min": 2004,
+    "max": 2007,
+    "rows": [
+     "est-mineiro/2026:Cruzeiro(2004)",
+     "est-mineiro/2025:Cruzeiro(2004)",
+     "serie-a/2026:Cruzeiro(2004)",
+     "serie-a/2023:América Mineiro(2006)",
+     "serie-a/2024:Cruzeiro(2005)",
+     "serie-a/2025:Cruzeiro(2005)",
+     "serie-b/2022:CSA(2007)"
     ]
    },
    {
@@ -35485,6 +36399,16 @@
     ]
    },
    {
+    "athlete_id": "ath-001881",
+    "name": "Jajá",
+    "min": 2002,
+    "max": 2006,
+    "rows": [
+     "est-paulista-a2/2026:Água Santa(2006)",
+     "serie-b/2022:Cruzeiro(2002)"
+    ]
+   },
+   {
     "athlete_id": "ath-002036",
     "name": "João Victor",
     "min": 1999,
@@ -35553,18 +36477,6 @@
     ]
    },
    {
-    "athlete_id": "ath-004462",
-    "name": "Jonathan",
-    "min": 2003,
-    "max": 2007,
-    "rows": [
-     "hub/2026:Cruzeiro(2004)",
-     "serie-b/2022:CSA(2007)",
-     "serie-c/2026:Maringá(2003)",
-     "serie-c/2025:Maringá(2004)"
-    ]
-   },
-   {
     "athlete_id": "ath-000898",
     "name": "E. Davis",
     "min": 1992,
@@ -35572,18 +36484,6 @@
     "rows": [
      "mls-next-pro/2026:Loudoun United(2006)",
      "serie-b/2024:Vila Nova(1992)"
-    ]
-   },
-   {
-    "athlete_id": "ath-004410",
-    "name": "Zé Vitor",
-    "min": 2000,
-    "max": 2003,
-    "rows": [
-     "serie-a/2026:Vitória(2000)",
-     "serie-c/2022:Vitória(2001)",
-     "serie-c/2024:Volta Redonda(2003)",
-     "serie-c/2025:Maringá(2001)"
     ]
    },
    {
@@ -36003,6 +36903,20 @@
     ]
    },
    {
+    "athlete_id": "ath-000340",
+    "person_key": "name:brenner|1995|0",
+    "names": [
+     "B. Garré",
+     "Brenner"
+    ],
+    "rows": [
+     "est-carioca/2026:B. Garré",
+     "est-mineiro/2024:Brenner",
+     "serie-b/2022:Brenner",
+     "serie-b/2024:Brenner"
+    ]
+   },
+   {
     "athlete_id": "ath-001821",
     "person_key": "name:j lavega|2005|1",
     "names": [
@@ -36156,17 +37070,13 @@
     "person_key": "name:ze gabriel|1999|0",
     "names": [
      "Davi Gabriel",
-     "Zé Gabriel",
-     "Zé Vitor"
+     "Zé Gabriel"
     ],
     "rows": [
      "est-carioca/2022:Zé Gabriel",
-     "est-carioca/2023:Zé Vitor",
      "est-carioca/2023:Zé Gabriel",
      "est-carioca/2024:Zé Gabriel",
-     "est-carioca/2025:Zé Vitor",
      "est-carioca/2025:Zé Gabriel",
-     "est-catarinense/2022:Zé Vitor",
      "est-pernambucano/2026:Davi Gabriel",
      "est-pernambucano/2026:Zé Gabriel",
      "serie-a/2023:Zé Gabriel",
@@ -36313,6 +37223,20 @@
     "rows": [
      "est-catarinense/2026:Jorginho",
      "serie-b/2022:J. Parraguez"
+    ]
+   },
+   {
+    "athlete_id": "ath-003121",
+    "person_key": "name:natan|1995|0",
+    "names": [
+     "Natan",
+     "Natanael"
+    ],
+    "rows": [
+     "est-catarinense/2026:Natanael",
+     "serie-c/2026:Natan",
+     "serie-c/2022:Natan",
+     "serie-c/2023:Natan"
     ]
    },
    {
@@ -36518,10 +37442,13 @@
     "rows": [
      "est-copa-paulista/2026:Coutinho",
      "est-copa-paulista/2022:Coutinho",
+     "est-copa-paulista/2022:Coutinho",
      "est-copa-paulista/2025:Coutinho",
      "est-paraense/2026:Coutinho",
      "est-paulista-a2/2026:Coutinho",
      "est-paulista-a2/2023:Coutinho",
+     "est-paulista-a2/2023:Coutinho",
+     "est-paulista-a2/2024:Coutinho",
      "est-paulista-a2/2024:Coutinho",
      "hub/2026:Domingos Duarte",
      "serie-a/2026:Domingos Duarte"
@@ -37257,6 +38184,17 @@
     ]
    },
    {
+    "athlete_id": "ath-000340",
+    "name": "B. Garré",
+    "with_photo": 1,
+    "rows_total": 4,
+    "missing": [
+     "est-mineiro/2024:América Mineiro",
+     "serie-b/2022:Ituano",
+     "serie-b/2024:América Mineiro"
+    ]
+   },
+   {
     "athlete_id": "ath-004446",
     "name": "Marlon",
     "with_photo": 1,
@@ -37267,12 +38205,34 @@
     ]
    },
    {
+    "athlete_id": "ath-003121",
+    "name": "Natanael",
+    "with_photo": 1,
+    "rows_total": 4,
+    "missing": [
+     "serie-c/2026:Floresta EC",
+     "serie-c/2022:Ferroviário",
+     "serie-c/2023:Botafogo PB"
+    ]
+   },
+   {
     "athlete_id": "ath-002048",
     "name": "João Vitor",
     "with_photo": 9,
     "rows_total": 10,
     "missing": [
      "serie-d/2026:Portuguesa"
+    ]
+   },
+   {
+    "athlete_id": "ath-001052",
+    "name": "Evandro",
+    "with_photo": 5,
+    "rows_total": 8,
+    "missing": [
+     "serie-b/2023:ABC",
+     "serie-c/2024:Botafogo PB",
+     "serie-c/2025:Botafogo PB"
     ]
    },
    {
@@ -37317,15 +38277,6 @@
   ],
   "homonym-collision": [
    {
-    "league": "est-carioca",
-    "season": "2024",
-    "name": "pablo",
-    "athlete_ids": [
-     "ath-003234",
-     "ath-003235"
-    ]
-   },
-   {
     "league": "est-mineiro",
     "season": "2024",
     "name": "juninho",
@@ -37342,15 +38293,6 @@
     "athlete_ids": [
      "ath-003314",
      "ath-003317"
-    ]
-   },
-   {
-    "league": "est-paulista-a1",
-    "season": "2022",
-    "name": "rafinha",
-    "athlete_ids": [
-     "ath-003495",
-     "ath-003497"
     ]
    },
    {
@@ -37376,15 +38318,6 @@
    },
    {
     "league": "est-paulista-a1",
-    "season": "2024",
-    "name": "ronald",
-    "athlete_ids": [
-     "ath-003782",
-     "ath-003783"
-    ]
-   },
-   {
-    "league": "est-paulista-a1",
     "season": "2026",
     "name": "joao vitor",
     "athlete_ids": [
@@ -37404,33 +38337,6 @@
     ]
    },
    {
-    "league": "est-paulista-a2",
-    "season": "2022",
-    "name": "joao vitor",
-    "athlete_ids": [
-     "ath-002045",
-     "ath-004450"
-    ]
-   },
-   {
-    "league": "est-paulista-a2",
-    "season": "2025",
-    "name": "paulinho",
-    "athlete_ids": [
-     "ath-003280",
-     "ath-003282"
-    ]
-   },
-   {
-    "league": "est-paulista-a2",
-    "season": "2026",
-    "name": "vitinho",
-    "athlete_ids": [
-     "ath-004147",
-     "ath-004151"
-    ]
-   },
-   {
     "league": "est-paulista-a3",
     "season": "2025",
     "name": "joao vitor",
@@ -37447,33 +38353,6 @@
      "ath-000883",
      "ath-000884",
      "ath-000885"
-    ]
-   },
-   {
-    "league": "hub",
-    "season": "2026",
-    "name": "joao vitor",
-    "athlete_ids": [
-     "ath-002046",
-     "ath-004448"
-    ]
-   },
-   {
-    "league": "hub",
-    "season": "2026",
-    "name": "lucas silva",
-    "athlete_ids": [
-     "ath-002591",
-     "ath-003432"
-    ]
-   },
-   {
-    "league": "hub",
-    "season": "2026",
-    "name": "paulinho",
-    "athlete_ids": [
-     "ath-003278",
-     "ath-003280"
     ]
    },
    {
@@ -37580,7 +38459,7 @@
     "name": "marlon",
     "athlete_ids": [
      "ath-002860",
-     "ath-002861",
+     "ath-002862",
      "ath-004446"
     ]
    },
@@ -37660,7 +38539,7 @@
     "season": "2024",
     "name": "marlon",
     "athlete_ids": [
-     "ath-002861",
+     "ath-002862",
      "ath-004446"
     ]
    },
@@ -37811,25 +38690,8 @@
     "name": "ferreira",
     "athlete_ids": [
      "ath-001231",
+     "ath-001233",
      "ath-001234"
-    ]
-   },
-   {
-    "league": "serie-b",
-    "season": "2022",
-    "name": "joao paulo",
-    "athlete_ids": [
-     "ath-002008",
-     "ath-002013"
-    ]
-   },
-   {
-    "league": "serie-b",
-    "season": "2022",
-    "name": "jonathan",
-    "athlete_ids": [
-     "ath-002081",
-     "ath-004462"
     ]
    },
    {
@@ -37912,6 +38774,16 @@
    {
     "league": "serie-b",
     "season": "2023",
+    "name": "caique",
+    "athlete_ids": [
+     "ath-000497",
+     "ath-000498",
+     "ath-000500"
+    ]
+   },
+   {
+    "league": "serie-b",
+    "season": "2023",
     "name": "luiz otavio",
     "athlete_ids": [
      "ath-002682",
@@ -37964,7 +38836,8 @@
     "name": "juninho",
     "athlete_ids": [
      "ath-002153",
-     "ath-002154"
+     "ath-002154",
+     "ath-004428"
     ]
    },
    {
@@ -38013,6 +38886,7 @@
     "season": "2025",
     "name": "nathan",
     "athlete_ids": [
+     "ath-003135",
      "ath-003137",
      "ath-003139",
      "ath-004469"
@@ -38056,6 +38930,7 @@
      "ath-002152",
      "ath-002154",
      "ath-002155",
+     "ath-004428",
      "ath-004429"
     ]
    },
@@ -38084,6 +38959,7 @@
     "season": "2026",
     "name": "nathan",
     "athlete_ids": [
+     "ath-003135",
      "ath-003136",
      "ath-003139"
     ]
@@ -38104,7 +38980,8 @@
     "name": "rai",
     "athlete_ids": [
      "ath-003508",
-     "ath-003509"
+     "ath-003509",
+     "ath-003510"
     ]
    },
    {
@@ -38112,8 +38989,8 @@
     "season": "2026",
     "name": "vitinho",
     "athlete_ids": [
+     "ath-004153",
      "ath-004154",
-     "ath-004441",
      "ath-004477"
     ]
    },
@@ -38218,6 +39095,15 @@
    {
     "league": "serie-c",
     "season": "2024",
+    "name": "gabriel lima",
+    "athlete_ids": [
+     "ath-001331",
+     "ath-004458"
+    ]
+   },
+   {
+    "league": "serie-c",
+    "season": "2024",
     "name": "gabriel silva",
     "athlete_ids": [
      "ath-001367",
@@ -38233,15 +39119,6 @@
      "ath-003677",
      "ath-003679",
      "ath-003680"
-    ]
-   },
-   {
-    "league": "serie-c",
-    "season": "2024",
-    "name": "ze vitor",
-    "athlete_ids": [
-     "ath-004409",
-     "ath-004410"
     ]
    },
    {
@@ -38336,6 +39213,16 @@
    {
     "league": "serie-c",
     "season": "2026",
+    "name": "juninho",
+    "athlete_ids": [
+     "ath-002151",
+     "ath-002157",
+     "ath-004428"
+    ]
+   },
+   {
+    "league": "serie-c",
+    "season": "2026",
     "name": "marquinhos",
     "athlete_ids": [
      "ath-002871",
@@ -38349,7 +39236,8 @@
     "name": "vitinho",
     "athlete_ids": [
      "ath-004149",
-     "ath-004151"
+     "ath-004151",
+     "ath-004155"
     ]
    }
   ]
