@@ -3,7 +3,7 @@ import { ScoutTopbar } from "@/components/ScoutTopbar";
 import { getMeta } from "@/lib/data.server";
 import type { LeagueId } from "@/lib/leagues";
 import { leaguePath } from "@/lib/leagues";
-import { elencosPath } from "@/lib/elencosApp";
+import { ELENCOS_ORIGIN } from "@/lib/elencosApp";
 import { POSITION_FAMILIES } from "@/lib/positions";
 
 const SECTIONS = [
@@ -39,7 +39,7 @@ export function LeagueHomeMain({ leagueId }: { leagueId: LeagueId }) {
             </Link>
             <Link
               className="home-cta home-cta-ghost"
-              href={elencosPath(leagueId, "/elenco")}
+              href={ELENCOS_ORIGIN}
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -85,6 +85,13 @@ Audit (etapa 5) cobre a camada: `name-divergence` (nomes divergentes sem
 override → fila de sugestão), `photo-coverage` (foto em parte das linhas),
 `photo-mismatch` (foto provadamente alheia).
 
+`scripts/disambiguate_names.py` (`--apply`) — desambigua **apresentação** de
+homônimos confirmados: para cada atleta em `homonym-collision`, grava
+`display_name` usando o nome curto do TM quando difere do cru ("Nathan" →
+"Nathan Pelae"), senão qualificador estável "Nome (posição)" /
+"Nome (posição, n.AAAA)" / "Nome (clube)" — nunca inventa sobrenome e nunca
+usa âncora disputada. Depois rode build_people + apply_athlete_ids.
+
 ## xProgressão (`xprog`)
 
 `python scripts/apply_xprog.py` — após rebuilds de dados (junto de

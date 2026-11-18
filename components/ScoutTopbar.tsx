@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { SiteLogo } from "@/components/SiteLogo";
 import { useLeagueOptional } from "@/components/LeagueProvider";
 import { getLeague, leaguePath, LEAGUES, type LeagueInfo } from "@/lib/leagues";
-import { elencosPath } from "@/lib/elencosApp";
+import { ELENCOS_ORIGIN } from "@/lib/elencosApp";
 import { hasSeasonArchive, isBrasileiraoLeague, withSeasonQuery } from "@/lib/seasons";
 
 const NAV_SCOUT = [
@@ -67,7 +67,8 @@ export function ScoutTopbar({ active, subnav, hubMode = false }: Props) {
 
   function navHref(item: { key: string; path: string; global: boolean; anywhere?: boolean }) {
     if (item.global) return item.path;
-    if (SQUAD_KEYS.has(item.key)) return elencosPath(league?.leagueId ?? "serie-a", item.path);
+    // Elencos: sempre a mesma URL de entrada — o app dedicado decide a liga.
+    if (SQUAD_KEYS.has(item.key)) return ELENCOS_ORIGIN;
     if (hubMode || !league) return item.anywhere ? item.path : "/";
     return league.href(item.path);
   }

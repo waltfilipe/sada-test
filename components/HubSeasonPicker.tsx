@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { BRASILEIRAO_LEAGUES, type LeagueId } from "@/lib/leagues";
-import { elencosPath } from "@/lib/elencosApp";
+import { ELENCOS_ORIGIN } from "@/lib/elencosApp";
 import { ESTADUAIS_LEVELS } from "@/lib/estaduaisHub";
 import { POSITION_FAMILIES } from "@/lib/positions";
 import {
@@ -551,7 +551,7 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
             {FEATURES.map((feature, index) => (
               <Link
                 key={feature.title}
-                href={feature.elencos ? elencosPath("serie-a", feature.path) : leagueHref("serie-a", feature.path)}
+                href={feature.elencos ? ELENCOS_ORIGIN : leagueHref("serie-a", feature.path)}
                 target={feature.elencos ? "_blank" : undefined}
                 rel={feature.elencos ? "noopener noreferrer" : undefined}
                 className="hb-product"
@@ -609,7 +609,7 @@ export function HubSeasonPicker({ data }: { data: HubData }) {
             Escale clubes, revise temporadas anteriores e monte times sombra com alvos por posição — tudo no app
             dedicado de elencos.
           </p>
-          <Link href={elencosPath("serie-a", "/elenco")} className="hb-cta" target="_blank" rel="noopener noreferrer">
+          <Link href={ELENCOS_ORIGIN} className="hb-cta" target="_blank" rel="noopener noreferrer">
             Começar
           </Link>
           <Link href={leagueHref("serie-a", "/comparar")} className="hb-more">
